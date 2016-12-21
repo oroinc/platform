@@ -26,7 +26,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator       = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator       = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->enumSynchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
             ->disableOriginalConstructor()
             ->getMock();
@@ -208,7 +208,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->will($this->returnValue($dataType));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(false));
@@ -240,7 +240,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->will($this->returnValue($dataType));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
@@ -333,7 +333,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldName')
             ->will($this->returnValue($fieldName));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
@@ -404,7 +404,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->will($this->returnValue($dataType));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
@@ -479,9 +479,9 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     protected function getFormEventMock($configModel, $form = null)
     {
         if (!$form) {
-            $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+            $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         }
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $form->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($formConfig));

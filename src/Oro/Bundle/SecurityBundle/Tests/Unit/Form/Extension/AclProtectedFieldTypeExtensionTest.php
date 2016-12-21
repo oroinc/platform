@@ -230,7 +230,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $form->add('street');
         $form->add('country');
 
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $builder = new FormBuilder('postoffice', null, $dispatcher, $this->factory);
         $builder->setPropertyPath(new PropertyPath('zip'));
         $builder->setAttribute('error_mapping', array());

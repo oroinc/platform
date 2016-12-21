@@ -144,7 +144,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -152,7 +152,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createAutoResponseManagerMock()
     {
-        return $this->getMock(AutoResponseManager::class, [], [], '', false);
+        return $this->createMock(AutoResponseManager::class);
     }
 
     /**
@@ -160,7 +160,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineMock()
     {
-        return $this->getMock(Registry::class, [], [], '', false);
+        return $this->createMock(Registry::class);
     }
 
     /**
@@ -168,7 +168,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityRepositoryMock()
     {
-        return $this->getMock(EntityRepository::class, [], [], '', false);
+        return $this->createMock(EntityRepository::class);
     }
 
     /**
@@ -176,6 +176,6 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

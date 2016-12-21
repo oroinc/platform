@@ -9,8 +9,7 @@ Dependencies
 "zendframework/zend-mail": "2.1.5"
 
 Notes:
-- We cannot use more recent version of zend-mail because *besimple/soap* uses it as well and requires 2.1.* version.
-- Also we have to use version 2.1.5 due an issue with *binary* content transfer encoding in version 2.1.6.
+- We have to use version 2.1.5 due an issue with *binary* content transfer encoding in version 2.1.6.
 
 
 Usage

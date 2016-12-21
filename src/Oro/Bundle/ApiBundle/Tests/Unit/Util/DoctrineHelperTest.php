@@ -16,7 +16,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
     public function testIsManageableEntityClassShouldBeCached()
     {
         $entityClass = 'Test\Entity';
-        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($entityClass)
@@ -31,7 +31,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
     public function testIsManageableEntityClassShouldBeCachedEvenForNotManageableEntity()
     {
         $entityClass = 'Test\Entity';
-        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($entityClass)
@@ -159,8 +159,8 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         $entityId = 123;
         $entity = new Entity\CompositeKeyEntity();
 
-        $this->setExpectedException(
-            '\InvalidArgumentException',
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage(
             sprintf(
                 'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
                 $entityId,
@@ -176,8 +176,8 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
 
-        $this->setExpectedException(
-            '\InvalidArgumentException',
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The entity "%s" does not have the "title1" property.',
                 get_class($entity)

@@ -111,7 +111,7 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $data = new WorkflowData();
         $data->set('foo', 'bar');
 
-        $serializer = $this->getMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
+        $serializer = $this->createMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
         $serializer->expects($this->once())->method('deserialize')
             ->with($serializedData, 'Oro\Bundle\WorkflowBundle\Model\WorkflowData', 'json')
             ->will($this->returnValue($data));

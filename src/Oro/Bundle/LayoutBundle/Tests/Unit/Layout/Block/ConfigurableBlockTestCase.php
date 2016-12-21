@@ -166,8 +166,8 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
      */
     protected function assertSetOptionException($object)
     {
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage(
             'Option setting "test" not supported. Supported settings is [default, required]'
         );
         $object->setOptionsConfig(['test' => ['test' => 'value']]);

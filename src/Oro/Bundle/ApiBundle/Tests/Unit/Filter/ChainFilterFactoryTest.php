@@ -10,15 +10,15 @@ class ChainFilterFactoryTest extends \PHPUnit_Framework_TestCase
     public function testChainFactory()
     {
         $chainFactory = new ChainFilterFactory();
-        $childFactory1 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
-        $childFactory2 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $childFactory1 = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $childFactory2 = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
         $chainFactory->addFilterFactory($childFactory1);
         $chainFactory->addFilterFactory($childFactory2);
 
-        $knownFilter1 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
-        $knownFilter2 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
-        $knownFilter31 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
-        $knownFilter32 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $knownFilter1 = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $knownFilter2 = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $knownFilter31 = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $knownFilter32 = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
 
         $childFactory1->expects($this->any())
             ->method('createFilter')

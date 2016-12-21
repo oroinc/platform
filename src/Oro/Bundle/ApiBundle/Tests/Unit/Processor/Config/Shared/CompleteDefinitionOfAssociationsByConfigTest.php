@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociationsByConfig;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
@@ -79,7 +81,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
 
         $this->context->setExtras(
             [
-                $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
+                $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
                 new TestConfigSection('test_section')
             ]
         );
@@ -213,7 +215,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
 
         $this->context->setExtras(
             [
-                $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
+                $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
                 new TestConfigSection('test_section')
             ]
         );
@@ -224,19 +226,24 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
             ->willReturn(
                 [
                     'association1'     => [
-                        'targetEntity' => 'Test\Association1Target'
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
                     ],
                     'association2'     => [
-                        'targetEntity' => 'Test\Association2Target'
+                        'targetEntity' => 'Test\Association2Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
                     ],
                     'association3'     => [
-                        'targetEntity' => 'Test\Association3Target'
+                        'targetEntity' => 'Test\Association3Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
                     ],
                     'association4'     => [
-                        'targetEntity' => 'Test\Association4Target'
+                        'targetEntity' => 'Test\Association4Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
                     ],
                     'realAssociation5' => [
-                        'targetEntity' => 'Test\Association5Target'
+                        'targetEntity' => 'Test\Association5Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
                     ],
                 ]
             );
@@ -318,6 +325,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     'association2' => [
                         'exclusion_policy' => 'all',
                         'target_class'     => 'Test\Association2Target',
+                        'target_type'      => 'to-one',
                         'fields'           => [
                             'id' => null
                         ],
@@ -326,6 +334,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                     'association3' => [
                         'exclusion_policy' => 'all',
                         'target_class'     => 'Test\Association3Target',
+                        'target_type'      => 'to-one',
                         'collapse'         => true,
                         'fields'           => [
                             'id' => null
@@ -338,6 +347,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                         'property_path'    => 'realAssociation5',
                         'exclusion_policy' => 'all',
                         'target_class'     => 'Test\Association5Target',
+                        'target_type'      => 'to-one',
                         'collapse'         => true,
                         'fields'           => [
                             'id' => null

@@ -37,10 +37,10 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->scheduleClass = Schedule::class;
-        $this->objectManager = $this->getMock(ObjectManager::class);
+        $this->objectManager = $this->createMock(ObjectManager::class);
 
         $this->deferredScheduler = new DeferredScheduler($this->scheduleManager, $this->registry, $this->scheduleClass);
     }
@@ -115,7 +115,7 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
         $foundMatchedSchedule = (new Schedule())->setArguments(['--arg1=string', '--arg2=42']);
         $foundNonMatchedSchedule = (new Schedule())->setArguments(['--arg2=string', '--arg2=41']);
 
-        $repository = $this->getMock(ObjectRepository::class);
+        $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->once())
             ->method('findBy')
             ->with(['command' => 'oro:test:command', 'definition' => '* * * * *'])
@@ -149,7 +149,8 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
             ->with($this->scheduleClass)
             ->willReturn(null);
 
-        $this->setExpectedException('InvalidArgumentException', 'Please provide manageable schedule entity class');
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('Please provide manageable schedule entity class');
 
         $this->deferredScheduler->flush();
     }

@@ -662,20 +662,24 @@ define(function(require) {
             if (this.firstRun || method === undefined || !method) {
                 method = 'get';
             }
-            var options = {
-                url: url,
-                type: method
-            };
-            if (data !== undefined) {
-                options.data = data;
-            }
-            options.data = (options.data !== undefined ? options.data + '&' : '') +
-                '_widgetContainer=' + this.options.type + '&_wid=' + this.getWid();
+            var options = this.prepareContentRequestOptions(data, method, url);
 
             this.trigger('beforeContentLoad', this);
             this.loading = $.ajax(options)
                 .done(_.bind(this._onContentLoad, this))
                 .fail(_.bind(this._onContentLoadFail, this));
+        },
+
+        prepareContentRequestOptions: function(data, method, url) {
+            var options = {
+                url: url,
+                type: method,
+                data: data === void 0 ? '' : data + '&'
+            };
+
+            options.data += '_widgetContainer=' + this.options.type + '&_wid=' + this.getWid();
+
+            return options;
         },
 
         /**

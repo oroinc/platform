@@ -5,8 +5,10 @@ namespace Oro\Bundle\EmailBundle\Api\Processor\GetSubresource;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterHelper;
-use Oro\Bundle\ApiBundle\Model\EntityDescriptor;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySuggestionApiEntityManager;
 
 class LoadEmailSuggestions implements ProcessorInterface
@@ -42,8 +44,22 @@ class LoadEmailSuggestions implements ProcessorInterface
             $filterHelper->getPageSize(),
             (bool)$filterHelper->getBooleanFilterValue('exclude-current-user')
         );
+        $titlePropertyPath = null;
+        if (!$context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME)) {
+            $titlePropertyPath = ConfigUtil::getPropertyPathOfMetaProperty(
+                LoadTitleMetaProperty::TITLE_META_PROPERTY_NAME,
+                $context->getConfig()
+            );
+        }
         foreach ($data['result'] as $item) {
-            $suggestions[] = new EntityDescriptor($item['id'], $item['entity'], $item['title']);
+            $suggestion = new EntityIdentifier($item['id'], $item['entity']);
+            if ($titlePropertyPath) {
+                $suggestion->setAttribute($titlePropertyPath, $item['title']);
+            }
+            $suggestions[] = $suggestion;
+        }
+        if ($titlePropertyPath) {
+            $context->setProcessed(LoadTitleMetaProperty::OPERATION_NAME);
         }
         $context->setResult($suggestions);
     }

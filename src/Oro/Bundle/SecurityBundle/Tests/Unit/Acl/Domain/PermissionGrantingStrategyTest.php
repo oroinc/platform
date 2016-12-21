@@ -92,7 +92,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $configProvider->expects($this->any())->method('hasConfig')->willReturn(false);
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
             ->will(
@@ -156,7 +156,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $this->rsid = new RoleSecurityIdentity('TestRole');
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue($user));
@@ -286,7 +286,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testIsGrantedCallsAuditLoggerOnGrant()
     {
-        $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->createMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
         $logger
             ->expects($this->once())
             ->method('logIfNeeded');
@@ -301,7 +301,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testIsGrantedCallsAuditLoggerOnDeny()
     {
-        $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->createMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
         $logger
             ->expects($this->once())
             ->method('logIfNeeded');

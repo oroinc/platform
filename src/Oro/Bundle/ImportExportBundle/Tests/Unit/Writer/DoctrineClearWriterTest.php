@@ -15,7 +15,7 @@ class DoctrineClearWriterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $registry */
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->once())
             ->method('getManager')
             ->willReturn($entityManager);

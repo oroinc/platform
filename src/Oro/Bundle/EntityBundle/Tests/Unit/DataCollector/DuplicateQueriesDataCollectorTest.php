@@ -41,9 +41,9 @@ class DuplicateQueriesDataCollectorTest extends \PHPUnit_Framework_TestCase
             $this->collector->addLogger($loggerName, $logger);
         }
         /** @var Request $request */
-        $request = $this->getMock(Request::class);
+        $request = $this->createMock(Request::class);
         /** @var Response $response */
-        $response = $this->getMock(Response::class);
+        $response = $this->createMock(Response::class);
         $this->collector->collect($request, $response);
         $this->assertEquals($expectedCount, $this->collector->getQueriesCount());
         $this->assertEquals($expectedIdentical, $this->collector->getIdenticalQueries());

@@ -18,7 +18,7 @@ class MappingDriverChainTest extends \PHPUnit_Framework_TestCase
     public function testTransientCache()
     {
         /** @var MappingDriver|\PHPUnit_Framework_MockObject_MockObject $mappingDriver */
-        $mappingDriver = $this->getMock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
+        $mappingDriver = $this->createMock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
         $mappingDriver->expects($this->once())->method('isTransient')->willReturn(true);
 
         $this->chain->addDriver($mappingDriver, '\stdClass');

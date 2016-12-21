@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation\Type;
@@ -18,21 +16,18 @@ class Result extends ArrayCollection
     protected $query;
 
     /**
-     * @Soap\ComplexType("int")
      * @Type("integer")
      * @var integer
      */
     protected $recordsCount;
 
     /**
-     * @Soap\ComplexType("int")
      * @Type("integer")
      * @var integer
      */
     protected $count;
 
     /**
-     * @Soap\ComplexType("Oro\Bundle\SearchBundle\Query\Result\Item[]")
      * @var Result\Item[]
      */
     protected $elements;

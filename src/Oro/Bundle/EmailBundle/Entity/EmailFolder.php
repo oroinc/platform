@@ -10,8 +10,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Oro\Bundle\EmailBundle\Model\FolderType;
 
 /**
@@ -49,7 +47,6 @@ class EmailFolder
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $name;
@@ -58,7 +55,6 @@ class EmailFolder
      * @var string
      *
      * @ORM\Column(name="full_name", type="string", length=255)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $fullName;
@@ -67,7 +63,6 @@ class EmailFolder
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=10)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $type;
@@ -76,7 +71,6 @@ class EmailFolder
      * @var bool
      *
      * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
-     * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
     protected $syncEnabled = false;

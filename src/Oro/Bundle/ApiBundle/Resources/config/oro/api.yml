@@ -16,6 +16,8 @@ api:
                     data_type: string
             # this entity does not have own Data API resource
             actions: false
+
+        # @deprecated since 2.0. Use Oro\Bundle\ApiBundle\Model\EntityIdentifier instead
         Oro\Bundle\ApiBundle\Model\EntityDescriptor:
             identifier_field_names: [id]
             disable_fieldset: true

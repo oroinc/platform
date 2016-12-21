@@ -39,7 +39,7 @@ class RouteExistsTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->router = $this->getMock(RouterInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
         $this->router->expects($this->any())
             ->method('getRouteCollection')
             ->willReturn($this->routeCollection);

@@ -37,7 +37,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
             ->with('oro_login', 'routes')
             ->willReturn(false);
 
-        $request = $this->getMock(Request::class);
+        $request = $this->createMock(Request::class);
         $request->method('get')->with('_route')->willReturn('oro_login');
         /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
@@ -55,7 +55,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
             ->with('oro_login', 'routes')
             ->willReturn(true);
 
-        $request = $this->getMock(Request::class);
+        $request = $this->createMock(Request::class);
         $request->method('get')->with('_route')->willReturn('oro_login');
         /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();
@@ -73,7 +73,7 @@ class RequestListenerTest extends \PHPUnit_Framework_TestCase
             ->with('oro_login', 'routes')
             ->willReturn(false);
 
-        $request = $this->getMock(Request::class);
+        $request = $this->createMock(Request::class);
         $request->method('get')->with('_route')->willReturn('oro_login');
         /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(GetResponseEvent::class)->disableOriginalConstructor()->getMock();

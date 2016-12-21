@@ -80,6 +80,7 @@ define([
                 this._elements().each(function() {
                     setValue($(this), '');
                 });
+                this.element.trigger('after-reset');
             }
             this._updateActions();
             this.changed = false;
@@ -88,6 +89,9 @@ define([
         _onSaveItem: function(e) {
             var attrs;
             e.preventDefault();
+
+            this.element.trigger('before-save');
+
             if (!this._validate()) {
                 return;
             }

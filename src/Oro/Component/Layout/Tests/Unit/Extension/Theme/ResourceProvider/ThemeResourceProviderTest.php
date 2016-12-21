@@ -29,7 +29,7 @@ class ThemeResourceProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->loader = $this->getMock(LayoutUpdateLoaderInterface::class);
+        $this->loader = $this->createMock(LayoutUpdateLoaderInterface::class);
         $this->blockViewCache = $this->getMockBuilder(BlockViewCache::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -140,7 +140,7 @@ class ThemeResourceProviderTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var Cache|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(Cache::class);
+        $cache = $this->createMock(Cache::class);
         $cache->expects($this->exactly(2))
             ->method('save');
 

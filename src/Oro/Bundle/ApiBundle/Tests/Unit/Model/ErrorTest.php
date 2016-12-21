@@ -98,7 +98,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $error->setTitle(new Label('title'));
         $error->setDetail(new Label('detail'));
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->at(0))
             ->method('trans')
             ->with('title')
@@ -117,7 +117,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
     {
         $error = new Error();
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->never())
             ->method('trans');
 

@@ -41,7 +41,7 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->em              = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->entity  = new Integration();
         $this->handler = new IntegrationHandler($this->request, $this->form, $this->em, $this->eventDispatcher);
     }
@@ -177,7 +177,7 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
     public function eventDataProvider()
     {
         $newIntegration = new Integration();
-        $newOwner   = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $newOwner   = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $idProperty = new \ReflectionProperty('Oro\Bundle\IntegrationBundle\Entity\Channel', 'id');
         $idProperty->setAccessible(true);
@@ -185,7 +185,7 @@ class IntegrationHandlerTest extends \PHPUnit_Framework_TestCase
         $oldIntegration = new Integration();
         $idProperty->setValue($oldIntegration, 100);
 
-        $someOwner           = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $someOwner           = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $oldIntegrationWithOwner = clone $oldIntegration;
         $oldIntegrationWithOwner->setDefaultUserOwner($someOwner);
 

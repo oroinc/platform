@@ -11,7 +11,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     }
 
     public function testHasConfig()

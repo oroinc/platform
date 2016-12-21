@@ -34,7 +34,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
             ->setMethods(['getOrganization'])
             ->getMock();
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
         $user->expects($this->any())
             ->method('getOrganization')

@@ -12,13 +12,12 @@
         "oro/attachment-bundle": "dev-master",
         "oro/user-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
-        "oro/workflow-bundle": "dev-master",
+        "oro/workflow-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\EmailBundle": "" }
     },
     "target-dir": "Oro/Bundle/EmailBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

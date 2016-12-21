@@ -34,12 +34,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMock(TranslatorInterface::class);
-        $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->extension = new ActionExtension(
             $this->container,

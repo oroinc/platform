@@ -39,7 +39,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     {
         if (null === self::$container) {
             self::$container = new Container();
-            self::$messageCollector = new MessageCollector($this->getMock(MessageProducerInterface::class));
+            self::$messageCollector = new MessageCollector($this->createMock(MessageProducerInterface::class));
             self::$container->set('oro_message_queue.test.message_collector', self::$messageCollector);
         }
     }

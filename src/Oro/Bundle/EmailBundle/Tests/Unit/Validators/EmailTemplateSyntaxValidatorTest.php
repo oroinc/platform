@@ -46,7 +46,7 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->context = $this
-            ->getMock('Symfony\Component\Validator\ExecutionContextInterface');
+            ->createMock('Symfony\Component\Validator\ExecutionContextInterface');
 
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()

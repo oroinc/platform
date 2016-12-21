@@ -47,8 +47,8 @@ class IntegrationAwareDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function inputDataProvider()
     {
-        $emptyContext = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $emptyContext = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->any())
             ->method('hasOption')
             ->with('channel')

@@ -29,7 +29,7 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
         $tokenizer->addNormalizer(new Pgsql92CommandArgsNormalizer());
 
         $this->filter = new CommandWithArgsFilter(
-            $this->getMock('Symfony\Component\Form\FormFactoryInterface'),
+            $this->createMock('Symfony\Component\Form\FormFactoryInterface'),
             new FilterUtility(),
             $tokenizer
         );
@@ -43,13 +43,13 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
     {
         $paramCounter = 0;
 
-        $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $qb = new QueryBuilder($em);
-        $ds = $this->getMock(
-            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
-            ['generateParameterName', 'getDatabasePlatform'],
-            [$qb]
-        );
+        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
+            ->setMethods(['generateParameterName', 'getDatabasePlatform'])
+            ->setConstructorArgs([$qb])
+            ->getMock();
+
         $ds->expects($this->any())
             ->method('generateParameterName')
             ->willReturnCallback(

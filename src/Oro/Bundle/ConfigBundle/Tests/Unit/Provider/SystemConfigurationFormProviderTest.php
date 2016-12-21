@@ -123,7 +123,8 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
      */
     public function testExceptions($filename, $exception, $message, $method, $arguments)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
         $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/' . $filename);
         call_user_func_array(array($provider, $method), $arguments);
     }
@@ -299,7 +300,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
         $subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(array('__construct'))
             ->disableOriginalConstructor()->getMock();
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $formType       = new FormType($subscriber, $container);
         $formFieldType  = new FormFieldType();

@@ -67,7 +67,7 @@ class AbstractEnumFixtureTest extends \PHPUnit_Framework_TestCase
             ->method('createEnumValue')
             ->with(self::VALUE_2, 2, false, self::ID_2);
 
-        $objectManagerMock = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManagerMock = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $objectManagerMock
             ->expects($this->any())
             ->method('getRepository')

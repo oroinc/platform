@@ -112,8 +112,8 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessDatasourceNotORM()
     {
         $config = DatagridConfiguration::create([]);
-        $dataSource = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
-        $dataSource->expects($this->never())->method('getQueryBuilder');
+        $dataSource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        $dataSource->expects($this->never())->method($this->anything());
         $this->processor->processDatasource($dataSource, [], $config);
     }
 }

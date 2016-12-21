@@ -42,11 +42,11 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->factory = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->factory = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()
             ->getMock();
@@ -120,7 +120,7 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $item = $this->getMock('Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface');
+        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface');
         $this->factory->expects($this->once())
             ->method('createItem')
             ->with($type, array())

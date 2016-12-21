@@ -41,17 +41,17 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configurationBuilder = $this->getMock(
+        $this->configurationBuilder = $this->createMock(
             'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder'
         );
 
-        $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
-        $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->definitionClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition';
 
-        $this->logger = $this->getMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->processDefinitionsConfigurator = new ProcessDefinitionsConfigurator(
             $this->configurationBuilder,

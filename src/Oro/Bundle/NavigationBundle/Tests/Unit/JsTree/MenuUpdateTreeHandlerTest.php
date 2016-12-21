@@ -28,7 +28,7 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->factory = new MenuFactory();
 

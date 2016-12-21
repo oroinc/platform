@@ -88,8 +88,8 @@ class TagSubscriberTest extends \PHPUnit_Framework_TestCase
     public function entityProvider()
     {
         return array(
-            'instance of taggable' => array($this->getMock('Oro\Bundle\TagBundle\Entity\Taggable'), 1),
-            'another entity'       => array($this->getMock('Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Entity'), false),
+            'instance of taggable' => array($this->createMock('Oro\Bundle\TagBundle\Entity\Taggable'), 1),
+            'another entity' => array($this->createMock('Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Entity'), false),
         );
     }
 }

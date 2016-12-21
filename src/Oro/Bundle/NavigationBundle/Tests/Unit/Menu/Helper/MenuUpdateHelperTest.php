@@ -27,8 +27,8 @@ class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->translator = $this->getMock(TranslatorInterface::class);
-        $this->localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $this->helper = new MenuUpdateHelper($this->translator, $this->localizationHelper);
     }
@@ -105,7 +105,8 @@ class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
         $message .= ' "undefinedNames()", "isUndefinedNames()", "hasUndefinedNames()", "__get()" exist and have public';
         $message .= ' access in class "Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub".';
 
-        $this->setExpectedException(NoSuchPropertyException::class, $message);
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage($message);
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'undefined_name', 'string');
     }

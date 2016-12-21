@@ -40,7 +40,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
 
         $user = $this->getUser();
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
         $user->expects($this->any())
             ->method('getOrganization')
@@ -260,7 +260,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         if (isset($data['refreshToken'])) {
             $userEmailOrigin->setRefreshToken($data['refreshToken']);
         }
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $userEmailOrigin->setOrganization($organization);
 
         $userEmailOrigin->setOwner($this->getUser());
