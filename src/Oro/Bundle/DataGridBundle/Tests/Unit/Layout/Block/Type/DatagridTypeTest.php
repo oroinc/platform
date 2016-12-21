@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
@@ -108,6 +106,9 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->getBlockView(new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testBuildBlock()
     {
         /** @var DatagridConfiguration|\PHPUnit_Framework_MockObject_MockObject $gridConfig */
