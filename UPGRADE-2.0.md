@@ -854,6 +854,13 @@ placeholders:
 - The command `oro:email:flag-sync` (class `Oro\Bundle\EmailBundle\Command\EmailFlagSyncCommand`) was removed. Produce message to the topic `oro.email.sync_email_seen_flag` instead.
 - The command `oro:email-attachment:purge` (class `Oro\Bundle\EmailBundle\Command\PurgeEmailAttachmentCommand`) was removed. Produce message to the topic `oro.email.purge_email_attachments` instead.
 - The command `oro:email:update-email-owner-associations` (class `Oro/Bundle/EmailBundle/Command/UpdateEmailOwnerAssociationsCommand`) was removed. Produce message to the topic `oro.email.update_email_owner_association` or `oro.email.update_email_owner_associations` instead.
+- Added `Oro\Bundle\EmailBundle\Form\Model\SmtpSettings` value object.
+- Added `Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory` for creating value objects from the request for now.
+- Added `Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker` service `oro_email.mailer.checker.smtp_settings`, used to check connection with a given `SmptSettings` value object.
+- Added `Oro\Bundle\EmailBundle\Form\Handler\EmailConfigurationHandler` which triggers `Oro\Bundle\EmailBundle\Event\SmtpSettingsSaved`.
+- Added `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction`.
+- Added `Oro\Bundle\EmailBundle\Mailer\DirectMailer::afterPrepareSmtpTransport`.
+- Added `Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider` to get smtp settings from configuration.
 
 ####EntityBundle
 - Added possibility to define
