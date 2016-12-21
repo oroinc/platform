@@ -90,6 +90,12 @@ This is association type is used to associate an entity with one of each possibl
 This is association type is used to associate an entity with many target entities of the same association kind: e.g. an Email can be associated with many Accounts and many Contacts
 
 
+Association kind
+----------------
+
+Any type of association can have an additional attribute named as "Association Kind". This attribute is optional and can be used to distinguish between different associations of the same type. E.g. an entity may have several many-to-one associations and in this case each association should have its own Association Kind. Actually Association Kind is a string and it is included in names of methods related to an association. The following sections describe it in more detail for each type of association.
+
+
 Configure many-to-one associations
 ----------------------------------
 
@@ -381,12 +387,12 @@ class ExtendEmail
      *
      * The real implementation of this method is auto generated.
      *
-     * @param string $targetClass The class name of the target entity
+     * @param string|null $targetClass The class name of the target entity
      * @return object[]
      */
-    public function getActivityTargets($targetClass)
+    public function getActivityTargets($targetClass = null)
     {
-        return null;
+        return [];
     }
 
     /**

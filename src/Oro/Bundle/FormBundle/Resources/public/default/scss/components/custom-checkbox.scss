@@ -11,9 +11,7 @@
             ~ .custom-checkbox__icon {
                 color: get-color('ui', 'focus');
 
-                &:before {
-                    content: '#{$checkbox-icon-checked-code}';
-                }
+                @include fa-icon($checkbox-icon-checked);
             }
         }
     }
@@ -22,14 +20,15 @@
         color: get-color('additional', 'middle');
 
         &:before {
-            content: '#{$checkbox-icon-unchecked-code}';
-
             display: inline-block;
 
-            font-family: $checkbox-icon-font;
+            min-width: $checkbox-icon-min-width;
+
             font-size: 17px;
             line-height: 1;
         }
+
+        @include fa-icon($checkbox-icon-unchecked);
     }
 
     &__text {

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 
+use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -163,5 +164,70 @@ class ExtendedAssociationFilterTest extends \PHPUnit_Framework_TestCase
 
         $criteria = new Criteria();
         $this->filter->apply($criteria, $filterValue);
+    }
+
+    public function testApplyFilterWithManyToManyAssociation()
+    {
+        $filterValue = new FilterValue('target.users', '123');
+        $requestType = new RequestType([RequestType::REST]);
+        $associationOwnerClass = 'Test\OwnerClass';
+        $associationType = 'manyToMany';
+        $associationKind = 'test';
+
+        $this->filter->setField('target');
+        $this->filter->setRequestType($requestType);
+        $this->filter->setAssociationOwnerClass($associationOwnerClass);
+        $this->filter->setAssociationType($associationType);
+        $this->filter->setAssociationKind($associationKind);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('users', DataType::ENTITY_CLASS, self::identicalTo($requestType))
+            ->willReturn('Test\User');
+        $this->associationManager->expects(self::once())
+            ->method('getAssociationTargets')
+            ->with($associationOwnerClass, null, $associationType, $associationKind)
+            ->willReturn(['Test\User' => 'userField', 'Test\Another' => 'anotherField']);
+
+        $criteria = new Criteria();
+        $this->filter->apply($criteria, $filterValue);
+
+        $this->assertEquals(
+            new Comparison('userField', 'MEMBER OF', '123'),
+            $criteria->getWhereExpression()
+        );
+    }
+
+    public function testApplyFilterWithManyToManyAssociationAndNotOperator()
+    {
+        $filterValue = new FilterValue('target.users', '123', '!=');
+        $requestType = new RequestType([RequestType::REST]);
+        $associationOwnerClass = 'Test\OwnerClass';
+        $associationType = 'manyToMany';
+        $associationKind = 'test';
+
+        $this->filter->setField('target');
+        $this->filter->setRequestType($requestType);
+        $this->filter->setAssociationOwnerClass($associationOwnerClass);
+        $this->filter->setAssociationType($associationType);
+        $this->filter->setAssociationKind($associationKind);
+        $this->filter->setSupportedOperators(['=', '!=']);
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with('users', DataType::ENTITY_CLASS, self::identicalTo($requestType))
+            ->willReturn('Test\User');
+        $this->associationManager->expects(self::once())
+            ->method('getAssociationTargets')
+            ->with($associationOwnerClass, null, $associationType, $associationKind)
+            ->willReturn(['Test\User' => 'userField', 'Test\Another' => 'anotherField']);
+
+        $criteria = new Criteria();
+        $this->filter->apply($criteria, $filterValue);
+
+        $this->assertEquals(
+            new CompositeExpression('NOT', [new Comparison('userField', 'MEMBER OF', '123')]),
+            $criteria->getWhereExpression()
+        );
     }
 }

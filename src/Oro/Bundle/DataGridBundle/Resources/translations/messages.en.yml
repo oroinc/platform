@@ -63,6 +63,9 @@ oro:
             gridview_edit_public:
                 label: Unshare grid view
                 description: Unshare custom grid views
+            gridview_export:
+                label: Export grid view
+                description: Export data from Grid view
 
         system_configuration:
             groups:
