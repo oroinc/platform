@@ -77,17 +77,15 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider isApplicableDataProvider
      *
-     * @param Operation $operation
      * @param ActionData $actionData
+     * @param Operation $operation
      * @param bool $expected
      */
-    public function testIsApplicable(Operation $operation = null, ActionData $actionData, $expected)
+    public function testIsApplicable(ActionData $actionData, Operation $operation = null, $expected = false)
     {
         $this->registry->expects($this->once())
             ->method('findByName')
-            ->with(
-                DeleteMassActionExtension::OPERATION_NAME
-            )
+            ->with(DeleteMassActionExtension::OPERATION_NAME)
             ->willReturn($operation);
 
         $context = [
@@ -141,19 +139,17 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         return [
             [
-                'operation' => null,
                 'actionData' => $actionData,
-                'expected' => false,
+                'operation' => null
             ],
             [
+                'actionData' => $actionData,
                 'operation' => $operationAvailable,
-                'actionData' => $actionData,
-                'expected' => true
+                'expected' => true,
             ],
             [
-                'operation' => $operationNotAvailable,
                 'actionData' => $actionData,
-                'expected' => false
+                'operation' => $operationNotAvailable
             ]
         ];
     }

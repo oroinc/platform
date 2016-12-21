@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Controller;
 
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,8 +40,7 @@ class AjaxController extends Controller
         $message = '';
 
         try {
-            $registry = $this->getOperationRegistry();
-            $operation = $registry->findByName($operationName);
+            $operation = $this->getOperationRegistry()->findByName($operationName);
 
             if (!$operation instanceof Operation || !$operation->isAvailable($data)) {
                 throw new OperationNotFoundException($operationName);
@@ -57,7 +55,7 @@ class AjaxController extends Controller
             $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        if (!empty($e)) {
+        if (isset($e)) {
             $message = $e->getMessage();
         }
 

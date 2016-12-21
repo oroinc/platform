@@ -110,7 +110,9 @@ class OperationFormHandler
             $data = $this->handleError($data, $e, $flashBag);
         }
 
-        $data['form'] = $form->createView();
+        if (isset($form)) {
+            $data['form'] = $form->createView();
+        }
         $data['context'] = $actionData->getValues();
 
         return $data;

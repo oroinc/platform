@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActionBundle\Controller;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,15 +41,9 @@ class WidgetController extends Controller
     {
         $handler = $this->get('oro_action.form.handler.operation_button');
 
-        $flashBag = $this->get('session')->getFlashBag();
+        $result = $handler->process($operationName, $request, $this->get('session')->getFlashBag());
 
-        $result = $handler->process($operationName, $request, $flashBag);
-
-        if ($result instanceof Response) {
-            return $result;
-        }
-
-        return $this->render($this->getFormTemplate($result), $result);
+        return $result instanceof Response ? $result : $this->render($this->getFormTemplate($result), $result);
     }
 
     /**
