@@ -12,6 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\ApiBundle\Form\ReflectionUtil;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 
 abstract class AbstractRelationshipMapper implements DataMapperInterface
 {
@@ -91,12 +92,42 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
         PropertyPathInterface $propertyPath
     ) {
         $dataValue = $this->propertyAccessor->getValue($data, $propertyPath);
-        if ($dataValue instanceof Collection && 1 === $propertyPath->getLength()) {
+        if ($this->useAdderAndRemover($dataValue, $formField, $propertyPath)) {
             // a collection valued property
             $this->mapDataToCollectionFormField($data, $formField, $propertyPath);
         } else {
             $formField->setData($dataValue);
         }
+    }
+
+    /**
+     * Checks whether adder and remover should be used instead of setter.
+     *
+     * @param                       $dataValue
+     * @param FormInterface         $formField
+     * @param PropertyPathInterface $propertyPath
+     *
+     * @return bool
+     */
+    protected function useAdderAndRemover($dataValue, FormInterface $formField, PropertyPathInterface $propertyPath)
+    {
+        if (1 !== $propertyPath->getLength()) {
+            return false;
+        }
+
+        if ($dataValue instanceof Collection) {
+            return true;
+        }
+
+        // Force using of adder and remover for to-many associations.
+        // It's especially important for extended associations because in this case a getter returns
+        // an array rather than Collection.
+        $metadata = $formField->getConfig()->getOption('metadata');
+        if ($metadata instanceof AssociationMetadata && $metadata->isCollection()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -122,7 +153,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
             return;
         }
 
-        if ($dataValue instanceof Collection && 1 === $propertyPath->getLength()) {
+        if ($this->useAdderAndRemover($dataValue, $formField, $propertyPath)) {
             // a collection valued property
             $this->mapCollectionFormFieldToData($data, $formField, $propertyPath);
         } elseif (!$formFieldConfig->getByReference() || $formData !== $dataValue) {

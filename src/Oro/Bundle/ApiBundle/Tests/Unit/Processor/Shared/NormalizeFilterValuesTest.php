@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
@@ -36,9 +40,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
     public function testProcess()
     {
-        $filters       = $this->context->getFilters();
+        $filters = $this->context->getFilters();
         $integerFilter = new ComparisonFilter('integer');
-        $stringFilter  = new ComparisonFilter('string');
+        $stringFilter = new ComparisonFilter('string');
         $filters->add('id', $integerFilter);
         $filters->add('label', $stringFilter);
 
@@ -66,5 +70,43 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $this->assertEquals(1, $filterValues->get('id')->getValue());
         $this->assertTrue(is_string($filterValues->get('label')->getValue()));
         $this->assertEquals('test', $filterValues->get('label')->getValue());
+
+        $this->assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessForInvalidDataType()
+    {
+        $filters = $this->context->getFilters();
+        $integerFilter = new ComparisonFilter('integer');
+        $filters->add('id', $integerFilter);
+
+        $exception = new \UnexpectedValueException('invalid data type');
+
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request->expects($this->once())
+            ->method('getQueryString')
+            ->willReturn('id=invalid');
+        $filterValues = new RestFilterValueAccessor($request);
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('invalid', 'integer', $this->context->getRequestType(), false)
+            ->willThrowException($exception);
+
+        $this->context->setFilterValues($filterValues);
+        $this->processor->process($this->context);
+
+        $this->assertEquals('invalid', $filterValues->get('id')->getValue());
+
+        $this->assertEquals(
+            [
+                Error::createByException($exception)
+                    ->setStatusCode(Response::HTTP_BAD_REQUEST)
+                    ->setSource(ErrorSource::createByParameter('id'))
+            ],
+            $this->context->getErrors()
+        );
     }
 }
