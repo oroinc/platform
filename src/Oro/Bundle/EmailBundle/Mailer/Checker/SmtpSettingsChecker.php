@@ -23,16 +23,16 @@ class SmtpSettingsChecker
     /**
      * @param SmtpSettings $smtpSettings
      *
-     * @return bool|string
+     * @return string
      */
     public function checkConnection(SmtpSettings $smtpSettings)
     {
-        $error = false;
+        $error = '';
         $this->directMailer->afterPrepareSmtpTransport($smtpSettings);
 
         try {
             $this->directMailer->getTransport()->start();
-        } catch (\Exception $e) {
+        } catch (\Swift_TransportException $e) {
             $error = $e->getMessage();
         }
 
