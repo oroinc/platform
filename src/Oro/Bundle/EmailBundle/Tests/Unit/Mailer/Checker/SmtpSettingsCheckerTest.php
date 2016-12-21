@@ -50,7 +50,7 @@ class SmtpSettingsCheckerTest extends \PHPUnit_Framework_TestCase
         $this->mailerTransport->expects($this->once())
             ->method('start');
 
-        $this->assertFalse($this->smtpSettingsChecker->checkConnection($this->smtpSettings));
+        $this->assertEmpty($this->smtpSettingsChecker->checkConnection($this->smtpSettings));
     }
 
     public function testCheckConnectionWithError()
@@ -63,7 +63,7 @@ class SmtpSettingsCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getTransport')
             ->will($this->returnValue($this->mailerTransport));
 
-        $exception = new \Exception('Test exception message');
+        $exception = new \Swift_TransportException('Test exception message');
 
         $this->mailerTransport->expects($this->once())
             ->method('start')
