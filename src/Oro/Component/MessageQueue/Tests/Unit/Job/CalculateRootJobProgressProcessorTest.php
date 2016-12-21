@@ -1,17 +1,18 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Job\CalculateRootJobProgressProcessor;
-use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
-use Oro\Component\MessageQueue\Job\CalculateRootJobProgressService;
 use Psr\Log\LoggerInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Job\Topics;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Job\CalculateRootJobProgressProcessor;
+use Oro\Component\MessageQueue\Job\RootJobProgressCalculator;
+use Oro\Component\MessageQueue\Job\Topics;
+use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobStorage;
 
 class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +20,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $calculateRootJobProgressProcessor = new CalculateRootJobProgressProcessor(
             $this->createJobStorageMock(),
-            $this->createCalculateRootJobProgressServiceMock(),
+            $this->createRootJobProgressCalculatorMock(),
             $this->createMessageProducerMock(),
             $this->createLoggerMock()
         );
@@ -54,7 +55,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new CalculateRootJobProgressProcessor(
             $this->createJobStorageMock(),
-            $this->createCalculateRootJobProgressServiceMock(),
+            $this->createRootJobProgressCalculatorMock(),
             $this->createMessageProducerMock(),
             $logger
         );
@@ -89,7 +90,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new CalculateRootJobProgressProcessor(
             $jobStorage,
-            $this->createCalculateRootJobProgressServiceMock(),
+            $this->createRootJobProgressCalculatorMock(),
             $this->createMessageProducerMock(),
             $logger
         );
@@ -126,16 +127,16 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('11111')
         ;
 
-        $calculateProgressService = $this->createCalculateRootJobProgressServiceMock();
-        $calculateProgressService
+        $rootJobProgressCalculator = $this->createRootJobProgressCalculatorMock();
+        $rootJobProgressCalculator
             ->expects($this->once())
-            ->method('calculateRootJobProgress')
+            ->method('calculate')
             ->with($this->identicalTo($job))
         ;
 
         $processor = new CalculateRootJobProgressProcessor(
             $jobStorage,
-            $calculateProgressService,
+            $rootJobProgressCalculator,
             $this->createMessageProducerMock(),
             $logger
         );
@@ -161,11 +162,11 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|CalculateRootJobProgressService
+     * @return \PHPUnit_Framework_MockObject_MockObject|RootJobProgressCalculator
      */
-    private function createCalculateRootJobProgressServiceMock()
+    private function createRootJobProgressCalculatorMock()
     {
-        return $this->getMock(CalculateRootJobProgressService::class, [], [], '', false);
+        return $this->getMock(RootJobProgressCalculator::class, [], [], '', false);
     }
 
     /**

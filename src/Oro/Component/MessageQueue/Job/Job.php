@@ -70,7 +70,7 @@ class Job
     protected $data;
 
     /**
-     * @var decimal
+     * @var float
      */
     protected $jobProgress;
 
@@ -327,6 +327,7 @@ class Job
     {
         $this->childJobs[] = $childJob;
     }
+
     /**
      * @return array
      */
@@ -344,7 +345,7 @@ class Job
     }
 
     /**
-     * @return decimal
+     * @return float
      */
     public function getJobProgress()
     {
@@ -352,7 +353,7 @@ class Job
     }
 
     /**
-     * @param decimal $jobProgress
+     * @param float $jobProgress
      */
     public function setJobProgress($jobProgress)
     {

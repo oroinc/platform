@@ -268,10 +268,7 @@ class JobProcessor
      */
     protected function sendRecalculateJobProgressMessage($job)
     {
-        $message = new Message();
-        $message->setBody(['jobId' => $job->getId()]);
-        $message->setPriority(MessagePriority::HIGH);
-
+        $message = new Message(['jobId' => $job->getId()], MessagePriority::HIGH);
         $this->producer->send(Topics::CALCULATE_ROOT_JOB_PROGRESS, $message);
     }
 }

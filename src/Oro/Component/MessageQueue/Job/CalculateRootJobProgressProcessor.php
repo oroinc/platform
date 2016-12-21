@@ -1,13 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class CalculateRootJobProgressProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -17,9 +18,9 @@ class CalculateRootJobProgressProcessor implements MessageProcessorInterface, To
     private $jobStorage;
 
     /**
-     * @var CalculateRootJobProgressService
+     * @var RootJobProgressCalculator
      */
-    private $calculateRootJobProgressService;
+    private $rootJobProgressCalculator;
 
     /**
      * @var MessageProducerInterface
@@ -33,18 +34,18 @@ class CalculateRootJobProgressProcessor implements MessageProcessorInterface, To
 
     /**
      * @param JobStorage $jobStorage
-     * @param CalculateRootJobProgressService $calculateRootJobProgressService
+     * @param RootJobProgressCalculator $rootJobProgressCalculator
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
      */
     public function __construct(
         JobStorage $jobStorage,
-        CalculateRootJobProgressService $calculateRootJobProgressService,
+        RootJobProgressCalculator $rootJobProgressCalculator,
         MessageProducerInterface $producer,
         LoggerInterface $logger
     ) {
         $this->jobStorage = $jobStorage;
-        $this->calculateRootJobProgressService = $calculateRootJobProgressService;
+        $this->rootJobProgressCalculator = $rootJobProgressCalculator;
         $this->producer = $producer;
         $this->logger = $logger;
     }
@@ -75,7 +76,7 @@ class CalculateRootJobProgressProcessor implements MessageProcessorInterface, To
             return self::REJECT;
         }
 
-        $this->calculateRootJobProgressService->calculateRootJobProgress($job);
+        $this->rootJobProgressCalculator->calculate($job);
 
         return self::ACK;
     }

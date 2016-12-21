@@ -2,12 +2,13 @@
 namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Component\MessageQueue\Job\Schema as UniqueJobSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInterface
 {
@@ -78,7 +79,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
             'notnull' => false,
             'comment' => '(DC2Type:json_array)',
         ]);
-        $table->addColumn('job_progress', 'decimal', ['notnull' => false, 'precision' => 5, 'scale' => 2]);
+        $table->addColumn('job_progress', 'percent', ['notnull' => false, 'precision' => 0]);
         $table->addForeignKeyConstraint(
             $table,
             ['root_job_id'],

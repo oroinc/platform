@@ -36,7 +36,7 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_message_queue.job.calculate_root_job_progress_service:
-        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobProgressService'
+        class: 'Oro\Component\MessageQueue\Job\RootJobProgressCalculator'
         arguments:
             - '@oro_message_queue.job.storage'
 

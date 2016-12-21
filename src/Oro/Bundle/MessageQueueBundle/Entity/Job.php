@@ -100,9 +100,9 @@ class Job extends BaseJob
     protected $data;
 
     /**
-     * @var array
+     * @var float
      *
-     * @ORM\Column(name="job_progress", type="decimal", precision=5, scale=2, nullable=true)
+     * @ORM\Column(name="job_progress", type="percent", nullable=true)
      */
     protected $jobProgress;
 
@@ -114,7 +114,7 @@ class Job extends BaseJob
     }
 
     /**
-     * @return float|int
+     * @return int
      */
     public function getCalculateRootJobProgress()
     {
@@ -125,10 +125,7 @@ class Job extends BaseJob
             return 0;
         }
         foreach ($children as $child) {
-            if ($child->getStatus() == self::STATUS_FAILED &&
-                $child->getStatus() == self::STATUS_CANCELLED &&
-                $child->getStatus() == self::STATUS_SUCCESS
-            ) {
+            if ($child->getStatus() != self::STATUS_NEW && $child->getStatus() != self::STATUS_RUNNING) {
                 $processed++;
             }
         }

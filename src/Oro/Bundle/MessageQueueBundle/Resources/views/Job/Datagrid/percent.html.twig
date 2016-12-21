@@ -2,17 +2,21 @@
 {% set percent = job.calculateRootJobProgress|default(0) %}
 
 {% if job.status == constant('STATUS_FAILED', job) %}
-    {% set classOfBar = 'danger'%}
+    {% set classOfBar = 'label-warning'%}
 {% elseif job.status == constant('STATUS_CANCELLED', job) %}
-    {% set classOfBar = 'warning'%}
+    {% set classOfBar = 'label-inverse'%}
+{% elseif job.status == constant('STATUS_RUNNING', job) %}
+    {% set classOfBar = 'label-info'%}
+{% elseif job.status is constant('STATUS_CANCELLED', job) %}
+    {% set class = 'label-inverse' %}
 {% elseif job.jobProgress == 100 %}
-    {% set classOfBar = 'success'%}
+    {% set classOfBar = 'label-success'%}
 {% else %}
-    {% set classOfBar = 'info' %}
+    {% set classOfBar = '' %}
 {% endif %}
 
-<div class="progress">
-    <div class="progress-bar progress-bar-{{ classOfBar }}" style="width:{{ job.jobProgress }}%; ">
-        {{ job.jobProgress }}%
+<div class="progress job-progress">
+    <div class="label {{ classOfBar }}" style="width:{{ job.jobProgress }}%;">
+        <span> {{ job.jobProgress }}%</span>
     </div>
 </div>
