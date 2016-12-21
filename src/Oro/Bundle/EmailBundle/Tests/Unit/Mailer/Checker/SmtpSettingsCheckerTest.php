@@ -40,7 +40,7 @@ class SmtpSettingsCheckerTest extends \PHPUnit_Framework_TestCase
     public function testCheckConnectionWithNoError()
     {
         $this->directMailer->expects($this->once())
-            ->method('postPrepareSmtpTransport')
+            ->method('afterPrepareSmtpTransport')
             ->with($this->smtpSettings);
 
         $this->directMailer->expects($this->once())
@@ -56,7 +56,7 @@ class SmtpSettingsCheckerTest extends \PHPUnit_Framework_TestCase
     public function testCheckConnectionWithError()
     {
         $this->directMailer->expects($this->once())
-            ->method('postPrepareSmtpTransport')
+            ->method('afterPrepareSmtpTransport')
             ->with($this->smtpSettings);
 
         $this->directMailer->expects($this->once())

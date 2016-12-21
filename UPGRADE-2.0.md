@@ -781,7 +781,7 @@ placeholders:
 - Added `Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker` service `oro_email.mailer.checker.smtp_settings`, used to check connection with a given `SmptSettings` value object.
 - Added `Oro\Bundle\EmailBundle\Form\Handler\EmailConfigurationHandler` which triggers `Oro\Bundle\EmailBundle\Event\SmtpSettingsSaved`.
 - Added `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction`.
-- Added `Oro\Bundle\EmailBundle\Mailer\DirectMailer::postPrepareSmtpTransport`.
+- Added `Oro\Bundle\EmailBundle\Mailer\DirectMailer::afterPrepareSmtpTransport`.
 - Added `Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider` to get smtp settings from configuration.
 
 ####EntityBundle
