@@ -50,7 +50,6 @@ class EmailController extends Controller
 {
     /**
      * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection")
-     * @AclAncestor("oro_config_system")
      */
     public function checkSmtpConnectionAction(Request $request)
     {
