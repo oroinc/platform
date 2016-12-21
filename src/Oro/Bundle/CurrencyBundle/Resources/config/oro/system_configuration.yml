@@ -13,7 +13,7 @@ system_configuration:
             type: oro_currency
             priority: 30
             options:
-                label: oro.currency.system_configuration.fields.default_currency.lable
+                label: oro.currency.system_configuration.fields.default_currency.label
                 tooltip: oro.locale.form.tooltip.currency
                 required: true
                 multiple: false
