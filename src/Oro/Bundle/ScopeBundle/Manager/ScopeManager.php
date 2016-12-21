@@ -74,6 +74,17 @@ class ScopeManager
     /**
      * @param $scopeType
      * @param null $context
+     * @return array
+     */
+    public function findMostSuitable($scopeType, $context = null)
+    {
+        $criteria = $this->getCriteria($scopeType, $context);
+        return $this->getScopeRepository()->findMostSuitable($criteria);
+    }
+
+    /**
+     * @param $scopeType
+     * @param null $context
      * @return BufferedQueryResultIterator|\Oro\Bundle\ScopeBundle\Entity\Scope[]
      */
     public function findBy($scopeType, $context = null)
