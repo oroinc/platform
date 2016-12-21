@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\TestFrameworkBundle\Test\Stub\CallableStub;
 
 class ButtonProviderTest extends \PHPUnit_Framework_TestCase
@@ -139,11 +140,12 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function getButton($order = 1)
     {
-        $button = $this->getMock(ButtonInterface::class);
-        $buttonContext = new ButtonContext();
-        $button->expects($this->any())->method('getOrder')->willReturn($order);
-        $button->expects($this->any())->method('getButtonContext')->willReturn($buttonContext);
-
-        return $button;
+        return new StubButton(
+            [
+                'order' => $order,
+                'templateData' => ['additionalData' => []],
+                'buttonContext' => new ButtonContext()
+            ]
+        );
     }
 }

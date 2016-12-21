@@ -15,9 +15,11 @@ use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -269,10 +271,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                             'action3',
                             true,
                             ['data' => ['key1' => 'value1']],
-                            [
-                                'getLabel' => 'Action 3 label',
-                                'getTemplateData' => ['additionalData' => ['key1' => 'value1']]
-                            ]
+                            'Action 3 label'
                         )
                     ]
                 ),
@@ -398,8 +397,8 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 4]),
                 'buttonCollection' => $this->createButtonsCollection(
                     [
-                        $this->createButton('action1', true, ['getOrder' => 1]),
-                        $this->createButton('action3', false, ['getOrder' => 2])
+                        $this->createButton('action1', true, ['order' => 1]),
+                        $this->createButton('action3', false, ['order' => 2])
                     ]
                 ),
                 'expectedActions' => [
@@ -425,8 +424,8 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 4]),
                 'buttonCollection' => $this->createButtonsCollection(
                     [
-                        $this->createButton('action1', true, ['getOrder' => 1]),
-                        $this->createButton('action3', false, ['getOrder' => 2])
+                        $this->createButton('action1', true, ['order' => 1]),
+                        $this->createButton('action3', false, ['order' => 2])
                     ]
                 ),
                 'expectedActions' => [
@@ -459,43 +458,44 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @param bool $isAvailable
      * @param array $extraData
-     * @param string $class
      *
      * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createButton($name, $isAvailable = true, array $extraData = [], $class = ButtonInterface::class)
+    protected function createButton($name, $isAvailable = true, array $extraData = [])
     {
         $buttonContext = new ButtonContext();
         $buttonContext->setEnabled($isAvailable);
 
-        /** @var $button ButtonInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $button = $this->getMockBuilder($class)->disableOriginalConstructor()->getMock();
-        $button->expects($this->any())->method('getName')->willReturn($name);
-        if (!array_key_exists('getTemplateData', $extraData)) {
-            $button->expects($this->any())->method('getTemplateData')->willReturn(['additionalData' => []]);
-        }
-        $button->expects($this->any())->method('getButtonContext')->willReturn($buttonContext);
-
-        foreach ($extraData as $method => $data) {
-            $button->expects($this->any())->method($method)->willReturn($data);
-        }
-
-        return $button;
+        return new StubButton(
+            array_merge(
+                [
+                    'name' => $name,
+                    'templateData' => ['additionalData' => []],
+                    'buttonContext' => $buttonContext
+                ],
+                $extraData
+            )
+        );
     }
 
     /**
      * @param string $name
      * @param bool $isAvailable
      * @param array $datagridOptions
-     * @param array $extraData
+     * @param string $label
      * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createOperationButton($name, $isAvailable, array $datagridOptions, array $extraData = [])
+    protected function createOperationButton($name, $isAvailable, array $datagridOptions = [], $label = null)
     {
-        $button = $this->createButton($name, $isAvailable, $extraData, OperationButton::class);
-        $button->expects($this->any())->method('getOperation')->willReturn($this->createOperation($datagridOptions));
+        $buttonContext = new ButtonContext();
+        $buttonContext->setEnabled($isAvailable);
 
-        return $button;
+        return new OperationButton(
+            $name,
+            $this->createOperation($datagridOptions, $label),
+            $buttonContext,
+            new ActionData()
+        );
     }
 
     /**
@@ -522,11 +522,13 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $datagridOptions
+     * @param string $label
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createOperation(array $datagridOptions)
+    protected function createOperation(array $datagridOptions, $label = null)
     {
         $definition = $this->getMockBuilder(OperationDefinition::class)->disableOriginalConstructor()->getMock();
+        $definition->expects($this->any())->method('getLabel')->willReturn($label);
         $definition->expects($this->any())->method('getDatagridOptions')->willReturn($datagridOptions);
 
         $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
