@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Utils;
 
+use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Component\Testing\Unit\EntityTrait;
+
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
@@ -10,6 +13,7 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 
 class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
     use MenuItemTestTrait;
 
     /** @var MenuUpdateHelper|\PHPUnit_Framework_MockObject_MockObject */
@@ -148,5 +152,13 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $item = $menu->getChild('item-1');
 
         $this->assertEquals(null, MenuUpdateUtils::getItemExceededMaxNestingLevel($menu, $item));
+    }
+
+    public function testGenerateKey()
+    {
+        $menuName = 'application_menu';
+        $scope = $this->getEntity(Scope::class, ['id' => 1]);
+
+        $this->assertEquals('application_menu_1', MenuUpdateUtils::generateKey($menuName, $scope));
     }
 }
