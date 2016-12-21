@@ -21,7 +21,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
@@ -43,7 +43,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             [],
             [],
@@ -70,7 +70,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
@@ -106,7 +106,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
@@ -137,7 +137,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
@@ -176,7 +176,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
@@ -213,7 +213,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
@@ -262,12 +262,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         ];
         $bundles = [TestBundle1::class];
 
-        $this->setExpectedException(CircularReferenceException::class);
+        $this->expectException(CircularReferenceException::class);
 
         $ignoreCache = true;
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,
@@ -295,12 +295,12 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         ];
         $bundles = [TestBundle1::class];
 
-        $this->setExpectedException(CircularReferenceException::class);
+        $this->expectException(CircularReferenceException::class);
 
         $ignoreCache = true;
         $config = new FeatureToggleConfiguration();
         /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMock(CacheProvider::class);
+        $cache = $this->createMock(CacheProvider::class);
         $configurationProvider = new ConfigurationProvider(
             $configuration,
             $bundles,

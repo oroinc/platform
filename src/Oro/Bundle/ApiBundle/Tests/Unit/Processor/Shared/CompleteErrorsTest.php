@@ -19,7 +19,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $this->errorCompleter = $this->getMock('Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface');
+        $this->errorCompleter = $this->createMock('Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface');
 
         $this->processor = new CompleteErrors($this->errorCompleter);
     }

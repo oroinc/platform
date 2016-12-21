@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Component\PhpUtils\PhpIniUtil;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 
 class PlatformUpdateCommand extends AbstractCommand
 {
@@ -45,6 +45,8 @@ class PlatformUpdateCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->checkSuggestedMemory($output);
+
         $force = $input->getOption('force');
 
         if ($force) {
@@ -109,6 +111,18 @@ class PlatformUpdateCommand extends AbstractCommand
             $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+        }
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    protected function checkSuggestedMemory(OutputInterface $output)
+    {
+        $minimalSuggestedMemory = 1 * pow(1024, 3);
+        $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
+        if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
+            $output->writeln('<comment>We recommend at least 1Gb to be available for PHP CLI</comment>');
         }
     }
 }

@@ -66,7 +66,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
         $this->dispatcher = $this->createDispatcherMock();
         $this->propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->type = $this->createWorkflowAttributesType(
             $this->workflowRegistry,
@@ -211,7 +211,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                         ),
                     ),
                     'attribute_default_values' => array('first' => 'Test'),
-                    'form_init' => $this->getMock('Oro\Component\Action\Action\ActionInterface')
+                    'form_init' => $this->createMock('Oro\Component\Action\Action\ActionInterface')
                 ),
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),
@@ -321,7 +321,8 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $expectedMessage,
         array $options
     ) {
-        $this->setExpectedException($expectedException, $expectedMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedMessage);
 
         $form = $this->factory->create($this->type, null, $options);
         $form->submit(array());

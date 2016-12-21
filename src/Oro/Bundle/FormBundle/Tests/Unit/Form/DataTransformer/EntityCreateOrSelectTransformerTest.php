@@ -97,7 +97,8 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransformException($value, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $this->transformer->transform($value);
     }
@@ -161,7 +162,8 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testReverseTransformException($value, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $this->transformer->reverseTransform($value);
     }

@@ -52,7 +52,7 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
     public function testOwner()
     {
         $this->assertNull($this->dashboard->getOwner());
-        $value = $this->getMock('Oro\\Bundle\\UserBundle\\Entity\\User');
+        $value = $this->createMock('Oro\\Bundle\\UserBundle\\Entity\\User');
         $this->assertEquals($this->dashboard, $this->dashboard->setOwner($value));
         $this->assertEquals($value, $this->dashboard->getOwner());
     }
@@ -60,7 +60,7 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
     public function testOrganization()
     {
         $this->assertNull($this->dashboard->getOrganization());
-        $value = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $value = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $this->assertEquals($this->dashboard, $this->dashboard->setOrganization($value));
         $this->assertEquals($value, $this->dashboard->getOrganization());
     }
@@ -68,14 +68,14 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
     public function testStartDashboard()
     {
         $this->assertNull($this->dashboard->getOwner());
-        $value = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard');
+        $value = $this->createMock('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard');
         $this->assertEquals($this->dashboard, $this->dashboard->setStartDashboard($value));
         $this->assertEquals($value, $this->dashboard->getStartDashboard());
     }
 
     public function testAddAndResetWidgets()
     {
-        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
+        $widget = $this->createMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
         $widget->expects($this->once())->method('setDashboard')
             ->with($this->dashboard);
         $this->assertFalse($this->dashboard->getWidgets()->contains($widget));
@@ -88,7 +88,7 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
 
     public function testHasWidget()
     {
-        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
+        $widget = $this->createMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
         $this->assertFalse($this->dashboard->hasWidget($widget));
         $this->dashboard->addWidget($widget);
         $this->assertTrue($this->dashboard->hasWidget($widget));
@@ -96,7 +96,7 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveWidget()
     {
-        $widget = $this->getMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
+        $widget = $this->createMock('Oro\\Bundle\\DashboardBundle\\Entity\\Widget');
         $this->assertFalse($this->dashboard->removeWidget($widget));
         $this->dashboard->addWidget($widget);
         $this->assertTrue($this->dashboard->hasWidget($widget));

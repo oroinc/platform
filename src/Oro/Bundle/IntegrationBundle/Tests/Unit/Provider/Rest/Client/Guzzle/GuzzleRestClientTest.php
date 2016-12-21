@@ -44,7 +44,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLastResponseWorks()
     {
-        $request = $this->getMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
         $this->sourceClient->expects($this->once())
             ->method('createRequest')
             ->will($this->returnValue($request));
@@ -65,7 +65,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testPerformRequestWorks($method, $args, $expected)
     {
-        $request = $this->getMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
         $this->sourceClient->expects($this->once())
             ->method('createRequest')
             ->with($expected['method'], $expected['url'], $expected['headers'], $expected['data'], $expected['options'])
@@ -214,7 +214,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
         $method = 'get';
         $url = 'https://google.com/api/v2';
 
-        $request = $this->getMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
 
         $this->sourceClient->expects($this->once())
             ->method('createRequest')
@@ -244,7 +244,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $request = $this->getMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
 
         $this->sourceClient->expects($this->once())
             ->method('createRequest')
@@ -285,7 +285,7 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $request = $this->getMock('Guzzle\\Http\\Message\\RequestInterface');
+        $request = $this->createMock('Guzzle\\Http\\Message\\RequestInterface');
 
         $this->sourceClient->expects($this->once())
             ->method('createRequest')
@@ -312,8 +312,8 @@ class GuzzleRestClientTest extends \PHPUnit_Framework_TestCase
             ->method('getReasonPhrase')
             ->will($this->returnValue($reasonPhrase));
 
-        $this->setExpectedException(
-            'Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\Guzzle\\GuzzleRestException',
+        $this->expectException('Oro\\Bundle\\IntegrationBundle\\Provider\\Rest\\Client\\Guzzle\\GuzzleRestException');
+        $this->expectExceptionMessage(
             "Unsuccessful response" . PHP_EOL .
             "[status code] $statusCode" . PHP_EOL .
             "[reason phrase] $reasonPhrase" . PHP_EOL .

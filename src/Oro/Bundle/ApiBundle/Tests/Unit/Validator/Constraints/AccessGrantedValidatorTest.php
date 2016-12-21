@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;

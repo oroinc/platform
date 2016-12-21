@@ -75,7 +75,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ],
         ]);
 
-        $config = $this->getMock(ConfigInterface::class);
+        $config = $this->createMock(ConfigInterface::class);
         $config
             ->expects($this->once())
             ->method('is')

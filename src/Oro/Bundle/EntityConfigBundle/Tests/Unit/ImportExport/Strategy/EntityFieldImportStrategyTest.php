@@ -52,7 +52,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldProperties')
             ->willReturn([]);
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator
             ->expects(static::any())
             ->method('trans')
@@ -80,7 +80,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy = $this->createStrategy();
 
         /** @var ContextInterface $context */
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $this->strategy->setImportExportContext($context);
         $this->strategy->setEntityName('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
         $this->strategy->setFieldTypeProvider($this->fieldTypeProvider);
@@ -98,7 +98,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
     public function testSetConstraintFactory()
     {
         /** @var ConstraintFactory $factory */
-        $factory = $this->getMock('Oro\Bundle\FormBundle\Validator\ConstraintFactory');
+        $factory = $this->createMock('Oro\Bundle\FormBundle\Validator\ConstraintFactory');
         $strategy = $this->createStrategy();
         static::assertNull($this->getProperty($strategy, 'constraintFactory'));
         $strategy->setConstraintFactory($factory);

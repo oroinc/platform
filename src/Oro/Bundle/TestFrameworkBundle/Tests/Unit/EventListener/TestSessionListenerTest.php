@@ -63,8 +63,8 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->willReturn($sessionName);
 
-        $request = $this->getMock(Request::class);
-        $request->cookies = $this->getMock(ParameterBag::class);
+        $request = $this->createMock(Request::class);
+        $request->cookies = $this->createMock(ParameterBag::class);
         $request->cookies->expects($this->once())
             ->method('get')
             ->with($sessionName)
@@ -107,8 +107,8 @@ class TestSessionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('setId')
             ->with($newSessionId);
 
-        $request = $this->getMock(Request::class);
-        $request->cookies = $this->getMock(ParameterBag::class);
+        $request = $this->createMock(Request::class);
+        $request->cookies = $this->createMock(ParameterBag::class);
         $request->cookies->expects($this->exactly(2))
             ->method('get')
             ->with($sessionName)

@@ -20,7 +20,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
         $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->logger     = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger     = $this->createMock('Psr\Log\LoggerInterface');
         $this->executor   = new MigrationQueryExecutor($this->connection);
         $this->executor->setLogger($this->logger);
     }
@@ -100,7 +100,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
     {
         $queryDescription = 'test query';
 
-        $query = $this->getMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
+        $query = $this->createMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
 
         $query->expects($this->once())
             ->method('getDescription')
@@ -120,7 +120,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
     {
         $queryDescription = ['test query 1', 'test query 2'];
 
-        $query = $this->getMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
+        $query = $this->createMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
 
         $query->expects($this->once())
             ->method('getDescription')
@@ -143,7 +143,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
     {
         $queryDescription = null;
 
-        $query = $this->getMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
+        $query = $this->createMock('Oro\Bundle\MigrationBundle\Migration\MigrationQuery');
 
         $query->expects($this->once())
             ->method('getDescription')

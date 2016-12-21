@@ -60,7 +60,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
 
-        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
         $this->routeProvider->expects($this->any())
             ->method('getExecutionRoute')

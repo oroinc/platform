@@ -182,7 +182,9 @@ class CompleteDefinition implements ProcessorInterface
         $idFieldNames = $metadata->getIdentifierFieldNames();
         // remove all not identifier fields
         foreach ($existingFields as $propertyPath => $fieldName) {
-            if (!in_array($propertyPath, $idFieldNames, true) && !ConfigUtil::isMetadataProperty($propertyPath)) {
+            if (!in_array($propertyPath, $idFieldNames, true)
+                && !$definition->getField($fieldName)->isMetaProperty()
+            ) {
                 $definition->removeField($fieldName);
             }
         }
@@ -261,7 +263,7 @@ class CompleteDefinition implements ProcessorInterface
             in_array($associationType, RelationType::$toManyRelations, true)
             || RelationType::MULTIPLE_MANY_TO_ONE === $associationType;
 
-        return $isCollection ? 'to-many' : 'to-one';
+        return $this->getAssociationTargetType($isCollection);
     }
 
     /**
@@ -373,14 +375,19 @@ class CompleteDefinition implements ProcessorInterface
                 $field->setExcluded();
             }
             $this->completeAssociation($field, $mapping['targetEntity'], $version, $requestType);
+            if ($field->getTargetClass()) {
+                $field->setTargetType(
+                    $this->getAssociationTargetType(!($mapping['type'] & ClassMetadata::TO_ONE))
+                );
+            }
         }
     }
 
     /**
      * @param EntityDefinitionFieldConfig $field
-     * @param string                 $targetClass
-     * @param string                 $version
-     * @param RequestType            $requestType
+     * @param string                      $targetClass
+     * @param string                      $version
+     * @param RequestType                 $requestType
      */
     protected function completeAssociation(
         EntityDefinitionFieldConfig $field,
@@ -456,6 +463,13 @@ class CompleteDefinition implements ProcessorInterface
                             $version,
                             $requestType
                         );
+                        if ($targetField->getTargetClass()) {
+                            $targetField->setTargetType(
+                                $this->getAssociationTargetType(
+                                    $targetMetadata->isCollectionValuedAssociation($targetFieldName)
+                                )
+                            );
+                        }
                     }
                 }
                 if (!$isAssociation) {
@@ -470,6 +484,16 @@ class CompleteDefinition implements ProcessorInterface
     }
 
     /**
+     * @param bool $isCollection
+     *
+     * @return string
+     */
+    protected function getAssociationTargetType($isCollection)
+    {
+        return $isCollection ? 'to-many' : 'to-one';
+    }
+
+    /**
      * @param EntityDefinitionConfig $definition
      */
     protected function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition)
@@ -477,7 +501,9 @@ class CompleteDefinition implements ProcessorInterface
         $idFieldNames = $definition->getIdentifierFieldNames();
         $fieldNames = array_keys($definition->getFields());
         foreach ($fieldNames as $fieldName) {
-            if (!in_array($fieldName, $idFieldNames, true) && !ConfigUtil::isMetadataProperty($fieldName)) {
+            if (!in_array($fieldName, $idFieldNames, true)
+                && !$definition->getField($fieldName)->isMetaProperty()
+            ) {
                 $definition->removeField($fieldName);
             }
         }

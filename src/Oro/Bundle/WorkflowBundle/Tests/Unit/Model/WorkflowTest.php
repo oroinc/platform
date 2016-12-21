@@ -62,7 +62,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function propertiesDataProvider()
     {
         return array(
-            'definition' => array('definition', $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'))
+            'definition' => array(
+                'definition',
+                $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            )
         );
     }
 
@@ -188,7 +191,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $workflow->getStepManager()->setSteps(array($step));
 
         if ($expectedResult instanceof \Exception) {
-            $this->setExpectedException(get_class($expectedResult), $expectedResult->getMessage());
+            $this->expectException(get_class($expectedResult));
+            $this->expectExceptionMessage($expectedResult->getMessage());
         }
 
         $actualResult = $workflow->isTransitionAllowed($workflowItem, 'test_transition', $errors, $fireExceptions);

@@ -25,7 +25,7 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCreateQueueUsingQueueNameFromContext()
     {
-        $loggerMock = $this->getMock(LoggerInterface::class);
+        $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock
             ->expects($this->once())
             ->method('debug')
@@ -62,7 +62,7 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('theQueueName2')
         ;
 
-        $loggerMock = $this->getMock(LoggerInterface::class);
+        $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock
             ->expects($this->at(0))
             ->method('debug')
@@ -96,7 +96,7 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -104,6 +104,6 @@ class CreateQueueExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createDriverMock()
     {
-        return $this->getMock(DriverInterface::class);
+        return $this->createMock(DriverInterface::class);
     }
 }

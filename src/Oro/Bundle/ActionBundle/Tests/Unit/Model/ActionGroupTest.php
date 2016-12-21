@@ -32,7 +32,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
@@ -92,10 +92,8 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $errors = new ArrayCollection();
 
         if ($exceptionMessage) {
-            $this->setExpectedException(
-                'Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException',
-                $exceptionMessage
-            );
+            $this->expectException('Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException');
+            $this->expectExceptionMessage($exceptionMessage);
         }
 
         $this->assertSame($data, $this->actionGroup->execute($data, $errors));
@@ -216,7 +214,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     protected function createActionGroup(\PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects, ActionData $data)
     {
         /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $action = $this->getMock('Oro\Component\Action\Action\ActionInterface');
+        $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
         $action->expects($expects)->method('execute')->with($data);
 
         return $action;

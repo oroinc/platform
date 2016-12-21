@@ -289,7 +289,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
      */
     public function testBuildFromConfigurationException($expectedException, $expectedMessage, array $inputData)
     {
-        $this->setExpectedException($expectedException, $expectedMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedMessage);
 
         $this->builder->buildFromConfiguration($inputData);
     }
@@ -314,8 +315,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
 
     public function testAddExtension()
     {
-        $firstExtension = $this->getMock(WorkflowDefinitionBuilderExtensionInterface::class);
-        $interruptionExtension = $this->getMock(WorkflowDefinitionBuilderExtensionInterface::class);
+        $firstExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);
+        $interruptionExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);
         $this->builder->addExtension($firstExtension);
         $this->builder->addExtension($interruptionExtension);
 
@@ -334,7 +335,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             ->with($name, $modifiedConfiguration)
             ->willThrowException(new \Exception('interrupted by extension'));
 
-        $this->setExpectedException(\Exception::class, 'interrupted by extension');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('interrupted by extension');
         $this->builder->buildOneFromConfiguration($name, $configuration);
     }
 

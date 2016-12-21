@@ -73,7 +73,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $securityContextLink =
             $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
                 ->disableOriginalConstructor()
@@ -230,7 +230,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($organization));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $aclGroupProvider */
-        $aclGroupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $aclGroupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
         $aclGroupProvider->expects($this->any())->method('getGroup')->willReturn($expectedGroup);
 
         $this->builder->setAclGroupProvider($aclGroupProvider);
@@ -266,7 +266,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUserIdWithNonLoginUser()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue('anon'));

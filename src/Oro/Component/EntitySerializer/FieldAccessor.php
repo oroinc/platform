@@ -76,7 +76,7 @@ class FieldAccessor
             }
             $fieldConfigs = $config->getFields();
             foreach ($fieldConfigs as $field => $fieldConfig) {
-                if (ConfigUtil::isMetadataProperty($fieldConfig->getPropertyPath($field))) {
+                if ($this->isMetadataProperty($fieldConfig->getPropertyPath($field))) {
                     $result[] = $field;
                 }
             }
@@ -160,6 +160,18 @@ class FieldAccessor
     }
 
     /**
+     * Checks whether the given property path represents a metadata property
+     *
+     * @param string $propertyPath
+     *
+     * @return mixed
+     */
+    public function isMetadataProperty($propertyPath)
+    {
+        return ConfigUtil::CLASS_NAME === $propertyPath || ConfigUtil::DISCRIMINATOR === $propertyPath;
+    }
+
+    /**
      * Returns a value of a metadata property
      *
      * @param object         $entity
@@ -171,10 +183,10 @@ class FieldAccessor
     public function getMetadataProperty($entity, $propertyPath, $entityMetadata)
     {
         switch ($propertyPath) {
-            case ConfigUtil::DISCRIMINATOR:
-                return $entityMetadata->getDiscriminatorValue(ClassUtils::getClass($entity));
             case ConfigUtil::CLASS_NAME:
                 return ClassUtils::getClass($entity);
+            case ConfigUtil::DISCRIMINATOR:
+                return $entityMetadata->getDiscriminatorValue(ClassUtils::getClass($entity));
             default:
                 return null;
         }

@@ -101,7 +101,7 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
     protected function prepareConfigProvider(array $configValues, $className)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigIdInterface $configId */
-        $configId = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
+        $configId = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
         $entityConfig = new Config($configId);
         $entityConfig->setValues($configValues);
         $this->configProvider->expects($this->once())->method('hasConfig')->with($this->equalTo($className))

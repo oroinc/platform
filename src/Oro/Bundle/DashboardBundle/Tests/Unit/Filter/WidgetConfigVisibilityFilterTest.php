@@ -11,7 +11,7 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $resolver = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
         $resolver->expects($this->any())
             ->method('resolve')
             ->will($this->returnCallback(function (array $value) {

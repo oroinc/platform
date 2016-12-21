@@ -28,7 +28,7 @@ class TranslationWriterTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
 
-        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with(Translation::class)
@@ -84,7 +84,8 @@ class TranslationWriterTest extends \PHPUnit_Framework_TestCase
         $this->translationManager->expects($this->once())->method('saveTranslation')->willThrowException($exception);
         $this->translationManager->expects($this->never())->method('flush');
 
-        $this->setExpectedException('Exception', 'test exception');
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('test exception');
 
         $this->writer->write($items);
     }
@@ -104,7 +105,8 @@ class TranslationWriterTest extends \PHPUnit_Framework_TestCase
         $this->translationManager->expects($this->once())->method('saveTranslation')->willThrowException($exception);
         $this->translationManager->expects($this->never())->method('flush');
 
-        $this->setExpectedException('Exception', 'test exception');
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('test exception');
 
         $this->writer->write($items);
     }

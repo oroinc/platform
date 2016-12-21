@@ -21,12 +21,12 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->resolver = new SystemAwareResolver();
         $this->resolver->setContainer($container);
 
         $service1 = new TestService();
-        $service2 = $this->getMock('Symfony\Component\Config\Resource\ResourceInterface');
+        $service2 = $this->createMock('Symfony\Component\Config\Resource\ResourceInterface');
         $service2->expects($this->any())
             ->method('getResource')
             ->will($this->returnValue(['service', 2]));

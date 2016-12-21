@@ -27,7 +27,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcher');
         $this->securityFacade  = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
     }
@@ -83,7 +83,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         $minifiedParams = []
     ) {
         $builder = $this->getBuilderMock(['buildDataSource']);
-        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
 
         $parameters->expects($this->once())
             ->method('get')
@@ -223,7 +223,8 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         if ($expectedException !== null) {
             list ($name, $message) = $expectedException;
 
-            $this->setExpectedException($name, $message);
+            $this->expectException($name);
+            $this->expectExceptionMessage($message);
         }
 
         $method = new \ReflectionMethod($builder, 'buildDataSource');

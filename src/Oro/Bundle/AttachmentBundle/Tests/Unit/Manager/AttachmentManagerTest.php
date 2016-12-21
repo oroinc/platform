@@ -88,13 +88,13 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testWrongAttachmentUrl()
     {
-        $this->setExpectedException('\LogicException');
+        $this->expectException('\LogicException');
         $this->attachmentManager->decodeAttachmentUrl('bm90Z29vZHN0cmluZw==');
     }
 
     public function testNoneBase64AttachmentUrl()
     {
-        $this->setExpectedException('\LogicException');
+        $this->expectException('\LogicException');
         $this->attachmentManager->decodeAttachmentUrl('bad string');
     }
 

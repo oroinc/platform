@@ -485,14 +485,14 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $configuration = new Configuration();
 
-        $connectionMock = $this->getMock(Connection::class, [], [], '', false);
+        $connectionMock = $this->createMock(Connection::class);
         $connectionMock
             ->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($configuration)
         ;
 
-        $entityManagerMock = $this->getMock(EntityManagerInterface::class);
+        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock
             ->expects($this->any())
             ->method('getConnection')
@@ -507,7 +507,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createRegistryStub($entityManager = null)
     {
-        $registryMock = $this->getMock(RegistryInterface::class);
+        $registryMock = $this->createMock(RegistryInterface::class);
         $registryMock
             ->expects($this->any())
             ->method('getManager')
@@ -522,7 +522,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSyncProcessorMock()
     {
-        $syncProcessor = $this->getMock(AbstractSyncProcessor::class, ['process', 'getLoggerStrategy'], [], '', false);
+        $syncProcessor = $this->createPartialMock(AbstractSyncProcessor::class, ['process', 'getLoggerStrategy']);
         $syncProcessor
             ->expects($this->any())
             ->method('getLoggerStrategy')
@@ -537,7 +537,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSyncProcessorRegistryStub($syncProcessor)
     {
-        $syncProcessorRegistry = $this->getMock(SyncProcessorRegistry::class);
+        $syncProcessorRegistry = $this->createMock(SyncProcessorRegistry::class);
         $syncProcessorRegistry
             ->expects($this->any())
             ->method('getProcessorForIntegration')
@@ -552,7 +552,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createTokenStorageMock()
     {
-        return $this->getMock(TokenStorageInterface::class);
+        return $this->createMock(TokenStorageInterface::class);
     }
 
     /**
@@ -560,7 +560,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createTransportStub()
     {
-        $transportMock = $this->getMock(Transport::class);
+        $transportMock = $this->createMock(Transport::class);
         $transportMock
             ->expects($this->any())
             ->method('getSettingsBag')
@@ -576,6 +576,6 @@ class SyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

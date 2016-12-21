@@ -43,7 +43,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()->getMock();
 
-        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
         $this->extension = new TransitionButtonProviderExtension(
             $this->workflowRegistry,
@@ -118,7 +118,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->getMock(Transition::class);
 
-        $transitionManager = $this->getMock(TransitionManager::class);
+        $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($this->any())
             ->method('getTransitions')
             ->willReturn(new ArrayCollection([$transition]));
@@ -283,7 +283,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getTransitionManager(array $transitions)
     {
-        $manager = $this->getMock(TransitionManager::class);
+        $manager = $this->createMock(TransitionManager::class);
         $manager->expects($this->any())
             ->method('getStartTransitions')
             ->willReturn(new ArrayCollection($transitions));

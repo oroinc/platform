@@ -24,7 +24,8 @@ class WorkflowHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandle(array $expected, array $input)
     {
-        $otherHandler = $this->getMock('Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface');
+        $otherHandler = $this
+            ->createMock('Oro\Bundle\WorkflowBundle\Configuration\Handler\ConfigurationHandlerInterface');
         $otherHandler->expects($this->once())->method('handle')->with($expected)
             ->will($this->returnValue($expected));
 

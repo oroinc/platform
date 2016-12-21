@@ -16,7 +16,7 @@ class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityIdTransformer = $this->getMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
 
         $this->entityIdAccessor = new EntityIdAccessor(
             new ArrayAccessor(),

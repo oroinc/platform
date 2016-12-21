@@ -17,6 +17,7 @@ class ActionConfig
     use Traits\SortingTrait;
     use Traits\InclusionTrait;
     use Traits\FieldsetTrait;
+    use Traits\MetaPropertyTrait;
     use Traits\FormTrait;
     use Traits\StatusCodesTrait;
 
@@ -49,6 +50,9 @@ class ActionConfig
 
     /** a flag indicates whether a requesting of a restricted set of fields is disabled */
     const DISABLE_FIELDSET = EntityDefinitionConfig::DISABLE_FIELDSET;
+
+    /** a flag indicates whether a requesting of additional meta properties is disabled */
+    const DISABLE_META_PROPERTIES = EntityDefinitionConfig::DISABLE_META_PROPERTIES;
 
     /** the form type that should be used for the entity */
     const FORM_TYPE = EntityDefinitionConfig::FORM_TYPE;

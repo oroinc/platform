@@ -223,7 +223,7 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHashWithContextItemInterfaceDescendantItems()
     {
-        $item = $this->getMock(ContextItemInterface::class);
+        $item = $this->createMock(ContextItemInterface::class);
         $item->expects($this->once())->method('toString')->willReturn('value');
 
         $this->context->getResolver()->setOptional(['item']);

@@ -19,7 +19,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateEntityMetadata()
     {
         $options = array('foo' => 'bar');
-        $doctrineMetadata = $this->getMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
+        $doctrineMetadata = $this->createMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
 
         $metadata = $this->factory->createEntityMetadata($options, $doctrineMetadata);
         $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata', $metadata);
@@ -57,7 +57,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateFieldMetadata()
     {
         $options = array('foo' => 'bar');
-        $doctrineMetadata = $this->getMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
+        $doctrineMetadata = $this->createMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
 
         $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);
         $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata', $metadata);
@@ -95,7 +95,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateDoctrineMetadata()
     {
         $options = array('foo' => 'bar');
-        $doctrineMetadata = $this->getMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
+        $doctrineMetadata = $this->createMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
 
         $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);
         $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata', $metadata);

@@ -343,6 +343,34 @@ invalid_value_for_disable_fieldset:
     expected: []
     error: 'Invalid type for path "entity.actions.get_list.disable_fieldset". Expected boolean, but got integer'
 
+enable_meta_properties:
+    config:
+        actions:
+            get_list:
+                disable_meta_properties: false
+    expected:
+        actions:
+            get_list:
+                disable_meta_properties: false
+
+disable_meta_properties:
+    config:
+        actions:
+            get_list:
+                disable_meta_properties: true
+    expected:
+        actions:
+            get_list:
+                disable_meta_properties: true
+
+invalid_value_for_disable_meta_properties:
+    config:
+        actions:
+            get_list:
+                disable_meta_properties: 123
+    expected: []
+    error: 'Invalid type for path "entity.actions.get_list.disable_meta_properties". Expected boolean, but got integer'
+
 null_status_codes:
     config:
         actions:

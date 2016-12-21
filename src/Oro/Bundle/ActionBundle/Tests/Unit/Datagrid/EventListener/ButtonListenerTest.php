@@ -80,7 +80,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $provider = $this->getMock(MassActionProviderInterface::class);
+        $provider = $this->createMock(MassActionProviderInterface::class);
         $provider->expects($this->any())
             ->method('getActions')
             ->willReturn(['test_config' => ['label' => 'test_label']]);

@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
 {
-    const SOME_CLASS = 'SomeClass';
+    const SOME_CLASS = \stdClass::class;
     const UNDEFINED_CLASS = 'UndefinedClass';
 
     /**
@@ -47,7 +47,7 @@ class AbstractMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['delete', 'deleteAll', 'fetch', 'save'])
             ->getMockForAbstractClass();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
             ->will(

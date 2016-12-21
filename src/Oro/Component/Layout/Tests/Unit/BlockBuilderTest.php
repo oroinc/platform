@@ -32,10 +32,10 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->rawLayout         = new RawLayout();
-        $this->typeHelper        = $this->getMock('Oro\Component\Layout\BlockTypeHelperInterface');
+        $this->typeHelper        = $this->createMock('Oro\Component\Layout\BlockTypeHelperInterface');
         $this->context           = new LayoutContext();
-        $this->layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $this->registry          = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $this->registry          = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
 
         $this->blockBuilder      = new BlockBuilder(
             $this->layoutManipulator,
@@ -86,7 +86,7 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
         $id   = 'test_id';
         $name = 'test_name';
 
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));

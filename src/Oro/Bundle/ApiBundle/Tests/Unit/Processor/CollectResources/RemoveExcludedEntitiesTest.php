@@ -17,7 +17,8 @@ class RemoveExcludedEntitiesTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityExclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+        $this->entityExclusionProvider = $this
+            ->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
 
         $this->processor = new RemoveExcludedEntities($this->entityExclusionProvider);
     }

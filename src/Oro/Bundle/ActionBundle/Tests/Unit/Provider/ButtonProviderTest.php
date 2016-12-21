@@ -29,7 +29,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testMatch()
     {
-        $searchContext = $this->getMock(ButtonSearchContext::class);
+        $searchContext = $this->createMock(ButtonSearchContext::class);
 
         $button1 = $this->getButton();
         $button2 = $this->getButton();
@@ -44,7 +44,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ButtonsCollection::class, $collection);
 
         //checking correct mapping button => extension at collection
-        $callable = $this->getMock(CallableStub::class);
+        $callable = $this->createMock(CallableStub::class);
         $callable->expects($this->at(0))
             ->method('__invoke')
             ->with(
@@ -79,7 +79,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
             return $this->extensions[$identifier];
         }
 
-        $this->extensions[$identifier] = $this->getMock(ButtonProviderExtensionInterface::class);
+        $this->extensions[$identifier] = $this->createMock(ButtonProviderExtensionInterface::class);
 
         $this->buttonProvider->addExtension($this->extensions[$identifier]);
 
@@ -95,7 +95,7 @@ class ButtonProviderTest extends \PHPUnit_Framework_TestCase
     public function testFindAll(array $input, array $output)
     {
         /** @var ButtonSearchContext $searchContext */
-        $searchContext = $this->getMock(ButtonSearchContext::class);
+        $searchContext = $this->createMock(ButtonSearchContext::class);
 
         $this->extension('one')->expects($this->once())
             ->method('find')

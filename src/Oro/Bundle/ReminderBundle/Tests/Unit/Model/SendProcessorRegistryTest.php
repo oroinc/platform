@@ -70,7 +70,7 @@ class SendProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockProcessor($name, $label)
     {
-        $result = $this->getMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
+        $result = $this->createMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
         $result->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));

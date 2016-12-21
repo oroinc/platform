@@ -37,7 +37,7 @@ class AppearanceExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ));
         $configuration = new Configuration($manager);
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->extension = new AppearanceExtension(
             $configuration,

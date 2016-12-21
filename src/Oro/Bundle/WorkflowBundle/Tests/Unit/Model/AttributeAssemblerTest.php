@@ -16,7 +16,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
     }
 
     /**
@@ -28,7 +28,8 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssembleRequiredOptionException($configuration, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $assembler = new AttributeAssembler($this->getAttributeGuesser(), $this->translator);
         $definition = $this->getWorkflowDefinition();

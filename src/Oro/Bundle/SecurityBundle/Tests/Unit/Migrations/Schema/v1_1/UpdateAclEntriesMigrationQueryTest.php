@@ -54,7 +54,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->aclCache = $this->getMock('Symfony\Component\Security\Acl\Model\AclCacheInterface');
+        $this->aclCache = $this->createMock('Symfony\Component\Security\Acl\Model\AclCacheInterface');
 
         $this->query = new UpdateAclEntriesMigrationQuery(
             $this->aclManager,

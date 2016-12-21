@@ -179,7 +179,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function createConfig()
     {
-        return $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        return $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
     }
 
     protected function createConfigProvider()

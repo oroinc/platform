@@ -27,7 +27,7 @@ class ComputeFileContentTest extends \PHPUnit_Framework_TestCase
         $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $this->context = new CustomizeLoadedDataContext();
         $this->processor = new ComputeFileContent($this->fileManager, $this->logger);

@@ -24,7 +24,7 @@ class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $builder->expects($this->once())
             ->method('addEventListener')
             ->with('form.post_bind');
@@ -35,7 +35,7 @@ class FileConfigTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
