@@ -170,4 +170,28 @@ class EntityNameResolverTest extends \PHPUnit_Framework_TestCase
         $result = $this->entityNameResolver->getNameDQL($className, $alias, $format, $locale);
         $this->assertEquals($expected, $result);
     }
+
+    public function testPrepareNameDQLForEmptyExpr()
+    {
+        self::assertEquals(
+            '\'\'',
+            $this->entityNameResolver->prepareNameDQL(null)
+        );
+    }
+
+    public function testPrepareNameDQLWithoutCastToString()
+    {
+        self::assertEquals(
+            'e.name',
+            $this->entityNameResolver->prepareNameDQL('e.name')
+        );
+    }
+
+    public function testPrepareNameDQLWithCastToString()
+    {
+        self::assertEquals(
+            'CAST(e.name AS string)',
+            $this->entityNameResolver->prepareNameDQL('e.name', true)
+        );
+    }
 }

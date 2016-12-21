@@ -36,6 +36,7 @@ class Entity
      * Returns array with all associated entities
      *
      * @return array
+     * @deprecated since 2.0. Method "getTestTarget" should be used instead
      */
     public function getTestTargetEntities()
     {

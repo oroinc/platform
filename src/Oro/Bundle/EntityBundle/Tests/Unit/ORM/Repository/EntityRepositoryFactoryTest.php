@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Repository;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\TestEntityRepository;
 
@@ -91,10 +93,6 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($classMetadata, '_class', $defaultRepository);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "TestEntity" is not manageable.
-     */
     public function testGetDefaultRepositoryNotManageableEntity()
     {
         $entityName = 'TestEntity';
@@ -109,6 +107,11 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('doctrine')
             ->willReturn($managerRegistry);
+
+        $this->setExpectedException(
+            NotManageableEntityException::class,
+            sprintf('Entity class "%s" is not manageable.', $entityName)
+        );
 
         $repositoryFactory = new EntityRepositoryFactory($this->container, []);
         $repositoryFactory->getDefaultRepository($entityName);
@@ -178,10 +181,6 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($classMetadata, '_class', $repository);
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Repository for class TestEntity must be instance of EntityRepository
-     */
     public function testGetRepositoryFromContainerNotEntityRepository()
     {
         $entityName = 'TestEntity';
@@ -206,16 +205,15 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($repositoryService)
             ->willReturn($entityRepository);
 
+        $this->setExpectedException(
+            LogicException::class,
+            sprintf('Repository for class %s must be instance of EntityRepository', $entityName)
+        );
+
         $repositoryFactory = new EntityRepositoryFactory($this->container, [$entityName => $repositoryService]);
         $repositoryFactory->getRepository($entityManager, $entityName);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Repository for class TestEntity must be instance of Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\TestEntityRepository
-     */
-    // @codingStandardIgnoreEnd
     public function testGetRepositoryFromContainerInvalidEntityRepository()
     {
         $entityName = 'TestEntity';
@@ -239,6 +237,11 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with($repositoryService)
             ->willReturn($entityRepository);
+
+        $this->setExpectedException(
+            LogicException::class,
+            sprintf('Repository for class %s must be instance of %s', $entityName, TestEntityRepository::class)
+        );
 
         $repositoryFactory = new EntityRepositoryFactory($this->container, [$entityName => $repositoryService]);
         $repositoryFactory->getRepository($entityManager, $entityName);

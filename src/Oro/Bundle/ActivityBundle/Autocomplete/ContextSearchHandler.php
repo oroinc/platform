@@ -10,10 +10,9 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
@@ -295,51 +294,31 @@ class ContextSearchHandler implements ConverterInterface
      */
     protected function getAssociatedTargetEntitiesQueryBuilder(array $groupedTargets)
     {
-        /** @var EntityManager $objectManager */
-        $objectManager = $this->objectManager;
+        /** @var EntityManager $em */
+        $em = $this->objectManager;
 
-        $selectStmt = null;
-        $subQueries = [];
+        $qb = new UnionQueryBuilder($em);
+        $qb
+            ->addSelect('id', 'id', Type::INTEGER)
+            ->addSelect('entityClass', 'entity')
+            ->addSelect('entityTitle', 'title');
         foreach ($groupedTargets as $entityClass => $ids) {
-            $nameExpr = $this->nameResolver->getNameDQL($entityClass, 'e');
-            /** @var QueryBuilder $subQb */
-            $subQb    = $objectManager->getRepository($entityClass)->createQueryBuilder('e')
+            $subQb = $em->getRepository($entityClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
-                        'e.id AS id, \'%s\' AS entityClass, ' . ($nameExpr ?: '\'\'') . ' AS entityTitle',
-                        str_replace('\'', '\'\'', $entityClass)
+                        'e.id AS id, \'%s\' AS entityClass, %s AS entityTitle',
+                        $entityClass,
+                        $this->nameResolver->prepareNameDQL(
+                            $this->nameResolver->getNameDQL($entityClass, 'e'),
+                            true
+                        )
                     )
                 );
-            $subQb->where(
-                $subQb->expr()->in('e.id', $ids)
-            );
-
-            $subQuery     = $subQb->getQuery();
-            $subQueries[] = QueryUtils::getExecutableSql($subQuery);
-
-            if (empty($selectStmt)) {
-                $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
-                $selectStmt = sprintf(
-                    'entity.%s AS id, entity.%s AS entity, entity.%s AS title',
-                    QueryUtils::getColumnNameByAlias($mapping, 'id'),
-                    QueryUtils::getColumnNameByAlias($mapping, 'entityClass'),
-                    QueryUtils::getColumnNameByAlias($mapping, 'entityTitle')
-                );
-            }
+            $subQb->where($subQb->expr()->in('e.id', $ids));
+            $qb->addSubQuery($subQb->getQuery());
         }
 
-        $rsm = QueryUtils::createResultSetMapping($objectManager->getConnection()->getDatabasePlatform());
-        $rsm
-            ->addScalarResult('id', 'id', Type::INTEGER)
-            ->addScalarResult('entity', 'entity')
-            ->addScalarResult('title', 'title');
-
-        $queryBuilder = new SqlQueryBuilder($objectManager, $rsm);
-        $queryBuilder
-            ->select($selectStmt)
-            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
-
-        return $queryBuilder;
+        return $qb->getQueryBuilder();
     }
 
     /**

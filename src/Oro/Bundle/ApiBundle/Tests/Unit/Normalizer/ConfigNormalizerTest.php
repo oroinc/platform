@@ -382,6 +382,19 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'extended association'                                       => [
+                'config'         => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'association1' => [
+                            'data_type' => 'association:manyToOne'
+                        ],
+                    ]
+                ],
+                'expectedConfig' => [
+                    'exclusion_policy' => 'all',
+                ]
+            ],
         ];
     }
 }
