@@ -59,7 +59,7 @@ class ConfigFileType extends AbstractType
         $resolver->setDefaults([
             'addEventSubscriber' => false,
             'fileConstraints' => [],
-            'allowDelete' => false
+            'allowDelete' => true
         ]);
     }
 

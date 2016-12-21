@@ -142,4 +142,3 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
-            - '@oro_attachment.file_manager'
