@@ -29,7 +29,7 @@ define([
                 pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
                 function doRedirect(redirectUrl) {
-                    mediator.execute('redirectTo', {url: redirectUrl});
+                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }
                 function doReload() {
                     mediator.execute('refreshPage');
@@ -37,13 +37,9 @@ define([
 
                 /** Handle redirectUrl result parameter for RedirectAction */
                 element.one('transitions_success', function(e, response) {
-                    if (
-                        response.workflowItem &&
-                            response.workflowItem.result &&
-                            response.workflowItem.result.redirectUrl
-                    ) {
+                    if (response.redirectUrl) {
                         e.stopImmediatePropagation();
-                        doRedirect(response.workflowItem.result.redirectUrl);
+                        doRedirect(response.redirectUrl);
                     }
                 });
                 /** By default reload page */
