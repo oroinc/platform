@@ -6,10 +6,8 @@ parameters:
     oro_action.helper.applications_url.class: Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
-    oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
-    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
 
@@ -77,13 +75,6 @@ services:
             - '@oro_action.configuration.provider.action_groups'
             - '@oro_action.assembler.action_group'
 
-    oro_action.operation_manager:
-        class: %oro_action.operation_manager.class%
-        arguments:
-            - '@oro_action.operation_registry'
-            - '@oro_action.action_group_registry'
-            - '@oro_action.helper.context'
-
     oro_action.attribute_guesser:
         class: %oro_action.attribute_guesser.class%
         arguments:
@@ -125,12 +116,13 @@ services:
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
 
-    oro_action.form_manager:
-        class: %oro_action.form_manager.class%
+    oro_action.form.handler.operation_button:
+        class: Oro\Bundle\ActionBundle\Handler\OperationFormHandler
         arguments:
             - '@form.factory'
-            - '@oro_action.operation_manager'
             - '@oro_action.helper.context'
+            - '@oro_action.operation_registry'
+            - '@translator'
 
     oro_action.api_manager:
         class: %oro_action.api_manager.class%
@@ -158,7 +150,8 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_datagrid.grid_configuration.helper'
-            - '@oro_action.operation_manager'
+            - '@oro_action.operation_registry'
+            - '@oro_action.helper.context'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
@@ -206,7 +199,7 @@ services:
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
 
-    oro_ui.provider.button.extension.operation:
+    oro_action.provider.button.extension.operation:
         class: 'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension'
         arguments:
             - '@oro_action.operation_registry'
