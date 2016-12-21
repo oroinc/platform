@@ -111,6 +111,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->booleanNode(ActionConfig::DISABLE_SORTING)->end()
             ->booleanNode(ActionConfig::DISABLE_INCLUSION)->end()
             ->booleanNode(ActionConfig::DISABLE_FIELDSET)->end()
+            ->booleanNode(ActionConfig::DISABLE_META_PROPERTIES)->end()
             ->scalarNode(ActionConfig::FORM_TYPE)->end()
             ->arrayNode(ActionConfig::FORM_OPTIONS)
                 ->useAttributeAsKey('name')

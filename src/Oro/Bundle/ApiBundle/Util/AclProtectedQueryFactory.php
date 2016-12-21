@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\EntitySerializer\EntityConfig;

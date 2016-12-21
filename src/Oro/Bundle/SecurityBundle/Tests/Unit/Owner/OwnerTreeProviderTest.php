@@ -151,26 +151,6 @@ class OwnerTreeProviderTest extends OrmTestCase
      * @param string                                   $sql
      * @param array                                    $result
      */
-    protected function setQueryExpectationAt(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
-        $expectsAt,
-        $sql,
-        $result
-    ) {
-        $stmt = $this->createFetchStatementMock($result);
-        $conn
-            ->expects($this->at($expectsAt))
-            ->method('query')
-            ->with($sql)
-            ->will($this->returnValue($stmt));
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
-     * @param int                                      $expectsAt
-     * @param string                                   $sql
-     * @param array                                    $result
-     */
     protected function setFetchAllQueryExpectationAt(
         \PHPUnit_Framework_MockObject_MockObject $conn,
         $expectsAt,

@@ -18,14 +18,14 @@ trait ExtendActivity
     }
 
     /**
-     * Gets entities of the given type associated with this activity entity
+     * Gets entities associated with this activity entity
      *
      * The real implementation of this method is auto generated.
      *
-     * @param string $targetClass The class name of the target entity
+     * @param string|null $targetClass The class name of the target entity
      * @return object[]
      */
-    public function getActivityTargets($targetClass)
+    public function getActivityTargets($targetClass = null)
     {
         return null;
     }
@@ -68,18 +68,5 @@ trait ExtendActivity
     public function removeActivityTarget($target)
     {
         return $this;
-    }
-
-    /**
-     * Gets full target entities list associated with activity
-     * Please use this method carefully because of the performance reasons
-     *
-     * The real implementation of this method is auto generated.
-     *
-     * @return object[]
-     */
-    public function getActivityTargetEntities()
-    {
-        return [];
     }
 }

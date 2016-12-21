@@ -172,3 +172,13 @@ class AcmeSomeExtension extends Extension
     }
 }
 ```
+
+### Yml inheritance
+
+You can use inheritance in yml files, for example:
+
+``` yaml
+imports:
+    - { resource: 'child1.yml' }
+    - { resource: 'child2.yml' }
+```
