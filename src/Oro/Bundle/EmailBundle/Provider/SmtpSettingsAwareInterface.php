@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 
-interface SmtpSettingsProviderInterface
+interface SmtpSettingsAwareInterface
 {
     /**
      * Gets SMTP settings model object

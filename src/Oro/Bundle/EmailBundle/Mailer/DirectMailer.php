@@ -69,7 +69,7 @@ class DirectMailer extends \Swift_Mailer
             }
         }
 
-        $this->postPrepareSmtpTransport();
+        $this->afterPrepareSmtpTransport();
     }
 
     /**
@@ -90,39 +90,43 @@ class DirectMailer extends \Swift_Mailer
 
     /**
      * Last chance to modify SMTP transport
+     *
+     * @param SmtpSettings|null $smtpSettings
      */
-    public function postPrepareSmtpTransport(SmtpSettings $smtpSettings = null)
+    public function afterPrepareSmtpTransport(SmtpSettings $smtpSettings = null)
     {
-        if (!$this->smtpTransport) {
-            if (!$smtpSettings instanceof SmtpSettings) {
-                $provider = $this->container->get('oro_email.provider.smtp_settings');
-                $smtpSettings = $provider->getSmtpSettings();
-            }
-
-            if ($smtpSettings->isEligible()) {
-                $transport = $this->getTransport();
-                $host = $smtpSettings->getHost();
-                $port = $smtpSettings->getPort();
-                $encryption = $smtpSettings->getEncryption();
-
-                if ($transport instanceof \Swift_SmtpTransport
-                    || $transport instanceof \Swift_Transport_EsmtpTransport
-                ) {
-                    $transport->setHost($host);
-                    $transport->setPort($port);
-                    $transport->setEncryption($encryption);
-                } else {
-                    $transport = \Swift_SmtpTransport::newInstance($host, $port, $encryption);
-                }
-
-                $transport
-                    ->setUsername($smtpSettings->getUsername())
-                    ->setPassword($smtpSettings->getPassword())
-                ;
-
-                $this->smtpTransport = $transport;
-            }
+        if ($this->smtpTransport) {
+            return;
         }
+
+        if (!$smtpSettings instanceof SmtpSettings) {
+            $provider = $this->container->get('oro_email.provider.smtp_settings');
+            $smtpSettings = $provider->getSmtpSettings();
+        }
+
+        if (!$smtpSettings->isEligible()) {
+            return;
+        }
+
+        $transport = $this->getTransport();
+        $host = $smtpSettings->getHost();
+        $port = $smtpSettings->getPort();
+        $encryption = $smtpSettings->getEncryption();
+
+        if ($transport instanceof \Swift_SmtpTransport) {
+            $transport->setHost($host);
+            $transport->setPort($port);
+            $transport->setEncryption($encryption);
+        } else {
+            $transport = \Swift_SmtpTransport::newInstance($host, $port, $encryption);
+        }
+
+        $transport
+            ->setUsername($smtpSettings->getUsername())
+            ->setPassword($smtpSettings->getPassword())
+        ;
+
+        $this->smtpTransport = $transport;
     }
 
     /**

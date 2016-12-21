@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Configuration as Config;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
-abstract class AbstractSmtpSettingsProvider implements SmtpSettingsProviderInterface
+abstract class AbstractSmtpSettingsProvider implements SmtpSettingsAwareInterface
 {
     /** @var ConfigManager */
     protected $configManager;

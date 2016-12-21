@@ -7,8 +7,8 @@ class SmtpSettings
     const DEFAULT_HOST = '';
     const DEFAULT_PORT = null;
     const DEFAULT_ENCRYPTION = null;
-    const DEFAULT_USERNAME = '';
-    const DEFAULT_PASSWORD = '';
+    const DEFAULT_USERNAME = null;
+    const DEFAULT_PASSWORD = null;
 
     /**
      * @var string
@@ -21,21 +21,21 @@ class SmtpSettings
     protected $port;
 
     /**
-     * The SSL type to be used to connect to the server. Can be null, 'ssl' or 'tls'
+     * The SSL type to be used to connect to the server. Can be empty string, 'ssl' or 'tls'
      *
-     * @var string|null
+     * @var string
      */
     protected $encryption;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $username;
 
     /**
      * Encrypted password. Must be persisted.
      *
-     * @var string
+     * @var string|null
      */
     protected $password;
 
@@ -44,9 +44,9 @@ class SmtpSettings
      *
      * @param string      $host
      * @param integer     $port
-     * @param string|null $encryption
-     * @param string      $username
-     * @param string      $password
+     * @param string      $encryption
+     * @param string|null $username
+     * @param string|null $password
      */
     public function __construct(
         $host = self::DEFAULT_HOST,
