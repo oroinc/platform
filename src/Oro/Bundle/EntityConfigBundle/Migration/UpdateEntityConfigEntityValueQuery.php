@@ -95,8 +95,10 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
             ";
 
         $value = $this->value;
+
+        // array values are not supported
         if (is_array($value)) {
-            $value = $this->connection->convertToDatabaseValue($value, Type::TARRAY);
+            return;
         }
 
         $parameters = [$value, $this->entityName, $this->scope, $this->code];

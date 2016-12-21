@@ -92,35 +92,17 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
-     * Remove specific inheritance targets
-     *
-     * @param string $entityClass
-     * @param string $targetClass
-     *
+     * @param  string $entityClass
      * @return array
      */
-    public function removeInheritanceTargetClass($entityClass, $targetClass)
+    public function getInheritanceTargets($entityClass)
     {
-        $newValues = [];
-        $config = $this->configManager->getEntityConfig('activity', $entityClass);
-        $configValues = $config->getValues();
-
-        if(!isset($configValues['inheritance_targets'])) {
-            $values = $configValues['inheritance_targets'];
-
-            foreach ($values as $value) {
-                if (array_key_exists('target', $value) && $value['target'] == $targetClass) {
-                    continue;
-                }
-
-                $newValues[] = $value;
-            }
-
-            $configValues['inheritance_targets'] = $newValues;
-            $config->setValues($configValues);
+        $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
+        if ($this->hasValueInInheritanceTargets($configValues)) {
+            return $configValues['inheritance_targets'];
         }
 
-        return $newValues;
+        return [];
     }
 
     /**
