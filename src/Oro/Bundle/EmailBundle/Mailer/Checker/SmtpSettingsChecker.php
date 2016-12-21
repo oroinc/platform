@@ -28,7 +28,7 @@ class SmtpSettingsChecker
     public function checkConnection(SmtpSettings $smtpSettings)
     {
         $error = false;
-        $this->directMailer->postPrepareSmtpTransport($smtpSettings);
+        $this->directMailer->afterPrepareSmtpTransport($smtpSettings);
 
         try {
             $this->directMailer->getTransport()->start();
