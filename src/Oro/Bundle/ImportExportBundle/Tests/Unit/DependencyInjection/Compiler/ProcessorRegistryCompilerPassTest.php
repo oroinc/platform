@@ -35,7 +35,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->with(ProcessorRegistryCompilerPass::PROCESSOR_TAG)
             ->will($this->returnValue($taggedProcessorIds));
 
-        $registryDefinition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $registryDefinition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
         $containerBuilder->expects($this->at(1))
             ->method('getDefinition')
             ->with(ProcessorRegistryCompilerPass::PROCESSOR_REGISTRY_SERVICE)
@@ -60,7 +60,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
                         array(
                             'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
                             'type' => 'import',
-                            'entity' => 'FooEntity',
+                            'entity' => \stdClass::class,
                             'alias' => 'foo_import'
                         )
                     ),
@@ -68,7 +68,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
                         array(
                             'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
                             'type' => 'export',
-                            'entity' => 'FooEntity',
+                            'entity' => \stdClass::class,
                             'alias' => 'foo_export'
                         )
                     ),
@@ -94,14 +94,24 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
                         'addMethodCall',
                         array(
                             'registerProcessor',
-                            array(new Reference('oro_test.foo_import_processor'), 'import', 'FooEntity', 'foo_import')
+                            array(
+                                new Reference('oro_test.foo_import_processor'),
+                                'import',
+                                \stdClass::class,
+                                'foo_import'
+                            )
                         ),
                     ),
                     array(
                         'addMethodCall',
                         array(
                             'registerProcessor',
-                            array(new Reference('oro_test.foo_export_processor'), 'export', 'FooEntity', 'foo_export')
+                            array(
+                                new Reference('oro_test.foo_export_processor'),
+                                'export',
+                                \stdClass::class,
+                                'foo_export'
+                            )
                         ),
                     ),
                     array(
@@ -147,7 +157,8 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilder->expects($this->never())->method('getDefinition');
 
-        $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->compiler->process($containerBuilder);
     }
 
@@ -160,7 +171,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
                         array(
                             'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
                             'alias' => 'foo_import',
-                            'entity' => 'FooEntity'
+                            'entity' => \stdClass::class
                         )
                     )
                 ),
@@ -190,7 +201,7 @@ class ProcessorRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
                         array(
                             'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
                             'type' => 'import',
-                            'entity' => 'FooEntity'
+                            'entity' => \stdClass::class
                         )
                     )
                 ),

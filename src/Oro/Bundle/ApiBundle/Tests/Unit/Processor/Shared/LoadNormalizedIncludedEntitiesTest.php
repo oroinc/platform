@@ -27,7 +27,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->processorBag = $this->getMock(ActionProcessorBagInterface::class);
+        $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
 
         $this->processor = new LoadNormalizedIncludedEntities($this->processorBag);
     }
@@ -64,7 +64,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
         $getContext->setMetadata($getMetadata);
-        $getProcessor = $this->getMock(ActionProcessorInterface::class);
+        $getProcessor = $this->createMock(ActionProcessorInterface::class);
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
@@ -138,7 +138,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
         $getContext->setMetadata($getMetadata);
-        $getProcessor = $this->getMock(ActionProcessorInterface::class);
+        $getProcessor = $this->createMock(ActionProcessorInterface::class);
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
@@ -207,7 +207,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData->setMetadata($createMetadata);
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
-        $getProcessor = $this->getMock(ActionProcessorInterface::class);
+        $getProcessor = $this->createMock(ActionProcessorInterface::class);
 
         $this->processorBag->expects(self::once())
             ->method('getProcessor')

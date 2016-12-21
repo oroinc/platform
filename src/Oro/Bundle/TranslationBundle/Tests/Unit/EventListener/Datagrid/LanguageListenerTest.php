@@ -78,7 +78,7 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildBefore()
     {
-        $event = new BuildBefore($this->getMock(DatagridInterface::class), DatagridConfiguration::create([]));
+        $event = new BuildBefore($this->createMock(DatagridInterface::class), DatagridConfiguration::create([]));
 
         $this->gridConfigurationHelper->expects($this->once())
             ->method('getEntityRootAlias')
@@ -99,7 +99,7 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnBuildBeforeAndExistingDefinition()
     {
         $event = new BuildBefore(
-            $this->getMock(DatagridInterface::class),
+            $this->createMock(DatagridInterface::class),
             DatagridConfiguration::create([
                 'columns' => [
                     LanguageListener::COLUMN_STATUS => [
@@ -208,7 +208,7 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             $records[] = new ResultRecord($item);
         }
 
-        return new OrmResultAfter($this->getMock(DatagridInterface::class), $records);
+        return new OrmResultAfter($this->createMock(DatagridInterface::class), $records);
     }
 
     /**

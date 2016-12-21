@@ -36,7 +36,7 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->metadata = $this
             ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->setMethods([])
+            ->setMethods(['getTable', 'getTableName'])
             ->disableOriginalConstructor()
             ->getMock();
     }

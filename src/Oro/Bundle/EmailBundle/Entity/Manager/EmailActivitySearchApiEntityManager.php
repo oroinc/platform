@@ -7,14 +7,14 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQueryBuilder;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
-use Oro\Bundle\EntityBundle\ORM\QueryUtils;
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
@@ -116,47 +116,28 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
         /** @var EntityManager $em */
         $em = $this->getObjectManager();
 
-        $selectStmt = null;
-        $subQueries = [];
+        $qb = new UnionQueryBuilder($em);
+        $qb
+            ->addSelect('id', 'id', Type::INTEGER)
+            ->addSelect('entityClass', 'entity')
+            ->addSelect('entityTitle', 'title');
         foreach ($this->getAssociatedEntitiesFilters($searchResult) as $entityClass => $ids) {
-            $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'e');
-            /** @var QueryBuilder $subQb */
-            $subQb    = $em->getRepository($entityClass)->createQueryBuilder('e')
+            $subQb = $em->getRepository($entityClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
-                        'e.id AS id, \'%s\' AS entityClass, ' . ($nameExpr ?: '\'\'') . ' AS entityTitle',
-                        str_replace('\'', '\'\'', $entityClass)
+                        'e.id AS id, \'%s\' AS entityClass, %s AS entityTitle',
+                        $entityClass,
+                        $this->entityNameResolver->prepareNameDQL(
+                            $this->entityNameResolver->getNameDQL($entityClass, 'e'),
+                            true
+                        )
                     )
                 );
-            $subQb->where(
-                $subQb->expr()->in('e.id', $ids)
-            );
-
-            $subQuery     = $subQb->getQuery();
-            $subQueries[] = QueryUtils::getExecutableSql($subQuery);
-
-            if (empty($selectStmt)) {
-                $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
-                $selectStmt = sprintf(
-                    'entity.%s AS id, entity.%s AS entity, entity.%s AS title',
-                    QueryUtils::getColumnNameByAlias($mapping, 'id'),
-                    QueryUtils::getColumnNameByAlias($mapping, 'entityClass'),
-                    QueryUtils::getColumnNameByAlias($mapping, 'entityTitle')
-                );
-            }
+            $subQb->where($subQb->expr()->in('e.id', $ids));
+            $qb->addSubQuery($subQb->getQuery());
         }
 
-        $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
-        $rsm
-            ->addScalarResult('id', 'id', Type::INTEGER)
-            ->addScalarResult('entity', 'entity')
-            ->addScalarResult('title', 'title');
-        $qb = new SqlQueryBuilder($em, $rsm);
-        $qb
-            ->select($selectStmt)
-            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
-
-        return $qb;
+        return $qb->getQueryBuilder();
     }
 
     /**

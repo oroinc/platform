@@ -36,10 +36,10 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ['scheduleCron', '1 * * * *'],
                 ['scheduleFilter', "e.field < DATE_ADD(NOW(), 1, 'day')"],
                 ['scheduleCheckConditions', true],
-                ['preAction', $this->getMock(ActionInterface::class)],
-                ['preCondition', $this->getMock(ExpressionInterface::class)],
-                ['condition', $this->getMock(ExpressionInterface::class)],
-                ['action', $this->getMock(ActionInterface::class)],
+                ['preAction', $this->createMock(ActionInterface::class)],
+                ['preCondition', $this->createMock(ExpressionInterface::class)],
+                ['condition', $this->createMock(ExpressionInterface::class)],
+                ['action', $this->createMock(ActionInterface::class)],
                 ['initEntities', ['TEST_ENTITY_1', 'TEST_ENTITY_2', 'TEST_ENTITY_3']],
                 ['initRoutes', ['TEST_ROUTE_1', 'TEST_ROUTE_2', 'TEST_ROUTE_3']],
                 ['initContextAttribute', 'testInitContextAttribute'],
@@ -85,7 +85,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $obj = new Transition();
 
         if (null !== $isAllowed) {
-            $condition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
             $condition->expects($this->once())
                 ->method('evaluate')
                 ->with($workflowItem)
@@ -123,11 +123,11 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
 
         $obj = new Transition();
 
-        $action = $this->getMock(ActionInterface::class);
+        $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())->method('execute')->with($workflowItem);
         $obj->setPreAction($action);
 
-        $condition = $this->getMock(ExpressionInterface::class);
+        $condition = $this->createMock(ExpressionInterface::class);
         $condition->expects($this->once())->method('evaluate')->with($workflowItem)->willReturn(true);
         $obj->setCondition($condition);
 
@@ -149,7 +149,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $obj->setFormOptions(['key' => 'value']);
 
         if (null !== $isAllowed) {
-            $condition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
             $condition->expects($this->once())
                 ->method('evaluate')
                 ->with($workflowItem)
@@ -175,7 +175,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $obj = new Transition();
 
         if (null !== $isAvailable) {
-            $preCondition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $preCondition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
             $preCondition->expects($this->any())
                 ->method('evaluate')
                 ->with($workflowItem)
@@ -183,7 +183,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             $obj->setPreCondition($preCondition);
         }
         if (null !== $isAllowed) {
-            $condition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+            $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
             $condition->expects($this->any())
                 ->method('evaluate')
                 ->with($workflowItem)
@@ -243,19 +243,19 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $workflowItem->expects($this->never())
             ->method('setCurrentStep');
 
-        $preCondition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $preCondition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $preCondition->expects($this->any())
             ->method('evaluate')
             ->with($workflowItem)
             ->will($this->returnValue($preConditionAllowed));
 
-        $condition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $condition->expects($this->any())
             ->method('evaluate')
             ->with($workflowItem)
             ->will($this->returnValue($conditionAllowed));
 
-        $action = $this->getMock('Oro\Component\Action\Action\ActionInterface');
+        $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
         $action->expects($this->never())
             ->method('execute');
 
@@ -310,19 +310,19 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->method('setCurrentStep')
             ->with($currentStepEntity);
 
-        $preCondition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $preCondition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $preCondition->expects($this->once())
             ->method('evaluate')
             ->with($workflowItem)
             ->will($this->returnValue(true));
 
-        $condition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $condition->expects($this->once())
             ->method('evaluate')
             ->with($workflowItem)
             ->will($this->returnValue(true));
 
-        $action = $this->getMock('Oro\Component\Action\Action\ActionInterface');
+        $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
         $action->expects($this->once())
             ->method('execute')
             ->with($workflowItem);

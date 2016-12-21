@@ -49,6 +49,6 @@ class ConfigProviderManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockConfigProviderInterface()
     {
-        return $this->getMock('Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface');
+        return $this->createMock('Oro\Bundle\RequireJSBundle\Provider\ConfigProviderInterface');
     }
 }

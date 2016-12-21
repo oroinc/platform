@@ -12,7 +12,7 @@ class AclTest extends \PHPUnit_Framework_TestCase
             array(
                 'id' => 'test_acl',
                 'type' => 'SomeType',
-                'class' => 'SomeClass',
+                'class' => \stdClass::class,
                 'permission' => 'SomePermission',
                 'group_name' => 'SomeGroup',
                 'label' => 'SomeLabel',
@@ -23,7 +23,7 @@ class AclTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals('test_acl', $annotation->getId());
         $this->assertEquals('SomeType', $annotation->getType());
-        $this->assertEquals('SomeClass', $annotation->getClass());
+        $this->assertEquals(\stdClass::class, $annotation->getClass());
         $this->assertEquals('SomePermission', $annotation->getPermission());
         $this->assertEquals('SomeGroup', $annotation->getGroup());
         $this->assertEquals('SomeLabel', $annotation->getLabel());

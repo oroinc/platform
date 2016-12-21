@@ -26,7 +26,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->authorizationChecker = $this
-            ->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+            ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
         $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();

@@ -29,13 +29,13 @@ class GroupingValidatorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->validator = new GroupingValidator(
             $this->translator
         );
 
-        $this->context = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock('\Symfony\Component\Validator\ExecutionContextInterface');
         $this->validator->initialize($this->context);
 
         $this->constraint = new GroupingConstraint();

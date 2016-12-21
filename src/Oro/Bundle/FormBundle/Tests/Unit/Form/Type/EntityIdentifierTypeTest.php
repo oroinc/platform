@@ -207,7 +207,8 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
             $this->addMockExpectedCalls($key, $calls);
         }
 
-        $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->factory->create($this->getTestFormType(), null, $options);
     }
 
@@ -372,7 +373,7 @@ class EntityIdentifierTypeTest extends FormIntegrationTestCase
     private function createMockEntity($property, $value)
     {
         $getter = 'get' . ucfirst($property);
-        $result = $this->getMock('MockEntity', array($getter));
+        $result = $this->createPartialMock(\stdClass::class, array($getter));
         $result->expects($this->any())->method($getter)->will($this->returnValue($value));
 
         return $result;

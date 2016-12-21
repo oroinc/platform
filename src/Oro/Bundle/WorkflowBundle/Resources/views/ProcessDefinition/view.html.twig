@@ -25,8 +25,8 @@
             }) }}
         {% endif %}
         <script type="text/javascript">
-            require(['jquery', 'oroui/js/mediator', 'oroui/js/error'],
-            function($, mediator, Error) {
+            require(['jquery', 'oroui/js/mediator'],
+            function($, mediator) {
                 $('#{{ idButton }}').on('click', function(e) {
                     e.preventDefault();
                     var el = $(this);
@@ -40,9 +40,6 @@
                                 });
                             }
                             mediator.execute('refreshPage');
-                        },
-                        error: function(xhr) {
-                            Error.handle({}, xhr, {enforce: true});
                         }
                     })
                 });

@@ -74,10 +74,8 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWithWrongTotalCallback()
     {
-        $this->setExpectedException(
-            '\RuntimeException',
-            'Expected callable for "totalCount", "stdClass" given.'
-        );
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage('Expected callable for "totalCount", "stdClass" given.');
 
         $this->context->setTotalCountCallback(new \stdClass());
         $this->context->getRequestHeaders()->set(
@@ -89,10 +87,8 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessWithWrongTotalCallbackResult()
     {
-        $this->setExpectedException(
-            '\RuntimeException',
-            'Expected integer as result of "totalCount" callback, "string" given.'
-        );
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage('Expected integer as result of "totalCount" callback, "string" given.');
 
         $this->context->setTotalCountCallback(
             function () {
@@ -158,8 +154,8 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessOnWrongQuery()
     {
-        $this->setExpectedException(
-            '\RuntimeException',
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(
             'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query, '
             . 'Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder or Oro\Bundle\EntityBundle\ORM\SqlQuery, '
             . '"stdClass" given.'

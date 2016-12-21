@@ -74,7 +74,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $provider = $this->getMock(MassActionProviderInterface::class);
+        $provider = $this->createMock(MassActionProviderInterface::class);
         $provider->expects($this->any())
             ->method('getActions')
             ->willReturn(['test_config' => ['label' => 'test_label']]);
@@ -449,7 +449,7 @@ class OperationListenerTest extends \PHPUnit_Framework_TestCase
     protected function createOperation($name = 'test_operation', $isAvailable = true, array $definitionParams = [])
     {
         /** @var $definition OperationDefinition|\PHPUnit_Framework_MockObject_MockObject */
-        $definition = $this->getMock(OperationDefinition::class);
+        $definition = $this->createMock(OperationDefinition::class);
 
         foreach ($definitionParams as $method => $params) {
             $definition->expects($this->any())->method($method)->willReturn($params);

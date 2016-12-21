@@ -71,7 +71,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->logger = $this->getMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->workflowManager = new WorkflowManager(
             $this->workflowRegistry,
@@ -395,12 +395,15 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     public function testStartWorkflowEntityWithoutId()
     {
         $entity = new \DateTime();
-        $transition = 'test_transition';
+        $transitionName = 'test_transition';
         $workflowData = ['key' => 'value'];
         $workflowItem = new WorkflowItem();
         $workflowItem->getData()->add($workflowData);
 
-        $workflow = $this->createWorkflow();
+        $transition = new Transition();
+        $transition->setName($transitionName);
+
+        $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME, [], [$transition]);
         $workflow->expects($this->once())
             ->method('start')
             ->with($entity, $workflowData, $transition)
@@ -425,7 +428,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $actualWorkflowItem = $this->workflowManager->startWorkflow(
             'test_workflow',
             $entity,
-            $transition,
+            $transitionName,
             $workflowData
         );
 
@@ -437,13 +440,16 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass();
         $entity->id = 42;
-        $transition = 'test_transition';
+        $transitionName = 'test_transition';
         $workflowData = ['key' => 'value'];
         $workflowItem = new WorkflowItem();
         $workflowItem->getData()->add($workflowData);
 
+        $transition = new Transition();
+        $transition->setName($transitionName);
+
         $workflowDefinition = new WorkflowDefinition();
-        $workflow = $this->createWorkflow();
+        $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME, [], [$transition]);
 
         $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
 
@@ -469,7 +475,55 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $actualWorkflowItem = $this->workflowManager->startWorkflow(
             'test_workflow',
             $entity,
-            $transition,
+            $transitionName,
+            $workflowData
+        );
+
+        $this->assertEquals($workflowItem, $actualWorkflowItem);
+        $this->assertEquals($workflowData, $actualWorkflowItem->getData()->getValues());
+    }
+
+    public function testStartWorkflowWithInitOptions()
+    {
+        $entity = new \stdClass();
+        $entity->id = 42;
+        $transitionName = 'test_transition';
+        $workflowData = ['key' => 'value'];
+        $workflowItem = new WorkflowItem();
+        $workflowItem->getData()->add($workflowData);
+
+        $transition = new Transition();
+        $transition->setName($transitionName);
+        $transition->setInitEntities([EntityStub::class]);
+
+        $workflowDefinition = new WorkflowDefinition();
+        $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME, [], [$transition]);
+
+        $workflow->expects($this->once())->method('getDefinition')->willReturn($workflowDefinition);
+
+        $workflow->expects($this->once())
+            ->method('start')
+            ->with($entity, $workflowData, $transition)
+            ->will($this->returnValue($workflowItem));
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getWorkflow')
+            ->with('test_workflow')
+            ->willReturn($workflow);
+
+        $em = $this->getTransactionScopedEntityManager(WorkflowItem::class);
+        $em->expects($this->once())->method('persist')->with($workflowItem);
+        $em->expects($this->once())->method('flush');
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->with($entity)
+            ->willReturn($entity->id);
+
+        $actualWorkflowItem = $this->workflowManager->startWorkflow(
+            'test_workflow',
+            $entity,
+            $transitionName,
             $workflowData
         );
 
@@ -535,8 +589,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             foreach ($expected as $iteration => $row) {
                 $workflowDefinition = new WorkflowDefinition();
 
+                $transition = new Transition();
+                $transition->setName('start');
+
                 $workflowName = $row['workflow'];
-                $workflow = $this->createWorkflow($workflowName);
+                $workflow = $this->createWorkflow($workflowName, [], [$transition]);
                 $workflow->expects($this->any())
                     ->method('isStartTransitionAvailable')
                     ->willReturn($row['startTransitionAllowed']);
@@ -1104,6 +1161,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $transitionManager->expects($this->any())
             ->method('getDefaultStartTransition')
             ->willReturn($this->getStartTransition());
+        $transitionManager->setTransitions($startTransitions);
 
         $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
 

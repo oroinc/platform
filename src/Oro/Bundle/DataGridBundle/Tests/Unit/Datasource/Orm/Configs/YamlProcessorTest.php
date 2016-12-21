@@ -143,8 +143,8 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($entity1)
             ->willReturn($repo);
 
-        $this->setExpectedException(
-            'Oro\Bundle\DataGridBundle\Exception\DatasourceException',
+        $this->expectException('Oro\Bundle\DataGridBundle\Exception\DatasourceException');
+        $this->expectExceptionMessage(
             sprintf(
                 '%s::methodNotReturnQB() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
                 get_class($repo),
@@ -163,8 +163,8 @@ class YamlProcessorTest extends \PHPUnit_Framework_TestCase
             'query_builder' => $qb,
         ];
 
-        $this->setExpectedException(
-            'Oro\Bundle\DataGridBundle\Exception\DatasourceException',
+        $this->expectException('Oro\Bundle\DataGridBundle\Exception\DatasourceException');
+        $this->expectExceptionMessage(
             sprintf(
                 '%s configured with service must return an instance of Doctrine\ORM\QueryBuilder, %s given',
                 'Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor',

@@ -56,7 +56,7 @@ class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
         $context->getRequest()->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $includeName);
 
         $serviceId = 'acme.demo.last-modified.handler';
-        $handler   = $this->getMock('Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface');
+        $handler   = $this->createMock('Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface');
         $this->container->set($serviceId, $handler);
         $this->handler->registerHandler($includeName, $serviceId);
 
@@ -80,7 +80,7 @@ class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
         $context->getRequest()->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $includeName);
 
         $serviceId = 'acme.demo.last-modified.handler';
-        $handler   = $this->getMock('Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface');
+        $handler   = $this->createMock('Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface');
         $this->container->set($serviceId, $handler);
         $this->handler->registerHandler($includeName, $serviceId);
 

@@ -122,21 +122,26 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $associationKind = $this->getAssociationKind();
 
         $supportMethodName = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
-        $getMethodName     = AssociationNameGenerator::generateGetTargetsMethodName($associationKind);
-        $setMethodName     = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
-        $resetMethodName   = AssociationNameGenerator::generateResetTargetsMethodName($associationKind);
+        $hasMethodName = AssociationNameGenerator::generateHasTargetMethodName($associationKind);
+        $getMethodName = AssociationNameGenerator::generateGetTargetsMethodName($associationKind);
+        $addMethodName = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
+        $removeMethodName = AssociationNameGenerator::generateRemoveTargetMethodName($associationKind);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
         ];
-        $getMethodBody     = [
+        $getMethodBody = [
             '$targets = [];',
         ];
-        $setMethodBody     = [
-            'if (null === $target) { $this->' . $resetMethodName . '(); return $this; }',
+        $hasMethodBody = [
+            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
+        ];
+        $addMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
         ];
-        $resetMethodBody   = [];
+        $removeMethodBody = [
+            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
+        ];
 
         foreach ($schema['relationData'] as $relationData) {
             if (!$this->isSupportedRelation($relationData)) {
@@ -144,15 +149,15 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             }
 
             /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId   = $relationData['field_id'];
-            $fieldName       = $fieldConfigId->getFieldName();
+            $fieldConfigId = $relationData['field_id'];
+            $fieldName = $fieldConfigId->getFieldName();
             $targetClassName = $relationData['target_entity'];
 
             $supportMethodBody[] = sprintf(
                 'if ($className === \'%s\') { return true; }',
                 $targetClassName
             );
-            $getMethodBody[]  = str_replace(
+            $getMethodBody[] = str_replace(
                 ['{field}'],
                 [$fieldName],
                 "\$entity = \$this->{field};\n"
@@ -160,22 +165,33 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                 . "    \$targets[] = \$entity;\n"
                 . "}"
             );
-            $setMethodBody[]     = sprintf(
-                'if ($className === \'%s\') { $this->%s = %s; return $this; }',
+            $hasMethodBody[] = sprintf(
+                'if ($className === \'%s\') { return $this->%s === $target; }',
                 $targetClassName,
-                $fieldName,
-                '$target'
-            );
-            $resetMethodBody[]   = sprintf(
-                '$this->%s = null;',
                 $fieldName
+            );
+            $addMethodBody[] = sprintf(
+                'if ($className === \'%s\') { $this->%s = $target; return $this; }',
+                $targetClassName,
+                $fieldName
+            );
+            $removeMethodBody[] = str_replace(
+                ['{class}', '{field}'],
+                [$targetClassName, $fieldName],
+                "if (\$className === '{class}') {\n"
+                . "    if (\$this->{field} === \$target) { \$this->{field} = null; }\n"
+                . "    return \$this;\n}"
             );
         }
 
-        $supportMethodBody[] = 'return false;';
-        $getMethodBody[]     = "return \$targets;";
-        $setMethodBody[]     = 'throw new \RuntimeException(sprintf('
+        $throwStmt = 'throw new \RuntimeException(sprintf('
             . '\'The association with "%s" entity was not configured.\', $className));';
+
+        $supportMethodBody[] = 'return false;';
+        $getMethodBody[] = "return \$targets;";
+        $hasMethodBody[] = 'return false;';
+        $addMethodBody[] = $throwStmt;
+        $removeMethodBody[] = $throwStmt;
 
         $supportMethodDocblock = "/**\n"
             . " * Checks if this entity can be associated with the given target entity type\n"
@@ -183,24 +199,31 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " * @param string \$targetClass The class name of the target entity\n"
             . " * @return bool\n"
             . " */";
-        $getMethodDocblock     = "/**\n"
+        $getMethodDocblock = "/**\n"
             . " * Gets the entities this entity is associated with\n"
             . " *\n"
             . " * @return object[]\n"
             . " */";
-        $setMethodDocblock     = "/**\n"
-            . " * Sets the entity this entity is associated with\n"
+        $hasMethodDocblock = "/**\n"
+            . " * Checks is the given entity is associated with this entity\n"
+            . " *\n"
+            . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
+            . " * @return bool\n"
+            . " */";
+        $addMethodDocblock = "/**\n"
+            . " * Associates the given entity with this entity\n"
+            . " *\n"
+            . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
+            . " * @return object This object\n"
+            . " */";
+        $removeMethodDocblock = "/**\n"
+            . " * Removes the association of the given entity and this entity\n"
             . " *\n"
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
             . " * @return object This object\n"
             . " */";
 
         $class
-            ->setMethod(
-                $this
-                    ->generateClassMethod($resetMethodName, implode("\n", $resetMethodBody))
-                    ->setVisibility('private')
-            )
             ->setMethod(
                 $this
                     ->generateClassMethod($supportMethodName, implode("\n", $supportMethodBody), ['targetClass'])
@@ -213,8 +236,18 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             )
             ->setMethod(
                 $this
-                    ->generateClassMethod($setMethodName, implode("\n", $setMethodBody), ['target'])
-                    ->setDocblock($setMethodDocblock)
+                    ->generateClassMethod($hasMethodName, implode("\n", $hasMethodBody), ['target'])
+                    ->setDocblock($hasMethodDocblock)
+            )
+            ->setMethod(
+                $this
+                    ->generateClassMethod($addMethodName, implode("\n", $addMethodBody), ['target'])
+                    ->setDocblock($addMethodDocblock)
+            )
+            ->setMethod(
+                $this
+                    ->generateClassMethod($removeMethodName, implode("\n", $removeMethodBody), ['target'])
+                    ->setDocblock($removeMethodDocblock)
             );
     }
 
@@ -228,22 +261,22 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
     {
         $associationKind = $this->getAssociationKind();
 
-        $supportMethodName   = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
-        $getMethodName       = AssociationNameGenerator::generateGetTargetMethodName($associationKind);
-        $setMethodName       = AssociationNameGenerator::generateSetTargetMethodName($associationKind);
-        $resetMethodName     = AssociationNameGenerator::generateResetTargetsMethodName($associationKind);
+        $supportMethodName = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
+        $getMethodName = AssociationNameGenerator::generateGetTargetMethodName($associationKind);
+        $setMethodName = AssociationNameGenerator::generateSetTargetMethodName($associationKind);
+        $resetMethodName = AssociationNameGenerator::generateResetTargetsMethodName($associationKind);
         $getAssociationsName = AssociationNameGenerator::generateGetTargetEntitiesMethodName($associationKind);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
         ];
-        $getMethodBody     = [];
-        $setMethodBody     = [
+        $getMethodBody = [];
+        $setMethodBody = [
             'if (null === $target) { $this->' . $resetMethodName . '(); return $this; }',
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
             '// This entity can be associated with only one another entity',
         ];
-        $resetMethodBody   = [];
+        $resetMethodBody = [];
         $getAssociationsMethodBody = [
             '$associationEntities = [];',
         ];
@@ -254,26 +287,26 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             }
 
             /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId   = $relationData['field_id'];
-            $fieldName       = $fieldConfigId->getFieldName();
+            $fieldConfigId = $relationData['field_id'];
+            $fieldName = $fieldConfigId->getFieldName();
             $targetClassName = $relationData['target_entity'];
 
             $supportMethodBody[] = sprintf(
                 'if ($className === \'%s\') { return true; }',
                 $targetClassName
             );
-            $getMethodBody[]     = sprintf(
+            $getMethodBody[] = sprintf(
                 'if (null !== $this->%s) { return $this->%s; }',
                 $fieldName,
                 $fieldName
             );
-            $setMethodBody[]     = sprintf(
-                'if ($className === \'%s\') { $this->' . $resetMethodName . '(); $this->%s = %s; return $this; }',
+            $setMethodBody[] = sprintf(
+                'if ($className === \'%s\') { $this->%s(); $this->%s = $target; return $this; }',
                 $targetClassName,
-                $fieldName,
-                '$target'
+                $resetMethodName,
+                $fieldName
             );
-            $resetMethodBody[]   = sprintf(
+            $resetMethodBody[] = sprintf(
                 '$this->%s = null;',
                 $fieldName
             );
@@ -288,8 +321,8 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         }
 
         $supportMethodBody[] = 'return false;';
-        $getMethodBody[]     = 'return null;';
-        $setMethodBody[]     = 'throw new \RuntimeException(sprintf('
+        $getMethodBody[] = 'return null;';
+        $setMethodBody[] = 'throw new \RuntimeException(sprintf('
             . '\'The association with "%s" entity was not configured.\', $className));';
         $getAssociationsMethodBody[] = "return \$associationEntities;";
 
@@ -299,12 +332,12 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " * @param string \$targetClass The class name of the target entity\n"
             . " * @return bool\n"
             . " */";
-        $getMethodDocblock     = "/**\n"
+        $getMethodDocblock = "/**\n"
             . " * Gets the entity this entity is associated with\n"
             . " *\n"
             . " * @return object|null Any configurable entity\n"
             . " */";
-        $setMethodDocblock     = "/**\n"
+        $setMethodDocblock = "/**\n"
             . " * Sets the entity this entity is associated with\n"
             . " *\n"
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
@@ -314,6 +347,10 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " * Returns array with all associated entities\n"
             . " *\n"
             . " * @return array\n"
+            . sprintf(
+                ' * @deprecated since 2.0. Method "get%sTarget" should be used instead' . "\n",
+                AssociationNameGenerator::classify($associationKind)
+            )
             . " */";
 
         $class
@@ -350,30 +387,29 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function generateManyToManyAssociationMethods(array $schema, PhpClass $class)
+    protected function generateManyToManyAssociationMethods(array $schema, PhpClass $class)
     {
         $associationKind = $this->getAssociationKind();
 
-        $supportMethodName   = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
-        $getMethodName       = AssociationNameGenerator::generateGetTargetsMethodName($associationKind);
-        $hasMethodName       = AssociationNameGenerator::generateHasTargetMethodName($associationKind);
-        $addMethodName       = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
-        $removeMethodName    = AssociationNameGenerator::generateRemoveTargetMethodName($associationKind);
+        $supportMethodName = AssociationNameGenerator::generateSupportTargetMethodName($associationKind);
+        $getMethodName = AssociationNameGenerator::generateGetTargetsMethodName($associationKind);
+        $hasMethodName = AssociationNameGenerator::generateHasTargetMethodName($associationKind);
+        $addMethodName = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
+        $removeMethodName = AssociationNameGenerator::generateRemoveTargetMethodName($associationKind);
         $getAssociationsName = AssociationNameGenerator::generateGetTargetEntitiesMethodName($associationKind);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
         ];
-        $getMethodBody     = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);'
-        ];
-        $hasMethodBody     = [
+        $getMethodBodyWithTargetClass = [];
+        $getMethodBodyWithoutTargetClass = [];
+        $hasMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
         ];
-        $addMethodBody     = [
+        $addMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
         ];
-        $removeMethodBody  = [
+        $removeMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
         ];
         $getAssociationsMethodBody = [
@@ -386,32 +422,38 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             }
 
             /** @var FieldConfigId $fieldConfigId */
-            $fieldConfigId   = $relationData['field_id'];
-            $fieldName       = $fieldConfigId->getFieldName();
+            $fieldConfigId = $relationData['field_id'];
+            $fieldName = $fieldConfigId->getFieldName();
             $targetClassName = $relationData['target_entity'];
 
             $supportMethodBody[] = sprintf(
                 'if ($className === \'%s\') { return true; }',
                 $targetClassName
             );
-            $getMethodBody[]     = sprintf(
-                'if ($className === \'%s\') { return $this->%s; }',
+            $getMethodBodyWithTargetClass[] = sprintf(
+                '    if ($className === \'%s\') { return $this->%s; }',
                 $targetClassName,
                 $fieldName
             );
-            $hasMethodBody[]     = str_replace(
+            $getMethodBodyWithoutTargetClass[] = str_replace(
+                ['{field}'],
+                [$fieldName],
+                "    \$entities = \$this->{field}->toArray();\n"
+                . "    if (!empty(\$entities)) { \$targets = array_merge(\$targets, \$entities); }"
+            );
+            $hasMethodBody[] = str_replace(
                 ['{class}', '{field}'],
                 [$targetClassName, $fieldName],
                 "if (\$className === '{class}') { return \$this->{field}->contains(\$target); }"
             );
-            $addMethodBody[]     = str_replace(
+            $addMethodBody[] = str_replace(
                 ['{class}', '{field}'],
                 [$targetClassName, $fieldName],
                 "if (\$className === '{class}') {\n"
                 . "    if (!\$this->{field}->contains(\$target)) { \$this->{field}->add(\$target); }\n"
                 . "    return \$this;\n}"
             );
-            $removeMethodBody[]  = str_replace(
+            $removeMethodBody[] = str_replace(
                 ['{class}', '{field}'],
                 [$targetClassName, $fieldName],
                 "if (\$className === '{class}') {\n"
@@ -432,10 +474,20 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . 'sprintf(\'The association with "%s" entity was not configured.\', $className));';
 
         $supportMethodBody[] = 'return false;';
-        $getMethodBody[]     = $throwStmt;
-        $hasMethodBody[]     = 'return false;';
-        $addMethodBody[]     = $throwStmt;
-        $removeMethodBody[]  = $throwStmt;
+        $getMethodBody = [
+            'if (null === $targetClass) {',
+            '    $targets = [];',
+            implode("\n", $getMethodBodyWithoutTargetClass),
+            '    return $targets;',
+            '} else {',
+            '    $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
+            implode("\n", $getMethodBodyWithTargetClass),
+            '    ' . $throwStmt,
+            '}',
+        ];
+        $hasMethodBody[] = 'return false;';
+        $addMethodBody[] = $throwStmt;
+        $removeMethodBody[] = $throwStmt;
         $getAssociationsMethodBody[] = "return \$associationEntities;";
 
         $supportMethodDocblock = "/**\n"
@@ -444,25 +496,25 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " * @param string \$targetClass The class name of the target entity\n"
             . " * @return bool\n"
             . " */";
-        $getMethodDocblock     = "/**\n"
-            . " * Gets entities of the given type associated with this entity\n"
+        $getMethodDocblock = "/**\n"
+            . " * Gets entities associated with this entity\n"
             . " *\n"
-            . " * @param string \$targetClass The class name of the target entity\n"
+            . " * @param string|null \$targetClass The class name of the target entity\n"
             . " * @return object[]\n"
             . " */";
-        $hasMethodDocblock     = "/**\n"
+        $hasMethodDocblock = "/**\n"
             . " * Checks is the given entity is associated with this entity\n"
             . " *\n"
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
             . " * @return bool\n"
             . " */";
-        $addMethodDocblock     = "/**\n"
+        $addMethodDocblock = "/**\n"
             . " * Associates the given entity with this entity\n"
             . " *\n"
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
             . " * @return object This object\n"
             . " */";
-        $removeMethodDocblock  = "/**\n"
+        $removeMethodDocblock = "/**\n"
             . " * Removes the association of the given entity and this entity\n"
             . " *\n"
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
@@ -472,6 +524,11 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " * Returns array with all associated entities\n"
             . " *\n"
             . " * @return array\n"
+            . sprintf(
+                ' * @deprecated since 2.0. Method "get%1$sTargets" without parameters should be used'
+                . ' instead of "get%1$sTargetEntities"' . "\n",
+                AssociationNameGenerator::classify($associationKind)
+            )
             . " */";
         $class
             ->setMethod(
@@ -481,7 +538,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             )
             ->setMethod(
                 $this
-                    ->generateClassMethod($getMethodName, implode("\n", $getMethodBody), ['targetClass'])
+                    ->generateClassMethod($getMethodName, implode("\n", $getMethodBody), [['targetClass', null]])
                     ->setDocblock($getMethodDocblock)
             )
             ->setMethod(
@@ -498,7 +555,8 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                 $this
                     ->generateClassMethod($removeMethodName, implode("\n", $removeMethodBody), ['target'])
                     ->setDocblock($removeMethodDocblock)
-            )->setMethod(
+            )
+            ->setMethod(
                 $this
                     ->generateClassMethod($getAssociationsName, implode("\n", $getAssociationsMethodBody))
                     ->setDocblock($getAssociationsMethodDocblock)

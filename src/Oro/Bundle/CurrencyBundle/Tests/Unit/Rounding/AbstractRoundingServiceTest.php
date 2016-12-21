@@ -171,10 +171,8 @@ abstract class AbstractRoundingServiceTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn(10);
 
-        $this->setExpectedException(
-            '\Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException',
-            'The type of the rounding is not valid "intl" rounding mode.'
-        );
+        $this->expectException('\Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException');
+        $this->expectExceptionMessage('The type of the rounding is not valid "intl" rounding mode.');
 
         $this->service->round(1.15, 10);
     }

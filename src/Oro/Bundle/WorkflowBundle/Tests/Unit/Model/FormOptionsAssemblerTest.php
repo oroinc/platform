@@ -28,9 +28,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         $this->configurationPass = $this->getMockBuilder(
             'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
@@ -65,7 +63,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
                 'attribute_one' => new PropertyPath('data.foo'),
                 'attribute_two' => new PropertyPath('data.bar'),
             ),
-            'form_init' => $this->getMock('Oro\Component\Action\Action\ActionInterface')
+            'form_init' => $this->createMock('Oro\Component\Action\Action\ActionInterface')
         );
 
         $attributes = array(
@@ -116,7 +114,8 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
         $expectedException,
         $expectedExceptionMessage
     ) {
-        $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->assembler->assemble($options, $attributes, $owner, $ownerName);
     }
 

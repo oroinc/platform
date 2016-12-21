@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -16,6 +18,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class GridController extends Controller
@@ -123,6 +127,8 @@ class GridController extends Controller
      *      requirements={"gridName"="[\w\:-]+"}
      * )
      *
+     * @AclAncestor("oro_datagrid_gridview_export")
+     *
      * @param Request $request
      * @param string $gridName
      *
@@ -212,21 +218,5 @@ class GridController extends Controller
         }
 
         return $renderParams;
-    }
-
-    /**
-     * @return MessageProducerInterface
-     */
-    protected function getMessageProducer()
-    {
-        return $this->get('oro_message_queue.client.message_producer');
-    }
-
-    /**
-     * @return RequestParameterBagFactory
-     */
-    protected function getRequestParametersFactory()
-    {
-        return $this->get('oro_datagrid.datagrid.request_parameters_factory');
     }
 }

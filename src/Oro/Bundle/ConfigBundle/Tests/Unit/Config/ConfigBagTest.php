@@ -12,7 +12,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
     }
 
     protected function tearDown()
@@ -46,7 +46,7 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataTransformer()
     {
-        $transformer = $this->getMock('Oro\Bundle\ConfigBundle\Config\DataTransformerInterface');
+        $transformer = $this->createMock('Oro\Bundle\ConfigBundle\Config\DataTransformerInterface');
         $this->container->expects($this->once())
             ->method('get')
             ->with('test.service')

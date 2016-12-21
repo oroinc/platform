@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\EventListener;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
@@ -38,6 +40,11 @@ class TemplateListener
             if ($template instanceof TemplateReferenceInterface) {
                 $template = $template->getLogicalName();
             }
+
+            if ($template instanceof Template) {
+                $template = $template->getTemplate();
+            }
+
             if (strpos($template, self::TEMPLATE_PARTS_SEPARATOR) !== false) {
                 $templateParts = explode(self::TEMPLATE_PARTS_SEPARATOR, $template);
                 if ($templateParts) {

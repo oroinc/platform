@@ -105,10 +105,8 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
     public function testException()
     {
         /** test getSubBlock Exception */
-        $this->setExpectedException(
-            '\PHPUnit_Framework_Error_Notice',
-            'Undefined index: testBlock'
-        );
+        $this->expectException('\PHPUnit_Framework_Error_Notice');
+        $this->expectExceptionMessage('Undefined index: testBlock');
         $this->formConfig->getBlock('testBlock');
     }
 }

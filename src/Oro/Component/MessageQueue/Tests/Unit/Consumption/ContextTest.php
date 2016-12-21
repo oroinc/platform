@@ -47,7 +47,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $context->setMessageConsumer($messageConsumer);
 
-        $this->setExpectedException(IllegalContextModificationException::class);
+        $this->expectException(IllegalContextModificationException::class);
         $context->setMessageConsumer($anotherMessageConsumer);
     }
 
@@ -70,7 +70,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $context->setMessageProcessor($messageProcessor);
 
-        $this->setExpectedException(IllegalContextModificationException::class);
+        $this->expectException(IllegalContextModificationException::class);
         $context->setMessageProcessor($anotherMessageProcessor);
     }
 
@@ -94,7 +94,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function testShouldAllowGetPreviouslySetMessage()
     {
         /** @var MessageInterface $message */
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
 
         $context = new Context($this->createSession());
 
@@ -106,12 +106,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function testThrowOnTryToChangeMessageIfAlreadySet()
     {
         /** @var MessageInterface $message */
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
 
         $context = new Context($this->createSession());
 
-        $this->setExpectedException(
-            IllegalContextModificationException::class,
+        $this->expectException(IllegalContextModificationException::class);
+        $this->expectExceptionMessage(
             'The message could be set once'
         );
 
@@ -147,10 +147,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $context = new Context($this->createSession());
 
-        $this->setExpectedException(
-            IllegalContextModificationException::class,
-            'The status modification is not allowed'
-        );
+        $this->expectException(IllegalContextModificationException::class);
+        $this->expectExceptionMessage('The status modification is not allowed');
 
         $context->setStatus($status);
         $context->setStatus($status);
@@ -172,8 +170,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $context = new Context($this->createSession());
 
-        $this->setExpectedException(
-            IllegalContextModificationException::class,
+        $this->expectException(IllegalContextModificationException::class);
+        $this->expectExceptionMessage(
             'The execution once interrupted could not be roll backed'
         );
 
@@ -206,8 +204,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $context->setLogger(new NullLogger());
 
-        $this->setExpectedException(
-            IllegalContextModificationException::class,
+        $this->expectException(IllegalContextModificationException::class);
+        $this->expectExceptionMessage(
             'The logger modification is not allowed'
         );
         $context->setLogger(new NullLogger());
@@ -228,8 +226,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         $context->setQueueName('theQueueName');
 
-        $this->setExpectedException(
-            IllegalContextModificationException::class,
+        $this->expectException(IllegalContextModificationException::class);
+        $this->expectExceptionMessage(
             'The queueName modification is not allowed'
         );
         $context->setQueueName('theAnotherQueueName');
@@ -240,7 +238,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSession()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -248,7 +246,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageConsumer()
     {
-        return $this->getMock(MessageConsumerInterface::class);
+        return $this->createMock(MessageConsumerInterface::class);
     }
 
     /**
@@ -256,6 +254,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProcessor()
     {
-        return $this->getMock(MessageProcessorInterface::class);
+        return $this->createMock(MessageProcessorInterface::class);
     }
 }

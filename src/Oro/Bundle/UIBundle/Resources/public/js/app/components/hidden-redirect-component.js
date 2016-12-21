@@ -98,7 +98,6 @@ define(function(require) {
                 },
                 error: function(xhr) {
                     _this._hideLoading();
-                    Error.handle({}, xhr, {enforce: true});
                 }
             });
         },
@@ -114,7 +113,6 @@ define(function(require) {
                 },
                 error: function(xhr) {
                     _this._hideLoading();
-                    Error.handle({}, xhr, {enforce: true});
                 }
             });
         },

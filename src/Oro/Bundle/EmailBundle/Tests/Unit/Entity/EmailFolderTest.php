@@ -32,8 +32,8 @@ class EmailFolderTest extends \PHPUnit_Framework_TestCase
 
     public function testFolderGetterAndSetter()
     {
-        $subFolder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
-        $subFolder2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
+        $subFolder = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
+        $subFolder2 = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
 
         $entity = new EmailFolder();
         $entity->addSubFolder($subFolder);
@@ -66,8 +66,8 @@ class EmailFolderTest extends \PHPUnit_Framework_TestCase
      */
     public function propertiesDataProvider()
     {
-        $origin = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailOrigin');
-        $parentFolder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
+        $origin = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailOrigin');
+        $parentFolder = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
         $synchronizedAt = new \DateTime();
 
         return [

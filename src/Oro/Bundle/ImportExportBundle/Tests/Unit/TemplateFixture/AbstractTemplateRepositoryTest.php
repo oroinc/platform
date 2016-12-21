@@ -77,7 +77,7 @@ class AbstractTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $entityKey = 'test1';
         $entity    = new \stdClass();
 
-        $repository = $this->getMock(
+        $repository = $this->createMock(
             'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
         );
         $repository->expects($this->once())

@@ -76,17 +76,6 @@ class Attachment
         return false;
     }
 
-    public function getTargetEntities()
-    {
-        $associationEntities = [];
-        $entity = $this->account;
-        if ($entity) {
-            $associationEntities[] = $entity;
-        }
-
-        return $associationEntities;
-    }
-
     private function resetTargets()
     {
         $this->account = null;

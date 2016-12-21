@@ -24,8 +24,8 @@ class ActionButtonsProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->routeProvider = $this->getMock(RouteProviderInterface::class, [], [], '', false);
-        $this->doctrineHelper = $this->getMock(DoctrineHelper::class, [], [], '', false);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->provider = new ActionButtonsProvider($this->routeProvider, $this->doctrineHelper);
     }

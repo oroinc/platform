@@ -10,21 +10,38 @@ define(function(require) {
      * Initializes jquery widget on _sourceElement
      */
     JqueryWidgetComponent = BaseComponent.extend({
+        $el: null,
+
+        widgetName: null,
+
         /**
-         * @constructor
-         * @param {Object} options
+         * @inheritDoc
          */
         initialize: function(options) {
+            this.$el = options._sourceElement;
             var widgetOptions = _.omit(options, ['_sourceElement', 'widgetModule', 'widgetName']);
-            var $elem = options._sourceElement;
 
             this._deferredInit();
 
             tools.loadModules(options.widgetModule, function initializeJqueryWidget(widgetName) {
                 widgetName = _.isString(widgetName) ? widgetName : '';
-                $elem[widgetName || options.widgetName](widgetOptions);
+                this.widgetName = widgetName || options.widgetName;
+                this.$el[this.widgetName](widgetOptions);
                 this._resolveDeferredInit();
             }, this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            if (this.$el[this.widgetName]('instance')) {
+                this.$el[this.widgetName]('destroy');
+            }
+            return JqueryWidgetComponent.__super__.dispose.apply(this, arguments);
         }
     });
 

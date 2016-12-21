@@ -19,7 +19,7 @@ class EntityTest extends Selenium2TestCase
      */
     public function testCreateEntity()
     {
-        $entityName = 'Entity'.mt_rand();
+        $entityName = \stdClass::class.mt_rand();
 
         $login = $this->login();
         /** @var ConfigEntities $login */

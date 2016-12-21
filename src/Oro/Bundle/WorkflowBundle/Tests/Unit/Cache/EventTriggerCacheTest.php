@@ -36,7 +36,7 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->cache = new EventTriggerCache($this->registry);
         $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
@@ -124,7 +124,7 @@ class EventTriggerCacheTest extends \PHPUnit_Framework_TestCase
         $this->cache->setProvider($this->prepareProvider([]));
         $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
 
-        $repository = $this->getMock(ObjectRepository::class);
+        $repository = $this->createMock(ObjectRepository::class);
 
         $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
         $entityManager->expects($this->any())

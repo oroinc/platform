@@ -29,7 +29,7 @@ class EnumFieldConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')

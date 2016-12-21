@@ -26,6 +26,9 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     /** a flag indicates whether the field represents a meta information */
     const META_PROPERTY = 'meta_property';
 
+    /** the name by which the meta property should be returned in the response */
+    const META_PROPERTY_RESULT_NAME = 'meta_property_result_name';
+
     /** the class name of a target entity */
     const TARGET_CLASS = 'target_class';
 
@@ -79,6 +82,34 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
             $this->items[EntityDefinitionFieldConfig::META_PROPERTY] = $isMetaProperty;
         } else {
             unset($this->items[EntityDefinitionFieldConfig::META_PROPERTY]);
+        }
+    }
+
+    /**
+     * Gets the name by which the meta property should be returned in the response.
+     *
+     * @param string|null $defaultValue
+     *
+     * @return string|null
+     */
+    public function getMetaPropertyResultName($defaultValue = null)
+    {
+        return array_key_exists(EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME, $this->items)
+            ? $this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME]
+            : $defaultValue;
+    }
+
+    /**
+     * Sets the name by which the meta property should be returned in the response.
+     *
+     * @param string $name
+     */
+    public function setMetaPropertyResultName($name)
+    {
+        if ($name) {
+            $this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME] = $name;
+        } else {
+            unset($this->items[EntityDefinitionFieldConfig::META_PROPERTY_RESULT_NAME]);
         }
     }
 

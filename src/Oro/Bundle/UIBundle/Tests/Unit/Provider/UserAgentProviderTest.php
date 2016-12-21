@@ -25,7 +25,7 @@ class UserAgentProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
+        $this->requestStack = $this->createMock('Symfony\Component\HttpFoundation\RequestStack');
 
         $this->userAgentProvider = new UserAgentProvider($this->requestStack);
     }
@@ -40,9 +40,9 @@ class UserAgentProviderTest extends \PHPUnit_Framework_TestCase
         $request = null;
         if ($isRequest) {
             /** @var HeaderBag|\PHPUnit_Framework_MockObject_MockObject $request */
-            $headers = $this->getMock('\Symfony\Component\HttpFoundation\HeaderBag');
+            $headers = $this->createMock('\Symfony\Component\HttpFoundation\HeaderBag');
             /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
-            $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+            $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
             $request->headers = $headers;
             $headers->expects($this->once())
                 ->method('get')

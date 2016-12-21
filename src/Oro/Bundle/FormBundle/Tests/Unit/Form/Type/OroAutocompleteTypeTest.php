@@ -45,7 +45,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     public function getMockSearchRegistry()
     {
         if (!$this->searchRegistry) {
-            $this->searchRegistry = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry');
+            $this->searchRegistry = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry');
             $this->searchRegistry->method('getSearchHandler')->willReturn($this->getMockSearchHandler());
         }
 
@@ -58,7 +58,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
     public function getMockSearchHandler()
     {
         if (!$this->searchHandler) {
-            $this->searchHandler = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
+            $this->searchHandler = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
             $this->searchHandler->method('getProperties')->willReturn(['code', 'label']);
         }
 

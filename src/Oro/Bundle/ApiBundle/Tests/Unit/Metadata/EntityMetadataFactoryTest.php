@@ -82,6 +82,19 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $this->assertEquals($expectedMetadata, $metadata);
     }
 
+    public function testCreateMetaPropertyMetadataForNotManageableField()
+    {
+        $expectedMetadata = new MetaPropertyMetadata();
+        $expectedMetadata->setName('unmanageableField');
+
+        $metadata = $this->metadataFactory->createMetaPropertyMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(self::ENTITY_NAMESPACE . 'Product'),
+            'unmanageableField'
+        );
+
+        $this->assertEquals($expectedMetadata, $metadata);
+    }
+
     public function testCreateFieldMetadataForIdentifier()
     {
         $expectedMetadata = new FieldMetadata();

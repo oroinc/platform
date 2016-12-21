@@ -234,7 +234,7 @@ class BlockFactoryTest extends LayoutTestCase
      */
     public function testExtensions()
     {
-        $testBlockType = $this->getMock('Oro\Component\Layout\Block\Type\AbstractType');
+        $testBlockType = $this->createMock('Oro\Component\Layout\Block\Type\AbstractType');
         $testBlockType->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('test'));
@@ -242,7 +242,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('getParent')
             ->will($this->returnValue(BaseType::NAME));
 
-        $headerLayoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $headerLayoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
         $headerLayoutUpdate->expects($this->once())
             ->method('updateLayout')
             ->will(
@@ -253,7 +253,7 @@ class BlockFactoryTest extends LayoutTestCase
                 )
             );
 
-        $headerBlockTypeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $headerBlockTypeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
         $headerBlockTypeExtension->expects($this->any())
             ->method('getExtendedType')
             ->will($this->returnValue('header'));

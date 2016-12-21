@@ -114,7 +114,7 @@ class AclAnnotationStorageTest extends \PHPUnit_Framework_TestCase
             'Acme\SomeClass1',
             'SomeMethod'
         );
-        $this->setExpectedException('\RuntimeException');
+        $this->expectException('\RuntimeException');
         $storage->addAncestor(
             new AclAnnotationAncestor(array('value' => 'annotation1')),
             'Acme\SomeClass1',

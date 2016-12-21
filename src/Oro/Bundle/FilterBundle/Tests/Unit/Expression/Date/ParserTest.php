@@ -37,7 +37,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testParse($tokens, $expectedResult, $expectedException = null)
     {
         if (null !== $expectedException) {
-            $this->setExpectedException($expectedException);
+            $this->expectException($expectedException);
         }
 
         $result = $this->parser->parse($tokens);

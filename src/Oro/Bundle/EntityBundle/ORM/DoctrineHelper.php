@@ -14,6 +14,9 @@ use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\EntityBundle\Exception;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class DoctrineHelper
 {
     /**
@@ -140,29 +143,39 @@ class DoctrineHelper
     /**
      * Gets an array of identifier field names for the given entity or class.
      *
-     * @param object|string $entityOrClass An entity object, entity class name or entity proxy class name
+     * @param object|string $entityOrClass  An entity object, entity class name or entity proxy class name
+     * @param bool          $throwException Whether to throw exception in case the entity is not manageable
      *
      * @return string[]
+     *
+     * @throws Exception\InvalidEntityException
      */
-    public function getEntityIdentifierFieldNames($entityOrClass)
+    public function getEntityIdentifierFieldNames($entityOrClass, $throwException = true)
     {
-        return $this
-            ->getEntityMetadata($entityOrClass)
-            ->getIdentifierFieldNames();
+        $em = $this->getEntityMetadata($entityOrClass, $throwException);
+
+        return null !== $em
+            ? $em->getIdentifierFieldNames()
+            : [];
     }
 
     /**
      * Gets an array of identifier field names for the given entity class.
      *
-     * @param string $entityClass The real class name of an entity
+     * @param string $entityClass    The real class name of an entity
+     * @param bool   $throwException Whether to throw exception in case the entity is not manageable
      *
      * @return string[]
+     *
+     * @throws Exception\InvalidEntityException
      */
-    public function getEntityIdentifierFieldNamesForClass($entityClass)
+    public function getEntityIdentifierFieldNamesForClass($entityClass, $throwException = true)
     {
-        return $this
-            ->getEntityMetadataForClass($entityClass)
-            ->getIdentifierFieldNames();
+        $em = $this->getEntityMetadataForClass($entityClass, $throwException);
+
+        return null !== $em
+            ? $em->getIdentifierFieldNames()
+            : [];
     }
 
     /**
