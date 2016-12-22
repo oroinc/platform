@@ -316,17 +316,24 @@ define(function(require) {
          * @param {jQuery} $toValue
          */
         cloneValue: function($fromValue, $toValue) {
+            var isChanged = false;
             $fromValue.each(function(i) {
                 var toValue = $toValue.get(i);
-
                 if ($(this).is(':checkbox') || $(this).is(':radio')) {
-                    toValue.checked = this.checked;
+                    if (toValue.checked !== this.checked) {
+                        isChanged = true;
+                        toValue.checked = this.checked;
+                    }
                 } else {
-                    $(toValue).val($(this).val());
+                    if ($(toValue).val() !== $(this).val()) {
+                        isChanged = true;
+                        $(toValue).val($(this).val());
+                    }
                 }
             });
-
-            $toValue.filter(':first').change();
+            if (isChanged) {
+                $toValue.filter(':first').change();
+            }
         },
 
         /**

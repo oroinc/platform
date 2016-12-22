@@ -4,10 +4,10 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -46,8 +46,7 @@ class OroUserBundleInstaller implements
     ExtendExtensionAwareInterface,
     ActivityExtensionAwareInterface
 {
-    /** @var AttachmentExtension */
-    protected $attachmentExtension;
+    use AttachmentExtensionAwareTrait;
 
     /** @var ActivityExtension */
     protected $activityExtension;
@@ -61,14 +60,6 @@ class OroUserBundleInstaller implements
     public function getMigrationVersion()
     {
         return 'v1_24';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
-    {
-        $this->attachmentExtension = $attachmentExtension;
     }
 
     /**
