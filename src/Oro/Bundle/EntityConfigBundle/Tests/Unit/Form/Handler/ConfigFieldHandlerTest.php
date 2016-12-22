@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler;
-use Oro\Bundle\EntityExtendBundle\Form\Handler\ConfigHelperHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Component\Testing\Unit\EntityTrait;
 

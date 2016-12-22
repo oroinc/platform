@@ -13,11 +13,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 
 class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, ContainerAwareInterface
 {
-    /** @var AttachmentExtension */
-    protected $attachmentExtension;
+    use AttachmentExtensionAwareTrait;
 
     /**
      * @var ContainerInterface
@@ -30,14 +30,6 @@ class OroUserBundle implements Migration, AttachmentExtensionAwareInterface, Con
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
-    {
-        $this->attachmentExtension = $attachmentExtension;
     }
 
     /**

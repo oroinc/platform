@@ -217,6 +217,10 @@ abstract class AbstractConfigGridListener
                     'type'  => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,
                 ];
 
+                if (isset($config['acl_resource'])) {
+                    $configItem['acl_resource'] = $config['acl_resource'];
+                }
+
                 if (isset($config['defaultMessages'])) {
                     $configItem['defaultMessages'] = $config['defaultMessages'];
                 }

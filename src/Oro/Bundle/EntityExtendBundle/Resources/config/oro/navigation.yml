@@ -1,21 +1,6 @@
 navigation:
-    menu_config:
-        items:
-            attributes_list:
-                label: 'oro.entity_extend.attribute.attributes'
-                uri: '#'
-        tree:
-            application_menu:
-                children:
-                    system_tab:
-                        children:
-                            attributes_list: ~
     titles:
         oro_entityextend_entity_create: New Entity
         oro_entityextend_field_create: New Field - %%entityName%%
         oro_entityextend_field_update: %%fieldName%% - New Field - %%entityName%%
         oro_entityextend_entity_unique_key: oro.entity_extend.unique_keys
-        oro_attribute_create: %%title%%
-        oro_attribute_save: %%title%%
-        oro_attribute_update: %%title%%
-        oro_attribute_index: ~
