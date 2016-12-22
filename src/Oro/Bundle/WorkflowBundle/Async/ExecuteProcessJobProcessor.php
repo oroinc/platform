@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
+
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -18,7 +20,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
      * @var DoctrineHelper
      */
     private $doctrineHelper;
-    
+
     /**
      * @var ProcessHandler
      */
@@ -46,7 +48,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = array_replace_recursive(['process_job_id' => null, ], JSON::decode($message->getBody()));
+        $body = array_replace_recursive(['process_job_id' => null], JSON::decode($message->getBody()));
         if (false == $body['process_job_id']) {
             $this->logger->critical(
                 '[ExecuteProcessJobProcessor] Process Job Id not set',
@@ -73,7 +75,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
                 '[ExecuteProcessJobProcessor] Process Job with id {process_job_id} not found',
                 [
                     'message_body' => $message->getBody(),
-                    'process_job_id' =>  $body['process_job_id']
+                    'process_job_id' => $body['process_job_id']
                 ]
             );
 
@@ -90,9 +92,20 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
             $this->processHandler->finishJob($processJob);
             $entityManager->commit();
         } catch (\Exception $e) {
+            $this->processHandler->finishJob($processJob);
+            $entityManager->clear();
             $entityManager->rollback();
 
-            throw  $e;
+            $this->logger->critical(
+                '[ExecuteProcessJobProcessor] Raised exception for job with id {process_job_id}',
+                [
+                    'process_job_id' => $body['process_job_id'],
+                    'exception' => $e,
+                ]
+            );
+
+            //Returned "REJECTED", because cannot be determined if job can be re-queued
+            return self::REJECT;
         }
 
         return self::ACK;

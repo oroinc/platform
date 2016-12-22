@@ -1,15 +1,16 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsByIdsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
+
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +18,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit_Framework_
     {
         new PurgeEmailAttachmentsByIdsMessageProcessor(
             $this->createRegistryInterfaceMock(),
+            $this->createJobRunnerMock(),
             $this->createLoggerMock()
         );
     }
@@ -44,12 +46,22 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit_Framework_
 
         $processor = new PurgeEmailAttachmentsByIdsMessageProcessor(
             $this->createRegistryInterfaceMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     */
+    private function createJobRunnerMock()
+    {
+        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
     }
 
     /**

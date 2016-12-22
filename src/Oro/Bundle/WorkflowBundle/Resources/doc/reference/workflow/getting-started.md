@@ -288,7 +288,7 @@ workflows:
                                 required: true              # define this field as required
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
-            add_email:                                      # transition from step "add_email" to "add_email" (self-transition)
+            add_email:                                      # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions
                 form_options:                               # options which will be passed to form type of transition
@@ -299,7 +299,7 @@ workflows:
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
                                     - Email: ~              # field must contain valid email
-            schedule_transition:                                            # transition from step "add_email" to "add_email" (self-transition)
+            schedule_transition:                                            # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                                          # next step after transition performing
                 transition_definition: schedule_transition_definition       # link to definition of conditions and post actions
                 triggers:                                                   # transition triggers
@@ -336,7 +336,7 @@ workflows:
                     - '@assign_value': [$user.status, 'processed']# change user's status
 ```
 
-This configuration describes Workflow that includes two steps - "set_name" and "add_email".
+This configuration describes Workflow that includes two transitions - "set_name" and "add_email".
 
 On step "started" user can update full name (first, middle and last name) using transition "set_name".
 Then on step "processed" user can add additional emails using transition "add_email".
