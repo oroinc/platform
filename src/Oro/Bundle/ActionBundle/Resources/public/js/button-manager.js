@@ -135,7 +135,7 @@ define(function(require) {
                 mediator.execute('hideLoading');
                 var messages = response.messages || {};
 
-                if (_.isEmpty(messages)) {
+                if (_.isEmpty(messages) && response.message) {
                     messenger.notificationFlashMessage('error', response.message);
                 } else {
                     _.each(messages, function(submessage) {
