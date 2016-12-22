@@ -14,7 +14,6 @@
         "psr-0": { "Oro\\Bundle\\SoapBundle": "" }
     },
     "target-dir": "Oro/Bundle/SoapBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 use Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -46,6 +47,16 @@ abstract class AbstractConfigControllerTest extends WebTestCase
             call_user_func(self::$warmupCache);
             self::$warmupCache = null;
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTestEntityAlias()
+    {
+        return $this->getContainer()
+            ->get('oro_entity.entity_alias_resolver')
+            ->getAlias(TestActivityTarget::class);
     }
 
     /**

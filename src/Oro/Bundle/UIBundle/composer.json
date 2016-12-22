@@ -45,7 +45,6 @@
     "autoload": {
         "psr-0": { "Oro\\Bundle\\UIBundle": "" }
     },
-    "minimum-stability": "dev",
     "target-dir": "Oro/Bundle/UIBundle",
     "extra": {
         "branch-alias": {

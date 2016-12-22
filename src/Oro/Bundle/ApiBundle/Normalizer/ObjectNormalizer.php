@@ -10,11 +10,9 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class ObjectNormalizer
 {
     const MAX_NESTING_LEVEL = 1;
@@ -34,25 +32,31 @@ class ObjectNormalizer
     /** @var ConfigNormalizer */
     protected $configNormalizer;
 
+    /** @var DataNormalizer */
+    protected $dataNormalizer;
+
     /**
      * @param ObjectNormalizerRegistry $normalizerRegistry
      * @param DoctrineHelper           $doctrineHelper
      * @param DataAccessorInterface    $dataAccessor
      * @param DataTransformerInterface $dataTransformer
      * @param ConfigNormalizer         $configNormalizer
+     * @param DataNormalizer           $dataNormalizer
      */
     public function __construct(
         ObjectNormalizerRegistry $normalizerRegistry,
         DoctrineHelper $doctrineHelper,
         DataAccessorInterface $dataAccessor,
         DataTransformerInterface $dataTransformer,
-        ConfigNormalizer $configNormalizer
+        ConfigNormalizer $configNormalizer,
+        DataNormalizer $dataNormalizer
     ) {
         $this->normalizerRegistry = $normalizerRegistry;
         $this->doctrineHelper = $doctrineHelper;
         $this->dataAccessor = $dataAccessor;
         $this->dataTransformer = $dataTransformer;
         $this->configNormalizer = $configNormalizer;
+        $this->dataNormalizer = $dataNormalizer;
     }
 
     /**
@@ -71,6 +75,11 @@ class ObjectNormalizer
                 $config = $normalizedConfig;
             }
             $object = $this->normalizeValue($object, is_array($object) ? 0 : 1, $context, $config);
+            if (null !== $config) {
+                $data = [$object];
+                $data = $this->dataNormalizer->normalizeData($data, $config);
+                $object = reset($data);
+            }
         }
 
         return $object;
@@ -138,9 +147,6 @@ class ObjectNormalizer
      * @param array                  $context
      *
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function normalizeObjectByConfig($object, $level, EntityDefinitionConfig $config, $context)
     {
@@ -155,59 +161,30 @@ class ObjectNormalizer
         }
 
         $result = [];
-        $entityClass = ClassUtils::getClass($object);
+        $entityClass = $this->getEntityClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
                 continue;
             }
 
-            $value = null;
             $propertyPath = $field->getPropertyPath($fieldName);
-            if (ConfigUtil::isMetadataProperty($propertyPath)) {
-                $value = $this->getMetadataProperty($entityClass, $propertyPath);
-            } elseif ($this->dataAccessor->tryGetValue($object, $propertyPath, $value) && null !== $value) {
-                $targetEntity = $field->getTargetEntity();
-                if (null !== $targetEntity) {
-                    $childFieldNames = array_keys($targetEntity->getFields());
-                    if ($field->isCollapsed() && count($childFieldNames) === 1) {
-                        $childFieldName = reset($childFieldNames);
-                        $isCollection = $field->hasTargetType()
-                            ? $field->isCollectionValuedAssociation()
-                            : $value instanceof \Traversable;
-                        if ($isCollection) {
-                            if (!$value instanceof \Traversable && !is_array($value)) {
-                                throw new RuntimeException(
-                                    sprintf(
-                                        'A value of "%s" field of entity "%s" should be "%s". Got: %s.',
-                                        $propertyPath,
-                                        ClassUtils::getClass($object),
-                                        '\Traversable or array',
-                                        is_object($value) ? get_class($value) : gettype($value)
-                                    )
-                                );
-                            }
-                            $childValue = [];
-                            foreach ($value as $val) {
-                                $childVal = null;
-                                $this->dataAccessor->tryGetValue($val, $childFieldName, $childVal);
-                                $childValue[] = $childVal;
-                            }
+            if ($this->isMetadataProperty($propertyPath)) {
+                $result[$propertyPath] = $this->getMetadataProperty($entityClass, $propertyPath);
+            } else {
+                $value = null;
+                if ($this->dataAccessor->tryGetValue($object, $propertyPath, $value)) {
+                    if (null !== $value) {
+                        $targetEntity = $field->getTargetEntity();
+                        if (null !== $targetEntity) {
+                            $value = $this->normalizeValue($value, $level + 1, $context, $targetEntity);
                         } else {
-                            $childValue = null;
-                            if (!$this->dataAccessor->tryGetValue($value, $childFieldName, $childValue)) {
-                                continue;
-                            }
+                            $value = $this->transformValue($entityClass, $fieldName, $value, $context, $field);
                         }
-                        $value = $childValue;
-                    } else {
-                        $value = $this->normalizeValue($value, $level + 1, $context, $targetEntity);
                     }
-                } else {
-                    $value = $this->transformValue($entityClass, $fieldName, $value, $context, $field);
+                    $result[$propertyPath] = $value;
                 }
             }
-            $result[$fieldName] = $value;
         }
 
         $postSerializeHandler = $config->getPostSerializeHandler();
@@ -310,6 +287,32 @@ class ObjectNormalizer
     }
 
     /**
+     * Gets the real class name of an entity.
+     *
+     * @param object $object
+     *
+     * @return string
+     */
+    protected function getEntityClass($object)
+    {
+        return $object instanceof EntityIdentifier
+            ? $object->getClass()
+            : ClassUtils::getClass($object);
+    }
+
+    /**
+     * Checks whether the given property path represents a metadata property
+     *
+     * @param string $propertyPath
+     *
+     * @return mixed
+     */
+    protected function isMetadataProperty($propertyPath)
+    {
+        return ConfigUtil::CLASS_NAME === $propertyPath || ConfigUtil::DISCRIMINATOR === $propertyPath;
+    }
+
+    /**
      * Returns a value of a metadata property
      *
      * @param string $entityClass
@@ -317,13 +320,13 @@ class ObjectNormalizer
      *
      * @return mixed
      */
-    public function getMetadataProperty($entityClass, $propertyPath)
+    protected function getMetadataProperty($entityClass, $propertyPath)
     {
         switch ($propertyPath) {
-            case ConfigUtil::DISCRIMINATOR:
-                return $this->getEntityDiscriminator($entityClass);
             case ConfigUtil::CLASS_NAME:
                 return $entityClass;
+            case ConfigUtil::DISCRIMINATOR:
+                return $this->getEntityDiscriminator($entityClass);
         }
 
         return null;
@@ -334,7 +337,7 @@ class ObjectNormalizer
      *
      * @return string|null
      */
-    public function getEntityDiscriminator($entityClass)
+    protected function getEntityDiscriminator($entityClass)
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
         if (null === $metadata) {

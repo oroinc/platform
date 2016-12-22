@@ -234,7 +234,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExtensionMock($forceQueued = null)
     {
-        $mock = $this->getMock(EventTriggerExtensionInterface::class);
+        $mock = $this->createMock(EventTriggerExtensionInterface::class);
 
         if (null !== $forceQueued) {
             $mock->expects($this->once())->method('setForceQueued')->with($forceQueued);
@@ -248,6 +248,6 @@ class EventTriggerCollectorListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getEntityManagerMock()
     {
-        return $this->getMock(EntityManagerInterface::class);
+        return $this->createMock(EntityManagerInterface::class);
     }
 }

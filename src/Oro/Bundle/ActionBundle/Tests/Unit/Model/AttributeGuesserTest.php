@@ -104,7 +104,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.unknown_field';
         $rootClass = 'RootClass';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->once())->method('hasAssociation')->with('unknown_field')
             ->will($this->returnValue(false));
         $metadata->expects($this->once())->method('hasField')->with('unknown_field')
@@ -120,7 +120,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.association';
         $rootClass = 'RootClass';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->once())->method('hasAssociation')->with('association')
             ->will($this->returnValue(true));
 
@@ -138,13 +138,13 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $associationEntity = 'AssociationEntity';
 
-        $entityMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $entityMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $entityMetadata->expects($this->any())->method('hasAssociation')->with('association')
             ->will($this->returnValue(true));
         $entityMetadata->expects($this->once())->method('getAssociationTargetClass')->with('association')
             ->will($this->returnValue($associationEntity));
 
-        $associationMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $associationMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $associationMetadata->expects($this->once())->method('hasAssociation')->with('field')
             ->will($this->returnValue(false));
         $associationMetadata->expects($this->once())->method('hasField')->with('field')
@@ -168,7 +168,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.field';
         $rootClass = 'RootClass';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())->method('hasAssociation')->with('field')
             ->will($this->returnValue(false));
         $metadata->expects($this->any())->method('hasField')->with('field')
@@ -187,7 +187,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $fieldLabel = 'Field Label';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
         $metadata->expects($this->any())->method('hasAssociation')->with('field')
@@ -216,7 +216,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $associationClass = 'AssociationClass';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
         $metadata->expects($this->any())->method('hasAssociation')->with('association')
@@ -246,7 +246,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $fieldLabel = 'Field Label';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
 
@@ -273,7 +273,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.association';
         $rootClass = 'RootClass';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
         $metadata->expects($this->any())->method('hasAssociation')->with('association')
@@ -378,7 +378,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'TestEntity';
         $fieldName = 'field';
 
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())->method('hasAssociation')->with($fieldName)
             ->will($this->returnValue(true));
         $metadata->expects($this->any())->method('getName')

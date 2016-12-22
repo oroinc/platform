@@ -128,7 +128,7 @@ class LanguageTypeTest extends FormIntegrationTestCase
             new ChoiceView('uk', 'uk', 'Ukrainian')
         ];
 
-        $this->formType->finishView($view, $this->getMock('Symfony\Component\Form\Test\FormInterface'), $options);
+        $this->formType->finishView($view, $this->createMock('Symfony\Component\Form\Test\FormInterface'), $options);
 
         $this->assertCount(count($expected), $view->vars['choices']);
 

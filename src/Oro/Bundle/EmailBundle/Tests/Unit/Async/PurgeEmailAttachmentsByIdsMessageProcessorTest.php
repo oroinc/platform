@@ -57,7 +57,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit_Framework_
      */
     private function createRegistryInterfaceMock()
     {
-        return $this->getMock(RegistryInterface::class, [], [], '', false);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -65,7 +65,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit_Framework_
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -73,6 +73,6 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends \PHPUnit_Framework_
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 }

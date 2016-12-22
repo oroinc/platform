@@ -170,7 +170,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                [$this->getMock('Oro\Component\Layout\LayoutUpdateInterface')]
+                [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')]
             ],
             [],
             []
@@ -190,7 +190,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                'test' => $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
+                'test' => $this->createMock('Oro\Component\Layout\LayoutUpdateInterface')
             ],
             [],
             []
@@ -222,12 +222,12 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getAbstractExtension()
     {
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('test'));
 
-        $extension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $extension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
         $extension->expects($this->any())
             ->method('getExtendedType')
             ->will($this->returnValue('test'));
@@ -237,11 +237,11 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [$extension],
             [
                 'test' => [
-                    $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
+                    $this->createMock('Oro\Component\Layout\LayoutUpdateInterface')
                 ]
             ],
-            [$this->getMock('Oro\Component\Layout\ContextConfiguratorInterface')],
-            ['test' => $this->getMock(\stdClass::class)]
+            [$this->createMock('Oro\Component\Layout\ContextConfiguratorInterface')],
+            ['test' => $this->createMock(\stdClass::class)]
         );
     }
 
@@ -252,10 +252,10 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getLayoutItem($id)
     {
-        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItem->expects($this->any())->method('getId')->willReturn($id);
         $layoutItem->expects($this->any())->method('getContext')
-            ->willReturn($this->getMock('Oro\Component\Layout\ContextInterface'));
+            ->willReturn($this->createMock('Oro\Component\Layout\ContextInterface'));
 
         return $layoutItem;
     }

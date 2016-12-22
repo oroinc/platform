@@ -1,4 +1,6 @@
 parameters:
+    twig.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
+    fos_rest.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
     security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
     oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 

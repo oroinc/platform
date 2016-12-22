@@ -84,7 +84,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
-        $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+        $this->exclusionProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
 
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->setMethods(['isResourceEnabled'])
@@ -104,10 +104,11 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->virtualFieldProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface');
+        $this->virtualFieldProvider = $this
+            ->createMock('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface');
 
         $this->virtualRelationProvider =
-            $this->getMock('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface');
+            $this->createMock('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface');
 
         $this->provider = new EntityFieldProvider(
             $this->entityConfigProvider,
@@ -786,7 +787,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metadataFactory = $this->getMock('Doctrine\ORM\Mapping\ClassMetadataFactory');
+        $metadataFactory = $this->createMock('Doctrine\ORM\Mapping\ClassMetadataFactory');
         $em->expects($this->any())
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));

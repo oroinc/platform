@@ -43,7 +43,7 @@ class MultiEnumFilterTest extends OrmTestCase
             ]
         );
 
-        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -131,7 +131,7 @@ class MultiEnumFilterTest extends OrmTestCase
 
     public function testGetForm()
     {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $this->formFactory->expects($this->once())
             ->method('create')
@@ -165,11 +165,11 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->filter->init('test', $params);
 
         /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
-        $ds = $this->getMock(
-            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
-            ['generateParameterName'],
-            [$qb]
-        );
+        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
+            ->setMethods(['generateParameterName'])
+            ->setConstructorArgs([$qb])
+            ->getMock();
+
         $ds->expects($this->any())
             ->method('generateParameterName')
             ->will($this->returnValue('param1'));
@@ -211,11 +211,11 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->filter->init('test', $params);
 
         /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
-        $ds = $this->getMock(
-            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
-            ['generateParameterName'],
-            [$qb]
-        );
+        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
+            ->setMethods(['generateParameterName'])
+            ->setConstructorArgs([$qb])
+            ->getMock();
+
         $ds->expects($this->any())
             ->method('generateParameterName')
             ->will($this->returnValue('param1'));

@@ -22,7 +22,7 @@ class ConfigLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoaders($configType, $config, $expected)
     {
-        $actionProcessorBag = $this->getMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
+        $actionProcessorBag = $this->createMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
         $actionProcessorBag->expects($this->any())
             ->method('getActions')
             ->willReturn(

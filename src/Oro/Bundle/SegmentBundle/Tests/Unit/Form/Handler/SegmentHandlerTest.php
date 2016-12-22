@@ -50,7 +50,7 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->staticSegmentManager = $this->getMockBuilder(
             'Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager'
         )
@@ -101,7 +101,7 @@ class SegmentHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('isValid')
             ->will($this->returnValue(true));
 
-        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $manager->expects($this->once())
             ->method('persist')
             ->with($this->entity);

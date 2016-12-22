@@ -41,7 +41,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     public function testConfigureContext()
     {
         /** @var OptionsResolverInterface|\PHPUnit_Framework_MockObject_MockObject $optionResolver */
-        $optionResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $optionResolver->expects($this->once())
             ->method('setRequired')
             ->with(['is_mobile'])
@@ -53,7 +53,7 @@ class IsMobileContextConfiguratorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($optionResolver);
 
         /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->getMock('Oro\Component\Layout\ContextInterface');
+        $context = $this->createMock('Oro\Component\Layout\ContextInterface');
         $context->expects($this->once())
             ->method('getResolver')
             ->willReturn($optionResolver);

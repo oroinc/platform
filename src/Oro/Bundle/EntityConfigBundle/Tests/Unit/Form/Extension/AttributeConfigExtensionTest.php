@@ -22,11 +22,6 @@ class AttributeConfigExtensionTest extends TypeTestCase
     protected $attributeConfigProvider;
 
     /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $extendConfigProvider;
-
-    /**
      * @var SerializedFieldProvider|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $serializedFieldProvider;
@@ -44,17 +39,12 @@ class AttributeConfigExtensionTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->serializedFieldProvider = $this->getMockBuilder(SerializedFieldProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->extension = new AttributeConfigExtension(
             $this->attributeConfigProvider,
-            $this->extendConfigProvider,
             $this->serializedFieldProvider
         );
     }
@@ -139,7 +129,27 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->extension->onPostSetData($event);
     }
 
-    public function testOnPostSubmit()
+    /**
+     * @return array
+     */
+    public function isSerializedDataProvider()
+    {
+        return [
+            'serialized field' => [
+                'is_serialized' => true
+            ],
+            'not serialized field' => [
+                'is_serialized' => false
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider isSerializedDataProvider
+     *
+     * @param bool $isSerialized
+     */
+    public function testOnPostSubmit($isSerialized)
     {
         $form = $this->getMockBuilder(FormInterface::class)
             ->getMock();
@@ -147,7 +157,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
             ->method('isValid')
             ->willReturn(true);
 
-        $formConfig = $this->getMock(FormConfigInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getOption')
             ->with('config_model')
@@ -159,7 +169,6 @@ class AttributeConfigExtensionTest extends TypeTestCase
 
         $data = [];
         $event = new FormEvent($form, $data);
-        $isSerialized = true;
         $fieldConfigModel = $this->getFieldConfigModel();
         $this->serializedFieldProvider->expects($this->once())
             ->method('isSerializedByData')
@@ -177,16 +186,15 @@ class AttributeConfigExtensionTest extends TypeTestCase
             ->method('addListener');
         $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
 
-        $extendConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
-        $extendConfig->expects($this->once())
-            ->method('set')
-            ->with('is_serialized', $isSerialized);
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($fieldConfigModel->getEntity()->getClassName(), $fieldConfigModel->getFieldName())
-            ->willReturn($extendConfig);
         $this->extension->onPostSubmit($event);
+
+        $expectedData = [
+            'extend'=> [
+                'is_serialized' => $isSerialized
+            ]
+        ];
+
+        $this->assertEquals($expectedData, $event->getData());
     }
 
     public function testOnPostSubmitNotValid()
@@ -198,8 +206,6 @@ class AttributeConfigExtensionTest extends TypeTestCase
             ->willReturn(false);
         $this->serializedFieldProvider->expects($this->never())
             ->method('isSerializedByData');
-        $this->extendConfigProvider->expects($this->never())
-            ->method('getConfig');
 
         $event = new FormEvent($form, []);
         $this->extension->onPostSubmit($event);

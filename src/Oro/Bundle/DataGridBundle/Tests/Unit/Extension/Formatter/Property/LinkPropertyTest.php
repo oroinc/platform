@@ -25,8 +25,8 @@ class LinkPropertyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->router = $this->getMock('Symfony\Component\Routing\RouterInterface');
-        $this->twig = $this->getMock('Oro\Bundle\UIBundle\Twig\Environment');
+        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
+        $this->twig = $this->createMock('Oro\Bundle\UIBundle\Twig\Environment');
 
         $this->property = new LinkProperty($this->router, $this->twig);
     }
@@ -44,7 +44,7 @@ class LinkPropertyTest extends \PHPUnit_Framework_TestCase
 
         $record = new ResultRecord($data);
 
-        $template = $this->getMock('Twig_TemplateInterface');
+        $template = $this->createMock('Twig_TemplateInterface');
 
         $this->twig
             ->expects($this->once())

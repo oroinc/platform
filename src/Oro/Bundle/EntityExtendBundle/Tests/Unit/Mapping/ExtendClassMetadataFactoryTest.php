@@ -18,8 +18,8 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $driver = $this->getMock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
-        $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $driver = $this->createMock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
+        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $this->cmf = new ExtendClassMetadataFactory($driver, $metadata);
     }
 

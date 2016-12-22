@@ -106,7 +106,7 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
     protected function getBuildBeforeEvent(DatagridConfiguration $datagridConfig)
     {
         return new BuildBefore(
-            $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface'),
+            $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface'),
             $datagridConfig
         );
     }
@@ -119,7 +119,7 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
     protected function getEntityConfig(array $values = [])
     {
         return new EntityConfig(
-            $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
+            $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
             $values
         );
     }

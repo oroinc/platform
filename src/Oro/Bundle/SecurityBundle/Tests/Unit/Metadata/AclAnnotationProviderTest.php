@@ -35,7 +35,7 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
             true,
             array('fetch', 'save', 'delete', 'deleteAll')
         );
-        $this->loader = $this->getMock('Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoaderInterface');
+        $this->loader = $this->createMock('Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoaderInterface');
         $this->provider = new AclAnnotationProvider($this->entityClassResolver, $this->cache);
         $this->provider->addLoader($this->loader);
     }
@@ -48,7 +48,7 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
                 /** @var AclAnnotationStorage $storage */
                 $storage->add(
                     new AclAnnotation(['id' => 'test', 'type' => 'entity', 'class' => 'Test:Entity']),
-                    'SomeClass',
+                    \stdClass::class,
                     'SomeMethod'
                 );
             });
@@ -64,8 +64,8 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test\Entity', $foundAnnotation->getClass());
         $this->assertNull($this->provider->findAnnotationById('unknown'));
 
-        $this->assertEquals('test', $this->provider->findAnnotation('SomeClass', 'SomeMethod')->getId());
-        $this->assertNull($this->provider->findAnnotation('SomeClass', 'UnknownMethod'));
+        $this->assertEquals('test', $this->provider->findAnnotation(\stdClass::class, 'SomeMethod')->getId());
+        $this->assertNull($this->provider->findAnnotation(\stdClass::class, 'UnknownMethod'));
         $this->assertNull($this->provider->findAnnotation('UnknownClass', 'SomeMethod'));
 
         $this->assertCount(1, $this->provider->getAnnotations());
@@ -83,23 +83,23 @@ class AclAnnotationProviderTest extends \PHPUnit_Framework_TestCase
                         /** @var AclAnnotationStorage $storage */
                         $storage->add(
                             new AclAnnotation(array('id' => 'test', 'type' => 'entity')),
-                            'SomeClass',
+                            \stdClass::class,
                             'SomeMethod'
                         );
                     }
                 )
             );
 
-        $this->assertFalse($this->provider->hasAnnotation('SomeClass'));
+        $this->assertFalse($this->provider->hasAnnotation(\stdClass::class));
         $this->assertFalse($this->provider->hasAnnotation('UnknownClass'));
-        $this->assertTrue($this->provider->hasAnnotation('SomeClass', 'SomeMethod'));
-        $this->assertFalse($this->provider->hasAnnotation('SomeClass', 'UnknownMethod'));
+        $this->assertTrue($this->provider->hasAnnotation(\stdClass::class, 'SomeMethod'));
+        $this->assertFalse($this->provider->hasAnnotation(\stdClass::class, 'UnknownMethod'));
         $this->assertFalse($this->provider->hasAnnotation('UnknownClass', 'SomeMethod'));
 
-        $this->assertTrue($this->provider->isProtectedClass('SomeClass'));
+        $this->assertTrue($this->provider->isProtectedClass(\stdClass::class));
         $this->assertFalse($this->provider->isProtectedClass('UnknownClass'));
-        $this->assertTrue($this->provider->isProtectedMethod('SomeClass', 'SomeMethod'));
-        $this->assertFalse($this->provider->isProtectedMethod('SomeClass', 'UnknownMethod'));
+        $this->assertTrue($this->provider->isProtectedMethod(\stdClass::class, 'SomeMethod'));
+        $this->assertFalse($this->provider->isProtectedMethod(\stdClass::class, 'UnknownMethod'));
         $this->assertFalse($this->provider->isProtectedMethod('UnknownClass', 'SomeMethod'));
     }
 

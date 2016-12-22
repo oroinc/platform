@@ -19,7 +19,7 @@ class ExpressionAvailableTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->factory = $this->getMock(FactoryWithTypesInterface::class);
+        $this->factory = $this->createMock(FactoryWithTypesInterface::class);
         $this->factory->expects($this->any())
             ->method('isTypeExists')
             ->willReturnCallback(

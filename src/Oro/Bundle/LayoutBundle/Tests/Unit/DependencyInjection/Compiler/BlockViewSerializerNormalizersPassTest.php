@@ -12,8 +12,8 @@ class BlockViewSerializerNormalizersPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $container = $this->getMock(ContainerBuilder::class);
-        $serializerServiceDef = $this->getMock(Definition::class);
+        $container = $this->createMock(ContainerBuilder::class);
+        $serializerServiceDef = $this->createMock(Definition::class);
         $expressionNormalizerServiceId = 'oro_layout.block_view_serializer.expression_normalizer';
         $normalizerTags = [$expressionNormalizerServiceId => []];
 

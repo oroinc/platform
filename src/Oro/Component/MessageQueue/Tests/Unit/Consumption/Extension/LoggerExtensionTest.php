@@ -57,7 +57,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -65,7 +65,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createLogger()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -73,6 +73,6 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageConsumerMock()
     {
-        return $this->getMock(MessageConsumerInterface::class);
+        return $this->createMock(MessageConsumerInterface::class);
     }
 }

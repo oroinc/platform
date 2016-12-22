@@ -23,7 +23,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
     protected function setUp()
     {
         $this->tokenStorage = $this
-            ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $this->listener = new ModifyCreatedAndUpdatedPropertiesListener($this->tokenStorage);
     }
@@ -47,7 +47,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
      */
     public function testModifyCreatedAndUpdatedPropertiesForNewEntity($user, $expectedCallSetUpdatedBy)
     {
-        $datesAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
+        $datesAwareEntity = $this->createMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
 
         $datesAwareEntity->expects($this->once())
             ->method('getCreatedAt');
@@ -61,7 +61,8 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('setUpdatedAt')
             ->with($this->equalTo(new \DateTime(), 1));
 
-        $alreadyUpdatedDatesAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
+        $alreadyUpdatedDatesAwareEntity = $this
+            ->createMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
         $alreadyUpdatedDatesAwareEntity->expects($this->once())
             ->method('getCreatedAt')
             ->willReturn(new \DateTime());
@@ -73,7 +74,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $alreadyUpdatedDatesAwareEntity->expects($this->never())
             ->method('setUpdatedAt');
 
-        $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $currentToken = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $currentToken->expects($this->exactly(4))
             ->method('getUser')
             ->willReturn($user);
@@ -81,7 +82,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('getToken')
             ->willReturn($currentToken);
 
-        $updatedByAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
+        $updatedByAwareEntity = $this->createMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
         $updatedByAwareEntity->expects($this->once())
             ->method('isUpdatedBySet')
             ->willReturn(false);
@@ -93,7 +94,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             $updatedByAwareEntity->expects($this->never())
                 ->method('setUpdatedBy');
         }
-        $alreadyUpdatedUpdatedByAwareEntity = $this->getMock(
+        $alreadyUpdatedUpdatedByAwareEntity = $this->createMock(
             'Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface'
         );
         $alreadyUpdatedUpdatedByAwareEntity->expects($this->once())
@@ -119,7 +120,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
      */
     public function testModifyCreatedAndUpdatedPropertiesForExistingEntity($user, $expectedCallSetUpdatedBy)
     {
-        $datesAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
+        $datesAwareEntity = $this->createMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
 
         $datesAwareEntity->expects($this->once())
             ->method('isUpdatedAtSet')
@@ -128,14 +129,15 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('setUpdatedAt')
             ->with($this->equalTo(new \DateTime(), 1));
 
-        $alreadyUpdatedDatesAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
+        $alreadyUpdatedDatesAwareEntity = $this
+            ->createMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
         $alreadyUpdatedDatesAwareEntity->expects($this->once())
             ->method('isUpdatedAtSet')
             ->willReturn(true);
         $alreadyUpdatedDatesAwareEntity->expects($this->never())
             ->method('setUpdatedAt');
 
-        $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $currentToken = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $currentToken->expects($this->exactly(4))
             ->method('getUser')
             ->willReturn($user);
@@ -143,7 +145,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('getToken')
             ->willReturn($currentToken);
 
-        $updatedByAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
+        $updatedByAwareEntity = $this->createMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
         $updatedByAwareEntity->expects($this->once())
             ->method('isUpdatedBySet')
             ->willReturn(false);
@@ -151,7 +153,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('setUpdatedBy')
             ->with($user);
 
-        $alreadyUpdatedUpdatedByAwareEntity = $this->getMock(
+        $alreadyUpdatedUpdatedByAwareEntity = $this->createMock(
             'Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface'
         );
         $alreadyUpdatedUpdatedByAwareEntity->expects($this->once())
@@ -205,7 +207,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $entityManager = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadataStub);

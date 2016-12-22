@@ -107,16 +107,16 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
 
         $this->context->set($formName, $formAccessor);
 
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $builder->expects($this->any())
             ->method('getContext')
             ->will($this->returnValue($this->context));
 
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
 
         $type = new EmbedFormFieldsType($formLayoutBuilder);
         $options = new Options($this->resolveOptions(
@@ -144,7 +144,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
      */
     public function testBuildBlockWithoutForm()
     {
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $builder->expects($this->any())
             ->method('getContext')
             ->will($this->returnValue($this->context));
@@ -170,7 +170,7 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
         $this->context->set($formName, 123);
 
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $builder->expects($this->any())
             ->method('getContext')
             ->will($this->returnValue($this->context));
@@ -185,11 +185,11 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
     public function testBuildView()
     {
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
         $type = new EmbedFormFieldsType($formLayoutBuilder);
 
         $view = new BlockView();
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
 
         $type->buildView(
             $view,
@@ -203,14 +203,14 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
     public function testFinishView()
     {
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
         $type = new EmbedFormFieldsType($formLayoutBuilder);
 
         $formName = 'form';
         $rootView = new BlockView();
         $view = new BlockView($rootView);
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $context = new LayoutContext();
         $formView = new FormView();
         $formAccessor->expects($this->any())
@@ -266,12 +266,12 @@ class EmbedFormFieldsTypeTest extends BlockTypeTestCase
 
     public function testFinishViewWhenFormBlockIsRoot()
     {
-        $formLayoutBuilder = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
+        $formLayoutBuilder = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilderInterface');
         $type = new EmbedFormFieldsType($formLayoutBuilder);
 
         $view = new BlockView();
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $context = new LayoutContext();
         $formView = new FormView();
         $formAccessor->expects($this->any())

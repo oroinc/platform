@@ -58,7 +58,8 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         $message = new NullMessage();
         $message->setBody('{]');
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'The malformed json given.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The malformed json given.');
         $processor->process($message, new NullSession());
     }
 
@@ -200,7 +201,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createProcessHandlerMock()
     {
-        return $this->getMock(ProcessHandler::class, [], [], '', false);
+        return $this->createMock(ProcessHandler::class);
     }
 
     /**
@@ -208,7 +209,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityManagerMock()
     {
-        return $this->getMock(EntityManagerInterface::class);
+        return $this->createMock(EntityManagerInterface::class);
     }
 
     /**
@@ -216,7 +217,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityRepositoryMock()
     {
-        return $this->getMock(EntityRepository::class, [], [], '', false);
+        return $this->createMock(EntityRepository::class);
     }
 
     /**
@@ -224,7 +225,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -232,7 +233,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineHelperStub($entityManager = null, $entityRepository = null)
     {
-        $doctrineHelper =  $this->getMock(DoctrineHelper::class, [], [], '', false);
+        $doctrineHelper =  $this->createMock(DoctrineHelper::class);
         $doctrineHelper
             ->expects($this->any())
             ->method('getEntityRepository')

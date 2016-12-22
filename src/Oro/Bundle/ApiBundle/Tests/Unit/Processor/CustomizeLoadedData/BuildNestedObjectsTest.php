@@ -26,6 +26,16 @@ class BuildNestedObjectsTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->hasResult());
     }
 
+    public function testProcessWithoutConfig()
+    {
+        $data = [
+            'field1' => 123
+        ];
+
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWithoutNestedFields()
     {
         $data = [

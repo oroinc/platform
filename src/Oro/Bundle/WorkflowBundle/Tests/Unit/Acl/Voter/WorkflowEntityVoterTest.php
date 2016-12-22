@@ -143,7 +143,7 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
 
         $this->setRegistryRepositories([$entityAcl], 'WorkflowEntity', $identifier, [$aclIdentity]);
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
         $this->assertEquals($expected, $this->voter->vote($token, $object, $attributes));
     }

@@ -9,7 +9,7 @@ class TestActivityList extends ActivityList
     /**
      * {@inheritdoc}
      */
-    public function getActivityListTargetEntities()
+    public function getActivityListTargets($targetClass = null)
     {
         return [new \stdClass()];
     }

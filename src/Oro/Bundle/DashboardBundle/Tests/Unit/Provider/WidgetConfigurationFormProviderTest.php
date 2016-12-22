@@ -77,7 +77,7 @@ class DashboardConfigurationFormProviderTest extends FormIntegrationTestCase
      */
     protected function getProviderWithConfigLoaded($configPath)
     {
-        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $config = $this->getConfig($configPath);
         $provider = new WidgetConfigurationFormProvider(

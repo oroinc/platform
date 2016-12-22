@@ -22,7 +22,7 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configProvider = $this->getMock(ProviderInterface::class);
+        $this->configProvider = $this->createMock(ProviderInterface::class);
         $this->configManager  = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -268,7 +268,7 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
         $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
         $apiTree = new SectionDefinition($path);
         $apiTree->addVariable(new VariableDefinition($key, $dataType));
-        $dataTransformer = $this->getMock('Oro\Bundle\ConfigBundle\Config\DataTransformerInterface');
+        $dataTransformer = $this->createMock('Oro\Bundle\ConfigBundle\Config\DataTransformerInterface');
 
         $this->configProvider->expects($this->once())
             ->method('getApiTree')

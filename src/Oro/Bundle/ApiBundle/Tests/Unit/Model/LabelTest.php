@@ -21,7 +21,7 @@ class LabelTest extends \PHPUnit_Framework_TestCase
     {
         $label = new Label('test');
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->once())
             ->method('trans')
             ->with('test')
@@ -34,7 +34,7 @@ class LabelTest extends \PHPUnit_Framework_TestCase
     {
         $label = new Label('test');
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->once())
             ->method('trans')
             ->with('test')

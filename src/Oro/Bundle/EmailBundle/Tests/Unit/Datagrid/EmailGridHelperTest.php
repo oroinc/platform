@@ -188,7 +188,7 @@ class EmailGridHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setGetEmailOriginsExpectations($userId, $emailOrigins)
     {
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $em   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();

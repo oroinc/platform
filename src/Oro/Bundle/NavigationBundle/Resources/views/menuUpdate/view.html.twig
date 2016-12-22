@@ -81,10 +81,15 @@
                                         'onSelectRoute' : menuUpdateRoute,
                                         'onMoveRoute' : 'oro_navigation_menuupdate_move'
                                     } %}
-                                    <div
-                                            data-page-component-module="oronavigation/js/app/components/tree-manage-component"
-                                            data-page-component-options="{{ treeOptions|json_encode }}"
-                                    ></div>
+
+                                    {{ UI.renderJsTree(
+                                        {
+                                            'module': 'oronavigation/js/app/components/tree-manage-component',
+                                            'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                                            'treeOptions': treeOptions
+                                        },
+                                        ['expand', 'collapse']
+                                    ) }}
                                 </div>
                             </div>
                             <div class="content">

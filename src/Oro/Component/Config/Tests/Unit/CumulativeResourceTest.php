@@ -52,7 +52,7 @@ class CumulativeResourceTest extends \PHPUnit_Framework_TestCase
     {
         $bundle = new TestBundle1();
 
-        $resourceLoader = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
 
         $resource = new CumulativeResource(
             'test',
@@ -75,7 +75,7 @@ class CumulativeResourceTest extends \PHPUnit_Framework_TestCase
     {
         $bundle = new TestBundle1();
 
-        $resourceLoader = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
 
         $resource = new CumulativeResource(
             'test',
@@ -99,8 +99,8 @@ class CumulativeResourceTest extends \PHPUnit_Framework_TestCase
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
 
-        $resourceLoader1 = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
-        $resourceLoader2 = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader1 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader2 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
 
         $resource1 = new CumulativeResource(
             'test1',
@@ -132,8 +132,8 @@ class CumulativeResourceTest extends \PHPUnit_Framework_TestCase
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
 
-        $resourceLoader1 = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
-        $resourceLoader2 = $this->getMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader1 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
+        $resourceLoader2 = $this->createMock('Oro\Component\Config\Loader\CumulativeResourceLoader');
 
         $resource = new CumulativeResource(
             'test',

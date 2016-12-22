@@ -96,7 +96,7 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
      */
     public function testBuildView($options, $expectedVars)
     {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $view = new FormView();
 
         $this->formType->buildView($view, $form, $options);

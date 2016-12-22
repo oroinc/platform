@@ -16,7 +16,7 @@ class TagGeneratorChainTest extends \PHPUnit_Framework_TestCase
     public function testConstructor(array $generators, $exceptionExpected = false)
     {
         if ($exceptionExpected) {
-            $this->setExpectedException($exceptionExpected);
+            $this->expectException($exceptionExpected);
         }
         new TagGeneratorChain($generators);
     }
