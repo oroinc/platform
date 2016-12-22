@@ -41,7 +41,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->logger              = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger              = $this->createMock('Psr\Log\LoggerInterface');
 
         $this->model = new Email();
 

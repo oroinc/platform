@@ -47,8 +47,8 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfTopicNameIsNotSet()
     {
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'Topic name is not set but it is required. service: "processor", '.
             'tag: "oro_message_queue.client.message'
         );
@@ -194,7 +194,8 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionWhenTopicSubscriberConfigurationIsInvalid()
     {
-        $this->setExpectedException(\LogicException::class, 'Topic subscriber configuration is invalid. "[12345]"');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Topic subscriber configuration is invalid. "[12345]"');
 
         $container = new ContainerBuilder();
 

@@ -35,7 +35,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 }
             );
 
-        $entityIdTransformer = $this->getMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
         $entityIdTransformer->expects($this->any())
             ->method('transform')
             ->willReturnCallback(

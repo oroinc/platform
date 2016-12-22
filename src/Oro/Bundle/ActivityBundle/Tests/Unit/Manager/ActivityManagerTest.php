@@ -230,7 +230,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -256,7 +256,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetForAlreadyAddedTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -278,7 +278,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetForNotSupportedTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -299,7 +299,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetForNullTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
 
         $activityEntity->expects($this->never())
             ->method('supportActivityTarget');
@@ -315,7 +315,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargets()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -338,7 +338,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetsForAlreadyAddedTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -360,7 +360,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testAddActivityTargetsForNotSupportedTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -381,7 +381,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -407,7 +407,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTargetForNotExistingTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -429,7 +429,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTargetForNotSupportedTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
         $targetEntity   = new Target();
 
         $activityEntity->expects($this->once())
@@ -450,7 +450,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testRemoveActivityTargetForNullTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
 
         $activityEntity->expects($this->never())
             ->method('supportActivityTarget');
@@ -466,7 +466,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);
@@ -507,7 +507,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTargetNoAssociationWithOldTarget()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);
@@ -546,7 +546,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTargetNewTargetAlreadyExist()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);
@@ -585,7 +585,7 @@ class ActivityManagerTest extends OrmTestCase
 
     public function testReplaceActivityTargetNoChanges()
     {
-        $activityEntity = $this->getMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $activityEntity = $this->createMock('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
 
         $oldTargetEntity = new Target(1);
         $newTargetEntity = new Target(2);

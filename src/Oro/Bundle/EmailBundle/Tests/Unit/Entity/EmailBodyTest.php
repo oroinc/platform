@@ -44,7 +44,7 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
 
     public function testAttachmentGetterAndSetter()
     {
-        $attachment = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
+        $attachment = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
 
         $entity = new EmailBody();
         $entity->addAttachment($attachment);

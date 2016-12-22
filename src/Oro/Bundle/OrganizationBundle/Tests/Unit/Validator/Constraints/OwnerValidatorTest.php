@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constrains;
 
-use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
 
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner;

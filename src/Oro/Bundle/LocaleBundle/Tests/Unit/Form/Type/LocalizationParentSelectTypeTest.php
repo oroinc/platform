@@ -72,10 +72,10 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildView($parentData, $expectedParentId)
     {
-        $parentForm = $this->getMock('Symfony\Component\Form\FormInterface');
+        $parentForm = $this->createMock('Symfony\Component\Form\FormInterface');
         $parentForm->expects($this->once())->method('getData')->willReturn($parentData);
 
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $form->expects($this->once())->method('getParent')->willReturn($parentForm);
 
         $formView = new FormView();

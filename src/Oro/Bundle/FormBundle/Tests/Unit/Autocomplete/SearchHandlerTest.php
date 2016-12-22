@@ -127,7 +127,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
-        $this->managerRegistry = $this->getMock(ManagerRegistry::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(self::TEST_ENTITY_CLASS)
@@ -462,7 +462,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
         foreach (array_keys($data) as $name) {
             $methods[$name] = 'get' . ucfirst($name);
         }
-        $result = $this->getMock('stdClass', array_values($methods));
+        $result = $this->createPartialMock(\stdClass::class, array_values($methods));
         foreach ($data as $name => $property) {
             $result->expects($this->any())
                 ->method($methods[$name])

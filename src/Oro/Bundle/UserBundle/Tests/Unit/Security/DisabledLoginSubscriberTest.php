@@ -25,7 +25,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->user = new User();
-        $this->token = $this->getMock(TokenInterface::class);
+        $this->token = $this->createMock(TokenInterface::class);
         $this->token->expects($this->any())
             ->method('getUser')
             ->willReturn($this->user);
@@ -49,11 +49,11 @@ class DisabledLoginSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->willReturn($this->token);
 
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session = $this->createMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session->expects($this->once())
             ->method('set');
 
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
         $request->expects($this->once())
             ->method('hasSession')
             ->willReturn(true);
@@ -85,11 +85,11 @@ class DisabledLoginSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->willReturn($this->token);
 
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session = $this->createMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session->expects($this->never())
             ->method('set');
 
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
         $request->expects($this->never())
             ->method('hasSession')
             ->willReturn(true);

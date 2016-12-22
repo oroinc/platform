@@ -35,8 +35,8 @@ class LayoutRendererRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetRenderer()
     {
         // prepare data
-        $renderer1 = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
-        $renderer2 = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $renderer1 = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
+        $renderer2 = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
         $this->registry->addRenderer('test1', $renderer1);
         $this->registry->addRenderer('test2', $renderer2);
         $this->registry->setDefaultRenderer('test2');

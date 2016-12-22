@@ -10,8 +10,8 @@ class SearchResultBeforeTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetQuery()
     {
-        $datagrid = $this->getMock(DatagridInterface::class);
-        $query    = $this->getMock(SearchQueryInterface::class);
+        $datagrid = $this->createMock(DatagridInterface::class);
+        $query    = $this->createMock(SearchQueryInterface::class);
 
         $event = new SearchResultBefore($datagrid, $query);
         $this->assertEquals($query, $event->getQuery());
@@ -19,8 +19,8 @@ class SearchResultBeforeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDatagrid()
     {
-        $datagrid = $this->getMock(DatagridInterface::class);
-        $query    = $this->getMock(SearchQueryInterface::class);
+        $datagrid = $this->createMock(DatagridInterface::class);
+        $query    = $this->createMock(SearchQueryInterface::class);
 
         $event = new SearchResultBefore($datagrid, $query);
         $this->assertEquals($datagrid, $event->getDatagrid());

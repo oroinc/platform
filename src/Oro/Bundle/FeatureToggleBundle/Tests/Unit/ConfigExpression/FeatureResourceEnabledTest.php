@@ -41,7 +41,7 @@ class FeatureResourceEnabledTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeWrongOptions(array $options)
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->condition->initialize($options);
     }
 

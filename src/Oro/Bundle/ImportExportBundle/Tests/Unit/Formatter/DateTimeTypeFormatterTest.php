@@ -37,7 +37,8 @@ class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
     public function testFormatType($value, $type, \Exception $exception = null)
     {
         if (null !== $exception) {
-            $this->setExpectedException(get_class($exception), $exception->getMessage());
+            $this->expectException(get_class($exception));
+            $this->expectExceptionMessage($exception->getMessage());
         }
         $this->formatter->formatType($value, $type);
     }

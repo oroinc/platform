@@ -24,8 +24,8 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->action = new CallServiceMethod(new ContextAccessor(), $this->container);
         $this->action->setDispatcher($this->eventDispatcher);
@@ -74,7 +74,8 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn(new TestService());
 
-        $this->setExpectedException($exception, $exceptionMessage);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->action->initialize($inputData);
     }

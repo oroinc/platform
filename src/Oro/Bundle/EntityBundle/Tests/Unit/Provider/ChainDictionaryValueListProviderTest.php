@@ -17,8 +17,8 @@ class ChainDictionaryValueListProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->provider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface');
-        $this->provider2 = $this->getMock('Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface');
+        $this->provider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface');
+        $this->provider2 = $this->createMock('Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface');
 
         $this->chainProvider = new ChainDictionaryValueListProvider();
         $this->chainProvider->addProvider($this->provider1);

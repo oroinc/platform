@@ -19,27 +19,19 @@ class AttributeConfigExtension extends AbstractTypeExtension
     protected $attributeConfigProvider;
 
     /**
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
-    /**
      * @var SerializedFieldProvider
      */
     protected $serializedFieldProvider;
 
     /**
      * @param ConfigProvider $attributeConfigProvider
-     * @param ConfigProvider $extendConfigProvider
      * @param SerializedFieldProvider $serializedFieldProvider
      */
     public function __construct(
         ConfigProvider $attributeConfigProvider,
-        ConfigProvider $extendConfigProvider,
         SerializedFieldProvider $serializedFieldProvider
     ) {
         $this->attributeConfigProvider = $attributeConfigProvider;
-        $this->extendConfigProvider = $extendConfigProvider;
         $this->serializedFieldProvider = $serializedFieldProvider;
     }
 
@@ -80,12 +72,10 @@ class AttributeConfigExtension extends AbstractTypeExtension
     {
         if ($event->getForm()->isValid()) {
             $configModel = $event->getForm()->getConfig()->getOption('config_model');
-            $isSerialized = $this->serializedFieldProvider->isSerializedByData($configModel, $event->getData());
-            $extendConfig = $this->extendConfigProvider->getConfig(
-                $configModel->getEntity()->getClassName(),
-                $configModel->getFieldName()
-            );
-            $extendConfig->set('is_serialized', $isSerialized);
+            $data = $event->getData();
+            $data['extend']['is_serialized'] = $this->serializedFieldProvider->isSerializedByData($configModel, $data);
+
+            $event->setData($data);
         }
     }
 

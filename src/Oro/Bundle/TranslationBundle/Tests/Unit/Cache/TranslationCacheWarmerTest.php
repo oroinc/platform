@@ -96,7 +96,7 @@ class TranslationCacheWarmerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getStrategy($name)
     {
-        $strategy = $this->getMock(TranslationStrategyInterface::class);
+        $strategy = $this->createMock(TranslationStrategyInterface::class);
         $strategy->expects($this->any())->method('isApplicable')->willReturn(true);
         $strategy->expects($this->any())->method('getName')->willReturn($name);
 

@@ -212,7 +212,8 @@ class OperationTypeTest extends FormIntegrationTestCase
      */
     public function testException(array $options, $exception, $message, ActionData $data = null)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $this->factory->create($this->formType, $data, $options);
     }

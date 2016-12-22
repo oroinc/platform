@@ -30,9 +30,9 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->factory = $this->getMock(FactoryWithTypesInterface::class);
+        $this->factory = $this->createMock(FactoryWithTypesInterface::class);
 
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
             ->willReturnCallback(
@@ -41,7 +41,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->input = $this->getMock(InputInterface::class);
+        $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
         $this->command = $this->getCommandInstance();
         $this->command->setContainer($this->container);

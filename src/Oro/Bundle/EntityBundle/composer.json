@@ -21,7 +21,6 @@
         "psr-0": { "Oro\\Bundle\\EntityBundle": "" }
     },
     "target-dir": "Oro/Bundle/EntityBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

@@ -146,7 +146,8 @@ class AddTreeGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testPrepareExceptions(array $source, $message)
     {
-        $this->setExpectedException('\Oro\Component\Layout\Exception\SyntaxException', $message);
+        $this->expectException('\Oro\Component\Layout\Exception\SyntaxException');
+        $this->expectExceptionMessage($message);
         $visitorCollection = new VisitorCollection();
         $this->extension->prepare(new GeneratorData($source), $visitorCollection);
     }

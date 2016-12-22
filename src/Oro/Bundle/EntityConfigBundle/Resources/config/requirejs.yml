@@ -1,0 +1,4 @@
+config:
+    paths:
+        'oro/select2-attribute-autocomplete-component': 'bundles/oroentityconfig/js/components/attribute-select-component.js'
+        'oroentityconfig/js/attribute-group-collection-component': 'bundles/oroentityconfig/js/components/attribute-group-collection-component.js'

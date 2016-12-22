@@ -47,9 +47,9 @@ class OwnerTreeListenerTest extends OrmTestCase
 
         $this->conn = $this->getDriverConnectionMock($this->em);
 
-        $this->treeProvider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $this->treeProvider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
             ->with('oro_security.ownership_tree_provider.chain')
@@ -65,7 +65,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     {
         $this->conn->expects($this->once())
             ->method('prepare')
-            ->will($this->returnValue($this->getMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock')));
+            ->will($this->returnValue($this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock')));
     }
 
     /**

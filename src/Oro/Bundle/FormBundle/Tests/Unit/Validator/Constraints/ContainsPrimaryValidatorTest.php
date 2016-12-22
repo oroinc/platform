@@ -14,7 +14,7 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateException()
     {
-        $constraint = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraint = $this->createMock('Symfony\Component\Validator\Constraint');
         $validator = new ContainsPrimaryValidator();
         $validator->validate(false, $constraint);
     }
@@ -24,7 +24,7 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
         /** @var AbstractLazyCollection $collection */
         $collection = $this->getMockForAbstractClass(AbstractLazyCollection::class);
         $validator = new ContainsPrimaryValidator();
-        $validator->validate($collection, $this->getMock('Symfony\Component\Validator\Constraint'));
+        $validator->validate($collection, $this->createMock('Symfony\Component\Validator\Constraint'));
 
         $this->assertFalse($collection->isInitialized());
     }
@@ -41,7 +41,7 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->never())
             ->method('addViolation');
 
-        $constraint = $this->getMock('Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary');
+        $constraint = $this->createMock('Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary');
         $validator = new ContainsPrimaryValidator();
         $validator->initialize($context);
 
@@ -86,7 +86,7 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('One of items must be set as primary.');
 
-        $constraint = $this->getMock('Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary');
+        $constraint = $this->createMock('Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary');
         $validator = new ContainsPrimaryValidator();
         $validator->initialize($context);
 

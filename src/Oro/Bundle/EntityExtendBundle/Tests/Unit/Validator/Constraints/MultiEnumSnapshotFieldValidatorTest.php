@@ -77,7 +77,7 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit_Framework_TestCase
         $field  = new FieldConfigModel($fieldName, $fieldType);
         $entity->addField($field);
 
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $this->validator->initialize($context);
 
         $constraint = new MultiEnumSnapshotField();
@@ -85,7 +85,7 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit_Framework_TestCase
         if ($expectedValidationMessageType) {
             $message   = PropertyAccess::createPropertyAccessor()
                 ->getValue($constraint, $expectedValidationMessageType);
-            $violation = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
+            $violation = $this->createMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
             $context->expects($this->once())
                 ->method('buildViolation')
                 ->with($message)

@@ -51,8 +51,8 @@ class ChannelTest extends \PHPUnit_Framework_TestCase
      */
     public function getSetDataProvider()
     {
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
         return [
             'id'               => ['id'],

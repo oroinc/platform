@@ -99,13 +99,13 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                 ],
                 'field7' => [
                     'data_transformer' => [
-                        $this->getMock('Oro\Component\EntitySerializer\DataTransformerInterface')
+                        $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface')
                     ]
                 ]
             ]
         ];
 
-        $timeDataTransformer = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $timeDataTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
         $this->dataTransformerRegistry->expects($this->any())
             ->method('getDataTransformer')
             ->willReturnMap(
@@ -153,13 +153,13 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                 ],
                 'field7' => [
                     'data_transformer' => [
-                        $this->getMock('Oro\Component\EntitySerializer\DataTransformerInterface')
+                        $this->createMock('Oro\Component\EntitySerializer\DataTransformerInterface')
                     ]
                 ],
             ]
         ];
 
-        $timeDataTransformer = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $timeDataTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
         $this->dataTransformerRegistry->expects($this->any())
             ->method('getDataTransformer')
             ->willReturnMap(
@@ -227,7 +227,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $timeDataTransformer = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $timeDataTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
         $this->dataTransformerRegistry->expects($this->any())
             ->method('getDataTransformer')
             ->willReturnMap(

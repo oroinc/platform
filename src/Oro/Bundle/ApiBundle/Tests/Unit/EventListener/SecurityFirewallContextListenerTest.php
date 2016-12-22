@@ -57,7 +57,7 @@ class SecurityFirewallContextListenerTest extends \PHPUnit_Framework_TestCase
     protected function createMasterRequestEvent($route = 'foo')
     {
         /** @var HttpKernelInterface|\PHPUnit_Framework_MockObject_MockObject $kernel */
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
         return new GetResponseEvent(
             $kernel,

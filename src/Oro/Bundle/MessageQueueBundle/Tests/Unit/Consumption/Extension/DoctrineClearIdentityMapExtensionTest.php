@@ -48,10 +48,10 @@ class DoctrineClearIdentityMapExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContext()
     {
-        $context = new Context($this->getMock(SessionInterface::class));
-        $context->setLogger($this->getMock(LoggerInterface::class));
-        $context->setMessageConsumer($this->getMock(MessageConsumerInterface::class));
-        $context->setMessageProcessor($this->getMock(MessageProcessorInterface::class));
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setLogger($this->createMock(LoggerInterface::class));
+        $context->setMessageConsumer($this->createMock(MessageConsumerInterface::class));
+        $context->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
 
         return $context;
     }
@@ -61,7 +61,7 @@ class DoctrineClearIdentityMapExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createRegistryMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -69,6 +69,6 @@ class DoctrineClearIdentityMapExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createManagerMock()
     {
-        return $this->getMock(ObjectManager::class);
+        return $this->createMock(ObjectManager::class);
     }
 }

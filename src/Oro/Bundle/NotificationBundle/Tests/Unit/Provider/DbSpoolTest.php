@@ -65,7 +65,7 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
      */
     public function testQueueMessage()
     {
-        $message = $this->getMock('\Swift_Mime_Message');
+        $message = $this->createMock('\Swift_Mime_Message');
         $this->spool->setLogType('log type');
         $this->entityPool->expects($this->once())
             ->method('addPersistEntity')
@@ -87,7 +87,7 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushMessage()
     {
-        $transport = $this->getMock('\Swift_Transport');
+        $transport = $this->createMock('\Swift_Transport');
 
         $transport->expects($this->once())
             ->method('isStarted')
@@ -95,9 +95,9 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->once())
             ->method('start');
 
-        $message = $this->getMock('\Swift_Mime_Message');
+        $message = $this->createMock('\Swift_Mime_Message');
 
-        $spoolItem = $this->getMock(self::SPOOL_ITEM_CLASS);
+        $spoolItem = $this->createMock(self::SPOOL_ITEM_CLASS);
         $spoolItem->expects($this->once())
             ->method('setStatus');
         $spoolItem->expects($this->once())
@@ -153,7 +153,7 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushMessageZeroEmails()
     {
-        $transport = $this->getMock('\Swift_Transport');
+        $transport = $this->createMock('\Swift_Transport');
 
         $transport->expects($this->once())
             ->method('isStarted')

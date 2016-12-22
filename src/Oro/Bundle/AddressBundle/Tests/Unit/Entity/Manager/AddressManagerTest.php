@@ -27,7 +27,7 @@ class AddressManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $classMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
@@ -123,7 +123,7 @@ class AddressManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getRepository($addressCriteria = array())
     {
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository
             ->expects($this->any())
             ->method('findOneBy')
