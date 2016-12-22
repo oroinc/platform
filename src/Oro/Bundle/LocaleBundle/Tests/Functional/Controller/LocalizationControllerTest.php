@@ -34,14 +34,14 @@ class LocalizationControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData']);
     }
-//
-//    public function testIndex()
-//    {
-//        $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_index'));
-//
-//        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-//        $this->assertContains('oro-locale-localizations-grid', $crawler->html());
-//    }
+
+    public function testIndex()
+    {
+        $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_index'));
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $this->assertContains('oro-locale-localizations-grid', $crawler->html());
+    }
 
     public function testCreate()
     {
