@@ -55,7 +55,7 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWidgetStateNotLoggedUser()
     {
-        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
 
         $this->securityFacade
             ->expects($this->once())
@@ -74,9 +74,9 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWidgetStateExist()
     {
-        $widgetState = $this->getMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
-        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $widgetState = $this->createMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
+        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $this->securityFacade
             ->expects($this->once())
@@ -103,8 +103,8 @@ class StateManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWidgetStateNew()
     {
-        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $this->securityFacade
             ->expects($this->once())

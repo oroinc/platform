@@ -30,9 +30,9 @@ class TwigRendererEngineTest extends RendererEngineTest
         $this->twigRendererEngine->setLayoutHelper($layoutHelper);
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = 'cache_key';
-        $template = $this->getMock('\Twig_Template', [], [], '', false);
+        $template = $this->createMock('\Twig_Template');
         $template->expects($this->once())
             ->method('getTemplateName')
             ->will($this->returnValue('theme'));
@@ -58,7 +58,7 @@ class TwigRendererEngineTest extends RendererEngineTest
         );
 
         /** @var \Twig_Environment|\PHPUnit_Framework_MockObject_MockObject $environment */
-        $environment = $this->getMock('\Twig_Environment', [], [], '', false);
+        $environment = $this->createMock('\Twig_Environment');
         $environment->expects($this->once())
             ->method('mergeGlobals')
             ->with($result)
@@ -73,7 +73,7 @@ class TwigRendererEngineTest extends RendererEngineTest
      */
     protected function getMockLayoutHelper()
     {
-        return $this->getMock('Oro\Bundle\LayoutBundle\Request\LayoutHelper', [], [], '', false);
+        return $this->createMock('Oro\Bundle\LayoutBundle\Request\LayoutHelper');
     }
 
     public function createRendererEngine()

@@ -21,7 +21,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         new ReindexEntityMessageProcessor(
             $this->createIndexerMock(),
             $this->createJobRunnerMock(),
-            $this->getMock(MessageProducerInterface::class)
+            $this->createMock(MessageProducerInterface::class)
         );
     }
 
@@ -73,7 +73,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $message->setBody('');
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
@@ -127,7 +127,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
@@ -181,7 +181,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ));
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
@@ -195,7 +195,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -203,6 +203,6 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createIndexerMock()
     {
-        return $this->getMock(IndexerInterface::class);
+        return $this->createMock(IndexerInterface::class);
     }
 }

@@ -98,7 +98,7 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
     public function testExceptionScenario()
     {
         $exceptionClass = '\LogicException';
-        $this->setExpectedException($exceptionClass);
+        $this->expectException($exceptionClass);
         $exception = new $exceptionClass();
 
         $this->em->expects($this->once())->method('beginTransaction');

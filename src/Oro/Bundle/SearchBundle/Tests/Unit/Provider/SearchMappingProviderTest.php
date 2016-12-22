@@ -28,8 +28,8 @@ class SearchMappingProviderTest extends AbstractSearchMappingProviderTest
 
     protected function setUp()
     {
-        $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
-        $this->cache = $this->getMock(Cache::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->cache = $this->createMock(Cache::class);
         parent::setUp();
     }
 

@@ -24,13 +24,13 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $manager = $this->getMock(ObjectManager::class);
+        $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->any())
             ->method('getRepository')
             ->with(WorkflowDefinition::class)
             ->willReturn($this->repository);
 
-        $registry = $this->getMock(ManagerRegistry::class);
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManagerForClass')
             ->with(WorkflowDefinition::class)

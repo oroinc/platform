@@ -24,7 +24,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->menuUpdateHelper = $this->getMock(MenuUpdateHelper::class, [], [], '', false);
+        $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);
     }
 
     public function testUpdateMenuUpdate()
@@ -69,7 +69,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $expectedItem->setUri('URI');
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
-        $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
+        $localizationHelper = $this->createMock(LocalizationHelper::class);
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
         $this->assertEquals($expectedItem, $item);
@@ -85,7 +85,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $update->setUri('URI');
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
-        $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
+        $localizationHelper = $this->createMock(LocalizationHelper::class);
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
         $this->assertNull($menu->getChild('item-2')->getChild('item-1-1-1-1'));
@@ -107,7 +107,7 @@ class MenuUpdateUtilsTest extends \PHPUnit_Framework_TestCase
         $update->setCustom(true);
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
-        $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
+        $localizationHelper = $this->createMock(LocalizationHelper::class);
         MenuUpdateUtils::updateMenuItem($update, $menu, $localizationHelper);
 
         $this->assertEquals($expectedItem, $menu->getChild('item-2')->getChild('item-1-1-1-1'));

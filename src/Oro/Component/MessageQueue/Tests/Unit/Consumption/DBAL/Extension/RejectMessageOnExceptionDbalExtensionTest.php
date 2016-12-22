@@ -79,7 +79,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
      */
     private function createMessageConsumerMock()
     {
-        return $this->getMock(MessageConsumerInterface::class);
+        return $this->createMock(MessageConsumerInterface::class);
     }
 
     /**
@@ -87,7 +87,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -95,6 +95,6 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

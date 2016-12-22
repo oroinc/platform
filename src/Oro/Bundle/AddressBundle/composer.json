@@ -20,6 +20,5 @@
     "autoload": {
         "psr-0": { "Oro\\Bundle\\AddressBundle": "" }
     },
-    "target-dir": "Oro/Bundle/AddressBundle",
-    "minimum-stability": "dev"
+    "target-dir": "Oro/Bundle/AddressBundle"
 }

@@ -22,7 +22,7 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
     }
 
     public function testGetDefaultRepositoryNoManagerNoRepositoryClass()
@@ -46,7 +46,7 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getConfiguration')
             ->willReturn($doctrineConfiguration);
 
-        $managerRegistry = $this->getMock(ManagerRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->with($entityName)
@@ -97,7 +97,7 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $entityName = 'TestEntity';
 
-        $managerRegistry = $this->getMock(ManagerRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->with($entityName)
@@ -108,8 +108,8 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('doctrine')
             ->willReturn($managerRegistry);
 
-        $this->setExpectedException(
-            NotManageableEntityException::class,
+        $this->expectException(NotManageableEntityException::class);
+        $this->expectExceptionMessage(
             sprintf('Entity class "%s" is not manageable.', $entityName)
         );
 
@@ -205,8 +205,8 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($repositoryService)
             ->willReturn($entityRepository);
 
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             sprintf('Repository for class %s must be instance of EntityRepository', $entityName)
         );
 
@@ -238,8 +238,8 @@ class EntityRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($repositoryService)
             ->willReturn($entityRepository);
 
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             sprintf('Repository for class %s must be instance of %s', $entityName, TestEntityRepository::class)
         );
 

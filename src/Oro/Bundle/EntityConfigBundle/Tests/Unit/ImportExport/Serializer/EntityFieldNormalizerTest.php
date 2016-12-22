@@ -135,7 +135,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testDenormalize(array $inputData, FieldConfigModel $expectedData)
     {
         /* @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager $objectManager */
-        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')

@@ -31,7 +31,7 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config('', '', '', '');
 
-        $doctrineConnection = $this->getMock(Connection::class, [], [], '', false);
+        $doctrineConnection = $this->createMock(Connection::class);
         $connection = new DbalConnection($doctrineConnection, 'aTableName');
 
         $factory = new DriverFactory([DbalConnection::class => DbalDriver::class]);
@@ -46,8 +46,9 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new DriverFactory([]);
 
-        $this->setExpectedException(\LogicException::class, 'Unexpected connection instance: "Mock_Connection');
-        $factory->create($this->getMock(ConnectionInterface::class), new Config('', '', '', ''));
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unexpected connection instance: "Mock_Connection');
+        $factory->create($this->createMock(ConnectionInterface::class), new Config('', '', '', ''));
     }
 
     /**
@@ -55,7 +56,7 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function createNullSessionMock()
     {
-        return $this->getMock(NullSession::class, [], [], '', false);
+        return $this->createMock(NullSession::class);
     }
 
     /**
@@ -63,6 +64,6 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function createNullConnectionMock()
     {
-        return $this->getMock(NullConnection::class, [], [], '', false);
+        return $this->createMock(NullConnection::class);
     }
 }

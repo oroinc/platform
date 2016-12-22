@@ -180,7 +180,7 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
         $mapperProvider  = new SearchMappingProvider($eventDispatcher);
         $mapperProvider->setMappingConfig($this->mappingConfig);
 
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
         $this->mapper->setMappingProvider($mapperProvider);

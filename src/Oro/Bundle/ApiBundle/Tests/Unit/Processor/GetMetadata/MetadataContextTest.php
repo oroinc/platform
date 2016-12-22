@@ -52,7 +52,7 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testHasExtraAndGetExtras()
     {
-        $extra = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface');
+        $extra = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface');
         $extra->expects($this->any())
             ->method('getName')
             ->willReturn('test');
@@ -66,7 +66,7 @@ class MetadataContextTest extends \PHPUnit_Framework_TestCase
 
     public function testSetExtras()
     {
-        $extra = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface');
+        $extra = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface');
         $extra->expects($this->once())
             ->method('getName')
             ->willReturn('test');

@@ -253,7 +253,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->method('getQueryBuilder')
             ->will($this->returnValue($queryBuilder));
 
-        $acceptor = $this->getMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
+        $acceptor = $this->createMock('Oro\Bundle\DataGridBundle\Extension\Acceptor');
         $result = ResultsObject::create(['data' => []]);
         $acceptor->expects($this->any())
             ->method('acceptResult')
@@ -264,7 +264,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $dataGrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $dataGrid->expects($this->any())
             ->method('getMetadata')
             ->will($this->returnValue($metadataObject));

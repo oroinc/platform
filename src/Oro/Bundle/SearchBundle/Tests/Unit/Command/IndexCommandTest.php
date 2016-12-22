@@ -17,7 +17,8 @@ class IndexCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfClassArgumentIsMissing()
     {
-        $this->setExpectedException(\RuntimeException::class, 'Not enough arguments (missing: "class")');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not enough arguments (missing: "class")');
 
         $command = new IndexCommand();
 
@@ -29,7 +30,8 @@ class IndexCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfIdentifiersArgumentIsMissing()
     {
-        $this->setExpectedException(\RuntimeException::class, 'Not enough arguments (missing: "identifiers")');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not enough arguments (missing: "identifiers")');
 
         $command = new IndexCommand();
 
@@ -41,7 +43,8 @@ class IndexCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfEntityManagerWasNotFoundForClass()
     {
-        $this->setExpectedException(\LogicException::class, 'Entity manager was not found for class: "class-name"');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Entity manager was not found for class: "class-name"');
 
         $doctrine = $this->createDoctrineMock();
         $doctrine
@@ -115,7 +118,7 @@ class IndexCommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityMangerMock()
     {
-        return $this->getMock(EntityManager::class, [], [], '', false);
+        return $this->createMock(EntityManager::class);
     }
 
     /**
@@ -123,7 +126,7 @@ class IndexCommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -131,6 +134,6 @@ class IndexCommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createSearchIndexerMock()
     {
-        return $this->getMock(IndexerInterface::class);
+        return $this->createMock(IndexerInterface::class);
     }
 }

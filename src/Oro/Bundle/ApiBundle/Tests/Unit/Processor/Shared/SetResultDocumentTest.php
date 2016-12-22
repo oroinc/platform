@@ -29,7 +29,7 @@ class SetResultDocumentTest extends GetProcessorTestCase
     public function testProcessWhenResponseDocumentBuilderExists()
     {
         $resultDocument = [];
-        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $documentBuilder->expects($this->once())
             ->method('getDocument')
             ->willReturn($resultDocument);
@@ -44,7 +44,7 @@ class SetResultDocumentTest extends GetProcessorTestCase
     {
         $result = ['result'];
         $resultDocument = ['resultDocument'];
-        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $documentBuilder->expects($this->once())
             ->method('getDocument')
             ->willReturn($resultDocument);

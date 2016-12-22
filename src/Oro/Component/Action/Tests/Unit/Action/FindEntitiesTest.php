@@ -25,10 +25,10 @@ class FindEntitiesTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->function = new FindEntities(new ContextAccessor(), $this->registry);
         $this->function->setDispatcher($dispatcher);
@@ -56,10 +56,8 @@ class FindEntitiesTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $options, $expectedMessage)
     {
-        $this->setExpectedException(
-            '\Oro\Component\Action\Exception\InvalidParameterException',
-            $expectedMessage
-        );
+        $this->expectException('\Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectExceptionMessage($expectedMessage);
 
         $this->function->initialize($options);
     }

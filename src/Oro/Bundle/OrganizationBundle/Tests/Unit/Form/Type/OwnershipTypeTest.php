@@ -22,7 +22,7 @@ class OwnershipTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $optionResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionResolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
 
         $optionResolver->expects($this->once())
             ->method('setDefaults')

@@ -38,7 +38,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+        $this->exclusionProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();

@@ -31,7 +31,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->searchIndexer = $this->getMock(
+        $this->searchIndexer = $this->createMock(
             Indexer::class,
             ['query'],
             [],
@@ -39,7 +39,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->innerQuery = $this->getMock(
+        $this->innerQuery = $this->createMock(
             Query::class,
             [
                 'setFirstResult',
@@ -56,7 +56,7 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->criteria = $this->getMock(Criteria::class);
+        $this->criteria = $this->createMock(Criteria::class);
 
         $this->innerQuery->method('getCriteria')
             ->willReturn($this->criteria);

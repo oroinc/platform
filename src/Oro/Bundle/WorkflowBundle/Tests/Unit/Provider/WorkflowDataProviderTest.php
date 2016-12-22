@@ -62,7 +62,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testWhenWorkflowIsStarted()
     {
-        $workflowItem = $this->getMock(WorkflowItem::class);
+        $workflowItem = $this->createMock(WorkflowItem::class);
 
         $this->workflowManager->expects($this->once())->method('getWorkflowItem')->willReturn($workflowItem);
 
@@ -79,11 +79,11 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testStepDataWhenIssetCurrentStep()
     {
-        $workflowStep = $this->getMock(WorkflowStep::class);
+        $workflowStep = $this->createMock(WorkflowStep::class);
         $workflowStep->expects($this->atLeastOnce())
             ->method('getName')->willReturn('name1');
 
-        $step = $this->getMock(Step::class);
+        $step = $this->createMock(Step::class);
         $step->expects($this->once())
             ->method('getLabel')
             ->willReturn('label_for_step_1');
@@ -98,7 +98,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
                 $this->getCollections()
             );
 
-        $workflowItem = $this->getMock(WorkflowItem::class);
+        $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->expects($this->once())->method('getCurrentStep')
             ->willReturn($workflowStep);
 
@@ -123,7 +123,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
     private function getWorkflow($workflowDefinition = null, $stepManager = null)
     {
         if ($workflowDefinition === null) {
-            $workflowDefinition = $this->getMock(WorkflowDefinition::class);
+            $workflowDefinition = $this->createMock(WorkflowDefinition::class);
         }
 
         $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
@@ -138,7 +138,7 @@ class WorkflowDataProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function getCollections()
     {
-        $collection = $this->getMock(Collection::class);
+        $collection = $this->createMock(Collection::class);
         $collection->expects($this->any())->method('toArray')->willReturn([]);
         $collection->expects($this->any())->method('filter')->willReturn(clone $collection);
 

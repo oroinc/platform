@@ -26,7 +26,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 
         $this->context->setAction('get_list');
 
-        $this->filterFactory = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $this->filterFactory = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
 
         $this->processor = new RegisterConfiguredFilters(
             $this->filterFactory,

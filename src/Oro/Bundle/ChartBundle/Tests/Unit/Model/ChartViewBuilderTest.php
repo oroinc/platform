@@ -40,14 +40,14 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->twig = $this->getMock('Twig_Environment');
+        $this->twig = $this->createMock('Twig_Environment');
 
         $this->builder = new ChartViewBuilder($this->configProvider, $this->transformerFactory, $this->twig);
     }
 
     public function testSetData()
     {
-        $data = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
 
         $this->assertEquals($this->builder, $this->builder->setData($data));
         $this->assertAttributeEquals($data, 'data', $this->builder);
@@ -64,7 +64,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDataGrid()
     {
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $columnsDefintion = array('foo' => array('foo' => 'bar'));
         $config = DatagridConfiguration::create(array('columns' => $columnsDefintion));
 
@@ -109,7 +109,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOptionsWithDataGridColumnsDefinitionMerge()
     {
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $columnsDefintion = array('bar' => array('name' => 'bar', 'label' => 'Foo label', 'frontend_type' => 'int'));
         $config = DatagridConfiguration::create(array('columns' => $columnsDefintion));
 
@@ -200,7 +200,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
         $chartName = 'chart_name';
         $chartTemplate = 'template.html.twig';
 
-        $data = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
 
         $chartConfig = array(
             'template' => $chartTemplate,
@@ -238,9 +238,9 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
         $chartName = 'chart_name';
         $chartTemplate = 'template.html.twig';
 
-        $data = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
-        $dataTransformer = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface');
-        $transformedData = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $dataTransformer = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\Transformer\TransformerInterface');
+        $transformedData = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
         $dataTransformerServiceId = 'data_transformer';
 
         $chartConfig = array(
@@ -278,7 +278,7 @@ class ChartViewBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $chartName = 'chart_name';
 
-        $data = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
 
         $chartConfig = array();
 

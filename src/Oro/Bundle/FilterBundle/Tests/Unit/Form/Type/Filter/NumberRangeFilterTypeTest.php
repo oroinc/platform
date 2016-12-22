@@ -60,7 +60,7 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
      */
     protected function createMockOptionsResolver()
     {
-        return $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        return $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
     }
 
     /**

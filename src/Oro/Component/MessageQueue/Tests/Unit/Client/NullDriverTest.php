@@ -114,7 +114,7 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(NullSession::class, [], [], '', false);
+        return $this->createMock(NullSession::class);
     }
 
     /**
@@ -122,7 +122,7 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionStub($message = null, $messageProducer = null)
     {
-        $sessionMock = $this->getMock(NullSession::class, [], [], '', false);
+        $sessionMock = $this->createMock(NullSession::class);
         $sessionMock
             ->expects($this->any())
             ->method('createMessage')
@@ -149,6 +149,6 @@ class NullDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducer()
     {
-        return $this->getMock(NullMessageProducer::class, [], [], '', false);
+        return $this->createMock(NullMessageProducer::class);
     }
 }

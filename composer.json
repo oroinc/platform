@@ -9,12 +9,6 @@
             "homepage": "http://www.orocrm.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://packagist.orocrm.com"
-        }
-    ],
     "require": {
         "php": ">=5.6",
         "ext-intl": "*",
@@ -113,8 +107,7 @@
         "npm-asset/requirejs": "2.3.*",
         "doctrine/annotations": "1.3.*",
         "robloach/component-installer": "0.2.*",
-        "jms/cg": "~1.1",
-        "phpdocumentor/reflection-docblock": "2.0.*"
+        "jms/cg": "1.2.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "3.1.2",
@@ -122,10 +115,14 @@
         "behat/mink-extension": "2.2.*",
         "behat/mink-selenium2-driver": "1.*",
         "behat/symfony2-extension": "2.1.1",
-        "nelmio/alice": "2.2.2"
+        "nelmio/alice": "2.2.*",
+        "phpunit/phpunit": "5.7.*",
+        "johnkary/phpunit-speedtrap": "1.0.*",
+        "mybuilder/phpunit-accelerator": "1.2.*",
+        "squizlabs/php_codesniffer": "2.7.*",
+        "phpmd/phpmd": "2.5.*",
+        "sebastian/phpcpd": "2.0.*"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "extra": {
         "branch-alias": {
             "dev-master": "1.x-dev"

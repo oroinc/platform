@@ -42,7 +42,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $message = new NullMessage();
         $message->setBody('');
 
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
         self::assertMessagesEmpty(Topics::INDEX_ENTITY);
@@ -64,7 +64,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
 
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessagesEmpty(Topics::INDEX_ENTITY);
@@ -90,7 +90,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new IndexEntitiesByIdMessageProcessor(self::getMessageProducer(), $logger);
 
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessagesEmpty(Topics::INDEX_ENTITY);
@@ -116,7 +116,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ]
         ));
 
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
@@ -130,6 +130,6 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

@@ -9,7 +9,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     public function testTypes()
     {
         $name = 'test';
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
 
         $extension = new PreloadedExtension(
             [
@@ -37,7 +37,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     public function testBlockTypeExtensions()
     {
         $name          = 'test';
-        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $extension = new PreloadedExtension(
             [],
@@ -58,7 +58,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetLayoutUpdates()
     {
         $id           = 'test';
-        $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $extension = new PreloadedExtension(
             [],
@@ -68,11 +68,11 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItem->expects($this->once())->method('getId')->willReturn($id);
-        $layoutItemUnknown = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemUnknown = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
-        $layoutItemAlias = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemAlias = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItemAlias->expects($this->never())->method('getId');
         $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
 
@@ -90,7 +90,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     public function testHasLayoutUpdates()
     {
         $id           = 'test';
-        $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $extension = new PreloadedExtension(
             [],
@@ -100,11 +100,11 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItem->expects($this->once())->method('getId')->willReturn($id);
-        $layoutItemUnknown = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemUnknown = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
-        $layoutItemAlias = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemAlias = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItemAlias->expects($this->never())->method('getId');
         $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
 
@@ -115,7 +115,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testContextConfigurators()
     {
-        $configurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $configurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
 
         $extension = new PreloadedExtension(
             [],
@@ -142,7 +142,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDataProviders()
     {
         $name         = 'test';
-        $dataProvider = $this->getMock(\stdClass::class);
+        $dataProvider = $this->createMock(\stdClass::class);
 
         $extension = new PreloadedExtension(
             [],
@@ -179,8 +179,8 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     {
         new PreloadedExtension(
             [
-                'test' => $this->getMock('Oro\Component\Layout\BlockTypeInterface'),
-                $this->getMock('Oro\Component\Layout\BlockTypeInterface')
+                'test' => $this->createMock('Oro\Component\Layout\BlockTypeInterface'),
+                $this->createMock('Oro\Component\Layout\BlockTypeInterface')
             ]
         );
     }
@@ -193,7 +193,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     {
         new PreloadedExtension(
             [
-                'test1' => $this->getMock('Oro\Component\Layout\BlockTypeInterface'),
+                'test1' => $this->createMock('Oro\Component\Layout\BlockTypeInterface'),
                 'test2' => new \stdClass()
             ]
         );
@@ -208,8 +208,8 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
         new PreloadedExtension(
             [],
             [
-                'test' => [$this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface')],
-                [$this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface')]
+                'test' => [$this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')],
+                [$this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')]
             ]
         );
     }
@@ -223,7 +223,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
         new PreloadedExtension(
             [],
             [
-                'test1' => [$this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface')],
+                'test1' => [$this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')],
                 'test2' => [new \stdClass()]
             ]
         );
@@ -238,7 +238,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
         new PreloadedExtension(
             [],
             [
-                'test' => $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface')
+                'test' => $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')
             ]
         );
     }
@@ -253,8 +253,8 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                'test' => [$this->getMock('Oro\Component\Layout\LayoutUpdateInterface')],
-                [$this->getMock('Oro\Component\Layout\LayoutUpdateInterface')]
+                'test' => [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')],
+                [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')]
             ]
         );
     }
@@ -269,7 +269,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                'test1' => [$this->getMock('Oro\Component\Layout\LayoutUpdateInterface')],
+                'test1' => [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')],
                 'test2' => [new \stdClass()]
             ]
         );
@@ -285,7 +285,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                'test' => $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
+                'test' => $this->createMock('Oro\Component\Layout\LayoutUpdateInterface')
             ]
         );
     }
@@ -301,7 +301,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface'),
+                $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface'),
                 new \stdClass()
             ]
         );
@@ -319,8 +319,8 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [],
             [
-                'test' => $this->getMock(\stdClass::class),
-                $this->getMock(\stdClass::class)
+                'test' => $this->createMock(\stdClass::class),
+                $this->createMock(\stdClass::class)
             ]
         );
     }

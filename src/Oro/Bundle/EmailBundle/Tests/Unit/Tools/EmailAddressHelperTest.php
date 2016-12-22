@@ -113,7 +113,7 @@ class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
 
     public function emailAddressesProvider()
     {
-        $emailObj = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailInterface');
+        $emailObj = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailInterface');
         $emailObj->expects($this->any())->method('getEmail')->will($this->returnValue('john@example.com'));
 
         return [
