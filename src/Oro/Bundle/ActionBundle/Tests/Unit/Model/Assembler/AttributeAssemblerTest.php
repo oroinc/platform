@@ -43,7 +43,8 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssembleRequiredOptionException(array $configuration, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $this->assembler->assemble($this->actionData, $configuration);
     }

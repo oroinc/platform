@@ -20,6 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -770,10 +771,8 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $result);
 
         // test that the created model is NOT stored in a local cache
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            '$className must not be empty'
-        );
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('$className must not be empty');
         $this->configModelManager->getEntityModel($className);
     }
 
@@ -826,10 +825,8 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $result);
 
         // test that the created model is NOT stored in a local cache
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            '$fieldName must not be empty'
-        );
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('$fieldName must not be empty');
         $this->configModelManager->getFieldModel(self::TEST_ENTITY, $fieldName);
     }
 

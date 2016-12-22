@@ -11,7 +11,7 @@ class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
         $filterUtility = $this->getMockBuilder('Oro\Bundle\FilterBundle\Filter\FilterUtility')
             ->disableOriginalConstructor()
             ->getMock();
@@ -24,7 +24,7 @@ class ManyToManyFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
     {
-        $ds = $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
+        $ds = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
         $this->manyToManyfilter->apply($ds, ['type' => FilterUtility::TYPE_EMPTY]);
     }
 

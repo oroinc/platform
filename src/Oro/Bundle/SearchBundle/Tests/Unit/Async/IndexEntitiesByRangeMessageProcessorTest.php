@@ -70,7 +70,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
             }))
         ;
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -115,7 +115,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
         ;
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -162,7 +162,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
 
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -213,7 +213,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
         ;
 
         $processor = new IndexEntitiesByRangeMessageProcessor($doctrine, $producer, $jobRunner, $logger);
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -223,7 +223,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
      */
     private function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -231,7 +231,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
      */
     protected function createSearchIndexerMock()
     {
-        return $this->getMock(IndexerInterface::class);
+        return $this->createMock(IndexerInterface::class);
     }
 
     /**
@@ -239,7 +239,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
      */
     protected function createDoctrineMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -247,6 +247,6 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit_Framework_TestCa
      */
     protected function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

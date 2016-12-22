@@ -34,10 +34,10 @@ class OroChartExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad(array $bundles, array $configs, array $expectedConfiguration)
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
 
         CumulativeResourceManager::getInstance()->setBundles($bundles);
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
 
         $definition->expects($this->once())
             ->method('replaceArgument')

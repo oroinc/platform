@@ -463,7 +463,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function createActivityManagerMock()
     {
-        return $this->getMock(ActivityManager::class, [], [], '', false);
+        return $this->createMock(ActivityManager::class);
     }
 
     /**
@@ -486,7 +486,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function createSecurityFacadeMock()
     {
-        return $this->getMock(SecurityFacade::class, [], [], '', false);
+        return $this->createMock(SecurityFacade::class);
     }
 
     /**
@@ -494,7 +494,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function createTranslatorMock()
     {
-        return $this->getMock(TranslatorInterface::class);
+        return $this->createMock(TranslatorInterface::class);
     }
 
     /**
@@ -502,7 +502,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityIdAccessorMock()
     {
-        return $this->getMock(EntityIdAccessor::class, [], [], '', false);
+        return $this->createMock(EntityIdAccessor::class);
     }
 
     /**
@@ -510,6 +510,6 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityRoutingHelperMock()
     {
-        return $this->getMock(EntityRoutingHelper::class, [], [], '', false);
+        return $this->createMock(EntityRoutingHelper::class);
     }
 }

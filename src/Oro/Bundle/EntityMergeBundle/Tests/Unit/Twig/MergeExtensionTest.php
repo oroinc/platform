@@ -28,11 +28,11 @@ class MergeExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->accessor = $this->getMock('Oro\\Bundle\\EntityMergeBundle\\Model\\Accessor\\AccessorInterface');
+        $this->accessor = $this->createMock('Oro\\Bundle\\EntityMergeBundle\\Model\\Accessor\\AccessorInterface');
         $this->renderer = $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Twig\\MergeRenderer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMock('Symfony\\Component\\Translation\\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\\Component\\Translation\\TranslatorInterface');
         $this->extension = new MergeExtension($this->accessor, $this->renderer, $this->translator);
     }
 
@@ -71,7 +71,7 @@ class MergeExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function createFormView(array $vars)
     {
-        $result = $this->getMock('Symfony\\Component\\Form\\FormView');
+        $result = $this->createMock('Symfony\\Component\\Form\\FormView');
         $result->vars = $vars;
         return $result;
     }

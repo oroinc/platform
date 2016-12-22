@@ -139,7 +139,7 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->tree));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface $container */
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
             ->will(

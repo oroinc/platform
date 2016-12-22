@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler;
-use Oro\Bundle\EntityExtendBundle\Form\Handler\ConfigHelperHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -128,14 +128,14 @@ class ConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('createView')
             ->willReturn($formView);
 
-        $entityConfig = $this->getMock(ConfigInterface::class);
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getEntityConfigByField')
             ->with($this->fieldConfigModel, 'entity')
             ->willReturn($entityConfig);
 
-        $fieldConfig = $this->getMock(ConfigInterface::class);
+        $fieldConfig = $this->createMock(ConfigInterface::class);
         $this->configHelper
             ->expects($this->once())
             ->method('getFieldConfig')

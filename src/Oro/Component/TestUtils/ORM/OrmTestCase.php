@@ -107,7 +107,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
-        $statement = $this->getMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
+        $statement = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
         $statement->expects($this->exactly(count($records) + 1))
             ->method('fetch')
             ->will(
@@ -146,7 +146,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getDriverConnectionMock(EntityManagerMock $em)
     {
-        $conn = $this->getMock('\Doctrine\DBAL\Driver\Connection');
+        $conn = $this->createMock('\Doctrine\DBAL\Driver\Connection');
         $this->setDriverConnection($conn, $em);
 
         return $conn;
@@ -160,7 +160,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function createCountStatementMock($numberOfRecords)
     {
-        $countStatement = $this->getMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
+        $countStatement = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
         $countStatement->expects($this->once())->method('fetchColumn')
             ->will($this->returnValue($numberOfRecords));
 

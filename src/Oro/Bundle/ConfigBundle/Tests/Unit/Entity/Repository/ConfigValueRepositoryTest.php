@@ -83,7 +83,7 @@ class ConfigValueRepositoryTest extends \PHPUnit_Framework_TestCase
             array('oro_user', 'level')
         );
 
-        $configMock = $this->getMock('Oro\Bundle\ConfigBundle\Entity\Config');
+        $configMock = $this->createMock('Oro\Bundle\ConfigBundle\Entity\Config');
 
         $this->repository->removeValues($configMock, $removed);
     }

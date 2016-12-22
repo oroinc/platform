@@ -181,7 +181,8 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $this->emailActivityListProvider->setFeatureChecker($this->featureChecker);
         $this->emailActivityListProvider->addFeature('email');
 
-        $mock = $this->getMockForTrait(FeatureCheckerHolderTrait::class);
+        $mock = $this->getMockBuilder(FeatureCheckerHolderTrait::class)->setMethods(['isFeaturesEnabled'])
+            ->getMockForTrait();
 
         $mock->expects($this->any())
             ->method('isFeaturesEnabled')

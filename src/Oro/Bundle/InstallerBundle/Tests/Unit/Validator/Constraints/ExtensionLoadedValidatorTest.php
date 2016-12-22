@@ -34,7 +34,7 @@ class ExtensionLoadedValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $constraint = new ExtensionLoaded();
 
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
 
         if ($expected) {
             $this->validator->initialize($this->context);
@@ -73,10 +73,8 @@ class ExtensionLoadedValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidData($data)
     {
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            sprintf('Value is type of %s, string is required', gettype($data))
-        );
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage(sprintf('Value is type of %s, string is required', gettype($data)));
         $constraint = new ExtensionLoaded();
         $this->validator->validate($data, $constraint);
     }

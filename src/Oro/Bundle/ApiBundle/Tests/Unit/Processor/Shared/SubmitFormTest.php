@@ -30,7 +30,7 @@ class SubmitFormTest extends FormProcessorTestCase
 
     public function testProcessForAlreadySubmittedForm()
     {
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $form->expects($this->once())
             ->method('isSubmitted')
@@ -59,7 +59,7 @@ class SubmitFormTest extends FormProcessorTestCase
             ]
         ];
 
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $form->expects($this->once())
             ->method('isSubmitted')

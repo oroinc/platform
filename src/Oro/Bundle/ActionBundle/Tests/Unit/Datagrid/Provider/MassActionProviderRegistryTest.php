@@ -37,6 +37,6 @@ class MassActionProviderRegistryTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProvider()
     {
-        return $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
+        return $this->createMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
     }
 }

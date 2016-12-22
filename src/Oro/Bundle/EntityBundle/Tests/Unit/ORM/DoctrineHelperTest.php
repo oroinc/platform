@@ -224,12 +224,10 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityIdentifierNotManageableEntity()
     {
-        $entity = $this->getMock('FooEntity');
+        $entity = $this->createMock(\stdClass::class);
 
-        $this->setExpectedException(
-            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
-            sprintf('Entity class "%s" is not manageable', get_class($entity))
-        );
+        $this->expectException('Oro\Bundle\EntityBundle\Exception\NotManageableEntityException');
+        $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', get_class($entity)));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -364,12 +362,10 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityIdentifierFieldNamesNotManageableEntity()
     {
-        $entity = $this->getMock('FooEntity');
+        $entity = $this->createMock(\stdClass::class);
 
-        $this->setExpectedException(
-            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
-            sprintf('Entity class "%s" is not manageable', get_class($entity))
-        );
+        $this->expectException('Oro\Bundle\EntityBundle\Exception\NotManageableEntityException');
+        $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', get_class($entity)));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -421,12 +417,10 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityIdentifierFieldNamesForClassNotManageableEntity()
     {
-        $class = 'FooEntity';
+        $class = \stdClass::class;
 
-        $this->setExpectedException(
-            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
-            sprintf('Entity class "%s" is not manageable', $class)
-        );
+        $this->expectException('Oro\Bundle\EntityBundle\Exception\NotManageableEntityException');
+        $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', $class));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -948,10 +942,8 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     {
         $class = 'ItemStubProxy';
 
-        $this->setExpectedException(
-            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
-            sprintf('Entity class "%s" is not manageable', $class)
-        );
+        $this->expectException('Oro\Bundle\EntityBundle\Exception\NotManageableEntityException');
+        $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', $class));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -986,10 +978,8 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     {
         $class = 'ItemStub';
 
-        $this->setExpectedException(
-            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
-            sprintf('Entity class "%s" is not manageable', $class)
-        );
+        $this->expectException('Oro\Bundle\EntityBundle\Exception\NotManageableEntityException');
+        $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable', $class));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -1001,7 +991,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityReference()
     {
-        $expectedResult = $this->getMock('MockEntityReference');
+        $expectedResult = $this->createMock(\stdClass::class);
         $entityClass    = 'MockEntity';
         $entityId       = 100;
 

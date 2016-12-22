@@ -108,8 +108,8 @@ class FormFieldTypeTest extends TypeTestCase
     public function testListeners($resettable, $expectedCount)
     {
         /* @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
-        $builder = $this->getMock(FormBuilderInterface::class);
-        $fieldBuilder = $this->getMock(FormBuilderInterface::class);
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $fieldBuilder = $this->createMock(FormBuilderInterface::class);
 
         $fieldBuilder->expects($this->exactly($expectedCount))
             ->method('addEventListener')

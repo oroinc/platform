@@ -52,7 +52,7 @@ class TagExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetList()
     {
-        $entity = $this->getMock('Oro\Bundle\TagBundle\Entity\Taggable');
+        $entity = $this->createMock('Oro\Bundle\TagBundle\Entity\Taggable');
 
         $this->manager->expects($this->once())
             ->method('getPreparedArray')

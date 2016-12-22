@@ -64,7 +64,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
 
         $this->action->setDispatcher($this->dispatcher);
 
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
         $this->action->setLogger($this->logger);
     }
 
@@ -76,7 +76,8 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
     {
-        $this->setExpectedException($exceptionName, $exceptionMessage);
+        $this->expectException($exceptionName);
+        $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
@@ -266,7 +267,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['getEmail'])
             ->getMock();
-        $emailEntity = $this->getMock('\Oro\Bundle\EmailBundle\Entity\Email');
+        $emailEntity = $this->createMock('\Oro\Bundle\EmailBundle\Entity\Email');
         $emailUserEntity->expects($this->any())
             ->method('getEmail')
             ->willReturn($emailEntity);
@@ -436,7 +437,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['getEmail'])
             ->getMock();
-        $emailEntity = $this->getMock('\Oro\Bundle\EmailBundle\Entity\Email');
+        $emailEntity = $this->createMock('\Oro\Bundle\EmailBundle\Entity\Email');
         $emailUserEntity->expects($this->any())
             ->method('getEmail')
             ->willReturn($emailEntity);

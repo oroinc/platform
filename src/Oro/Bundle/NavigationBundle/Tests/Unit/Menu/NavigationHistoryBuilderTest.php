@@ -43,11 +43,11 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->factory = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->factory = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()
             ->getMock();
@@ -61,7 +61,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manipulator = $this->getMock('Knp\Menu\Util\MenuManipulator');
+        $this->manipulator = $this->createMock('Knp\Menu\Util\MenuManipulator');
         $this->builder->expects($this->any())->method('getMenuManipulator')
             ->will($this->returnValue($this->manipulator));
         $this->builder->setFeatureChecker($this->featureChecker);
@@ -97,7 +97,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $item = $this->getMock('Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface');
+        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface');
         $this->factory->expects($this->once())
             ->method('createItem')
             ->with($type, array())
@@ -123,11 +123,11 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $menu = $this->getMockBuilder('Knp\Menu\MenuItem')->disableOriginalConstructor()->getMock();
 
-        $childMock = $this->getMock('Knp\Menu\ItemInterface');
+        $childMock = $this->createMock('Knp\Menu\ItemInterface');
         $childMock2 = clone $childMock;
         $children = array($childMock, $childMock2);
 
-        $matcher = $this->getMock('\Knp\Menu\Matcher\Matcher');
+        $matcher = $this->createMock('\Knp\Menu\Matcher\Matcher');
         $matcher->expects($this->once())
             ->method('isCurrent')
             ->will($this->returnValue(true));

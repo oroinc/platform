@@ -1,36 +1,41 @@
 define([
+    'module',
+    'oroui/js/mediator',
     'jquery',
-    'underscore',
-    'oroui/js/mediator'
-], function($, _, mediator) {
+    'underscore'
+], function(module, mediator, $, _) {
     'use strict';
 
     var viewportManager;
 
+    var defaults = $.extend(true, {
+        screenMap: [
+            {
+                name: 'desktop',
+                min: 1100
+            },
+            {
+                name: 'tablet',
+                max: 1099
+            },
+            {
+                name: 'tablet-small',
+                max: 992
+            },
+            {
+                name: 'mobile-landscape',
+                max: 640
+            },
+            {
+                name: 'mobile',
+                max: 414
+            }
+        ]
+    }, module.config());
+
     viewportManager = {
         options: {
-            screenMap: [
-                {
-                    name: 'desktop',
-                    min: 1100
-                },
-                {
-                    name: 'tablet',
-                    max: 1099
-                },
-                {
-                    name: 'tablet-small',
-                    max: 992
-                },
-                {
-                    name: 'mobile-landscape',
-                    max: 640
-                },
-                {
-                    name: 'mobile',
-                    max: 414
-                }
-            ]
+            screenMap: defaults.screenMap
         },
 
         viewport: null,

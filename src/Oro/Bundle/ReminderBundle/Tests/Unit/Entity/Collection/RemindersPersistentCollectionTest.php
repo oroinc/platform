@@ -207,7 +207,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit_Framework_TestCase
 
     protected function createReminder($id)
     {
-        $result = $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
+        $result = $this->createMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
         $result->expects($this->any())
             ->method('getId')
             ->will($this->returnValue($id));

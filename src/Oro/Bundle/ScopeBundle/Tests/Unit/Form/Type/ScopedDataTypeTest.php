@@ -54,7 +54,7 @@ class ScopedDataTypeTest extends FormIntegrationTestCase
             );
 
         /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
-        $registry = $this->getMock(ManagerRegistry::class);
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->method('getManagerForClass')->willReturn($em);
 
         $this->formType = new ScopedDataType($registry);

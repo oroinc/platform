@@ -79,7 +79,7 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
     public function testValueRetrieving($key, array $expectedValues, $exception = false)
     {
         if (false !== $exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $new = $this->event->getNewValue($key);

@@ -35,7 +35,8 @@ class TransitionTriggerMessageTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateFromJsonException($json, $expectedMessage)
     {
-        $this->setExpectedException('\InvalidArgumentException', $expectedMessage);
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage($expectedMessage);
 
         TransitionTriggerMessage::createFromJson($json);
     }
@@ -108,7 +109,7 @@ class TransitionTriggerMessageTest extends \PHPUnit_Framework_TestCase
      */
     protected function getEventTriggerMock($id)
     {
-        $mock = $this->getMock(BaseTransitionTrigger::class);
+        $mock = $this->createMock(BaseTransitionTrigger::class);
         $mock->expects($this->any())->method('getId')->willReturn($id);
 
         return $mock;

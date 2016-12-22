@@ -67,7 +67,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedIdentifier        = 'test_template_identifier';
         $expectedClassName         = 'Tasks';
 
-        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $reminder->expects($this->exactly(2))->method('getExpireAt')->willReturn($expectedExpireAt);
         $reminder->expects($this->exactly(2))->method('getRelatedEntityClassName')->willReturn($expectedClassName);
         $reminder->expects($this->once())->method('getId')->willReturn($expectedId);
@@ -108,7 +108,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedFormattedExpireAt = 'formatted date time';
         $expectedUrl               = 'www.tests.com';
 
-        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $reminder->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($expectedId));

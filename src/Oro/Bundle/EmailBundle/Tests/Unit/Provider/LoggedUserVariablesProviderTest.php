@@ -65,7 +65,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVariableDefinitionsForNonOroUser()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
 
         $this->securityFacade->expects($this->once())
             ->method('getLoggedUser')
@@ -143,7 +143,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVariableValuesForNonOroUser()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->once())
             ->method('getUsername')
             ->will($this->returnValue('test'));

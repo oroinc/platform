@@ -24,8 +24,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->propertyAccessor = $this->getMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
+        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->propertyAccessor = $this->createMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
 
         $this->processor = new BuildFormBuilder($this->formFactory, $this->propertyAccessor);
 
@@ -36,7 +36,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     public function testAppendRelationshipMapperShouldBeSetForFormBuilder()
     {
         $parentEntity = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);

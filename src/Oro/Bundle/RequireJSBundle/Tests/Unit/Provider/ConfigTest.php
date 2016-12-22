@@ -23,7 +23,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('getParameter')
             ->will($this->returnCallback(
@@ -32,7 +32,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 }
             ));
 
-        $templating = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $templating = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
         $templating->expects($this->any())
             ->method('render')
             ->will($this->returnArgument(1));
@@ -55,7 +55,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $expected['config']['paths']['oro/test2'] = 'orotest/js/test2';
 
-        $cache = $this->getMock('\Doctrine\Common\Cache\PhpFileCache', array(), array(), '', false);
+        $cache = $this->createMock('\Doctrine\Common\Cache\PhpFileCache', array(), array(), '', false);
         $cache->expects($this->any())
             ->method('fetch')
             ->will($this->returnValue($expected));
