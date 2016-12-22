@@ -460,9 +460,9 @@ define([
             var initialState = this._initialState;
 
             if (_.isArray(state)) {
-                $.each(state, function (index, item) {
+                $.each(state, function(index, item) {
                     if (_.isArray(item)) {
-                        item = $.grep(item, function (field) {
+                        item = $.grep(item, function(field) {
                             return _.isObject(field) && field.name.indexOf('temp-validation-name-') === -1;
                         });
                         state[index] = item;
