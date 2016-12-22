@@ -37,9 +37,13 @@ define([
 
                 /** Handle redirectUrl result parameter for RedirectAction */
                 element.one('transitions_success', function(e, response) {
-                    if (response.redirectUrl) {
+                    if (
+                        response.workflowItem &&
+                            response.workflowItem.result &&
+                            response.workflowItem.result.redirectUrl
+                    ) {
                         e.stopImmediatePropagation();
-                        doRedirect(response.redirectUrl);
+                        doRedirect(response.workflowItem.result.redirectUrl);
                     }
                 });
                 /** By default reload page */
