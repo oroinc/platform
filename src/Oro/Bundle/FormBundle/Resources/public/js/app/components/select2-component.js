@@ -251,13 +251,11 @@ define(function(require) {
         }
 
         return function(object, container, query) {
-            debugger;
             if ($.isEmptyObject(object)) {
                 return undefined;
             }
             var result = '';
             var highlight = function(str) {
-                    debugger;
                     return object.children ? str : highlightSelection(str, query);
                 };
             if (object._html !== undefined) {
