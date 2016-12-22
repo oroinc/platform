@@ -150,7 +150,6 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldExecuteProcessJob()
     {
-
         $processJob = new ProcessJob();
 
         $entityManager = $this->createEntityManagerMock();
@@ -161,7 +160,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $entityRepository = $this->createEntityRepositoryMock();
         $entityRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with('theProcessJobId')
             ->willReturn($processJob)
@@ -169,15 +168,15 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processHandle = $this->createProcessHandlerMock();
         $processHandle
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handleJob')
-            ->with(self::identicalTo($processJob))
+            ->with($processJob)
         ;
 
         $processHandle
             ->expects($this->once())
             ->method('finishJob')
-            ->with(self::identicalTo($processJob))
+            ->with($processJob)
         ;
 
         $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
@@ -222,6 +221,8 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($processJob)
         ;
 
+        $exception = new \Exception('unexpected');
+
         $processHandle = $this->createProcessHandlerMock();
         $processHandle
             ->expects(self::once())
@@ -236,13 +237,22 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(self::identicalTo($processJob))
         ;
 
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects(self::once())
+            ->method('critical')
+            ->with(
+                '[ExecuteProcessJobProcessor] Raised exception for job with id {process_job_id}',
+                [
+                    'process_job_id' => 'theProcessJobId',
+                    'exception' => $exception
+                ]
+            )
+        ;
+
         $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
 
-        $processor = new ExecuteProcessJobProcessor(
-            $doctrineHelper,
-            $processHandle,
-            $this->createLoggerMock()
-        );
+        $processor = new ExecuteProcessJobProcessor($doctrineHelper, $processHandle, $logger);
 
         $message = new NullMessage();
         $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));

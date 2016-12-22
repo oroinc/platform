@@ -48,7 +48,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = array_replace_recursive(['process_job_id' => null,], JSON::decode($message->getBody()));
+        $body = array_replace_recursive(['process_job_id' => null], JSON::decode($message->getBody()));
         if (false == $body['process_job_id']) {
             $this->logger->critical(
                 '[ExecuteProcessJobProcessor] Process Job Id not set',
