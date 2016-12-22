@@ -15,7 +15,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $this->provider = new CurrentUserWalkerHintProvider($this->securityContext);
     }
@@ -32,7 +32,7 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHintsWithNotSupportedToken()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $this->securityContext->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
@@ -51,12 +51,12 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHintsWithNotOrganizationToken()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $this->securityContext->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
 
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\AbstractUser');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\AbstractUser');
         $user->expects($this->once())
             ->method('getId')
             ->willReturn(123);
@@ -77,17 +77,17 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHints()
     {
-        $token = $this->getMock('Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface');
+        $token = $this->createMock('Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface');
         $this->securityContext->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
 
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\AbstractUser');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\AbstractUser');
         $user->expects($this->once())
             ->method('getId')
             ->willReturn(123);
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $organization->expects($this->once())
             ->method('getId')
             ->willReturn(456);
@@ -112,17 +112,17 @@ class CurrentUserWalkerHintProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHintsWithCustomFields()
     {
-        $token = $this->getMock('Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface');
+        $token = $this->createMock('Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface');
         $this->securityContext->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
 
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\AbstractUser');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\AbstractUser');
         $user->expects($this->once())
             ->method('getId')
             ->willReturn(123);
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $organization->expects($this->once())
             ->method('getId')
             ->willReturn(456);

@@ -15,7 +15,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->extension = new DependencyInjectionExtension(
             $this->container,
             ['test' => 'block_type_service'],
@@ -34,7 +34,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetType()
     {
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->once())
             ->method('getName')
             ->will($this->returnValue('test'));
@@ -55,7 +55,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testGetTypeWithInvalidAlias()
     {
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('test1'));
@@ -85,7 +85,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTypeExtensions()
     {
-        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->container->expects($this->once())
             ->method('get')
@@ -115,7 +115,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLayoutUpdates()
     {
-        $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->container->expects($this->exactly(2))
             ->method('get')
@@ -145,7 +145,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContextConfigurators()
     {
-        $configurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $configurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
 
         $this->container->expects($this->once())
             ->method('get')
@@ -179,7 +179,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataProvider()
     {
-        $dataProvider = $this->getMock(\stdClass::class);
+        $dataProvider = $this->createMock(\stdClass::class);
 
         $this->container->expects($this->once())
             ->method('get')
@@ -205,7 +205,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getLayoutItem($id)
     {
-        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $layoutItem->expects($this->any())->method('getId')->willReturn($id);
 
         return $layoutItem;

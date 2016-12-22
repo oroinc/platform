@@ -19,7 +19,7 @@ class RefreshGridTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->action = new RefreshGrid(new ContextAccessor());
         $this->action->setDispatcher($this->eventDispatcher);

@@ -29,7 +29,7 @@ class TagSearchResultsGridListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $this->parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
 
         $this->securityProvider = $this->getMockBuilder('Oro\Bundle\TagBundle\Security\SecurityProvider')
             ->disableOriginalConstructor()

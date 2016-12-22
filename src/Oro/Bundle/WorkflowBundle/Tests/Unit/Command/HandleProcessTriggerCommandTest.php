@@ -59,7 +59,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getManager')
             ->willReturn($em);
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
 
         $this->processHandler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessHandler')
             ->disableOriginalConstructor()
@@ -114,7 +114,8 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             ->will($exception ? $this->throwException($exception) : $this->returnSelf());
 
         if ($exception) {
-            $this->setExpectedException(get_class($exception), $exception->getMessage());
+            $this->expectException(get_class($exception));
+            $this->expectExceptionMessage($exception->getMessage());
         }
 
         $this->command->execute($this->input, $this->output);

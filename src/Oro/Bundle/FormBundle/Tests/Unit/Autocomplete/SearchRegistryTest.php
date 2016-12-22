@@ -19,7 +19,7 @@ class SearchRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->searchHandler = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
+        $this->searchHandler = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
         $this->searchRegistry = new SearchRegistry();
     }
 

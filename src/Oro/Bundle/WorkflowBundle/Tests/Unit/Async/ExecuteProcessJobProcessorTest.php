@@ -58,7 +58,8 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         $message = new NullMessage();
         $message->setBody('{]');
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'The malformed json given.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The malformed json given.');
         $processor->process($message, new NullSession());
     }
 
@@ -256,7 +257,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createProcessHandlerMock()
     {
-        return $this->getMockBuilder(ProcessHandler::class)->disableOriginalConstructor()->getMock();
+        return $this->createMock(ProcessHandler::class);
     }
 
     /**
@@ -264,7 +265,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityManagerMock()
     {
-        return $this->getMockBuilder(EntityManagerInterface::class)->getMock();
+        return $this->createMock(EntityManagerInterface::class);
     }
 
     /**
@@ -272,7 +273,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityRepositoryMock()
     {
-        return $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
+        return $this->createMock(EntityRepository::class);
     }
 
     /**
@@ -280,7 +281,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMockBuilder(LoggerInterface::class)->getMock();
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -291,7 +292,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineHelperStub($entityManager = null, $entityRepository = null)
     {
-        $doctrineHelper =  $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+        $doctrineHelper =  $this->createMock(DoctrineHelper::class);
         $doctrineHelper
             ->expects($this->any())
             ->method('getEntityRepository')

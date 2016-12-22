@@ -11,8 +11,8 @@ class QueryExpressionVisitorFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateExpressionVisitor()
     {
-        $compositeExpressions = ['AND' => $this->getMock(CompositeExpressionInterface::class)];
-        $comparisonExpressions = ['=' => $this->getMock(ComparisonExpressionInterface::class)];
+        $compositeExpressions = ['AND' => $this->createMock(CompositeExpressionInterface::class)];
+        $comparisonExpressions = ['=' => $this->createMock(ComparisonExpressionInterface::class)];
 
         $factory = new QueryExpressionVisitorFactory(
             $compositeExpressions,

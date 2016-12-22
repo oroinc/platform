@@ -268,7 +268,8 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
             $queryBuilderCallback
         );
 
-        $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $transformer->reverseTransform($value);
     }
 
@@ -423,7 +424,7 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
     private function createMockEntity($property, $value)
     {
         $getter = 'get' . ucfirst($property);
-        $result = $this->getMock('MockEntity', array($getter));
+        $result = $this->createPartialMock(\ArrayObject::class, array($getter));
         $result->expects($this->any())->method($getter)->will($this->returnValue($value));
 
         return $result;

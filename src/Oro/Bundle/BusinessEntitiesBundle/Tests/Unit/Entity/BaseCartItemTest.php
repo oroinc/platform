@@ -46,7 +46,7 @@ class BaseCartItemTest extends \PHPUnit_Framework_TestCase
     {
         $created  = new \DateTime('now');
         $updated  = new \DateTime('now');
-        $cartMock = $this->getMock('Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCart');
+        $cartMock = $this->createMock('Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCart');
 
         return [
             'id'             => ['id', self::TEST_ID, self::TEST_ID],

@@ -32,9 +32,9 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldRegisterExpectedCompilerPasses()
     {
-        $extensionMock = $this->getMock(OroMessageQueueExtension::class, [], [], '', false);
+        $extensionMock = $this->createMock(OroMessageQueueExtension::class);
 
-        $container = $this->getMock(ContainerBuilder::class);
+        $container = $this->createMock(ContainerBuilder::class);
         $container
             ->expects($this->at(0))
             ->method('addCompilerPass')
@@ -72,7 +72,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldRegisterDefaultAndNullTransportFactories()
     {
-        $extensionMock = $this->getMock(OroMessageQueueExtension::class, [], [], '', false);
+        $extensionMock = $this->createMock(OroMessageQueueExtension::class);
 
         $extensionMock
             ->expects($this->at(0))
@@ -85,7 +85,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(NullTransportFactory::class))
         ;
 
-        $container = $this->getMock(ContainerBuilder::class);
+        $container = $this->createMock(ContainerBuilder::class);
         $container
             ->expects($this->at(5))
             ->method('getExtension')
@@ -99,7 +99,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldRegisterDbalTransportFactory()
     {
-        $extensionMock = $this->getMock(OroMessageQueueExtension::class, [], [], '', false);
+        $extensionMock = $this->createMock(OroMessageQueueExtension::class);
 
         $extensionMock
             ->expects($this->at(2))
@@ -107,7 +107,7 @@ class OroMessageQueueBundleTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf(DbalTransportFactory::class))
         ;
 
-        $container = $this->getMock(ContainerBuilder::class);
+        $container = $this->createMock(ContainerBuilder::class);
         $container
             ->expects($this->at(5))
             ->method('getExtension')

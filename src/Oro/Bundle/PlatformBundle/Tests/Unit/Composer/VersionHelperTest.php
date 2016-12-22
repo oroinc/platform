@@ -31,7 +31,7 @@ class VersionHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repo = $this->getMock('Composer\Repository\WritableRepositoryInterface');
+        $this->repo = $this->createMock('Composer\Repository\WritableRepositoryInterface');
         $this->helper = new VersionHelper($this->factory);
     }
 
@@ -55,7 +55,7 @@ class VersionHelperTest extends \PHPUnit_Framework_TestCase
         }
 
         $package = $this
-            ->getMock('Composer\Package\PackageInterface');
+            ->createMock('Composer\Package\PackageInterface');
 
         $package
             ->expects($this->once())

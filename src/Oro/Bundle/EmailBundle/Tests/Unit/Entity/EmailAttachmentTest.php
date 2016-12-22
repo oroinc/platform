@@ -31,7 +31,7 @@ class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
 
     public function testContentGetterAndSetter()
     {
-        $content = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent');
+        $content = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent');
 
         $entity = new EmailAttachment();
         $entity->setContent($content);
@@ -41,7 +41,7 @@ class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
 
     public function testEmailBodyGetterAndSetter()
     {
-        $emailBody = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $emailBody = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
 
         $entity = new EmailAttachment();
         $entity->setEmailBody($emailBody);
@@ -51,7 +51,7 @@ class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
     
     public function testGetSize()
     {
-        $file = $this->getMock('Oro\Bundle\AttachmentBundle\Entity\File');
+        $file = $this->createMock('Oro\Bundle\AttachmentBundle\Entity\File');
         $file->expects($this->once())
             ->method('getFileSize')
             ->will($this->returnValue(100));
@@ -60,7 +60,7 @@ class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($entity->getSize() === 100);
 
         $entity = new EmailAttachment();
-        $attachmentContent = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent');
+        $attachmentContent = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent');
         $attachmentContent->expects($this->once())
             ->method('getContent')
             ->will($this->returnValue(base64_encode('1234')));

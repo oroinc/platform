@@ -41,7 +41,7 @@ class MapPrimaryFieldTest extends TypeTestCase
 
     protected function setUp()
     {
-        $this->customizationProcessor = $this->getMock(ActionProcessorInterface::class);
+        $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);
 
         parent::setUp();
 

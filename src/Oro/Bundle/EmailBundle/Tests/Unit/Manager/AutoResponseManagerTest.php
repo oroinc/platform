@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -48,7 +48,7 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $this->render = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()

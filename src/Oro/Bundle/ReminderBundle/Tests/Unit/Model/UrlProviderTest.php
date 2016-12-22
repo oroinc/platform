@@ -35,7 +35,7 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUrlReturnEmptyStringIfMetadataNotExist()
     {
-        $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $expected = '';
         $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue(null));
         $actual = $this->urlProvider->getUrl($reminder);
@@ -44,7 +44,7 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUrlForView()
     {
-        $reminder            = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder            = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $expected            = '/fake/path/for/view';
         $expectedId          = 42;
         $metadata            = new \StdClass();
@@ -58,7 +58,7 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUrlForIndex()
     {
-        $reminder            = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder            = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $expected            = '/fake/path/for/view';
         $metadata            = new \StdClass();
         $metadata->routeName = $expected;

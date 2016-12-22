@@ -22,7 +22,7 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->verifier = $this->getMock(TransitionEventTriggerVerifierInterface::class);
+        $this->verifier = $this->createMock(TransitionEventTriggerVerifierInterface::class);
         $this->assembler = new TransitionEventTriggerAssembler($this->verifier);
     }
 
@@ -158,8 +158,8 @@ class TransitionEventTriggerAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyTriggerException()
     {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Expected instance of Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger ' .
             'got Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger'
         );

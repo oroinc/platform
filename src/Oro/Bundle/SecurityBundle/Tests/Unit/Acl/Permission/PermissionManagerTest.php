@@ -86,7 +86,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityManager);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ValidatorInterface $validator */
-        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $validator = $this->createMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $validator->expects($this->any())
             ->method('validate')
             ->with($this->isInstanceOf('Oro\Bundle\SecurityBundle\Entity\Permission'))

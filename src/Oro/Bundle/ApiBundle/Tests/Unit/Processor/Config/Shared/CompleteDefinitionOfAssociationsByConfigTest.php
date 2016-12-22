@@ -81,7 +81,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
 
         $this->context->setExtras(
             [
-                $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
+                $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
                 new TestConfigSection('test_section')
             ]
         );
@@ -215,7 +215,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
 
         $this->context->setExtras(
             [
-                $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
+                $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'),
                 new TestConfigSection('test_section')
             ]
         );

@@ -59,7 +59,7 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->classMetadata = $this->getMock(ClassMetadata::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
 
         $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()

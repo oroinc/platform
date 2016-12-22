@@ -17,7 +17,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandle()
     {
-        $entity = $this->getMock(\stdClass::class);
+        $entity = $this->createMock(\stdClass::class);
         /** @var NotificationEvent | \PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder(NotificationEvent::class)
             ->disableOriginalConstructor()
@@ -37,7 +37,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         /** @var EmailNotification $notification */
-        $notification = $this->getMock(EmailNotification::class);
+        $notification = $this->createMock(EmailNotification::class);
         $notifications = [$notification];
         $notificationsForManager = [new EmailNotificationAdapter($entity, $notification, $em, $configProvider)];
 

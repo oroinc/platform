@@ -64,12 +64,12 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetFallbackLocales(array $fallbackTree, $locale, array $expectedFallbackLocales)
     {
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $defaultStrategy */
-        $defaultStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $defaultStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
 
         $provider = new TranslationStrategyProvider($defaultStrategy);
 
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $defaultStrategy */
-        $testedStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $testedStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $testedStrategy->expects($this->any())
             ->method('getLocaleFallbacks')
             ->willReturn($fallbackTree);
@@ -159,12 +159,12 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetAllFallbackLocales(array $fallbackTree, array $expectedFallbackLocales)
     {
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $defaultStrategy */
-        $defaultStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $defaultStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
 
         $provider = new TranslationStrategyProvider($defaultStrategy);
 
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $defaultStrategy */
-        $testedStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $testedStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $testedStrategy->expects($this->any())
             ->method('getLocaleFallbacks')
             ->willReturn($fallbackTree);
@@ -217,7 +217,7 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getStrategy($name)
     {
-        $strategy = $this->getMock(TranslationStrategyInterface::class);
+        $strategy = $this->createMock(TranslationStrategyInterface::class);
         $strategy->expects($this->any())->method('isApplicable')->willReturn(true);
         $strategy->expects($this->any())->method('getName')->willReturn($name);
 

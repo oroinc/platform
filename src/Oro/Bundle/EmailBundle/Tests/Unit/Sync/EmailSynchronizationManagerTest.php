@@ -12,7 +12,7 @@ class EmailSynchronizationManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSyncOrigins()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $sync1 = $this->getMockForAbstractClass(
             'Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer',

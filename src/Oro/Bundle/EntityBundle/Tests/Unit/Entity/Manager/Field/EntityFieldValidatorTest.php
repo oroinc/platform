@@ -22,14 +22,14 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translation = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translation = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->validator = new EntityFieldValidator($this->registry, $this->translation);
     }
 
     public function testPositiveValidate()
     {
-        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())
             ->method('hasField')
@@ -38,7 +38,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::never())
             ->method('hasAssociation');
 
-        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $objectManager
             ->expects(self::once())
@@ -64,7 +64,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateWithFieldException()
     {
-        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())
             ->method('hasField')
@@ -74,7 +74,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('hasAssociation')
             ->willReturn(false);
 
-        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $objectManager
             ->expects(self::once())
@@ -100,7 +100,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateWithAccessException()
     {
-        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())
             ->method('hasField')
@@ -109,7 +109,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::never())
             ->method('hasAssociation');
 
-        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $objectManager
             ->expects(self::once())
@@ -131,7 +131,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testPositiveCustomValidate()
     {
-        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())
             ->method('hasField')
@@ -140,7 +140,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::never())
             ->method('hasAssociation');
 
-        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $objectManager
             ->expects(self::once())
@@ -158,7 +158,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $customGridFieldValidator = $this
-            ->getMock('Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterface');
+            ->createMock('Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterface');
         $customGridFieldValidator
             ->expects(self::once())
             ->method('hasAccessEditField')
@@ -174,7 +174,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testFailCustomValidate()
     {
-        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $classMetadata
             ->expects(self::once())
             ->method('hasField')
@@ -183,7 +183,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::never())
             ->method('hasAssociation');
 
-        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $objectManager
             ->expects(self::once())
@@ -206,7 +206,7 @@ class EntityFieldValidatorTest extends \PHPUnit_Framework_TestCase
             ->willReturn('right message');
 
         $customGridFieldValidator = $this
-            ->getMock('Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterface');
+            ->createMock('Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterface');
         $customGridFieldValidator
             ->expects(self::once())
             ->method('hasAccessEditField')

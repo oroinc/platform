@@ -27,7 +27,7 @@ class DataBlockBuilderTest extends \PHPUnit_Framework_TestCase
             ->addTypeExtension(new DataBlockExtension())
             ->getFormFactory();
 
-        $templateRenderer = $this->getMock('Oro\Bundle\FormBundle\Form\Builder\TemplateRendererInterface');
+        $templateRenderer = $this->createMock('Oro\Bundle\FormBundle\Form\Builder\TemplateRendererInterface');
         $templateRenderer->expects($this->any())
             ->method('render')
             ->will($this->returnArgument(0));

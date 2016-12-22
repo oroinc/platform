@@ -67,7 +67,7 @@ class TrackingWebsiteTest extends \PHPUnit_Framework_TestCase
     {
         $date = new \DateTime();
         $user = new User();
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
         return [
             ['name', 'test', 'test'],
