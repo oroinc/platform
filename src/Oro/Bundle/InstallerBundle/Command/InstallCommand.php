@@ -543,13 +543,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 ->runCommand('oro:translation:load', ['--process-isolation' => true]);
         }
 
-        $commandExecutor->runCommand(
-            'oro:navigation:init',
-            [
-                '--process-isolation' => true,
-            ]
-        );
-
         if (!$skipAssets) {
             $commandExecutor->runCommand(
                 'fos:js-routing:dump',
