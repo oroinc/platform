@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -86,9 +87,12 @@ class UserMenuController extends AbstractMenuController
      */
     private function getMenuTreeContext()
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return [
-            ScopeOrganizationCriteriaProvider::SCOPE_KEY => $this->getCurrentOrganization(),
-            ScopeUserCriteriaProvider::SCOPE_KEY => $this->getUser()
+            ScopeOrganizationCriteriaProvider::SCOPE_KEY => $user->getOrganization(),
+            ScopeUserCriteriaProvider::SCOPE_KEY => $user
         ];
     }
 
