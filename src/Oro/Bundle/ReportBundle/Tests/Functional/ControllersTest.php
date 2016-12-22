@@ -170,7 +170,7 @@ class ControllersTest extends WebTestCase
                 'format' => 'csv',
                 'batchSize' => 200,
                 'parameters' => [
-                    'gridName' => 'oro_report_table_1',
+                    'gridName' => sprintf('oro_report_table_%s', $id),
                     'gridParameters' => [],
                     'format_type' => 'excel'
                 ],
