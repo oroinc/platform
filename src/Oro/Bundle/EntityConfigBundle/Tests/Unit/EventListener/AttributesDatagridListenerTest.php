@@ -38,7 +38,7 @@ class AttributesDatagridListenerTest extends \PHPUnit_Framework_TestCase
         $resultRecord5 = new ResultRecord(['id' => 5]);
 
         $event = new OrmResultAfter(
-            $this->getMock(DatagridInterface::class),
+            $this->createMock(DatagridInterface::class),
             [$resultRecord1, $resultRecord2, $resultRecord5]
         );
 
