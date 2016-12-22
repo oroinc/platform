@@ -105,7 +105,7 @@ class ChunkHttpImportMessageProcessorTest extends WebTestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -113,6 +113,6 @@ class ChunkHttpImportMessageProcessorTest extends WebTestCase
      */
     private function createImportHandlerMock()
     {
-        return $this->getMock(HttpImportHandler::class, [], [], '', false);
+        return $this->createMock(HttpImportHandler::class);
     }
 }

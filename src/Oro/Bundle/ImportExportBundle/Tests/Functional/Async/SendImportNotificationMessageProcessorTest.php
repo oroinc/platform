@@ -208,7 +208,7 @@ Errors: 5, processed: 12, read: 12, added: 2, updated: 0, replaced: 5<br/><a hre
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**

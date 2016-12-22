@@ -212,7 +212,7 @@ class ConsolidateImportJobResultNotificationServiceTest extends \PHPUnit_Framewo
      */
     private function createTranslatorInterfaceMock()
     {
-        return $this->getMock(TranslatorInterface::class);
+        return $this->createMock(TranslatorInterface::class);
     }
 
     /**
@@ -220,7 +220,7 @@ class ConsolidateImportJobResultNotificationServiceTest extends \PHPUnit_Framewo
      */
     private function createRouterMock()
     {
-        return $this->getMock(Router::class, [], [], '', false);
+        return $this->createMock(Router::class);
     }
 
     /**
@@ -228,6 +228,6 @@ class ConsolidateImportJobResultNotificationServiceTest extends \PHPUnit_Framewo
      */
     private function createConfigManagerMock()
     {
-        return $this->getMock(ConfigManager::class, [], [], '', false);
+        return $this->createMock(ConfigManager::class);
     }
 }

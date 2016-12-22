@@ -72,7 +72,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldRejectMessageAndLogCriticalIfUserNotFound()
     {
-        $repository = $this->getMock(EntityRepository::class, [], [], '', false);
+        $repository = $this->createMock(EntityRepository::class);
         $repository
             ->expects($this->once())
             ->method('find')
@@ -131,7 +131,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createExportHandlerMock()
     {
-        return $this->getMock(ExportHandler::class, [], [], '', false);
+        return $this->createMock(ExportHandler::class);
     }
 
     /**
@@ -139,7 +139,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -147,7 +147,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducerInterfaceMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -155,7 +155,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createConfigManagerMock()
     {
-        return $this->getMock(ConfigManager::class, [], [], '', false);
+        return $this->createMock(ConfigManager::class);
     }
 
     /**
@@ -163,7 +163,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineHelperMock()
     {
-        return $this->getMock(DoctrineHelper::class, [], [], '', false);
+        return $this->createMock(DoctrineHelper::class);
     }
 
     /**
@@ -171,7 +171,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerInterfaceMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -179,7 +179,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionInterfaceMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -187,7 +187,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSecurityFacadeMock()
     {
-        return $this->getMock(SecurityFacade::class, [], [], '', false);
+        return $this->createMock(SecurityFacade::class);
     }
 
     /**
@@ -195,6 +195,6 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createTokenStorageInterfaceMock()
     {
-        return $this->getMock(TokenStorageInterface::class);
+        return $this->createMock(TokenStorageInterface::class);
     }
 }

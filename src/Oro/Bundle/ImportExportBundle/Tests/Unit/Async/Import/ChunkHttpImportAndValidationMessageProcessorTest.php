@@ -231,7 +231,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
         $logger
             ->expects($this->once())
             ->method('info')
-            ->with('Import of the csv is completed, success: 1, info: imports was done, errors url: , message: ')
+            ->with('Import of the csv is completed, success: 1, info: imports was done, message: ')
         ;
 
         $httpImportHandler = $this->createHttpImportHandlerMock();
@@ -355,7 +355,6 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
             ->with('Import validation of the csv from Test is completed.
                  Success: true.
                  Info: "[]".
-                 Errors url: .
                  Errors: "[]"');
         $httpImportHandler = $this->createHttpImportHandlerMock();
         $httpImportHandler
@@ -415,7 +414,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     protected function createHttpImportHandlerMock()
     {
-        return $this->getMock(HttpImportHandler::class, [], [], '', false);
+        return $this->createMock(HttpImportHandler::class);
     }
 
     /**
@@ -423,7 +422,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     protected function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -431,7 +430,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     protected function createMessageProducerInterfaceMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -439,7 +438,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     protected function createDoctrineMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -447,7 +446,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     protected function createTokenStorageInterfaceMock()
     {
-        return $this->getMock(TokenStorageInterface::class);
+        return $this->createMock(TokenStorageInterface::class);
     }
 
     /**
@@ -455,7 +454,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     protected function createLoggerInterfaceMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -463,7 +462,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     protected function createJobStorageMock()
     {
-        return $this->getMock(JobStorage::class, [], [], '', false);
+        return $this->createMock(JobStorage::class);
     }
 
     /**
@@ -471,7 +470,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     private function createMessageMock()
     {
-        return $this->getMock(MessageInterface::class, [], [], '', false);
+        return $this->createMock(MessageInterface::class);
     }
 
     /**
@@ -479,7 +478,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -487,6 +486,6 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
      */
     private function createUserRepositoryMock()
     {
-        return $this->getMock(UserRepository::class, [], [], '', false);
+        return $this->createMock(UserRepository::class);
     }
 }

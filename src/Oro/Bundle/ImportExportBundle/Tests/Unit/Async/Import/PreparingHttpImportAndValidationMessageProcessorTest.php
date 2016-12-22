@@ -382,7 +382,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createHttpImportHandlerMock()
     {
-        return $this->getMock(HttpImportHandler::class, [], [], '', false);
+        return $this->createMock(HttpImportHandler::class);
     }
 
     /**
@@ -390,7 +390,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -398,7 +398,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createMessageProducerInterfaceMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -406,7 +406,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createLoggerInterfaceMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -414,7 +414,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createSplitterCsvFileMock()
     {
-        return $this->getMock(SplitterCsvFile::class, [], [], '', false);
+        return $this->createMock(SplitterCsvFile::class);
     }
 
     /**
@@ -422,7 +422,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createDoctrineMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -430,7 +430,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createDependentJobMock()
     {
-        return $this->getMock(DependentJobService::class, [], [], '', false);
+        return $this->createMock(DependentJobService::class);
     }
 
     /**
@@ -438,7 +438,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createMessageMock()
     {
-        return $this->getMock(MessageInterface::class, [], [], '', false);
+        return $this->createMock(MessageInterface::class);
     }
 
     /**
@@ -446,7 +446,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -454,13 +454,13 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createUserRepositoryMock()
     {
-        return $this->getMock(UserRepository::class, [], [], '', false);
+        return $this->createMock(UserRepository::class);
     }
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobContext
      */
     private function createDependentJobContextMock()
     {
-        return $this->getMock(DependentJobContext::class, [], [], '', false);
+        return $this->createMock(DependentJobContext::class);
     }
 }

@@ -66,7 +66,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldRejectMessageAndLogCriticalIfUserNotFound()
     {
-        $repository = $this->getMock(EntityRepository::class, [], [], '', false);
+        $repository = $this->createMock(EntityRepository::class);
         $repository
             ->expects($this->once())
             ->method('find')
@@ -126,7 +126,12 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $arguments
         );
 
-        return $this->getMock(AbstractExportMessageProcessor::class, ['getSubscribedTopics'], $arguments);
+        return $this
+            ->getMockBuilder(AbstractExportMessageProcessor::class)
+            ->setMethods(['getSubscribedTopics'])
+            ->setConstructorArgs($arguments)
+            ->getMock()
+        ;
     }
 
     /**
@@ -134,7 +139,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createExportHandlerMock()
     {
-        return $this->getMock(ExportHandler::class, [], [], '', false);
+        return $this->createMock(ExportHandler::class);
     }
 
     /**
@@ -142,7 +147,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -150,7 +155,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducerInterfaceMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -158,7 +163,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createConfigManagerMock()
     {
-        return $this->getMock(ConfigManager::class, [], [], '', false);
+        return $this->createMock(ConfigManager::class);
     }
 
     /**
@@ -166,7 +171,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineHelperMock()
     {
-        return $this->getMock(DoctrineHelper::class, [], [], '', false);
+        return $this->createMock(DoctrineHelper::class);
     }
 
     /**
@@ -174,7 +179,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createExportConnectorMock()
     {
-        return $this->getMock(DatagridExportConnector::class, [], [], '', false);
+        return $this->createMock(DatagridExportConnector::class);
     }
 
     /**
@@ -182,7 +187,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createExportProcessorMock()
     {
-        return $this->getMock(ExportProcessor::class, [], [], '', false);
+        return $this->createMock(ExportProcessor::class);
     }
 
     /**
@@ -190,7 +195,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createTokenStorageInterfaceMock()
     {
-        return $this->getMock(TokenStorageInterface::class);
+        return $this->createMock(TokenStorageInterface::class);
     }
 
     /**
@@ -198,7 +203,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerInterfaceMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -206,6 +211,6 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionInterfaceMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 }

@@ -12,10 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class GridController extends Controller
 {
@@ -213,5 +215,21 @@ class GridController extends Controller
         }
 
         return $renderParams;
+    }
+
+    /**
+     * @return MessageProducerInterface
+     */
+    protected function getMessageProducer()
+    {
+        return $this->get('oro_message_queue.client.message_producer');
+    }
+
+    /**
+     * @return RequestParameterBagFactory
+     */
+    protected function getRequestParametersFactory()
+    {
+        return $this->get('oro_datagrid.datagrid.request_parameters_factory');
     }
 }

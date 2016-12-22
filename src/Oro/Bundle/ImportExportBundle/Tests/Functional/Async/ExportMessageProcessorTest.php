@@ -134,7 +134,7 @@ class ExportMessageProcessorTest extends WebTestCase
      */
     private function createExportHandlerMock()
     {
-        return $this->getMock(ExportHandler::class, [], [], '', false);
+        return $this->createMock(ExportHandler::class);
     }
 
     /**
@@ -142,6 +142,6 @@ class ExportMessageProcessorTest extends WebTestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 }

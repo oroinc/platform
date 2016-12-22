@@ -236,7 +236,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     protected function createMessageProducerInterfaceMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -244,7 +244,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     protected function createLoggerInterfaceMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -252,7 +252,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     protected function createJobStorageMock()
     {
-        return $this->getMock(JobStorage::class, [], [], '', false);
+        return $this->createMock(JobStorage::class);
     }
 
     /**
@@ -260,7 +260,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     protected function createConsolidateImportJobResultNotificationServiceMock()
     {
-        return $this->getMock(ConsolidateImportJobResultNotificationService::class, [], [], '', false);
+        return $this->createMock(ConsolidateImportJobResultNotificationService::class);
     }
 
     /**
@@ -268,7 +268,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     private function createConfigManagerMock()
     {
-        return $this->getMock(ConfigManager::class, [], [], '', false);
+        return $this->createMock(ConfigManager::class);
     }
 
     /**
@@ -276,7 +276,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     private function createTranslatorInterfaceMock()
     {
-        return $this->getMock(TranslatorInterface::class);
+        return $this->createMock(TranslatorInterface::class);
     }
 
     /**
@@ -284,7 +284,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     protected function createDoctrineMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -292,7 +292,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     private function createMessageMock()
     {
-        return $this->getMock(MessageInterface::class, [], [], '', false);
+        return $this->createMock(MessageInterface::class);
     }
 
     /**
@@ -300,7 +300,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -308,6 +308,6 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
      */
     private function createUserRepositoryMock()
     {
-        return $this->getMock(UserRepository::class, [], [], '', false);
+        return $this->createMock(UserRepository::class);
     }
 }
