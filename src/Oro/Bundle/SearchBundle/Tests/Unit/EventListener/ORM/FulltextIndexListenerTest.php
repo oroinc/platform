@@ -44,10 +44,31 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $databaseDriver
      * @param string $textIndexTableName
+     * @param string $returnMysqlVersion
      */
-    protected function initListener($databaseDriver, $textIndexTableName)
+    protected function initListener($databaseDriver, $textIndexTableName, $returnMysqlVersion = '5.5')
     {
-        $this->listener = new FulltextIndexListener($databaseDriver, $textIndexTableName);
+        $connection = $this
+            ->getMockBuilder('Doctrine\DBAL\Connection')
+            ->setMethods(['getDriver', 'getName', 'fetchColumn'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection
+            ->expects($this->any())
+            ->method('getDriver')
+            ->willReturn($connection);
+        $connection
+            ->expects($this->any())
+            ->method('getName')
+            ->willReturn($databaseDriver);
+
+        $connection
+            ->expects($this->any())
+            ->method('fetchColumn')
+            ->with('select version()')
+            ->willReturn($returnMysqlVersion);
+
+        $this->listener = new FulltextIndexListener($textIndexTableName, $connection);
     }
 
     public function testPlatformNotMatch()
@@ -84,9 +105,14 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->metadata->table);
     }
 
-    public function testAddedOptions()
+    /**
+     * @dataProvider getMysqlVersionsProvider
+     *
+     * @param string $mysqlVersion
+     */
+    public function testTableEngineDependsOnMysqlVersionOptions($mysqlVersion, $tableEngine)
     {
-        $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, IndexText::TABLE_NAME);
+        $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, IndexText::TABLE_NAME, $mysqlVersion);
 
         $this->metadata
             ->expects($this->once())
@@ -102,10 +128,21 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'options' => ['engine' => PdoMysql::ENGINE_MYISAM],
+                'options' => ['engine' => $tableEngine],
                 'indexes' => ['value' => ['columns' => ['value'], 'flags' => ['fulltext']]],
             ],
             $this->metadata->table
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function getMysqlVersionsProvider()
+    {
+        return [
+            ['5.5.5', PdoMysql::ENGINE_MYISAM],
+            ['5.6.6', PdoMysql::ENGINE_INNODB]
+        ];
     }
 }
