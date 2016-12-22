@@ -72,7 +72,7 @@ class UniqueKeyCollectionTypeTest extends TypeTestCase
                 )
             );
 
-        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $config
             ->expects($this->exactly(3))
             ->method('get')

@@ -25,8 +25,8 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->formBuilder = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->formBuilder = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         $this->subscriber = new AddressCountryAndRegionSubscriber($this->om, $this->formBuilder);
     }
@@ -61,7 +61,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $addressMock = $this->getMock('Oro\Bundle\AddressBundle\Entity\Address');
+        $addressMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Address');
         $addressMock->expects($this->once())
             ->method('getCountry')
             ->will($this->returnValue(null));
@@ -87,18 +87,18 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('hasRegions')
             ->will($this->returnValue(true));
 
-        $addressMock = $this->getMock('Oro\Bundle\AddressBundle\Entity\Address');
+        $addressMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Address');
         $addressMock->expects($this->once())
             ->method('getCountry')
             ->will($this->returnValue($countryMock));
         $addressMock->expects($this->once())
             ->method('getRegion');
 
-        $configMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $configMock = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $configMock->expects($this->once())
             ->method('getOptions')
             ->will($this->returnValue(array()));
-        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $type = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $type->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('oro_region'));
@@ -158,7 +158,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('hasRegions')
             ->will($this->returnValue(true));
 
-        $addressMock = $this->getMock('Oro\Bundle\AddressBundle\Entity\Address');
+        $addressMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Address');
         $addressMock->expects($this->once())
             ->method('getCountry')
             ->will($this->returnValue($countryMock));
@@ -206,17 +206,17 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('hasRegions')
             ->will($this->returnValue(true));
 
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository->expects($this->any())->method('find')->with(self::TEST_COUNTRY_NAME)
             ->will($this->returnValue($countryMock));
 
         $this->om->expects($this->once())->method('getRepository')->with($this->equalTo('OroAddressBundle:Country'))
             ->will($this->returnValue($repository));
 
-        $configMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $configMock = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $configMock->expects($this->once())->method('getOptions')
             ->will($this->returnValue(array()));
-        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $type = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $type->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('oro_region'));
@@ -267,7 +267,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('hasRegions')
             ->will($this->returnValue(false));
 
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository->expects($this->any())->method('find')->with(self::TEST_COUNTRY_NAME)
             ->will($this->returnValue($countryMock));
 

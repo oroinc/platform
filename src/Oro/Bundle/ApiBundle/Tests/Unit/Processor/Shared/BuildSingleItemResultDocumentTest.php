@@ -25,9 +25,9 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $this->documentBuilder = $this->getMock('Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface');
-        $this->errorCompleter = $this->getMock('Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface');
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->documentBuilder = $this->createMock('Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface');
+        $this->errorCompleter = $this->createMock('Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $this->processor = new BuildSingleItemResultDocument(
             $this->documentBuilder,

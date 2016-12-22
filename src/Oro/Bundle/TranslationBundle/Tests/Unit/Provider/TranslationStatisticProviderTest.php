@@ -29,7 +29,7 @@ class TranslationStatisticProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->cache            = $this->getMock('Doctrine\Common\Cache\Cache');
+        $this->cache            = $this->createMock('Doctrine\Common\Cache\Cache');
         $this->adapter          = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter')
             ->disableOriginalConstructor()->getMock();
         $this->packagesProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Provider\PackagesProvider')

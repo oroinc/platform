@@ -78,7 +78,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetEmailSeenChanges($isSeen, $newSeen, $seen, $flush, $calls, $flushCalls)
     {
-        $emailUser = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+        $emailUser = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
         $emailUser->expects($this->once())
             ->method('isSeen')
             ->will($this->returnValue($isSeen));
@@ -139,7 +139,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetEmailSeenChangesDefs()
     {
-        $emailUser = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+        $emailUser = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
         $emailUser->expects($this->once())
             ->method('isSeen')
             ->will($this->returnValue(false));
@@ -268,7 +268,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $emailUser = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
+        $emailUser = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailUser');
         $emailUser->expects($this->once())
             ->method('isSeen')
             ->will($this->returnValue($isSeen));

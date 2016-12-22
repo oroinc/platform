@@ -236,6 +236,16 @@ services:
             - '@oro_email.mailbox.process_storage'
             - '@event_dispatcher'
 
+    oro_email.form.handler.email_configuration:
+        class: 'Oro\Bundle\EmailBundle\Form\Handler\EmailConfigurationHandler'
+        arguments:
+            - '@event_dispatcher'
+
+    oro_email.form.configurator.email_configuration:
+        class: 'Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator'
+        arguments:
+            - '@oro_security.encoder.mcrypt'
+
     oro_email.form.factory:
         class: %oro_email.form.factory.class%
 

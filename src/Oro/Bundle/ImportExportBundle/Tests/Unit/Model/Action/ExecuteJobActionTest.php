@@ -54,10 +54,8 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeErrors(array $options, $expectedExceptionMessage)
     {
-        $this->setExpectedException(
-            'Oro\Component\Action\Exception\InvalidParameterException',
-            $expectedExceptionMessage
-        );
+        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->action->initialize($options);
     }
 
@@ -112,10 +110,8 @@ class ExecuteJobActionTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteExceptions(array $options, $context, $expectedExceptionMessage)
     {
-        $this->setExpectedException(
-            'Oro\Component\Action\Exception\InvalidParameterException',
-            $expectedExceptionMessage
-        );
+        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->action->initialize($options);
         $this->action->execute($context);
     }

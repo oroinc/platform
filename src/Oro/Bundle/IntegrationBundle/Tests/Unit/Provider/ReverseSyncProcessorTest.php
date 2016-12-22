@@ -31,13 +31,13 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->processorRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
+        $this->processorRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
         $this->jobExecutor       = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor')
             ->disableOriginalConstructor()->getMock();
-        $this->registry          = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $this->integration       = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $this->log               = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
-        $this->eventDispatcher   = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->registry          = $this->createMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
+        $this->integration       = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->log               = $this->createMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+        $this->eventDispatcher   = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     }
 
     public function tearDown()
@@ -129,16 +129,15 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getReverseSyncProcessor($mockedMethods = null)
     {
-        return $this->getMock(
-            'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor',
-            $mockedMethods,
-            [
+        return $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor')
+            ->setMethods($mockedMethods)
+            ->setConstructorArgs([
                 $this->processorRegistry,
                 $this->jobExecutor,
                 $this->registry,
                 $this->eventDispatcher,
                 $this->log
-            ]
-        );
+            ])
+            ->getMock();
     }
 }

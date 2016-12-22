@@ -20,7 +20,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->exceptionTextExtractor = $this->getMock('Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface');
+        $this->exceptionTextExtractor = $this
+            ->createMock('Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface');
 
         $this->metadata = $this->getMockBuilder('Oro\Bundle\ApiBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()

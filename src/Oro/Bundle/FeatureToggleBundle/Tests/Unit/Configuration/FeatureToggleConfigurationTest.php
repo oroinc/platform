@@ -80,10 +80,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessInvalidConfiguration(array $inputData, $expectedExceptionMessage)
     {
-        $this->setExpectedException(
-            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-            $expectedExceptionMessage
-        );
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $this->processConfiguration($inputData);
     }

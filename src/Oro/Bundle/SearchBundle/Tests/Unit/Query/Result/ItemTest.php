@@ -35,9 +35,9 @@ class ItemTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 
-        $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
 
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $this->product = new Product();
         $this->product->setName('test product');

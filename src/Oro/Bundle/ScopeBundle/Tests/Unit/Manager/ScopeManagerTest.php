@@ -33,7 +33,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->entityFieldProvider = $this->getMockBuilder(EntityFieldProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -60,7 +60,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->with($expectedCriteria)
             ->willReturn($scope);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
         $this->registry->method('getManagerForClass')->willReturn($em);
 
@@ -82,13 +82,13 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
     public function testFind()
     {
         $scope = new Scope();
-        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaForCurrentScope')->willReturn(['fieldName' => 1]);
         $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]);
         $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();
         $repository->method('findOneByCriteria')->with($scopeCriteria)->willReturn($scope);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
         $this->registry->method('getManagerForClass')->willReturn($em);
 
@@ -113,7 +113,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();
         $repository->method('findByCriteria')->with($scopeCriteria)->willReturn([$scope]);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
         $this->registry->method('getManagerForClass')->willReturn($em);
 
@@ -136,7 +136,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
         /** @var ScopeCriteriaProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
-        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaByContext')
             ->willReturn([]);
         $provider->method('getCriteriaField')
@@ -151,7 +151,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->with(new ScopeCriteria(['fieldName' => ScopeCriteria::IS_NOT_NULL, 'fieldName2' => null]))
             ->willReturn($scopes);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
 
         $this->registry->method('getManagerForClass')->willReturn($em);
@@ -167,7 +167,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
         /** @var ScopeCriteriaProviderInterface|\PHPUnit_Framework_MockObject_MockObject $provider */
-        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaByContext')
             ->willReturn([]);
         $provider->method('getCriteriaForCurrentScope')->willReturn(['fieldName' => 1]);
@@ -181,7 +181,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->with(new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]))
             ->willReturn($scopes);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
 
         $this->registry->method('getManagerForClass')->willReturn($em);
@@ -191,7 +191,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
     public function testFindOrCreate()
     {
         $scope = new Scope();
-        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaForCurrentScope')->willReturn([]);
 
         $repository = $this->getMockBuilder(ScopeRepository::class)
@@ -199,7 +199,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repository->method('findOneByCriteria')->willReturn(null);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
         $em->expects($this->once())->method('persist')->with($scope);
         $em->expects($this->once())->method('flush')->with($scope);
@@ -216,7 +216,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
     public function testFindOrCreateWithoutFlush()
     {
         $scope = new Scope();
-        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->expects($this->once())
             ->method('getCriteriaForCurrentScope')->willReturn([]);
 
@@ -227,7 +227,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findOneByCriteria')
             ->willReturn(null);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);
@@ -251,7 +251,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $scope = new Scope();
         $context = ['scopeAttribute' => new \stdClass()];
-        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->method('getCriteriaByContext')->with($context)->willReturn([]);
 
         $repository = $this->getMockBuilder(ScopeRepository::class)
@@ -259,7 +259,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repository->method('findOneByCriteria')->willReturn(null);
 
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
         $em->expects($this->once())->method('persist')->with($scope);
         $em->expects($this->once())->method('flush')->with($scope);

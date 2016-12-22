@@ -32,12 +32,12 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->context = $this->getMock(ExecutionContextInterface::class);
+        $this->context = $this->createMock(ExecutionContextInterface::class);
 
-        $this->builderChainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
+        $this->builderChainProvider = $this->createMock(BuilderChainProvider::class);
 
         /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject $localizationHelper */
-        $localizationHelper = $this->getMock(LocalizationHelper::class, [], [], '', false);
+        $localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $this->validator = new MaxNestedLevelValidator($this->builderChainProvider, $localizationHelper);
         $this->validator->initialize($this->context);
@@ -50,7 +50,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 2);
 
-        $scope = $this->getMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
         $user = new User();
         $organization = new Organization();
         $scope->expects($this->once())
@@ -101,7 +101,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
         $menu = $this->getMenu();
         $menu->setExtra('max_nesting_level', 3);
 
-        $scope = $this->getMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
         $user = new User();
         $organization = new Organization();
         $scope->expects($this->once())
@@ -154,7 +154,7 @@ class MaxNestedLevelValidatorTest extends \PHPUnit_Framework_TestCase
 
         $update = new MenuUpdateStub();
 
-        $scope = $this->getMock(Scope::class, ['getOrganization', 'getUser']);
+        $scope = $this->createPartialMock(Scope::class, ['getOrganization', 'getUser']);
         $user = new User();
         $organization = new Organization();
         $scope->expects($this->once())

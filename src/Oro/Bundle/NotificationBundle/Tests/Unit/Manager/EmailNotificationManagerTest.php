@@ -152,7 +152,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -160,7 +160,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createTemplateMock()
     {
-        return $this->getMock(EmailTemplate::class);
+        return $this->createMock(EmailTemplate::class);
     }
 
     /**
@@ -168,7 +168,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createEmailNotificationMock()
     {
-        return $this->getMock(EmailNotificationInterface::class);
+        return $this->createMock(EmailNotificationInterface::class);
     }
 
     /**
@@ -176,6 +176,6 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createUserMock()
     {
-        return $this->getMock(User::class);
+        return $this->createMock(User::class);
     }
 }

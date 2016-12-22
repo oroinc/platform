@@ -23,7 +23,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
     protected function setUp()
     {
         /** @var \Symfony\Component\Templating\EngineInterface $templatingEngine */
-        $this->phpEngine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $this->phpEngine = $this->createMock('Symfony\Component\Templating\EngineInterface');
         $this->engine = new TemplatingRendererEngine($this->phpEngine);
     }
 
@@ -35,7 +35,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
         $secondTheme = 'MyBundle:layouts/second_theme/php';
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme]);
@@ -69,7 +69,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
         $thirdTheme = 'MyBundle:layouts/third_theme/php';
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme]);
@@ -112,7 +112,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
         $thirdTheme = 'MyBundle:layouts/third_theme/php';
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme]);
@@ -157,11 +157,11 @@ class TemplatingRendererEngineTest extends RendererEngineTest
         $thirdTheme = 'MyBundle:layouts/third_theme/php';
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $rootView = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $rootView = $this->createMock('Symfony\Component\Form\FormView');
         $rootView->vars['cache_key'] = '_root_root';
 
         $this->engine->addDefaultThemes([$firstTheme]);
@@ -202,7 +202,7 @@ class TemplatingRendererEngineTest extends RendererEngineTest
     public function createRendererEngine()
     {
         /** @var \Symfony\Component\Templating\EngineInterface $phpEngine */
-        $phpEngine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $phpEngine = $this->createMock('Symfony\Component\Templating\EngineInterface');
         $engine = new TemplatingRendererEngine($phpEngine);
 
         return $engine;

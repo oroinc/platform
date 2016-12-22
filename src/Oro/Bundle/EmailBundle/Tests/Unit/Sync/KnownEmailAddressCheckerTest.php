@@ -34,7 +34,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger                 = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger                 = $this->createMock('Psr\Log\LoggerInterface');
         $this->em                     = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -339,17 +339,17 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function getEmailOwnerProviderStorage()
     {
-        $userProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $userProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $userProvider->expects($this->any())
             ->method('getEmailOwnerClass')
             ->will($this->returnValue(self::USER_CLASS));
 
-        $contactProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $contactProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $contactProvider->expects($this->any())
             ->method('getEmailOwnerClass')
             ->will($this->returnValue(self::TEST_CONTACT_CLASS));
 
-        $mailboxProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $mailboxProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $mailboxProvider->expects($this->any())
             ->method('getEmailOwnerClass')
             ->will($this->returnValue(self::MAILBOX_CLASS));

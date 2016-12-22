@@ -31,7 +31,7 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             $normalizers,
             new DoctrineHelper($doctrine),
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface')),
+            new EntityDataTransformer($this->createMock('Symfony\Component\DependencyInjection\ContainerInterface')),
             new ConfigNormalizer(),
             new DataNormalizer()
         );

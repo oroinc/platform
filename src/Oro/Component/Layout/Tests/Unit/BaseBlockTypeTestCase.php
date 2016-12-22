@@ -42,7 +42,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     {
         $layoutFactoryBuilder->addRenderer(
             'test',
-            $this->getMock('Oro\Component\Layout\LayoutRendererInterface')
+            $this->createMock('Oro\Component\Layout\LayoutRendererInterface')
         );
     }
 

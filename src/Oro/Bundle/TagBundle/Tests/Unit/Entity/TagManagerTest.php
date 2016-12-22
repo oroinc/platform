@@ -45,7 +45,7 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
         $this->router = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
             ->disableOriginalConstructor()->getMock();
 
-        $this->user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $this->user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $this->user->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(self::TEST_USER_ID));
@@ -67,7 +67,7 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     {
         $testTags = array(new Tag(self::TEST_TAG_NAME));
 
-        $collection = $this->getMock('Doctrine\Common\Collections\ArrayCollection');
+        $collection = $this->createMock('Doctrine\Common\Collections\ArrayCollection');
         $collection->expects($this->once())->method('add');
 
         $resource = $this->getMockForAbstractClass('Oro\Bundle\TagBundle\Entity\Taggable');
@@ -128,7 +128,7 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function tagIdsProvider()
     {
-        $tag = $this->getMock('Oro\Bundle\TagBundle\Entity\Tag');
+        $tag = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
         $tag->expects($this->once())->method('getId')
             ->will($this->returnValue(self::TEST_TAG_ID));
 
@@ -194,9 +194,9 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetPreparedArrayFromDb()
     {
         $resource = new Taggable(array('id' => 1));
-        $tagging = $this->getMock('Oro\Bundle\TagBundle\Entity\Tagging');
+        $tagging = $this->createMock('Oro\Bundle\TagBundle\Entity\Tagging');
 
-        $tag1 = $this->getMock('Oro\Bundle\TagBundle\Entity\Tag');
+        $tag1 = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
         $tag1->expects($this->once())->method('getName')
             ->will($this->returnValue('test name 1'));
         $tag1->expects($this->any())->method('getId')
@@ -204,7 +204,7 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
         $tag1->expects($this->exactly(1))->method('getTagging')
             ->will($this->returnValue(new ArrayCollection(array($tagging))));
 
-        $tag2 = $this->getMock('Oro\Bundle\TagBundle\Entity\Tag');
+        $tag2 = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
         $tag2->expects($this->once())->method('getName')
             ->will($this->returnValue('test name 2'));
         $tag2->expects($this->any())->method('getId')
@@ -212,7 +212,7 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
         $tag2->expects($this->exactly(1))->method('getTagging')
             ->will($this->returnValue(new ArrayCollection(array($tagging))));
 
-        $userMock = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $userMock = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $tagging->expects($this->exactly(2))
             ->method('getOwner')->will($this->returnValue($userMock));
@@ -278,9 +278,9 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function tagForPreparing()
     {
-        $tag1 = $this->getMock('Oro\Bundle\TagBundle\Entity\Tag');
-        $tag2 = $this->getMock('Oro\Bundle\TagBundle\Entity\Tag');
-        $tagging = $this->getMock('Oro\Bundle\TagBundle\Entity\Tagging');
+        $tag1 = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
+        $tag2 = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
+        $tagging = $this->createMock('Oro\Bundle\TagBundle\Entity\Tagging');
 
         $tag1->expects($this->exactly(2))
             ->method('getName')
@@ -299,7 +299,7 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
         $tag2->expects($this->exactly(1))->method('getTagging')
             ->will($this->returnValue(new ArrayCollection(array($tagging))));
 
-        $userMock = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $userMock = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $tagging->expects($this->exactly(2))
             ->method('getOwner')->will($this->returnValue($userMock));

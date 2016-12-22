@@ -17,10 +17,10 @@ class ChainAclGroupProviderTest extends \PHPUnit_Framework_TestCase
     public function testAddProvider()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $provider1 */
-        $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $provider2 */
-        $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
 
         $chain = new ChainAclGroupProvider();
         $chain->addProvider('alias1', $provider1);
@@ -70,7 +70,7 @@ class ChainAclGroupProviderTest extends \PHPUnit_Framework_TestCase
     protected function getAclGroupProviderMock($isSupports = true, $group = '')
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
         $provider->expects($this->any())
             ->method('supports')
             ->willReturn($isSupports);

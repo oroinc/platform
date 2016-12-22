@@ -39,7 +39,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator->expects($this->any())
             ->method('trans')
             ->willReturn('Items');
@@ -83,7 +83,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnBuildMetadata($keys, $calls)
     {
-        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $this->configProvider->expects($this->any())
             ->method('getConfig')
             ->willReturn($config);

@@ -122,7 +122,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -130,7 +130,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -138,6 +138,6 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

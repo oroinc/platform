@@ -120,7 +120,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnDefaultCss()
     {
         $type = 'type';
-        $typeInstance = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface');
+        $typeInstance = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface');
         $container = $this->createContainerMock($typeInstance);
         $formFactory = $this->createFormFactoryMock();
         $defaultCss = 'my default css';
@@ -139,7 +139,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnDefaultSuccessMessage()
     {
         $type = 'type';
-        $typeInstance = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface');
+        $typeInstance = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface');
         $container = $this->createContainerMock($typeInstance);
         $formFactory = $this->createFormFactoryMock();
         $defaultMessage = 'my default message';
@@ -190,8 +190,9 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function customLayoutTypesProvider()
     {
         $customLayout = 'layout.html.twig';
-        $typeInstance = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface');
-        $newInterfaceTypeInstance = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface');
+        $typeInstance = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface');
+        $newInterfaceTypeInstance = $this
+            ->createMock('Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface');
 
         $typeInstance->expects($this->any())->method('geFormLayout')
             ->will($this->returnValue($customLayout));
@@ -211,7 +212,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createFormFactoryMock()
     {
-        return $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        return $this->createMock('Symfony\Component\Form\FormFactoryInterface');
     }
 
     /**
@@ -220,7 +221,7 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContainerMock($typeInstance = null)
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         if ($typeInstance) {
             $container->expects($this->once())

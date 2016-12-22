@@ -46,7 +46,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     public function testBuildForm()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormBuilderInterface $builder */
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $options = [
             'current_password_label' => 'label',
             'plain_password_invalid_message' => 'label',
@@ -72,7 +72,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
     public function testSetDefaultOptions()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsResolver $resolver */
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(

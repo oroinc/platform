@@ -174,7 +174,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockProcessJob()
     {
-        $processJob = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
+        $processJob = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
         $processJob->expects($this->once())
             ->method('setSerializer')
             ->will($this->returnSelf());

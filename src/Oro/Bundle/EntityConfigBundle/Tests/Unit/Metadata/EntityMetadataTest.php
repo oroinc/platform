@@ -66,7 +66,8 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRouteThrowExceptionInStrictMode($name)
     {
-        $this->setExpectedException('\LogicException', sprintf('No route "%s" found for entity', $name));
+        $this->expectException('\LogicException');
+        $this->expectExceptionMessage(sprintf('No route "%s" found for entity', $name));
 
         $metadata = new EntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity');
         $metadata->getRoute($name, true);

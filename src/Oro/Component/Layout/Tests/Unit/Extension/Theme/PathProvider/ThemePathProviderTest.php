@@ -135,7 +135,7 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getThemeMock($directory = null, $parent = null)
     {
-        $theme = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
+        $theme = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
         $theme->expects($this->any())->method('getParentTheme')->willReturn($parent);
         $theme->expects($this->any())->method('getDirectory')->willReturn($directory);
 

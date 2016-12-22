@@ -41,10 +41,10 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator =  $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->transListener = $this->getMock('Gedmo\Translatable\TranslatableListener');
-        $this->router = $this->getMock('Symfony\Component\Routing\RequestContextAwareInterface');
-        $this->currentLocalizationProvider = $this->getMock(CurrentLocalizationProvider::class);
+        $this->translator =  $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->transListener = $this->createMock('Gedmo\Translatable\TranslatableListener');
+        $this->router = $this->createMock('Symfony\Component\Routing\RequestContextAwareInterface');
+        $this->currentLocalizationProvider = $this->createMock(CurrentLocalizationProvider::class);
 
         $this->defaultLocale = \Locale::getDefault();
 

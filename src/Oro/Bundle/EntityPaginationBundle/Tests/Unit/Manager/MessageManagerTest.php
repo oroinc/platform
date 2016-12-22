@@ -39,7 +39,7 @@ class MessageManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->session = new Session(new MockArraySessionStorage());
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator->expects($this->any())
             ->method('trans')
             ->will(

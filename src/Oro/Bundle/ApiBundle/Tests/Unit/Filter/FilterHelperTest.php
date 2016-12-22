@@ -25,7 +25,7 @@ class FilterHelperTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->filters = new FilterCollection();
-        $this->filterValues = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $this->filterValues = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
 
         $this->filterHelper = new FilterHelper($this->filters, $this->filterValues);
     }

@@ -23,7 +23,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->realDispatcherMock = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->realDispatcherMock = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->dispatcher         = new EventDispatcher($this->realDispatcherMock);
     }
 
@@ -41,7 +41,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testDispatchGridEvent(array $config, array $expectedEvents)
     {
         $config   = DatagridConfiguration::create($config);
-        $gridMock = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $gridMock = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $gridMock->expects($this->any())->method('getConfig')->will($this->returnValue($config));
 
         foreach ($expectedEvents as $k => $event) {
@@ -94,8 +94,8 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     }
     public function testDispatchException()
     {
-        $this->setExpectedException(
-            '\InvalidArgumentException',
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage(
             'Unexpected event type. Expected instance of GridEventInterface or GridConfigurationEventInterface'
         );
         $event = $this->getMockBuilder('Symfony\Component\EventDispatcher\Event')

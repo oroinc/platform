@@ -222,7 +222,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProcessorFactory()
     {
-        $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $factory->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(

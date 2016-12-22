@@ -46,7 +46,7 @@ class ContextReaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->context = $this
-            ->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+            ->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
 
         $this->stepExecution = $this
             ->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')

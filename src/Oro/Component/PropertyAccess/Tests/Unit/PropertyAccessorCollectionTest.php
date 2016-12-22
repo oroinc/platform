@@ -27,8 +27,8 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()
     {
-        $car        = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CompositeCar');
-        $structure  = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarStructure');
+        $car        = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CompositeCar');
+        $structure  = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarStructure');
         $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
         $axesAfter  = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -60,7 +60,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
     // @codingStandardsIgnoreEnd
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
-        $car        = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover');
+        $car        = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover');
         $axesBefore = $this->getContainer(array(1 => 'second', 3 => 'fourth'));
         $axesAfter  = $this->getContainer(array(0 => 'first', 1 => 'second', 2 => 'third'));
 
@@ -73,7 +73,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
     {
-        $car = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Car');
+        $car = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Car');
         $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes', $axes));
@@ -81,7 +81,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testIsWritableReturnsFalseIfOnlyAdderExists()
     {
-        $car = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarOnlyAdder');
+        $car = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarOnlyAdder');
         $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
@@ -89,7 +89,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testIsWritableReturnsFalseIfOnlyRemoverExists()
     {
-        $car = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarOnlyRemover');
+        $car = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarOnlyRemover');
         $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
@@ -97,7 +97,7 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
     public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
     {
-        $car = $this->getMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover');
+        $car = $this->createMock('Oro\Component\PropertyAccess\Tests\Unit\Fixtures\CarNoAdderAndRemover');
         $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));

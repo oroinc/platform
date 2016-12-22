@@ -33,7 +33,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger   = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger   = $this->createMock('Psr\Log\LoggerInterface');
         $this->selector = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector')
             ->disableOriginalConstructor()
             ->getMock();
@@ -82,7 +82,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
-        $loader = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
 
         $this->selector->expects($this->once())
             ->method('select')
@@ -134,7 +134,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
 
         $exception = new \Exception('some exception');
 
-        $loader = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
 
         $this->selector->expects($this->once())
             ->method('select')
@@ -180,7 +180,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
 
         $exception = new EmailBodyNotFoundException($email);
 
-        $loader = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
 
         $this->selector->expects($this->once())
             ->method('select')
@@ -256,7 +256,7 @@ class EmailBodySynchronizerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $loader = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
+        $loader = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
 
         $this->selector->expects($this->once())
             ->method('select')

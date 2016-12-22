@@ -87,6 +87,6 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 }

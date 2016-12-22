@@ -16,7 +16,7 @@ class NullValueTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->innerTransformer = $this->getMock(DataTransformerInterface::class);
+        $this->innerTransformer = $this->createMock(DataTransformerInterface::class);
 
         $this->nullValueTransformer = new NullValueTransformer($this->innerTransformer);
     }

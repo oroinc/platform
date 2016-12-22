@@ -159,7 +159,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer->expects($this->never())
             ->method('send');
 
-        $this->setExpectedException($exception, $exceptionMessage);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
         $this->emailProcessor->process($this->createEmailModel($data));
     }
 
@@ -287,7 +288,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('body')
             ->will($this->returnValue($body));
 
-        $batch = $this->getMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
+        $batch = $this->createMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
         $this->emailEntityBuilder->expects($this->once())
             ->method('getBatch')
             ->will($this->returnValue($batch));

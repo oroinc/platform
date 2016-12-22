@@ -21,8 +21,8 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
 
         $this->om->expects($this->any())
             ->method('getRepository')

@@ -41,12 +41,12 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
         $entity = new EntityConfigModel(self::TEST_CLASS_NAME);
         $field  = new FieldConfigModel($fieldName, $type);
         $entity->addField($field);
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $this->validator->initialize($context);
         $constraint = new UniqueExtendEntityMethodName();
 
         if ($hasMethods) {
-            $violation = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
+            $violation = $this->createMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
             $context->expects(self::once())
                 ->method('buildViolation')
                 ->with($constraint->message)
@@ -80,7 +80,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
     public function testFailedValidate()
     {
         $field   = '';
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $this->validator->initialize($context);
         $constraint = new UniqueExtendEntityMethodName();
 

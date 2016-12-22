@@ -8,8 +8,8 @@ class EmailOwnerProviderStorageTest extends \PHPUnit_Framework_TestCase
 {
     public function testStorage()
     {
-        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
-        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
 
         $storage = new EmailOwnerProviderStorage();
         $storage->addProvider($provider1);

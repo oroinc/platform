@@ -47,9 +47,7 @@ class SendEmailTransportListener
             $security = $emailOrigin->getSmtpEncryption();
 
             $transport = $event->getTransport();
-            if ($transport instanceof \Swift_SmtpTransport
-                || $transport instanceof \Swift_Transport_EsmtpTransport
-            ) {
+            if ($transport instanceof \Swift_SmtpTransport) {
                 $transport->setHost($host);
                 $transport->setPort($port);
                 $transport->setEncryption($security);
