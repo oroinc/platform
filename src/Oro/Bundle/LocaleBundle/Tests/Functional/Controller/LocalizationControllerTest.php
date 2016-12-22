@@ -34,14 +34,14 @@ class LocalizationControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures(['Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData']);
     }
-
-    public function testIndex()
-    {
-        $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_index'));
-
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains('oro-locale-localizations-grid', $crawler->html());
-    }
+//
+//    public function testIndex()
+//    {
+//        $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_index'));
+//
+//        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+//        $this->assertContains('oro-locale-localizations-grid', $crawler->html());
+//    }
 
     public function testCreate()
     {
@@ -195,18 +195,12 @@ class LocalizationControllerTest extends WebTestCase
     }
 
     /**
-     * @param string|null $name
+     * @param string $name
      * @return Localization
      */
-    private function getLocalization($name = null)
+    private function getLocalization($name)
     {
-        $localization = $this->getRepository()->findOneBy($name ? ['name' => $name] : []);
-
-        if (!$localization) {
-            throw new \LogicException('At least one localization must be defined');
-        }
-
-        return $localization;
+        return $this->getRepository()->findOneBy(['name' => $name]);
     }
 
     /**

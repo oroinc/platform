@@ -33,8 +33,15 @@ class ButtonProviderTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], [], true);
-        $this->buttonProvider = $this->getClient()->getContainer()->get('oro_action.provider.button');
+        $this->buttonProvider = $this->getContainer()->get('oro_action.provider.button');
         $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
+    }
+
+    protected function tearDown()
+    {
+        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
+
+        parent::tearDown();
     }
 
     /**
