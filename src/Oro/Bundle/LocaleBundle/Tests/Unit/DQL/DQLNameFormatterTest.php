@@ -53,7 +53,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . 'COALESCE(CONCAT(CAST(a.firstName as string), \' \'), \'\')'
                 . '))',
                 '%last_name% %first_name% %suffix%',
-                $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
+                $this->createMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'first and last name exists, has unknown placeholders'       => [
                 'TRIM(CONCAT('
@@ -61,7 +61,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . 'COALESCE(CONCAT(CAST(a.firstName as string), \' \'), \'\')'
                 . '))',
                 '%unknown_data_one% %last_name% %first_name% %suffix% %unknown_data_two%',
-                $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
+                $this->createMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'has both prepend and append separators'                     => [
                 'TRIM(CONCAT('
@@ -70,7 +70,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . 'COALESCE(CONCAT(CAST(a.lastName as string), \') - \'), \'\')'
                 . '))',
                 '(%first_name% %last_name%) - %suffix%!',
-                $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
+                $this->createMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'first and last name exists, first name should be uppercase' => [
                 'TRIM(CONCAT('
@@ -78,7 +78,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . 'COALESCE(CONCAT(CAST(UPPER(a.firstName) as string), \' \'), \'\')'
                 . '))',
                 '%last_name% %FIRST_NAME% %suffix%',
-                $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
+                $this->createMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'full name format, and entity contains all parts'            => [
                 'TRIM(CONCAT('
@@ -88,7 +88,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . 'COALESCE(CAST(a.nameSuffix as string), \'\')'
                 . '))',
                 '%prefix% %last_name% %first_name% - %suffix%',
-                $this->getMock('Oro\Bundle\LocaleBundle\Model\FullNameInterface')
+                $this->createMock('Oro\Bundle\LocaleBundle\Model\FullNameInterface')
             ],
             'without separators'                                         => [
                 'TRIM(CONCAT('
@@ -96,7 +96,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . 'COALESCE(CAST(a.firstName as string), \'\')'
                 . '))',
                 '%last_name%%first_name%',
-                $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
+                $this->createMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'one item and prefix'                                        => [
                 'TRIM(CONCAT('
@@ -104,7 +104,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 . 'COALESCE(CAST(a.lastName as string), \'\')'
                 . '))',
                 ' - %last_name%',
-                $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
+                $this->createMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
         ];
     }

@@ -37,7 +37,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+        $this->userProvider = $this->createMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
         $cache = new ArrayCache();
 
@@ -119,7 +119,8 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $token = $this->prepareTestInstance($user, $secret);
         $this->assertFalse($token->isAuthenticated());
 
-        $this->setExpectedException($exceptionType, $exceptionString);
+        $this->expectException($exceptionType);
+        $this->expectExceptionMessage($exceptionString);
 
         $this->provider->authenticate($token);
     }
@@ -189,7 +190,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSecret()
     {
-        $noApiKeyUser = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $noApiKeyUser = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $noApiKeyUser
             ->expects(static::exactly(2))
             ->method('getApiKeys')

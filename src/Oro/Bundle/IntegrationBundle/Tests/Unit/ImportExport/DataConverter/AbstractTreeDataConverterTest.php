@@ -25,7 +25,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit_Framework_TestCase
 
     public function testSetImportExportContext()
     {
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
 
         $awareConverter = $this
             ->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter')
@@ -34,7 +34,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit_Framework_TestCase
         $awareConverter->expects($this->once())
             ->method('setImportExportContext')
             ->with($context);
-        $simpleConverter = $this->getMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
+        $simpleConverter = $this->createMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
 
         $this->dataConverter->addNodeDataConverter('test1', $awareConverter);
         $this->dataConverter->addNodeDataConverter('test2', $simpleConverter);

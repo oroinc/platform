@@ -49,7 +49,7 @@ class LocalRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFilesystem($isExists)
     {
-        $fs = $this->getMock('Symfony\Component\Filesystem\Filesystem');
+        $fs = $this->createMock('Symfony\Component\Filesystem\Filesystem');
 
         $fs
             ->expects($this->once())

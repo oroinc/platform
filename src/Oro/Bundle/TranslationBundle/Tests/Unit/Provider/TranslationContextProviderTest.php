@@ -25,9 +25,9 @@ class TranslationContextProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveContext()
     {
-        $extension1 = $this->getMock(TranslationContextResolverInterface::class);
-        $extension2 = $this->getMock(TranslationContextResolverInterface::class);
-        $extension3 = $this->getMock(TranslationContextResolverInterface::class);
+        $extension1 = $this->createMock(TranslationContextResolverInterface::class);
+        $extension2 = $this->createMock(TranslationContextResolverInterface::class);
+        $extension3 = $this->createMock(TranslationContextResolverInterface::class);
 
         $extension1->expects($this->once())->method('resolve')->willReturn(null);
         $extension2->expects($this->once())->method('resolve')->willReturn('Resolved Value');

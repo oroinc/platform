@@ -47,7 +47,7 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
 
-        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
         $this->routeProvider->expects($this->any())
             ->method('getExecutionRoute')
@@ -129,9 +129,9 @@ class OperationButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private function createOperationMock($isAvailable = false, $withForm = false)
     {
-        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operation = $this->createMock(Operation::class);
         $operation->expects($this->once())->method('isAvailable')->with(new ActionData())->willReturn($isAvailable);
-        $operation->expects($this->once())->method('hasForm')->willReturn($withForm);
+        $operation->expects($this->any())->method('hasForm')->willReturn($withForm);
 
         return $operation;
     }

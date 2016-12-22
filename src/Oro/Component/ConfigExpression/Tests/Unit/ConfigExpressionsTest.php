@@ -50,21 +50,21 @@ class ConfigExpressionsTest extends \PHPUnit_Framework_TestCase
 
     public function testSetAssembler()
     {
-        $assembler = $this->getMock('Oro\Component\ConfigExpression\AssemblerInterface');
+        $assembler = $this->createMock('Oro\Component\ConfigExpression\AssemblerInterface');
         $this->language->setAssembler($assembler);
         $this->assertSame($assembler, $this->language->getAssembler());
     }
 
     public function testSetFactory()
     {
-        $factory = $this->getMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
         $this->language->setFactory($factory);
         $this->assertSame($factory, $this->language->getFactory());
     }
 
     public function testSetContextAccessor()
     {
-        $contextAccessor = $this->getMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
+        $contextAccessor = $this->createMock('Oro\Component\ConfigExpression\ContextAccessorInterface');
         $this->language->setContextAccessor($contextAccessor);
         $this->assertSame($contextAccessor, $this->language->getContextAccessor());
     }
@@ -76,7 +76,7 @@ class ConfigExpressionsTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->language->setFactory($factory);
 
-        $extension = $this->getMock('Oro\Component\ConfigExpression\Extension\ExtensionInterface');
+        $extension = $this->createMock('Oro\Component\ConfigExpression\Extension\ExtensionInterface');
 
         $factory->expects($this->once())
             ->method('addExtension')

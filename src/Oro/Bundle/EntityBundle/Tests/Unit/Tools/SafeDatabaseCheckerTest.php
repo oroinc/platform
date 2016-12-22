@@ -121,8 +121,8 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTableName()
     {
-        $doctrine      = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $em            = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $doctrine      = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $em            = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -150,8 +150,8 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTableNameForNotOrmEntity()
     {
-        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $om       = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $om       = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $entityName = 'Test\Entity';
 
@@ -172,7 +172,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTableNameWithEmptyEntityNameParam($entityName)
     {
-        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $doctrine->expects($this->never())
             ->method('getManagerForClass');
@@ -195,7 +195,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTableNameShouldHandleExpectedExceptions($exception)
     {
-        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
@@ -222,7 +222,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTableNameShouldRethrowUnexpectedException()
     {
-        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
@@ -233,10 +233,10 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllMetadata()
     {
-        $om              = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $metadataFactory = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
+        $om              = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $metadataFactory = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
 
-        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $classMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
 
         $allMetadata = [$classMetadata];
 
@@ -258,7 +258,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAllMetadataShouldHandleExpectedExceptions($exception)
     {
-        $om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $om->expects($this->once())
             ->method('getMetadataFactory')
@@ -286,7 +286,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAllMetadataShouldRethrowUnexpectedException()
     {
-        $om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $om->expects($this->once())
             ->method('getMetadataFactory')

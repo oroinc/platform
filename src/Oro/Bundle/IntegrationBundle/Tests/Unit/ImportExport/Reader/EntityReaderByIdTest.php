@@ -36,7 +36,7 @@ class EntityReaderByIdTest extends OrmTestCase
             ->setMethods(array('getByStepExecution'))
             ->getMock();
 
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $reader                = new AnnotationReader();
         $metadataDriver        = new AnnotationDriver(
             $reader,

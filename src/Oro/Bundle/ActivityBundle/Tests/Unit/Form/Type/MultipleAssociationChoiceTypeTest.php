@@ -52,7 +52,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             ->method('getConfig');
 
         $view    = new FormView();
-        $form    = new Form($this->getMock('Symfony\Component\Form\FormConfigInterface'));
+        $form    = new Form($this->createMock('Symfony\Component\Form\FormConfigInterface'));
         $options = [
             'config_id'         => new EntityConfigId('test', 'Test\Entity2'),
             'association_class' => 'test'

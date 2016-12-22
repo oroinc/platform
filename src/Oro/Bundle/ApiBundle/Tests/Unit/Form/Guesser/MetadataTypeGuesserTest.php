@@ -46,7 +46,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMetadataAccessor(EntityMetadata $metadata = null)
     {
-        $metadataAccessor = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $metadataAccessor = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
         if (null === $metadata) {
             $metadataAccessor->expects($this->once())
                 ->method('getMetadata')
@@ -69,7 +69,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConfigAccessor($className, EntityDefinitionConfig $config = null)
     {
-        $configAccessor = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+        $configAccessor = $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
         if (null === $config) {
             $configAccessor->expects($this->once())
                 ->method('getConfig')
@@ -120,14 +120,14 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldGetPreviouslySetMetadataAccessor()
     {
-        $metadataAccessor = $this->getMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
+        $metadataAccessor = $this->createMock('Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface');
         $this->typeGuesser->setMetadataAccessor($metadataAccessor);
         self::assertSame($metadataAccessor, $this->typeGuesser->getMetadataAccessor());
     }
 
     public function testShouldGetPreviouslySetConfigAccessor()
     {
-        $configAccessor = $this->getMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
+        $configAccessor = $this->createMock('Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface');
         $this->typeGuesser->setConfigAccessor($configAccessor);
         self::assertSame($configAccessor, $this->typeGuesser->getConfigAccessor());
     }
@@ -240,7 +240,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
             'integer'
         );
         $metadata->addAssociation($associationMetadata);
-        $includedEntities = $this->getMock(IncludedEntityCollection::class);
+        $includedEntities = $this->createMock(IncludedEntityCollection::class);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setIncludedEntities($includedEntities);
@@ -288,7 +288,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
             'integer'
         );
         $metadata->addAssociation($associationMetadata);
-        $includedEntities = $this->getMock(IncludedEntityCollection::class);
+        $includedEntities = $this->createMock(IncludedEntityCollection::class);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setIncludedEntities($includedEntities);

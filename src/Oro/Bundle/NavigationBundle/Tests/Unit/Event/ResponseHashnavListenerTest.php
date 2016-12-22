@@ -57,9 +57,9 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getResponse')
             ->will($this->returnValue($this->response));
 
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->templating      = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $this->kernel          = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->templating      = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $this->kernel          = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
         $this->listener        = $this->getListener(false);
     }
 
@@ -136,7 +136,7 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
     {
         $expected = array('full_redirect' => 1, 'location' => self::TEST_URL);
         $this->response->headers->add(array('location' => self::TEST_URL));
-        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
+        $response = new Response();
         $this->response->setStatusCode(503);
         $this->templating
             ->expects($this->once())

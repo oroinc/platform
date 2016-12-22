@@ -57,9 +57,9 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configurationProvider =
-            $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
+            $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
-        $this->actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
@@ -73,7 +73,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
         )->disableOriginalConstructor()->getMock();
 
-        $this->applicationProvider = $this->getMock(CurrentApplicationProviderInterface::class);
+        $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->applicationProvider->expects($this->any())
             ->method('isApplicationsValid')
             ->willReturnCallback(
@@ -478,7 +478,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $filter = $this->getMock(OperationRegistryFilterInterface::class);
+        $filter = $this->createMock(OperationRegistryFilterInterface::class);
 
         $criteria3 = new OperationFindCriteria('e1', 'r1', 'd1');
         $filter->expects($this->once())->method('filter')->with(

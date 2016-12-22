@@ -39,13 +39,11 @@ class UniqueEntityValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidArgument($value, $expectedExceptionMessage)
     {
-        $this->setExpectedException(
-            'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
-            $expectedExceptionMessage
-        );
+        $this->expectException('Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $constraint = $this
-            ->getMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity');
+            ->createMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity');
         $this->validator->validate($value, $constraint);
     }
 
@@ -98,7 +96,7 @@ class UniqueEntityValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $constraint = $this
-            ->getMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity');
+            ->createMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity');
         $this->validator->initialize($context);
 
         $this->validator->validate($entityData, $constraint);

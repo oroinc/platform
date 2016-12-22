@@ -22,11 +22,11 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->highPriorityProvider =
-            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
+            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
         $this->lowPriorityProvider  =
-            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
+            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
         $this->unsupportedProvider  =
-            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
+            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
     }
 
     public function testSupports()
@@ -188,7 +188,7 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
         $groupNameProvider = null;
         if ($withGroupNameProvider) {
             /** @var \PHPUnit_Framework_MockObject_MockObject|LabelProviderInterface $groupNameProvider */
-            $groupNameProvider = $this->getMock('Oro\Bundle\UIBundle\Provider\LabelProviderInterface');
+            $groupNameProvider = $this->createMock('Oro\Bundle\UIBundle\Provider\LabelProviderInterface');
             $groupNameProvider->expects($this->any())
                 ->method('getLabel')
                 ->will(
@@ -202,7 +202,7 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
 
         if ($setEventDispatcher) {
             /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface $eventDispatcher */
-            $eventDispatcher = $this->getMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
+            $eventDispatcher = $this->createMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
             $eventDispatcher->expects($this->once())
                 ->method('dispatch');
         }

@@ -30,7 +30,7 @@ class OwnerDeletionManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->defaultChecker    =
-            $this->getMock('Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface');
+            $this->createMock('Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface');
         $this->ownershipProvider =
             $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
                 ->disableOriginalConstructor()
@@ -179,7 +179,7 @@ class OwnerDeletionManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityOwnershipMetadata));
 
         $customChecker =
-            $this->getMock('Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface');
+            $this->createMock('Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface');
         $customChecker->expects($this->once())
             ->method('hasAssignments')
             ->with($ownerId, $entityClassName, 'owner', $this->identicalTo($this->em))

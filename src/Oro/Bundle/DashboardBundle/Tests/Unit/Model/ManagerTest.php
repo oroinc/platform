@@ -85,7 +85,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $this->manager = new Manager(
             $this->factory,
@@ -99,7 +99,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     {
         $id = 100;
 
-        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -134,7 +134,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         $criteria = array('label' => 'Foo');
         $orderBy = array('label' => 'ASC');
 
-        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -169,7 +169,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     {
         $id = 100;
 
-        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -201,7 +201,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDashboardModel()
     {
-        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -216,7 +216,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWidgetModel()
     {
-        $widget = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -232,8 +232,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetDashboardModels()
     {
         $entities = array(
-            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard'),
-            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard')
+            $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard'),
+            $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard')
         );
 
         $dashboardModels = array(
@@ -314,8 +314,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSave()
     {
-        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
+        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetModel = $this->createMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
         $widgetModel->expects($this->once())
             ->method('getEntity')
             ->will($this->returnValue($widgetEntity));
@@ -332,8 +332,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSaveWithFlush()
     {
-        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
+        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetModel = $this->createMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
         $widgetModel->expects($this->exactly(2))
             ->method('getEntity')
             ->will($this->returnValue($widgetEntity));
@@ -355,7 +355,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
 
         $dashboardModel->expects($this->once())
             ->method('getStartDashboard')
@@ -378,8 +378,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $startDashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $startDashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
 
         $dashboardModel->expects($this->once())
             ->method('getStartDashboard')
@@ -406,15 +406,15 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $startDashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
-        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $startDashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $startDashboardWidgets = array(
-            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
-            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+            $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+            $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
         );
         $copyWidgets = array(
-            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
-            $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+            $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
+            $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget'),
         );
         $copyWidgetModels = array(
             $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
@@ -496,8 +496,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRemove()
     {
-        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $widgetModel = $this->getMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
+        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetModel = $this->createMock('Oro\Bundle\DashboardBundle\Model\EntityModelInterface');
         $widgetModel->expects($this->once())
             ->method('getEntity')
             ->will($this->returnValue($widgetEntity));
@@ -511,10 +511,10 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindUserActiveDashboard()
     {
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $activeDashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard');
-        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $activeDashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard');
+        $dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -555,8 +555,8 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFindUserActiveDashboardEmpty()
     {
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $token = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
@@ -585,7 +585,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function testFindDefaultDashboard()
     {
         $organization = new Organization();
-        $dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -649,7 +649,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     public function testFindAllowedDashboards()
     {
         $permission = 'EDIT';
-        $expectedEntities = array($this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard'));
+        $expectedEntities = array($this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard'));
         $expectedModels = array(
             $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
                 ->disableOriginalConstructor()
@@ -692,16 +692,16 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUserActiveDashboardOverrideExistOne()
     {
-        $organization       = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-        $activeDashboard    = $this->getMock('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard');
-        $dashboard          = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $organization       = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $activeDashboard    = $this->createMock('Oro\Bundle\DashboardBundle\Entity\ActiveDashboard');
+        $dashboard          = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
 
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
         $dashboardModel->expects($this->once())->method('getEntity')->will($this->returnValue($dashboard));
 
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $token = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
@@ -731,15 +731,15 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUserActiveDashboardCreateNew()
     {
-        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
 
         $dashboardModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\DashboardModel')
             ->disableOriginalConstructor()
             ->getMock();
         $dashboardModel->expects($this->once())->method('getEntity')->will($this->returnValue($dashboard));
 
-        $user           = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $organization   = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $user           = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $organization   = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
         $token = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'

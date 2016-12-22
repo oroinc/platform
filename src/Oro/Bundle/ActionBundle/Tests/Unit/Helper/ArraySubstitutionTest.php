@@ -130,7 +130,7 @@ class ArraySubstitutionTest extends \PHPUnit_Framework_TestCase
             'b' => 'e'
         ]);
 
-        $this->setExpectedException('Oro\Bundle\ActionBundle\Exception\CircularReferenceException');
+        $this->expectException('Oro\Bundle\ActionBundle\Exception\CircularReferenceException');
 
         $things = [
             'a' => ['a body'],

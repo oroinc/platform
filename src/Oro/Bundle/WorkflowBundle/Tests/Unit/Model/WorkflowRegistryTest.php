@@ -332,8 +332,8 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
      */
     private function createDefinitionFilterMock(Collection $in, Collection $out)
     {
-        $filter = $this->getMock(WorkflowDefinitionFilterInterface::class);
-        $filter->expects($this->once())->method('filter')->with($in)->willReturn($out);
+        $filter = $this->createMock(WorkflowDefinitionFilterInterface::class);
+        $filter->expects($this->any())->method('filter')->with($in)->willReturn($out);
 
         return $filter;
     }

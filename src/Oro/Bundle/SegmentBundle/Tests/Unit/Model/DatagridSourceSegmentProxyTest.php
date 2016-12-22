@@ -17,7 +17,7 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
     public function testProxy($definition, $expectedDefinition, $expectedException = null)
     {
         if ($expectedException) {
-            $this->setExpectedException($expectedException);
+            $this->expectException($expectedException);
         }
 
         $segment            = $this->getSegment(false, $definition);

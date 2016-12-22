@@ -62,7 +62,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->authChecker = $this
-            ->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+            ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
 
         $this->extension = new InlineEditingExtension(
             $this->guesser,
@@ -97,7 +97,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $config = DatagridConfiguration::create([Configuration::BASE_CONFIG_KEY => ['enable' => true]]);
 
-        $this->setExpectedException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
         $this->extension->processConfigs($config);
     }
 

@@ -47,7 +47,7 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
 
     public function onNavigationConfigureProvider()
     {
-        $factory = $this->getMock('Knp\Menu\FactoryInterface');
+        $factory = $this->createMock('Knp\Menu\FactoryInterface');
         
         return [
             [

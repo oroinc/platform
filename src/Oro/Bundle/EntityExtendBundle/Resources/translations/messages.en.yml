@@ -126,9 +126,6 @@ oro:
                         precision: "Precision"
                         scale: "Scale"
                         is_deleted: "Deleted"
-                attribute:
-                    grid_action:
-                        remove: "Remove"
             search:
                 field:
                     items:
@@ -139,42 +136,12 @@ oro:
                 entity:
                     items:
                         searchable.tooltip: The entity will appear in search results after the completion of reindex job that might take some time.
-            attribute:
-                field:
-                    items:
-                        is_attribute: Attribute
-                        searchable: Searchable
-                        filterable: Filterable
-                        sortable: Sortable
-                        enabled: Enabled
 
         config_grid:
             entities: Entities
             new_entity: New entity
             unique_keys: Unique keys
             new_field: New field
-
-        attribute:
-            entity_label: attribute
-            manage: Access attributes management
-            create: Create an attribute
-            update: Update an attribute
-            remove: Remove an attribute
-            restore: Restore an attribute
-            attributes: Attributes
-            new_attribute: New attribute
-            edit_attribute: Edit attribute
-            entity_not_supported: This entity does not support attributes
-            not_attribute: This field is not an attribute
-            successfully_deleted: Attribute successfully deleted
-            successfully_saved: Attribute was successfully saved
-            was_restored: Attribute was restored
-            cannot_be_restored: This attribute cannot be restored because an attribute with similar name exists.
-            confirm_delete: Do you really want to delete this attribute?
-
-            import:
-                title: Import Attributes
-                label: Import Attributes
 
     entityextend:
         enumvalue:

@@ -7,7 +7,7 @@ class OroNoteBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testBuild()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
 
         $bundle = new OroNoteBundle();
         $bundle->build($container);

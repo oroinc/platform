@@ -17,8 +17,8 @@ class EntityNameResolverTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->provider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface');
-        $this->provider2 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface');
+        $this->provider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface');
+        $this->provider2 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface');
 
         $this->entityNameResolver = new EntityNameResolver(
             'full',

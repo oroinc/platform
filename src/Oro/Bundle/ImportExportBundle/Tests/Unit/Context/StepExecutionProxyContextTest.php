@@ -78,7 +78,7 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
     {
         $expectedCount = 1;
 
-        $executionContext = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
 
         $this->stepExecution->expects($this->exactly(2))
             ->method('getExecutionContext')
@@ -116,7 +116,7 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
     {
         $expectedCount = 1;
 
-        $executionContext = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
 
         $this->stepExecution->expects($this->once())
             ->method('getExecutionContext')

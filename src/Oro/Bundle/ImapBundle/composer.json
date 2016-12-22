@@ -18,7 +18,6 @@
         "psr-0": { "Oro\\Bundle\\ImapBundle": "" }
     },
     "target-dir": "Oro/Bundle/ImapBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

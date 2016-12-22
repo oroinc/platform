@@ -79,7 +79,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
      */
     private function createConfigManagerMock()
     {
-        return $this->getMock(ConfigManager::class, [], [], '', false);
+        return $this->createMock(ConfigManager::class);
     }
 
     /**
@@ -87,7 +87,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
      */
     private function createRegistryInterfaceMock()
     {
-        return $this->getMock(RegistryInterface::class, [], [], '', false);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -95,6 +95,6 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

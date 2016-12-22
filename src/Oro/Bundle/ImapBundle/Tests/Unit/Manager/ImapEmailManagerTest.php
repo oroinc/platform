@@ -43,7 +43,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEmails($strDate)
     {
-        $toAddress = $this->getMock('Zend\Mail\Address\AddressInterface');
+        $toAddress = $this->createMock('Zend\Mail\Address\AddressInterface');
         $toAddress->expects($this->once())->method('toString')->will($this->returnValue('toEmail'));
         $toAddressList = $this->getMockForAbstractClass(
             'Zend\Mail\Header\AbstractAddressList',
@@ -56,7 +56,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         );
         $toAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$toAddress]));
 
-        $ccAddress = $this->getMock('Zend\Mail\Address\AddressInterface');
+        $ccAddress = $this->createMock('Zend\Mail\Address\AddressInterface');
         $ccAddress->expects($this->once())->method('toString')->will($this->returnValue('ccEmail'));
         $ccAddressList = $this->getMockForAbstractClass(
             'Zend\Mail\Header\AbstractAddressList',
@@ -69,7 +69,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         );
         $ccAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$ccAddress]));
 
-        $bccAddress = $this->getMock('Zend\Mail\Address\AddressInterface');
+        $bccAddress = $this->createMock('Zend\Mail\Address\AddressInterface');
         $bccAddress->expects($this->once())->method('toString')->will($this->returnValue('bccEmail'));
         $bccAddressList = $this->getMockForAbstractClass(
             'Zend\Mail\Header\AbstractAddressList',
@@ -295,7 +295,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getHeader($value)
     {
-        $header = $this->getMock('Zend\Mail\Header\HeaderInterface');
+        $header = $this->createMock('Zend\Mail\Header\HeaderInterface');
         $header->expects($this->once())
             ->method('getFieldValue')
             ->will($this->returnValue($value));
@@ -312,7 +312,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
     {
         $headers = [];
         foreach ($values as $value) {
-            $header = $this->getMock('Zend\Mail\Header\HeaderInterface');
+            $header = $this->createMock('Zend\Mail\Header\HeaderInterface');
             $header->expects($this->once())
                 ->method('getFieldValue')
                 ->will($this->returnValue($value));
@@ -335,7 +335,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                 $exactly = 2;
             }
 
-            $header = $this->getMock('Zend\Mail\Header\HeaderInterface');
+            $header = $this->createMock('Zend\Mail\Header\HeaderInterface');
             $header->expects($this->exactly($exactly))
                 ->method('getFieldValue')
                 ->will($this->returnValue($value));

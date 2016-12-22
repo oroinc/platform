@@ -48,7 +48,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfProcessorInstanceHasWrongClass()
     {
-        $this->setExpectedException(\LogicException::class, 'Invalid message processor service given.'.
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Invalid message processor service given.'.
             ' It must be an instance of Oro\Component\MessageQueue\Consumption\MessageProcessorInterface but stdClass');
 
         $container = new Container();
@@ -109,7 +110,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createConnectionMock()
     {
-        return $this->getMock(ConnectionInterface::class);
+        return $this->createMock(ConnectionInterface::class);
     }
 
     /**
@@ -117,7 +118,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProcessor()
     {
-        return $this->getMock(MessageProcessorInterface::class);
+        return $this->createMock(MessageProcessorInterface::class);
     }
 
     /**
@@ -125,6 +126,6 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createQueueConsumerMock()
     {
-        return $this->getMock(QueueConsumer::class, [], [], '', false);
+        return $this->createMock(QueueConsumer::class);
     }
 }

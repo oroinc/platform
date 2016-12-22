@@ -17,7 +17,8 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfMemoryLimitIsNotInt()
     {
-        $this->setExpectedException(\InvalidArgumentException::class, 'Expected memory limit is int but got: "double"');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected memory limit is int but got: "double"');
 
         new LimitConsumerMemoryExtension(0.0);
     }
@@ -126,10 +127,10 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContext()
     {
-        $context = new Context($this->getMock(SessionInterface::class));
-        $context->setLogger($this->getMock(LoggerInterface::class));
-        $context->setMessageConsumer($this->getMock(MessageConsumerInterface::class));
-        $context->setMessageProcessor($this->getMock(MessageProcessorInterface::class));
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setLogger($this->createMock(LoggerInterface::class));
+        $context->setMessageConsumer($this->createMock(MessageConsumerInterface::class));
+        $context->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
 
         return $context;
     }

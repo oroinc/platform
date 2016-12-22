@@ -14,12 +14,13 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new Indexer($this->getMock(MessageProducerInterface::class), $this->createDoctrineHelperMock());
+        new Indexer($this->createMock(MessageProducerInterface::class), $this->createDoctrineHelperMock());
     }
 
     public function testResetIndexShouldThrowExceptionMethodIsNotImplemented()
     {
-        $this->setExpectedException(\LogicException::class, 'Method is not implemented');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Method is not implemented');
 
         $indexer = new Indexer(self::getMessageProducer(), $this->createDoctrineHelperMock());
 
@@ -28,7 +29,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassesForReindexShouldThrowExceptionMethodIsNotImplemented()
     {
-        $this->setExpectedException(\LogicException::class, 'Method is not implemented');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Method is not implemented');
 
         $indexer = new Indexer(self::getMessageProducer(), $this->createDoctrineHelperMock());
 
@@ -222,6 +224,6 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createDoctrineHelperMock()
     {
-        return $this->getMock(DoctrineHelper::class, [], [], '', false);
+        return $this->createMock(DoctrineHelper::class);
     }
 }

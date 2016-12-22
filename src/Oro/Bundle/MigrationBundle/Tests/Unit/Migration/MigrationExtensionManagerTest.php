@@ -130,8 +130,8 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
     public function testExtensionWithNoAwareInterface()
     {
         $dir = 'Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension';
-        $this->setExpectedException(
-            '\RuntimeException',
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The extension aware interface for "%s\NoAwareInterfaceExtension" was not found. '
                 . 'Make sure that "%s\NoAwareInterfaceExtensionAwareInterface" interface is declared.',
@@ -147,8 +147,8 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
     public function testAnotherExtensionWithNoAwareInterface()
     {
         $dir = 'Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension';
-        $this->setExpectedException(
-            '\RuntimeException',
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The extension aware interface for neither "%s\AnotherNoAwareInterfaceExtension"'
                 . ' not one of its parent classes was not found.',
@@ -163,8 +163,8 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
     public function testExtensionWithInvalidAwareInterface()
     {
         $dir = 'Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension';
-        $this->setExpectedException(
-            '\RuntimeException',
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The method "%s\InvalidAwareInterfaceExtensionAwareInterface::setInvalidAwareInterfaceExtension"'
                 . ' was not found.',

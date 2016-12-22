@@ -22,7 +22,7 @@ class LastModifiedDateContextConfiguratorTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-        $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $this->cache = $this->createMock('Doctrine\Common\Cache\Cache');
         $this->contextConfigurator = new LastModifiedDateContextConfigurator($this->cache);
     }
 

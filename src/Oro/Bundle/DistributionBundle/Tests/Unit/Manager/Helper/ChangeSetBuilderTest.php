@@ -51,7 +51,7 @@ class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected function createPackageMock($name, $sourceReference)
     {
-        $package = $this->getMock('Composer\Package\PackageInterface');
+        $package = $this->createMock('Composer\Package\PackageInterface');
         $package->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name));

@@ -41,7 +41,7 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
 
-        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
         $registry->expects($this->any())->method('getManager')
             ->will($this->returnValue($this->em));
 
@@ -120,8 +120,8 @@ class DefaultOwnerHelperTest extends \PHPUnit_Framework_TestCase
     {
         $integrationEmptyOwner = new Integration();
 
-        $user                 = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $organization        = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $user                 = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $organization        = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $integrationWithOwner = new Integration();
         $integrationWithOwner->setDefaultUserOwner($user);
 

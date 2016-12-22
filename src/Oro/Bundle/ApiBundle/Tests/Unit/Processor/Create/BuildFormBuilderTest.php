@@ -27,8 +27,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->getMock(FormFactoryInterface::class);
-        $this->propertyAccessor = $this->getMock(PropertyAccessorInterface::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
 
         $this->processor = new BuildFormBuilder($this->formFactory, $this->propertyAccessor);
     }
@@ -37,7 +37,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->getMock(FormBuilderInterface::class);
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
         $metadata = new EntityMetadata();

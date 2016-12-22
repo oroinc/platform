@@ -90,7 +90,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->renderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $this->validator = $this->createMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -99,12 +99,12 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         )
             ->disableOriginalConstructor()
             ->getMock();
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
         $this->objectManager->expects($this->any())
             ->method('getRepository')
             ->willReturn($this->objectRepository);
 
-        $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
+        $this->emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
 
         $this->action = new SendEmailTemplate(
             $this->contextAccessor,
@@ -128,7 +128,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
     {
-        $this->setExpectedException($exceptionName, $exceptionMessage);
+        $this->expectException($exceptionName);
+        $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
@@ -349,7 +350,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteWithInvalidEmail()
     {
-        $this->setExpectedException('\Symfony\Component\Validator\Exception\ValidatorException', 'test');
+        $this->expectException('\Symfony\Component\Validator\Exception\ValidatorException');
+        $this->expectExceptionMessage('test');
         $options = [
             'from' => 'invalidemailaddress',
             'to' => 'test@test.com',
@@ -506,7 +508,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['getEmail'])
             ->getMock();
-        $emailEntity = $this->getMock('\Oro\Bundle\EmailBundle\Entity\Email');
+        $emailEntity = $this->createMock('\Oro\Bundle\EmailBundle\Entity\Email');
         $emailUserEntity->expects($this->any())
             ->method('getEmail')
             ->willReturn($emailEntity);

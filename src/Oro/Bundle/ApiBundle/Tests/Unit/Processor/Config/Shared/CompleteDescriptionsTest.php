@@ -39,11 +39,11 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->entityDescriptionProvider = $this->getMockBuilder(EntityDescriptionProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->resourceDocProvider = $this->getMock(ResourceDocProviderInterface::class);
+        $this->resourceDocProvider = $this->createMock(ResourceDocProviderInterface::class);
         $this->apiDocParser = $this->getMockBuilder(MarkdownApiDocParser::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()

@@ -27,7 +27,7 @@ class GeneratedValueStrategyListenerPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess($parameterValue)
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
 
         $this->container->expects($this->once())->method('hasDefinition')->willReturn(true);
         $this->container->expects($this->once())->method('getDefinition')->willReturn($definition);

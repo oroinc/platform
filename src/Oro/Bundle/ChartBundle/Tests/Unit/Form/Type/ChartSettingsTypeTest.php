@@ -39,10 +39,8 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
      */
     public function testRequireOptionsIncorrectType(array $options, $exception, $message)
     {
-        $this->setExpectedException(
-            $exception,
-            $message
-        );
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $this->factory->create($this->type, null, $options);
     }

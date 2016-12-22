@@ -38,7 +38,7 @@ class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->constraint = new Constraints\DefaultLocalization();
-        $this->violationBuilder = $this->getMock(ConstraintViolationBuilderInterface::class);
+        $this->violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context = $this->getMockBuilder(ExecutionContextInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -47,7 +47,7 @@ class DefaultLocalizationValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->form = $this->getMock(FormInterface::class);
+        $this->form = $this->createMock(FormInterface::class);
 
         $this->validator = new DefaultLocalizationValidator($this->localizationManager);
         $this->validator->initialize($this->context);

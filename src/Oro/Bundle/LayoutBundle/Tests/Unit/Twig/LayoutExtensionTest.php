@@ -23,7 +23,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->renderer   = $this->getMock('Oro\Bundle\LayoutBundle\Form\TwigRendererInterface');
+        $this->renderer   = $this->createMock('Oro\Bundle\LayoutBundle\Form\TwigRendererInterface');
         $this->textHelper = $this->getMockBuilder('Oro\Component\Layout\Templating\TextHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -242,12 +242,12 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetClassPrefixToForm()
     {
-        $prototypeView = $this->getMock(FormView::class);
+        $prototypeView = $this->createMock(FormView::class);
 
-        $childView = $this->getMock(FormView::class);
+        $childView = $this->createMock(FormView::class);
         $childView->vars['prototype'] = $prototypeView;
 
-        $formView = $this->getMock(FormView::class);
+        $formView = $this->createMock(FormView::class);
         $formView->children = [$childView];
 
         $this->extension->setClassPrefixToForm($formView, 'foo');

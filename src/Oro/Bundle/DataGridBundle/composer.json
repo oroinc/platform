@@ -19,7 +19,6 @@
         "psr-0": { "Oro\\Bundle\\DataGridBundle": "" }
     },
     "target-dir": "Oro/Bundle/DataGridBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

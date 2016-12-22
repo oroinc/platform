@@ -599,18 +599,20 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'no orm datasource' => [
-                'datasource' => $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface'),
+                'datasource' => $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface'),
                 'inputConfig' => DatagridConfiguration::create([])
             ],
             'orm datasource and empty config' => [
                 'datasource' => $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
                     ->disableOriginalConstructor()
+                    ->disableOriginalClone()
                     ->getMock(),
                 'inputConfig' => DatagridConfiguration::create([])
             ],
             'orm datasource and no filters' => [
                 'datasource' => $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
                     ->disableOriginalConstructor()
+                    ->disableOriginalClone()
                     ->getMock(),
                 'inputConfig' => DatagridConfiguration::create(
                     [
@@ -803,7 +805,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($hasConfig));
 
         if ($hasConfig) {
-            $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+            $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
             $config->expects($this->any())->method('has')->with('show_step_in_grid')
                 ->will($this->returnValue(true));
             $config->expects($this->any())->method('is')->with('show_step_in_grid')
@@ -861,7 +863,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createBuildAfterEvent(DatasourceInterface $datasource, DatagridConfiguration $configuration)
     {
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $datagrid->expects($this->any())->method('getDatasource')->willReturn($datasource);
         $datagrid->expects($this->any())->method('getConfig')->willReturn($configuration);
 
@@ -879,7 +881,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createResultAfterEvent(DatagridConfiguration $configuration)
     {
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $datagrid->expects($this->any())->method('getConfig')->willReturn($configuration);
 
         $event = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\OrmResultAfter')

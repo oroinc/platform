@@ -394,7 +394,7 @@ class EnumTypeHelperTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Entity';
 
-        $config = new Config($this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'));
+        $config = new Config($this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'));
         $config->set('owner', $owner);
 
         $configProvider = $this->getConfigProviderMock();

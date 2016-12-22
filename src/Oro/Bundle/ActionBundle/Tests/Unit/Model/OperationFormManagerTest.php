@@ -34,7 +34,7 @@ class OperationFormManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
@@ -81,7 +81,7 @@ class OperationFormManagerTest extends \PHPUnit_Framework_TestCase
 
         $data = new ActionData(['data' => ['param']]);
 
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $this->formFactory->expects($this->once())
             ->method('create')

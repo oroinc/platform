@@ -42,7 +42,7 @@ class EmailOwnerManagerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $emailOwnerProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $emailOwnerProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $emailOwnerProvider
             ->expects($this->any())
             ->method('getEmailOwnerClass')
