@@ -138,14 +138,4 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     {
         return count($this->toArray());
     }
-
-    /**
-     * Returns a string representation of this object.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return __CLASS__ . '@' . spl_object_hash($this);
-    }
 }

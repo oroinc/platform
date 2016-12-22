@@ -121,14 +121,6 @@ class ButtonsCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(\ArrayIterator::class, $this->collection->getIterator());
     }
 
-    public function testToString()
-    {
-        $this->assertEquals(
-            ButtonsCollection::class . '@' . spl_object_hash($this->collection),
-            (string)$this->collection
-        );
-    }
-
     public function testCount()
     {
         $buttons = [$this->getButtonMock(), $this->getButtonMock()];
