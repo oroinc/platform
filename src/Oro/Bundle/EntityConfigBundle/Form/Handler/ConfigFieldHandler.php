@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
 
 use Symfony\Component\Form\FormInterface;

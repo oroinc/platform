@@ -23,7 +23,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         parent::setUp();
 
         $this->entityHierarchyProvider = $this
-            ->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
+            ->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
         $this->configBag               = $this
             ->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigBag')
             ->disableOriginalConstructor()

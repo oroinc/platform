@@ -16,6 +16,16 @@ class ExtendTrackingVisit
     }
 
     /**
+     * Checks if this entity can be associated with the given target entity type
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportIdentifierTarget($targetClass)
+    {
+    }
+
+    /**
      * Sets the entity this entity is associated with
      *
      * @param object $target Any configurable entity that can be associated with this type of entity

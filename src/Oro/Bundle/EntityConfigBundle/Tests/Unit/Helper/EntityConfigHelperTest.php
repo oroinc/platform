@@ -41,9 +41,9 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $this->config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
-        $this->groupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $this->groupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
 
         $this->helper = new EntityConfigHelper($this->configProvider, $this->groupProvider);
     }
@@ -114,7 +114,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->willThrowException(new \RuntimeException('test exception'));
 
         if ($strict) {
-            $this->setExpectedException('RuntimeException', 'test exception');
+            $this->expectException('RuntimeException', 'test exception');
         }
 
         $this->assertNull($this->helper->getConfigValue('stdClass', 'param', $strict));

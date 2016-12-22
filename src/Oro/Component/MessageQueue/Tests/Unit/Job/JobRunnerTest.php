@@ -234,7 +234,8 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $jobRunner = new JobRunner($jobProcessor);
 
-        $this->setExpectedException(\LogicException::class, 'Job was not found. id: "job-id"');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Job was not found. id: "job-id"');
 
         $jobRunner->runDelayed('job-id', function () {
         });
@@ -387,6 +388,6 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobProcessorMock()
     {
-        return $this->getMock(JobProcessor::class, [], [], '', false);
+        return $this->createMock(JobProcessor::class);
     }
 }

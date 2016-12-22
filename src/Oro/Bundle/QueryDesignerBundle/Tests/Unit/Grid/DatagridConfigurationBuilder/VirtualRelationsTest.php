@@ -36,7 +36,8 @@ class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|VirtualRelationProviderInterface $virtualRelationProvider */
-        $virtualRelationProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface');
+        $virtualRelationProvider = $this
+            ->createMock('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface');
 
         $virtualRelationProvider->expects($this->any())
             ->method('isVirtualRelation')

@@ -14,7 +14,7 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->entity = new EntitySecurityMetadata(
             'SomeType',
-            'SomeClass',
+            \stdClass::class,
             'SomeGroup',
             'SomeLabel',
             array(), //permissions
@@ -35,7 +35,7 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
     public function testGetters()
     {
         static::assertEquals('SomeType', $this->entity->getSecurityType());
-        static::assertEquals('SomeClass', $this->entity->getClassName());
+        static::assertEquals(\stdClass::class, $this->entity->getClassName());
         static::assertEquals('SomeGroup', $this->entity->getGroup());
         static::assertEquals('SomeLabel', $this->entity->getLabel());
         static::assertEquals('SomeDescription', $this->entity->getDescription());
@@ -55,7 +55,7 @@ class EntitySecurityMetadataTest extends \PHPUnit_Framework_TestCase
         $emptyEntity = unserialize($data);
 
         static::assertEquals('SomeType', $emptyEntity->getSecurityType());
-        static::assertEquals('SomeClass', $emptyEntity->getClassName());
+        static::assertEquals(\stdClass::class, $emptyEntity->getClassName());
         static::assertEquals('SomeGroup', $emptyEntity->getGroup());
         static::assertEquals('SomeLabel', $emptyEntity->getLabel());
         static::assertEquals('SomeDescription', $emptyEntity->getDescription());

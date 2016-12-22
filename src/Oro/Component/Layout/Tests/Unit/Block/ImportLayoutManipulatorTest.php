@@ -25,7 +25,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->layoutManipulator = $this->getMock(LayoutManipulatorInterface::class);
+        $this->layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
         $this->import = $this->getImportMock('import_id', 'import_root', 'import_namespace');
         $this->importLayoutManipulator = new ImportLayoutManipulator($this->layoutManipulator, $this->import);
     }
@@ -587,7 +587,7 @@ class ImportLayoutManipulatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getImportMock($id, $root, $namespace)
     {
-        $import = $this->getMock(LayoutUpdateImport::class, [], [], '', false);
+        $import = $this->createMock(LayoutUpdateImport::class);
         $import->expects($this->any())
             ->method('getId')
             ->will($this->returnValue($id));

@@ -15,7 +15,7 @@ class ExpressionEncoderRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->encoder = $this->getMock(ExpressionEncoderInterface::class, [], [], '', false);
+        $this->encoder = $this->createMock(ExpressionEncoderInterface::class);
         $this->encoderRegistry = new ExpressionEncoderRegistry(
             ['test' => $this->encoder]
         );

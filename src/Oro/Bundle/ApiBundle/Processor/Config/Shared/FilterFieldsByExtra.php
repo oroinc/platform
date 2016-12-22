@@ -11,7 +11,6 @@ use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -110,9 +109,9 @@ class FilterFieldsByExtra implements ProcessorInterface
             $fields = $definition->getFields();
             foreach ($fields as $fieldName => $field) {
                 if (!$field->isExcluded()
+                    && !$field->isMetaProperty()
                     && !in_array($fieldName, $allowedFields, true)
                     && !in_array($fieldName, $idFieldNames, true)
-                    && !ConfigUtil::isMetadataProperty($field->getPropertyPath($fieldName))
                 ) {
                     $field->setExcluded();
                 }

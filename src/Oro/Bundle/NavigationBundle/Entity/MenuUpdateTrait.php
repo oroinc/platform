@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 trait MenuUpdateTrait
 {
@@ -72,18 +73,12 @@ trait MenuUpdateTrait
     protected $menu;
 
     /**
-     * @var string
+     * @var Scope
      *
-     * @ORM\Column(name="ownership_type", type="string")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\ScopeBundle\Entity\Scope")
+     * @ORM\JoinColumn(name="scope_id", referencedColumnName="id", nullable=false)
      */
-    protected $ownershipType;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="owner_id", type="integer", nullable=false)
-     */
-    protected $ownerId;
+    protected $scope;
 
     /**
      * @var string
@@ -304,46 +299,6 @@ trait MenuUpdateTrait
     /**
      * @return string
      */
-    public function getOwnershipType()
-    {
-        return $this->ownershipType;
-    }
-
-    /**
-     * @param string $ownershipType
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setOwnershipType($ownershipType)
-    {
-        $this->ownershipType = $ownershipType;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOwnerId()
-    {
-        return $this->ownerId;
-    }
-
-    /**
-     * @param int $ownerId
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setOwnerId($ownerId)
-    {
-        $this->ownerId = $ownerId;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getIcon()
     {
         return $this->icon;
@@ -456,6 +411,26 @@ trait MenuUpdateTrait
     public function setCustom($custom)
     {
         $this->custom = $custom;
+
+        return $this;
+    }
+
+    /**
+     * @return Scope
+     */
+    public function getScope()
+    {
+        return $this->scope;
+    }
+
+    /**
+     * @param Scope $scope
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setScope(Scope $scope)
+    {
+        $this->scope = $scope;
 
         return $this;
     }

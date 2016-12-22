@@ -57,17 +57,17 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->securityContext = new SecurityContext(
             new TokenStorage(),
-            $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')
+            $this->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')
         );
 
-        $this->userRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
-        $this->organizationRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->userRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->organizationRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
 
         $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->any())
             ->method('getRepository')
             ->with($this->isType('string'))
@@ -85,7 +85,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
             ->will(
@@ -367,8 +367,8 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $command->setApplication($application);
 
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $input = $this->createMock('Symfony\Component\Console\Input\InputInterface');
+        $output = $this->createMock('Symfony\Component\Console\Output\OutputInterface');
 
         return new ConsoleCommandEvent($command, $input, $output);
     }

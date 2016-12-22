@@ -101,8 +101,8 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testUnexpectedClass()
     {
-        $this->setExpectedException(
-            '\Symfony\Component\Validator\Exception\UnexpectedTypeException',
+        $this->expectException('\Symfony\Component\Validator\Exception\UnexpectedTypeException');
+        $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "stdClass" given'
         );
         $this->validator->validate(new \stdClass(), $this->constraint);
@@ -110,7 +110,8 @@ class LocalizationValidatorTest extends \PHPUnit_Framework_TestCase
 
     private function expectViolation()
     {
-        $violationBuilder = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
+        $violationBuilder = $this
+            ->createMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
         $violationBuilder->expects($this->once())
             ->method('atPath')
             ->with('parentLocalization')

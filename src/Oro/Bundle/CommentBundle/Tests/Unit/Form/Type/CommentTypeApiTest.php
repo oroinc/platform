@@ -25,7 +25,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
     public function testBuildForm()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject | FormBuilderInterface $builder */
-        $builder = $this->getMock('\Symfony\Component\Form\FormBuilder', [], [], '', false);
+        $builder = $this->createMock('\Symfony\Component\Form\FormBuilder');
         $builder->expects($this->at(0))
             ->method('add')
             ->with(
@@ -65,7 +65,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
     public function testSetDefaultOptions()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject | OptionsResolverInterface $resolver */
-        $resolver = $this->getMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([

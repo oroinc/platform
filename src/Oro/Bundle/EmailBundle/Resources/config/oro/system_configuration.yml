@@ -4,6 +4,8 @@ system_configuration:
             icon:  fa-envelope
             title: oro.email.system_configuration.email_configuration
             page_reload: true
+            handler: '@oro_email.form.handler.email_configuration::process'
+            configurator: '@oro_email.form.configurator.email_configuration::configure'
 
         user_email_configuration:
             icon:  fa-envelope
@@ -33,6 +35,10 @@ system_configuration:
             title: oro.email.system_configuration.attachment_configuration.label
             priority: 70
 
+        smtp_settings:
+            title: oro.email.system_configuration.smtp_settings.label
+            priority: 65
+
         template_configuration:
             title: oro.email.system_configuration.template_configuration.label
             priority: 60
@@ -56,6 +62,7 @@ system_configuration:
             priority: 110
             options:
                 label: oro.email.system_configuration.feature_enabled.label
+
         oro_email.minimum_input_length:
             data_type: integer
             type: number
@@ -98,6 +105,61 @@ system_configuration:
                 label: false
                 required: false
                 resettable: false
+
+        oro_email.smtp_settings_host:
+            data_type: string
+            type: text
+            options:
+                attr: {data-class: smtp_settings}
+                label: oro.email.system_configuration.smtp_settings.host.label
+                constraints:
+                    - NotBlank: ~
+                    - Length:
+                        min: 3
+                        max: 255
+
+        oro_email.smtp_settings_port:
+            data_type: number
+            type: number
+            options:
+                attr: {data-class: smtp_settings}
+                label: oro.email.system_configuration.smtp_settings.port.label
+                constraints:
+                    - NotBlank: ~
+                    - Range:
+                        min: 0
+                        max: 65535
+
+        oro_email.smtp_settings_encryption:
+            data_type: string
+            type: choice
+            options:
+                attr: {data-class: smtp_settings}
+                label: oro.email.system_configuration.smtp_settings.encryption.label
+                choices:
+                    ~: oro.email.system_configuration.smtp_settings.encryption.none.label
+                    ssl: oro.email.system_configuration.smtp_settings.encryption.ssl.label
+                    tls: oro.email.system_configuration.smtp_settings.encryption.tls.label
+                constraints:
+                    - Choice:
+                        choices: [~, ssl, tls]
+
+        oro_email.smtp_settings_username:
+            data_type: string
+            type: text
+            options:
+                attr: {data-class: smtp_settings}
+                label: oro.email.system_configuration.smtp_settings.username.label
+                required: false
+
+        oro_email.smtp_settings_password:
+            data_type: string
+            type: password
+            options:
+                attr: {data-class: smtp_settings}
+                label: oro.email.system_configuration.smtp_settings.password.label
+                required: false
+
         oro_email.show_recent_emails_in_user_bar:
             data_type: boolean
             type: oro_config_checkbox
@@ -181,12 +243,20 @@ system_configuration:
                                             - oro_email.attachment_sync_enable
                                             - oro_email.attachment_sync_max_size
                                             - oro_email.attachment_preview_limit
+                                    smtp_settings:
+                                        children:
+                                            - oro_email.smtp_settings_host
+                                            - oro_email.smtp_settings_port
+                                            - oro_email.smtp_settings_encryption
+                                            - oro_email.smtp_settings_username
+                                            - oro_email.smtp_settings_password
                                     template_configuration:
                                         children:
                                             - oro_email.sanitize_html
                                     mailboxes:
                                         children:
                                             - oro_email.mailbox_grid
+
         user_configuration:
             platform:
                 children:

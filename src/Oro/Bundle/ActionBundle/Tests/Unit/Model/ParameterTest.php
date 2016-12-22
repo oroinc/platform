@@ -49,8 +49,8 @@ class ParameterTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->parameter->hasDefault());
         $this->assertFalse($this->parameter->hasTypeHint());
 
-        $this->setExpectedException(
-            'LogicException',
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage(
             'Parameter `test` has no default value set. ' .
             'Please check `hasDefault() === true` or `isRequired() === false` before default value retrieval'
         );

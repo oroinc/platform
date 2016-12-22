@@ -25,7 +25,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
             new Filesystem(),
             __DIR__
         );
-        $this->layoutResource->setLogger($this->getMock(LoggerInterface::class));
+        $this->layoutResource->setLogger($this->createMock(LoggerInterface::class));
     }
 
     protected function tearDown()

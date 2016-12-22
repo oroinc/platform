@@ -52,7 +52,8 @@ class DateTimeParserTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseFailure($strDate, $exceptionMessage)
     {
-        $this->setExpectedException('\InvalidArgumentException', $exceptionMessage);
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage($exceptionMessage);
         DateTimeParser::parse($strDate);
     }
 

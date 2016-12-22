@@ -326,7 +326,7 @@ class TestHelper
      */
     protected function getGroupProviderMock(\PHPUnit_Framework_TestCase $testCase)
     {
-        $mock = $testCase->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $mock = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface')->getMock();
         $mock->expects($testCase->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);

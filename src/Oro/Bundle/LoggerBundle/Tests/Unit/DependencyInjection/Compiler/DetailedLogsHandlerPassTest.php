@@ -24,7 +24,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->containerBuilder = $this->getMock(ContainerBuilder::class, [], [], '', false);
+        $this->containerBuilder = $this->createMock(ContainerBuilder::class);
         $this->compilerPass = new DetailedLogsHandlerPass();
     }
 
@@ -93,21 +93,21 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function ($handlerId) {
                 switch ($handlerId) {
                     case 'monolog.logger':
-                        $logger = $this->getMock(Definition::class, [], [], '', false);
+                        $logger = $this->createMock(Definition::class);
                         $logger->expects($this->any())->method('getMethodCalls')->willReturn([]);
                         return $logger;
                     case 'monolog.handler.detailed_logs_nested':
-                        return $this->getMock(Definition::class, [], [], '', false);
+                        return $this->createMock(Definition::class);
                     case 'monolog.handler.detailed_logs':
-                        $handler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+                        $handler = $this->createMock(DefinitionDecorator::class);
                         $handler->expects($this->once())
                             ->method('getParent')
                             ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
                         return $handler;
                     case 'monolog.handler.nested':
-                        return $this->getMock(Definition::class, [], [], '', false);
+                        return $this->createMock(Definition::class);
                     case 'monolog.handler.main':
-                        return $this->getMock(Definition::class, [], [], '', false);
+                        return $this->createMock(Definition::class);
                     default:
                         $this->fail("Call to findDefinition with unexpected argument: $handlerId");
                         return null;
@@ -139,7 +139,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
             ->with('monolog.handlers_to_channels')
             ->willReturn($handlersToChannels);
 
-        $detailedLogsHandler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+        $detailedLogsHandler = $this->createMock(DefinitionDecorator::class);
         $detailedLogsHandler->expects($this->once())
             ->method('getParent')
             ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
@@ -172,27 +172,27 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
                 switch ($handlerId) {
                     case 'monolog.logger':
                     case 'monolog.logger.doctrine':
-                        $detailedLogsNestedHandlerReference = $this->getMock(Reference::class, [], [], '', false);
+                        $detailedLogsNestedHandlerReference = $this->createMock(Reference::class);
                         $detailedLogsNestedHandlerReference->expects($this->any())
                             ->method('__toString')
                             ->willReturn('monolog.handler.detailed_logs_nested');
 
-                        $detailedLogsHandlerReference = $this->getMock(Reference::class, [], [], '', false);
+                        $detailedLogsHandlerReference = $this->createMock(Reference::class);
                         $detailedLogsHandlerReference->expects($this->any())
                             ->method('__toString')
                             ->willReturn('monolog.handler.detailed_logs');
 
-                        $nestedHandlerReference = $this->getMock(Reference::class, [], [], '', false);
+                        $nestedHandlerReference = $this->createMock(Reference::class);
                         $nestedHandlerReference->expects($this->any())
                             ->method('__toString')
                             ->willReturn('monolog.handler.nested');
 
-                        $mainHandlerReference = $this->getMock(Reference::class, [], [], '', false);
+                        $mainHandlerReference = $this->createMock(Reference::class);
                         $mainHandlerReference->expects($this->any())
                             ->method('__toString')
                             ->willReturn('monolog.handler.main');
 
-                        $logger = $this->getMock(Definition::class, [], [], '', false);
+                        $logger = $this->createMock(Definition::class);
                         $logger->expects($this->any())
                             ->method('getMethodCalls')
                             ->willReturn([
@@ -221,19 +221,19 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
 
                         return $logger;
                     case 'monolog.handler.detailed_logs_nested':
-                        return $this->getMock(Definition::class, [], [], '', false);
+                        return $this->createMock(Definition::class);
                     case 'monolog.handler.detailed_logs':
-                        $handler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+                        $handler = $this->createMock(DefinitionDecorator::class);
                         $handler->expects($this->once())
                             ->method('getParent')
                             ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);
                         return $handler;
                     case 'monolog.handler.nested':
-                        return $this->getMock(Definition::class, [], [], '', false);
+                        return $this->createMock(Definition::class);
                     case 'monolog.handler.main':
-                        return $this->getMock(Definition::class, [], [], '', false);
+                        return $this->createMock(Definition::class);
                     case 'oro_logger.monolog.detailed_logs.handler':
-                        $handler = $this->getMock(Definition::class, [], [], '', false);
+                        $handler = $this->createMock(Definition::class);
                         $handler->expects($this->once())
                             ->method('addMethodCall')
                             ->with('setHandler', $this->callback(function ($args) {
@@ -270,22 +270,22 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(function ($handlerId) {
                 switch ($handlerId) {
                     case 'monolog.logger':
-                        $detailedLogsHandlerReference = $this->getMock(Reference::class, [], [], '', false);
+                        $detailedLogsHandlerReference = $this->createMock(Reference::class);
                         $detailedLogsHandlerReference->expects($this->any())
                             ->method('__toString')
                             ->willReturn('monolog.handler.detailed_logs');
 
-                        $nestedHandlerReference = $this->getMock(Reference::class, [], [], '', false);
+                        $nestedHandlerReference = $this->createMock(Reference::class);
                         $nestedHandlerReference->expects($this->any())
                             ->method('__toString')
                             ->willReturn('monolog.handler.nested');
 
-                        $mainHandlerReference = $this->getMock(Reference::class, [], [], '', false);
+                        $mainHandlerReference = $this->createMock(Reference::class);
                         $mainHandlerReference->expects($this->any())
                             ->method('__toString')
                             ->willReturn('monolog.handler.main');
 
-                        $logger = $this->getMock(Definition::class, [], [], '', false);
+                        $logger = $this->createMock(Definition::class);
                         $logger->expects($this->any())
                             ->method('getMethodCalls')
                             ->willReturn([
@@ -296,7 +296,7 @@ class DetailedLogsHandlerPassTest extends \PHPUnit_Framework_TestCase
 
                         return $logger;
                     case 'monolog.handler.detailed_logs':
-                        $handler = $this->getMock(DefinitionDecorator::class, [], [], '', false);
+                        $handler = $this->createMock(DefinitionDecorator::class);
                         $handler->expects($this->once())
                             ->method('getParent')
                             ->willReturn(DetailedLogsHandlerPass::DETAILED_LOGS_HANDLER_PROTOTYPE_ID);

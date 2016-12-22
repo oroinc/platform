@@ -58,7 +58,7 @@ class OroUserBundle implements Migration, ActivityExtensionAwareInterface
 How to make an entity as activity
 ---------------------------------
 
-If you created the new entity and want to make it as the activity you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class. The name of this class should start with `Extend` word and this class should implement [ActivityInterface](/Model/ActivityInterface.php). An example:
+If you created the new entity and want to make it as the activity you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class. The name of this class should start with `Extend` word and this class should implement [ActivityInterface](./Model/ActivityInterface.php). An example:
 
 ``` php
 <?php

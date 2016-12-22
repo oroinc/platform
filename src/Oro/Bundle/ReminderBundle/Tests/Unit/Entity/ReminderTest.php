@@ -71,9 +71,9 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
     {
         $expectedSubject   = 'subject';
         $expectedExpireAt  = new \DateTime();
-        $expectedRecipient = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $expectedRecipient = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
-        $reminderData = $this->getMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
+        $reminderData = $this->createMock('Oro\Bundle\ReminderBundle\Model\ReminderDataInterface');
 
         $reminderData->expects($this->once())
             ->method('getSubject')
@@ -156,7 +156,7 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'property' => 'relatedEntityClassName',
             ],
             'recipient'              => [
-                'value'    => $this->getMock('Oro\\Bundle\\UserBundle\\Entity\\User'),
+                'value'    => $this->createMock('Oro\\Bundle\\UserBundle\\Entity\\User'),
                 'property' => 'recipient',
             ],
             'createdAt'              => [

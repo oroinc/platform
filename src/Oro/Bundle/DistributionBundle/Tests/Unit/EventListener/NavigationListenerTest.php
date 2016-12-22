@@ -231,7 +231,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSecurityContextMock()
     {
-        return $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        return $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
     }
 
     /**

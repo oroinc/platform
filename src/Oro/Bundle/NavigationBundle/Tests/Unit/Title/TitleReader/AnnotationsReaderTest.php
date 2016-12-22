@@ -27,16 +27,16 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 
-        $this->testBundle = $this->getMock(
+        $this->testBundle = $this->createMock(
             'Symfony\Bundle\FrameworkBundle\FrameworkBundle'
         );
 
-        $this->kernelMock = $this->getMock(
+        $this->kernelMock = $this->createMock(
             'Symfony\Component\HttpKernel\KernelInterface',
             array()
         );
 
-        $this->annotationReader = $this->getMock(
+        $this->annotationReader = $this->createMock(
             'Doctrine\Common\Annotations\AnnotationReader'
         );
     }
@@ -59,7 +59,7 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
             ->method('getBundles')
             ->will($this->returnValue(array($this->testBundle)));
 
-        $routeMock = $this->getMock('Symfony\Component\Routing\Route', array(), array('/user/show/{id}'));
+        $routeMock = $this->createMock('Symfony\Component\Routing\Route', array(), array('/user/show/{id}'));
 
         $routeMock->expects($this->once())
             ->method('getDefault')

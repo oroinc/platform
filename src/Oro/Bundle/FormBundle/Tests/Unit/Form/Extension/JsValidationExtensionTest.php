@@ -172,7 +172,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
             'integer' => 1,
         );
 
-        $constraintWithCustomName = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraintWithCustomName = $this->createMock('Symfony\Component\Validator\Constraint');
         $constraintWithCustomName->foo = 1;
 
         return array(
@@ -282,6 +282,6 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createForm()
     {
-        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        return $this->createMock('Symfony\Component\Form\Test\FormInterface');
     }
 }

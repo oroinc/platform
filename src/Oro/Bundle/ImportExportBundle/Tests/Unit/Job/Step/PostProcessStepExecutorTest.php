@@ -48,13 +48,13 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->executor->setJobExecutor($this->jobExecutor);
 
-        $this->reader = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
+        $this->reader = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
         $this->executor->setReader($this->reader);
 
-        $this->processor = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
+        $this->processor = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
         $this->executor->setProcessor($this->processor);
 
-        $this->writer = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
+        $this->writer = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
         $this->executor->setWriter($this->writer);
 
         $this->executor->setBatchSize(2);
@@ -96,8 +96,8 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
             $executionContext->put($key, $value);
         }
 
-        $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
-        $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+        $jobExecution = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
+        $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
         $jobExecution->expects($this->any())
             ->method('getJobInstance')
             ->will($this->returnValue($jobInstance));
@@ -113,7 +113,7 @@ class PostProcessStepExecutorTest extends \PHPUnit_Framework_TestCase
         $jobResult = new JobResult();
         $jobResult->setSuccessful($isJobSuccess);
         if (!$isJobSuccess) {
-            $this->setExpectedException('Oro\Bundle\ImportExportBundle\Exception\RuntimeException');
+            $this->expectException('Oro\Bundle\ImportExportBundle\Exception\RuntimeException');
         }
 
         $this->jobExecutor->expects($this->exactly($jobExecutions))

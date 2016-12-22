@@ -61,7 +61,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $stmt = $this->createFetchStatementMock(
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?',
             [
                 [
                     'id_1'   => $entity->getId(),
@@ -71,10 +73,6 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
             [1 => $value['id']],
             [1 => \PDO::PARAM_INT]
         );
-        $this->getDriverConnectionMock($this->em)->expects($this->any())
-            ->method('prepare')
-            ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
-            ->willReturn($stmt);
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
@@ -90,7 +88,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $stmt = $this->createFetchStatementMock(
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?',
             [
                 [
                     'id_1'   => $entity->getId(),
@@ -100,10 +100,6 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
             [1 => $value['id']],
             [1 => \PDO::PARAM_INT]
         );
-        $this->getDriverConnectionMock($this->em)->expects($this->any())
-            ->method('prepare')
-            ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
-            ->willReturn($stmt);
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
@@ -154,14 +150,13 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
 
         $value = ['class' => Group::class, 'id' => 123];
 
-        $stmt = $this->createFetchStatementMock(
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?',
             [],
             [1 => $value['id']],
             [1 => \PDO::PARAM_INT]
         );
-        $this->getDriverConnectionMock($this->em)->expects($this->any())
-            ->method('prepare')
-            ->willReturn($stmt);
 
         $transformer->reverseTransform($value);
     }
@@ -182,19 +177,15 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
             'id'    => ['id' => 123, 'title' => 'test']
         ];
 
-        $stmt = $this->createFetchStatementMock(
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.title AS title_2'
+            . ' FROM composite_key_entity t0'
+            . ' WHERE t0.id = ? AND t0.title = ?',
             [],
             [1 => $value['id']['id'], 2 => $value['id']['title']],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_STR]
         );
-        $this->getDriverConnectionMock($this->em)->expects($this->any())
-            ->method('prepare')
-            ->with(
-                'SELECT t0.id AS id_1, t0.title AS title_2'
-                . ' FROM composite_key_entity t0'
-                . ' WHERE t0.id = ? AND t0.title = ?'
-            )
-            ->willReturn($stmt);
 
         $transformer->reverseTransform($value);
     }
@@ -270,7 +261,9 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $stmt = $this->createFetchStatementMock(
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?',
             [
                 [
                     'id_1'   => $entity->getId(),
@@ -280,10 +273,6 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
             [1 => $value['id']],
             [1 => \PDO::PARAM_INT]
         );
-        $this->getDriverConnectionMock($this->em)->expects($this->any())
-            ->method('prepare')
-            ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
-            ->willReturn($stmt);
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }

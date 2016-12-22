@@ -403,7 +403,7 @@ class EmailModelBuilder
      */
     protected function applyEntityDataFromEmail(EmailModel $emailModel, EmailEntity $emailEntity)
     {
-        $entities = $emailEntity->getActivityTargetEntities();
+        $entities = $emailEntity->getActivityTargets();
         foreach ($entities as $entity) {
             if ($entity != $this->helper->getUser()) {
                 $emailModel->setEntityClass(ClassUtils::getClass($entity));

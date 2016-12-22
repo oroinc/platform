@@ -57,6 +57,10 @@ class EntityMetadataFactory
             $metaPropertyMetadata->setName($fieldName);
         }
         $this->metadataHelper->setPropertyPath($metaPropertyMetadata, $fieldName, $field, $targetAction);
+        $resultName = $field->getMetaPropertyResultName();
+        if ($resultName) {
+            $metaPropertyMetadata->setResultName($resultName);
+        }
         $entityMetadata->addMetaProperty($metaPropertyMetadata);
 
         return $metaPropertyMetadata;

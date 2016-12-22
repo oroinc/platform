@@ -21,14 +21,14 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->config = $this->getMock('Oro\Bundle\RequireJSBundle\Config\Config');
+        $this->config = $this->createMock('Oro\Bundle\RequireJSBundle\Config\Config');
 
-        $provider = $this->getMock('Oro\Bundle\RequireJSBundle\Provider\ConfigProvider', [], [], '', false);
+        $provider = $this->createMock('Oro\Bundle\RequireJSBundle\Provider\ConfigProvider');
         $provider->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($this->config));
 
-        $manager = $this->getMock('Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager');
+        $manager = $this->createMock('Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager');
         $manager->expects($this->any())
             ->method('getProvider')
             ->with('oro_requirejs_config_provider')

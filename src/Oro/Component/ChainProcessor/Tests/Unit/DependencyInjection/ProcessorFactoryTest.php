@@ -13,7 +13,7 @@ class ProcessorFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $processor1 = new ProcessorMock();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->at(0))
             ->method('get')
             ->with('processor1', ContainerInterface::NULL_ON_INVALID_REFERENCE)

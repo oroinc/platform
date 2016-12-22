@@ -49,7 +49,7 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $this->validator = $this->createMock('Symfony\Component\Validator\Validator\ValidatorInterface');
 
         $translator = $this
             ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')

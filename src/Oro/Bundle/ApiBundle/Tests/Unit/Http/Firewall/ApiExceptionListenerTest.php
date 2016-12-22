@@ -109,11 +109,11 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
     protected function createApiExceptionListener($fullSetup = false)
     {
         /** @var TokenStorageInterface|\PHPUnit_Framework_MockObject_MockObject $tokenStorage */
-        $tokenStorage = $this->getMock(
+        $tokenStorage = $this->createMock(
             'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
         );
         /** @var AuthenticationTrustResolverInterface|\PHPUnit_Framework_MockObject_MockObject $trustResolver */
-        $trustResolver = $this->getMock(
+        $trustResolver = $this->createMock(
             'Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface'
         );
         $authenticationEntryPoint = null;
@@ -122,13 +122,13 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
             $tokenStorage
                 ->expects($this->once())->method('getToken')
                 ->will($this->returnValue(
-                    $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
+                    $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
                 ));
             $trustResolver
                 ->expects($this->once())
                 ->method('isFullFledged')
                 ->will($this->returnValue(false));
-            $authenticationEntryPoint = $this->getMock(
+            $authenticationEntryPoint = $this->createMock(
                 'Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface'
             );
             $authenticationEntryPoint
@@ -140,7 +140,7 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
         return new ApiExceptionListener(
             $tokenStorage,
             $trustResolver,
-            $this->getMock('Symfony\Component\Security\Http\HttpUtils'),
+            $this->createMock('Symfony\Component\Security\Http\HttpUtils'),
             'key',
             $authenticationEntryPoint,
             null,
@@ -156,7 +156,7 @@ class ApiExceptionListenerTest extends \PHPUnit_Framework_TestCase
     protected function createEvent(\Exception $exception)
     {
         return new GetResponseForExceptionEvent(
-            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
             Request::create('/'),
             HttpKernelInterface::MASTER_REQUEST,
             $exception

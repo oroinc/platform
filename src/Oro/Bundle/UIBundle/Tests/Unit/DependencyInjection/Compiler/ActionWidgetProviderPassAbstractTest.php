@@ -24,7 +24,7 @@ abstract class ActionWidgetProviderPassAbstractTest extends \PHPUnit_Framework_T
     public function testGetChainProviderServiceId()
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
-        $container = $this->getMock('\Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('\Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with($this->getChainProviderServiceId())
@@ -38,7 +38,7 @@ abstract class ActionWidgetProviderPassAbstractTest extends \PHPUnit_Framework_T
     public function testGetProviderTagName()
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
-        $container = $this->getMock('\Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('\Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->once())
             ->method('hasDefinition')
             ->willReturn(true);

@@ -1,0 +1,17 @@
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set gridName = 'attribute-family-grid' %}
+{% set pageTitle = attributeFamiliesLabel|trans %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_attribute_family_create') %}
+        <div class="btn-group pull-right">
+            {{ UI.addButton({
+                'path':  path('oro_attribute_family_create', { 'alias': alias }),
+                'entity_label': 'oro.entity_config.attribute_family.entity_label'|trans})
+            }}
+        </div>
+    {% endif %}
+    {{ parent() }}
+{% endblock navButtons %}

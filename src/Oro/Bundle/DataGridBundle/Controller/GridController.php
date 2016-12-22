@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,8 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class GridController extends Controller
 {
@@ -121,6 +124,8 @@ class GridController extends Controller
      *      name="oro_datagrid_export_action",
      *      requirements={"gridName"="[\w\:-]+"}
      * )
+     *
+     * @AclAncestor("oro_datagrid_gridview_export")
      *
      * @param string $gridName
      *
