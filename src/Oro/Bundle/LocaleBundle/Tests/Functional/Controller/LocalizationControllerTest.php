@@ -155,7 +155,7 @@ class LocalizationControllerTest extends WebTestCase
                 [
                     'operationName' => 'DELETE',
                     'entityId' => $id,
-                    'entityClass' => $this->getContainer()->getParameter('oro_locale.entity.localization.class')
+                    'entityClass' => 'Oro\Bundle\LocaleBundle\Entity\Localization'
                 ]
             ),
             [],
