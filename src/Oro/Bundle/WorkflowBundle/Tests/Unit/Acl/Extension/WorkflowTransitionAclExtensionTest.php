@@ -45,11 +45,11 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->objectIdAccessor = $this->getMockBuilder(ObjectIdAccessor::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->metadataProvider = $this->getMock(MetadataProviderInterface::class);
+        $this->metadataProvider = $this->createMock(MetadataProviderInterface::class);
         $this->entityOwnerAccessor = $this->getMockBuilder(EntityOwnerAccessor::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->decisionMaker = $this->getMock(AccessLevelOwnershipDecisionMakerInterface::class);
+        $this->decisionMaker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
         $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -190,7 +190,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecideIsGrantingForNotSupportedObject($object)
     {
-        $securityToken = $this->getMock(TokenInterface::class);
+        $securityToken = $this->createMock(TokenInterface::class);
         self::assertTrue($this->extension->decideIsGranting(0, $object, $securityToken));
     }
 
@@ -206,7 +206,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $object = new DomainObjectReference('workflow1', 123, 1, 2);
         $relatedEntity = new \stdClass();
-        $securityToken = $this->getMock(TokenInterface::class);
+        $securityToken = $this->createMock(TokenInterface::class);
 
         $workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
@@ -238,7 +238,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDecideIsGrantingForNoOwningObject()
     {
         $object = new DomainObjectStub();
-        $securityToken = $this->getMock(TokenInterface::class);
+        $securityToken = $this->createMock(TokenInterface::class);
 
         $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
@@ -253,7 +253,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDecideIsGrantingForUserOwningObject()
     {
         $object = new DomainObjectStub();
-        $securityToken = $this->getMock(TokenInterface::class);
+        $securityToken = $this->createMock(TokenInterface::class);
 
         $this->metadataProvider->expects(self::once())
             ->method('getMetadata')

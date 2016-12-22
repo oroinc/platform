@@ -15,7 +15,7 @@ class AclCacheTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->cacheProvider = $this->getMock('Doctrine\Common\Cache\CacheProvider', array(
+        $this->cacheProvider = $this->createMock('Doctrine\Common\Cache\CacheProvider', array(
             'deleteAll', 'doFetch', 'doContains', 'doSave', 'doDelete', 'doFlush', 'doGetStats'
         ));
         $this->underlyingCache = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Cache\UnderlyingAclCache')

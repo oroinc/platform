@@ -23,6 +23,7 @@ oro:
             columns_data.label: Columns data
             appearance_type.label: Appearance type
             appearance_data.label: Appearance data
+            duplicate.label: Duplicate %entity%
         appearance:
             grid: Grid
             board: Kanban Board
@@ -56,6 +57,9 @@ oro:
             gridview_edit_public:
                 label: Unshare grid view
                 description: Unshare custom grid views
+            gridview_export:
+                label: Export grid view
+                description: Export data from Grid view
 
         system_configuration:
             groups:

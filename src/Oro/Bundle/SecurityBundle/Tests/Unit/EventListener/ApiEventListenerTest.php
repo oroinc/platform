@@ -60,7 +60,7 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($isGranted));
 
         if ($throwException) {
-            $this->setExpectedException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+            $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
         }
         $event = new FindAfter($object);
         $this->listener->onFindAfter($event);

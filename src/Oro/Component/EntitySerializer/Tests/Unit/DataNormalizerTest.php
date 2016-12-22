@@ -716,6 +716,105 @@ class DataNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
+            'renamed to-many association'                                => [
+                'config'       => [
+                    'fields' => [
+                        'id'             => null,
+                        'renamedFolders' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'folders.id'
+                        ],
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'      => 123,
+                        'folders' => [
+                            ['id' => 456]
+                        ],
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'             => 123,
+                        'renamedFolders' => [456],
+                    ]
+                ]
+            ],
+            'renamed empty to-many association'                          => [
+                'config'       => [
+                    'fields' => [
+                        'id'             => null,
+                        'renamedFolders' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'folders.id'
+                        ],
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'      => 123,
+                        'folders' => [],
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'             => 123,
+                        'renamedFolders' => [],
+                    ]
+                ]
+            ],
+            'renamed to-one association'                                 => [
+                'config'       => [
+                    'fields' => [
+                        'id'            => null,
+                        'renamedFolder' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'folder.id'
+                        ],
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'     => 123,
+                        'folder' => ['id' => 456],
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'            => 123,
+                        'renamedFolder' => 456,
+                    ]
+                ]
+            ],
+            'renamed empty to-one association'                           => [
+                'config'       => [
+                    'fields' => [
+                        'id'            => null,
+                        'renamedFolder' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => ['id' => null],
+                            'property_path'    => 'folder.id'
+                        ],
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'     => 123,
+                        'folder' => null,
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'            => 123,
+                        'folder'        => null,
+                        'renamedFolder' => null,
+                    ]
+                ]
+            ],
         ];
     }
 }

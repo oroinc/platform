@@ -741,10 +741,8 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayColumnInputData(array $array, $columnKey, $indexKey, $expectedMessage)
     {
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            $expectedMessage
-        );
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage($expectedMessage);
 
         ArrayUtil::arrayColumn($array, $columnKey, $indexKey);
     }

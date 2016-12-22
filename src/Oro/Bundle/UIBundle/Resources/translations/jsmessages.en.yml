@@ -61,6 +61,7 @@ oro:
         leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
         leave_page_save_data_or_discard_title: "Navigation confirmation"
         leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
+        error: "There was an error performing the requested operation. Please try again or contact us for assistance."
         page_header:
             button:
                 more: "More"
@@ -86,6 +87,12 @@ oro:
             other: Other
         jstree:
             move_node_error: "You can not move node {{ nodeText }} here."
+            actions:
+                expand: 'Expand all'
+                collapse: 'Collapse all'
+                subcategories:
+                    select: 'Select Sub Categories'
+                    do_not_select: 'Do Not Select Sub Categories'
         select2:
             input_too_short: "{1}Please enter {{ number }} more character|[2,Inf[Please enter {{ number }} more characters"
             input_too_long: "{1}Please delete {{ number }} character|[2,Inf[Please delete {{ number }} characters"

@@ -105,14 +105,14 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
         $this->qb->expects($this->any())
             ->method('setParameter');
 
-        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $tokenStorage = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
         $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->setMethods(['getId', 'getOrganizations'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
         $organization
             ->expects($this->once())
             ->method('getId')

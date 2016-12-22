@@ -28,8 +28,8 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
-        $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
+        $this->adapter = $this->createMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
+        $this->dumper  = $this->createMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper');
 
         $this->databasePersister = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DatabasePersister')
             ->disableOriginalConstructor()
@@ -364,10 +364,6 @@ class TranslationServiceProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getServiceMock($methods = [], $args = [])
     {
-        return $this->getMock(
-            $this->className,
-            $methods,
-            $args
-        );
+        return $this->getMockBuilder($this->className)->setMethods($methods)->setConstructorArgs($args)->getMock();
     }
 }

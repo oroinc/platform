@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
+use Oro\Bundle\ApiBundle\Config\DataTransformersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
@@ -245,6 +247,8 @@ class SubresourceContext extends Context
     {
         return [
             new EntityDefinitionConfigExtra(),
+            new CustomizeLoadedDataConfigExtra(),
+            new DataTransformersConfigExtra(),
             new FilterFieldsConfigExtra([$this->getParentClassName() => [$this->getAssociationName()]])
         ];
     }

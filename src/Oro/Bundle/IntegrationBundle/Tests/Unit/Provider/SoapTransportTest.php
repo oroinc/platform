@@ -42,7 +42,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->settings        = new ParameterBag();
-        $this->transportEntity = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
+        $this->transportEntity = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
         $this->transportEntity->expects($this->any())->method('getSettingsBag')
             ->will($this->returnValue($this->settings));
 

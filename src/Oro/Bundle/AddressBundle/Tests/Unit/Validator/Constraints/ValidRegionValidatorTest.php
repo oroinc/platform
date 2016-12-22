@@ -30,7 +30,7 @@ class ValidRegionValidatorTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->constraint = new ValidRegion();
-        $this->context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $this->context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $this->validator = new ValidRegionValidator();
         $this->validator->initialize($this->context);
     }

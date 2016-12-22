@@ -56,7 +56,7 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:EmailTemplate')
             ->willReturn($this->objectRepository);
 
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->with('OroEmailBundle:EmailTemplate')
@@ -72,7 +72,7 @@ abstract class AbstractProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->mailProcessor = $this->setProcessor();
 
-        $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
+        $this->emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
     }
 
     protected function setConfigManager()

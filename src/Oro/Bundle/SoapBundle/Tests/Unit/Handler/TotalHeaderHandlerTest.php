@@ -26,7 +26,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->optimizer = $this->getMock('Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer');
+        $this->optimizer = $this->createMock('Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer');
         $this->optimizer->expects($this->any())->method('getCountQueryBuilder')
             ->with($this->isInstanceOf('Doctrine\ORM\QueryBuilder'))->willReturnArgument(0);
 
@@ -93,7 +93,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     public function testSupportsWithEntityManagerAwareController()
     {
         $context = $this->createContext(
-            $this->getMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface'),
+            $this->createMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface'),
             null,
             null,
             RestApiReadInterface::ACTION_LIST
@@ -105,7 +105,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     public function testDoesNotSupportWithAnotherThenListActionsEvenControllerIsEntityManagerAwareController()
     {
         $context = $this->createContext(
-            $this->getMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface'),
+            $this->createMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface'),
             null,
             null,
             RestApiReadInterface::ACTION_READ
@@ -177,14 +177,14 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $testCount = 22;
 
-        $dbalQb = $this->getMock(
+        $dbalQb = $this->createMock(
             'Doctrine\DBAL\Query\QueryBuilder',
             ['setMaxResults', 'setFirstResult'],
             [],
             '',
             false
         );
-        $conn   = $this->getMock(
+        $conn   = $this->createMock(
             'Doctrine\DBAL\Connection',
             ['createQueryBuilder'],
             [],
@@ -215,7 +215,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $conn->expects($this->once())->method('createQueryBuilder')
             ->will($this->returnValue($dbalQb));
 
-        $qb = new SqlQueryBuilder($em, $this->getMock('Doctrine\ORM\Query\ResultSetMapping', [], [], '', false));
+        $qb = new SqlQueryBuilder($em, $this->createMock('Doctrine\ORM\Query\ResultSetMapping'));
 
         $dbalQb->expects($this->once())->method('setMaxResults')
             ->with($this->identicalTo(null))
@@ -260,7 +260,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($configuration));
 
         $query  = new SqlQuery($em);
-        $dbalQb = $this->getMock(
+        $dbalQb = $this->createMock(
             'Doctrine\DBAL\Query\QueryBuilder',
             ['setMaxResults', 'setFirstResult'],
             [],
@@ -294,10 +294,10 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $testCount = 22;
 
         $entityClass = 'Test\Class';
-        $controller  = $this->getMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface');
+        $controller  = $this->createMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface');
         $context     = $this->createContext($controller);
-        $om          = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $metadata    = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $om          = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $metadata    = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $repo        = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()->getMock();
 

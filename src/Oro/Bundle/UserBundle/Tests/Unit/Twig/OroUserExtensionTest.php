@@ -24,7 +24,7 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->genderProvider = $this->getMock(
+        $this->genderProvider = $this->createMock(
             'Oro\Bundle\UserBundle\Provider\GenderProvider',
             array('getLabelByName'),
             array(),
@@ -32,7 +32,7 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $this->twigExtension = new OroUserExtension($this->genderProvider, $this->securityContext);
     }

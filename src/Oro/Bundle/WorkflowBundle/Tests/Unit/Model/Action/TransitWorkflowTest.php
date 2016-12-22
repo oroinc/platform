@@ -68,12 +68,12 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
 
         $expectedData = array_merge($options['data'], ['path' => $expectedParameter]);
 
-        $workflowData = $this->getMock('Oro\Bundle\WorkflowBundle\Model\WorkflowData');
+        $workflowData = $this->createMock('Oro\Bundle\WorkflowBundle\Model\WorkflowData');
         $workflowData->expects($this->once())
             ->method('add')
             ->with($expectedData);
 
-        $expectedWorkflowItem = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
+        $expectedWorkflowItem = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
         $expectedWorkflowItem->expects($this->once())
             ->method('getData')
             ->willReturn($workflowData);
@@ -215,7 +215,8 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
     {
-        $this->setExpectedException($exceptionName, $exceptionMessage);
+        $this->expectException($exceptionName);
+        $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 

@@ -13,7 +13,7 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
             ->will($this->returnCallback(function ($id) {
@@ -151,7 +151,7 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function createProvider($section, array $provided, $recipientExactly = 1)
     {
-        $provider = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface');
         $provider->expects($this->any())
             ->method('getSection')
             ->will($this->returnValue($section));

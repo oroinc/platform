@@ -47,9 +47,9 @@ class OwnerTreeListenerTest extends OrmTestCase
 
         $this->conn = $this->getDriverConnectionMock($this->em);
 
-        $this->treeProvider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        $this->treeProvider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
             ->with('oro_security.ownership_tree_provider.chain')
@@ -61,34 +61,11 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->em->getEventManager()->addEventListener('onFlush', $this->listener);
     }
 
-    /**
-     * @param int    $expectsAt
-     * @param string $sql
-     * @param array  $result
-     * @param array  $params
-     * @param array  $types
-     */
-    protected function setQueryExpectationAt($expectsAt, $sql, $result, $params = [], $types = [])
-    {
-        $stmt = $this->createFetchStatementMock($result, $params, $types);
-        if ($params) {
-            $this->conn->expects($this->at($expectsAt))
-                ->method('prepare')
-                ->with($sql)
-                ->will($this->returnValue($stmt));
-        } else {
-            $this->conn->expects($this->at($expectsAt))
-                ->method('query')
-                ->with($sql)
-                ->will($this->returnValue($stmt));
-        }
-    }
-
     protected function setInsertQueryExpectation()
     {
         $this->conn->expects($this->once())
             ->method('prepare')
-            ->will($this->returnValue($this->getMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock')));
+            ->will($this->returnValue($this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock')));
     }
 
     /**
@@ -101,6 +78,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     protected function findUser($userId, $userName, $ownerId)
     {
         $this->setQueryExpectationAt(
+            $this->conn,
             0,
             'SELECT t0.id AS id_1, t0.username AS username_2, t0.owner_id AS owner_id_3'
             . ' FROM tbl_user t0 WHERE t0.id = ?',
@@ -123,6 +101,7 @@ class OwnerTreeListenerTest extends OrmTestCase
             $rows[] = ['id_1' => $businessUnitId, 'parent_id_2' => null, 'organization_id_3' => null];
         }
         $this->setQueryExpectationAt(
+            $this->conn,
             1,
             'SELECT t0.id AS id_1, t0.parent_id AS parent_id_2, t0.organization_id AS organization_id_3'
             . ' FROM tbl_business_unit t0'

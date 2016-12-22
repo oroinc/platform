@@ -239,16 +239,19 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                     'association1' => [
                         'exclusion_policy' => 'all',
                         'target_class'     => 'Test\Association1Target',
+                        'target_type'      => 'to-one',
                         'test_section'     => ['attr' => 'val']
                     ],
                     'association2' => [
                         'exclusion_policy' => 'all',
                         'target_class'     => 'Test\Association2Target',
+                        'target_type'      => 'to-one',
                         'test_section'     => ['attr' => 'val']
                     ],
                     'association3' => [
                         'exclusion_policy' => 'all',
                         'property_path'    => 'realAssociation3',
+                        'target_type'      => 'to-one',
                         'target_class'     => 'Test\Association3Target'
                     ],
                 ]
@@ -307,7 +310,8 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 'fields' => [
                     'association1' => [
                         'exclusion_policy' => 'all',
-                        'target_class'     => 'Test\Association1Target'
+                        'target_class'     => 'Test\Association1Target',
+                        'target_type'      => 'to-one'
                     ],
                 ]
             ],

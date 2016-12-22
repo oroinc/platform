@@ -118,7 +118,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(DemoEntity::ENTITY_NAME, $this->configProvider->getClassName($persistentCollection));
 
-        $this->setExpectedException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
+        $this->expectException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
         $this->assertEquals(DemoEntity::ENTITY_NAME, $this->configProvider->getClassName(array()));
     }
 

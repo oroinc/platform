@@ -21,7 +21,7 @@ class MenuExtensionPassTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->container = $this->getMock(ContainerBuilder::class);
+        $this->container = $this->createMock(ContainerBuilder::class);
 
         $this->menuExtensionPass = new MenuExtensionPass();
     }
@@ -84,7 +84,7 @@ class MenuExtensionPassTest extends \PHPUnit_Framework_TestCase
             ]));
 
         /** @var Definition|\PHPUnit_Framework_MockObject_MockObject $definition */
-        $definition = $this->getMock(Definition::class);
+        $definition = $this->createMock(Definition::class);
         $definition->expects($this->exactly(2))
             ->method('addMethodCall')
             ->withConsecutive(

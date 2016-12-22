@@ -55,7 +55,7 @@ abstract class AbstractProvidersPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->at(0))
             ->method('addMethodCall')
             ->with('addProvider', ['alias1', new Reference('provider1')]);
@@ -84,7 +84,7 @@ abstract class AbstractProvidersPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessEmptyProviders()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->never())
             ->method('addMethodCall');
 
@@ -110,7 +110,7 @@ abstract class AbstractProvidersPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessWithoutAlias()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->never())->method('addMethodCall');
 
         $this->container->expects($this->once())
@@ -128,8 +128,8 @@ abstract class AbstractProvidersPassTest extends \PHPUnit_Framework_TestCase
                 'provider1' => [['class' => 'Test\Class1']],
             ]);
 
-        $this->setExpectedException(
-            '\InvalidArgumentException',
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage(
             'Tag ' . $this->tagName . ' alias is missing for provider1 service'
         );
 

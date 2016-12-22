@@ -16,7 +16,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmailThreadIdFoundInThreadIdAttributes()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getRefs')
             ->will($this->returnValue(['testMessageId']));
@@ -34,8 +34,8 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getResult'])
             ->getMockForAbstractClass();
 
-        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
-        $emailFromTread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $thread = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
+        $emailFromTread = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromTread->expects($this->exactly(2))
             ->method('getThread')
             ->will($this->returnValue($thread));
@@ -60,7 +60,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmailThreadIdFoundInXThreadIdAttributes()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getRefs')
             ->will($this->returnValue(['testMessageId']));
@@ -78,8 +78,8 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getResult'])
             ->getMockForAbstractClass();
 
-        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
-        $emailFromTread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $thread = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
+        $emailFromTread = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromTread->expects($this->exactly(2))
             ->method('getThread')
             ->will($this->returnValue($thread));
@@ -104,7 +104,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmailThreadIdGenerated()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getRefs')
             ->will($this->returnValue(['testMessageId']));
@@ -122,7 +122,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getResult'])
             ->getMockForAbstractClass();
 
-        $emailFromTread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $emailFromTread = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
 
         $query->expects($this->exactly(1))
             ->method('getResult')
@@ -144,7 +144,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetThreadEmailWithoutThread()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getThread')
             ->will($this->returnValue(''));
@@ -159,8 +159,8 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetThreadEmailWithThread()
     {
-        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $thread = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
             ->method('getThread')
             ->will($this->returnValue($thread));

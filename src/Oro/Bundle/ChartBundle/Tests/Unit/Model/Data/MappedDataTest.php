@@ -15,10 +15,8 @@ class MappedDataTest extends \PHPUnit_Framework_TestCase
     public function testToArraySourceHasNoMappedField()
     {
         $mapping = array('label' => 'unknownProperty');
-        $source = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
-        $sourceData = array(
-            $this->getMock('stdClass', array(), array(), 'dataSourceClassName')
-        );
+        $source = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $sourceData = array($this->createMock(MappedData::class));
         $source->expects($this->once())->method('toArray')->will($this->returnValue($sourceData));
         $mappedData = new MappedData($mapping, $source);
         $actual = $mappedData->toArray();
@@ -28,7 +26,7 @@ class MappedDataTest extends \PHPUnit_Framework_TestCase
     public function testToArrayIfSourceIsArray()
     {
         $mapping = array('label' => 'firstName', 'value' => 'totalAmount');
-        $source = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $source = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
         $name = 'John';
         $amount = 10;
         $secondName = 'Alex';
@@ -50,7 +48,7 @@ class MappedDataTest extends \PHPUnit_Framework_TestCase
     public function testToArrayIfSourceIsNestedArray()
     {
         $mapping = array('label' => 'firstName', 'value' => 'totalAmount');
-        $source = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $source = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
         $name = 'John';
         $amount = 10;
         $secondName = 'Alex';
@@ -72,7 +70,7 @@ class MappedDataTest extends \PHPUnit_Framework_TestCase
     public function testToArrayIfSourceIsObject()
     {
         $mapping = array('label' => 'firstName', 'value' => 'totalAmount');
-        $source = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $source = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
         $name = 'John';
         $amount = 10;
         $secondName = 'Alex';
@@ -97,7 +95,7 @@ class MappedDataTest extends \PHPUnit_Framework_TestCase
             'getFirstName',
             'getTotalAmount'
         );
-        $sourceRow = $this->getMock('stdClass', $methods, array());
+        $sourceRow = $this->getMockBuilder('stdClass')->setMethods($methods)->getMock();
 
         $sourceRow->expects($this->once())->method('getFirstName')->will($this->returnValue($firstName));
         $sourceRow->expects($this->once())->method('getTotalAmount')->will($this->returnValue($totalAmount));

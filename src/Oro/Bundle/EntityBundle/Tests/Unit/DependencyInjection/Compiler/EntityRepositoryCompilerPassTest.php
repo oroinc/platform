@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntityRepository;
@@ -27,22 +28,29 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->compilerPass = new EntityRepositoryCompilerPass();
     }
 
-    public function testProcessWithMissingServices()
+    /**
+     * @param array $services
+     *
+     * @dataProvider processWithMissingServicesDataProvider
+     */
+    public function testProcessWithMissingServices(array $services)
     {
-        $container = $this->prepareContainer();
+        $container = $this->prepareContainer($services);
         $container->expects($this->never())
             ->method('getDefinitions');
         $this->compilerPass->process($container);
+    }
 
-        $container = $this->prepareContainer(['oro_entity.repository.factory' => []]);
-        $container->expects($this->never())
-            ->method('getDefinitions');
-        $this->compilerPass->process($container);
-
-        $container = $this->prepareContainer(['doctrine.orm.configuration' => []]);
-        $container->expects($this->never())
-            ->method('getDefinitions');
-        $this->compilerPass->process($container);
+    /**
+     * @return array
+     */
+    public function processWithMissingServicesDataProvider()
+    {
+        return [
+            'no required services' => ['services' => []],
+            'only factory'         => ['services' => ['oro_entity.repository.factory' => []]],
+            'only configuration'   => ['services' => ['doctrine.orm.configuration' => []]],
+        ];
     }
 
     public function testProcessNoRepositoryServices()
@@ -132,12 +140,6 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Repository service test.repository.first for class Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Stub\FirstEntity must be public
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessPrivateRepositoryService()
     {
         $container = $this->prepareContainer(
@@ -152,15 +154,14 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf('Repository service %s for class %s must be public', 'test.repository.first', FirstEntity::class)
+        );
+
         $this->compilerPass->process($container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Repository service test.repository.first might accept only entity class and repository class as arguments
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessRepositoryServiceWithoutArguments()
     {
         $container = $this->prepareContainer(
@@ -173,15 +174,17 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Repository service %s might accept only entity class and repository class as arguments',
+                'test.repository.first'
+            )
+        );
+
         $this->compilerPass->process($container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Repository service test.repository.first might accept only entity class and repository class as arguments
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessRepositoryServiceWithInvalidArguments()
     {
         $container = $this->prepareContainer(
@@ -195,15 +198,17 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Repository service %s might accept only entity class and repository class as arguments',
+                'test.repository.first'
+            )
+        );
+
         $this->compilerPass->process($container);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
-     * @expectedExceptionMessage Entity class NotExistingEntity defined at repository service test.repository.first doesn't exist
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessNotExistingEntity()
     {
         $container = $this->prepareContainer(
@@ -218,6 +223,11 @@ class EntityRepositoryCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf('Entity class NotExistingEntity defined at repository service test.repository.first doesn\'t exist')
+        );
+
         $this->compilerPass->process($container);
     }
 

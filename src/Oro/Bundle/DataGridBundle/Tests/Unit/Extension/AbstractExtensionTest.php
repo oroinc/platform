@@ -20,7 +20,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testParameters()
     {
-        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
 
         $this->extension->setParameters($parameters);
         $this->assertEquals($parameters, $this->extension->getParameters($parameters));

@@ -23,10 +23,10 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
         $testTypeName  = 'testType';
         $testOptions   = ['required' => true, 'auto_initialize' => true];
 
-        $rootForm   = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $childForm  = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-        $formType   = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $rootForm   = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $childForm  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
 
         $rootForm->expects($this->once())->method('get')->with($testFieldName)
             ->will($this->returnValue($childForm));
@@ -123,7 +123,7 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
      */
     public function testReplaceTransformer(array $existingTransformers, $type, $toReplace, array $expected)
     {
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
 
         $model = 'model' === $type;
         $builder->expects($this->once())->method($model ? 'getModelTransformers' : 'getViewTransformers')
@@ -152,8 +152,8 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
         $newTransformer = new StubTransformer();
 
         $transformerOrigin = new StubTransformer();
-        $transformer1      = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
-        $transformer3      = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $transformer1      = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
+        $transformer3      = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
 
         return [
             'should append view transformer'                => [

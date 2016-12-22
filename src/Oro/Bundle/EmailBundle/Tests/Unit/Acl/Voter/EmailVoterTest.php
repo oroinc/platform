@@ -95,7 +95,7 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testVote($atLeastOneGranted)
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $email = new Email();
         $emailUser1 = new EmailUser();
         $emailUser2 = new EmailUser();

@@ -26,7 +26,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
     {
         $proxiedServiceID = 'registry';
 
-        $this->registry = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
+        $this->registry = $this->createMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
         $container      = new Container();
         $container->set($proxiedServiceID, $this->registry);
 
@@ -38,7 +38,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
 
         $em->expects($this->any())->method('getRepository')->with('OroIntegrationBundle:Channel')
             ->will($this->returnValue($this->repo));
-        $registry = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
+        $registry = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
         $registry->expects($this->any())->method('getManager')
             ->will($this->returnValue($em));
         $link =new ServiceLink($container, $proxiedServiceID);
@@ -60,7 +60,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
     public function testGetTransportFromSource($source, $exceptionExpected = false)
     {
         if (false !== $exceptionExpected) {
-            $this->setExpectedException($exceptionExpected);
+            $this->expectException($exceptionExpected);
         } else {
             $this->registry->expects($this->once())->method('getTransportTypeBySettingEntity')
                 ->will($this->returnValue(new \stdClass()));
@@ -89,7 +89,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
         $integration   = new Integration();
         $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())->method('getOption')->with('channel')
             ->will($this->returnValue($testID));
 
@@ -109,7 +109,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
         $integration = new Integration();
         $integration->setTransport($this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport'));
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())->method('getOption')->with('channel')
             ->will($this->returnValue($testID));
 
@@ -122,7 +122,7 @@ class ConnectorContextMediatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetInitializedTransport()
     {
-        $testTransport = $this->getMock('Oro\Bundle\IntegrationBundle\Provider\TransportInterface');
+        $testTransport = $this->createMock('Oro\Bundle\IntegrationBundle\Provider\TransportInterface');
         $transportEntity = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Entity\Transport');
         $integration = new Integration();
         $integration->setTransport($transportEntity);

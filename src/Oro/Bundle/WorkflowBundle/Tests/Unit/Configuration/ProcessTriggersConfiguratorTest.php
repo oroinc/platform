@@ -45,7 +45,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configurationBuilder = $this->getMock(
+        $this->configurationBuilder = $this->createMock(
             'Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder'
         );
 
@@ -53,9 +53,9 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository'
         )->disableOriginalConstructor()->getMock();
 
-        $this->objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
 
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->processCronScheduler = $this
             ->getMockBuilder('Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler')
             ->disableOriginalConstructor()
@@ -63,7 +63,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->triggerEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger';
 
-        $this->logger = $this->getMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->processTriggersConfigurator = new ProcessTriggersConfigurator(
             $this->configurationBuilder,
@@ -96,7 +96,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertObjectManagerCalledForRepository($this->triggerEntityClass);
 
         /** @var ProcessTrigger|\PHPUnit_Framework_MockObject_MockObject $mockExistentTrigger */
-        $mockExistentTrigger = $this->getMock($this->triggerEntityClass);
+        $mockExistentTrigger = $this->createMock($this->triggerEntityClass);
 
         $nonExistentNewTrigger->setDefinition($definition)->setCron('42 * * * *');
         $mockExistentTrigger->expects($this->once())->method('import')->with($existentNewTrigger);
@@ -104,7 +104,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit_Framework_TestCase
         $mockExistentTrigger->expects($this->any())->method('getDefinition')->willReturn($definition);
         $mockExistentTrigger->expects($this->any())->method('getCron')->willReturn('43 * * * *');
 
-        $mockUnaffectedTrigger = $this->getMock($this->triggerEntityClass);
+        $mockUnaffectedTrigger = $this->createMock($this->triggerEntityClass);
         $mockUnaffectedTrigger->expects($this->any())->method('isDefinitiveEqual')->willReturn(false);
 
         $this->repository->expects($this->once())

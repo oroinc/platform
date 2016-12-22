@@ -22,7 +22,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
         $this->loader = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityAliasLoader')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $this->cache = $this->createMock('Doctrine\Common\Cache\Cache');
 
         $this->entityAliasResolver = new EntityAliasResolver($this->loader, $this->cache, true);
     }

@@ -43,11 +43,11 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry            = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->rawLayoutBuilder    = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
-        $this->layoutManipulator   = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
-        $this->blockFactory        = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
-        $this->renderer            = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->registry            = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->rawLayoutBuilder    = $this->createMock('Oro\Component\Layout\RawLayoutBuilderInterface');
+        $this->layoutManipulator   = $this->createMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
+        $this->blockFactory        = $this->createMock('Oro\Component\Layout\BlockFactoryInterface');
+        $this->renderer            = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
         $this->expressionProcessor = $this
             ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
             ->disableOriginalConstructor()
@@ -282,7 +282,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->expressionProcessor->expects($this->once())
             ->method('processExpressions');
 
-        $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
+        $optionValueBag = $this->createMock('Oro\Component\Layout\OptionValueBag');
         $optionValueBag->expects($this->once())->method('buildValue');
 
         $rootView->vars['bag'] = $optionValueBag;
@@ -377,7 +377,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->expressionProcessor->expects($this->once())
             ->method('processExpressions');
 
-        $optionValueBag = $this->getMock('Oro\Component\Layout\OptionValueBag');
+        $optionValueBag = $this->createMock('Oro\Component\Layout\OptionValueBag');
         $optionValueBag->expects($this->once())->method('buildValue');
 
         $rootView->vars['bag'] = $optionValueBag;

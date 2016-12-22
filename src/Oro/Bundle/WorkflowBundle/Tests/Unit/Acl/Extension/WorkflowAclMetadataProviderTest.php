@@ -32,8 +32,8 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMock(ManagerRegistry::class);
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -73,7 +73,7 @@ class ContextsSelectTypeTest extends TypeTestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
         $builder->expects($this->once())
             ->method('addViewTransformer');
         $type = new ContextsSelectType(
@@ -89,7 +89,7 @@ class ContextsSelectTypeTest extends TypeTestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(

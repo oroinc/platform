@@ -35,7 +35,7 @@ class IdentifierVisitConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
             ->getMock();
 
         $this->identifyProvider = $this
-            ->getMock('Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider');
+            ->createMock('Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider');
 
         $this->associationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
             ->disableOriginalConstructor()

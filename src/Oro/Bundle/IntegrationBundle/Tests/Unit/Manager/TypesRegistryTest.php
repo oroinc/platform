@@ -115,7 +115,7 @@ class TypesRegistryTest extends \PHPUnit_Framework_TestCase
         $this->typesRegistry->addConnectorType(
             $expectedIntegrationType.'Type',
             $expectedIntegrationType,
-            $this->getMock(ConnectorInterface::class)
+            $this->createMock(ConnectorInterface::class)
         );
 
         $this->assertTrue($this->typesRegistry->supportsSync($integrationMock));

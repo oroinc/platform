@@ -14,11 +14,11 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $this->registry = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\Registry')
             ->setConstructorArgs([$container, [''], ['default' => 'default'], '', 'default'])
-            ->setMethods(['getService', 'resetService'])
+            ->setMethods(['getService', 'resetService', 'getManager'])
             ->getMock();
     }
 
@@ -33,6 +33,8 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->expects($this->at(1))
             ->method('resetService');
         $this->registry->expects($this->at(2))
+            ->method('getManager');
+        $this->registry->expects($this->at(3))
             ->method('getService')
             ->willReturn($manager2);
 
@@ -68,11 +70,11 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
      */
     protected function getManagerMock()
     {
-        $managerMetadataFactory = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
+        $managerMetadataFactory = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
         $managerMetadataFactory->expects($this->any())
             ->method('isTransient')
             ->willReturn(false);
-        $manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $manager->expects($this->any())
             ->method('getMetadataFactory')
             ->willReturn($managerMetadataFactory);

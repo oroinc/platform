@@ -7,6 +7,43 @@ oro:
             view_entity:         View configurable entity
             update_entity_field: Update configurable entity field
             field_search:        Return varchar type field(s) in given entity
+            attribute:
+                manage: '[Attribute] Manage attributes'
+                create: '[Attribute] Create attribute'
+                update: '[Attribute] Edit attribute'
+                remove: '[Attribute] Remove attribute'
+                unremove: '[Attribute] Restore attribute'
+            attribute_family:
+                manage: '[Attribute Family] Manage attribute families'
+                view: '[Attribute Family] View attribute family'
+                create: '[Attribute Family] Create attribute family'
+                update: '[Attribute Family] Edit attribute family'
+                delete: '[Attribute Family] Delete attribute family'
+
+        attribute:
+            entity_label: Attribute
+            entity_plural_label: Attributes
+            entity_not_supported: This entity does not support attributes
+            not_attribute: This field is not an attribute
+            successfully_deleted: Attribute successfully deleted
+            successfully_saved: Attribute was successfully saved
+            was_restored: Attribute was restored
+            cannot_be_restored: This attribute cannot be restored because an attribute with similar name exists.
+            confirm_delete: Do you really want to delete this attribute?
+
+        attribute_family:
+            entity_label: Attribute Family
+            entity_plural_label: Attribute Families
+            code.label: Code
+            enabled.label: Enabled
+            labels.label: Label
+            image.label: Image
+            attribute_groups.label: Attribute Groups
+            message.deleted:  Successfully deleted
+
+        attribute_group:
+            labels.label: Label
+            attribute_relations.label: Attributes
 
         block_titles:
             general.label:       General Information
@@ -20,12 +57,17 @@ oro:
             logged_at.label: Logged at
 
         menu:
+            attributes_list.label:         Attributes
             entities_list.label:           Entities
             entities_list.description:     List of entities
             entity_management.label:       Entity Management
             entity_management.description: List of entities
 
         controller:
+            attribute_family:
+                message:
+                    update: Attribute family successfully updated
+                    saved: Attribute family was successfully saved
             config_entity:
                 message:
                     saved:  Entity saved
@@ -42,6 +84,16 @@ oro:
         entity_config:
             entity_name.label: Name
             module_name.label: Module
+            attribute:
+                grid_action:
+                    remove: "Remove"
+                    restore: "Restore"
+                field.items:
+                    is_attribute: Attribute
+                    searchable: Searchable
+                    sortable: Sortable
+                    filterable: Filterable
+                    enabled: Enabled
 
         field_config:
             field_name.label: Name
@@ -53,6 +105,7 @@ oro:
             records_count.label: 'Number of records: %count%'
 
         form:
+            default_group_label: Default group
             name.label: Name
             type.label: Type
 
@@ -64,3 +117,24 @@ oro:
                 invalid_field_type: Invalid field type.
                 change_type_not_allowed: Changing type of existing fields is not allowed.
                 require_update_schema: "Please, click 'Update Schema' to apply changes"
+                cant_replace_extend_field: Can not create attribute with such name.
+
+        sections:
+            attribute_family:
+                attributes: Attributes
+                settings: Settings
+
+    entityconfig:
+        attribute.entity:
+             attributefamily:
+                  entity_label: Attribute family
+                  entity_plural_label: Attribute families
+                  code.label: Code
+                  entity_class.label: AttributeFamily
+                  id.label: ID
+                  is_enabled.label: Is enabled
+                  attribute_groups.label: Group
+                  image.label: Image
+                  labels.label: Labels
+                  owner.label: Owner
+                  organization.label: Organization

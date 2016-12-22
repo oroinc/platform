@@ -355,7 +355,7 @@ class EnumValueTypeTest extends TypeTestCase
     protected function getValidator()
     {
         /* @var $loader \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
-        $loader = $this->getMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
+        $loader = $this->createMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
         $loader
             ->expects($this->any())
             ->method('loadClassMetadata')
@@ -389,7 +389,7 @@ class EnumValueTypeTest extends TypeTestCase
     protected function getConstraintValidatorFactory()
     {
         /* @var $factory \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface */
-        $factory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
+        $factory = $this->createMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
 
         $factory->expects($this->any())
             ->method('getInstance')

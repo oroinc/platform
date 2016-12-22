@@ -21,7 +21,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());
-        $this->extension = $this->getMock('Oro\Component\Layout\Extension\ExtensionInterface');
+        $this->extension = $this->createMock('Oro\Component\Layout\Extension\ExtensionInterface');
         $this->registry->addExtension($this->extension);
     }
 
@@ -41,7 +41,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetType()
     {
         $name = 'test';
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
 
         $this->extension->expects($this->once())
             ->method('hasType')
@@ -103,7 +103,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetTypeExtensions()
     {
         $name          = 'test';
-        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
@@ -121,7 +121,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContextConfigurators()
     {
-        $configurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $configurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
 
         $this->extension->expects($this->once())
             ->method('hasContextConfigurators')
@@ -138,7 +138,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testFindDataProvider()
     {
         $name         = 'test';
-        $dataProvider = $this->getMock(\stdClass::class);
+        $dataProvider = $this->createMock(\stdClass::class);
 
         $this->extension->expects($this->once())
             ->method('hasDataProvider')
@@ -193,9 +193,9 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $name     = 'test';
         /** @var OptionsResolver $resolver */
-        $resolver = $this->getMock('Oro\Component\Layout\Block\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock('Oro\Component\Layout\Block\OptionsResolver\OptionsResolver');
 
-        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
@@ -215,10 +215,10 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testBuildBlock()
     {
         $name    = 'test';
-        $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $options = new Options(['foo' => 'bar']);
 
-        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
@@ -239,9 +239,9 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $name    = 'test';
         $view    = new BlockView();
-        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block   = $this->createMock('Oro\Component\Layout\BlockInterface');
         $options = new Options(['foo' => 'bar']);
-        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
@@ -262,9 +262,9 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $name    = 'test';
         $view    = new BlockView();
-        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block   = $this->createMock('Oro\Component\Layout\BlockInterface');
 
-        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
@@ -284,12 +284,12 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     public function testUpdateLayout()
     {
         $id                = 'test';
-        $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $item              = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $item              = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
         $item->expects($this->once())->method('getContext')
-            ->willReturn($this->getMock('Oro\Component\Layout\ContextInterface'));
+            ->willReturn($this->createMock('Oro\Component\Layout\ContextInterface'));
 
-        $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->extension->expects($this->once())
             ->method('hasLayoutUpdates')
@@ -308,9 +308,9 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureContext()
     {
-        $context = $this->getMock('Oro\Component\Layout\ContextInterface');
+        $context = $this->createMock('Oro\Component\Layout\ContextInterface');
 
-        $contextConfigurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $contextConfigurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
 
         $this->extension->expects($this->once())
             ->method('hasContextConfigurators')

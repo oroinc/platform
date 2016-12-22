@@ -31,6 +31,19 @@ class ComputePrimaryFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->context->hasResult());
     }
 
+    public function testProcessWithoutConfig()
+    {
+        $this->context->setResult(
+            [
+                'roles' => [
+                    ['name' => 'role1', 'enabled' => false],
+                    ['name' => 'role2', 'enabled' => true]
+                ]
+            ]
+        );
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWhenNoConfigForPrimaryField()
     {
         $config = new EntityDefinitionConfig();

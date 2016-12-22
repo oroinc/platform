@@ -38,8 +38,8 @@ class OroElementFactoryTest extends \PHPUnit_Framework_TestCase
     protected function getElementFactory(array $configuration = [])
     {
         $session = new Session(
-            $this->getMock('Behat\Mink\Driver\DriverInterface'),
-            $this->getMock('Behat\Mink\Selector\SelectorsHandler')
+            $this->createMock('Behat\Mink\Driver\DriverInterface'),
+            $this->createMock('Behat\Mink\Selector\SelectorsHandler')
         );
         $mink = new Mink(['default' => $session]);
         $mink->setDefaultSessionName('default');

@@ -30,7 +30,7 @@ class RepeatedTypeExtensionTest extends \PHPUnit_Framework_TestCase
         array $expectedVars,
         array $expectedChildrenVars
     ) {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $this->extension->finishView($view, $form, $options);
 

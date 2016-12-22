@@ -84,7 +84,7 @@ class EntityFieldWriter implements ItemWriterInterface
             );
         }
 
-        $this->setExtendData($className, $fieldName, $state);
+        $this->setExtendData($configModel, $state);
         $this->updateEntityState($className);
 
         if ($state === ExtendScope::STATE_UPDATE && in_array($configModel->getType(), ['enum', 'multiEnum'], true)) {
@@ -188,16 +188,17 @@ class EntityFieldWriter implements ItemWriterInterface
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
+     * @param FieldConfigModel $configModel
      * @param string $state
      */
-    protected function setExtendData($className, $fieldName, $state)
+    protected function setExtendData(FieldConfigModel $configModel, $state)
     {
         $provider = $this->configManager->getProvider('extend');
         if (!$provider) {
             return;
         }
+        $className = $configModel->getEntity()->getClassName();
+        $fieldName = $configModel->getFieldName();
 
         $config = $provider->getConfig($className, $fieldName);
         $data = [

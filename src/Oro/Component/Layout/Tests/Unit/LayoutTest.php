@@ -16,7 +16,7 @@ class LayoutTest extends LayoutTestCase
 
     protected function setUp()
     {
-        $this->renderer         = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->renderer         = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
         $this->rendererRegistry = new LayoutRendererRegistry();
         $this->rendererRegistry->addRenderer('test', $this->renderer);
         $this->rendererRegistry->setDefaultRenderer('test');
@@ -64,7 +64,7 @@ class LayoutTest extends LayoutTestCase
 
         $view = new BlockView();
 
-        $otherRenderer = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $otherRenderer = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
         $this->rendererRegistry->addRenderer('other', $otherRenderer);
 
         $otherRenderer->expects($this->once())
