@@ -13,16 +13,12 @@ use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
 
 class OperationType extends AbstractType
 {
     const NAME = 'oro_action_operation';
-
-    /** @var OperationManager */
-    protected $operationManager;
 
     /** @var RequiredAttributesListener */
     protected $requiredAttributesListener;
@@ -31,16 +27,13 @@ class OperationType extends AbstractType
     protected $contextAccessor;
 
     /**
-     * @param OperationManager $operationManager
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
      */
     public function __construct(
-        OperationManager $operationManager,
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor
     ) {
-        $this->operationManager = $operationManager;
         $this->requiredAttributesListener = $requiredAttributesListener;
         $this->contextAccessor = $contextAccessor;
     }

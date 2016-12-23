@@ -18,15 +18,16 @@ trait AbstractMessageQueueAssertTrait
      *
      * @param string                    $expectedTopic   The expected topic name
      * @param string|array|Message|null $expectedMessage The expected message or NULL if a message is not matter
+     * @param bool                      $isSubJobMessage true if the message is sent for runDelayed running
      */
-    protected static function assertMessageSent($expectedTopic, $expectedMessage = null)
+    protected static function assertMessageSent($expectedTopic, $expectedMessage = null, $isSubJobMessage = false)
     {
         $message = ['topic' => $expectedTopic];
         if (null !== $expectedMessage) {
             $message['message'] = $expectedMessage;
         }
 
-        self::assertThat(self::getSentMessages(), new SentMessageConstraint($message));
+        self::assertThat(self::getSentMessages(), new SentMessageConstraint($message, $isSubJobMessage));
     }
 
     /**
@@ -36,11 +37,12 @@ trait AbstractMessageQueueAssertTrait
      * @param string $expectedTopic    The expected topic name
      * @param array  $expectedMessages The expected messages
      *                                 Each message can be string, array or instance of Message class
+     * @param bool                     $isSubJobMessage true if the message is sent for runDelayed running
      */
-    protected static function assertMessagesSent($expectedTopic, array $expectedMessages)
+    protected static function assertMessagesSent($expectedTopic, array $expectedMessages, $isSubJobMessage = false)
     {
         foreach ($expectedMessages as $expectedMessage) {
-            self::assertMessageSent($expectedTopic, $expectedMessage);
+            self::assertMessageSent($expectedTopic, $expectedMessage, $isSubJobMessage);
         }
 
         $topicMessages = [];

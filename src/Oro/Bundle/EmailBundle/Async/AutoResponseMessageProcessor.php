@@ -4,15 +4,16 @@ namespace Oro\Bundle\EmailBundle\Async;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
+
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -27,6 +28,11 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     private $autoResponseManager;
 
     /**
+     * @var JobRunner
+     */
+    private $jobRunner;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -34,12 +40,18 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     /**
      * @param Registry            $doctrine
      * @param AutoResponseManager $autoResponseManager
+     * @param JobRunner $jobRunner
      * @param LoggerInterface     $logger
      */
-    public function __construct(Registry $doctrine, AutoResponseManager $autoResponseManager, LoggerInterface $logger)
-    {
+    public function __construct(
+        Registry $doctrine,
+        AutoResponseManager $autoResponseManager,
+        JobRunner $jobRunner,
+        LoggerInterface $logger
+    ) {
         $this->doctrine = $doctrine;
         $this->autoResponseManager = $autoResponseManager;
+        $this->jobRunner = $jobRunner;
         $this->logger = $logger;
     }
 
@@ -50,11 +62,11 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     {
         $data = JSON::decode($message->getBody());
 
-        if (! isset($data['id'])) {
+        if (! isset($data['jobId'], $data['id'])) {
             $this->logger->critical(sprintf(
                 '[AutoResponseMessageProcessor] Got invalid message. "%s"',
                 $message->getBody()
-            ));
+            ), ['message' => $message]);
 
             return self::REJECT;
         }
@@ -65,16 +77,18 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
             $this->logger->error(sprintf(
                 '[AutoResponseMessageProcessor] Email was not found. id: "%s"',
                 $data['id']
-            ));
+            ), ['message' => $message]);
 
             return self::REJECT;
         }
 
-        //toDo: can possibly send duplicate replies. See BAP-12503
+        $result = $this->jobRunner->runDelayed($data['jobId'], function () use ($email) {
+            $this->autoResponseManager->sendAutoResponses($email);
 
-        $this->autoResponseManager->sendAutoResponses($email);
+            return true;
+        });
 
-        return self::ACK;
+        return $result ? self::ACK : self::REJECT;
     }
 
     /**

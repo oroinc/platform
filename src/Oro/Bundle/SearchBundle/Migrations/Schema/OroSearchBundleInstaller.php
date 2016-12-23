@@ -13,6 +13,7 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterfac
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
+use Oro\Bundle\SearchBundle\Migrations\Schema\v1_3\OroSearchBundleUseInnoDbQuery;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -35,7 +36,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
      */
     public function getMigrationVersion()
     {
-        return 'v1_2';
+        return 'v1_3';
     }
 
     /**
@@ -77,6 +78,8 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
         if ($this->container->has('oro_search.fulltext_index_manager')) {
             $query = $this->container->get('oro_search.fulltext_index_manager')->getQuery();
             $queries->addQuery($query);
+            // switch oro_search_index_text table to InnoDB in case of MySQL >= 5.6
+            $queries->addPostQuery(new OroSearchBundleUseInnoDbQuery());
         }
     }
 
