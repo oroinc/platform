@@ -55,7 +55,7 @@ class AttributeMultiselectTypeTest extends FormIntegrationTestCase
         $field = $this->getEntity(FieldConfigModel::class, ['id' => 777]);
 
         $this->managerMock->expects($this->once())
-            ->method('getAttributesByClass')
+            ->method('getActiveAttributesByClass')
             ->with('some\class')
             ->willReturn([$field]);
 
@@ -87,7 +87,7 @@ class AttributeMultiselectTypeTest extends FormIntegrationTestCase
         $field = $this->getEntity(FieldConfigModel::class, ['id' => 777]);
 
         $this->managerMock->expects($this->once())
-            ->method('getAttributesByClass')
+            ->method('getActiveAttributesByClass')
             ->with('')
             ->willReturn([$field]);
 

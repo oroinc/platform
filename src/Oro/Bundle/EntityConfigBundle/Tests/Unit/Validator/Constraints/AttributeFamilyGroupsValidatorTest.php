@@ -54,42 +54,11 @@ class AttributeFamilyGroupsValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($entity, $this->constraint);
     }
 
-    public function testValidateManyDefaultGroups()
-    {
-        $entity = new AttributeFamily();
-        $group1 = new AttributeGroup();
-        $group1->setIsDefault(true);
-        $entity->addAttributeGroup($group1);
-        $group2 = new AttributeGroup();
-        $group2->setIsDefault(true);
-        $entity->addAttributeGroup($group2);
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->manyDefaultGroupsMessage);
-
-        $this->validator->validate($entity, $this->constraint);
-    }
-
-    public function testValidateDefaultGroupIsNotExsist()
-    {
-        $entity = new AttributeFamily();
-        $group = new AttributeGroup();
-        $entity->addAttributeGroup($group);
-
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->defaultGroupIsNotExistMessage);
-
-        $this->validator->validate($entity, $this->constraint);
-    }
-
     public function testValidateValid()
     {
         $entity = new AttributeFamily();
         $entity->setEntityClass('entityClass');
         $group1 = new AttributeGroup();
-        $group1->setIsDefault(true);
         $entity->addAttributeGroup($group1);
         $group2 = new AttributeGroup();
         $entity->addAttributeGroup($group2);
