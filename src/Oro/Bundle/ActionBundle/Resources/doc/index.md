@@ -11,6 +11,8 @@ Table of Contents
 configuration. 
   Those parties are:
   
+  **Buttons** - User interface component under witch you can deliver your custom actions for user interaction.
+  
   **Operations** - configured user interaction elements (buttons, links or even further: forms, pages) with customizable
 execution logic;
   
@@ -20,6 +22,10 @@ execution logic;
 ActionBundle Glossary
 ---------------------
 
+  * [**Buttons**](./buttons.md) - bring a way to expose any kind of actions (Operations, for example) to UI for a proper context through a 
+ specific [ButtonsProviderExtension](../../Extension/ButtonProviderExtensionInterface.php) together with
+  [Buttons](../../Button/ButtonInterface.php) that were matched by a context.
+
   * [**Operation**](./operations.md) - one of the main models in ActionBundle that handle an information about
 specific operation logic, how and when to display UI element, what reaction should it provide and how to aggregate data
 retrieved from a user (usually through a form) into execution units values and launch configured *Actions* after all.
@@ -28,10 +34,6 @@ retrieved from a user (usually through a form) into execution units values and l
 An *Operation* can be enabled or disabled. Other fields of the operation contain information about its name, extended 
 options, an order of display buttons.
  More options see in [Operation Configuration](./operations.md#operation-configuration).
- 
-  * [**Buttons**](./buttons.md) - bring a way to expose any kind of actions (Operations, for example) to UI for a proper context through a 
- specific [ButtonsProviderExtension](../../Extension/ButtonProviderExtensionInterface.php) together with
-  [Buttons](../../Model/ButtonInterface.php) that were matched by a context.
      
   * [**ActionGroup**](./action-groups.md) - another one of the main models in ActionBundle. A named bunch of Actions with entry
 `parameters` (required or optional, typed or not) and conditions. 

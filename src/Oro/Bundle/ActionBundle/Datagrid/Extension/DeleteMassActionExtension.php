@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension as BaseDeleteMassActionExtension;
 use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
@@ -13,8 +14,11 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
 {
     const OPERATION_NAME = 'DELETE';
 
-    /** @var OperationManager */
-    protected $operationManager;
+    /** @var OperationRegistry */
+    protected $operationRegistry;
+
+    /** @var ContextHelper */
+    private $contextHelper;
 
     /** @var array */
     protected $groups;
@@ -22,16 +26,19 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param GridConfigurationHelper $gridConfigurationHelper
-     * @param OperationManager $operationManager
+     * @param OperationRegistry $operationRegistry
+     * @param ContextHelper $contextHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         GridConfigurationHelper $gridConfigurationHelper,
-        OperationManager $operationManager
+        OperationRegistry $operationRegistry,
+        ContextHelper $contextHelper
     ) {
         parent::__construct($doctrineHelper, $gridConfigurationHelper);
 
-        $this->operationManager = $operationManager;
+        $this->operationRegistry = $operationRegistry;
+        $this->contextHelper = $contextHelper;
     }
 
     /**
@@ -43,7 +50,17 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
             return parent::isDeleteActionExists($config, $key);
         }
 
-        return $this->operationManager->hasOperation(self::OPERATION_NAME, $this->getDatagridContext($config));
+        $operation = $this->operationRegistry->findByName(self::OPERATION_NAME);
+
+        if (!$operation instanceof Operation) {
+            return false;
+        }
+
+        return $operation->isAvailable(
+            $this->contextHelper->getActionData(
+                $this->getDatagridContext($config)
+            )
+        );
     }
 
     /**

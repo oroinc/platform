@@ -288,7 +288,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsSystem($isSystem)
     {
-        $config = $this->getMock(ConfigInterface::class);
+        $config = $this->createMock(ConfigInterface::class);
         $config
             ->expects($this->once())
             ->method('is')
@@ -315,7 +315,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     public function testAttributeLabelWhenTranslationExists()
     {
         $attributeLabel = 'oro.entity.attributeFieldName.label';
-        $config = $this->getMock(ConfigInterface::class);
+        $config = $this->createMock(ConfigInterface::class);
         $config
             ->expects($this->once())
             ->method('get')
@@ -352,7 +352,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     public function testAttributeLabelWhenTranslationNotExists()
     {
         $attributeLabel = 'oro.entity.attributeFieldName.label';
-        $config = $this->getMock(ConfigInterface::class);
+        $config = $this->createMock(ConfigInterface::class);
         $config
             ->expects($this->once())
             ->method('get')
