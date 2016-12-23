@@ -11,7 +11,7 @@ use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'oro_menu_config';
+    const ROOT_NODE                = 'oro_menu_config';
     const NAVIGATION_ELEMENTS_NODE = 'oro_navigation_elements';
 
 

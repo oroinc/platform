@@ -397,6 +397,12 @@ class TitleService implements TitleServiceInterface
         $this->em->flush();
     }
 
+    /**
+     * @param string $route
+     * @param string $title
+     *
+     * @return bool|string
+     */
     protected function createTitle($route, $title)
     {
         if (!($title instanceof Route)) {

@@ -8,6 +8,7 @@ use Knp\Menu\Provider\MenuProviderInterface;
 
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 
 class MenuExtension extends \Twig_Extension
 {
@@ -26,19 +27,18 @@ class MenuExtension extends \Twig_Extension
     private $provider;
 
     /**
-     * @var array $menuConfiguration
-     */
-    protected $menuConfiguration;
-
-    /**
      * @var BreadcrumbManagerInterface
      */
     protected $breadcrumbManager;
 
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
+
     /**
-     * @param Helper $helper
+     * @param Helper                $helper
      * @param MenuProviderInterface $provider
-     * @param BreadcrumbManager $breadcrumbManager
+     * @param BreadcrumbManager     $breadcrumbManager
+     * @param ConfigurationProvider $configurationProvider
      *
      * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbManagerInterface
      * @see \Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface
@@ -46,19 +46,13 @@ class MenuExtension extends \Twig_Extension
     public function __construct(
         Helper $helper,
         MenuProviderInterface $provider,
-        BreadcrumbManager $breadcrumbManager
+        BreadcrumbManager $breadcrumbManager,
+        ConfigurationProvider $configurationProvider
     ) {
         $this->helper = $helper;
         $this->provider = $provider;
         $this->breadcrumbManager = $breadcrumbManager;
-    }
-
-    /**
-     * @param array $configuration
-     */
-    public function setMenuConfiguration(array $configuration)
-    {
-        $this->menuConfiguration = $configuration;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -68,18 +62,18 @@ class MenuExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            'oro_menu_render' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
+        return [
+            'oro_menu_render' => new \Twig_Function_Method($this, 'render', ['is_safe' => ['html']]),
             'oro_menu_get' => new \Twig_Function_Method($this, 'getMenu'),
             'oro_breadcrumbs' => new \Twig_Function_Method(
                 $this,
                 'renderBreadCrumbs',
-                array(
-                    'is_safe' => array('html'),
+                [
+                    'is_safe' => ['html'],
                     'needs_environment' => true
-                )
+                ]
             )
-        );
+        ];
     }
 
     /**
@@ -92,10 +86,10 @@ class MenuExtension extends \Twig_Extension
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function render($menu, array $options = array(), $renderer = null)
+    public function render($menu, array $options = [], $renderer = null)
     {
         if (!$menu instanceof ItemInterface) {
-            $path = array();
+            $path = [];
             if (is_array($menu)) {
                 if (empty($menu)) {
                     throw new \InvalidArgumentException('The array cannot be empty');
@@ -107,11 +101,14 @@ class MenuExtension extends \Twig_Extension
             $menu = $this->getMenu($menu, $path, $options);
         }
 
+        // TODO set const
+        $menuConfiguration = $this->configurationProvider->getConfiguration('oro_menu_config');
+
         $menu = $this->filterUnallowedItems($menu);
         $menuType = $menu->getExtra('type');
         // rewrite config options with args
-        if (!empty($menuType) && !empty($this->menuConfiguration['templates'][$menuType])) {
-            $options = array_replace_recursive($this->menuConfiguration['templates'][$menuType], $options);
+        if (!empty($menuType) && !empty($menuConfiguration['templates'][$menuType])) {
+            $options = array_replace_recursive($menuConfiguration['templates'][$menuType], $options);
         }
 
         return $this->helper->render($menu, $options, $renderer);
@@ -138,7 +135,7 @@ class MenuExtension extends \Twig_Extension
                 }
 
                 if (count($filteredChildren) == $invisibleChildrenCount
-                    && (!$item->getUri() || $item->getUri() == '#')
+                    && (!$item->getUri() || $item->getUri() === '#')
                 ) {
                     $item->setExtra('isAllowed', false);
                 }
@@ -162,10 +159,10 @@ class MenuExtension extends \Twig_Extension
             $template = $environment->loadTemplate(self::BREADCRUMBS_TEMPLATE);
 
             return $template->render(
-                array(
+                [
                     'breadcrumbs' => $breadcrumbs,
                     'useDecorators' => $useDecorators
-                )
+                ]
             );
         }
 
@@ -193,7 +190,7 @@ class MenuExtension extends \Twig_Extension
      *
      * @throws \InvalidArgumentException when the path is invalid
      */
-    public function getMenu($menu, array $path = array(), array $options = array())
+    public function getMenu($menu, array $path = [], array $options = [])
     {
         if (!$menu instanceof ItemInterface) {
             $menu = $this->provider->get((string) $menu, $options);

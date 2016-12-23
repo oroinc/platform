@@ -27,73 +27,73 @@ class OroNavigationExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $entitiesConfig = $titlesConfig = array();
+//        $entitiesConfig = $titlesConfig = array();
 
-        $configLoader = new CumulativeConfigLoader(
-            'oro_navigation',
-            new YamlCumulativeFileLoader('Resources/config/oro/navigation.yml')
-        );
-        $resources    = $configLoader->load($container);
-        foreach ($resources as $resource) {
-            // Merge menu from bundle configuration
-            if (isset($resource->data[self::NAVIGATION_CONFIG_ROOT][self::MENU_CONFIG_KEY])) {
-                $this->mergeMenuConfig(
-                    $entitiesConfig,
-                    $resource->data[self::NAVIGATION_CONFIG_ROOT][self::MENU_CONFIG_KEY]
-                );
-            }
-            // Merge titles from bundle configuration
-            if (!empty($resource->data[self::NAVIGATION_CONFIG_ROOT][self::TITLES_KEY])) {
-                $titlesConfig = array_merge(
-                    $titlesConfig,
-                    (array)$resource->data[self::NAVIGATION_CONFIG_ROOT][self::TITLES_KEY]
-                );
-            }
-            // Merge navigation elements node from bundle configuration
-            if (!empty($resource->data[self::NAVIGATION_CONFIG_ROOT][self::NAVIGATION_ELEMENTS_KEY])) {
-                $this->appendConfigPart(
-                    $entitiesConfig[Configuration::ROOT_NODE],
-                    $resource->data[self::NAVIGATION_CONFIG_ROOT][self::NAVIGATION_ELEMENTS_KEY],
-                    Configuration::NAVIGATION_ELEMENTS_NODE
-                );
-            }
-        }
+//        $configLoader = new CumulativeConfigLoader(
+//            'oro_navigation',
+//            new YamlCumulativeFileLoader('Resources/config/oro/navigation.yml')
+//        );
+//        $resources    = $configLoader->load($container);
+//        foreach ($resources as $resource) {
+//            // Merge menu from bundle configuration
+//            if (isset($resource->data[self::NAVIGATION_CONFIG_ROOT][self::MENU_CONFIG_KEY])) {
+//                $this->mergeMenuConfig(
+//                    $entitiesConfig,
+//                    $resource->data[self::NAVIGATION_CONFIG_ROOT][self::MENU_CONFIG_KEY]
+//                );
+//            }
+//            // Merge titles from bundle configuration
+//            if (!empty($resource->data[self::NAVIGATION_CONFIG_ROOT][self::TITLES_KEY])) {
+//                $titlesConfig = array_merge(
+//                    $titlesConfig,
+//                    (array)$resource->data[self::NAVIGATION_CONFIG_ROOT][self::TITLES_KEY]
+//                );
+//            }
+//            // Merge navigation elements node from bundle configuration
+//            if (!empty($resource->data[self::NAVIGATION_CONFIG_ROOT][self::NAVIGATION_ELEMENTS_KEY])) {
+//                $this->appendConfigPart(
+//                    $entitiesConfig[Configuration::ROOT_NODE],
+//                    $resource->data[self::NAVIGATION_CONFIG_ROOT][self::NAVIGATION_ELEMENTS_KEY],
+//                    Configuration::NAVIGATION_ELEMENTS_NODE
+//                );
+//            }
+//        }
 
         // Merge menu from application configuration
-        foreach ($configs as $configPart) {
-            $this->mergeMenuConfig($entitiesConfig, $configPart);
-        }
+//        foreach ($configs as $configPart) {
+//            $this->mergeMenuConfig($entitiesConfig, $configPart);
+//        }
 
         // process configurations to validate and merge
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $entitiesConfig);
+        $config = $this->processConfiguration($configuration, $configs);
 
-        $this->normalizeOptionNames($config);
+//        $this->normalizeOptionNames($config);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('content_providers.yml');
         $loader->load('form_types.yml');
 
-        $container
-            ->getDefinition('oro_menu.configuration_builder')
-            ->addMethodCall('setConfiguration', array($config));
-        $container
-            ->getDefinition('oro_menu.twig.extension')
-            ->addMethodCall('setMenuConfiguration', array($config));
-
-        $container
-            ->getDefinition('oro_navigation.title_config_reader')
-            ->addMethodCall('setConfigData', array($titlesConfig));
-        $container
-            ->getDefinition('oro_navigation.title_provider')
-            ->addMethodCall('setTitles', array($titlesConfig));
-        $container
-            ->getDefinition('oro_navigation.content_provider.navigation_elements')
-            ->replaceArgument(0, $config[Configuration::NAVIGATION_ELEMENTS_NODE]);
-        $container
-            ->getDefinition('oro_navigation.extension.datasource.menu')
-            ->addMethodCall('setMenuConfiguration', [$config]);
+//        $container
+//            ->getDefinition('oro_menu.configuration_builder')
+//            ->addMethodCall('setConfiguration', array($config));
+//        $container
+//            ->getDefinition('oro_menu.twig.extension')
+//            ->addMethodCall('setMenuConfiguration', array($config));
+//
+//        $container
+//            ->getDefinition('oro_navigation.title_config_reader')
+//            ->addMethodCall('setConfigData', array($titlesConfig));
+//        $container
+//            ->getDefinition('oro_navigation.title_provider')
+//            ->addMethodCall('setTitles', array($titlesConfig));
+//        $container
+//            ->getDefinition('oro_navigation.content_provider.navigation_elements')
+//            ->replaceArgument(0, $config[Configuration::NAVIGATION_ELEMENTS_NODE]);
+//        $container
+//            ->getDefinition('oro_navigation.extension.datasource.menu')
+//            ->addMethodCall('setMenuConfiguration', [$config]);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
 

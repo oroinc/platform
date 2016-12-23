@@ -8,14 +8,13 @@ use Knp\Menu\ItemInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
-
-    /** @var array */
-    protected $configuration;
 
     /** @var ResolverInterface */
     protected $resolver;
@@ -26,27 +25,25 @@ class ConfigurationBuilder implements BuilderInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
+
     /**
      * @param ResolverInterface        $resolver
      * @param FactoryInterface         $factory
      * @param EventDispatcherInterface $eventDispatcher
+     * @param ConfigurationProvider    $configurationProvider
      */
     public function __construct(
         ResolverInterface $resolver,
         FactoryInterface $factory,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ConfigurationProvider $configurationProvider
     ) {
         $this->resolver = $resolver;
         $this->factory = $factory;
         $this->eventDispatcher = $eventDispatcher;
-    }
-
-    /**
-     * @param array $configuration
-     */
-    public function setConfiguration(array $configuration)
-    {
-        $this->configuration = $configuration;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -58,7 +55,8 @@ class ConfigurationBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $menuConfig = $this->configuration;
+        // TODO set const
+        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
 
         if (!empty($menuConfig['items']) && !empty($menuConfig['tree'])) {
             foreach ($menuConfig['tree'] as $menuTreeName => $menuTreeElement) {

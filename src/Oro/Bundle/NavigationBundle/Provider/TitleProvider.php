@@ -11,17 +11,19 @@ class TitleProvider
     private $doctrineHelper;
 
     /** @var array */
-    private $titles;
-
-    /** @var array */
     private $cache = [];
 
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper        $doctrineHelper
+     * @param ConfigurationProvider $configurationProvider
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigurationProvider $configurationProvider)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -50,10 +52,12 @@ class TitleProvider
                 'short_title' => $title->getShortTitle()
             ];
         } else {
-            if (isset($this->titles[$routeName])) {
+            $titles = $this->configurationProvider->getConfiguration('oro_navigation_titles');
+
+            if (array_key_exists($routeName, $titles)) {
                 $result = [
-                    'title'       => $this->titles[$routeName],
-                    'short_title' => $this->titles[$routeName]
+                    'title'       => $titles[$routeName],
+                    'short_title' => $titles[$routeName]
                 ];
             } else {
                 $result = [];
@@ -63,15 +67,5 @@ class TitleProvider
         $this->cache[$routeName] = $result;
 
         return $result;
-    }
-
-    /**
-     * Inject titles from config
-     *
-     * @param $titles
-     */
-    public function setTitles($titles)
-    {
-        $this->titles = $titles;
     }
 }

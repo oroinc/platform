@@ -4,27 +4,23 @@ namespace Oro\Bundle\NavigationBundle\ContentProvider;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\UIBundle\ContentProvider\AbstractContentProvider;
 
 class NavigationElementsContentProvider extends AbstractContentProvider
 {
-    /** @var array */
-    protected $configuration;
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
 
     /** @var Request */
     protected $request;
 
     /**
-     * @param array $configuration array of current configuration comes from navigation.yml configs.
-     *                             Example: [
-     *                                 'pinBar' => [
-     *                                    'routes'  => ['page_with_pinbar' => true, 'page_without_pinbar' => false]
-     *                                    'default' => true
-     *                             ]
+     * @param ConfigurationProvider $configurationProvider
      */
-    public function __construct(array $configuration)
+    public function __construct(ConfigurationProvider $configurationProvider)
     {
-        $this->configuration = $configuration;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -40,12 +36,16 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     public function getContent()
     {
-        $elements      = array_keys($this->configuration);
+        // TODO set const
+        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
+        $elementConfiguration = $menuConfig['oro_navigation_elements'];
+
+        $elements      = array_keys($elementConfiguration);
         $defaultValues = $values = array_map(
             function ($item) {
                 return $item['default'];
             },
-            $this->configuration
+            $elementConfiguration
         );
 
         if (null !== $this->request) {
@@ -82,7 +82,10 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     protected function hasConfigValue($element, $route)
     {
-        return isset($this->configuration[$element], $this->configuration[$element]['routes'][$route]);
+        // TODO set const
+        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
+        $elementConfiguration = $menuConfig['oro_navigation_elements'];
+        return isset($elementConfiguration[$element], $elementConfiguration[$element]['routes'][$route]);
     }
 
     /**
@@ -93,6 +96,9 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     protected function getConfigValue($element, $route)
     {
-        return $this->hasConfigValue($element, $route) ? (bool)$this->configuration[$element]['routes'][$route] : null;
+        // TODO set const
+        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
+        $elementConfiguration = $menuConfig['oro_navigation_elements'];
+        return $this->hasConfigValue($element, $route) ? (bool)$elementConfiguration[$element]['routes'][$route] : null;
     }
 }
