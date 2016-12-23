@@ -97,6 +97,7 @@ datagrids:
 
     oro-translation-translations-grid:
         acl_resource: oro_translation_translation_index
+        extended_entity_name: %oro_translation.entity.translation.class%
         source:
             type: orm
             query:
