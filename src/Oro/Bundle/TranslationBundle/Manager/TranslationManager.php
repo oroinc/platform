@@ -106,15 +106,14 @@ class TranslationManager
             return null;
         }
 
-        if (!$value && null !== $translation) {
+        if (null === $value && null !== $translation) {
             $cacheKey = $this->getCacheKey($locale, $domain, $key);
             $translation->setValue($value);
             $this->translations[$cacheKey] = $translation;
-
             return null;
         }
 
-        if ($value && null === $translation) {
+        if (null !== $value && null === $translation) {
             $translation = $this->createTranslation($key, $value, $locale, $domain);
         }
 
@@ -206,7 +205,7 @@ class TranslationManager
 
         $em = $this->getEntityManager(Translation::class);
         foreach ($this->translations as $key => $translation) {
-            if ($translation->getValue()) {
+            if (!is_null($translation->getValue())) {
                 $em->persist($translation);
             } elseif ($translation->getId()) {
                 $em->remove($translation);
