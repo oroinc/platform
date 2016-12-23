@@ -22,6 +22,7 @@ return [
                'scope1' => 'value3',
            ],
         ],
+        'datagrids' => ['datagrid1', 'datagrid2'],
         'steps' => [
             'first_step' => [
                 'order' => 1,
@@ -86,6 +87,7 @@ return [
                 ],
                 'init_entities' => ['entity1'],
                 'init_routes' => ['route1'],
+                'init_datagrids' => ['datagrid1'],
                 'init_context_attribute' => 'test_init_context',
                 'triggers' => [
                     [
@@ -172,6 +174,7 @@ return [
         'start_step' => 'second_step',
         'priority' => 0,
         'scopes' => [],
+        'datagrids' => [],
         'defaults' => [
             'active' => false,
         ],
@@ -207,6 +210,7 @@ return [
                 'triggers' => [],
                 'init_entities' => [],
                 'init_routes' => [],
+                'init_datagrids' => [],
                 'init_context_attribute' => 'init_context',
             ]
         ],

@@ -94,7 +94,6 @@ define([
          */
         _onClickCriteriaSelector: function(e) {
             e.stopPropagation();
-            $('body').trigger('click');
             if (!this.popupCriteriaShowed) {
                 this._showCriteria();
             } else {
@@ -159,6 +158,7 @@ define([
          * @protected
          */
         _showCriteria: function() {
+            this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).show();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
             setTimeout(_.bind(function() {

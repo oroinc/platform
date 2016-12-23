@@ -64,7 +64,6 @@ class GroupAttributesValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new AttributeFamily();
         $group1 = new AttributeGroup();
-        $group1->setIsDefault(true);
         $entity->addAttributeGroup($group1);
         $group2 = new AttributeGroup();
         $entity->addAttributeGroup($group2);
@@ -91,7 +90,6 @@ class GroupAttributesValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new AttributeFamily();
         $entity->setEntityClass('entityClass');
         $group1 = new AttributeGroup();
-        $group1->setIsDefault(true);
         $entity->addAttributeGroup($group1);
         $group2 = new AttributeGroup();
         $entity->addAttributeGroup($group2);
@@ -122,7 +120,6 @@ class GroupAttributesValidatorTest extends \PHPUnit_Framework_TestCase
         $entity = new AttributeFamily();
         $entity->setEntityClass('entityClass');
         $group1 = new AttributeGroup();
-        $group1->setIsDefault(true);
         $entity->addAttributeGroup($group1);
         $group2 = new AttributeGroup();
         $entity->addAttributeGroup($group2);

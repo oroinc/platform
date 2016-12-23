@@ -44,15 +44,12 @@ define(function(require) {
             AttributeSelectComponent.__super__.initialize.call(this, options);
 
             //Modify dropdown - show already selected attributes (from other groups) in braces
-            $(this.attributeSelect).on('select2-opening', function(e) {
-                self.selectedAttributesOtherSelects = [];
-                var data = {'sourceFtid': self.ftid, 'selectedOptions': []};
-                mediator.trigger('attribute-select:find-selected-attributes',  data);
-                self.prepareDropdown(data.selectedOptions);
+            $(this.attributeSelect).on('select2-opening', function() {
+                self.addLabelsToAttributesFromOtherGroups();
             });
 
             //Restore dropdown with initial option labels
-            $(this.attributeSelect).on('select2-close', function(e) {
+            $(this.attributeSelect).on('select2-close', function() {
                 self.restoreInitialDropdown();
             });
 
@@ -70,10 +67,7 @@ define(function(require) {
             });
 
             mediator.on('attribute-select:selected', this.onAttributeSelect, this);
-
-            if (options.configs.isDefault) {
-                mediator.on('attribute-select:group-remove', this.onGroupRemove, this);
-            }
+            mediator.on('attribute-group:remove', this.onGroupRemove, this);
         },
 
         /**
@@ -111,40 +105,73 @@ define(function(require) {
          */
         onAttributeSelect: function(eventData) {
             if (eventData.ftid !== this.ftid) {
-                this.applyOption(eventData.selectedValue, false);
+                this.applyOption(eventData.selectedValue, false, this.attributeSelect);
             }
         },
 
-        /**
-         * @param {Array} optionsArray
-         */
-        onGroupRemove: function(optionsArray) {
-            for (var i = 0; i < optionsArray.length; i++) {
-                var value = optionsArray[i];
-                this.applyOption(value, true);
+        onGroupRemove: function(eventData) {
+            if (eventData.attributeSelectFtid !== this.ftid) {
+                return;
             }
-            var message = _.__('oro.attribute.attributes_moved_to_default_group');
-            mediator.execute('showFlashMessage', 'info', message);
+
+            // Move system attributes to the first group
+            var selectedSystemOptions = $(this.attributeSelect).find('option[locked="locked"]:selected');
+            var optionsArray = $(selectedSystemOptions).map(function() {
+                return this.value;
+            }).get();
+
+            if (optionsArray.length) {
+                var select = eventData.firstGroup.find('[data-bound-input-widget="select2"]');
+                for (var i = 0; i < optionsArray.length; i++) {
+                    var value = optionsArray[i];
+                    this.applyOption(value, true, select);
+                }
+                var message = _.__('oro.attribute.attributes_moved_to_default_group');
+                mediator.execute('showFlashMessage', 'info', message);
+            }
         },
 
         /**
          * @param {Integer} value
-         * @param {Boolean} select
+         * @param {Boolean} isSelected
+         * @param {Object} select
          */
-        applyOption: function(value, select) {
+        applyOption: function(value, isSelected, select) {
             var option;
-            if (select) {
-                option = $(this.attributeSelect).find('option[value="' + value + '"]').not(':selected');
+            if (isSelected) {
+                option = $(select).find('option[value="' + value + '"]').not(':selected');
             } else {
-                option = $(this.attributeSelect).find('option[value="' + value + '"]:selected');
+                option = $(select).find('option[value="' + value + '"]:selected');
             }
 
             if (option.length) {
                 //Need this timeout to deffer Change call because it causes some delay and it may be visible on UI
                 setTimeout(function() {
-                    $(option).prop('selected', select).change();
+                    $(option).prop('selected', isSelected).change();
                 }, 1);
             }
+        },
+
+        addLabelsToAttributesFromOtherGroups: function() {
+            var eventData = {'attributeSelects': []};
+            mediator.trigger('attribute-select:find-selected-attributes', eventData);
+
+            var selectedOptions = [];
+            var self = this;
+            $(eventData.attributeSelects).each(function(key, value) {
+                var groupLabel = value.groupLabel;
+                var attributesSelect = value.attributesSelect;
+                if ($(attributesSelect).data('ftid') === self.ftid) {
+                    return;
+                }
+
+                $(attributesSelect).find('option:selected').each(function() {
+                    var val = $(this).val();
+                    selectedOptions[val] = groupLabel;
+                });
+            });
+
+            this.prepareDropdown(selectedOptions);
         },
 
         /**
@@ -152,18 +179,9 @@ define(function(require) {
          */
         dispose: function(e) {
             mediator.off('attribute-select:selected', this.onAttributeSelect, this);
-            if (this.options.configs.isDefault) {
-                mediator.off('attribute-select:group-remove', this.onGroupRemove, this);
-            }
-            //Find all selected system attributes and move it default group
-            var selectedSystemOptions = $(this.attributeSelect).find('option[locked="locked"]:selected');
-            var optionsArray = $(selectedSystemOptions).map(function() {
-                return this.value;
-            }).get();
+            mediator.off('attribute-group:remove', this.onGroupRemove, this);
 
-            if (optionsArray.length) {
-                mediator.trigger('attribute-select:group-remove', optionsArray);
-            }
+            AttributeSelectComponent.__super__.dispose.call(this);
         }
     });
 

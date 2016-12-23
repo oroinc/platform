@@ -21,7 +21,7 @@ After your valid configuration is ready you should add translations or user-frie
  
 Workflow translations can be loaded from theirs translation files placed under `<YourBundle>/Resources/translations/workflows.{lang}.yml` file (the same behavior as `messages.{lang}.yml` in Symfony defaults).
 
-For that purpose, to fill valid keys with translation text, you can use special command `oro:workflow:translations:dump` that might dump all related to your workflow translation keys to output (stdout) and can be used to build a `workflow.{lang}.yml` file.
+For that purpose, to fill valid keys with translation text, you can use special command `oro:workflow:translations:dump` that might dump all related to your workflow translation keys to output (stdout) and can be used to build a `workflows.{lang}.yml` file.
 
 *For example*, you have workflow named "my_workflow" and creating a translation file directly by redirecting output of command to a file:
 ```bash

@@ -2,13 +2,29 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Stub;
 
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 
 class ButtonStub implements ButtonInterface
 {
     const TITLE = 'Stub button title';
     const LABEL = 'Stub button label';
+
+    /** @var array */
+    protected $buttonOptions;
+
+    public function __construct(array $buttonOptions = [])
+    {
+        $this->buttonOptions = array_replace_recursive(
+            [
+                'name' => 'name',
+                'label' => 'Label',
+                'icon' => 'icon',
+                'translationDomain' => 'de_de'
+            ],
+            $buttonOptions
+        );
+    }
 
     /**
      * {@inheritdoc}
@@ -51,5 +67,37 @@ class ButtonStub implements ButtonInterface
     public function getGroup()
     {
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->buttonOptions['name'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->buttonOptions['label'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->buttonOptions['icon'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTranslationDomain()
+    {
+        return $this->buttonOptions['translationDomain'];
     }
 }

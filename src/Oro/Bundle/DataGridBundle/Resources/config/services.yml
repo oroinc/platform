@@ -115,6 +115,7 @@ services:
             - '@router'
             - '@oro_security.security_facade'
             - '@oro_datagrid.helper.route'
+            - '@request_stack'
         tags:
             - { name: twig.extension }
 

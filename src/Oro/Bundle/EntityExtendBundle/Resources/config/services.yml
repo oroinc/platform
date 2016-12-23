@@ -103,6 +103,7 @@ services:
             - "@oro_entity_extend.db_id_name_generator"
             - "@oro_entity_extend.extend.field_type_helper"
             - "@oro_entity_extend.entity_generator"
+            - "@oro_entity_extend.provider.extend_entity_config_provider"
             - %kernel.cache_dir%
 
     oro_entity_extend.entity_config_dumper.extension.association:
@@ -524,3 +525,8 @@ services:
         decoration_inner_name: cache_warmer.inner
         arguments:
             - '@cache_warmer.inner'
+
+    oro_entity_extend.provider.extend_entity_config_provider:
+            class: 'Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityConfigProvider'
+            arguments:
+                - '@oro_entity_config.config_manager'
