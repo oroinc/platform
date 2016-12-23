@@ -77,6 +77,6 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
      */
     private function createEmailOwnersProviderMock()
     {
-        return $this->getMock(EmailOwnersProvider::class, [], [], '', false);
+        return $this->createMock(EmailOwnersProvider::class);
     }
 }

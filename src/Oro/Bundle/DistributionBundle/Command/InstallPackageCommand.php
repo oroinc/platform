@@ -4,6 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Command;
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
+use Oro\Component\PhpUtils\PhpIniUtil;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,6 +31,21 @@ class InstallPackageCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var DialogHelper $dialog */
+        $dialog = $this->getHelperSet()->get('dialog');
+
+        if (!$this->checkSuggestions($output)) {
+            $continue = $dialog->askConfirmation(
+                $output,
+                'Some suggestions were not met. Do you want to continue? (yes/no, default - no) ',
+                false
+            );
+
+            if (!$continue) {
+                return 0;
+            }
+        }
+
         $packageName = $input->getArgument('package');
         $packageVersion = $input->getArgument('version');
         $forceDependenciesInstalling = $input->getOption('force');
@@ -44,8 +60,6 @@ class InstallPackageCommand extends ContainerAwareCommand
             );
         }
 
-        /** @var DialogHelper $dialog */
-        $dialog = $this->getHelperSet()->get('dialog');
         $loadDemoData = $dialog->askConfirmation(
             $output,
             'Do you want to load demo data? (yes/no, default - no) ',
@@ -86,5 +100,30 @@ class InstallPackageCommand extends ContainerAwareCommand
         $output->writeln(sprintf('%s has been installed!', $packageName));
 
         return 0;
+    }
+
+    /**
+     * @param OutputInterface $output
+     *
+     * @return bool True if suggestions are met, false otherwise
+     */
+    protected function checkSuggestions(OutputInterface $output)
+    {
+        $warnings = [];
+
+        $minimalSuggestedMemory = 2 * pow(1024, 3);
+        $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
+        if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
+            $warnings[] = '<comment>We recommend at least 2Gb to be available for PHP CLI</comment>';
+        }
+
+        if (extension_loaded('xdebug')) {
+            $warnings[] = '<comment>You are about to run composer with xdebug enabled. '
+                . 'This has a major impact on runtime performance. See https://getcomposer.org/xdebug</comment>';
+        }
+
+        array_walk($warnings, [$output, 'writeln']);
+
+        return !$warnings;
     }
 }

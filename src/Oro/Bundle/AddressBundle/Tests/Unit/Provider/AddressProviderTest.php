@@ -22,7 +22,7 @@ class AddressProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->provider = new AddressProvider();
-        $this->storageMock = $this->getMock('Oro\Bundle\AddressBundle\Entity\Manager\StorageInterface');
+        $this->storageMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Manager\StorageInterface');
     }
 
     /**

@@ -26,7 +26,7 @@ class UniqueEnumNameValidatorTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->context       = $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context       = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
 
         $this->validator = new UniqueEnumNameValidator($this->configManager);
         $this->validator->initialize($this->context);

@@ -186,7 +186,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             if ($target.is('.dropdown, .dropup, .oro-drop')) {
                 clickingTarget = $target;
             } else {
-                clickingTarget = $target.closest('.dropdown, .dropup, .oro-drop');
+                clickingTarget = $target.parents('.dropdown, .dropup, .oro-drop');
             }
             $(openDropdownsSelector).filter(function() {
                 return !$(this).has(document.activeElement).length;

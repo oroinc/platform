@@ -184,7 +184,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'))
             ->will($this->returnValue($job));
 
-        $dispatcher = $this->getMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(Events::AFTER_JOB_EXECUTION)
@@ -259,7 +259,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'))
             ->will($this->returnValue($job));
 
-        $dispatcher = $this->getMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('hasListeners')
             ->with(Events::AFTER_JOB_EXECUTION)

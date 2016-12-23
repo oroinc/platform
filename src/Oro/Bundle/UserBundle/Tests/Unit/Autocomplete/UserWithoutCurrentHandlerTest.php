@@ -66,13 +66,13 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
 
-        $metadataFactory = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
+        $metadataFactory = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
         $metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(self::NAME)
             ->will($this->returnValue($metadata));
 
-        $this->manager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->manager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $this->manager->expects($this->any())
             ->method('getRepository')
             ->with(self::NAME)
@@ -112,7 +112,7 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getLoggedUserId')
             ->will($this->returnValue($currentUserId));
 
-        $expr = $this->getMock('Doctrine\ORM\Query\Expr');
+        $expr = $this->createMock('Doctrine\ORM\Query\Expr');
         $expr->expects($this->once())
             ->method('in')
             ->with($this->isType('string'), $expectedUsers);

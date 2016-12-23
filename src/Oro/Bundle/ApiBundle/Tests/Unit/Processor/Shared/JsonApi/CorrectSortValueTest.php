@@ -71,7 +71,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     public function testProcess($className, $config, $orderBy, $expectedOrderBy)
     {
         $sortFilterValue = new FilterValue('sort', $orderBy);
-        $filterValueAccessor = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $filterValueAccessor = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
         $filterValueAccessor->expects($this->once())
             ->method('get')
             ->with('sort')
@@ -174,7 +174,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
             ->method('normalizeValue')
             ->with($defaultValue, DataType::ORDER_BY, $this->context->getRequestType(), false)
             ->willReturn($normalizedDefaultValue);
-        $filterValueAccessor = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $filterValueAccessor = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
         $filterValueAccessor->expects($this->once())
             ->method('set')
             ->willReturnCallback(
@@ -232,7 +232,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
             'sort',
             new SortFilter(DataType::ORDER_BY)
         );
-        $this->context->setFilterValues($this->getMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface'));
+        $this->context->setFilterValues($this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface'));
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->processor->process($this->context);
 
@@ -242,7 +242,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessNoFilter()
     {
-        $this->context->setFilterValues($this->getMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface'));
+        $this->context->setFilterValues($this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface'));
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->processor->process($this->context);
 

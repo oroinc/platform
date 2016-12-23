@@ -99,7 +99,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->with($workflowItem)
             ->willReturn([$workflow]);
 
-        $stepManager = $this->getMock(StepManager::class);
+        $stepManager = $this->createMock(StepManager::class);
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue(false));
 
@@ -218,7 +218,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new \stdClass();
 
-        $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
+        $stepManager = $this->createMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue(false));
 
@@ -307,7 +307,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
     {
         $event = $this->getEvent($entity);
 
-        $stepManager = $this->getMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
+        $stepManager = $this->createMock('Oro\Bundle\WorkflowBundle\Model\StepManager');
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue(true));
 

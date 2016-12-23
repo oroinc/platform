@@ -32,7 +32,7 @@ class UniqueKeyTypeTest extends TypeTestCase
                 ->addExtensions([new ValidatorExtension($validator)])
                 ->getFormFactory();
 
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
 
         $fields = [

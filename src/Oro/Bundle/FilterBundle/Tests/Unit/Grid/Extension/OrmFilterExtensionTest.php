@@ -18,7 +18,7 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $configurationProvider = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider')
             ->disableOriginalConstructor()
@@ -100,7 +100,7 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $filter = $this->getMock('Oro\Bundle\FilterBundle\Filter\FilterInterface');
+        $filter = $this->createMock('Oro\Bundle\FilterBundle\Filter\FilterInterface');
         $filter
             ->expects($this->any())
             ->method('getName')

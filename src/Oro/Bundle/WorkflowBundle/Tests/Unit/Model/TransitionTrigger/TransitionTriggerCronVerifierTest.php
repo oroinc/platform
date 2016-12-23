@@ -57,7 +57,7 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase
         $metadata = new ClassMetadataInfo(self::ENTITY_CLASS);
         $metadata->setIdentifier([self::ENTITY_ID_FIELD]);
 
-        $em = $this->getMock(ObjectManager::class);
+        $em = $this->createMock(ObjectManager::class);
         $em->expects($this->any())
             ->method('getRepository')
             ->with(WorkflowItem::class)
@@ -67,14 +67,14 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
 
-        $registry = $this->getMock(ManagerRegistry::class);
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManagerForClass')
             ->with($this->logicalOr(WorkflowItem::class, self::ENTITY_CLASS))
             ->willReturn($em);
 
-        $this->cronVerifier = $this->getMock(ExpressionVerifierInterface::class);
-        $this->filterVerifier = $this->getMock(ExpressionVerifierInterface::class);
+        $this->cronVerifier = $this->createMock(ExpressionVerifierInterface::class);
+        $this->filterVerifier = $this->createMock(ExpressionVerifierInterface::class);
 
         $this->verifier = new TransitionTriggerCronVerifier($this->workflowAssembler, $registry);
     }
@@ -110,7 +110,7 @@ class TransitionTriggerCronVerifierTest extends \PHPUnit_Framework_TestCase
         $this->cronVerifier->expects($this->once())->method('verify')->with($cron);
         $this->filterVerifier->expects($this->once())->method('verify')->with($query);
 
-        $testVerifier = $this->getMock(ExpressionVerifierInterface::class);
+        $testVerifier = $this->createMock(ExpressionVerifierInterface::class);
         $testVerifier->expects($this->never())->method($this->anything());
 
         $this->verifier->addOptionVerifier('cron', $this->cronVerifier);

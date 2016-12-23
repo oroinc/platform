@@ -19,7 +19,7 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock('Oro\Bundle\ImportExportBundle\Serializer\Serializer');
+        $this->serializer = $this->createMock('Oro\Bundle\ImportExportBundle\Serializer\Serializer');
         $this->normalizer = new CollectionNormalizer();
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -30,14 +30,14 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetInvalidSerializer()
     {
-        $this->normalizer->setSerializer($this->getMock('Symfony\Component\Serializer\SerializerInterface'));
+        $this->normalizer->setSerializer($this->createMock('Symfony\Component\Serializer\SerializerInterface'));
     }
 
     public function testSupportsNormalization()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
 
-        $collection = $this->getMock('Doctrine\Common\Collections\Collection');
+        $collection = $this->createMock('Doctrine\Common\Collections\Collection');
         $this->assertTrue($this->normalizer->supportsNormalization($collection));
     }
 
@@ -66,8 +66,8 @@ class CollectionNormalizerTest extends \PHPUnit_Framework_TestCase
         $format = null;
         $context = array('context');
 
-        $firstElement = $this->getMock('FirstObject');
-        $secondElement = $this->getMock('SecondObject');
+        $firstElement = $this->createMock(\stdClass::class);
+        $secondElement = $this->createMock(\ArrayObject::class);
         $data = new ArrayCollection(array($firstElement, $secondElement));
 
         $this->serializer->expects($this->exactly(2))

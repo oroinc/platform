@@ -15,14 +15,14 @@ class GoogleResourceOwnerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $httpClient = $this->getMock('Buzz\Client\ClientInterface');
-        $httpUtils = $this->getMock('Symfony\Component\Security\Http\HttpUtils');
+        $httpClient = $this->createMock('Buzz\Client\ClientInterface');
+        $httpUtils = $this->createMock('Symfony\Component\Security\Http\HttpUtils');
         $options = [
             'client_id' => 'changeMe',
             'client_secret' => 'changeMe',
         ];
         $name = 'google';
-        $storage = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\RequestDataStorageInterface');
+        $storage = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\RequestDataStorageInterface');
 
         $this->googleResourceOwner = new GoogleResourceOwner($httpClient, $httpUtils, $options, $name, $storage);
     }

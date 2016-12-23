@@ -95,7 +95,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
      */
     private function createQueueSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**

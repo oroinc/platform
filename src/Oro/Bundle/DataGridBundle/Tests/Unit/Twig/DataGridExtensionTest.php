@@ -43,9 +43,9 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->manager = $this->getMock(ManagerInterface::class);
-        $this->nameStrategy = $this->getMock(NameStrategyInterface::class);
-        $this->router = $this->getMock(RouterInterface::class);
+        $this->manager = $this->createMock(ManagerInterface::class);
+        $this->nameStrategy = $this->createMock(NameStrategyInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
         $this->securityFacade = $this->getMockBuilder(SecurityFacade::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -102,7 +102,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $gridName = 'test-grid';
         $params = ['foo' => 'bar'];
 
-        $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
         $configuration = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\DatagridConfiguration')
             ->disableOriginalConstructor()
@@ -180,7 +180,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $url = '/datagrid/test-grid?test-grid-test-scope=foo=bar';
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
-        $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $metadata = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\MetadataObject')
             ->disableOriginalConstructor()
             ->getMock();
@@ -251,7 +251,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetGridDataWorks()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
-        $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $gridData = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\ResultsObject')
             ->disableOriginalConstructor()
             ->getMock();
@@ -278,7 +278,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGenerateGridElementIdWorks($gridName, $gridScope, $expectedPattern)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
-        $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
         $grid->expects($this->once())
             ->method('getName')

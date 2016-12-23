@@ -32,7 +32,7 @@ class FieldSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFieldInfo()
     {
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel
             ->expects($this->exactly(2))
             ->method('getId')
@@ -84,7 +84,7 @@ class FieldSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasFieldInfoWhenInfoIsAbsent($fieldName, $fieldType)
     {
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel
             ->expects($this->exactly(2))
             ->method('getId')
@@ -104,7 +104,7 @@ class FieldSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testHasFieldInfoWhenInfoExists()
     {
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel
             ->expects($this->exactly(2))
             ->method('getId')
@@ -124,7 +124,7 @@ class FieldSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testSaveFieldInfo()
     {
-        $entityConfigModel = $this->getMock(EntityConfigModel::class);
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel
             ->expects($this->exactly(2))
             ->method('getId')

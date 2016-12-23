@@ -109,7 +109,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('filter')
             ->will($this->returnValue($fields));
 
-        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
         $this->configProvider
             ->expects($this->any())

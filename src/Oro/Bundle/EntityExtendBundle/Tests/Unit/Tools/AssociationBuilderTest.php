@@ -43,11 +43,10 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateManyToManyRelationForNewAssociation()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
-        $builder = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
-            ['getPrimaryKeyColumnNames'],
-            [$this->doctrine, $this->configManager, $this->relationBuilder]
-        );
+        $builder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
+            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
+            ->getMock();
 
         $fieldName = 'target_entity_98c95332';
 
@@ -133,11 +132,10 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateManyToManyRelationForNewAssociationAndNoLabelForTargetEntity()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
-        $builder = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
-            ['getPrimaryKeyColumnNames'],
-            [$this->doctrine, $this->configManager, $this->relationBuilder]
-        );
+        $builder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
+            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
+            ->getMock();
 
         $fieldName = 'target_entity_98c95332';
 
@@ -220,12 +218,10 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateManyToManyRelationForExistingAssociation()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
-        $builder = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
-            ['getPrimaryKeyColumnNames'],
-            [$this->doctrine, $this->configManager, $this->relationBuilder]
-        );
-
+        $builder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
+            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
+            ->getMock();
         $fieldName = 'target_entity_98c95332';
 
         $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
@@ -275,11 +271,10 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateManyToOneRelationForNewAssociation()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
-        $builder = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
-            ['getPrimaryKeyColumnNames'],
-            [$this->doctrine, $this->configManager, $this->relationBuilder]
-        );
+        $builder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
+            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
+            ->getMock();
 
         $fieldName = 'target_entity_98c95332';
 
@@ -360,11 +355,10 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateManyToOneRelationForNewAssociationAndNoLabelForTargetEntity()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
-        $builder = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
-            ['getPrimaryKeyColumnNames'],
-            [$this->doctrine, $this->configManager, $this->relationBuilder]
-        );
+        $builder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
+            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
+            ->getMock();
 
         $fieldName = 'target_entity_98c95332';
 
@@ -442,11 +436,10 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCreateManyToOneRelationForExistingAssociation()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
-        $builder = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
-            ['getPrimaryKeyColumnNames'],
-            [$this->doctrine, $this->configManager, $this->relationBuilder]
-        );
+        $builder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder')
+            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
+            ->getMock();
 
         $fieldName = 'target_entity_98c95332';
 

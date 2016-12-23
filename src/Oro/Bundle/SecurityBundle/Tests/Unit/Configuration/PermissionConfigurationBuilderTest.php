@@ -51,7 +51,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 ['EntityNotManageable', false],
             ]);
 
-        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $this->validator = $this->createMock('Symfony\Component\Validator\Validator\ValidatorInterface');
 
         $this->builder = new PermissionConfigurationBuilder($doctrineHelper, $this->validator);
     }
@@ -110,8 +110,8 @@ class PermissionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->setExpectedException(
-            '\Symfony\Component\Validator\Exception\ValidatorException',
+        $this->expectException('\Symfony\Component\Validator\Exception\ValidatorException');
+        $this->expectExceptionMessage(
             sprintf('Configuration of permission test_permission is invalid:%s    Test message', PHP_EOL)
         );
 

@@ -76,7 +76,7 @@ class WorkflowReplacementSelectTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildView($workflow, $expectedId)
     {
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
 
         $formView = new FormView();
 

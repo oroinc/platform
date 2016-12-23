@@ -14,7 +14,7 @@ class DataTransformerRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->transformer1 = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $this->transformer1 = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
 
         $this->registry = new DataTransformerRegistry();
         $this->registry->addDataTransformer('dataType1', $this->transformer1);

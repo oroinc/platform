@@ -229,7 +229,7 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
             ->willReturn($platform);
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getConnection')
             ->willReturn($connection);

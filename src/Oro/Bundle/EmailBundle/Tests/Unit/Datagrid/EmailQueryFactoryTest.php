@@ -83,7 +83,7 @@ class EmailQueryFactoryTest extends OrmTestCase
 
     public function testPrepareQueryOneProviderGiven()
     {
-        $provider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $provider->expects($this->any())->method('getEmailOwnerClass')
             ->will($this->returnValue(self::TEST_ENTITY));
         $this->providerStorage->addProvider($provider);

@@ -21,7 +21,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock(Serializer::class, [], [], '', false);
+        $this->serializer = $this->createMock(Serializer::class);
 
         $this->normalizer = new BlockViewNormalizer();
         $this->normalizer->setSerializer($this->serializer);
@@ -31,7 +31,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization((object)[]));
         $this->assertTrue($this->normalizer->supportsNormalization(
-            $this->getMock(BlockView::class)
+            $this->createMock(BlockView::class)
         ));
     }
 

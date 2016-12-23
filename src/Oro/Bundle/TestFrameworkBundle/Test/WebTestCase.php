@@ -20,6 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResol
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Component\Testing\DbIsolationExtension;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * Abstract class for functional and integration tests
@@ -809,8 +810,9 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get intersect of $target array with values of keys in $source array. If key is an array in both places then
-     * the value of this key will be returned as intersection as well.
+     * Get intersect of $target array with values of keys in $source array.
+     * If key is an array in both places then the value of this key will be returned as intersection as well.
+     * Not associative arrays will be returned completely
      *
      * @param array $source
      * @param array $target
@@ -819,15 +821,29 @@ abstract class WebTestCase extends BaseWebTestCase
     public static function getRecursiveArrayIntersect(array $target, array $source)
     {
         $result = [];
-        foreach (array_keys($source) as $key) {
-            if (array_key_exists($key, $target)) {
-                if (is_array($target[$key]) && is_array($source[$key])) {
-                    $result[$key] = self::getRecursiveArrayIntersect($target[$key], $source[$key]);
+
+        $isSourceAssociative = ArrayUtil::isAssoc($source);
+        $isTargetAssociative = ArrayUtil::isAssoc($target);
+        if (!$isSourceAssociative || !$isTargetAssociative) {
+            foreach ($target as $key => $value) {
+                if (array_key_exists($key, $source) && is_array($value) && is_array($source[$key])) {
+                    $result[$key] = self::getRecursiveArrayIntersect($value, $source[$key]);
                 } else {
-                    $result[$key] = $target[$key];
+                    $result[$key] = $value;
+                }
+            }
+        } else {
+            foreach (array_keys($source) as $key) {
+                if (array_key_exists($key, $target)) {
+                    if (is_array($target[$key]) && is_array($source[$key])) {
+                        $result[$key] = self::getRecursiveArrayIntersect($target[$key], $source[$key]);
+                    } else {
+                        $result[$key] = $target[$key];
+                    }
                 }
             }
         }
+
 
         return $result;
     }
@@ -837,7 +853,6 @@ abstract class WebTestCase extends BaseWebTestCase
      * a more comprehensive way.
      *
      * @param array $array
-     * @return mixed
      */
     protected static function sortArrayByKeyRecursively(array &$array)
     {

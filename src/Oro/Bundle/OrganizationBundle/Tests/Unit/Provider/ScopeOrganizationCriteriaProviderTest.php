@@ -19,7 +19,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMock(TokenStorageInterface::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->provider = new ScopeOrganizationCriteriaProvider($this->tokenStorage);
     }
 
@@ -31,7 +31,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
         $user->setOrganization($organization);
 
         /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
-        $token = $this->getMock(TokenInterface::class);
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
@@ -61,7 +61,7 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
         $user = new \stdClass();
 
         /** @var TokenInterface|\PHPUnit_Framework_MockObject_MockObject $token */
-        $token = $this->getMock(TokenInterface::class);
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);

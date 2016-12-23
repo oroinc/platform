@@ -22,7 +22,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         $this->processor = new BuildFormBuilder($this->formFactory);
     }
@@ -55,7 +55,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
     public function testProcessWhenFormBuilderAlreadyExists()
     {
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $this->context->setFormBuilder($formBuilder);
         $this->processor->process($this->context);
@@ -64,7 +64,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
     public function testProcessWhenFormAlreadyExists()
     {
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
@@ -76,7 +76,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $formType = 'test_form';
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
         $config->setFormType($formType);
@@ -112,7 +112,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1');
@@ -210,7 +210,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1')
@@ -255,7 +255,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
         $config->addField('field1')
@@ -299,7 +299,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
         $config->addField('association1')
@@ -344,7 +344,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
         $config->addField('association1')

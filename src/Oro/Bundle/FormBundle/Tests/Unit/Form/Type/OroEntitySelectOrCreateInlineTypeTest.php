@@ -45,7 +45,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->method('getProvider')
             ->will($this->returnValue($provider));
 
-        $this->config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $this->config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
         $provider
             ->expects($this->any())
@@ -104,7 +104,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->method('getClassMetadata')
             ->will($this->returnValue($metadata));
 
-        $handler        = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
+        $handler        = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
         $searchRegistry = $this
             ->getMockBuilder('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry')
             ->disableOriginalConstructor()
@@ -123,7 +123,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $config        = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config        = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
         $configProvider
             ->expects($this->any())
@@ -217,7 +217,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
      */
     public function formTypeDataProvider()
     {
-        $converter = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface');
+        $converter = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface');
 
         return [
             'create disabled'                   => [

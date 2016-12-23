@@ -56,11 +56,10 @@ services:
         tags:
             - { name: form.type, alias: oro_entity_config_choice }
 
-    oro_entity_config.form.extension.attribute_field_config_extension:
+    oro_entity_config.form.extension.attribute_config_extension:
         class: 'Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeConfigExtension'
         arguments:
             - '@oro_entity_config.provider.attribute'
-            - '@oro_entity_config.provider.extend'
             - '@oro_entity_config.provider.serialized_field_provider'
         tags:
             - { name: form.type_extension, alias: oro_entity_config_type }
@@ -69,7 +68,31 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigFieldHandler
         scope: request
         arguments:
-            - '@oro_entity_extend.form.handler.config_helper_handler'
+            - '@oro_entity_config.form.handler.config_helper_handler'
             - '@oro_entity_config.config.config_helper'
             - '@oro_form.model.update_handler'
             - '@request_stack'
+
+    oro_entity_config.form.type.attribute_family_type:
+            class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType'
+            arguments:
+                - '@translator'
+            tags:
+                - { name: form.type, alias: oro_attribute_family }
+
+    oro_entity_config.form.type.attribute_group_collection:
+        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupCollectionType'
+        tags:
+            - { name: form.type, alias: oro_entity_config_attribute_group_collection }
+
+    oro_entity_config.form.type.attribute_group:
+        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType'
+        tags:
+            - { name: form.type, alias: oro_entity_config_attribute_group }
+
+    oro_entity_config.form.type.attribute_multi_select:
+        class: 'Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType'
+        arguments:
+            - '@oro_entity_config.manager.attribute_manager'
+        tags:
+            - { name: form.type, alias: oro_entity_config_attribute_multi_select }

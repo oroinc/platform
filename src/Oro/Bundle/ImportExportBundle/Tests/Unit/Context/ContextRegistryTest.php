@@ -32,7 +32,7 @@ class ContextRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($barContext, $fooContext);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|JobInstance $jobInstance */
-        $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+        $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
         $jobInstance->expects($this->any())
             ->method('getAlias')
             ->will($this->returnValue('job2'));
@@ -52,8 +52,8 @@ class ContextRegistryTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         if ($alias) {
-            $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
-            $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+            $jobExecution = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
+            $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
             $jobExecution->expects($this->any())
                 ->method('getJobInstance')
                 ->will($this->returnValue($jobInstance));
