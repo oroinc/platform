@@ -29,44 +29,47 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
      */
     protected static $attributes = [
         self::SYSTEM_ATTRIBUTE_1 => [
-            'attribute' => [
-                'is_system' => true,
-            ],
+            'extend' => [
+                'owner' => ExtendScope::OWNER_SYSTEM,
+                'origin' => ExtendScope::ORIGIN_CUSTOM, //needed to apply changes set to extend scope
+                'state' => ExtendScope::STATE_ACTIVE,
+            ]
         ],
         self::SYSTEM_ATTRIBUTE_2 => [
-            'attribute' => [
-                'is_system' => true,
-            ],
+            'extend' => [
+                'owner' => ExtendScope::OWNER_SYSTEM,
+                'origin' => ExtendScope::ORIGIN_CUSTOM,
+                'state' => ExtendScope::STATE_ACTIVE,
+            ]
         ],
         self::DELETED_SYSTEM_ATTRIBUTE => [
-            'attribute' => [
-                'is_system' => true,
-            ],
             'extend' => [
                 'state' => ExtendScope::STATE_DELETE,
+                'owner' => ExtendScope::OWNER_SYSTEM,
             ]
         ],
         self::REGULAR_ATTRIBUTE_1 => [
-            'attribute' => [
-                'is_system' => false,
-            ],
+            'extend' => [
+                'owner' => ExtendScope::OWNER_CUSTOM,
+                'state' => ExtendScope::STATE_ACTIVE,
+            ]
         ],
         self::REGULAR_ATTRIBUTE_2 => [
-            'attribute' => [
-                'is_system' => false,
-            ],
+            'extend' => [
+                'owner' => ExtendScope::OWNER_CUSTOM,
+                'state' => ExtendScope::STATE_ACTIVE,
+            ]
         ],
         self::NOT_USED_ATTRIBUTE => [
-            'attribute' => [
-                'is_system' => false,
-            ],
+            'extend' => [
+                'owner' => ExtendScope::OWNER_CUSTOM,
+                'state' => ExtendScope::STATE_NEW
+            ]
         ],
         self::DELETED_REGULAR_ATTRIBUTE => [
-            'attribute' => [
-                'is_system' => false,
-            ],
             'extend' => [
                 'state' => ExtendScope::STATE_DELETE,
+                'owner' => ExtendScope::OWNER_CUSTOM,
             ]
         ],
     ];
@@ -81,11 +84,11 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
      */
     public function load(ObjectManager $manager)
     {
-        $modelManager = $this->container->get('oro_entity_config.attribute.config_model_manager');
         $configManager = $this->container->get('oro_entity_config.config_manager');
         $configHelper = $this->container->get('oro_entity_config.config.config_helper');
+        $entityModel = $configManager->getConfigEntityModel(self::ENTITY_CONFIG_MODEL);
+        $entityManager = $configManager->getEntityManager();
 
-        $entityModel = $modelManager->getEntityModel(self::ENTITY_CONFIG_MODEL);
         $persistedAttributes = [];
         foreach (self::$attributes as $attributeName => $attributeOptions) {
             $attribute = $configManager->createConfigFieldModel(
@@ -104,11 +107,11 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
             );
             $configHelper->updateFieldConfigs($attribute, $options);
 
-            $modelManager->getEntityManager()->persist($attribute);
+            $entityManager->persist($attribute);
             $persistedAttributes[$attributeName] = $attribute;
         }
 
-        $modelManager->getEntityManager()->flush();
+        $entityManager->flush();
 
         foreach ($persistedAttributes as $attributeName => $attribute) {
             self::$attributesData[$attributeName] = $attribute->getId();

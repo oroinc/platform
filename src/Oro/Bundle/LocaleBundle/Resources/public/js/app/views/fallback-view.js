@@ -82,7 +82,7 @@ define(function(require) {
             this.mapItemToChildren();
 
             this.getValueEl(this.$el).each(function() {
-                self.cloneValueToChildren(self.getItemEl(this));
+                //self.cloneValueToChildren(self.getItemEl(this)); uncomment on merging master
             });
 
             this.fixFallbackWidth();

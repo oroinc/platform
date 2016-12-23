@@ -14,11 +14,11 @@ oro:
                 remove: '[Attribute] Remove attribute'
                 unremove: '[Attribute] Restore attribute'
             attribute_family:
-                manage: '[Attribute Family] Manage attribute families'
-                view: '[Attribute Family] View attribute family'
-                create: '[Attribute Family] Create attribute family'
-                update: '[Attribute Family] Edit attribute family'
-                delete: '[Attribute Family] Delete attribute family'
+                manage: '[Product Family] Manage Product Families'
+                view:   '[Product Family] View Product Family'
+                create: '[Product Family] Create Product Family'
+                update: '[Product Family] Edit Product Family'
+                delete: '[Product Family] Delete Product Family'
 
         attribute:
             entity_label: Attribute
@@ -32,14 +32,16 @@ oro:
             confirm_delete: Do you really want to delete this attribute?
 
         attribute_family:
-            entity_label: Attribute Family
-            entity_plural_label: Attribute Families
+            entity_label: Product Family
+            entity_plural_label: Product Families
             code.label: Code
             enabled.label: Enabled
             labels.label: Label
             image.label: Image
             attribute_groups.label: Attribute Groups
             message.deleted:  Successfully deleted
+            message.updated:  Successfully updated
+            message.cant_delete:  Can not be deleted
 
         attribute_group:
             labels.label: Label
@@ -66,8 +68,8 @@ oro:
         controller:
             attribute_family:
                 message:
-                    update: Attribute family successfully updated
-                    saved: Attribute family was successfully saved
+                    update: Product Family successfully updated
+                    saved: Product Family was successfully saved
             config_entity:
                 message:
                     saved:  Entity saved
@@ -127,8 +129,8 @@ oro:
     entityconfig:
         attribute.entity:
              attributefamily:
-                  entity_label: Attribute family
-                  entity_plural_label: Attribute families
+                  entity_label: Product Family
+                  entity_plural_label: Product Families
                   code.label: Code
                   entity_class.label: AttributeFamily
                   id.label: ID

@@ -53,4 +53,16 @@ class AttributeFamilyRepositoryTest extends WebTestCase
         $this->assertEquals($this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1), $families[0]);
         $this->assertEquals($this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2), $families[1]);
     }
+
+    public function testCountFamiliesByEntityClass()
+    {
+        $this->assertEquals(2, $this->repository->countFamiliesByEntityClass(
+            LoadAttributeData::ENTITY_CONFIG_MODEL
+        ));
+    }
+
+    public function testCountFamiliesByEntityClassWithNotExistingEntityClass()
+    {
+        $this->assertEquals(0, $this->repository->countFamiliesByEntityClass('NotExistingEntityClass'));
+    }
 }
