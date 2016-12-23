@@ -1,5 +1,6 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 {% set gridName = 'attributes-grid' %}
 {% set pageTitle = attributesLabel|trans %}
@@ -19,6 +20,7 @@
         } %}
     {% endif %}
 
+    {{ entityConfig.displayLayoutActions(layoutActions) }}
     {% if resource_granted('oro_attribute_create') %}
         <div class="btn-group pull-right">
             {{ UI.addButton({

@@ -17,30 +17,69 @@ define(function(require) {
         },
 
         /**
+         * @property {String}
+         */
+        groupSelector: '[data-attribute-group]',
+
+        /**
+         * @property {String}
+         */
+        removeBtn: '.removeRow.btn-link',
+
+        /**
          * @inheritDoc
          */
         initialize: function(options) {
+            AttributeGroupComponent.__super__.initialize.call(this, options);
+
             this.options = _.defaults(options || {}, this.options);
             mediator.on('attribute-select:find-selected-attributes', this.onGetSelectedAttributes, this);
-            //Remove delete button for default group
-            if ($(this.options._sourceElement).find('[data-is-default]').data('is-default')) {
-                $(this.options._sourceElement).parent().find('.removeRow.btn-link').remove();
+
+            var groups = this.getAllGroups();
+            if (groups.length === 1) {
+                this.hideRemoveButton(groups);
+            } else {
+                this.showRemoveButton(groups);
             }
             //temporary width fix
             $(this.options._sourceElement).parents().find('.oro-item-collection .row-oro').width(960);
         },
 
+        getAllGroups: function() {
+            return $(this.groupSelector);
+        },
+
+        showRemoveButton: function(groups) {
+            groups.parent().find('.removeRow.btn-link').show();
+        },
+
+        hideRemoveButton: function(groups) {
+            groups.parent().find('.removeRow.btn-link').hide();
+        },
+
+        getAttributeSelect: function() {
+            return $(this.options._sourceElement).find('[data-name="field__attribute-relations"]');
+        },
+
         onGetSelectedAttributes: function(eventData) {
             var groupLabel = $(this.options._sourceElement).find('[data-attribute-select-group]').val();
 
-            var attributesSelect = $(this.options._sourceElement).find('[data-name="field__attribute-relations"]');
-            if ($(attributesSelect).data('ftid') === eventData.sourceFtid) {
-                return;
+            eventData.attributeSelects.push({groupLabel: groupLabel, attributesSelect: this.getAttributeSelect()});
+        },
+
+        dispose: function() {
+            var groups = this.getAllGroups();
+            if (groups.length === 2) { // Disable remove button for the last group
+                this.hideRemoveButton(groups);
             }
-            $(attributesSelect).find('option:selected').each(function() {
-                var val = $(this).val();
-                eventData.selectedOptions[val] = groupLabel;
+
+            mediator.off('attribute-select:find-selected-attributes', this.onGetSelectedAttributes, this);
+            mediator.trigger('attribute-group:remove', {
+                attributeSelectFtid: this.getAttributeSelect().data('ftid'),
+                firstGroup: groups.not(this.options._sourceElement).first()
             });
+
+            AttributeGroupComponent.__super__.dispose.call(this);
         }
     });
 
