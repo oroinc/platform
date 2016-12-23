@@ -42,4 +42,29 @@ class ApplyController extends Controller
 
         return new Response();
     }
+
+    /**
+     * @Route(
+     *      "/update_attribute_schema",
+     *      name="oro_entityextend_attribute_schema_update",
+     *      defaults={"id"=0}
+     * )
+     * Acl(
+     *      id="oro_entityextend_attribute_schema_update",
+     *      label="oro.entity_extend.action.apply_changes",
+     *      type="action",
+     *      group_name=""
+     * )
+     */
+    public function updateAttributeSchemaAction()
+    {
+        /** @var EntityProcessor $entityProcessor */
+        $entityProcessor = $this->get('oro_entity_extend.extend.entity_processor');
+
+        if (!$entityProcessor->updateDatabase(true, true, true)) {
+            throw new HttpException(500, 'Update failed');
+        }
+
+        return new Response();
+    }
 }

@@ -24,7 +24,8 @@ class AttributeGroupType extends AbstractType
         $resolver->setDefaults(
             [
                 'attr' => [
-                    'data-page-component-module' => 'oroentityconfig/js/attribute-group-collection-component'
+                    'data-page-component-module' => 'oroentityconfig/js/attribute-group-collection-component',
+                    'data-attribute-group' => true
                 ],
             ]
         );
@@ -61,7 +62,6 @@ class AttributeGroupType extends AbstractType
             [
                 'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
                 'configs' => [
-                    'isDefault' => false,
                     'component' => 'attribute-autocomplete',
                 ],
                 'attributeEntityClass' => $options['attributeEntityClass']
@@ -90,11 +90,7 @@ class AttributeGroupType extends AbstractType
             [
                 'label' => 'oro.entity_config.attribute_group.attribute_relations.label',
                 'configs' => [
-                    'isDefault' => $data->getIsDefault(),
                     'component' => 'attribute-autocomplete',
-                ],
-                'attr' => [
-                    'data-is-default' => $data->getIsDefault()
                 ],
                 'attributeGroup' => $data
             ]

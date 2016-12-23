@@ -244,7 +244,7 @@ After this "oro_jqueryselect2_hidden" form type can receive option "autocomplete
 This services receives a class name of entity that will be used by form type and during search requests. Also it
 receives properties names that control what data will be transported to select2 javascript widget.
 
-This services can be parent of abstract service "oro_form.autocomplete.search_handler" but if you need your
+This services can be children of abstract service "oro_form.autocomplete.search_handler" but if you need your
 own implementation of search handler you should implement Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface.
 
 #### Security

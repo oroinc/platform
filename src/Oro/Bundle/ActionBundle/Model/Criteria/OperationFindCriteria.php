@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Criteria;
 
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 
 class OperationFindCriteria
 {
@@ -45,7 +45,7 @@ class OperationFindCriteria
         return new static(
             $buttonSearchContext->getEntityClass(),
             $buttonSearchContext->getRouteName(),
-            $buttonSearchContext->getGridName(),
+            $buttonSearchContext->getDatagrid(),
             $buttonSearchContext->getGroup()
         );
     }

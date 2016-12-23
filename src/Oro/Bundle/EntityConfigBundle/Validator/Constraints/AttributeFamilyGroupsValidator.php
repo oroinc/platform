@@ -29,21 +29,5 @@ class AttributeFamilyGroupsValidator extends ConstraintValidator
 
             return;
         }
-
-        $defaultGroups = 0;
-        foreach ($attributeGroups as $group) {
-            if ($group->getIsDefault()) {
-                $defaultGroups++;
-            }
-
-            if ($defaultGroups > 1) {
-                $this->context->addViolation($constraint->manyDefaultGroupsMessage);
-                break;
-            }
-        }
-
-        if (!$defaultGroups) {
-            $this->context->addViolation($constraint->defaultGroupIsNotExistMessage);
-        }
     }
 }

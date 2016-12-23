@@ -41,7 +41,7 @@ class AttributeGroupGridListenerTest extends \PHPUnit_Framework_TestCase
         $record2 = new ResultRecord(['id' => $groupId2]);
         $records = [$record1, $record2];
 
-        $datagrid = $this->getMock(DatagridInterface::class);
+        $datagrid = $this->createMock(DatagridInterface::class);
         $event = new OrmResultAfter($datagrid, $records);
 
         $attributeId1 = 5;

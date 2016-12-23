@@ -36,6 +36,7 @@ services:
         arguments:
             - '@oro_security.acl_helper'
             - '@oro_batch.orm.query_builder.count_query_optimizer'
+            - '@oro_entity.query_hint_resolver'
         class: %oro_datagrid.extension.pager.orm.pager.class%
 
     oro_datagrid.extension.orm_sorter:

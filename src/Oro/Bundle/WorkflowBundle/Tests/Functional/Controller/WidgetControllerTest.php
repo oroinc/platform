@@ -201,6 +201,8 @@ class WidgetControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
         $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
+        $this->assertContains('transition-test_start_init_option-start_transition', $crawler->html());
+        $this->assertNotContains('transition-test_start_init_option-start_transition_from_entities', $crawler->html());
     }
 
     /**

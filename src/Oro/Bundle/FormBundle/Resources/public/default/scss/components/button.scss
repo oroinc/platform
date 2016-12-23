@@ -14,7 +14,7 @@
         box-shadow:  $btn-shadow;
     }
 
-    &[disabled] {
+    @include element-state('disabled') {
         opacity: .75;
     }
 

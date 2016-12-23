@@ -160,6 +160,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     {
         $result = $this->runCommand(self::NAME, ['--no-ansi']);
 
+        $result = str_replace(["\r\n", "\t", "\n", '  '], "", $result);
+
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {
             $this->assertContains($message, $result);

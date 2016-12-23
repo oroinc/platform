@@ -128,8 +128,9 @@ define([
                 this.$el.width(this.column.get('width'));
             }
 
-            if (!_.isFunction(this.column.attributes.cell.prototype.className)) {
-                this.$el.addClass(this.column.attributes.cell.prototype.className);
+            var cell = this.column.get('oldCell') || this.column.get('cell');
+            if (!_.isFunction(cell.prototype.className)) {
+                this.$el.addClass(cell.prototype.className);
             }
 
             if (this.column.has('align')) {

@@ -1,14 +1,16 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,6 +18,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
     {
         new UpdateEmailOwnerAssociationsMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $this->createLoggerMock()
         );
     }
@@ -36,6 +39,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
 
         $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -60,6 +64,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
 
         $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -85,22 +90,68 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
         $producer
             ->expects($this->at(0))
             ->method('send')
-            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, ['ownerId' => 1,'ownerClass' => 'class'])
+            ->with(
+                'oro.email.update_email_owner_association',
+                ['ownerId' => 1, 'ownerClass' => 'class', 'jobId' => 12345]
+            )
         ;
         $producer
             ->expects($this->at(1))
             ->method('send')
-            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, ['ownerId' => 2,'ownerClass' => 'class'])
+            ->with(
+                'oro.email.update_email_owner_association',
+                ['ownerId' => 2, 'ownerClass' => 'class', 'jobId' => 54321]
+            )
         ;
 
-        $message = new NullMessage();
-        $message->setBody(json_encode([
+        $body = [
             'ownerClass' => 'class',
             'ownerIds' => [1,2],
-        ]));
+        ];
+
+        $message = new NullMessage();
+        $message->setBody(json_encode($body));
+        $message->setMessageId('message-id');
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runUnique')
+            ->with('message-id', 'oro.email.update_email_owner_associations' . ':class:'.md5('1,2'))
+            ->will($this->returnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+                $callback($jobRunner);
+
+                return true;
+            }))
+        ;
+
+        $jobRunner
+            ->expects($this->at(0))
+            ->method('createDelayed')
+            ->with('oro.email.update_email_owner_association'.':class:1')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(12345);
+
+                $callback($jobRunner, $job);
+            }))
+        ;
+
+        $jobRunner
+            ->expects($this->at(1))
+            ->method('createDelayed')
+            ->with('oro.email.update_email_owner_association'.':class:2')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(54321);
+
+                $callback($jobRunner, $job);
+            }))
+        ;
 
         $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
             $producer,
+            $jobRunner,
             $logger
         );
 
@@ -131,6 +182,14 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit_Framewor
     private function createLoggerMock()
     {
         return $this->createMock(LoggerInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     */
+    private function createJobRunnerMock()
+    {
+        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
