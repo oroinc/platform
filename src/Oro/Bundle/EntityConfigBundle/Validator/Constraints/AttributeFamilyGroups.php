@@ -24,7 +24,7 @@ class AttributeFamilyGroups extends Constraint
     /**
      * @var string
      */
-    public $sameLabelsMessage = 'oro.entity_extend.validator.attribute_family.same_labels';
+    public $sameLabelsMessage = 'oro.entity_config.validator.attribute_family.same_labels';
 
     /**
      * {@inheritdoc}
