@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Stub\AttributeGroupStub;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\AttributeGroupStub;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Component\Testing\Unit\EntityTrait;

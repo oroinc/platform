@@ -56,7 +56,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $this->addAttributeFamilyImageAssociation($schema);
         $this->addOrganizationForeignKey($schema);
         $table = $schema->getTable('oro_attribute_group');
-        $table->addColumn('code', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('code', 'string', ['length' => 255]);
     }
 
     /**
