@@ -1054,8 +1054,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####OroTrackingBundle
 - Moved ``TrackingBundle`` to a separate ``marketing`` package, required by default in the CRM applications.
-- Added ``Oro\\Bundle\\TrackingBundle\\Composer\\TrackingInstaller::copyTrackingScript`` Composer script to be executed on ``post-install-cmd`` and ``post-update-cmd``, to copy the ``tracking.php`` front controller to application's ``/web`` folder.
-- Deleted ``tracking.php`` front controllers from applications.
+- Deleted ``tracking.php`` front controllers from applications. This file is created in application's `/web` folder automatically duting an instalation.
 
 ####OroNoteBundle
 - Implementation of activity list relation with entity  `Oro\Bundle\NoteBundle\Entity\Note` was changed. Now the entity is a regular activity entity like others: Email, Task, Call, Email, etc.
