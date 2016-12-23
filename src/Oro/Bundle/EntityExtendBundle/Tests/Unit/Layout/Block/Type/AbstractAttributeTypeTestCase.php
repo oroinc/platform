@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityExtendBundle\Layout\Block\Type\AbstractAttributeType;
-use Oro\Bundle\EntityExtendBundle\Manager\AttributeManager;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 

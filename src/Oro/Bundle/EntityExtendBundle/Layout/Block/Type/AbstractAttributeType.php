@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Manager\AttributeManager;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
