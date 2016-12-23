@@ -105,7 +105,7 @@ define([
          * @protected
          */
         _onCollectionReset: function(collection) {
-            var hasRecords = collection.state.totalRecords > 0;
+            var hasRecords = collection.length > 0;
             var hasFiltersState = !_.isEmpty(collection.state.filters);
             if (hasRecords || hasFiltersState) {
                 if (!this.isVisible) {

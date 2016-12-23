@@ -2,7 +2,7 @@
   margin: 0;
 }
 .grid-toolbar {
-  padding: @contentPadding 10px;
+  padding: 0 10px @contentPadding;
   margin-bottom: -@contentPadding;
   &:after {
     content: '';
@@ -69,6 +69,9 @@
     overflow: hidden;
     .forScreen(430px, height, 32px);
   }
+}
+.oro-datagrid:first-child > .toolbar:first-child > .grid-toolbar {
+  padding-top: @contentPadding;
 }
 
 .other-scroll-container {

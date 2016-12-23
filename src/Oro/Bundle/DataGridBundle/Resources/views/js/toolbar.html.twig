@@ -1,6 +1,6 @@
 <script type="text/html" id="template-datagrid-toolbar">
-{% if isDesktopVersion() %}
-    <div class="grid-toolbar">
+    <div class="grid-toolbar clearfix">
+    {% if isDesktopVersion() %}
         <div class="sorting pull-left form-horizontal" data-grid-sorting></div>
         <div class="pull-left grid-toolbar-mass-actions">
             <div class="mass-actions-panel btn-group icons-holder"></div>
@@ -12,9 +12,7 @@
         </div>
         <div class="pagination pagination-centered" data-grid-pagination></div>
         <div class="test" data-grid-items-counter></div>
-    </div>
-{% else %}
-    <div class="grid-toolbar">
+    {% else %}
         <div class="actions-panel pull-right" data-grid-actions-panel></div>
         <div class="pull-left grid-toolbar-mass-actions">
             <div class="mass-actions-panel btn-group icons-holder"></div>
@@ -23,6 +21,6 @@
             <div class="pagination pull-left" data-grid-pagination></div>
             <div class="page-size pull-left" data-grid-pagesize></div>
         </div>
+    {% endif %}
     </div>
-{% endif %}
 </script>
