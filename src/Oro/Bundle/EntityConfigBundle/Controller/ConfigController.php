@@ -13,7 +13,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
@@ -24,6 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 
 /**
  * EntityConfig controller.
@@ -156,7 +156,7 @@ class ConfigController extends Controller
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
 
         list(, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
-        list ($layoutActions, $requireJsModules) = $this->getLayoutParams($entity);
+        list ($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
 
         return [
             'entity'        => $entity,
@@ -187,7 +187,7 @@ class ConfigController extends Controller
             ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->find($id);
 
-        list ($layoutActions, $requireJsModules) = $this->getLayoutParams($entity);
+        list ($layoutActions, $requireJsModules) = $this->getConfigProviderHelper()->getLayoutParams($entity);
 
         return [
             'buttonConfig' => $layoutActions,
@@ -407,82 +407,18 @@ class ConfigController extends Controller
     }
 
     /**
-     * Return configured layout actions and requirejs modules
-     *
-     * @param  EntityConfigModel $entity
-     * @return array
-     */
-    protected function getLayoutParams(EntityConfigModel $entity)
-    {
-        $actions          = [];
-        $requireJsModules = [];
-
-        $providers = $this->getConfigManager()->getProviders();
-        foreach ($providers as $provider) {
-            $layoutActions = $provider->getPropertyConfig()->getLayoutActions(PropertyConfigContainer::TYPE_FIELD);
-            foreach ($layoutActions as $action) {
-                if ($this->isLayoutActionApplicable($action, $entity, $provider)) {
-                    if (isset($action['entity_id']) && $action['entity_id'] == true) {
-                        $action['args'] = ['id' => $entity->getId()];
-                    }
-                    $actions[] = $action;
-                }
-            }
-
-            $requireJsModules = array_merge(
-                $requireJsModules,
-                $provider->getPropertyConfig(PropertyConfigContainer::TYPE_FIELD)->getRequireJsModules()
-            );
-        }
-
-        return [$actions, $requireJsModules];
-    }
-
-    /**
-     * @param array             $action
-     * @param EntityConfigModel $entity
-     * @param ConfigProvider    $provider
-     *
-     * @return bool
-     */
-    protected function isLayoutActionApplicable(
-        array $action,
-        EntityConfigModel $entity,
-        ConfigProvider $provider
-    ) {
-        if (!isset($action['filter'])) {
-            return true;
-        }
-
-        $result = true;
-        foreach ($action['filter'] as $key => $value) {
-            if ($key === 'mode') {
-                if ($entity->getMode() !== $value) {
-                    $result = false;
-                    break;
-                }
-            } else {
-                $config = $provider->getConfig($entity->getClassName());
-                if (is_array($value)) {
-                    if (!$config->in($key, $value)) {
-                        $result = false;
-                        break;
-                    }
-                } elseif ($config->get($key) != $value) {
-                    $result = false;
-                    break;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * @return ConfigManager
      */
     protected function getConfigManager()
     {
         return $this->get('oro_entity_config.config_manager');
+    }
+
+    /**
+     * @return EntityConfigProviderHelper
+     */
+    private function getConfigProviderHelper()
+    {
+        return $this->get('oro_entity_config.helper.entity_config_provider_helper');
     }
 }

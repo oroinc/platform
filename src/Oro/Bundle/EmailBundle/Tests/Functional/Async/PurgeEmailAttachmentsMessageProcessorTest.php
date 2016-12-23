@@ -40,17 +40,20 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 
         $message = new NullMessage();
         $message->setBody(json_encode(['size' => null, 'all' => true]));
+        $message->setMessageId('SomeId');
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments');
 
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(PurgeEmailAttachmentsMessageProcessor::ACK, $result);
-        $this->assertMessageSent(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, ['ids' => [
-            $allAttachments[0]->getId(),
-            $allAttachments[1]->getId(),
-            $allAttachments[2]->getId(),
-        ]]);
+        $this->assertMessageSent(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, [
+            'ids' => [
+                $allAttachments[0]->getId(),
+                $allAttachments[1]->getId(),
+                $allAttachments[2]->getId(),
+            ]
+        ], true);
     }
 
     /**
