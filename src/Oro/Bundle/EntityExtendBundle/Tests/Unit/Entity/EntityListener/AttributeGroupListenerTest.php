@@ -82,11 +82,11 @@ class AttributeGroupListenerTest extends \PHPUnit_Framework_TestCase
             'code slug generated from label' => [
                 'group' => $group1,
                 'repositoryArgs' => [
-                    [[ 'attributeFamily' => $group1->getAttributeFamily(), 'code' => 'proverka-transliteracii' ]],
-                    [[ 'attributeFamily' => $group1->getAttributeFamily(), 'code' => 'proverka-transliteracii1' ]],
+                    [[ 'attributeFamily' => $group1->getAttributeFamily(), 'code' => 'proverka_transliteracii' ]],
+                    [[ 'attributeFamily' => $group1->getAttributeFamily(), 'code' => 'proverka_transliteracii1' ]],
                 ],
                 'repositoryResults' => [$group1, null],
-                'expectedSlug' => 'proverka-transliteracii1',
+                'expectedSlug' => 'proverka_transliteracii1',
             ],
             'default unique slug created' => [
                 'group' => $group2,

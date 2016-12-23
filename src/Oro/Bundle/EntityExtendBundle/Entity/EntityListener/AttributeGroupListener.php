@@ -33,6 +33,7 @@ class AttributeGroupListener
         }
 
         $codeSlug = $this->slugGenerator->slugify((string)$group->getDefaultLabel()) ?: self::DEFAULT_SLUG;
+        $codeSlug = str_replace('-', '_', $codeSlug);
 
         $repository = $args->getEntityManager()->getRepository(AttributeGroup::class);
         $i = 0;
