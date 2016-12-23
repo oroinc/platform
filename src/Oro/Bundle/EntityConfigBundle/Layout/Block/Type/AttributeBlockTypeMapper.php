@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Layout\Block\Type;
+namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 

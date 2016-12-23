@@ -21,7 +21,7 @@ class AttributeFamilyGroupsValidator extends ConstraintValidator
             return;
         }
 
-        /** @var \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup[] $attributeGroups */
+        /** @var AttributeGroup[] $attributeGroups */
         $attributeGroups = $value->getAttributeGroups()->getValues();
 
         if (!count($attributeGroups)) {

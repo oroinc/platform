@@ -13,12 +13,13 @@ class AttributeGroupStub extends AttributeGroup
     private $label;
 
     /**
-     * @param int $id
+     * @param int         $id
      * @param null|string $label
      */
     public function __construct($id, $label = null)
     {
         parent::__construct();
+
         $this->id = $id;
         $this->label = $label;
     }

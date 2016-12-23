@@ -6,8 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PrePersist;
 
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
@@ -72,7 +70,9 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
 
     /**
      * @var AttributeFamily
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups")
+     * @ORM\ManyToOne(
+     *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups"
+     * )
      * @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id")
      */
     private $attributeFamily;

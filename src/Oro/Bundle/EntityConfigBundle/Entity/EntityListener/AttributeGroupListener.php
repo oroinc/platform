@@ -11,11 +11,11 @@ class AttributeGroupListener
 {
     const DEFAULT_SLUG = 'default_group';
 
-    /** @var \Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator */
+    /** @var SlugGenerator */
     private $slugGenerator;
 
     /**
-     * @param \Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator $slugGenerator
+     * @param SlugGenerator $slugGenerator
      */
     public function __construct(SlugGenerator $slugGenerator)
     {
@@ -23,7 +23,7 @@ class AttributeGroupListener
     }
 
     /**
-     * @param AttributeGroup $group
+     * @param AttributeGroup     $group
      * @param LifecycleEventArgs $args
      */
     public function prePersist(AttributeGroup $group, LifecycleEventArgs $args)

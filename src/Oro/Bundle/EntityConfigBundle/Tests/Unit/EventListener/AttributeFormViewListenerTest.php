@@ -1,20 +1,22 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
+
+use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\AttributeGroupStub;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Bundle\EntityConfigBundle\EventListener\AttributeFormViewListener;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
-use Symfony\Component\Form\FormView;
+
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributeFormViewListenerTest extends \PHPUnit_Framework_TestCase
 {

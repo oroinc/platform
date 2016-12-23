@@ -46,6 +46,7 @@ oro:
         attribute_group:
             labels.label: Label
             attribute_relations.label: Attributes
+            code.label: Code
 
         block_titles:
             general.label:       General Information
@@ -128,25 +129,15 @@ oro:
 
     entityconfig:
         attribute.entity:
-            attributefamily:
-                 entity_label: Product Family
-                 entity_plural_label: Product Families
-                 code.label: Code
-                 entity_class.label: AttributeFamily
-                 id.label: ID
-                 is_enabled.label: Is enabled
-                 attribute_groups.label: Group
-                 image.label: Image
-                 labels.label: Labels
-                 owner.label: Owner
-                 organization.label: Organization
-            attributegroup:
-                 entity_label: Attribute group
-                 entity_plural_label: Attribute groups
-                 id.label: ID
-                 is_default.label: Default
-                 is_deletable.label: Deletable
-                 attribute_family.label: Attribute family
-                 labels.label: Labels
-                 label_title: Label
-                 code: Code
+             attributefamily:
+                  entity_label: Product Family
+                  entity_plural_label: Product Families
+                  code.label: Code
+                  entity_class.label: AttributeFamily
+                  id.label: ID
+                  is_enabled.label: Is enabled
+                  attribute_groups.label: Group
+                  image.label: Image
+                  labels.label: Labels
+                  owner.label: Owner
+                  organization.label: Organization

@@ -20,9 +20,12 @@ class AttributeGroupListenerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
     private $em;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->listener = new \Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener(new SlugGenerator());
+        $this->listener = new AttributeGroupListener(new SlugGenerator());
         $this->em = $this->createMock(EntityManagerInterface::class);
     }
 
@@ -30,17 +33,20 @@ class AttributeGroupListenerTest extends \PHPUnit_Framework_TestCase
     {
         $group = new AttributeGroupStub(1, 'label');
         $group->setCode('some-code');
-        $eventArgs = new LifecycleEventArgs($group, $this->em);
+
         $this->em->expects($this->never())->method('getRepository');
+
+        $eventArgs = new LifecycleEventArgs($group, $this->em);
         $this->listener->prePersist($group, $eventArgs);
     }
 
     /**
      * @dataProvider prePersistDataProvider
+     *
      * @param AttributeGroup $group
-     * @param array $repositoryArgs
-     * @param array $repositoryResults
-     * @param string $expectedCodeSlug
+     * @param array          $repositoryArgs
+     * @param array          $repositoryResults
+     * @param string         $expectedCodeSlug
      */
     public function testPrePersist(
         AttributeGroup $group,
@@ -100,7 +106,7 @@ class AttributeGroupListenerTest extends \PHPUnit_Framework_TestCase
                     [
                         [
                             'attributeFamily' => $group2->getAttributeFamily(),
-                            'code' => \Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener::DEFAULT_SLUG . 1
+                            'code' => AttributeGroupListener::DEFAULT_SLUG . 1
                         ]
                     ],
                     [
