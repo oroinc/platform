@@ -207,4 +207,16 @@ interface MenuUpdateInterface
      * @return MenuUpdateInterface
      */
     public function setScope(Scope $scope);
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt();
+
+    /**
+     * @param \DateTime $updatedAt
+     *
+     * @return MenuUpdateInterface
+     */
+    public function setUpdatedAt($updatedAt);
 }

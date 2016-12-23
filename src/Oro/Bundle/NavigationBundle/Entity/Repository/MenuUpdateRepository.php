@@ -55,20 +55,21 @@ class MenuUpdateRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('u');
 
-        $qb->where($qb->expr()->eq('u.menu', ':menuName'))
+        return $qb->select(['u', 'titles', 'descriptions'])
+            ->innerJoin('u.titles', 'titles')
+            ->innerJoin('u.descriptions', 'descriptions')
+            ->where($qb->expr()->eq('u.menu', ':menuName'))
             ->andWhere($qb->expr()->eq('u.scope', ':scope'))
             ->orderBy('u.id')
             ->setParameters([
                 'menuName' => $menuName,
                 'scope' => $scope
-            ]);
-
-        $query = $qb->getQuery()
+            ])
+            ->getQuery()
             ->useResultCache(true)
             ->setResultCacheDriver($this->getQueryResultCache())
-            ->setResultCacheId(MenuUpdateUtils::generateKey($menuName, $scope));
-
-        return $query->getResult();
+            ->setResultCacheId(MenuUpdateUtils::generateKey($menuName, $scope))
+            ->getResult();
     }
 
     /**

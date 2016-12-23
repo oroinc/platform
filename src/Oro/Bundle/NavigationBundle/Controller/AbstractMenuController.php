@@ -123,6 +123,8 @@ abstract class AbstractMenuController extends Controller
             $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
         }
 
+        $menuUpdate->setUpdatedAt(new \DateTime('UTC'));
+
         $form = $this->createForm(MenuUpdateType::NAME, $menuUpdate, ['menu_item' => $menuItem]);
 
         $response = $this->get('oro_form.model.update_handler')->update(

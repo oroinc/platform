@@ -30,9 +30,9 @@ class MenuUpdateListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->cache = $this->getMock(CacheProvider::class);
+        $this->cache = $this->createMock(CacheProvider::class);
 
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
             ->with(MenuUpdateListener::MENU_CACHE_SERVICE_ID)
@@ -48,18 +48,18 @@ class MenuUpdateListenerTest extends \PHPUnit_Framework_TestCase
         /** @var MenuUpdate $update */
         $update = $this->getEntity(MenuUpdate::class, ['menu' => 'test', 'scope' => $scope]);
 
-        $repository = $this->getMock(MenuUpdateRepository::class, [], [], '', false);
+        $repository = $this->createMock(MenuUpdateRepository::class);
         $repository->expects($this->once())->method('findMenuUpdatesByScope')->with('test', $scope);
 
-        $classMetadata = $this->getMock(ClassMetadata::class, [], [], '', false);
+        $classMetadata = $this->createMock(ClassMetadata::class);
 
         /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())->method('getRepository')->willReturn($repository);
         $em->expects($this->any())->method('getClassMetadata')->willReturn($classMetadata);
 
         /** @var LifecycleEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
-        $args = $this->getMock(LifecycleEventArgs::class, [], [], '', false);
+        $args = $this->createMock(LifecycleEventArgs::class);
         $args->expects($this->any())->method('getEntityManager')->willReturn($em);
 
         $this->listener->postPersist($update, $args);
@@ -71,18 +71,18 @@ class MenuUpdateListenerTest extends \PHPUnit_Framework_TestCase
         /** @var MenuUpdate $update */
         $update = $this->getEntity(MenuUpdate::class, ['menu' => 'test', 'scope' => $scope]);
 
-        $repository = $this->getMock(MenuUpdateRepository::class, [], [], '', false);
+        $repository = $this->createMock(MenuUpdateRepository::class);
         $repository->expects($this->once())->method('findMenuUpdatesByScope')->with('test', $scope);
 
-        $classMetadata = $this->getMock(ClassMetadata::class, [], [], '', false);
+        $classMetadata = $this->createMock(ClassMetadata::class);
 
         /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())->method('getRepository')->willReturn($repository);
         $em->expects($this->any())->method('getClassMetadata')->willReturn($classMetadata);
 
         /** @var LifecycleEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
-        $args = $this->getMock(LifecycleEventArgs::class, [], [], '', false);
+        $args = $this->createMock(LifecycleEventArgs::class);
         $args->expects($this->any())->method('getEntityManager')->willReturn($em);
 
         $this->listener->postUpdate($update, $args);
@@ -94,18 +94,18 @@ class MenuUpdateListenerTest extends \PHPUnit_Framework_TestCase
         /** @var MenuUpdate $update */
         $update = $this->getEntity(MenuUpdate::class, ['menu' => 'test', 'scope' => $scope]);
 
-        $repository = $this->getMock(MenuUpdateRepository::class, [], [], '', false);
+        $repository = $this->createMock(MenuUpdateRepository::class);
         $repository->expects($this->once())->method('findMenuUpdatesByScope')->with('test', $scope);
 
-        $classMetadata = $this->getMock(ClassMetadata::class, [], [], '', false);
+        $classMetadata = $this->createMock(ClassMetadata::class);
 
         /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject $em */
-        $em = $this->getMock(EntityManagerInterface::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())->method('getRepository')->willReturn($repository);
         $em->expects($this->any())->method('getClassMetadata')->willReturn($classMetadata);
 
         /** @var LifecycleEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
-        $args = $this->getMock(LifecycleEventArgs::class, [], [], '', false);
+        $args = $this->createMock(LifecycleEventArgs::class);
         $args->expects($this->any())->method('getEntityManager')->willReturn($em);
 
         $this->listener->postRemove($update, $args);
