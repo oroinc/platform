@@ -115,7 +115,6 @@ define([
         onOpenDropdown: function() {
             this._setDropdownDesign();
             this.getWidget().find('input[type="search"]').focus();
-            $('body').trigger('click');
         },
 
         /**

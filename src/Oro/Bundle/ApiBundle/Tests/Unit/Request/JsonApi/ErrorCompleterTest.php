@@ -21,7 +21,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->exceptionTextExtractor = $this->getMock('Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface');
+        $this->exceptionTextExtractor = $this
+            ->createMock('Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface');
 
         $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor);
     }

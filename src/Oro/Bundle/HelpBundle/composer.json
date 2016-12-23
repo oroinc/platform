@@ -15,7 +15,6 @@
         "psr-0": { "Oro\\Bundle\\HelpBundle": "" }
     },
     "target-dir": "Oro/Bundle/HelpBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

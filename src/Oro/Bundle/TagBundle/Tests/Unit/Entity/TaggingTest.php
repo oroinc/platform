@@ -18,7 +18,7 @@ class TaggingTest extends \PHPUnit_Framework_TestCase
 
     public function testSetGetUserMethods()
     {
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $this->tagging->setOwner($user);
         $this->assertEquals($user, $this->tagging->getOwner());
@@ -26,7 +26,7 @@ class TaggingTest extends \PHPUnit_Framework_TestCase
 
     public function testSetGetTagMethods()
     {
-        $tag = $this->getMock('Oro\Bundle\TagBundle\Entity\Tag');
+        $tag = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
         $this->tagging->setTag($tag);
 
         $this->assertEquals($tag, $this->tagging->getTag());

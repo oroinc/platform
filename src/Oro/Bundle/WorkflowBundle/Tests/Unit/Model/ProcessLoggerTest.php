@@ -56,7 +56,7 @@ class ProcessLoggerTest extends \PHPUnit_Framework_TestCase
                 $doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity, false)
                     ->will($this->returnValue($entityId));
             }
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $logger->expects($this->once())->method('debug')->with($message, $context);
         } else {
             $doctrineHelper->expects($this->never())->method('getSingleEntityIdentifier');

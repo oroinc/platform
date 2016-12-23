@@ -21,7 +21,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         $this->processor = new BuildFormBuilder($this->formFactory);
 
@@ -31,7 +31,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWhenFormBuilderAlreadyExists()
     {
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $this->context->setFormBuilder($formBuilder);
         $this->processor->process($this->context);
@@ -40,7 +40,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWhenFormAlreadyExists()
     {
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
@@ -51,7 +51,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     public function testProcessWithDefaultOptions()
     {
         $parentEntity = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
@@ -87,7 +87,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     public function testProcessWithCustomOptions()
     {
         $parentEntity = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $parentConfig = new EntityDefinitionConfig();
         $associationConfig = $parentConfig->addField(self::TEST_ASSOCIATION_NAME);

@@ -13,7 +13,7 @@ class ChainExclusionProviderWithIncludeRulesTest extends \PHPUnit_Framework_Test
 
     public function setUp()
     {
-        $hierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
+        $hierarchyProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
         $hierarchyProvider->expects($this->any())
             ->method('getHierarchyForClassName')
             ->willReturnMap(

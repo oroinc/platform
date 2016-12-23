@@ -18,7 +18,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $extension = $this->getMock('Symfony\Component\DependencyInjection\Extension\ExtensionInterface');
+        $extension = $this->createMock('Symfony\Component\DependencyInjection\Extension\ExtensionInterface');
         $extension
             ->expects($this->any())
             ->method('getAlias')

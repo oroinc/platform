@@ -35,7 +35,7 @@ class TransitionIsAllowedValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateExceptions($workflowException, $expectedViolations)
     {
         $workflowName = 'test_workflow';
-        $workflowItem = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
+        $workflowItem = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
 
         $workflowItem->expects($this->any())
             ->method('getWorkflowName')
@@ -66,7 +66,7 @@ class TransitionIsAllowedValidatorTest extends \PHPUnit_Framework_TestCase
 
         $value = new WorkflowData();
 
-        $context = $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
 
         foreach (array_values($expectedViolations) as $index => $expectedViolation) {
             list($message, $params) = array_pad((array)$expectedViolation, 2, array());

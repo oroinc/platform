@@ -1,5 +1,8 @@
 oro:
     email:
+        smtp_connection:
+            success: Connection established successfully
+            error:   Could not establish connection
         menu:
             mark_unread:
                 success.message: Message has been marked as unread

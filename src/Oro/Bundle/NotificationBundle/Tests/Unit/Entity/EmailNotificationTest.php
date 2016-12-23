@@ -34,7 +34,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
 
     public function testGetterSetterForTemplate()
     {
-        $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
+        $emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $this->assertNull($this->entity->getTemplate());
         $this->entity->setTemplate($emailTemplate);
         $this->assertEquals($emailTemplate, $this->entity->getTemplate());
@@ -44,7 +44,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->entity->getEvent());
 
-        $event = $this->getMock('Oro\Bundle\NotificationBundle\Entity\Event', array(), array('test.name'));
+        $event = $this->createMock('Oro\Bundle\NotificationBundle\Entity\Event', array(), array('test.name'));
         $this->entity->setEvent($event);
         $this->assertEquals($event, $this->entity->getEvent());
     }
@@ -53,7 +53,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->entity->getRecipientList());
 
-        $list = $this->getMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
+        $list = $this->createMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
         $this->entity->setRecipientList($list);
         $this->assertEquals($list, $this->entity->getRecipientList());
     }
@@ -62,11 +62,11 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->entity->getRecipientUsersList()->isEmpty());
 
-        $userMock1 = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $userMock2 = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $userMock1 = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $userMock2 = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $collection = new ArrayCollection(array($userMock1, $userMock2));
 
-        $list = $this->getMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
+        $list = $this->createMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
         $list->expects($this->once())->method('getUsers')->will($this->returnValue($collection));
         $this->entity->setRecipientList($list);
 
@@ -79,12 +79,12 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->entity->getRecipientGroupsList()->isEmpty());
 
-        $groupMock1 = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
-        $groupMock2 = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
+        $groupMock1 = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
+        $groupMock2 = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
 
         $collection = new ArrayCollection(array($groupMock1, $groupMock2));
 
-        $list = $this->getMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
+        $list = $this->createMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
         $list->expects($this->once())->method('getGroups')->will($this->returnValue($collection));
         $this->entity->setRecipientList($list);
 

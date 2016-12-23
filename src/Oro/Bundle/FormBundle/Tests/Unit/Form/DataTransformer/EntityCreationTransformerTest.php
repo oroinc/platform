@@ -64,7 +64,8 @@ class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
         $this->transformer->setAllowEmptyProperty($allowEmptyProperty);
         $this->transformer->setNewEntityPropertyName($newEntityPropertyName);
         if (null !== $exception) {
-            $this->setExpectedException(get_class($exception), $exception->getMessage());
+            $this->expectException(get_class($exception));
+            $this->expectExceptionMessage($exception->getMessage());
         }
         if ($loadEntity) {
             /** @var TestCreationEntity $expected */

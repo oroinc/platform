@@ -41,7 +41,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'The topic name must not be empty');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The topic name must not be empty');
         $router->addRoute('', 'aProcessorName', 'aQueueName');
     }
 
@@ -49,7 +50,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'The processor name must not be empty');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The processor name must not be empty');
         $router->addRoute('aTopicName', '', 'aQueueName');
     }
 
@@ -89,8 +91,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
 
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'Got message without required parameter: "oro.message_queue.client.topic_name"'
         );
         $result = $router->route(new NullMessage());
@@ -102,7 +104,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'The queue name must not be empty');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The queue name must not be empty');
         $router->addRoute('aTopicName', 'aProcessorName', '');
     }
 
@@ -241,7 +244,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
      */
     protected function createDriverStub()
     {
-        $driverMock = $this->getMock(DriverInterface::class);
+        $driverMock = $this->createMock(DriverInterface::class);
         $driverMock
             ->expects($this->any())
             ->method('createTransportMessage')

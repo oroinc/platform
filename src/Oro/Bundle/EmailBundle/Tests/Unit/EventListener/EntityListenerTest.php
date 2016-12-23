@@ -72,7 +72,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->producer = $this->getMock(MessageProducerInterface::class);
+        $this->producer = $this->createMock(MessageProducerInterface::class);
 
         $this->emailOwnerStorage = new EmailOwnerProviderStorage();
         $this->emailOwnerStorage->addProvider($this->userEmailOwnerProvider);
@@ -256,7 +256,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createClassMetadataMock()
     {
-        return $this->getMock(ClassMetadata::class, [], [], '', false);
+        return $this->createMock(ClassMetadata::class);
     }
 
     /**
@@ -264,7 +264,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createClassMetadataInfoMock()
     {
-        return $this->getMock(ClassMetadataInfo::class, [], [], '', false);
+        return $this->createMock(ClassMetadataInfo::class);
     }
 
     /**
@@ -272,7 +272,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityManagerMock()
     {
-        return $this->getMock(EntityManager::class, [], [], '', false);
+        return $this->createMock(EntityManager::class);
     }
 
     /**
@@ -280,7 +280,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createOnFlushEventArgsMock()
     {
-        return $this->getMock(OnFlushEventArgs::class, [], [], '', false);
+        return $this->createMock(OnFlushEventArgs::class);
     }
 
     /**
@@ -288,6 +288,6 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function createPostFlushEventArgsMock()
     {
-        return $this->getMock(PostFlushEventArgs::class, [], [], '', false);
+        return $this->createMock(PostFlushEventArgs::class);
     }
 }

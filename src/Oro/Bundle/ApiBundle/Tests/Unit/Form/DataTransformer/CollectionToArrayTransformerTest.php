@@ -16,7 +16,7 @@ class CollectionToArrayTransformerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->elementTransformer = $this->getMock('Symfony\Component\Form\DataTransformerInterface');
+        $this->elementTransformer = $this->createMock('Symfony\Component\Form\DataTransformerInterface');
 
         $this->transformer = new CollectionToArrayTransformer($this->elementTransformer);
     }

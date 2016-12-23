@@ -53,12 +53,12 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
 
         $workflowItem = new WorkflowItem();
 
         $transitionName = 'test';
-        $transition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Transition');
+        $transition = $this->createMock('Oro\Bundle\WorkflowBundle\Model\Transition');
         $transition->expects($this->once())->method('getName')->will($this->returnValue($transitionName));
 
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')

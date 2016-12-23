@@ -116,7 +116,8 @@ class BundleConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $configuration = new BundleConfiguration();
 
-        $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $processor->processConfiguration($configuration, array($options));
     }

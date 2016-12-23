@@ -10,10 +10,10 @@ class TwigRendererTest extends \PHPUnit_Framework_TestCase
     public function testSetEnvironment()
     {
         /** @var \Twig_Environment $environment */
-        $environment = $this->getMock('Twig_Environment');
+        $environment = $this->createMock('Twig_Environment');
 
         /** @var TwigRendererEngineInterface|\PHPUnit_Framework_MockObject_MockObject $engine */
-        $engine = $this->getMock('Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface');
+        $engine = $this->createMock('Oro\Bundle\LayoutBundle\Form\TwigRendererEngineInterface');
         $engine->expects($this->once())
             ->method('setEnvironment')
             ->with($environment);

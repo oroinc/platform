@@ -63,16 +63,6 @@ class MultiCurrencyType extends PriceType
                 ]
             );
 
-        $builder->addViewTransformer(new MultiCurrencyTransformer());
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $multiCurrencyHolder = $event->getForm()->getParent()->getData();
-                if ($multiCurrencyHolder instanceof MultiCurrencyHolderInterface) {
-                    $multiCurrencyHolder->updateMultiCurrencyFields();
-                }
-            }
-        );
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {

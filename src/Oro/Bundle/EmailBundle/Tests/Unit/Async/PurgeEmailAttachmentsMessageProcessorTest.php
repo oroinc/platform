@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
+
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,6 +18,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
         new PurgeEmailAttachmentsMessageProcessor(
             $this->createRegistryInterfaceMock(),
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $this->createConfigManagerMock()
         );
     }
@@ -45,6 +46,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
         $processor = new PurgeEmailAttachmentsMessageProcessor(
             $this->createRegistryInterfaceMock(),
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $configManager
         );
 
@@ -79,7 +81,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
      */
     private function createConfigManagerMock()
     {
-        return $this->getMock(ConfigManager::class, [], [], '', false);
+        return $this->createMock(ConfigManager::class);
     }
 
     /**
@@ -87,14 +89,24 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit_Framework_TestC
      */
     private function createRegistryInterfaceMock()
     {
-        return $this->getMock(RegistryInterface::class, [], [], '', false);
+        return $this->createMock(RegistryInterface::class);
     }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     */
+    private function createJobRunnerMock()
+    {
+        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
+    }
+
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

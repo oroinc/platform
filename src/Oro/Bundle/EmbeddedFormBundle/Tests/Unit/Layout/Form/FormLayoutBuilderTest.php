@@ -31,8 +31,8 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $this->blockBuilder      = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
+        $this->layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $this->blockBuilder      = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
         $this->blockBuilder->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(self::ROOT_ID));
@@ -291,9 +291,9 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getForm($compound = true, $type = 'form', $name = 'some_form')
     {
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $form       = new Form($formConfig);
-        $formType   = $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        $formType   = $this->createMock('Symfony\Component\Form\FormTypeInterface');
         $formType->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($type));

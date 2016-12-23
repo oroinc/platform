@@ -9,7 +9,7 @@ git checkout <VERSION TO UPGRADE>
 ```
   * Upgrade composer dependency
 ```bash
-php composer.phar install --prefer-dist
+php composer.phar install --prefer-dist --no-dev
 ```
   * Remove old caches and assets
 ```bash

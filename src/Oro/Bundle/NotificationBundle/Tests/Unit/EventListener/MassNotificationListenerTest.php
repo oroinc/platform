@@ -38,11 +38,11 @@ class MassNotificationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testLogMassNotification()
     {
-        $spoolItem = $this->getMock('Oro\Bundle\NotificationBundle\Entity\SpoolItem');
-        $message = $this->getMock('Swift_Mime_Message');
+        $spoolItem = $this->createMock('Oro\Bundle\NotificationBundle\Entity\SpoolItem');
+        $message = $this->createMock('Swift_Mime_Message');
         $email = ['test@test.com' => 'test name'];
         $date = new \DateTime('now');
-        $message = $this->getMock('Swift_Mime_Message');
+        $message = $this->createMock('Swift_Mime_Message');
         $message->expects($this->once())->method('getTo')->will($this->returnValue(['to@test.com' => 'test']));
         $message->expects($this->once())->method('getFrom')->will($this->returnValue(['from@test.com' => 'test']));
         $message->expects($this->once())->method('getDate')->will($this->returnValue($date->getTimestamp()));
@@ -77,7 +77,7 @@ class MassNotificationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoLoggingDone()
     {
-        $spoolItem = $this->getMock('Oro\Bundle\NotificationBundle\Entity\SpoolItem');
+        $spoolItem = $this->createMock('Oro\Bundle\NotificationBundle\Entity\SpoolItem');
         $spoolItem->expects($this->once())->method('getLogType')->will(
             $this->returnValue('non existing type')
         );

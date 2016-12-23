@@ -9,7 +9,6 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -17,9 +16,6 @@ use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
 class OperationTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
-    protected $operationManager;
-
     /** @var RequiredAttributesListener */
     protected $requiredAttributesListener;
 
@@ -30,14 +26,9 @@ class OperationTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->requiredAttributesListener = new RequiredAttributesListener();
 
         $this->formType = new OperationType(
-            $this->operationManager,
             $this->requiredAttributesListener,
             new ContextAccessor()
         );
@@ -212,7 +203,8 @@ class OperationTypeTest extends FormIntegrationTestCase
      */
     public function testException(array $options, $exception, $message, ActionData $data = null)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $this->factory->create($this->formType, $data, $options);
     }

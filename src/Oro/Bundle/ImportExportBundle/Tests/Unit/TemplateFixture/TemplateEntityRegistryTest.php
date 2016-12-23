@@ -44,10 +44,8 @@ class TemplateEntityRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->entityRegistry->hasEntity('Test\Entity', 'test3')
         );
-        $this->setExpectedException(
-            'Oro\Bundle\ImportExportBundle\Exception\LogicException',
-            'The entity "Test\Entity" with key "test3" does not exist.'
-        );
+        $this->expectException('Oro\Bundle\ImportExportBundle\Exception\LogicException');
+        $this->expectExceptionMessage('The entity "Test\Entity" with key "test3" does not exist.');
         $this->entityRegistry->getEntity('Test\Entity', 'test3');
     }
 
@@ -58,10 +56,8 @@ class TemplateEntityRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity1);
 
-        $this->setExpectedException(
-            'Oro\Bundle\ImportExportBundle\Exception\LogicException',
-            'The entity "Test\Entity" with key "test1" is already exist.'
-        );
+        $this->expectException('Oro\Bundle\ImportExportBundle\Exception\LogicException');
+        $this->expectExceptionMessage('The entity "Test\Entity" with key "test1" is already exist.');
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity2);
     }
 
@@ -72,10 +68,10 @@ class TemplateEntityRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->entityRegistry->addEntity('Test\Entity1', 'test1', $entity1);
 
-        $repository1 = $this->getMock(
+        $repository1 = $this->createMock(
             'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
         );
-        $repository2 = $this->getMock(
+        $repository2 = $this->createMock(
             'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
         );
 
@@ -120,10 +116,10 @@ class TemplateEntityRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->entityRegistry->addEntity('Test\Entity1', 'test1', $entity1);
 
-        $repository1 = $this->getMock(
+        $repository1 = $this->createMock(
             'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
         );
-        $repository2 = $this->getMock(
+        $repository2 = $this->createMock(
             'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
         );
 

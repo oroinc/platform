@@ -77,7 +77,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $this->resultCallbackInvoked = false;
 
@@ -128,7 +128,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleUpdateWorksWithBlankDataAndNoHandler()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $entity = $this->getObject();
         $expected = $this->getExpectedSaveData($form, $entity);
 
@@ -515,7 +515,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleUpdateWorksWithRouteCallback()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
-        $this->form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $entity = $this->getObject();
 
@@ -534,7 +534,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             return $saveAndCloseRoute;
         };
         /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $expectedForm */
-        $expectedForm = $this->getMock(FormInterface::class);
+        $expectedForm = $this->createMock(FormInterface::class);
 
         $expected = $this->getExpectedSaveData($this->form, $entity);
         $expected['savedId'] = 1;
@@ -658,7 +658,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFlashBagMock($message)
     {
-        $flashBag = $this->getMock('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
+        $flashBag = $this->createMock('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
         $flashBag->expects($this->once())
             ->method('add')
             ->with('success', $message);
@@ -673,7 +673,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getHandlerStub($entity)
     {
-        $handler = $this->getMock('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub');
+        $handler = $this->createMock('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub');
         $handler->expects($this->once())
             ->method('process')
             ->with($entity)

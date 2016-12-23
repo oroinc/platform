@@ -187,7 +187,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
      */
     protected function getTranslator(TranslatorInterface $translator = null)
     {
-        return $translator ?: $this->getMock(TranslatorInterface::class);
+        return $translator ?: $this->createMock(TranslatorInterface::class);
     }
 
     /**

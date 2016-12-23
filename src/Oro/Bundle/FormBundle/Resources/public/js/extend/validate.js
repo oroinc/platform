@@ -25,8 +25,8 @@ define([
         if (validator instanceof $.validator) {
             return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
                 var $el = $(el);
-                // is it current element or first in a group of elements
-                return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
+                // is it current element or the validated input is among the elements of the current collection
+                return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).has(element));
             });
         } else {
             return [];
@@ -220,7 +220,7 @@ define([
         var validator = this;
 
         $(this.currentForm).on('content:changed', function(event) {
-            validationHandler.initialize($(event.target));
+            validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
         }).on('disabled', function(e) {
             validator.hideElementErrors(e.target);
         });

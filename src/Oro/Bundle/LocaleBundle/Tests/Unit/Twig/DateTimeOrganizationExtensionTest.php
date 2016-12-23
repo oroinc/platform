@@ -50,7 +50,7 @@ class DateTimeOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
         $date = new \DateTime('2016-05-31 00:00:00');
         $expected = 'May 30, 2016, 4:00 PM';
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
 
         $organizationLocale = 'en_US';
         $organizationTimezone = 'America/Los_Angeles';

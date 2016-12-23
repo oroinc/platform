@@ -79,7 +79,7 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -87,7 +87,7 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createImapEmailSynchronizerMock()
     {
-        return $this->getMock(ImapEmailSynchronizer::class, [], [], '', false);
+        return $this->createMock(ImapEmailSynchronizer::class);
     }
 
     /**
@@ -95,6 +95,6 @@ class SyncEmailMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

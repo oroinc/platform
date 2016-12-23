@@ -25,7 +25,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->formExtensionSwitcher = $this->getMock(FormExtensionSwitcherInterface::class);
+        $this->formExtensionSwitcher = $this->createMock(FormExtensionSwitcherInterface::class);
         $this->metadataTypeGuesser = $this->getMockBuilder(MetadataTypeGuesser::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -73,9 +73,9 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
 
     public function testProcessForPreviouslyRememberedContext()
     {
-        $includedEntities = $this->getMock(IncludedEntityCollection::class);
-        $metadataAccessor = $this->getMock(MetadataAccessorInterface::class);
-        $configAccessor = $this->getMock(ConfigAccessorInterface::class);
+        $includedEntities = $this->createMock(IncludedEntityCollection::class);
+        $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
+        $configAccessor = $this->createMock(ConfigAccessorInterface::class);
 
         $this->formExtensionSwitcher->expects($this->once())
             ->method('switchToDefaultFormExtension');

@@ -43,7 +43,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $command->setApplication($app);
 
         if ($exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $transServiceMock = $this->getMockBuilder(
@@ -233,6 +233,6 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function getNewMock($class)
     {
-        return $this->getMock($class, [], [], '', false);
+        return $this->createMock($class);
     }
 }

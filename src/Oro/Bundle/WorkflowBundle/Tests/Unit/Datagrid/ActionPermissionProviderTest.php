@@ -48,12 +48,12 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function getWorkflowDefinitionPermissionsDataProvider()
     {
-        $systemDefinition = $this->getMock(ResultRecordInterface::class);
+        $systemDefinition = $this->createMock(ResultRecordInterface::class);
         $systemDefinition->expects($this->any())
             ->method('getValue')
             ->will($this->returnValueMap(array(array('system', true))));
 
-        $regularDefinition = $this->getMock(ResultRecordInterface::class);
+        $regularDefinition = $this->createMock(ResultRecordInterface::class);
         $regularDefinition->expects($this->any())
             ->method('getValue')
             ->will($this->returnValueMap(array(array('system', false))));
@@ -214,7 +214,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getDefinitionMock($active)
     {
-        $definition = $this->getMock(ResultRecordInterface::class);
+        $definition = $this->createMock(ResultRecordInterface::class);
 
         $definition->expects($this->any())
             ->method('getValue')

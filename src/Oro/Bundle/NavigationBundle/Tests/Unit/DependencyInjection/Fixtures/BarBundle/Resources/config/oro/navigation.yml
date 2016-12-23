@@ -3,11 +3,11 @@ navigation:
         tree:
             application_menu:
                 type: application_menu
-                area: default
+                scope_type: default
 
             shortcuts:
                 type: shortcuts
-                area: custom
+                scope_type: custom
 
     navigation_elements:
         favoriteButton:

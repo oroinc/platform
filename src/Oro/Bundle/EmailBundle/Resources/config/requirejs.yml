@@ -4,6 +4,7 @@ config:
         'oroemail/js/app/models/email-template-model': 'bundles/oroemail/js/app/models/email-template-model.js'
         'oroemail/js/app/models/email-attachment-model': 'bundles/oroemail/js/app/models/email-attachment-model.js'
         'oroemail/js/app/models/email-attachment-collection': 'bundles/oroemail/js/app/models/email-attachment-collection.js'
+        'oroemail/js/app/models/check-smtp-connection-model': 'bundles/oroemail/js/app/models/check-smtp-connection-model.js'
 
         'oroemail/js/app/views/email-template-view': 'bundles/oroemail/js/app/views/email-template-view.js'
         'oroemail/js/app/views/email-attachment-link-view': 'bundles/oroemail/js/app/views/email-attachment-link-view.js'
@@ -14,9 +15,11 @@ config:
         'oroemail/js/app/views/select2-email-recipients-view': 'bundles/oroemail/js/app/views/select2-email-recipients-view.js'
         'oroemail/js/app/views/email-folder-tree-view': 'bundles/oroemail/js/app/views/email-folder-tree-view.js'
         'oroemail/js/app/views/unread-emails-counter-view': 'bundles/oroemail/js/app/views/unread-emails-counter-view.js'
+        'oroemail/js/app/views/check-smtp-connection-view': 'bundles/oroemail/js/app/views/check-smtp-connection-view.js'
 
         'oroemail/js/app/views/mailbox-update-view': 'bundles/oroemail/js/app/views/mailbox-update-view.js'
 
+        'oroemail/js/app/components/check-smtp-connection-component': 'bundles/oroemail/js/app/components/check-smtp-connection-component.js'
         'oroemail/js/app/components/email-editor-component': 'bundles/oroemail/js/app/components/email-editor-component.js'
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
         'oroemail/js/app/components/email-attachment-component': 'bundles/oroemail/js/app/components/email-attachment-component.js'

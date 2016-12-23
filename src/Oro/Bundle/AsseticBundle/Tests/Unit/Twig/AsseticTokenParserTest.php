@@ -170,7 +170,7 @@ class AsseticTokenParserTest extends \PHPUnit_Framework_TestCase
 
         $this->parser->setParser($parser);
 
-        $this->setExpectedException('Twig_Error_Syntax');
+        $this->expectException('Twig_Error_Syntax');
 
         $this->parser->parse(new Twig_Token(Twig_Token::NAME_TYPE, 'oro_css', 31));
     }
