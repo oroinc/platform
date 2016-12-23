@@ -36,13 +36,14 @@ class AttributeGroupListener
 
         $repository = $args->getEntityManager()->getRepository(AttributeGroup::class);
         $i = 0;
+        $baseSlug = $codeSlug;
         do {
             $exists = $repository->findOneBy([
                 'attributeFamily' => $group->getAttributeFamily(),
                 'code' => $codeSlug
             ]);
             if ($exists) {
-                $codeSlug .= ++$i;
+                $codeSlug = $baseSlug . ++$i;
             }
         } while ($exists);
 

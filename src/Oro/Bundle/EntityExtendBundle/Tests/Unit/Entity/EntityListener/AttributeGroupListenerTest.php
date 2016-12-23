@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
+use Oro\Bundle\EntityExtendBundle\Entity\AttributeFamily;
 use Oro\Bundle\EntityExtendBundle\Entity\AttributeGroup;
 use Oro\Bundle\EntityExtendBundle\Entity\EntityListener\AttributeGroupListener;
 use Oro\Bundle\EntityExtendBundle\Generator\SlugGenerator;
@@ -36,30 +37,27 @@ class AttributeGroupListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider prePersistDataProvider
-     * @param string $label
-     * @param string $initialCodeSlug
+     * @param AttributeGroup $group
+     * @param array $repositoryArgs
+     * @param array $repositoryResults
      * @param string $expectedCodeSlug
      */
-    public function testPrePersist($label, $initialCodeSlug, $expectedCodeSlug)
-    {
-        $group = new AttributeGroupStub(1, $label);
+    public function testPrePersist(
+        AttributeGroup $group,
+        array $repositoryArgs,
+        array $repositoryResults,
+        $expectedCodeSlug
+    ) {
         $eventArgs = new LifecycleEventArgs($group, $this->em);
 
         $repository = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $repository->expects($this->exactly(2))
+        $repository->expects($this->exactly(count($repositoryArgs)))
             ->method('findOneBy')
-            ->withConsecutive(
-                [
-                    [ 'attributeFamily' => $group->getAttributeFamily(), 'code' => $initialCodeSlug ]
-                ],
-                [
-                    [ 'attributeFamily' => $group->getAttributeFamily(), 'code' => $initialCodeSlug . 1 ]
-                ]
-            )
-            ->willReturnOnConsecutiveCalls($group, null);
+            ->withConsecutive(...$repositoryArgs)
+            ->willReturnOnConsecutiveCalls(...$repositoryResults);
 
         $this->em->expects($this->once())
             ->method('getRepository')
@@ -75,16 +73,45 @@ class AttributeGroupListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function prePersistDataProvider()
     {
+        $group1 = new AttributeGroupStub(1, 'проверка транслитерации!');
+        $group1->setAttributeFamily((new AttributeFamily())->setCode('group1Family'));
+        $group2 = new AttributeGroupStub(1, '!!!&&&&!!!');
+        $group2->setAttributeFamily((new AttributeFamily())->setCode('group2Family'));
+
         return [
             'code slug generated from label' => [
-                'label' => 'проверка транслитерации!',
-                'initialSlug' => 'proverka-transliteracii',
+                'group' => $group1,
+                'repositoryArgs' => [
+                    [[ 'attributeFamily' => $group1->getAttributeFamily(), 'code' => 'proverka-transliteracii' ]],
+                    [[ 'attributeFamily' => $group1->getAttributeFamily(), 'code' => 'proverka-transliteracii1' ]],
+                ],
+                'repositoryResults' => [$group1, null],
                 'expectedSlug' => 'proverka-transliteracii1',
             ],
             'default unique slug created' => [
-                'label' => '!!!&&&&!!!',
-                'initialSlug' => AttributeGroupListener::DEFAULT_SLUG,
-                'expectedSlug' => AttributeGroupListener::DEFAULT_SLUG . 1,
+                'group' => $group2,
+                'repositoryArgs' => [
+                    [
+                        [
+                            'attributeFamily' => $group2->getAttributeFamily(),
+                            'code' => AttributeGroupListener::DEFAULT_SLUG
+                        ]
+                    ],
+                    [
+                        [
+                            'attributeFamily' => $group2->getAttributeFamily(),
+                            'code' => AttributeGroupListener::DEFAULT_SLUG . 1
+                        ]
+                    ],
+                    [
+                        [
+                            'attributeFamily' => $group2->getAttributeFamily(),
+                            'code' => AttributeGroupListener::DEFAULT_SLUG . 2
+                        ]
+                    ]
+                ],
+                'repositoryResults' => [$group2, $group2, null],
+                'expectedSlug' => AttributeGroupListener::DEFAULT_SLUG . 2,
             ]
         ];
     }
