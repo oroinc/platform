@@ -220,7 +220,7 @@ define([
         var validator = this;
 
         $(this.currentForm).on('content:changed', function(event) {
-            validationHandler.initialize($(event.target));
+            validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
         }).on('disabled', function(e) {
             validator.hideElementErrors(e.target);
         });

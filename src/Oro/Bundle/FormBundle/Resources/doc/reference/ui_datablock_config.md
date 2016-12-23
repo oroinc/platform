@@ -1,7 +1,7 @@
 UI DataBlock Config Overview
 ============================
 
-This functionality add ability to config DataBlocks for UI component inside FromType instead of template
+This functionality add ability to config DataBlocks for UI component inside FormType instead of template
 
 
 Configure block in template:
@@ -83,17 +83,17 @@ Twig
 ```
 
 
-'block' - code of block,
-If block is not configured in 'block_config'. Block will be created.
-If block title is not configured in 'block_config'. Title of block will be same as code.
-If form type filed options don't have 'block' attribute, this filed will be ignored
+'block' - code of block.
+If block is not configured in 'block_config', block will be created.
+If block title is not configured in 'block_config', title of block will be same as code.
+If form type filed options don't have 'block' attribute, this filed will be ignored.
 
-'subblock' - code of subblock,
-If subblock is not configured in 'block_config'. SubBlock will be created.
-If form type filed options don't have 'subblock' attribute, this field will be added to first subblock in block
+'subblock' - code of subblock.
+If subblock is not configured in 'block_config', subBlock will be created.
+If form type filed options don't have 'subblock' attribute, this field will be added to first subblock in block.
 
-If 'subblock' is congigured but 'block' is not configured field will be ignored
+If 'subblock' is congigured but 'block' is not configured field will be ignored.
 
 
-'block_config' is optinal attribute
-This attribute contain config for block and subblock(title, class, subblocks)
+'block_config' is optinal attribute.
+This attribute contain config for block and subblock(title, class, subblocks).

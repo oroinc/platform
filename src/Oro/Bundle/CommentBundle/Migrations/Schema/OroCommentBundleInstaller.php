@@ -4,8 +4,8 @@ namespace Oro\Bundle\CommentBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtensionAwareInterface;
 use Oro\Bundle\CommentBundle\Migrations\Schema\v1_0\OroCommentBundle as OroCommentBundle10;
@@ -17,11 +17,10 @@ class OroCommentBundleInstaller implements
     CommentExtensionAwareInterface,
     AttachmentExtensionAwareInterface
 {
+    use AttachmentExtensionAwareTrait;
+
     /** @var CommentExtension */
     protected $comment;
-
-    /** @var AttachmentExtension */
-    protected $attachmentExtension;
 
     /**
      * @param CommentExtension $commentExtension
@@ -29,14 +28,6 @@ class OroCommentBundleInstaller implements
     public function setCommentExtension(CommentExtension $commentExtension)
     {
         $this->comment = $commentExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
-    {
-        $this->attachmentExtension = $attachmentExtension;
     }
 
     /**

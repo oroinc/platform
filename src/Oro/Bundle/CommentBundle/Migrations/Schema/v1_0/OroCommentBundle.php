@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -14,11 +15,10 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroCommentBundle implements Migration, CommentExtensionAwareInterface, AttachmentExtensionAwareInterface
 {
+    use AttachmentExtensionAwareTrait;
+
     /** @var CommentExtension */
     protected $comment;
-
-    /** @var AttachmentExtension */
-    protected $attachmentExtension;
 
     /**
      * @param CommentExtension $commentExtension
@@ -26,14 +26,6 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     public function setCommentExtension(CommentExtension $commentExtension)
     {
         $this->comment = $commentExtension;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
-    {
-        $this->attachmentExtension = $attachmentExtension;
     }
 
     /**

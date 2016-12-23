@@ -4,7 +4,7 @@ Buttons
 Together with [Operations](./operations.md), ActionBundle provides a useful way for a developer to add your specific
  User Interface Buttons for some context matches that are common in the OroPlatform based applications.
 Those are `entity` (FQCN with optional `id`), `routeName`, `grid` (the datagrid name), `referrer` (a URL), `group` (any named sort of a group).
- In other words - all that fit to a [ButtonSearchContext](../../Model/ButtonSearchContext.php) model parameters.
+ In other words - all that fit to a [ButtonSearchContext](../../Extension/ButtonSearchContext.php) model parameters.
 And then, a developer can implement its own `ButtonProviderExtension` by the interface and deliver a list of buttons
  to general button provider that places that buttons within a proper UI context.
 

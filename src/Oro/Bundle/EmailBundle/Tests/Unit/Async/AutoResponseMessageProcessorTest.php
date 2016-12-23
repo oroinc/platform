@@ -4,15 +4,16 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,6 +22,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
         new AutoResponseMessageProcessor(
             $this->createDoctrineMock(),
             $this->createAutoResponseManagerMock(),
+            $this->createJobRunnerMock(),
             $this->createLoggerMock()
         );
     }
@@ -37,6 +39,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new AutoResponseMessageProcessor(
             $this->createDoctrineMock(),
             $this->createAutoResponseManagerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -75,14 +78,28 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($email))
         ;
 
+
+        $message = new NullMessage();
+        $message->setBody(json_encode(['id' => 123, 'jobId' => 4321]));
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runDelayed')
+            ->with(4321)
+            ->will($this->returnCallback(function ($name, $callback) use ($email) {
+                $callback($email);
+
+                return true;
+            }))
+        ;
+
         $processor = new AutoResponseMessageProcessor(
             $doctrine,
             $autoResponseManager,
+            $jobRunner,
             $this->createLoggerMock()
         );
-
-        $message = new NullMessage();
-        $message->setBody(json_encode(['id' => 123]));
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -123,11 +140,12 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor = new AutoResponseMessageProcessor(
             $doctrine,
             $autoResponseManager,
+            $this->createJobRunnerMock(),
             $logger
         );
 
         $message = new NullMessage();
-        $message->setBody(json_encode(['id' => 123]));
+        $message->setBody(json_encode(['id' => 123, 'jobId' => 4321]));
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -169,6 +187,14 @@ class AutoResponseMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createEntityRepositoryMock()
     {
         return $this->createMock(EntityRepository::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     */
+    private function createJobRunnerMock()
+    {
+        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
     }
 
     /**

@@ -64,6 +64,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
         }
 
         $processData = new ProcessData();
+        $processHandler = $this->getProcessHandler();
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine')->getManager();
@@ -72,10 +73,9 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
         try {
             $start = microtime(true);
 
-            $processHandler = $this->getProcessHandler();
             $processHandler->handleTrigger($processTrigger, $processData);
-
             $entityManager->flush();
+            $processHandler->finishTrigger($processTrigger, $processData);
             $entityManager->commit();
 
             $output->writeln(
@@ -88,6 +88,7 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
                 )
             );
         } catch (\Exception $e) {
+            $processHandler->finishTrigger($processTrigger, $processData);
             $entityManager->rollback();
 
             $output->writeln(
