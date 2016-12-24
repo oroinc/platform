@@ -9,6 +9,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -20,6 +22,7 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
     const ATTRIBUTE_FAMILY_1 = 'attribute_family_1';
     const ATTRIBUTE_FAMILY_2 = 'attribute_family_2';
 
+    /** @var array */
     protected $families = [
         self::ATTRIBUTE_FAMILY_1 => [
             LoadAttributeGroupData::DEFAULT_ATTRIBUTE_GROUP_1,
@@ -46,12 +49,13 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
      */
     public function load(ObjectManager $manager)
     {
-        $modelManager = $this->container->get('oro_entity_config.attribute.config_model_manager');
+        $configManager = $this->container->get('oro_entity_config.config_manager');
         /** @var EntityConfigModel $entityConfigModel */
-        $entityConfigModel = $modelManager->getEntityModel(LoadAttributeData::ENTITY_CONFIG_MODEL);
+        $entityConfigModel = $configManager->getConfigEntityModel(LoadAttributeData::ENTITY_CONFIG_MODEL);
         foreach ($this->families as $familyName => $groups) {
             $family = new AttributeFamily();
             $family->setDefaultLabel($familyName);
+            $family->setOwner($this->getAdminUser($manager));
             $family->setCode($familyName);
             $family->setEntityClass($entityConfigModel->getClassName());
             foreach ($groups as $group) {
@@ -66,5 +70,16 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
             $manager->persist($family);
         }
         $manager->flush();
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @return User
+     */
+    private function getAdminUser(ObjectManager $manager)
+    {
+        $repository = $manager->getRepository(User::class);
+
+        return $repository->findOneBy(['email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL]);
     }
 }

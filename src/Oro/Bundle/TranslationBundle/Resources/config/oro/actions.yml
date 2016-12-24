@@ -23,6 +23,8 @@ operations:
                     form_type: oro_translation_add_language
                     options:
                         required: true
+                        constraints:
+                            - NotBlank: ~
         actions:
             - '@create_entity':
                 class: Oro\Bundle\TranslationBundle\Entity\Language

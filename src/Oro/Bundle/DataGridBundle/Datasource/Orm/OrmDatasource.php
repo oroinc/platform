@@ -35,6 +35,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var array|null */
     protected $queryHints;
 
+    /** @var array */
+    protected $countQueryHints = [];
+
     /** @var ConfigProcessorInterface */
     protected $configProcessor;
 
@@ -120,6 +123,14 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     }
 
     /**
+     * @return array
+     */
+    public function getCountQueryHints()
+    {
+        return $this->countQueryHints;
+    }
+
+    /**
      * Returns query builder
      *
      * @return QueryBuilder
@@ -179,6 +190,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $this->countQb   = $this->configProcessor->processCountQuery($config);
         if (isset($config['hints'])) {
             $this->queryHints = $config['hints'];
+        }
+        if (isset($config['count_hints'])) {
+            $this->countQueryHints = $config['count_hints'];
         }
     }
 }

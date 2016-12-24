@@ -403,13 +403,15 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $entities
      * @param array $routes
+     * @param array $datagrids
      * @param bool $result
      */
-    public function testIsNotEmptyInitContext(array $entities, array $routes, $result)
+    public function testIsNotEmptyInitContext(array $entities, array $routes, array $datagrids, $result)
     {
         $transition = new Transition();
         $transition->setInitEntities($entities);
         $transition->setInitRoutes($routes);
+        $transition->setInitDatagrids($datagrids);
         $this->assertSame($result, $transition->isEmptyInitOptions());
     }
 
@@ -419,29 +421,40 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
     public function initContextProvider()
     {
         return [
-            [
+            'empty' => [
                 'entities' => [],
                 'routes' => [],
+                'datagrids' => [],
                 'result' => true
             ],
-            [
+            'only entity' => [
                 'entities' => ['entity'],
                 'routes' => [],
+                'datagrids' => [],
                 'result' => false
             ],
-            [
+            'only route' => [
                 'entities' => [],
                 'routes' => ['route'],
+                'datagrids' => [],
                 'result' => false
             ],
-            [
+            'only datagrid' => [
+                'entities' => [],
+                'routes' => [],
+                'datagrids' => ['datagrid'],
+                'result' => false
+            ],
+            'full' => [
                 'entities' => ['entity'],
                 'routes' => ['route'],
+                'datagrids' => ['datagrid'],
                 'result' => false
             ],
-            [
+            'full with arrays' => [
                 'entities' => ['entity1', 'entity2'],
                 'routes' => ['route1', 'route2'],
+                'datagrids' => ['datagrid1', 'datagrid2'],
                 'result' => false
             ]
         ];
