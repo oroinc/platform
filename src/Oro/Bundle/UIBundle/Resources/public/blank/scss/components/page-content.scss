@@ -2,7 +2,7 @@
 
 .page-content {
     width: $page-content-width;
-
+    
     @include clearfix();
 
     &--has-sidebar {
