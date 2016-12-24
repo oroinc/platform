@@ -32,8 +32,8 @@ class FormScopeCriteriaResolverTest extends \PHPUnit_Framework_TestCase
     public function testResolve()
     {
         // parent form contains scope options which should be used in result context
-        $parentForm = $this->getMock(FormInterface::class);
-        $parentFormConfig = $this->getMock(FormConfigInterface::class);
+        $parentForm = $this->createMock(FormInterface::class);
+        $parentFormConfig = $this->createMock(FormConfigInterface::class);
         $rootScope = new Scope();
         $this->manager->method('getCriteriaByScope')
             ->with($rootScope, 'test_scope')
@@ -56,8 +56,8 @@ class FormScopeCriteriaResolverTest extends \PHPUnit_Framework_TestCase
         $parentForm->method('getConfig')->willReturn($parentFormConfig);
 
         // form with context in options, form options has greater priority then parent form's
-        $form = $this->getMock(FormInterface::class);
-        $formConfig = $this->getMock(FormConfigInterface::class);
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->method('hasOption')->with('context')->willReturn(true);
         $formConfig->method('getOption')->with('context')->willReturn(['field1' => 'context_value']);
         $form->method('getConfig')->willReturn($formConfig);

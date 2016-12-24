@@ -20,9 +20,9 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMock(ContextAccessorInterface::class);
+        $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
 
-        $this->extension = $this->getMock(ExtensionInterface::class);
+        $this->extension = $this->createMock(ExtensionInterface::class);
 
         $this->factory = new ExpressionFactory($this->contextAccessor);
         $this->factory->addExtension($this->extension);

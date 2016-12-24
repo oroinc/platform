@@ -263,6 +263,12 @@ config:
         'autolinker': 'bundles/bowerassets/Autolinker.js/dist/Autolinker.js'
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
+
+        'oroui/js/app/views/jstree/action-manager-view': 'bundles/oroui/js/app/views/jstree/action-manager-view.js'
+        'oroui/js/app/views/jstree/abstract-action-view': 'bundles/oroui/js/app/views/jstree/abstract-action-view.js'
+        'oroui/js/app/views/jstree/expand-action-view': 'bundles/oroui/js/app/views/jstree/expand-action-view.js'
+        'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
+        'oroui/js/app/views/jstree/subcategories-action-view': 'bundles/oroui/js/app/views/jstree/subcategories-action-view.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class EntityDescriptionProvider
 {
@@ -22,8 +22,8 @@ class EntityDescriptionProvider
     /** @var EntityClassNameProviderInterface */
     protected $entityClassNameProvider;
 
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -50,18 +50,18 @@ class EntityDescriptionProvider
 
     /**
      * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param ConfigProvider                   $entityConfigProvider
+     * @param ConfigManager                    $configManager
      * @param DoctrineHelper                   $doctrineHelper
      * @param TranslatorInterface              $translator
      */
     public function __construct(
         EntityClassNameProviderInterface $entityClassNameProvider,
-        ConfigProvider $entityConfigProvider,
+        ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
         TranslatorInterface $translator
     ) {
         $this->entityClassNameProvider = $entityClassNameProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
+        $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
         $this->translator = $translator;
     }
@@ -75,10 +75,7 @@ class EntityDescriptionProvider
      */
     public function getEntityDescription($entityClass)
     {
-        if (!isset($this->cache[$entityClass])) {
-            $this->cache[$entityClass] = [];
-        }
-        if (array_key_exists(self::DESCRIPTION, $this->cache[$entityClass])) {
+        if ($this->hasEntityAttribute($entityClass, self::DESCRIPTION)) {
             return $this->cache[$entityClass][self::DESCRIPTION];
         }
 
@@ -97,10 +94,7 @@ class EntityDescriptionProvider
      */
     public function getEntityPluralDescription($entityClass)
     {
-        if (!isset($this->cache[$entityClass])) {
-            $this->cache[$entityClass] = [];
-        }
-        if (array_key_exists(self::PLURAL_DESCRIPTION, $this->cache[$entityClass])) {
+        if ($this->hasEntityAttribute($entityClass, self::PLURAL_DESCRIPTION)) {
             return $this->cache[$entityClass][self::PLURAL_DESCRIPTION];
         }
 
@@ -119,10 +113,7 @@ class EntityDescriptionProvider
      */
     public function getEntityDocumentation($entityClass)
     {
-        if (!isset($this->cache[$entityClass])) {
-            $this->cache[$entityClass] = [];
-        }
-        if (array_key_exists(self::DOCUMENTATION, $this->cache[$entityClass])) {
+        if ($this->hasEntityAttribute($entityClass, self::DOCUMENTATION)) {
             return $this->cache[$entityClass][self::DOCUMENTATION];
         }
 
@@ -142,10 +133,7 @@ class EntityDescriptionProvider
      */
     public function getFieldDescription($entityClass, $propertyPath)
     {
-        if (!isset($this->cache[$entityClass][self::FIELDS][$propertyPath])) {
-            $this->cache[$entityClass][self::FIELDS][$propertyPath] = [];
-        }
-        if (array_key_exists(self::DESCRIPTION, $this->cache[$entityClass][self::FIELDS][$propertyPath])) {
+        if ($this->hasFieldAttribute($entityClass, $propertyPath, self::DESCRIPTION)) {
             return $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DESCRIPTION];
         }
 
@@ -175,10 +163,7 @@ class EntityDescriptionProvider
      */
     public function getFieldDocumentation($entityClass, $propertyPath)
     {
-        if (!isset($this->cache[$entityClass][self::FIELDS][$propertyPath])) {
-            $this->cache[$entityClass][self::FIELDS][$propertyPath] = [];
-        }
-        if (array_key_exists(self::DOCUMENTATION, $this->cache[$entityClass][self::FIELDS][$propertyPath])) {
+        if ($this->hasFieldAttribute($entityClass, $propertyPath, self::DOCUMENTATION)) {
             return $this->cache[$entityClass][self::FIELDS][$propertyPath][self::DOCUMENTATION];
         }
 
@@ -211,16 +196,10 @@ class EntityDescriptionProvider
      */
     protected function findEntityDocumentation($entityClass)
     {
-        $result = null;
-        $config = $this->getEntityConfig($entityClass);
-        if (null !== $config) {
-            $label = $config->get('description');
-            if ($label) {
-                $result = $this->trans($label);
-            }
-        }
-
-        return $result;
+        return $this->transConfigAttribute(
+            'description',
+            $this->getEntityConfig($entityClass)
+        );
     }
 
     /**
@@ -231,16 +210,10 @@ class EntityDescriptionProvider
      */
     protected function findFieldDescription($entityClass, $propertyPath)
     {
-        $result = null;
-        $config = $this->findFieldConfig($entityClass, $propertyPath);
-        if (null !== $config) {
-            $label = $config->get('label');
-            if ($label) {
-                $result = $this->trans($label);
-            }
-        }
-
-        return $result;
+        return $this->transConfigAttribute(
+            'label',
+            $this->findFieldConfig($entityClass, $propertyPath)
+        );
     }
 
     /**
@@ -251,16 +224,10 @@ class EntityDescriptionProvider
      */
     protected function findFieldDocumentation($entityClass, $propertyPath)
     {
-        $result = null;
-        $config = $this->findFieldConfig($entityClass, $propertyPath);
-        if (null !== $config) {
-            $label = $config->get('description');
-            if ($label) {
-                $result = $this->trans($label);
-            }
-        }
-
-        return $result;
+        return $this->transConfigAttribute(
+            'description',
+            $this->findFieldConfig($entityClass, $propertyPath)
+        );
     }
 
     /**
@@ -291,8 +258,8 @@ class EntityDescriptionProvider
      */
     protected function getEntityConfig($entityClass)
     {
-        return $this->entityConfigProvider->hasConfig($entityClass)
-            ? $this->entityConfigProvider->getConfig($entityClass)
+        return $this->isConfigurableEntity($entityClass)
+            ? $this->configManager->getEntityConfig('entity', $entityClass)
             : null;
     }
 
@@ -304,9 +271,14 @@ class EntityDescriptionProvider
      */
     protected function getFieldConfig($entityClass, $fieldName)
     {
-        return $this->entityConfigProvider->hasConfig($entityClass, $fieldName)
-            ? $this->entityConfigProvider->getConfig($entityClass, $fieldName)
-            : null;
+        if (!$this->isConfigurableEntity($entityClass)
+            || !$this->configManager->hasConfig($entityClass, $fieldName)
+            || $this->configManager->isHiddenModel($entityClass, $fieldName)
+        ) {
+            return null;
+        }
+
+        return $this->configManager->getFieldConfig('entity', $entityClass, $fieldName);
     }
 
     /**
@@ -338,17 +310,40 @@ class EntityDescriptionProvider
     }
 
     /**
+     * @param string               $attributeName
+     * @param ConfigInterface|null $config
+     *
+     * @return string|null
+     */
+    protected function transConfigAttribute($attributeName, ConfigInterface $config = null)
+    {
+        if (null === $config) {
+            return null;
+        }
+
+        $label = $config->get($attributeName);
+        if (!$label) {
+            return null;
+        }
+
+        return $this->trans($label);
+    }
+
+    /**
      * @param string $entityClass
      *
      * @return bool
      */
     protected function isManageableEntity($entityClass)
     {
-        if (!array_key_exists(self::MANAGEABLE, $this->cache[$entityClass])) {
-            $this->cache[$entityClass][self::MANAGEABLE] = $this->doctrineHelper->isManageableEntity($entityClass);
+        if ($this->hasEntityAttribute($entityClass, self::MANAGEABLE)) {
+            return $this->cache[$entityClass][self::MANAGEABLE];
         }
 
-        return $this->cache[$entityClass][self::MANAGEABLE];
+        $result = $this->doctrineHelper->isManageableEntity($entityClass);
+        $this->cache[$entityClass][self::MANAGEABLE] = $result;
+
+        return $result;
     }
 
     /**
@@ -358,10 +353,40 @@ class EntityDescriptionProvider
      */
     protected function isConfigurableEntity($entityClass)
     {
-        if (!array_key_exists(self::CONFIGURABLE, $this->cache[$entityClass])) {
-            $this->cache[$entityClass][self::CONFIGURABLE] = $this->entityConfigProvider->hasConfig($entityClass);
+        if ($this->hasEntityAttribute($entityClass, self::CONFIGURABLE)) {
+            return $this->cache[$entityClass][self::CONFIGURABLE];
         }
 
-        return $this->cache[$entityClass][self::CONFIGURABLE];
+        $result = $this->configManager->hasConfig($entityClass) && !$this->configManager->isHiddenModel($entityClass);
+        $this->cache[$entityClass][self::CONFIGURABLE] = $result;
+
+        return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $attributeName
+     *
+     * @return bool
+     */
+    protected function hasEntityAttribute($entityClass, $attributeName)
+    {
+        return
+            isset($this->cache[$entityClass])
+            && array_key_exists($attributeName, $this->cache[$entityClass]);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $propertyPath
+     * @param string $attributeName
+     *
+     * @return bool
+     */
+    protected function hasFieldAttribute($entityClass, $propertyPath, $attributeName)
+    {
+        return
+            isset($this->cache[$entityClass][self::FIELDS][$propertyPath])
+            && array_key_exists($attributeName, $this->cache[$entityClass][self::FIELDS][$propertyPath]);
     }
 }

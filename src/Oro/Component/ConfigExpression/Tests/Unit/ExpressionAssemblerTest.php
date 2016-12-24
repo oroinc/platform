@@ -14,7 +14,7 @@ class ExpressionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssemble($configuration, $expected)
     {
-        $factory = $this->getMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
         $factory->expects($this->any())
             ->method('create')
             ->will(

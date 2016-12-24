@@ -19,7 +19,7 @@ class DatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->router = $this->getMock(RouterInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
 
         $this->routeHelper = new DatagridRouteHelper($this->router);
     }

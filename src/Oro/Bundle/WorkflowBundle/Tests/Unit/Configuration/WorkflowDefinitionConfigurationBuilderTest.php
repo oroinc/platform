@@ -194,6 +194,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'name' => 'transit1',
                     WorkflowConfiguration::NODE_INIT_ENTITIES => ['entity1', 'entity2'],
                     WorkflowConfiguration::NODE_INIT_ROUTES => ['route1', 'route2'],
+                    WorkflowConfiguration::NODE_INIT_DATAGRIDS => ['datagrid1', 'datagrid2'],
                     'is_start' => true,
                 ],
             ],
@@ -236,6 +237,10 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                                     'route1' => ['transit1'],
                                     'route2' => ['transit1'],
                                 ],
+                                WorkflowConfiguration::NODE_INIT_DATAGRIDS => [
+                                    'datagrid1' => ['transit1'],
+                                    'datagrid2' => ['transit1'],
+                                ],
                             ]
                         )
                     ),
@@ -270,6 +275,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
             WorkflowConfiguration::NODE_INIT_ENTITIES,
             WorkflowConfiguration::NODE_INIT_ROUTES,
+            WorkflowConfiguration::NODE_INIT_DATAGRIDS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));
@@ -283,7 +289,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
      */
     public function testBuildFromConfigurationException($expectedException, $expectedMessage, array $inputData)
     {
-        $this->setExpectedException($expectedException, $expectedMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedMessage);
 
         $this->builder->buildFromConfiguration($inputData);
     }
@@ -308,8 +315,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
 
     public function testAddExtension()
     {
-        $firstExtension = $this->getMock(WorkflowDefinitionBuilderExtensionInterface::class);
-        $interruptionExtension = $this->getMock(WorkflowDefinitionBuilderExtensionInterface::class);
+        $firstExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);
+        $interruptionExtension = $this->createMock(WorkflowDefinitionBuilderExtensionInterface::class);
         $this->builder->addExtension($firstExtension);
         $this->builder->addExtension($interruptionExtension);
 
@@ -328,7 +335,8 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             ->with($name, $modifiedConfiguration)
             ->willThrowException(new \Exception('interrupted by extension'));
 
-        $this->setExpectedException(\Exception::class, 'interrupted by extension');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('interrupted by extension');
         $this->builder->buildOneFromConfiguration($name, $configuration);
     }
 
@@ -401,6 +409,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     ->setName($transitionData['name'])
                     ->setInitEntities($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
                     ->setInitRoutes($this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+                    ->setInitDatagrids(
+                        $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_DATAGRIDS, [])
+                    )
                     ->setInitContextAttribute(
                         $this->getOption($transitionData, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE, '')
                     );

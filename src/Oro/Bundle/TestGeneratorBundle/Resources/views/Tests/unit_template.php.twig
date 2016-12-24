@@ -32,7 +32,7 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 {% else %}
-        $this->{{ dependencyData.variable }} = $this->getMock({{ fullClassName|raw }});
+        $this->{{ dependencyData.variable }} = $this->createMock({{ fullClassName|raw }});
 {% endif %}
 {% endif %}
 {% endfor %}
@@ -53,7 +53,7 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
             ->getMock();
 
 {% else %}
-        ${{ argument.name }} = $this->getMock({{ fullClassName|raw }});
+        ${{ argument.name }} = $this->createMock({{ fullClassName|raw }});
 
 {% endif %}
 {% else %}

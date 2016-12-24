@@ -32,9 +32,9 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testDisplayIsSet()
     {
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity');
-        $item = $this->getMock('Knp\Menu\ItemInterface');
-        $menu = $this->getMock('Knp\Menu\ItemInterface');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $item = $this->createMock('Knp\Menu\ItemInterface');
+        $menu = $this->createMock('Knp\Menu\ItemInterface');
 
         /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
@@ -59,7 +59,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisplayIsNotSet($item, $user, $isGranted)
     {
-        $menu = $this->getMock('Knp\Menu\ItemInterface');
+        $menu = $this->createMock('Knp\Menu\ItemInterface');
 
         /** @var ConfigureMenuEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
@@ -80,17 +80,17 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         return [
             'with empty item' => [
                 'item' => null,
-                'user' => $this->getMock('Oro\Bundle\UserBundle\Entity'),
+                'user' => $this->createMock('Oro\Bundle\UserBundle\Entity\User'),
                 'isGranted' => true,
             ],
             'with no logged user' => [
-                'item' => $this->getMock('Knp\Menu\ItemInterface'),
+                'item' => $this->createMock('Knp\Menu\ItemInterface'),
                 'user' => null,
                 'isGranted' => true,
             ],
             'with no access rights' => [
-                'item' => $this->getMock('Knp\Menu\ItemInterface'),
-                'user' => $this->getMock('Oro\Bundle\UserBundle\Entity'),
+                'item' => $this->createMock('Knp\Menu\ItemInterface'),
+                'user' => $this->createMock('Oro\Bundle\UserBundle\Entity\User'),
                 'isGranted' => false,
             ],
         ];

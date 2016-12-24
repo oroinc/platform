@@ -434,7 +434,7 @@ class ActivityListChainProvider
             $list->setVerb($verb);
 
             if ($verb === ActivityList::VERB_UPDATE) {
-                $activityListTargets = $list->getActivityListTargetEntities();
+                $activityListTargets = $list->getActivityListTargets();
                 foreach ($activityListTargets as $target) {
                     $list->removeActivityListTarget($target);
                 }

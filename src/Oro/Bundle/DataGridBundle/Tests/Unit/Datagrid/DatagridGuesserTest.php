@@ -15,8 +15,8 @@ class DatagridGuesserTest extends \PHPUnit_Framework_TestCase
         $property = 'testProp';
         $type     = 'integer';
 
-        $guesser1 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser2 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser1 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser2 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
 
         $formatterGuess = new ColumnGuess(
             ['formatter_prop1' => 'prop1', 'formatter_prop2' => 'prop2'],

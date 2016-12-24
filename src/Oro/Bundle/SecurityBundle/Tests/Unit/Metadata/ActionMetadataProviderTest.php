@@ -38,7 +38,7 @@ class ActionMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($value) {

@@ -81,28 +81,28 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
                 'expected'               => false
             ],
             'existing entity with association' => [
-                'entity'                 => $this->getMock('\stdClass'),
+                'entity'                 => $this->createMock('\stdClass'),
                 'attachmentConfigReturn' => true,
                 'isNewRecord'            => false,
                 'isManaged'              => true,
                 'expected'               => true
             ],
             'existing entity without association' => [
-                'entity'                 => $this->getMock('\stdClass'),
+                'entity'                 => $this->createMock('\stdClass'),
                 'attachmentConfigReturn' => false,
                 'isNewRecord'            => false,
                 'isManaged'              => true,
                 'expected'               => false
             ],
             'new entity without association' => [
-                'entity'                 => $this->getMock('\stdClass'),
+                'entity'                 => $this->createMock('\stdClass'),
                 'attachmentConfigReturn' => false,
                 'isNewRecord'            => true,
                 'isManaged'              => true,
                 'expected'               => false
             ],
             'not managed entity' => [
-                'entity'                 => $this->getMock('\stdClass'),
+                'entity'                 => $this->createMock('\stdClass'),
                 'attachmentConfigReturn' => false,
                 'isNewRecord'            => true,
                 'isManaged'              => false,

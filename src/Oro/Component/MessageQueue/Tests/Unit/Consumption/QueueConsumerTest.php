@@ -56,7 +56,8 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer = new QueueConsumer($this->createConnectionStub(), null, 0);
 
-        $this->setExpectedException(\LogicException::class, 'The queue name must be not empty.');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The queue name must be not empty.');
         $consumer->bind('', $messageProcessorMock);
     }
 
@@ -68,7 +69,8 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer->bind('theQueueName', $messageProcessorMock);
 
-        $this->setExpectedException(\LogicException::class, 'The queue was already bound.');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The queue was already bound.');
         $consumer->bind('theQueueName', $messageProcessorMock);
     }
 
@@ -95,16 +97,16 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     public function testShouldSubscribeToGivenQueueAndQuitAfterFifthIdleCycle()
     {
         $expectedQueueName = 'theQueueName';
-        $expectedQueue = $this->getMock(QueueInterface::class);
+        $expectedQueue = $this->createMock(QueueInterface::class);
 
-        $messageConsumerMock = $this->getMock(MessageConsumerInterface::class);
+        $messageConsumerMock = $this->createMock(MessageConsumerInterface::class);
         $messageConsumerMock
             ->expects($this->exactly(5))
             ->method('receive')
             ->willReturn(null)
         ;
 
-        $sessionMock = $this->getMock(SessionInterface::class);
+        $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock
             ->expects($this->once())
             ->method('createConsumer')
@@ -201,7 +203,8 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $queueConsumer = new QueueConsumer($connectionStub, new BreakCycleExtension(1), 0);
         $queueConsumer->bind('aQueueName', $messageProcessorMock);
 
-        $this->setExpectedException(\LogicException::class, 'Status is not supported');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Status is not supported');
         $queueConsumer->consume();
     }
 
@@ -263,7 +266,8 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowIfMessageProcessorReturnInvalidStatus()
     {
-        $this->setExpectedException(\LogicException::class, 'Status is not supported: invalidStatus');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Status is not supported: invalidStatus');
 
         $messageMock = $this->createMessageMock();
         $messageConsumerStub = $this->createMessageConsumerStub($messageMock);
@@ -758,7 +762,8 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldCallOnInterruptedIfExceptionThrow()
     {
-        $this->setExpectedException(\Exception::class, 'Process failed');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Process failed');
 
         $expectedException = new \Exception('Process failed');
         $expectedMessage = $this->createMessageMock();
@@ -947,7 +952,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageConsumerStub($message = null)
     {
-        $messageConsumerMock = $this->getMock(MessageConsumerInterface::class);
+        $messageConsumerMock = $this->createMock(MessageConsumerInterface::class);
         $messageConsumerMock
             ->expects($this->any())
             ->method('receive')
@@ -962,7 +967,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createConnectionStub($session = null)
     {
-        $connectionMock = $this->getMock(ConnectionInterface::class);
+        $connectionMock = $this->createMock(ConnectionInterface::class);
         $connectionMock
             ->expects($this->any())
             ->method('createSession')
@@ -977,7 +982,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSessionStub($messageConsumer = null)
     {
-        $sessionMock = $this->getMock(SessionInterface::class);
+        $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock
             ->expects($this->any())
             ->method('createConsumer')
@@ -986,7 +991,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $sessionMock
             ->expects($this->any())
             ->method('createQueue')
-            ->willReturn($this->getMock(QueueInterface::class))
+            ->willReturn($this->createMock(QueueInterface::class))
         ;
         $sessionMock
             ->expects($this->any())
@@ -1001,7 +1006,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProcessorMock()
     {
-        return $this->getMock(MessageProcessorInterface::class);
+        return $this->createMock(MessageProcessorInterface::class);
     }
 
     /**
@@ -1024,7 +1029,7 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageMock()
     {
-        return $this->getMock(MessageInterface::class);
+        return $this->createMock(MessageInterface::class);
     }
 
     /**
@@ -1032,6 +1037,6 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createExtension()
     {
-        return $this->getMock(ExtensionInterface::class);
+        return $this->createMock(ExtensionInterface::class);
     }
 }

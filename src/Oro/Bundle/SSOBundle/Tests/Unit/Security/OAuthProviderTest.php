@@ -44,11 +44,11 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->userProvider = $this
-                ->getMock('HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface');
+                ->createMock('HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface');
         $this->resourceOwnerMap = $this->getMockBuilder('HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
+        $this->userChecker = $this->createMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
 
         $this->tokenFactory = new OAuthTokenFactory();
 
@@ -87,9 +87,9 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
         $organization->setEnabled(true);
         $token->setOrganizationContext($organization);
 
-        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
 
-        $resourceOwner = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface');
+        $resourceOwner = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface');
         $resourceOwner
             ->expects($this->any())
             ->method('getName')

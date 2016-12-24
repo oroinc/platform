@@ -34,9 +34,9 @@ class AttachmentHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $this->attachment = new Attachment();
 
         $this->handler = new AttachmentHandler($this->request, $this->om);

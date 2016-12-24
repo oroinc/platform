@@ -6,8 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ApiBundle\Form\DataMapper\RemoveRelationshipMapper;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\EntityWithoutGettersAndSetters;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
@@ -26,22 +28,9 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->propertyAccessor = $this->getMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
+        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->propertyAccessor = $this->createMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
         $this->mapper = new RemoveRelationshipMapper($this->propertyAccessor);
-    }
-
-    /**
-     * @param $path
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getPropertyPath($path)
-    {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->setConstructorArgs([$path])
-            ->setMethods(['getValue', 'setValue'])
-            ->getMock();
     }
 
     /**
@@ -73,7 +62,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->once())
             ->method('getValue')
@@ -96,7 +85,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->once())
             ->method('getValue')
@@ -132,7 +121,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     public function testMapDataToFormsIgnoresUnmapped()
     {
         $car = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
             ->method('getValue');
@@ -151,7 +140,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
     {
         $default = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
             ->method('getValue');
@@ -177,7 +166,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $doors = new ArrayCollection([new \stdClass()]);
-        $propertyPath = $this->getPropertyPath('doors');
+        $propertyPath = new PropertyPath('doors');
 
         $this->propertyAccessor->expects($this->once())
             ->method('getValue')
@@ -198,7 +187,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->once())
             ->method('setValue')
@@ -217,7 +206,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->once())
             ->method('setValue')
@@ -236,7 +225,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         // $car already contains the reference of $engine
         $this->propertyAccessor->expects($this->once())
@@ -260,7 +249,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
             ->method('setValue');
@@ -279,7 +268,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
             ->method('setValue');
@@ -296,7 +285,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     public function testMapFormsToDataIgnoresEmptyData()
     {
         $car = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
             ->method('setValue');
@@ -314,7 +303,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
             ->method('setValue');
@@ -332,7 +321,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
     {
         $car = new \stdClass();
         $engine = new \stdClass();
-        $propertyPath = $this->getPropertyPath('engine');
+        $propertyPath = new PropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
             ->method('setValue');
@@ -358,7 +347,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->addGroup($group1);
         $user->addGroup($group2);
-        $propertyPath = $this->getPropertyPath('groups');
+        $propertyPath = new PropertyPath('groups');
 
         $this->propertyAccessor->expects($this->once())
             ->method('getValue')
@@ -389,7 +378,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $user = new EntityWithoutGettersAndSetters();
         $user->groups->add($group1);
         $user->groups->add($group2);
-        $propertyPath = $this->getPropertyPath('groups');
+        $propertyPath = new PropertyPath('groups');
 
         $this->propertyAccessor->expects($this->exactly(2))
             ->method('getValue')
@@ -422,7 +411,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $user->addGroup($group2);
         $product = new Product();
         $product->setOwner($user);
-        $propertyPath = $this->getPropertyPath('owner.groups');
+        $propertyPath = new PropertyPath('owner.groups');
 
         $groupsFormData = [$group2, $group3];
 
@@ -441,5 +430,50 @@ class RemoveRelationshipMapperTest extends \PHPUnit_Framework_TestCase
         $form = $this->getForm($config);
 
         $this->mapper->mapFormsToData([$form], $product);
+    }
+
+    public function testMapFormsToDataElementsShouldBeAddedToCollectionInCaseOfExtendedToManyAssociation()
+    {
+        $group1 = new Group();
+        $group1->setName('group1');
+        $group2 = new Group();
+        $group2->setName('group2');
+        $user = new User();
+        $product1 = new Product();
+        $product1->setName('test product 1');
+        $product2 = new Product();
+        $product1->setName('test product 2');
+
+        $user->addGroup($group1);
+        $user->addGroup($group2);
+        $user->addProduct($product1);
+        $user->addProduct($product2);
+        $propertyPath = new PropertyPath('targets');
+
+        $this->propertyAccessor->expects($this->any())
+            ->method('getValue')
+            ->with($user, $propertyPath)
+            ->willReturn($user->getTargets());
+
+        $metadata = new AssociationMetadata();
+        $metadata->setIsCollection(true);
+
+        $config = new FormConfigBuilder('targets', null, $this->dispatcher, ['metadata' => $metadata]);
+        $config->setByReference(true);
+        $config->setPropertyPath($propertyPath);
+        $config->setData([$group2, $product1]);
+        $form = $this->getForm($config);
+
+        $this->mapper->mapFormsToData([$form], $user);
+
+        $expectedGroups = new ArrayCollection();
+        $expectedGroups->add($group1);
+        $this->assertEquals($expectedGroups, $user->getGroups());
+
+        $expectedProducts = new ArrayCollection();
+        $expectedProducts->add($product1);
+        $expectedProducts->add($product2);
+        $expectedProducts->removeElement($product1);
+        $this->assertEquals($expectedProducts, $user->getProducts());
     }
 }

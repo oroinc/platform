@@ -20,7 +20,7 @@ class SettingsProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFormSettings($config, $integrationType, $expectedFields, $resolvedValue)
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $resolver  = new SystemAwareResolver();
         $resolver->setContainer($container);
 

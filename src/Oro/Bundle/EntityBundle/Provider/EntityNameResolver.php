@@ -117,6 +117,32 @@ class EntityNameResolver
     }
 
     /**
+     * Returns an expression that is ready to be used in DQL query.
+     * * An empty expression is replaces with ''
+     * * If casting to a string is requested the expression is wrapped with CAST(expr AS string)
+     *
+     * @param string|null $expr         The name DQL expression
+     * @param bool        $castToString Whether the given DQL expression should be casted to a string
+     *                                  Usually this is required for UNION and UNION ALL queries
+     *
+     * @return string
+     */
+    public function prepareNameDQL($expr, $castToString = false)
+    {
+        if (!$expr) {
+            $expr = '\'\'';
+        } elseif ($castToString) {
+            // For UNION and UNION ALL queries an expression need to be forcibly converted to string
+            // to avoid errors like this:
+            // "UNION types text and integer cannot be matched"
+            // "Illegal mix of collations for operation 'UNION'"
+            $expr = sprintf('CAST(%s AS string)', $expr);
+        }
+
+        return $expr;
+    }
+
+    /**
      * Returns the registered providers sorted by priority.
      *
      * @return EntityNameProviderInterface[]

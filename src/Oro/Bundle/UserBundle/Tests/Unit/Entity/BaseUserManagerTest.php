@@ -53,11 +53,11 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 
-        $this->ef = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
-        $class = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $this->ef = $this->createMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
+        $class = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
 
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
 
         $this->om
             ->expects($this->any())
@@ -71,7 +71,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo(static::USER_CLASS))
             ->will($this->returnValue($class));
 
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->will($this->returnValue($this->om));
@@ -113,7 +113,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
         $user->setEmail(self::TEST_EMAIL);
         $user->setPlainPassword($password);
 
-        $encoder = $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
+        $encoder = $this->createMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
         $encoder->expects($this->once())
             ->method('encodePassword')
             ->with($user->getPlainPassword(), $user->getSalt())
@@ -235,7 +235,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRefreshUserNotSupported()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
         $this->userManager->refreshUser($user);
     }
 
@@ -245,7 +245,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRefreshUserNotOroUser()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
         $userManager = new BaseUserManager(
             'Symfony\Component\Security\Core\User\UserInterface',
             $this->registry,

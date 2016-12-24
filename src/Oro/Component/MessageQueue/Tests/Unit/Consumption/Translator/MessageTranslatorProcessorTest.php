@@ -68,7 +68,7 @@ class MessageTranslatorProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -76,6 +76,6 @@ class MessageTranslatorProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

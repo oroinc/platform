@@ -60,7 +60,7 @@ class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
             ['processor' => 'processor3', 'attributes' => []]
         ];
 
-        $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $factory->expects($this->at(0))
             ->method('getProcessor')
             ->with('processor1')
@@ -160,7 +160,7 @@ class ProcessorIteratorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProcessorFactory()
     {
-        $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $factory->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(

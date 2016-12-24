@@ -21,7 +21,7 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
         $cache    = $this->getMockForAbstractClass('Doctrine\Common\Cache\CacheProvider');
 
         $this->securityContext = $this
-            ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $this->manager = new UserScopeManager($doctrine, $cache);
         $this->manager->setSecurityContext($this->securityContext);
@@ -37,7 +37,7 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->setId(123);
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
         $this->securityContext->expects($this->once())
             ->method('getToken')
@@ -53,7 +53,7 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
         $this->securityContext->expects($this->once())
             ->method('getToken')
@@ -67,7 +67,7 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testInitializeScopeIdForUnsupportedUserObject()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
         $this->securityContext->expects($this->once())
             ->method('getToken')

@@ -33,9 +33,9 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->resolver = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->resolver = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
 
-        $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
 
         $this->valueProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider')
             ->disableOriginalConstructor()
@@ -45,7 +45,7 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $widgetConfigVisibilityFilter = $this
             ->getMockBuilder('Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter')

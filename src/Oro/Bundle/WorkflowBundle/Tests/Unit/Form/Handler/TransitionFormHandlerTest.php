@@ -44,7 +44,6 @@ class TransitionFormHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
         $this->entityManager->expects($this->any())->method('getUnitOfWork')->willReturn($this->unitOfWork);
-        $this->entityManager->expects($this->any())->method('isManageableEntity')->willReturn(true);
 
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
         $this->doctrineHelper->expects($this->any())->method('getEntityManager')->willReturn($this->entityManager);

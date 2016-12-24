@@ -24,7 +24,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
  * * filters
  * * identifier field
  * * "createdAt" and "updatedAt" fields
- * * ownership fields (e.g. owner, organization).
+ * * ownership fields such as "owner" and "organization".
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -32,6 +32,16 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 class CompleteDescriptions implements ProcessorInterface
 {
     const PLACEHOLDER_INHERIT_DOC = '{@inheritdoc}';
+
+    const ID_DESCRIPTION           = 'The unique identifier of a resource';
+    const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation';
+    const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record';
+    const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record';
+    const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm, '
+    . 'company or another organization to which the users belong';
+
+    const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
+    const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
 
     /** @var EntityDescriptionProvider */
     protected $entityDocProvider;
@@ -94,10 +104,6 @@ class CompleteDescriptions implements ProcessorInterface
             $context->getParentClassName()
         );
         $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
-        $this->setDescriptionForIdentifierField($definition);
-        $this->setDescriptionForCreatedAtField($definition);
-        $this->setDescriptionForUpdatedAtField($definition);
-        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
         $filters = $context->getFilters();
         if (null !== $filters) {
             $this->setDescriptionsForFilters($filters, $definition, $entityClass);
@@ -289,6 +295,8 @@ class CompleteDescriptions implements ProcessorInterface
         $targetAction,
         $fieldPrefix = null
     ) {
+        $this->setDescriptionForIdentifierField($definition);
+
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $this->getFieldPropertyPath($field, $fieldName, $fieldPrefix);
@@ -329,6 +337,10 @@ class CompleteDescriptions implements ProcessorInterface
                 }
             }
         }
+
+        $this->setDescriptionForCreatedAtField($definition);
+        $this->setDescriptionForUpdatedAtField($definition);
+        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
     }
 
     /**
@@ -391,9 +403,9 @@ class CompleteDescriptions implements ProcessorInterface
                 } else {
                     $fieldsDefinition = $definition->getField($fieldName);
                     if ($fieldsDefinition && $fieldsDefinition->hasTargetEntity()) {
-                        $field->setDescription(sprintf('Filter records by \'%s\' relationship.', $fieldName));
+                        $field->setDescription(sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName));
                     } else {
-                        $field->setDescription(sprintf('Filter records by \'%s\' field.', $fieldName));
+                        $field->setDescription(sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName));
                     }
                 }
             } else {
@@ -441,7 +453,7 @@ class CompleteDescriptions implements ProcessorInterface
      */
     protected function trans(Label $label)
     {
-        return $label->trans($this->translator) ? : null;
+        return $label->trans($this->translator) ?: null;
     }
 
     /**
@@ -470,7 +482,7 @@ class CompleteDescriptions implements ProcessorInterface
         $this->updateFieldDescription(
             $definition,
             reset($identifierFieldNames),
-            'The identifier of an entity'
+            self::ID_DESCRIPTION
         );
     }
 
@@ -482,7 +494,7 @@ class CompleteDescriptions implements ProcessorInterface
         $this->updateFieldDescription(
             $definition,
             'createdAt',
-            'The date and time of resource record creation'
+            self::CREATED_AT_DESCRIPTION
         );
     }
 
@@ -494,7 +506,7 @@ class CompleteDescriptions implements ProcessorInterface
         $this->updateFieldDescription(
             $definition,
             'updatedAt',
-            'The date and time of the last update of the resource record'
+            self::UPDATED_AT_DESCRIPTION
         );
     }
 
@@ -514,14 +526,13 @@ class CompleteDescriptions implements ProcessorInterface
             $definition,
             $entityConfig,
             'owner_field_name',
-            'An Owner record represents the ownership capabilities of the record'
+            self::OWNER_DESCRIPTION
         );
         $this->updateOwnershipFieldDescription(
             $definition,
             $entityConfig,
             'organization_field_name',
-            'An Organization record represents a real enterprise, business, firm, '
-            . 'company or another organization, to which the record belongs'
+            self::ORGANIZATION_DESCRIPTION
         );
     }
 

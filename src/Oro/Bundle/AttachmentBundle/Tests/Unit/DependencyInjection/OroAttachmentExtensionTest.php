@@ -20,7 +20,7 @@ class OroAttachmentExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroAttachmentExtension();
         $configs = array();
         $isCalled = false;
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->any())
             ->method('setParameter')
             ->will(

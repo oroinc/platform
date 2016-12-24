@@ -37,7 +37,7 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->registry  = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry  = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->converter = new DoctrineParamConverter(
             $this->registry,
             $this->securityFacade
@@ -49,8 +49,8 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testApply($object, $isGranted, $class, $isCorrectClass)
     {
-        $manager          = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $objectRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $manager          = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $manager->expects($this->once())
             ->method('getRepository')
             ->will($this->returnValue($objectRepository));
@@ -84,10 +84,8 @@ class DoctrineParamConverterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($isGranted));
 
         if ($isGranted === -1) {
-            $this->setExpectedException(
-                'Symfony\Component\Security\Core\Exception\AccessDeniedException',
-                'You do not get EDIT permission for this object'
-            );
+            $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+            $this->expectExceptionMessage('You do not get EDIT permission for this object');
             $this->securityFacade->expects($this->any())
                 ->method('getRequestAcl')
                 ->will($this->returnValue($annotation));

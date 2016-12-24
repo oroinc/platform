@@ -20,7 +20,7 @@ class SearchRepositoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->queryFactory = $this->getMock(QueryFactoryInterface::class);
+        $this->queryFactory = $this->createMock(QueryFactoryInterface::class);
         $this->mappingProvider = $this->getMockBuilder(AbstractSearchMappingProvider::class)
             ->disableOriginalConstructor()
             ->setMethods(['getEntityAlias'])
@@ -30,7 +30,7 @@ class SearchRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateQueryWithoutEntity()
     {
-        $query = $this->getMock(SearchQueryInterface::class);
+        $query = $this->createMock(SearchQueryInterface::class);
 
         $this->queryFactory->expects($this->once())
             ->method('create')
@@ -47,7 +47,7 @@ class SearchRepositoryTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'TestClass';
         $entityAlias = 'test_class';
 
-        $query = $this->getMock(SearchQueryInterface::class);
+        $query = $this->createMock(SearchQueryInterface::class);
         $query->expects($this->once())
             ->method('setFrom')
             ->with($entityAlias);

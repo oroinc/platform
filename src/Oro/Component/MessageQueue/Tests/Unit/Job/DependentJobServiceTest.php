@@ -23,7 +23,8 @@ class DependentJobServiceTest extends \PHPUnit_Framework_TestCase
 
         $service = new DependentJobService($this->createJobStorageMock());
 
-        $this->setExpectedException(\LogicException::class, 'Only root jobs allowed but got child. jobId: "12345"');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Only root jobs allowed but got child. jobId: "12345"');
 
         $service->saveDependentJob($context);
     }
@@ -70,6 +71,6 @@ class DependentJobServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobStorageMock()
     {
-        return $this->getMock(JobStorage::class, [], [], '', false);
+        return $this->createMock(JobStorage::class);
     }
 }

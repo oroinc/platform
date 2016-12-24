@@ -21,6 +21,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\SortingTrait;
     use Traits\InclusionTrait;
     use Traits\FieldsetTrait;
+    use Traits\MetaPropertyTrait;
     use Traits\FormTrait;
     use Traits\StatusCodesTrait;
 
@@ -47,6 +48,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** a flag indicates whether a requesting of a restricted set of fields is disabled */
     const DISABLE_FIELDSET = 'disable_fieldset';
+
+    /** a flag indicates whether a requesting of additional meta properties is disabled */
+    const DISABLE_META_PROPERTIES = 'disable_meta_properties';
 
     /** a handler that should be used to delete the entity */
     const DELETE_HANDLER = 'delete_handler';

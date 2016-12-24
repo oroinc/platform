@@ -1,20 +1,25 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Async\AddEmailAssociationMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
+
+use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AddEmailAssociationMessageProcessor($this->createAssociationManagerMock(), $this->createLoggerMock());
+        new AddEmailAssociationMessageProcessor(
+            $this->createAssociationManagerMock(),
+            $this->createJobRunnerMock(),
+            $this->createLoggerMock()
+        );
     }
 
     public function testShouldRejectMessageIfEmailIdIsMissing()
@@ -35,6 +40,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
 
         $processor = new AddEmailAssociationMessageProcessor(
             $this->createAssociationManagerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -60,6 +66,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
 
         $processor = new AddEmailAssociationMessageProcessor(
             $this->createAssociationManagerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -86,6 +93,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
 
         $processor = new AddEmailAssociationMessageProcessor(
             $this->createAssociationManagerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -110,14 +118,29 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
         ;
 
         $message = new NullMessage();
-        $message->setBody(json_encode([
+        $body = [
+            'jobId' => 123,
             'emailId' => 456,
             'targetClass' => 'class',
             'targetId' => 123,
-        ]));
+        ];
+        $message->setBody(json_encode($body));
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runDelayed')
+            ->with(123)
+            ->will($this->returnCallback(function ($name, $callback) use ($body) {
+                $callback($body);
+
+                return true;
+            }))
+        ;
 
         $processor = new AddEmailAssociationMessageProcessor(
             $manager,
+            $jobRunner,
             $logger
         );
 
@@ -139,7 +162,7 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -147,7 +170,15 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createAssociationManagerMock()
     {
-        return $this->getMock(AssociationManager::class, [], [], '', false);
+        return $this->createMock(AssociationManager::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     */
+    private function createJobRunnerMock()
+    {
+        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -155,6 +186,6 @@ class AddEmailAssociationMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

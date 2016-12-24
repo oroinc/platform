@@ -31,8 +31,8 @@ class DestinationMetaRegistryTest extends \PHPUnit_Framework_TestCase
             'default'
         );
 
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'The destination meta not found. Requested name `aName`'
         );
         $registry->getDestinationMeta('aName');

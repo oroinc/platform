@@ -42,7 +42,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
@@ -63,7 +63,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
@@ -84,7 +84,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
@@ -105,7 +105,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
@@ -127,7 +127,7 @@ class ClassAttributeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));

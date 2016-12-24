@@ -91,7 +91,7 @@ class ThemeListenerTest extends \PHPUnit_Framework_TestCase
     protected function createMasterRequestEvent(array $query = [], array $attributes = [])
     {
         return new GetResponseEvent(
-            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
             new Request($query, [], $attributes),
             HttpKernelInterface::MASTER_REQUEST
         );
@@ -105,7 +105,7 @@ class ThemeListenerTest extends \PHPUnit_Framework_TestCase
     protected function createSubRequestEvent(array $attributes = [])
     {
         return new GetResponseEvent(
-            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
             new Request([], [], $attributes),
             HttpKernelInterface::SUB_REQUEST
         );

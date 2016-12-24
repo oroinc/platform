@@ -24,7 +24,7 @@ class ValidateStepTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->validator = $this
-            ->getMock('Symfony\Component\Validator\ValidatorInterface');
+            ->createMock('Symfony\Component\Validator\ValidatorInterface');
 
         $this->constraintViolation = $this
             ->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')

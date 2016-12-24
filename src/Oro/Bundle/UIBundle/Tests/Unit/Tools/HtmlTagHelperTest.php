@@ -15,7 +15,7 @@ class HtmlTagHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
         $this->helper = new HtmlTagHelper($this->htmlTagProvider);
     }
 

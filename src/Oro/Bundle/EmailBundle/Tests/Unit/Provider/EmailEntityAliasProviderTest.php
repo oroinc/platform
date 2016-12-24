@@ -29,7 +29,7 @@ class EmailEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityAlias()
     {
-        $this->assertNull($this->entityAliasProvider->getEntityAlias('SomeClass'));
+        $this->assertNull($this->entityAliasProvider->getEntityAlias(\stdClass::class));
 
         $entityAlias = $this->entityAliasProvider->getEntityAlias(self::EMAIL_ADDRESS_PROXY_CLASS);
 

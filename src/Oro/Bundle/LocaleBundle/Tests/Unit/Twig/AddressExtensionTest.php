@@ -36,7 +36,7 @@ class AddressExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testFormat()
     {
-        $address = $this->getMock('Oro\Bundle\LocaleBundle\Model\AddressInterface');
+        $address = $this->createMock('Oro\Bundle\LocaleBundle\Model\AddressInterface');
         $country = 'CA';
         $newLineSeparator = '<br/>';
         $expectedResult = 'expected result';

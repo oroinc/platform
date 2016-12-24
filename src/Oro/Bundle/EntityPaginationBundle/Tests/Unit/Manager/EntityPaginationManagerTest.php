@@ -139,13 +139,13 @@ class EntityPaginationManagerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
         } else {
-            $dataSource = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+            $dataSource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
         }
 
         $config = ['options' => ['entity_pagination' => $entityPagination]];
         $configObject = DatagridConfiguration::create($config);
 
-        $dataGrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $dataGrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $dataGrid->expects($this->any())
             ->method('getDatasource')
             ->will($this->returnValue($dataSource));

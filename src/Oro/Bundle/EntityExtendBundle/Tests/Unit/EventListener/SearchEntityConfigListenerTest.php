@@ -36,7 +36,7 @@ class SearchEntityConfigListenerTest extends \PHPUnit_Framework_TestCase
         $this->searchMappingProvider = $this->getMockBuilder(SearchMappingProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->searchIndexer = $this->getMock(IndexerInterface::class);
+        $this->searchIndexer = $this->createMock(IndexerInterface::class);
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
