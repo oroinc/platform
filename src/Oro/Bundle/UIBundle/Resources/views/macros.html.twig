@@ -1269,7 +1269,7 @@
         <div data-page-component-module="{{ data.module }}"
              data-page-component-options="{{ data.treeOptions|json_encode }}"
              data-collapse-container>
-            {% if data.treeOptions.data|default([]) %}
+            {% if not data.disableSearch|default(false) and data.treeOptions.data|default([]) %}
             <div class="jstree-search-component">
                 <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
             </div>

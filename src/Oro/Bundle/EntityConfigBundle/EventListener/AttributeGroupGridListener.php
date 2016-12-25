@@ -41,16 +41,17 @@ class AttributeGroupGridListener
         $attributes = $this->attributeManager->getAttributesByIdsWithIndex($attributeIds);
 
         foreach ($records as $record) {
-            if (!isset($attributeMap[$record->getValue('id')])) {
-                continue;
-            }
-            $groupAttributeIds = $attributeMap[$record->getValue('id')];
+            $groupAttributeIds = isset($attributeMap[$record->getValue('id')])
+                ? $attributeMap[$record->getValue('id')]
+                : [];
             $labels = [];
-            foreach ($groupAttributeIds as $id) {
-                if (empty($attributes[$id])) {
-                    continue;
+            if (!empty($groupAttributeIds)) {
+                foreach ($groupAttributeIds as $id) {
+                    if (empty($attributes[$id])) {
+                        continue;
+                    }
+                    $labels[] = $this->attributeManager->getAttributeLabel($attributes[$id]);
                 }
-                $labels[] = $this->attributeManager->getAttributeLabel($attributes[$id]);
             }
             $record->addData(['attributes' => $labels]);
         }

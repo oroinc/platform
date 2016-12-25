@@ -16,6 +16,22 @@
     {% endif %}
 {% endmacro %}
 
+{% macro renderDynamicField(entity, field) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% set dynamicField = oro_get_dynamic_field(entity, field) %}
+    {% if dynamicField %}
+        {{ ui.renderHtmlProperty(
+            dynamicField.label|trans,
+            _self.formatDynamicFieldValue(
+                field.entity,
+                field.entity.className,
+                field.fieldName,
+                dynamicField
+            )
+        ) }}
+    {% endif %}
+{% endmacro %}
+
 {% macro formatDynamicFieldValue(entity, entity_class, field_name, item) %}
     {% set hasLink = false %}
     {% set fieldValue = item.value %}
@@ -90,4 +106,32 @@
     {% else %}
         {{ value.title|escape }}
     {% endif %}
+{% endmacro %}
+
+{% macro displayLayoutActions(actions) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% for button in actions %}
+        {% set componentData = {} %}
+        {% if  button.page_component_module is defined %}
+            {% set componentData = {'page-component-module' : button.page_component_module} %}
+
+            {% if  button.page_component_options is defined %}
+                {% set componentData = componentData|merge({
+                    'page-component-options' : button.page_component_options|json_encode
+                })
+                %}
+            {% endif %}
+
+        {% endif %}
+        {{ UI.button({
+            'path'   : button.void is defined ? 'javascript:void(0);' : path(button.route, button.args|default({})),
+            'data'   : {
+                'url' : button.void is defined ? path(button.route, button.args|default({})) : null,
+            }|merge(componentData),
+            'iCss'   : button.iCss|default(''),
+            'aCss'   : button.aCss|default(''),
+            'title'  : button.title|default(button.name)|trans,
+            'label'  : button.name|trans
+        }) }}
+    {% endfor %}
 {% endmacro %}
