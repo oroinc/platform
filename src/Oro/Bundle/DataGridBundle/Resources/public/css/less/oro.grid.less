@@ -166,7 +166,7 @@
   margin-left: 0;
 }
 .with-floating-header {
-  .grid-header-cell:not(.number-cell){
+  .grid-header-cell:not(.number-cell, .align-right){
     padding-right: 0;
   }
   .grid-header-cell__link, .grid-header-cell__label-container{
@@ -178,8 +178,29 @@
     display: block;
     overflow: hidden;
   }
-  .number-cell .grid-header-cell__label {
-    margin-left: auto;
+  .number-cell, .align-right, .align-center{
+    .grid-header-cell__label {
+      margin-left: auto;
+    }
+  }
+  .align-left {
+    .grid-header-cell__label {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+  .align-center{
+    .grid-header-cell__label {
+      margin-right: auto;
+    }
+    &.ascending, &.descending {
+      .grid-header-cell__label {
+        margin-right: 0;
+      }
+      .caret {
+        margin-right: auto;
+      }
+    }
   }
   &.floatThead .grid-header.thead-sizing .grid-header-cell.shortenable-label .grid-header-cell__label {
     width: 0 !important;
