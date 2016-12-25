@@ -6,5 +6,4 @@
 composer.lock
 /vendor
 phpunit.xml
-/components
 *~
