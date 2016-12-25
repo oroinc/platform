@@ -199,6 +199,10 @@ class WidgetControllerTest extends WebTestCase
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
+
+        $transitionButton = $crawler->selectLink('oro.workflow.test_active_flow1.transition.transition1.label');
+        $this->assertCount(1, $transitionButton);
+        $this->assertSame('javascript:void(0);', $transitionButton->attr('href'));
         $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
         $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
         $this->assertContains('transition-test_start_init_option-start_transition', $crawler->html());

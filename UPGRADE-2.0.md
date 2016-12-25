@@ -1052,6 +1052,10 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` 
 - `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigProvider`
 
+####OroTrackingBundle
+- Moved ``TrackingBundle`` to a separate ``marketing`` package, required by default in the CRM applications.
+- Deleted ``tracking.php`` front controllers from applications. This file is created in application's `/web` folder automatically duting an instalation.
+
 ####OroNoteBundle
 - Implementation of activity list relation with entity  `Oro\Bundle\NoteBundle\Entity\Note` was changed. Now the entity is a regular activity entity like others: Email, Task, Call, Email, etc.
 
