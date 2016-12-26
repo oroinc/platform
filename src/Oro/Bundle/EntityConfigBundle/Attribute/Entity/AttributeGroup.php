@@ -15,7 +15,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
  * @ORM\Table(name="oro_attribute_group")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EntityExtendBundle\Entity\Repository\AttributeGroupRepository")
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
  * @ORM\HasLifecycleCallbacks
  * @Config(
  *      mode="hidden"

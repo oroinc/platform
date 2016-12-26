@@ -33,19 +33,3 @@ services:
             - [setName, ['attribute_multiselect']]
         tags:
              - { name: layout.block_type, alias: attribute_multiselect }
-
-    oro_entity_config.block_type.attribute_block_type_mapper:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeBlockTypeMapper'
-        calls:
-            - [addBlockTypeByAttributeType, ['string', 'attribute_text']]
-            - [addBlockTypeByAttributeType, ['text', 'attribute_text']]
-            - [addBlockTypeByAttributeType, ['bigint', 'attribute_text']]
-            - [addBlockTypeByAttributeType, ['integer', 'attribute_text']]
-            - [addBlockTypeByAttributeType, ['float', 'attribute_text']]
-            - [addBlockTypeByAttributeType, ['smallint', 'attribute_text']]
-            - [addBlockTypeByAttributeType, ['decimal', 'attribute_text']]
-            - [addBlockTypeByAttributeType, ['percent', 'attribute_percent']]
-            - [addBlockTypeByAttributeType, ['currency', 'attribute_money']]
-            - [addBlockTypeByAttributeType, ['date', 'attribute_date']]
-            - [addBlockTypeByAttributeType, ['datetime', 'attribute_datetime']]
-            - [addBlockTypeByAttributeType, ['multiEnum', 'attribute_multiselect']]

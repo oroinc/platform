@@ -301,3 +301,20 @@ services:
 
     oro_entity_config.slug.generator:
         class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
+
+    oro_entity_config.block_type.abstract_attribute_block_type_mapper:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper'
+        abstract: true
+        calls:
+            - [addBlockType, ['string', 'attribute_text']]
+            - [addBlockType, ['text', 'attribute_text']]
+            - [addBlockType, ['bigint', 'attribute_text']]
+            - [addBlockType, ['integer', 'attribute_text']]
+            - [addBlockType, ['float', 'attribute_text']]
+            - [addBlockType, ['smallint', 'attribute_text']]
+            - [addBlockType, ['decimal', 'attribute_text']]
+            - [addBlockType, ['percent', 'attribute_percent']]
+            - [addBlockType, ['currency', 'attribute_money']]
+            - [addBlockType, ['date', 'attribute_date']]
+            - [addBlockType, ['datetime', 'attribute_datetime']]
+            - [addBlockType, ['multiEnum', 'attribute_multiselect']]
