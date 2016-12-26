@@ -22,6 +22,7 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
     const REGULAR_ATTRIBUTE_GROUP_2 = 'regular_attribute_group_2';
     const EMPTY_ATTRIBUTE_GROUP = 'empty_attribute_group';
 
+    /** @var array */
     protected $groups = [
         'default' => [
             self::DEFAULT_ATTRIBUTE_GROUP_1 => [
@@ -59,14 +60,17 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
      */
     public function load(ObjectManager $manager)
     {
-        $modelManager = $this->container->get('oro_entity_config.attribute.config_model_manager');
+        $configManager = $this->container->get('oro_entity_config.config_manager');
         foreach ($this->groups as $type => $groups) {
             foreach ($groups as $groupName => $attributes) {
                 $group = new AttributeGroup();
                 $group->setDefaultLabel($groupName);
-                $group->setIsDefault($type === 'default');
+
                 foreach ($attributes as $attributeName) {
-                    $attribute = $modelManager->getFieldModel(LoadAttributeData::ENTITY_CONFIG_MODEL, $attributeName);
+                    $attribute = $configManager->getConfigFieldModel(
+                        LoadAttributeData::ENTITY_CONFIG_MODEL,
+                        $attributeName
+                    );
                     $relation = new AttributeGroupRelation();
                     $relation->setAttributeGroup($group);
                     $relation->setEntityConfigFieldId($attribute->getId());

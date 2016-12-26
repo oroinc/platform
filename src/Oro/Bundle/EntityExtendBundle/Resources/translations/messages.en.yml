@@ -76,6 +76,7 @@ oro:
         enum_options.default.tooltip: If marked, this option will be selected by default for new records.
         action:
             apply_changes: "Apply entityconfig changes"
+            apply_attribute_schema_changes: "Apply attributes changes"
             config_entity_grid:
                 unique: "Unique entity unique keys"
                 create: "Create custom entity"

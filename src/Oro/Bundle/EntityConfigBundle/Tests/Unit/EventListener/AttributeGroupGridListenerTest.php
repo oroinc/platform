@@ -91,10 +91,6 @@ class AttributeGroupGridListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRecords, $event->getRecords());
     }
 
-    /**
-     * @param int $id
-     * @return FieldConfigModel object
-     */
     private function getAttribute($id)
     {
         return $this->getEntity(FieldConfigModel::class, ['id' => $id]);

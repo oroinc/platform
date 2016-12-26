@@ -55,6 +55,8 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $this->addOroAttributeGroupForeignKeys($schema);
         $this->addAttributeFamilyImageAssociation($schema);
         $this->addOrganizationForeignKey($schema);
+        $table = $schema->getTable('oro_attribute_group');
+        $table->addColumn('code', 'string', ['length' => 255, 'notnull' => false]);
     }
 
     /**
@@ -266,7 +268,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $table = $schema->createTable('oro_attribute_group');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('attribute_family_id', 'integer', ['notnull' => false]);
-        $table->addColumn('is_default', 'boolean', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

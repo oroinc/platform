@@ -68,7 +68,7 @@ class AttributeFamilyTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $attributeManagerMock->expects($this->any())->method('getAttributesByClass')->willReturn([]);
+        $attributeManagerMock->expects($this->any())->method('getActiveAttributesByClass')->willReturn([]);
 
         return [
             new PreloadedExtension(

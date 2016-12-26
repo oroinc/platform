@@ -49,6 +49,8 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         $this->addOroLocalizationForeignKeys($schema);
         $this->addOroFallbackLocalizedValueForeignKeys($schema);
         $this->addOroLocalizationTitleForeignKeys($schema);
+
+        $this->addRelationsToScope($schema);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
@@ -15,6 +15,8 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\AttributeGroupRepository;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -26,24 +28,14 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     const ATTRIBUTE_FIELD_NAME = 'attribute_field_name';
 
     /**
-     * @var ConfigModelManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $configModelManager;
+    protected $configManager;
 
     /**
      * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $doctrineHelper;
-
-    /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $attributeConfigProvider;
-
-    /**
-     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $entityConfigProvider;
 
     /**
      * @var Translator|\PHPUnit_Framework_MockObject_MockObject
@@ -57,19 +49,11 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configModelManager = $this->getMockBuilder(ConfigModelManager::class)
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -78,10 +62,8 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->manager = new AttributeManager(
-            $this->configModelManager,
+            $this->configManager,
             $this->doctrineHelper,
-            $this->attributeConfigProvider,
-            $this->entityConfigProvider,
             $this->translator
         );
     }
@@ -91,8 +73,8 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function expectsDatabaseCheck($isCheckSuccessful)
     {
-        $this->configModelManager->expects($this->once())
-            ->method('checkDatabase')
+        $this->configManager->expects($this->once())
+            ->method('isDatabaseReadyToWork')
             ->willReturn($isCheckSuccessful);
     }
 
@@ -277,39 +259,54 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     public function isSystemDataProvider()
     {
         return [
-            [true],
-            [false]
+           'system' => [
+               true
+           ],
+           'not system' => [
+               false
+           ]
         ];
     }
 
     /**
      * @dataProvider isSystemDataProvider
-     * @param bool $isSystem
+     * @param bool $expectation
      */
-    public function testIsSystem($isSystem)
+    public function testIsSystem($expectation)
     {
         $config = $this->createMock(ConfigInterface::class);
         $config
             ->expects($this->once())
             ->method('is')
-            ->with('is_system')
-            ->willReturn($isSystem);
+            ->with('owner', ExtendScope::OWNER_SYSTEM)
+            ->willReturn($expectation);
 
         $attributeFieldName = 'attributeFieldName';
         $entityClassName = 'entityClassName';
 
-        $this->attributeConfigProvider
-            ->expects($this->once())
+        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        $extendConfigProvider = $this->getMockBuilder(ConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($entityClassName, $attributeFieldName)
             ->willReturn($config);
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendConfigProvider);
+
         /** @var FieldConfigModel $attribute */
         $attribute = $this->getEntity(FieldConfigModel::class, [
             'fieldName' => $attributeFieldName,
             'entity' => $this->getEntity(EntityConfigModel::class, ['className' => $entityClassName])
         ]);
 
-        $this->assertEquals($isSystem, $this->manager->isSystem($attribute));
+        $this->assertEquals($expectation, $this->manager->isSystem($attribute));
     }
 
     public function testAttributeLabelWhenTranslationExists()
@@ -322,11 +319,22 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
             ->with('label')
             ->willReturn($attributeLabel);
 
-        $this->entityConfigProvider
-            ->expects($this->once())
+        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        $entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME, self::ATTRIBUTE_FIELD_NAME)
             ->willReturn($config);
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('getProvider')
+            ->with('entity')
+            ->willReturn($entityConfigProvider);
+
         /** @var FieldConfigModel $attribute */
         $attribute = $this->getEntity(FieldConfigModel::class, [
             'fieldName' => self::ATTRIBUTE_FIELD_NAME,
@@ -359,11 +367,21 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
             ->with('label')
             ->willReturn($attributeLabel);
 
-        $this->entityConfigProvider
-            ->expects($this->once())
+        /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+        $entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME, self::ATTRIBUTE_FIELD_NAME)
             ->willReturn($config);
+
+        $this->configManager
+            ->expects($this->once())
+            ->method('getProvider')
+            ->with('entity')
+            ->willReturn($entityConfigProvider);
 
         /** @var FieldConfigModel $attribute */
         $attribute = $this->getEntity(FieldConfigModel::class, [
@@ -434,6 +452,113 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($repository);
 
         return $repository;
+    }
+
+    /**
+     * @return array
+     */
+    public function groupsWithAttributesDataProvider()
+    {
+        $group1 = $this->getEntity(AttributeGroup::class, [
+            'attributeRelations' => [
+                $this->getEntity(AttributeGroupRelation::class, ['entityConfigFieldId' => 1]),
+                $this->getEntity(AttributeGroupRelation::class, ['entityConfigFieldId' => 2])
+            ]
+        ]);
+        $group2 = $this->getEntity(AttributeGroup::class, [
+            'attributeRelations' => [
+                $this->getEntity(AttributeGroupRelation::class, ['entityConfigFieldId' => 3])
+            ]
+        ]);
+        $attribute1 = $this->getEntity(FieldConfigModel::class, ['id' => 1]);
+        $attribute2 = $this->getEntity(FieldConfigModel::class, ['id' => 2]);
+        $attribute3 = $this->getEntity(FieldConfigModel::class, ['id' => 3]);
+
+        return [
+            'empty' => [
+                'groups' => [],
+                'attributes' => [],
+                'attributeIds' => [],
+                'familyData' => [],
+                'expectedData' => []
+            ],
+            'full' => [
+                'groups' => [$group1, $group2],
+                'attributes' => [
+                    $attribute1->getId() => $attribute1,
+                    $attribute2->getId() => $attribute2,
+                    $attribute3->getId() => $attribute3
+                ],
+                'attributeIds' => [1, 2, 3],
+                'familyData' => [
+                    'attributeGroups' => [$group1, $group2]
+                ],
+                'expectedData' => [
+                    [
+                        'group' => $group1,
+                        'attributes' => [
+                            $attribute1,
+                            $attribute2
+                        ]
+                    ],
+                    [
+                        'group' => $group2,
+                        'attributes' => [
+                            $attribute3
+                        ]
+                    ],
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider groupsWithAttributesDataProvider
+     * @param array $groups
+     * @param array $attributes
+     * @param array $attributeIds
+     * @param array $familyData
+     * @param array $expected
+     */
+    public function testGetGroupsWithAttributes(
+        array $groups,
+        array $attributes,
+        array $attributeIds,
+        array $familyData,
+        array $expected
+    ) {
+        /** @var AttributeFamily $attributeFamily */
+        $attributeFamily = $this->getEntity(AttributeFamily::class, $familyData);
+
+        $groupRepository = $this->getMockBuilder(AttributeGroupRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fieldRepository = $this->getMockBuilder(FieldConfigModelRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fieldRepository
+            ->expects($this->once())
+            ->method('getAttributesByIds')
+            ->with($attributeIds)
+            ->willReturn($attributes);
+
+        $groupRepository
+            ->expects($this->once())
+            ->method('getGroupsWithAttributeRelations')
+            ->with($attributeFamily)
+            ->willReturn($groups);
+
+        $this->expectsDatabaseCheck(true);
+
+        $this->doctrineHelper
+            ->expects($this->exactly(2))
+            ->method('getEntityRepositoryForClass')
+            ->withConsecutive([AttributeGroup::class], [FieldConfigModel::class])
+            ->willReturnOnConsecutiveCalls($groupRepository, $fieldRepository);
+
+        $this->assertEquals($expected, $this->manager->getGroupsWithAttributes($attributeFamily));
     }
 
     /**
