@@ -18,6 +18,7 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->chainMapper = new ChainAttributeBlockTypeMapper();
+        $this->chainMapper->setDefaultBlockType('default_block_type');
     }
 
     public function testGetBlockTypeFromProvider()
@@ -33,39 +34,9 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit_Framework_TestCase
             ->with($attribute)
             ->willReturn('attribute_string');
 
-        $mapper->expects($this->once())
-            ->method('supports')
-            ->with($attribute)
-            ->willReturn(true);
-
         $this->chainMapper->addMapper($mapper);
 
         $this->assertEquals('attribute_string', $this->chainMapper->getBlockType($attribute));
-    }
-
-    public function testGetBlockTypeFromProviderNotSupported()
-    {
-        $this->chainMapper->addBlockType('int', 'attribute_int');
-
-        $attribute = new FieldConfigModel();
-        $attribute->setType('string');
-        $attribute->setFieldName('string_field');
-
-        $mapper = $this->getMockBuilder(AttributeBlockTypeMapperInterface::class)->getMock();
-        $mapper->expects($this->never())
-            ->method('getBlockType');
-
-        $mapper->expects($this->once())
-            ->method('supports')
-            ->with($attribute)
-            ->willReturn(false);
-
-        $this->chainMapper->addMapper($mapper);
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Block type is not define for field "string_field"');
-
-        $this->chainMapper->getBlockType($attribute);
     }
 
     public function testGetBlockTypeFromRegistry()
@@ -81,17 +52,12 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit_Framework_TestCase
             ->with($attribute)
             ->willReturn(null);
 
-        $mapper->expects($this->once())
-            ->method('supports')
-            ->with($attribute)
-            ->willReturn(true);
-
         $this->chainMapper->addMapper($mapper);
 
         $this->assertEquals('attribute_string', $this->chainMapper->getBlockType($attribute));
     }
 
-    public function testGetBlockTypeLogicException()
+    public function testGetBlockTypeDefault()
     {
         $this->chainMapper->addBlockType('string', 'attribute_string');
 
@@ -105,17 +71,9 @@ class ChainAttributeBlockTypeMapperTest extends \PHPUnit_Framework_TestCase
             ->with($attribute)
             ->willReturn(null);
 
-        $mapper->expects($this->once())
-            ->method('supports')
-            ->with($attribute)
-            ->willReturn(true);
-
         $this->chainMapper->addMapper($mapper);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Block type is not define for field "percent_field"');
-
-        $this->chainMapper->getBlockType($attribute);
+        $this->assertEquals('default_block_type', $this->chainMapper->getBlockType($attribute));
 
     }
 }

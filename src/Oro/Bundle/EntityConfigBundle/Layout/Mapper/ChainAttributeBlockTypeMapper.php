@@ -6,6 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 class ChainAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
 {
+    /** @var string  */
+    protected $defaultBlockType;
+
     /** @var array */
     private $attributeTypesRegistry = [];
 
@@ -38,6 +41,14 @@ class ChainAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
     }
 
     /**
+     * @param string $blockType
+     */
+    public function setDefaultBlockType($blockType)
+    {
+        $this->defaultBlockType = $blockType;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @throws \LogicException
@@ -47,10 +58,6 @@ class ChainAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
         $type = $attribute->getType();
 
         foreach ($this->mappers as $mapper) {
-            if (!$mapper->supports($attribute)) {
-                continue;
-            }
-
             $blockType = $mapper->getBlockType($attribute);
             if ($blockType !== null) {
                 return $blockType;
@@ -61,17 +68,6 @@ class ChainAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
             return $this->attributeTypesRegistry[$type];
         }
 
-        $fieldName = $attribute->getFieldName();
-        throw new \LogicException(sprintf('Block type is not define for field "%s"', $fieldName));
-    }
-
-    /**
-     * @param FieldConfigModel $attribute
-     *
-     * @return boolean
-     */
-    public function supports(FieldConfigModel $attribute)
-    {
-        return true;
+        return $this->defaultBlockType;
     }
 }

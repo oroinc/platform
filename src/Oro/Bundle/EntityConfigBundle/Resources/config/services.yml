@@ -305,13 +305,7 @@ services:
     oro_entity_config.block_type.chain_attribute_block_type_mapper:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper'
         calls:
-            - [addBlockType, ['string', 'attribute_text']]
-            - [addBlockType, ['text', 'attribute_text']]
-            - [addBlockType, ['bigint', 'attribute_text']]
-            - [addBlockType, ['integer', 'attribute_text']]
-            - [addBlockType, ['float', 'attribute_text']]
-            - [addBlockType, ['smallint', 'attribute_text']]
-            - [addBlockType, ['decimal', 'attribute_text']]
+            - [setDefaultBlockType, ['attribute_text']]
             - [addBlockType, ['percent', 'attribute_percent']]
             - [addBlockType, ['currency', 'attribute_currency']]
             - [addBlockType, ['date', 'attribute_date']]
