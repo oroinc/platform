@@ -12,4 +12,11 @@ interface AttributeBlockTypeMapperInterface
      * @return string|null
      */
     public function getBlockType(FieldConfigModel $attribute);
+
+    /**
+     * @param FieldConfigModel $attribute
+     *
+     * @return boolean
+     */
+    public function supports(FieldConfigModel $attribute);
 }

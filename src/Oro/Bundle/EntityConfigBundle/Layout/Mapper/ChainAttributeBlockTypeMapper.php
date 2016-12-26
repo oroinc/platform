@@ -4,22 +4,22 @@ namespace Oro\Bundle\EntityConfigBundle\Layout\Mapper;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
-abstract class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
+class ChainAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
 {
     /** @var array */
-    private $attributeTypesRegistry;
+    private $attributeTypesRegistry = [];
 
     /** @var AttributeBlockTypeMapperInterface[] */
-    private $providers;
+    private $mappers;
 
     /**
-     * @param AttributeBlockTypeMapperInterface $provider
+     * @param AttributeBlockTypeMapperInterface $mapper
      *
-     * @return AbstractAttributeBlockTypeMapper
+     * @return ChainAttributeBlockTypeMapper
      */
-    public function addProvider(AttributeBlockTypeMapperInterface $provider)
+    public function addMapper(AttributeBlockTypeMapperInterface $mapper)
     {
-        $this->providers[] = $provider;
+        $this->mappers[] = $mapper;
 
         return $this;
     }
@@ -28,7 +28,7 @@ abstract class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMap
      * @param string $attributeType
      * @param string $blockType
      *
-     * @return AbstractAttributeBlockTypeMapper
+     * @return ChainAttributeBlockTypeMapper
      */
     public function addBlockType($attributeType, $blockType)
     {
@@ -46,8 +46,12 @@ abstract class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMap
     {
         $type = $attribute->getType();
 
-        foreach ($this->providers as $provider) {
-            $blockType = $provider->getBlockType($attribute);
+        foreach ($this->mappers as $mapper) {
+            if (!$mapper->supports($attribute)) {
+                continue;
+            }
+
+            $blockType = $mapper->getBlockType($attribute);
             if ($blockType !== null) {
                 return $blockType;
             }
@@ -59,5 +63,15 @@ abstract class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMap
 
         $fieldName = $attribute->getFieldName();
         throw new \LogicException(sprintf('Block type is not define for field "%s"', $fieldName));
+    }
+
+    /**
+     * @param FieldConfigModel $attribute
+     *
+     * @return boolean
+     */
+    public function supports(FieldConfigModel $attribute)
+    {
+        return true;
     }
 }

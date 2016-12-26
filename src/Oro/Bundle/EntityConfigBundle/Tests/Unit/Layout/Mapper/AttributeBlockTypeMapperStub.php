@@ -1,9 +1,0 @@
-<?php
-
-namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\Mapper;
-
-use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper;
-
-class AttributeBlockTypeMapperStub extends AbstractAttributeBlockTypeMapper
-{
-}
