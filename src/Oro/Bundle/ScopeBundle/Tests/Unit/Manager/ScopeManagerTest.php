@@ -411,4 +411,34 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $this->manager->getScopeEntities('scope_type'));
     }
+
+    public function testFindMostSuitable()
+    {
+        $scope = new Scope();
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('getCriteriaForCurrentScope')
+            ->willReturn(['fieldName' => 1]);
+        $scopeCriteria = new ScopeCriteria(['fieldName' => 1, 'fieldName2' => null]);
+        $repository = $this->getMockBuilder(ScopeRepository::class)->disableOriginalConstructor()->getMock();
+        $repository->expects($this->once())
+            ->method('findMostSuitable')
+            ->with($scopeCriteria)
+            ->willReturn($scope);
+
+        $this->entityStorage->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        $this->entityFieldProvider->expects($this->once())
+            ->method('getRelations')
+            ->willReturn([
+                ['name' => 'fieldName'],
+                ['name' => 'fieldName2'],
+            ]);
+
+        $this->manager->addProvider('testScope', $provider);
+        $actualScope = $this->manager->findMostSuitable('testScope');
+        $this->assertEquals($scope, $actualScope);
+    }
 }

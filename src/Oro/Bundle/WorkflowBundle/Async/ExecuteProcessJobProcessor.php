@@ -93,7 +93,6 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
             $entityManager->commit();
         } catch (\Exception $e) {
             $this->processHandler->finishJob($processJob);
-            $entityManager->clear();
             $entityManager->rollback();
 
             $this->logger->critical(
