@@ -42,7 +42,7 @@ class WorkflowActivationTest extends WebTestCase
      */
     protected function createNewEntity()
     {
-        $testEntity = new WorkflowAwareEntity()
+        $testEntity = new WorkflowAwareEntity();
         $testEntity->setName('test_' . uniqid('test', true));
 
         $entityManager = $this->getContainer()->get('doctrine')->getManagerForClass(self::ENTITY_CLASS);
