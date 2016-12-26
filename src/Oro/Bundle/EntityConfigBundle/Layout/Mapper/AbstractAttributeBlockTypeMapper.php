@@ -53,11 +53,11 @@ abstract class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMap
             }
         }
 
-        if (array_key_exists($type, $this->attributeTypesRegistry[])) {
+        if (array_key_exists($type, $this->attributeTypesRegistry)) {
             return $this->attributeTypesRegistry[$type];
         }
 
         $fieldName = $attribute->getFieldName();
-        throw new \LogicException('Block type is not define for field "%s" ' . $fieldName);
+        throw new \LogicException(sprintf('Block type is not define for field "%s"', $fieldName));
     }
 }
