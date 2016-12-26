@@ -74,7 +74,7 @@ class ScopeManager
     /**
      * @param $scopeType
      * @param null $context
-     * @return array
+     * @return Scope
      */
     public function findMostSuitable($scopeType, $context = null)
     {

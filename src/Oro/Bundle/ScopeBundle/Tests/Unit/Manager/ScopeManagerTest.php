@@ -415,7 +415,7 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
     public function testFindMostSuitable()
     {
         $scope = new Scope();
-        $provider = $this->getMock(ScopeCriteriaProviderInterface::class);
+        $provider = $this->createMock(ScopeCriteriaProviderInterface::class);
         $provider->expects($this->once())
             ->method('getCriteriaForCurrentScope')
             ->willReturn(['fieldName' => 1]);
@@ -426,13 +426,9 @@ class ScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->with($scopeCriteria)
             ->willReturn($scope);
 
-        $em = $this->getMock(EntityManagerInterface::class);
-        $em->expects($this->once())
+        $this->entityStorage->expects($this->any())
             ->method('getRepository')
             ->willReturn($repository);
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->willReturn($em);
 
         $this->entityFieldProvider->expects($this->once())
             ->method('getRelations')
