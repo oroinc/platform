@@ -9,6 +9,7 @@ parameters:
     oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
     oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
     oro_entity_config.helper.entity_config.class:               Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper
+    oro_entity_config.attribute.entity.attribute_group.class:   Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup
 
 services:
     oro_entity_config.link.entity_manager:
@@ -290,3 +291,23 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_entity_config.entity_listener.attribute_group:
+        class: Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener
+        public: false
+        arguments:
+             - "@oro_entity_config.slug.generator"
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: '%oro_entity_config.attribute.entity.attribute_group.class%', event: prePersist}
+
+    oro_entity_config.slug.generator:
+        class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
+
+    oro_entity_config.block_type.chain_attribute_block_type_mapper:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper'
+        calls:
+            - [setDefaultBlockType, ['attribute_text']]
+            - [addBlockType, ['percent', 'attribute_percent']]
+            - [addBlockType, ['currency', 'attribute_currency']]
+            - [addBlockType, ['date', 'attribute_date']]
+            - [addBlockType, ['datetime', 'attribute_datetime']]
+            - [addBlockType, ['multiEnum', 'attribute_multiselect']]
