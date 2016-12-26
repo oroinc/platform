@@ -337,6 +337,7 @@ datagrids:
             query:
                 select:
                     - attributeGroup.id
+                    - attributeFamily.code
                 from:
                     - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup', alias: attributeGroup }
                 join:
@@ -350,6 +351,8 @@ datagrids:
         columns:
             groupLabel:
                 label: oro.entity_config.attribute_group.labels.label
+            code:
+                label: oro.entity_config.attribute_group.code.label
             attributes:
                 label: oro.entity_config.attribute_group.attribute_relations.label
                 renderable: true
@@ -365,3 +368,5 @@ datagrids:
             columns:
                 groupLabel:
                     data_name: groupLabel
+                code:
+                    data_name: code
