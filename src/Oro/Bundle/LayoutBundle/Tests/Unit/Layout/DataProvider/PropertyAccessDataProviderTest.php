@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\DataProvider;
 
-use Oro\Bundle\LayoutBundle\Layout\DataProvider\PropertyAccessDataProvider;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+use Oro\Bundle\LayoutBundle\Layout\DataProvider\PropertyAccessDataProvider;
 
 class PropertyAccessDataProviderTest extends \PHPUnit_Framework_TestCase
 {
