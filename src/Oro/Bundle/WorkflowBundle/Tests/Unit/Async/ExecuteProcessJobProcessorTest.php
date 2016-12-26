@@ -206,10 +206,6 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         ;
         $entityManager
             ->expects(self::once())
-            ->method('clear')
-        ;
-        $entityManager
-            ->expects(self::once())
             ->method('rollback')
         ;
 
