@@ -96,7 +96,7 @@ class CompleteDefinition implements ProcessorInterface
             } else {
                 $version = $context->getVersion();
                 $requestType = $context->getRequestType();
-                $this->completeExtendedAssociations($definition, $metadata->name, $version, $requestType);
+                $this->completeCustomAssociations($definition, $metadata->name, $version, $requestType);
                 $this->completeFields($definition, $metadata, $existingFields);
                 $this->completeAssociations($definition, $metadata, $existingFields, $version, $requestType);
                 $this->completeDependentAssociations($definition, $metadata, $version, $requestType);
@@ -202,7 +202,7 @@ class CompleteDefinition implements ProcessorInterface
      * @param string                 $version
      * @param RequestType            $requestType
      */
-    protected function completeExtendedAssociations(
+    protected function completeCustomAssociations(
         EntityDefinitionConfig $definition,
         $entityClass,
         $version,
@@ -418,7 +418,14 @@ class CompleteDefinition implements ProcessorInterface
                 $targetEntity->setExcludeAll();
                 $targetFields = $targetDefinition->getFields();
                 foreach ($targetFields as $targetFieldName => $targetField) {
-                    $targetEntity->addField($targetFieldName, $targetField);
+                    if ($targetEntity->hasField($targetFieldName)) {
+                        $existingField = $targetEntity->getField($targetFieldName);
+                        if ($targetField->isMetaProperty()) {
+                            $existingField->setMetaProperty(true);
+                        }
+                    } else {
+                        $targetEntity->addField($targetFieldName, $targetField);
+                    }
                 }
                 $field->setCollapsed();
             }
@@ -521,14 +528,14 @@ class CompleteDefinition implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (DataType::isNestedObject($field->getDataType())) {
+            $dataType = $field->getDataType();
+            if (DataType::isNestedObject($dataType)) {
                 $this->completeNestedObject($fieldName, $field);
             } else {
                 $targetClass = $field->getTargetClass();
-                if (!$targetClass) {
-                    continue;
+                if ($targetClass) {
+                    $this->completeAssociation($field, $targetClass, $version, $requestType);
                 }
-                $this->completeAssociation($field, $targetClass, $version, $requestType);
             }
         }
     }
@@ -544,11 +551,25 @@ class CompleteDefinition implements ProcessorInterface
         $target = $field->getOrCreateTargetEntity();
         $target->setExcludeAll();
 
+        $this->completeDependsOn($field);
+
+        $formOptions = $field->getFormOptions();
+        if (null === $formOptions || !array_key_exists('property_path', $formOptions)) {
+            $formOptions['property_path'] = $fieldName;
+            $field->setFormOptions($formOptions);
+        }
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function completeDependsOn(EntityDefinitionFieldConfig $field)
+    {
         $dependsOn = $field->getDependsOn();
         if (null === $dependsOn) {
             $dependsOn = [];
         }
-        $targetFields = $target->getFields();
+        $targetFields = $field->getTargetEntity()->getFields();
         foreach ($targetFields as $targetFieldName => $targetField) {
             $targetPropertyPath = $targetField->getPropertyPath($targetFieldName);
             if (!in_array($targetPropertyPath, $dependsOn, true)) {
@@ -556,11 +577,5 @@ class CompleteDefinition implements ProcessorInterface
             }
         }
         $field->setDependsOn($dependsOn);
-
-        $formOptions = $field->getFormOptions();
-        if (null === $formOptions || !array_key_exists('property_path', $formOptions)) {
-            $formOptions['property_path'] = $fieldName;
-            $field->setFormOptions($formOptions);
-        }
     }
 }
