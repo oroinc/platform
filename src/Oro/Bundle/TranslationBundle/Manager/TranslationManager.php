@@ -205,7 +205,7 @@ class TranslationManager
 
         $em = $this->getEntityManager(Translation::class);
         foreach ($this->translations as $key => $translation) {
-            if (!is_null($translation->getValue())) {
+            if (null !== $translation->getValue()) {
                 $em->persist($translation);
             } elseif ($translation->getId()) {
                 $em->remove($translation);

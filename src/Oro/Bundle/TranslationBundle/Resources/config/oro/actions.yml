@@ -317,7 +317,12 @@ operations:
             - '@call_service_method':
                 service: oro_translation.manager.translation
                 method: saveTranslation
-                method_parameters: [$translationKey.key, null, $language.code,  $translationKey.domain]
+                method_parameters:
+                    - $translationKey.key
+                    - null
+                    - $language.code
+                    - $translationKey.domain
+                    - $scope
             - '@call_service_method':
                 service: oro_translation.manager.translation
                 method: flush
