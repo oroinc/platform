@@ -94,6 +94,9 @@ define(function(require) {
                         response.results = _.filter(response.results, function(item) {
                             return !item.hasOwnProperty('id') || _.indexOf(that.excluded, item.id) < 0;
                         });
+                        setTimeout(function() {
+                            that.view.$el.data('selected-data', that.view.$el.select2('data'));
+                        }, 4);
                         return response;
                     });
                 }
