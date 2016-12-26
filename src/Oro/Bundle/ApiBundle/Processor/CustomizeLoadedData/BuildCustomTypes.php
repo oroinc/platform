@@ -4,15 +4,19 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
- * Computes values of fields that represent extended associations.
+ * Computes values of fields that represent
+ * * extended associations
+ * * nested objects
  */
-class BuildExtendedAssociations implements ProcessorInterface
+class BuildCustomTypes implements ProcessorInterface
 {
     /** @var AssociationManager */
     protected $associationManager;
@@ -45,23 +49,21 @@ class BuildExtendedAssociations implements ProcessorInterface
         $hasChanges = false;
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (!$field->isExcluded()
-                && DataType::isExtendedAssociation($field->getDataType())
-                && !array_key_exists($fieldName, $data)
-            ) {
-                list($associationType, $associationKind) = DataType::parseExtendedAssociation(
-                    $field->getDataType()
-                );
-                $associationTargets = $this->associationManager->getAssociationTargets(
-                    $context->getClassName(),
-                    null,
-                    $associationType,
-                    $associationKind
-                );
+            if ($field->isExcluded()) {
+                continue;
+            }
+
+            $dataType = $field->getDataType();
+            if (DataType::isNestedObject($dataType)) {
+                $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity());
+                $hasChanges = true;
+            } elseif (DataType::isExtendedAssociation($dataType) && !array_key_exists($fieldName, $data)) {
+                list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
                 $data[$fieldName] = $this->buildExtendedAssociation(
                     $data,
+                    $context->getClassName(),
                     $associationType,
-                    $associationTargets
+                    $associationKind
                 );
                 $hasChanges = true;
             }
@@ -73,28 +75,56 @@ class BuildExtendedAssociations implements ProcessorInterface
 
     /**
      * @param array  $data
+     * @param string $entityClass
      * @param string $associationType
-     * @param array  $associationTargets [target entity class => target field name]
+     * @param string $associationKind
      *
      * @return array|null
      */
     protected function buildExtendedAssociation(
         array $data,
+        $entityClass,
         $associationType,
-        array $associationTargets
+        $associationKind
     ) {
         switch ($associationType) {
             case RelationType::MANY_TO_ONE:
-                return $this->buildManyToOneExtendedAssociation($data, $associationTargets);
+                return $this->buildManyToOneExtendedAssociation(
+                    $data,
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                );
             case RelationType::MANY_TO_MANY:
-                return $this->buildManyToManyExtendedAssociation($data, $associationTargets);
+                return $this->buildManyToManyExtendedAssociation(
+                    $data,
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                );
             case RelationType::MULTIPLE_MANY_TO_ONE:
-                return $this->buildMultipleManyToOneExtendedAssociation($data, $associationTargets);
+                return $this->buildMultipleManyToOneExtendedAssociation(
+                    $data,
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                );
             default:
                 throw new \LogicException(
                     sprintf('Unsupported type of extended association: %s.', $associationType)
                 );
         }
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $associationType
+     * @param string $associationKind
+     *
+     * @return array [target entity class => target field name]
+     */
+    protected function getAssociationTargets($entityClass, $associationType, $associationKind)
+    {
+        return $this->associationManager->getAssociationTargets(
+            $entityClass,
+            null,
+            $associationType,
+            $associationKind
+        );
     }
 
     /**
@@ -153,6 +183,56 @@ class BuildExtendedAssociations implements ProcessorInterface
                 $item[ConfigUtil::CLASS_NAME] = $entityClass;
                 $result[] = $item;
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array                  $data
+     * @param EntityDefinitionConfig $config
+     *
+     * @return array|null
+     */
+    protected function buildNestedObject(array $data, EntityDefinitionConfig $config)
+    {
+        $result = [];
+        $isEmpty = true;
+        $fields = $config->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
+                continue;
+            }
+            $value = $this->getOwnPropertyValue($data, $field->getPropertyPath($fieldName));
+            if (null !== $value) {
+                $isEmpty = false;
+            }
+            $result[$fieldName] = $value;
+        }
+
+        return $isEmpty ? null : $result;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $propertyPath
+     *
+     * @return mixed
+     */
+    protected function getOwnPropertyValue(array $data, $propertyPath)
+    {
+        if (false !== strpos($propertyPath, '.')) {
+            throw new RuntimeException(
+                sprintf(
+                    'The "%s" property path is not supported.',
+                    $propertyPath
+                )
+            );
+        }
+
+        $result = null;
+        if (array_key_exists($propertyPath, $data)) {
+            $result = $data[$propertyPath];
         }
 
         return $result;

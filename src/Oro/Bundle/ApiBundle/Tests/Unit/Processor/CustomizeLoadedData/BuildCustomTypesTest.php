@@ -3,11 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildExtendedAssociations;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
-class BuildExtendedAssociationsTest extends \PHPUnit_Framework_TestCase
+class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
 {
     /** @var CustomizeLoadedDataContext */
     protected $context;
@@ -15,7 +16,7 @@ class BuildExtendedAssociationsTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $associationManager;
 
-    /** @var BuildExtendedAssociations */
+    /** @var BuildCustomTypes */
     protected $processor;
 
     protected function setUp()
@@ -24,7 +25,7 @@ class BuildExtendedAssociationsTest extends \PHPUnit_Framework_TestCase
         $this->associationManager = $this->getMockBuilder(AssociationManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->processor = new BuildExtendedAssociations($this->associationManager);
+        $this->processor = new BuildCustomTypes($this->associationManager);
     }
 
     public function testProcessWhenNoData()
@@ -43,7 +44,7 @@ class BuildExtendedAssociationsTest extends \PHPUnit_Framework_TestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutExtendedAssociations()
+    public function testProcessWithoutCustomFields()
     {
         $data = [
             'field1' => 123
@@ -60,6 +61,62 @@ class BuildExtendedAssociationsTest extends \PHPUnit_Framework_TestCase
             ],
             $this->context->getResult()
         );
+    }
+
+    public function testProcessNestedObject()
+    {
+        $data = [
+            'field1' => 'val1',
+            'field2' => null,
+            'field3' => 'val3',
+        ];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setExcluded();
+        $config->addField('field2')->setExcluded();
+        $config->addField('field3')->setExcluded();
+        $nestedObjectFieldConfig = $config->addField('nestedObjectField');
+        $nestedObjectFieldConfig->setDataType('nestedObject');
+        $nestedObjectFieldTargetConfig = $nestedObjectFieldConfig->getOrCreateTargetEntity();
+        $nestedObjectFieldTargetConfig->addField('targetField1')->setPropertyPath('field1');
+        $nestedObjectFieldTargetConfig->addField('targetField2')->setPropertyPath('field2');
+        $excludedTargetField = $nestedObjectFieldTargetConfig->addField('targetField3');
+        $excludedTargetField->setPropertyPath('field3');
+        $excludedTargetField->setExcluded();
+        $nestedObjectFieldTargetConfig->addField('targetField4')->setPropertyPath('field4');
+
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        $this->assertEquals(
+            [
+                'field1'            => 'val1',
+                'field2'            => null,
+                'field3'            => 'val3',
+                'nestedObjectField' => [
+                    'targetField1' => 'val1',
+                    'targetField2' => null,
+                    'targetField4' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
+     * @expectedExceptionMessage The "field1.field11" property path is not supported.
+     */
+    public function testProcessNestedObjectWithNotSupportedPropertyPath()
+    {
+        $config = new EntityDefinitionConfig();
+        $nestedObjectFieldConfig = $config->addField('nestedObjectField');
+        $nestedObjectFieldConfig->setDataType('nestedObject');
+        $nestedObjectFieldTargetConfig = $nestedObjectFieldConfig->getOrCreateTargetEntity();
+        $nestedObjectFieldTargetConfig->addField('targetField1')->setPropertyPath('field1.field11');
+
+        $this->context->setResult([]);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
     }
 
     public function testProcessForExcludedExtendedAssociation()
@@ -125,10 +182,8 @@ class BuildExtendedAssociationsTest extends \PHPUnit_Framework_TestCase
         $config = new EntityDefinitionConfig();
         $config->addField('association')->setDataType('association:unknown:kind');
 
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with('Test\Class', null, 'unknown', 'kind')
-            ->willReturn([]);
+        $this->associationManager->expects(self::never())
+            ->method('getAssociationTargets');
 
         $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
