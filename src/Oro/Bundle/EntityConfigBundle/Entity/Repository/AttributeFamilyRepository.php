@@ -10,6 +10,7 @@ class AttributeFamilyRepository extends EntityRepository
 {
     /**
      * @param integer $attributeId
+     *
      * @return AttributeFamily[]
      */
     public function getFamiliesByAttributeId($attributeId)
@@ -28,6 +29,7 @@ class AttributeFamilyRepository extends EntityRepository
 
     /**
      * @param string $entityClass
+     *
      * @return int
      */
     public function countFamiliesByEntityClass($entityClass)
@@ -40,5 +42,24 @@ class AttributeFamilyRepository extends EntityRepository
             ->setParameter('entityClass', $entityClass)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * @param integer $familyId
+     *
+     * @return AttributeFamily[]
+     */
+    public function getGroupsWithAttributesByFamily($familyId)
+    {
+        $queryBuilder = $this->createQueryBuilder('f');
+
+        return $queryBuilder
+            ->select('f,g,r')
+            ->innerJoin('f.attributeGroups', 'g')
+            ->innerJoin('g.attributeRelations', 'r')
+            ->where('g.attributeFamily = :id')
+            ->setParameter('id', $familyId)
+            ->getQuery()
+            ->getResult();
     }
 }

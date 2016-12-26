@@ -16,6 +16,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Layout\ContextItemInterface;
 
 /**
  * @ORM\Table(name="oro_attribute_family")
@@ -35,7 +36,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterface, OrganizationAwareInterface
+class AttributeFamily extends ExtendAttributeFamily implements
+    DatesAwareInterface,
+    OrganizationAwareInterface,
+    ContextItemInterface
 {
     use DatesAwareTrait;
 
@@ -327,5 +331,28 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     public function __toString()
     {
         return $this->getDefaultLabel()->getString();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString()
+    {
+        $data = [];
+
+        /** @var AttributeGroup $group */
+        $groups = $this->getAttributeGroups();
+
+        foreach ($groups as $group) {
+            $item = ['group' => $group->getId(), 'attributes' => []];
+
+            /** @var AttributeGroupRelation $attributeRelation */
+            foreach ($group->getAttributeRelations() as $attributeRelation) {
+                $item['attributes'][] = $attributeRelation->getEntityConfigFieldId();
+            }
+            $data[] = $item;
+        }
+
+        return md5(serialize([$this->getId() => $data]));
     }
 }

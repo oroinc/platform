@@ -44,4 +44,24 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
         $entity->setAttributeGroups($attributeGroups);
         $this->assertEquals($attributeGroups, $entity->getAttributeGroups());
     }
+
+    public function testToString()
+    {
+        $entity = new AttributeFamily();
+        $attributeGroups = new ArrayCollection([new AttributeGroup(), new AttributeGroup()]);
+        $entity->setAttributeGroups($attributeGroups);
+
+        $result[''] = [
+            [
+                'group' => null,
+                'attributes' => []
+            ],
+            [
+                'group' => null,
+                'attributes' => []
+            ],
+        ];
+
+        $this->assertEquals(md5(serialize($result)), $entity->toString());
+    }
 }

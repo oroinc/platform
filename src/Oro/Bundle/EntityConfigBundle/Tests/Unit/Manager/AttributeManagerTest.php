@@ -569,4 +569,15 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     {
         return $this->getEntity(AttributeGroupRelation::class, ['entityConfigFieldId' => $attributeId]);
     }
+
+    public function testGetGroupsWithAttributesByFamily()
+    {
+        $repository = $this->expectsGetAttributeFamilyRepository();
+        $repository->expects($this->once())
+            ->method('getGroupsWithAttributesByFamily')
+            ->with(1)
+            ->willReturn([]);
+
+        $this->manager->getGroupsWithAttributesByFamily(1);
+    }
 }

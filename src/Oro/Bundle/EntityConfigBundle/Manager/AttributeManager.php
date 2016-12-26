@@ -265,4 +265,14 @@ class AttributeManager
             );
         }
     }
+
+    /**
+     * @param integer $familyId
+     *
+     * @return AttributeFamily[]
+     */
+    public function getGroupsWithAttributesByFamily($familyId)
+    {
+        return $this->getAttributeFamilyRepository()->getGroupsWithAttributesByFamily($familyId);
+    }
 }
