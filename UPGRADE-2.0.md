@@ -1033,6 +1033,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Removed service @oro_user.password_reset.widget_provider.actions (replaced by @oro_user.forced_password_reset.widget_provider.actions)
 - Constructor of `Oro\Bundle\UserBundle\Entity\UserManager` changed. Added 4-th parameter of type `Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider`.
 - Added method `setAuthStatus($user, $enumId)` to `Oro\Bundle\UserBundle\Entity\UserManager` method to set `auth_status` of a User by enum id.
+- Removed `Oro\Bundle\UserBundle\Security\WsseAuthListener` class.
 
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
