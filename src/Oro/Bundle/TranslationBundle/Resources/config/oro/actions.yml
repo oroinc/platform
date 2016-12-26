@@ -303,6 +303,26 @@ operations:
                 message: oro.translation.translation.message.rebuild_cache
                 type: 'success'
 
+    oro_translation_translation_remove:
+        label: oro.translation.action.remove_translation
+        acl_resource: [TRANSLATE, $language]
+        applications: [default]
+        datagrids:
+            - oro-translation-translations-grid
+        button_options:
+            icon: fa-trash-o
+        preconditions:
+            '@not_blank': $id
+        actions:
+            - '@call_service_method':
+                service: oro_translation.manager.translation
+                method: saveTranslation
+                method_parameters: [$translationKey.key, null, $language.code,  $translationKey.domain]
+            - '@call_service_method':
+                service: oro_translation.manager.translation
+                method: flush
+            - '@refresh_grid': oro-translation-translations-grid
+
 action_groups:
     oro_translation_language_set_enabled:
         parameters:

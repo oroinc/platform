@@ -22,7 +22,7 @@ class TranslationManager
     protected $registry;
 
     /** @var TranslationDomainProvider */
-    protected $domainProvier;
+    protected $domainProvider;
 
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
@@ -41,16 +41,16 @@ class TranslationManager
 
     /**
      * @param ManagerRegistry $registry
-     * @param TranslationDomainProvider $domainProvier
+     * @param TranslationDomainProvider $domainProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
         ManagerRegistry $registry,
-        TranslationDomainProvider $domainProvier,
+        TranslationDomainProvider $domainProvider,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
         $this->registry = $registry;
-        $this->domainProvier = $domainProvier;
+        $this->domainProvider = $domainProvider;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
@@ -237,7 +237,7 @@ class TranslationManager
         $this->translationKeys = [];
         $this->translationKeysToRemove = [];
         $this->translations = [];
-        $this->domainProvier->clearCache();
+        $this->domainProvider->clearCache();
     }
 
     /**
