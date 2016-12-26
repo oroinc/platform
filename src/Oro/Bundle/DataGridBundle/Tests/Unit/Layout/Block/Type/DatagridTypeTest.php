@@ -232,14 +232,14 @@ class DatagridTypeTest extends BlockTypeTestCase
     {
         $type = new DatagridType($this->nameStrategy, $this->manager, $this->securityFacade);
 
-        $childView = $this->getMock(BlockView::class);
+        $childView = $this->createMock(BlockView::class);
         $childView->vars = [
             'block_type' => 'datagrid_toolbar',
             'unique_block_prefix' => '_product_datagrid_toolbar',
             'block_prefixes' => ['block', 'datagrid_toolbar', '_product_datagrid_toolbar'],
         ];
 
-        $view = $this->getMock(BlockView::class);
+        $view = $this->createMock(BlockView::class);
         $view->vars = [
             'block_type' => 'datagrid',
             'unique_block_prefix' => '_product_datagrid',
@@ -247,7 +247,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         ];
         $view->children = [$childView];
 
-        $block = $this->getMock(BlockInterface::class);
+        $block = $this->createMock(BlockInterface::class);
         $block->expects($this->any())
             ->method('getId')
             ->willReturn('product_datagrid');

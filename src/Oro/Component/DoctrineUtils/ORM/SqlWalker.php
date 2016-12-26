@@ -3,6 +3,8 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\ORM\Query\AST\OrderByItem;
 use Doctrine\ORM\Query\SqlWalker as BaseSqlWalker;
 
 class SqlWalker extends BaseSqlWalker
@@ -35,5 +37,28 @@ class SqlWalker extends BaseSqlWalker
         }
 
         return $result;
+    }
+
+    /**
+     * Make sort strategy same for MySQL and PostgreSQL.
+     *
+     * ASC sorting should sort NULL to top, desc in reverse order.
+     *
+     * @param OrderByItem $orderByItem
+     * {@inheritdoc}
+     */
+    public function walkOrderByItem($orderByItem)
+    {
+        $item = parent::walkOrderByItem($orderByItem);
+
+        if ($this->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            if ($orderByItem->isDesc()) {
+                $item .= ' NULLS LAST';
+            } else {
+                $item .= ' NULLS FIRST';
+            }
+        }
+
+        return $item;
     }
 }
