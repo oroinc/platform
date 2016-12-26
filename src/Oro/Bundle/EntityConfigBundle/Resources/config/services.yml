@@ -314,7 +314,7 @@ services:
             - [addBlockType, ['smallint', 'attribute_text']]
             - [addBlockType, ['decimal', 'attribute_text']]
             - [addBlockType, ['percent', 'attribute_percent']]
-            - [addBlockType, ['currency', 'attribute_money']]
+            - [addBlockType, ['currency', 'attribute_currency']]
             - [addBlockType, ['date', 'attribute_date']]
             - [addBlockType, ['datetime', 'attribute_datetime']]
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
