@@ -69,8 +69,6 @@ services:
         scope: request
         arguments:
             - '@oro_entity_config.form.handler.config_helper_handler'
-            - '@oro_entity_config.config.config_helper'
-            - '@oro_form.model.update_handler'
             - '@request_stack'
 
     oro_entity_config.form.type.attribute_family_type:

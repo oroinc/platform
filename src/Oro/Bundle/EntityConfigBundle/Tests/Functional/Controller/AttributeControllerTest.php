@@ -92,6 +92,11 @@ class AttributeControllerTest extends AbstractConfigControllerTest
     private function finishAttributeCreation($form)
     {
         $this->client->submit($form);
+        $this->assertResponse();
+    }
+
+    private function assertResponse()
+    {
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Attribute was successfully saved', $result->getContent());
@@ -121,20 +126,32 @@ class AttributeControllerTest extends AbstractConfigControllerTest
     {
         $form = $this->processFirstStep('enum');
 
-        $form['oro_entity_config_type[enum][enum_options][0][label]'] = 'First';
-        $form['oro_entity_config_type[enum][enum_options][0][priority]'] = '1';
+        $formValues = $form->getPhpValues();
+        $formValues['oro_entity_config_type']['enum']['enum_options'] = [
+            [
+                'label' => 'First',
+                'priority' => 1
+            ]
+        ];
 
-        $this->finishAttributeCreation($form);
+        $this->client->request($form->getMethod(), $form->getUri(), $formValues);
+        $this->assertResponse();
     }
 
     public function testCreateMultiEnum()
     {
         $form = $this->processFirstStep('multiEnum');
 
-        $form['oro_entity_config_type[enum][enum_options][0][label]'] = 'First';
-        $form['oro_entity_config_type[enum][enum_options][0][priority]'] = '1';
+        $formValues = $form->getPhpValues();
+        $formValues['oro_entity_config_type']['enum']['enum_options'] = [
+            [
+                'label' => 'First',
+                'priority' => 1
+            ]
+        ];
 
-        $this->finishAttributeCreation($form);
+        $this->client->request($form->getMethod(), $form->getUri(), $formValues);
+        $this->assertResponse();
     }
 
     public function testCreateOneToManyRelation()
