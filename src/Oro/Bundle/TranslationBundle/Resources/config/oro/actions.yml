@@ -103,7 +103,7 @@ operations:
                 importProcessor: 'oro_translation_translation'
                 importJob: 'language_translations_import_from_csv'
         button_options:
-            icon: upload-alt
+            icon: upload
             data:
                 options:
                     refreshPageOnSuccess: $.isDefaultLanguage
@@ -144,7 +144,7 @@ operations:
                 exportProcessor: 'oro_translation_translation'
                 exportJob: 'language_translations_export_to_csv'
         button_options:
-            icon: download-alt
+            icon: download
             data:
                 options:
                     filePrefix: $.filePrefix
