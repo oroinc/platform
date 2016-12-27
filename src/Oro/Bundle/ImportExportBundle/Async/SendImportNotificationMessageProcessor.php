@@ -2,21 +2,23 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
+use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Job\JobStorage;
 
 class SendImportNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -36,9 +38,9 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     private $logger;
 
     /**
-     *  @var ConsolidateImportJobResultNotificationService
+     *  @var ImportExportJobSummaryResultService
      */
-    private $consolidateJobNotificationService;
+    private $importJobSummaryResultService;
 
     /**
      * @var ConfigManager
@@ -55,17 +57,15 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         MessageProducerInterface $producer,
         LoggerInterface $logger,
         JobStorage $jobStorage,
-        ConsolidateImportJobResultNotificationService $consolidateJobNotificationService,
+        ImportExportJobSummaryResultService $importJobSummaryResultService,
         ConfigManager $configManager,
-        TranslatorInterface $translator,
         RegistryInterface $doctrine
     ) {
         $this->producer = $producer;
         $this->logger = $logger;
         $this->jobStorage = $jobStorage;
-        $this->consolidateJobNotificationService = $consolidateJobNotificationService;
+        $this->importJobSummaryResultService = $importJobSummaryResultService;
         $this->configManager = $configManager;
-        $this->translator = $translator;
         $this->doctrine = $doctrine;
     }
 
@@ -103,21 +103,16 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
         if (in_array(Topics::IMPORT_HTTP_PREPARING, $body['subscribedTopic'])) {
-            $summary = $this->consolidateJobNotificationService->getImportSummary($job, $body['originFileName']);
-            $subject = $this->translator->trans(
-                'oro.importexport.import.async_import',
-                ['%origin_file_name%' => $body['originFileName']]
-            );
+            $typeOfResult = ImportExportJobSummaryResultService::TEMPLATE_IMPORT_RESULT;
         } else {
-            $summary = $this->consolidateJobNotificationService->getValidationImportSummary(
-                $job,
-                $body['originFileName']
-            );
-            $subject = $this->translator->trans(
-                'oro.importexport.import.async_validation_import',
-                ['%origin_file_name%' => $body['originFileName']]
-            );
+            $typeOfResult = ImportExportJobSummaryResultService::TEMPLATE_IMPORT_VALIDATION_RESULT;
         }
+
+        list($subject, $summary) = $this->importJobSummaryResultService->getSummaryResultForNotification(
+            $job,
+            $body['originFileName'],
+            $typeOfResult
+        );
 
         $this->sendNotification($subject, $user->getEmail(), $summary);
 
@@ -133,7 +128,8 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             'fromName' => $fromName,
             'toEmail' => $toEmail,
             'subject' => $subject,
-            'body' => $summary
+            'body' => $summary,
+            'contentType' => 'text/html'
         ];
 
         $this->producer->send(

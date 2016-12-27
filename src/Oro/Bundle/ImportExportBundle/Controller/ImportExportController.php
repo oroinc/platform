@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
-use Oro\Bundle\ImportExportBundle\Async\ConsolidateImportJobResultNotificationService;
+use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
@@ -393,7 +393,7 @@ class ImportExportController extends Controller
             throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
         }
 
-        $content = $this->getConsolidateImportJobResultService()->getErrorLog($job);
+        $content = $this->getImportJobSummaryResultService()->getErrorLog($job);
 
         return new Response($content, 200, ['Content-Type' => 'text/x-log']);
     }
@@ -415,11 +415,11 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @return ConsolidateImportJobResultNotificationService
+     * @return ImportExportJobSummaryResultService
      */
-    protected function getConsolidateImportJobResultService()
+    protected function getImportJobSummaryResultService()
     {
-        return $this->get('oro_importexport.async.consolidate_import_job_result_notification_service');
+        return $this->get('oro_importexport.async.import_export_job_summary_result_service');
     }
 
     /**

@@ -103,19 +103,53 @@ class ExportMessageProcessorTest extends WebTestCase
                 'resultSuccess' => true,
                 'readsCount' => 100,
                 'errorsCount' => 0,
-                'emailBody' => 'Export performed successfully, 100 User were exported. Download link: http://localhost',
+                'emailBody' => '<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style><div class="wrapper"><p>
+                Export performed successfully.
+                100 User were exported.
+                <a href="http://localhost" target="_blank">Download</a></p></div>',
                 'processResult' => ExportMessageProcessor::ACK,
             ], [
                 'resultSuccess' => true,
                 'readsCount' => 0,
                 'errorsCount' => 0,
-                'emailBody' => 'No User found for export.',
+                'emailBody' => '<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style><div class="wrapper"><p>
+            Export operation failed, 0 error(s) found.
+            <a href="http://localhost" target="_blank">Error log</a></p></div>',
                 'processResult' => ExportMessageProcessor::ACK,
             ], [
                 'resultSuccess' => false,
                 'readsCount' => 0,
                 'errorsCount' => 5,
-                'emailBody' => 'Export operation failed, 5 error(s) found. Error log: http://localhost',
+                'emailBody' => '<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style><div class="wrapper"><p>
+            Export operation failed, 5 error(s) found.
+            <a href="http://localhost" target="_blank">Error log</a></p></div>',
                 'processResult' => ExportMessageProcessor::REJECT,
             ],
         ];

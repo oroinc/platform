@@ -56,6 +56,10 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $this->assertInstanceOf(TopicSubscriberInterface::class, $instance);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function resultOfImportProcessDataProvider()
     {
         $this->setUp();
@@ -95,8 +99,25 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                     'fromName' => $this->emailNotificationSenderName,
                     'toEmail' => 'admin@example.com',
                     'subject' => 'Result of importing file import.csv',
-                    'body' => "Import of the import.csv was completed. Part(s) 2 of 2 were imported.
-Errors: 0, processed: 12, read: 12, added: 7, updated: 0, replaced: 5",
+                    'body' => '<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style><div class="wrapper"><p>Import of the import.csv was completed. Part(s) 2
+        of 2 were imported.</p><p>
+        Errors: 0
+        processed: 12,
+        read: 12,
+        added: 7,
+        updated: 0,
+        replaced: 5
+    </p></div>',
+                    'contentType' => 'text/html',
                 ]
             ],
             [
@@ -140,10 +161,27 @@ Errors: 0, processed: 12, read: 12, added: 7, updated: 0, replaced: 5",
                     'toEmail' => 'admin@example.com',
                     'subject' => 'Result of importing file import.csv',
                     'body' => sprintf(
-                        'Import of the import.csv was completed. Part(s) 2 of 2 were imported.
-Errors: 5, processed: 12, read: 12, added: 2, updated: 0, replaced: 5<br/><a href="%s" target="_blank">Error log</a>',
+                        '<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100%% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style><div class="wrapper"><p>Import of the import.csv was completed. Part(s) 2
+        of 2 were imported.</p><p>
+        Errors: 5
+        processed: 12,
+        read: 12,
+        added: 2,
+        updated: 0,
+        replaced: 5
+    </p><a href="%s">Error log</a></div>',
                         $this->url
                     ),
+                    'contentType' => 'text/html',
                 ]
             ],
         ];

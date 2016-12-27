@@ -4,10 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ImportExportBundle\Async\ConsolidateImportJobResultNotificationService;
+use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -29,9 +28,8 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
             $this->createMessageProducerInterfaceMock(),
             $this->createLoggerInterfaceMock(),
             $this->createJobStorageMock(),
-            $this->createConsolidateImportJobResultNotificationServiceMock(),
+            $this->createImportJobSummaryResultServiceMock(),
             $this->createConfigManagerMock(),
-            $this->createTranslatorInterfaceMock(),
             $this->createDoctrineMock()
         );
 
@@ -58,9 +56,8 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
             $this->createMessageProducerInterfaceMock(),
             $logger,
             $this->createJobStorageMock(),
-            $this->createConsolidateImportJobResultNotificationServiceMock(),
+            $this->createImportJobSummaryResultServiceMock(),
             $this->createConfigManagerMock(),
-            $this->createTranslatorInterfaceMock(),
             $this->createDoctrineMock()
         );
 
@@ -111,9 +108,8 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
             $this->createMessageProducerInterfaceMock(),
             $logger,
             $jobStorage,
-            $this->createConsolidateImportJobResultNotificationServiceMock(),
+            $this->createImportJobSummaryResultServiceMock(),
             $this->createConfigManagerMock(),
-            $this->createTranslatorInterfaceMock(),
             $doctrine
         );
 
@@ -170,18 +166,12 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
             ->method('findJobById')
             ->with(1)
             ->willReturn($job);
-        $consolidateImportJobResultNotification = $this->createConsolidateImportJobResultNotificationServiceMock();
-           $consolidateImportJobResultNotification
+        $consolidateImportJobResultNotification = $this->createImportJobSummaryResultServiceMock();
+        $consolidateImportJobResultNotification
             ->expects($this->once())
-            ->method('getImportSummary')
-            ->with($job, 'import.csv')
-            ->willReturn('summary import information');
-        $translator = $this->createTranslatorInterfaceMock();
-        $translator
-            ->expects($this->once())
-            ->method('trans')
-            ->with('oro.importexport.import.async_import', ['%origin_file_name%' => 'import.csv'])
-            ->willReturn('Subject of import email');
+            ->method('getSummaryResultForNotification')
+            ->with($job, 'import.csv', ImportExportJobSummaryResultService::TEMPLATE_IMPORT_RESULT)
+            ->willReturn(['Subject of import email', 'summary import information']);
         $configManager = $this->createConfigManagerMock();
         $configManager
             ->expects($this->at(0))
@@ -204,7 +194,8 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
                     'fromName' => 'John',
                     'toEmail' => $user->getEmail(),
                     'subject' => 'Subject of import email',
-                    'body' => 'summary import information'
+                    'body' => 'summary import information',
+                    'contentType' => 'text/html',
                 ]
             );
         $processor = new SendImportNotificationMessageProcessor(
@@ -213,7 +204,6 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
             $jobStorage,
             $consolidateImportJobResultNotification,
             $configManager,
-            $translator,
             $doctrine
         );
         $message = $this->createMessageMock();
@@ -256,11 +246,11 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConsolidateImportJobResultNotificationService
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImportExportJobSummaryResultService
      */
-    protected function createConsolidateImportJobResultNotificationServiceMock()
+    protected function createImportJobSummaryResultServiceMock()
     {
-        return $this->createMock(ConsolidateImportJobResultNotificationService::class);
+        return $this->createMock(ImportExportJobSummaryResultService::class);
     }
 
     /**
@@ -269,14 +259,6 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit_Framework_Test
     private function createConfigManagerMock()
     {
         return $this->createMock(ConfigManager::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
-     */
-    private function createTranslatorInterfaceMock()
-    {
-        return $this->createMock(TranslatorInterface::class);
     }
 
     /**

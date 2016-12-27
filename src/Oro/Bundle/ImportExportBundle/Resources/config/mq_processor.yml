@@ -10,6 +10,7 @@ services:
             - '@oro_security.security_facade'
             - '@security.token_storage'
             - '@logger'
+            - '@oro_importexport.async.import_export_job_summary_result_service'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -89,9 +90,8 @@ services:
             - '@oro_message_queue.client.message_producer'
             - '@logger'
             - '@oro_message_queue.job.storage'
-            - '@oro_importexport.async.consolidate_import_job_result_notification_service'
+            - '@oro_importexport.async.import_export_job_summary_result_service'
             - '@oro_config.user'
-            - '@translator'
             - '@doctrine'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

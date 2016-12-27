@@ -34,12 +34,6 @@ oro:
             validation_label: "Validate Data File"
             success:        "File was successfully imported."
             alert:          "%added% %entities% were added, %updated% %entities% were updated"
-            notification.result: "Import of the %file_name% was completed. Part(s) %success_parts% of %total_parts% were imported."
-            notification.detail: "Errors: %errors%, processed: %process%, read: %read%, added: %add%, updated: %update%, replaced: %replace%"
-            validation.notification.result: "Import validation of the file %file_name% was completed. Part(s) %success_parts% of %total_parts% were validated."
-            validation.notification.detail: "Errors: %errors%, process: %process%, read: %read%"
-            async_import:                   "Result of importing file %origin_file_name%"
-            async_validation_import:        "Result of import validation file %origin_file_name%"
             entity:         Import %entityName%
             entity_validation:         Import %entityName% Validation
             tempate:        Download Data Template

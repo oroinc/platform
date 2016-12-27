@@ -65,6 +65,11 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $logger;
 
     /**
+     * @var ImportExportJobSummaryResultService
+     */
+    private $importExportJobSummaryResultService;
+
+    /**
      * @param ExportHandler $exportHandler
      * @param JobRunner $jobRunner
      * @param MessageProducerInterface $producer
@@ -73,6 +78,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param SecurityFacade $securityFacade
      * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
+     * @param ImportExportJobSummaryResultService $importExportJobSummaryResultService
      */
     public function __construct(
         ExportHandler $exportHandler,
@@ -82,7 +88,8 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         DoctrineHelper $doctrineHelper,
         SecurityFacade $securityFacade,
         TokenStorageInterface $tokenStorage,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ImportExportJobSummaryResultService $importExportJobSummaryResultService
     ) {
         $this->exportHandler = $exportHandler;
         $this->jobRunner = $jobRunner;
@@ -92,6 +99,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->securityFacade = $securityFacade;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
+        $this->importExportJobSummaryResultService = $importExportJobSummaryResultService;
     }
 
     /**
@@ -179,26 +187,10 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     protected function sendNotificationMessage($jobUniqueName, array $exportResult, $user)
     {
-        $subject = sprintf('Export result for job %s', $jobUniqueName);
-
-        if ($exportResult['success']) {
-            if ($exportResult['readsCount']) {
-                $body = sprintf(
-                    'Export performed successfully, %s %s were exported. Download link: %s',
-                    $exportResult['readsCount'],
-                    $exportResult['entities'],
-                    $exportResult['url']
-                );
-            } else {
-                $body = sprintf('No %s found for export.', $exportResult['entities']);
-            }
-        } else {
-            $body = sprintf(
-                'Export operation failed, %s error(s) found. Error log: %s',
-                $exportResult['errorsCount'],
-                $exportResult['url']
-            );
-        }
+        list($subject, $body) = $this->importExportJobSummaryResultService->processSummaryExportResultForNotification(
+            $jobUniqueName,
+            $exportResult
+        );
 
         $this->producer->send(EmailTopics::SEND_NOTIFICATION_EMAIL, [
             'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),

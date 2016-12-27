@@ -50,9 +50,10 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: integer, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }
 
-    oro_importexport.async.consolidate_import_job_result_notification_service:
-        class: Oro\Bundle\ImportExportBundle\Async\ConsolidateImportJobResultNotificationService
+    oro_importexport.async.import_export_job_summary_result_service:
+        class: Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService
         arguments:
-            - '@translator'
             - '@router'
             - '@oro_config.global'
+            - '@oro_email.email_renderer'
+            - '@doctrine'

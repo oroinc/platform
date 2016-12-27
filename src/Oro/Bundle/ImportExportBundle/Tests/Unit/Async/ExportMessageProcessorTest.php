@@ -3,6 +3,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -62,7 +63,8 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createDoctrineHelperMock(),
             $this->createSecurityFacadeMock(),
             $this->createTokenStorageInterfaceMock(),
-            $logger
+            $logger,
+            $this->createImportExportJobSummaryResultServiceMock()
         );
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
@@ -110,7 +112,8 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $doctrineHelper,
             $this->createSecurityFacadeMock(),
             $this->createTokenStorageInterfaceMock(),
-            $logger
+            $logger,
+            $this->createImportExportJobSummaryResultServiceMock()
         );
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
@@ -196,5 +199,13 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createTokenStorageInterfaceMock()
     {
         return $this->createMock(TokenStorageInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImportExportJobSummaryResultService
+     */
+    protected function createImportExportJobSummaryResultServiceMock()
+    {
+        return $this->createMock(ImportExportJobSummaryResultService::class);
     }
 }
