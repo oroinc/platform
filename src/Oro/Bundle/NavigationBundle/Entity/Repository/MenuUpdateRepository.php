@@ -56,8 +56,8 @@ class MenuUpdateRepository extends EntityRepository
         $qb = $this->createQueryBuilder('u');
 
         return $qb->select(['u', 'titles', 'descriptions'])
-            ->innerJoin('u.titles', 'titles')
-            ->innerJoin('u.descriptions', 'descriptions')
+            ->leftJoin('u.titles', 'titles')
+            ->leftJoin('u.descriptions', 'descriptions')
             ->where($qb->expr()->eq('u.menu', ':menuName'))
             ->andWhere($qb->expr()->eq('u.scope', ':scope'))
             ->orderBy('u.id')

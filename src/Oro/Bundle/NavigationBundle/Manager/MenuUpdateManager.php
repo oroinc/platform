@@ -183,10 +183,7 @@ class MenuUpdateManager
         $item = $this->findMenuItem($menuName, $key, $scope);
         if ($item !== null) {
             $update = $this->findOrCreateMenuUpdate($menuName, $item->getName(), $scope);
-            $update
-                ->setActive(true)
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
             $this->showMenuItemParents($menuName, $item, $scope);
@@ -206,10 +203,7 @@ class MenuUpdateManager
         $parent = $item->getParent();
         if ($parent !== null && !$parent->isDisplayed()) {
             $update = $this->findOrCreateMenuUpdate($menuName, $parent->getName(), $scope);
-            $update
-                ->setActive(true)
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
             $this->showMenuItemParents($menuName, $parent, $scope);
@@ -226,10 +220,7 @@ class MenuUpdateManager
         /** @var ItemInterface $child */
         foreach ($item->getChildren() as $child) {
             $update = $this->findOrCreateMenuUpdate($menuName, $child->getName(), $scope);
-            $update
-                ->setActive(true)
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $update->setActive(true);
             $this->getEntityManager()->persist($update);
 
             $this->showMenuItemChildren($menuName, $child, $scope);
@@ -246,10 +237,7 @@ class MenuUpdateManager
         $item = $this->findMenuItem($menuName, $key, $scope);
         if ($item !== null) {
             $update = $this->findOrCreateMenuUpdate($menuName, $item->getName(), $scope);
-            $update
-                ->setActive(false)
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $update->setActive(false);
             $this->getEntityManager()->persist($update);
 
             $this->hideMenuItemChildren($menuName, $item, $scope);
@@ -268,10 +256,7 @@ class MenuUpdateManager
         /** @var ItemInterface $child */
         foreach ($item->getChildren() as $child) {
             $update = $this->findOrCreateMenuUpdate($menuName, $child->getName(), $scope);
-            $update
-                ->setActive(false)
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $update->setActive(false);
             $this->getEntityManager()->persist($update);
 
             $this->hideMenuItemChildren($menuName, $child, $scope);
@@ -293,10 +278,7 @@ class MenuUpdateManager
 
         $parent = $this->findMenuItem($menuName, $parentKey, $scope);
         if ($menuName !== $parentKey) {
-            $currentUpdate
-                ->setParentKey($parent ? $parent->getName() : null)
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $currentUpdate->setParentKey($parent ? $parent->getName() : null);
         }
 
         $order = [];
@@ -305,10 +287,7 @@ class MenuUpdateManager
         /** @var ItemInterface $child */
         foreach ($parent->getChildren() as $child) {
             if ($i === (int) $position) {
-                $currentUpdate
-                    ->setPriority($i)
-                    ->setUpdatedAt(new \DateTime('UTC'))
-                ;
+                $currentUpdate->setPriority($i);
                 $i++;
             }
 
@@ -372,10 +351,7 @@ class MenuUpdateManager
         );
 
         foreach ($updates as $update) {
-            $update
-                ->setPriority($order[$update->getKey()])
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $update->setPriority($order[$update->getKey()]);
             unset($orderedChildren[$order[$update->getKey()]]);
         }
 
@@ -385,10 +361,7 @@ class MenuUpdateManager
                 ['key' => $child->getName(), 'menu' => $menuName]
             );
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName, $this->menuUpdateHelper);
-            $update
-                ->setPriority($priority)
-                ->setUpdatedAt(new \DateTime('UTC'))
-            ;
+            $update->setPriority($priority);
             $updates[] = $update;
         }
 

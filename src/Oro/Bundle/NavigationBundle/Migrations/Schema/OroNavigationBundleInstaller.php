@@ -82,7 +82,6 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('title', 'text', []);
         $table->addColumn('position', 'smallint', []);
         $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_323B0258A76ED395', []);
@@ -161,7 +160,6 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('is_custom', 'boolean', []);
         $table->addColumn('priority', 'integer', ['notnull' => false]);
         $table->addColumn('scope_id', 'integer', ['notnull' => true]);
-        $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['key', 'scope_id', 'menu'], 'oro_navigation_menu_upd_uidx');
     }

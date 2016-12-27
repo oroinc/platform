@@ -441,15 +441,13 @@ services:
             - '@translator'
             - '@oro_locale.helper.localization'
 
-    oro_navigation.listener.orm.menu_update:
-        class: 'Oro\Bundle\NavigationBundle\EventListener\ORM\MenuUpdateListener'
-        public: false
-        calls:
-            - [ setContainer, [ '@service_container' ] ]
+    oro_navigation.event_listener.menu_update_cache_flusher:
+        class: Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher
+        arguments:
+            - '@oro_navigation.repository.menu_update'
+            - '@oro_navigation.menu_update.cache'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_navigation.entity.menu_update.class%', event: postPersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_navigation.entity.menu_update.class%', event: postUpdate }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_navigation.entity.menu_update.class%', event: postRemove }
+            - { name: kernel.event_listener, event: oro_menu.menu_update_scope_change, method: onMenuUpdateScopeChange }
 
     oro_navigation.repository.menu_update:
         class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'

@@ -116,13 +116,6 @@ trait MenuUpdateTrait
     protected $custom = false;
 
     /**
-     * @var \DateTime $updatedAt
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     */
-    protected $updatedAt;
-
-    /**
      * @return int
      */
     public function getId()
@@ -438,26 +431,6 @@ trait MenuUpdateTrait
     public function setScope(Scope $scope)
     {
         $this->scope = $scope;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     *
-     * @return MenuUpdateInterface
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }
