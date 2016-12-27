@@ -12,7 +12,7 @@ class SplitterCsvFileTest extends \PHPUnit_Framework_TestCase
      */
     private function createCsvFileReaderMock()
     {
-        return $this->getMock(CsvFileReader::class, [], [], '', false);
+        return $this->createMock(CsvFileReader::class, [], [], '', false);
     }
 
     private $cacheDir;
@@ -77,7 +77,7 @@ class SplitterCsvFileTest extends \PHPUnit_Framework_TestCase
                     if ($i > 150) {
                         return null;
                     }
-                    return [1,2];
+                    return [1, 2];
                 }
             ));
         $self = new SplitterCsvFile($csvReader, $storage, 100);

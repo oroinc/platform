@@ -2,21 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class SendImportNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -51,6 +50,15 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     private $doctrine;
 
 
+    /**
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface $logger
+     * @param JobStorage $jobStorage
+     * @param ConsolidateImportJobResultNotificationService $consolidateJobNotificationService
+     * @param ConfigManager $configManager
+     * @param TranslatorInterface $translator
+     * @param RegistryInterface $doctrine
+     */
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,

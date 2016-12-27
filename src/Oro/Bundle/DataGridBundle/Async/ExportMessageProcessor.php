@@ -144,8 +144,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             'userId' => null,
         ], $body);
 
-        if (! is_array($body['parameters'])
-                || ! isset($body['userId'], $body['parameters'], $body['parameters']['gridName'], $body['format'])) {
+        if (! isset($body['userId'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical(
                 sprintf('[DataGridExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
                 ['message' => $message]

@@ -1,12 +1,10 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\ImportExportBundle\Async\Topics;
+
 use Oro\Bundle\ImportExportBundle\File\SplitterCsvFile;
+
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -19,6 +17,8 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 abstract class AbstractPreparingHttpImportMessageProcessor implements
     MessageProcessorInterface,
@@ -55,6 +55,15 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
      */
     protected $doctrine;
 
+    /**
+     * @param HttpImportHandler $httpImportHandler
+     * @param JobRunner $jobRunner
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface $logger
+     * @param SplitterCsvFile $splitterCsvFileHelper
+     * @param RegistryInterface $doctrine
+     * @param DependentJobService $dependentJob
+     */
     public function __construct(
         HttpImportHandler $httpImportHandler,
         JobRunner $jobRunner,
@@ -128,10 +137,10 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                         ),
                         function (JobRunner $jobRunner, Job $child) use ($body, $file, $key) {
                             $body['filePath'] = $file;
-                                $this->producer->send(
-                                    static::getTopicForChildJob(),
-                                    array_merge($body, ['jobId' => $child->getId()])
-                                );
+                            $this->producer->send(
+                                static::getTopicForChildJob(),
+                                array_merge($body, ['jobId' => $child->getId()])
+                            );
                         }
                     );
                 }
@@ -140,8 +149,8 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
                     Topics::SEND_IMPORT_NOTIFICATION,
                     [
                         'rootImportJobId' => $job->getRootJob()->getId(),
-                        'filePath' => $body['filePath'] ,
-                        'originFileName' => $body['originFileName'] ,
+                        'filePath' => $body['filePath'],
+                        'originFileName' => $body['originFileName'],
                         'userId' => $body['userId'],
                         'subscribedTopic' => static::getSubscribedTopics(),
                     ]
