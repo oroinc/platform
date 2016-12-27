@@ -114,5 +114,4 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 
         $this->assertSame(ContainerType::NAME, $type->getParent());
     }
-
 }
