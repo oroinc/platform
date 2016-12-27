@@ -27,4 +27,4 @@ before_script:
 script:
   - ./vendor/bin/phpunit
   - ./vendor/bin/phpcs ./src -p --encoding=utf-8 --extensions=php --standard=psr2
-  - if [[ DIFF ]]; then ./vendor/bin/phpmd ${DIFF/$\n/,} text codesize --suffixes php fi
+  - if [[ DIFF ]]; then ./vendor/bin/phpmd ${DIFF/$\'\n\'/,} text codesize --suffixes php fi
