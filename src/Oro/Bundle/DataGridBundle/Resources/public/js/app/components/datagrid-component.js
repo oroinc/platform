@@ -453,10 +453,12 @@ define(function(require) {
             var massActions = [];
 
             _.each(actions, function(options, action) {
-                massActions.push({
-                    action: action,
-                    module: modules[helpers.actionType(options.frontend_type)].extend(options)
-                });
+                if (_.has(modules, helpers.actionType(options.frontend_type))) {
+                    massActions.push({
+                        action: action,
+                        module: modules[helpers.actionType(options.frontend_type)].extend(options)
+                    });
+                }
             });
 
             return massActions;

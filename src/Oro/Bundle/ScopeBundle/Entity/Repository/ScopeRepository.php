@@ -36,6 +36,21 @@ class ScopeRepository extends EntityRepository
     }
 
     /**
+     * Find most suitable scope from already existing scopes
+     *
+     * @param ScopeCriteria $criteria
+     * @return Scope|null
+     */
+    public function findMostSuitable(ScopeCriteria $criteria)
+    {
+        $qb = $this->createQueryBuilder('scope');
+        $criteria->applyWhereWithPriority($qb, 'scope');
+        $qb->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
      * @param ScopeCriteria $criteria
      *
      * @return array
@@ -46,6 +61,19 @@ class ScopeRepository extends EntityRepository
         $criteria->applyWhereWithPriority($qb, 'scope');
 
         return $this->findIdentifiers($qb);
+    }
+
+    /**
+     * @param ScopeCriteria $criteria
+     * @return Scope
+     */
+    public function findOneByCriteria(ScopeCriteria $criteria)
+    {
+        $qb = $this->createQueryBuilder('scope');
+        $criteria->applyWhere($qb, 'scope');
+        $qb->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -65,18 +93,5 @@ class ScopeRepository extends EntityRepository
         }
 
         return $ids;
-    }
-
-    /**
-     * @param ScopeCriteria $criteria
-     * @return Scope
-     */
-    public function findOneByCriteria(ScopeCriteria $criteria)
-    {
-        $qb = $this->createQueryBuilder('scope');
-        $criteria->applyWhere($qb, 'scope');
-        $qb->setMaxResults(1);
-
-        return $qb->getQuery()->getOneOrNullResult();
     }
 }

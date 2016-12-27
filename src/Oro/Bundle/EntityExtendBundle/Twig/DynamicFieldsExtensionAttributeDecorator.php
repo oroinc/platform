@@ -3,11 +3,10 @@
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
-class DynamicFieldsExtensionAttributeDecorator extends DynamicFieldsExtension
+class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension
 {
     /**
      * @var DynamicFieldsExtension
@@ -23,18 +22,10 @@ class DynamicFieldsExtensionAttributeDecorator extends DynamicFieldsExtension
      * @param DynamicFieldsExtension $extension
      * @param AttributeConfigHelper $attributeHelper
      */
-    public function __construct(DynamicFieldsExtension $extension, AttributeConfigHelper $attributeHelper)
+    public function __construct(AbstractDynamicFieldsExtension $extension, AttributeConfigHelper $attributeHelper)
     {
         $this->extension = $extension;
         $this->attributeHelper = $attributeHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFunctions()
-    {
-        return $this->extension->getFunctions();
     }
 
     /**
@@ -46,9 +37,7 @@ class DynamicFieldsExtensionAttributeDecorator extends DynamicFieldsExtension
     }
 
     /**
-     * @param object      $entity
-     * @param null|string $entityClass
-     * @return array
+     * {@inheritdoc}
      */
     public function getFields($entity, $entityClass = null)
     {
@@ -64,21 +53,5 @@ class DynamicFieldsExtensionAttributeDecorator extends DynamicFieldsExtension
             },
             ARRAY_FILTER_USE_KEY
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function filterFields(ConfigInterface $config)
-    {
-        return $this->extension->filterFields($config);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->extension->getName();
     }
 }

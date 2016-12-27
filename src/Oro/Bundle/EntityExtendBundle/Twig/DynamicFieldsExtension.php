@@ -24,10 +24,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
-class DynamicFieldsExtension extends \Twig_Extension
+class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 {
-    const NAME = 'oro_entity_config_fields';
-
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
@@ -73,19 +71,6 @@ class DynamicFieldsExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
-    {
-        return [
-            new \Twig_SimpleFunction('oro_get_dynamic_fields', [$this, 'getFields']),
-            new \Twig_SimpleFunction('oro_get_dynamic_field', [$this, 'getField']),
-        ];
-    }
-
-    /**
-     * @param object      $entity
-     * @param null|string $entityClass
-     * @return array
-     */
     public function getFields($entity, $entityClass = null)
     {
         if (null === $entityClass) {
@@ -104,9 +89,7 @@ class DynamicFieldsExtension extends \Twig_Extension
     }
 
     /**
-     * @param object $entity
-     * @param FieldConfigModel $field
-     * @return array
+     * {@inheritdoc}
      */
     public function getField($entity, FieldConfigModel $field)
     {
@@ -151,14 +134,6 @@ class DynamicFieldsExtension extends \Twig_Extension
         }
 
         return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**
