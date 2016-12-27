@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -29,6 +33,9 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendConfigDumper */
     protected $dumper;
 
+    /** @var ExtendEntityConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $extendEntityConfigProvider;
+
     public function setUp()
     {
         $this->entityManagerBag = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag')
@@ -48,6 +55,10 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->extendEntityConfigProvider = $this->getMockBuilder(ExtendEntityConfigProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->cacheDir = __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR
             . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
 
@@ -57,6 +68,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             new ExtendDbIdentifierNameGenerator(),
             new FieldTypeHelper([]),
             $this->generator,
+            $this->extendEntityConfigProvider,
             $this->cacheDir
         );
     }
@@ -176,5 +188,29 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->dumper->setCacheDir($this->cacheDir . '_other');
         $this->dumper->checkConfig();
+    }
+
+    public function testUpdateConfig()
+    {
+        $this->markTestSkipped('Return after extendEntityConfigProvider logic fixed');
+        $this->entityManagerBag->expects($this->exactly(2))
+            ->method('getEntityManagers')
+            ->willReturn([]);
+
+        $extension = $this->createMock(AbstractEntityConfigDumperExtension::class);
+        $configId = new EntityConfigId('somescope', 'SomeClass');
+        $config = new Config($configId, ['param1' => 'value1', 'upgradeable' => true]);
+
+        $this->extendEntityConfigProvider->expects($this->once())
+            ->method('getExtendEntityConfigs')
+            ->with(false, false)
+            ->willReturn([$config]);
+
+        $this->configManager->expects($this->once())
+            ->method('flush');
+
+        $this->dumper->addExtension($extension);
+
+        $this->dumper->updateConfig();
     }
 }

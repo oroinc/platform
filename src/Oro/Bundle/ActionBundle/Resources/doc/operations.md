@@ -22,7 +22,6 @@ described Preconditions are met. The *operation* will be performed by clicking o
 Preconditions and Conditions are met. Also, after clicking on a button, a modal dialog will be shown with some fields
 only if the operation has a config for form dialog.
 
-
 How it works?
 -------------
 

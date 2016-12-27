@@ -3,6 +3,7 @@ define(function(require) {
 
     var ToggleFiltersAction;
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var AbstractAction = require('oro/datagrid/action/abstract-action');
     var FiltersManager = require('orofilter/js/filters-manager');
 
@@ -32,6 +33,7 @@ define(function(require) {
 
         onFilterManagerModeChange: function(mode) {
             this.launcherInstanse.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_VIEW_MODE);
+            mediator.trigger('layout:reposition');
         }
     });
 

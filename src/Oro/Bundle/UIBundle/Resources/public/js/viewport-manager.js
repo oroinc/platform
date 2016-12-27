@@ -69,6 +69,8 @@ define([
                 screenTypes[screenMap[i].name] = inRange;
             }
 
+            screenTypes.any = true;
+
             this.viewport = {
                 width: viewportWidth,
                 screenTypes: screenTypes

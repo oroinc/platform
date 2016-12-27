@@ -54,7 +54,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -101,6 +101,8 @@ class OroTestFrameworkBundleInstaller implements
                 true
             );
         }
+
+        $this->addAttributeFamilyRelationForTestActivityTarget($schema);
     }
 
     /**
@@ -668,6 +670,24 @@ class OroTestFrameworkBundleInstaller implements
             ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    public function addAttributeFamilyRelationForTestActivityTarget(Schema $schema)
+    {
+        $table = $schema->getTable('test_activity_target');
+
+        $table->addColumn('attribute_family_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['attribute_family_id']);
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_attribute_family'),
+            ['attribute_family_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'RESTRICT']
         );
     }
 }
