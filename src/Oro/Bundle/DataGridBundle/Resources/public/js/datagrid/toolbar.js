@@ -76,7 +76,7 @@ define([
                 extraActionsPanel: new this.extraActionsPanel()
             };
 
-            if (_.result(options.pageSize, 'hide') !== false) {
+            if (_.result(options.pageSize, 'hide') !== true) {
                 this.subviews.pageSize = new this.pageSize(_.defaults({collection: this.collection}, options.pageSize));
             }
 
