@@ -56,3 +56,6 @@ services:
             - '@translator'
             - '@router'
             - '@oro_config.global'
+
+    oro_importexport.writer.writer_chain:
+        class: Oro\Bundle\ImportExportBundle\Writer\WriterChain

@@ -1,26 +1,38 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async;
 
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Doctrine\ORM\EntityRepository;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\DataGridBundle\Async\AbstractExportMessageProcessor;
+use Oro\Bundle\DataGridBundle\Async\ExportMessageProcessor;
+use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
+
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
+use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
+use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testShouldReturnSubscribedTopics()
+    {
+        $this->assertEquals(
+            [Topics::EXPORT],
+            ExportMessageProcessor::getSubscribedTopics()
+        );
+    }
+
     public function messageBodyLoggerCriticalDataProvider()
     {
         return [
@@ -54,14 +66,14 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($loggerMessage)
         ;
 
-        $processor = $this->createStubAbstractMessageProcessor(['logger' => $logger]);
+        $processor = $this->createExportMessageProcessorStab(['logger' => $logger]);
 
         $message = new NullMessage();
         $message->setBody(json_encode($messageBody));
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
 
-        $this->assertEquals(AbstractExportMessageProcessor::REJECT, $result);
+        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
     }
 
     public function testShouldRejectMessageAndLogCriticalIfUserNotFound()
@@ -89,9 +101,18 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('[DataGridExportMessageProcessor] Cannot find user by id "1"')
         ;
 
-        $processor = $this->createStubAbstractMessageProcessor([
+        $writerChain = $this->createWriterChainMock();
+        $writerChain
+            ->expects($this->once())
+            ->method('getWriter')
+            ->with('csv')
+            ->willReturn($this->createCsvWriterMock())
+        ;
+
+        $processor = $this->createExportMessageProcessorStab([
             'doctrineHelper' => $doctrineHelper,
-            'logger' => $logger
+            'logger' => $logger,
+            'writerChain' => $writerChain,
         ]);
 
         $message = new NullMessage();
@@ -103,13 +124,87 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
 
-        $this->assertEquals(AbstractExportMessageProcessor::REJECT, $result);
+        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
+    }
+
+    public function testShouldRejectMessageAndLogCriticalIfWriterNotFound()
+    {
+        $doctrineHelper = $this->createDoctrineHelperMock();
+
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->once())
+            ->method('critical')
+            ->with('[DataGridExportMessageProcessor] Invalid writer alias: "csv"')
+        ;
+
+        $writerChain = $this->createWriterChainMock();
+        $writerChain
+            ->expects($this->once())
+            ->method('getWriter')
+            ->with('csv')
+            ->willReturn(null)
+        ;
+
+        $processor = $this->createExportMessageProcessorStab([
+            'doctrineHelper' => $doctrineHelper,
+            'logger' => $logger,
+            'writerChain' => $writerChain,
+        ]);
+
+        $message = new NullMessage();
+        $message->setBody(json_encode([
+            'userId' => 1,
+            'parameters' => ['gridName' => 'grid_name'],
+            'format' => 'csv'
+        ]));
+
+        $result = $processor->process($message, $this->createSessionInterfaceMock());
+
+        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
+    }
+
+    public function testShouldRejectMessageAndLogCriticalIfWriterNotInstanceOfFileWriter()
+    {
+        $doctrineHelper = $this->createDoctrineHelperMock();
+
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->once())
+            ->method('critical')
+            ->with('[DataGridExportMessageProcessor] Invalid writer alias: "csv"')
+        ;
+
+        $writerChain = $this->createWriterChainMock();
+        $writerChain
+            ->expects($this->once())
+            ->method('getWriter')
+            ->with('csv')
+            ->willReturn($this->createMock(ItemWriterInterface::class))
+        ;
+
+        $processor = $this->createExportMessageProcessorStab([
+            'doctrineHelper' => $doctrineHelper,
+            'logger' => $logger,
+            'writerChain' => $writerChain,
+        ]);
+
+        $message = new NullMessage();
+        $message->setBody(json_encode([
+            'userId' => 1,
+            'parameters' => ['gridName' => 'grid_name'],
+            'format' => 'csv'
+        ]));
+
+        $result = $processor->process($message, $this->createSessionInterfaceMock());
+
+        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractExportMessageProcessor
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExportMessageProcessor
      */
-    private function createStubAbstractMessageProcessor(array $arguments = [])
+    private function createExportMessageProcessorStab(array $arguments = [])
     {
         $arguments = array_merge(
             [
@@ -120,6 +215,7 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 'doctrineHelper' => $this->createDoctrineHelperMock(),
                 'exportConnector' => $this->createExportConnectorMock(),
                 'exportProcessor' => $this->createExportProcessorMock(),
+                'writerChain' => $this->createWriterChainMock(),
                 'tokenStorage' => $this->createTokenStorageInterfaceMock(),
                 'logger' => $this->createLoggerInterfaceMock()
             ],
@@ -127,11 +223,27 @@ class AbstractExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         );
 
         return $this
-            ->getMockBuilder(AbstractExportMessageProcessor::class)
+            ->getMockBuilder(ExportMessageProcessor::class)
             ->setMethods(['getSubscribedTopics'])
             ->setConstructorArgs($arguments)
             ->getMock()
         ;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject | CsvFileWriter
+     */
+    private function createCsvWriterMock()
+    {
+        return $this->getMockBuilder(CsvFileWriter::class)->disableOriginalConstructor()->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|WriterChain
+     */
+    private function createWriterChainMock()
+    {
+        return $this->createMock(WriterChain::class);
     }
 
     /**
