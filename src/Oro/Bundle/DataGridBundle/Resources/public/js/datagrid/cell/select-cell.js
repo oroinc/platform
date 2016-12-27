@@ -28,8 +28,10 @@ define([
                 this.editor = SelectCellRadioEditor;
             }
 
-            if (options.column.get('metadata').choices) {
-                _.each(options.column.get('metadata').choices, function(value, key) {
+            var choices = options.column.get('metadata').choices;
+            if (choices) {
+                this.optionValues = [];
+                _.each(choices, function(value, key) {
                     this.optionValues.push([_.escape(textUtil.prepareText(value)), key]);
                 }, this);
             } else {
@@ -48,10 +50,6 @@ define([
          * @inheritDoc
          */
         render: function() {
-            if (!this.optionValues.length) {
-                return;
-            }
-
             var render = SelectCell.__super__.render.apply(this, arguments);
 
             this.enterEditMode();
