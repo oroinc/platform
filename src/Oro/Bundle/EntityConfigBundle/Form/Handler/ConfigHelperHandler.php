@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\UIBundle\Route\Router;
 
@@ -97,22 +98,22 @@ class ConfigHelperHandler
     {
         $this->session->getFlashBag()->add('success', $successMessage);
 
-        return $this->router->redirect($fieldConfigModel);
+        return $this->redirect($fieldConfigModel);
     }
 
     /**
-     * @param FieldConfigModel|string $fieldConfigModel
+     * @param ConfigModel|string $entityOrUrl
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function redirect($fieldConfigModel)
+    public function redirect($entityOrUrl)
     {
-        return $this->router->redirect($fieldConfigModel);
+        return $this->router->redirect($entityOrUrl);
     }
 
     /**
      * @param FieldConfigModel $fieldConfigModel
      * @param FormInterface $form
-     * @param $formAction
+     * @param string $formAction
      * @return array
      */
     public function constructConfigResponse(FieldConfigModel $fieldConfigModel, FormInterface $form, $formAction)
