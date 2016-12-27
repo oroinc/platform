@@ -41,7 +41,6 @@ class AttributeGroupType extends AbstractContainerType
         $this->blockTypeMapper = $blockTypeMapper;
     }
 
-
     /**
      * {@inheritdoc}
      */
