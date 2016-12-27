@@ -61,19 +61,19 @@ class JsTemplateExtensionTest extends \PHPUnit_Framework_TestCase
                 . '<% print("</sc" + "ript>") %>',
             ],
             'js template inside and outside script' => [
-                '<div><%= var %></div>' + "\n"
-                . '<script type="text/javascript">var a = "<%= var %>";</script>' + "\n"
-                . '<div><%= var %></div>' + "\n"
-                . '<script>var a = "<%= var %>";</script>' + "\n"
+                '<div><%= var %></div>' . "\n"
+                . '<script type="text/javascript">var a = "<%= var %>";</script>' . "\n"
+                . '<div><%= var %></div>' . "\n"
+                . '<script>var a = "<%= var %>";</script>' . "\n"
                 . 'some text',
-                '<div><%= var %></div>' + "\n"
+                '<div><%= var %></div>' . "\n"
                 . '<% print("<sc" + "ript") %> type="text/javascript">'
                 . 'var a = "<% print("<" + "%") %>= var <% print("%" + ">") %>";'
-                . '<% print("</sc" + "ript>") %>' + "\n"
-                . '<div><%= var %></div>' + "\n"
+                . '<% print("</sc" + "ript>") %>' . "\n"
+                . '<div><%= var %></div>' . "\n"
                 . '<% print("<sc" + "ript") %>>'
                 . 'var a = "<% print("<" + "%") %>= var <% print("%" + ">") %>";'
-                . '<% print("</sc" + "ript>") %>' + "\n"
+                . '<% print("</sc" + "ript>") %>' . "\n"
                 . 'some text',
             ],
         ];
