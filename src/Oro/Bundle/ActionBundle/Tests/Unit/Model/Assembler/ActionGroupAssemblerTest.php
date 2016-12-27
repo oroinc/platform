@@ -186,7 +186,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getActionFactory()
     {
-        return $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        return $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
     }
 
     /**

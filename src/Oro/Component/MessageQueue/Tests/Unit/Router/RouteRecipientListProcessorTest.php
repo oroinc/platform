@@ -71,7 +71,7 @@ class RouteRecipientListProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -79,7 +79,7 @@ class RouteRecipientListProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -87,6 +87,6 @@ class RouteRecipientListProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createRecipientListRouterMock()
     {
-        return $this->getMock(RecipientListRouterInterface::class);
+        return $this->createMock(RecipientListRouterInterface::class);
     }
 }

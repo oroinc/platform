@@ -46,7 +46,7 @@ class DbalSchemaTest extends \PHPUnit_Framework_TestCase
 
     private function createSchemaManagerMock()
     {
-        return $this->getMock(AbstractSchemaManager::class, [], [], '', false);
+        return $this->createMock(AbstractSchemaManager::class);
     }
 
     /**
@@ -54,6 +54,6 @@ class DbalSchemaTest extends \PHPUnit_Framework_TestCase
      */
     private function createConnectionMock()
     {
-        return $this->getMock(Connection::class, [], [], '', false);
+        return $this->createMock(Connection::class);
     }
 }

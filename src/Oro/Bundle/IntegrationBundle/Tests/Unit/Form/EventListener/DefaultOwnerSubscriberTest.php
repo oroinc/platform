@@ -23,7 +23,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->user     = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $this->user     = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
 
@@ -54,8 +54,8 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey(FormEvents::POST_SET_DATA, $events);
         $this->assertEquals($events[FormEvents::POST_SET_DATA], 'postSet');
 
-        $form      = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $fieldMock = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form      = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $fieldMock = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $form->expects($this->any())
             ->method('has')
@@ -82,7 +82,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function formDataProvider()
     {
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $integration->expects($this->any())->method('getId')
             ->will($this->returnValue(123));
 
@@ -94,7 +94,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetWithUserDefaultOwnerType()
     {
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $integration->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('integration_type'));
@@ -104,7 +104,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('integration_type'))
             ->will($this->returnValue(DefaultOwnerTypeAwareInterface::USER));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $form->expects($this->at(0))
             ->method('has')
@@ -138,7 +138,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetWithBusinessUnitDefaultOwnerType()
     {
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $integration->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('integration_type'));
@@ -148,7 +148,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('integration_type'))
             ->will($this->returnValue(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $form->expects($this->at(0))
             ->method('has')
@@ -183,7 +183,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetWithUserDefaultOwnerTypeAndExistingOtherField()
     {
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $integration->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('integration_type'));
@@ -193,7 +193,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('integration_type'))
             ->will($this->returnValue(DefaultOwnerTypeAwareInterface::USER));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $form->expects($this->at(0))
             ->method('has')
@@ -231,7 +231,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingOtherField()
     {
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $integration->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('integration_type'));
@@ -241,7 +241,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('integration_type'))
             ->will($this->returnValue(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $form->expects($this->at(0))
             ->method('has')
@@ -280,7 +280,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetWithUserDefaultOwnerTypeAndExistingSameField()
     {
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $integration->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('integration_type'));
@@ -290,7 +290,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('integration_type'))
             ->will($this->returnValue(DefaultOwnerTypeAwareInterface::USER));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $form->expects($this->at(0))
             ->method('has')
@@ -310,7 +310,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingSameField()
     {
-        $integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
         $integration->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('integration_type'));
@@ -320,7 +320,7 @@ class DefaultOwnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('integration_type'))
             ->will($this->returnValue(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT));
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
 
         $form->expects($this->at(0))
             ->method('has')

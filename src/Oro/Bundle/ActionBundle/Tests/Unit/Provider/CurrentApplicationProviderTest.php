@@ -19,7 +19,7 @@ class CurrentApplicationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMock(TokenStorageInterface::class);
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $this->provider = new CurrentApplicationProvider($this->tokenStorage);
     }
@@ -127,7 +127,7 @@ class CurrentApplicationProviderTest extends \PHPUnit_Framework_TestCase
     protected function createToken($user, \PHPUnit_Framework_MockObject_Matcher_Invocation $expects = null)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|TokenInterface $token */
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($expects ?: $this->once())
             ->method('getUser')
             ->willReturn($user);

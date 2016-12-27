@@ -17,8 +17,8 @@ class ChainConstraintTextExtractorTest extends \PHPUnit_Framework_TestCase
     {
         $this->extractor = new ChainConstraintTextExtractor();
 
-        $firstExtractor = $this->getMock('Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface');
-        $secondExtractor = $this->getMock('Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface');
+        $firstExtractor = $this->createMock('Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface');
+        $secondExtractor = $this->createMock('Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface');
 
         $this->extractor->addExtractor($firstExtractor);
         $this->extractor->addExtractor($secondExtractor);

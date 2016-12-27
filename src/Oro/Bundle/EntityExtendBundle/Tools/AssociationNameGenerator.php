@@ -84,6 +84,8 @@ class AssociationNameGenerator
      * @param string|null $associationKind The association type or NULL for unclassified (default) association
      *
      * @return string
+     *
+     * @deprecated since 2.0. Method "get%sTargets" without parameters should be used instead of "get%sTargetEntities"
      */
     public static function generateGetTargetEntitiesMethodName($associationKind)
     {

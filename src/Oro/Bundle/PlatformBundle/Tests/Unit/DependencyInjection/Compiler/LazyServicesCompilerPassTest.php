@@ -15,7 +15,7 @@ class LazyServicesCompilerPassTest extends \PHPUnit_Framework_TestCase
         $compiler = new LazyServicesCompilerPass();
         $this->assertAttributeEquals($expectedTags, 'lazyServicesTags', $compiler);
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $containerIteration = 0;
 
         foreach ($expectedTags as $tagName) {
@@ -27,7 +27,7 @@ class LazyServicesCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($testTags));
 
             foreach (array_keys($testTags) as $serviceId) {
-                $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+                $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
                 $definition->expects($this->once())->method('setLazy')->with(true)->willReturn($definition);
                 $definition->expects($this->once())->method('setPublic')->with(false)->willReturn($definition);
 

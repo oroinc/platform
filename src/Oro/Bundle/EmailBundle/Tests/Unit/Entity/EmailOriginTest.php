@@ -16,7 +16,7 @@ class EmailOriginTest extends \PHPUnit_Framework_TestCase
 
     public function testFolderGetterAndSetter()
     {
-        $folder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
+        $folder = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
 
         $entity = new TestEmailOrigin();
         $entity->addFolder($folder);

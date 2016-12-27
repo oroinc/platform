@@ -188,12 +188,18 @@ define(function(require) {
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
         },
 
-        _onContentLoadingStatusChange: function() {
-            if (this.model.get('isContentLoading')) {
+        _onContentLoadingStatusChange: function(model) {
+            if (!this.subview('loading')) {
                 this.subview('loading', new LoadingMaskView({
                     container: this.$el
                 }));
+            }
+            if (this.model.get('isContentLoading')) {
                 this.subview('loading').show();
+            } else if (!model.hasChanged('contentHTML')) {
+                // in case contentHTML was not changed after load action -- hide loading mask now,
+                // otherwise it'll be hidden on initLayout done
+                this.subview('loading').hide();
             }
         },
 

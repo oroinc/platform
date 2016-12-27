@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
@@ -37,19 +41,27 @@ class NormalizeFilterValues implements ProcessorInterface
         }
 
         $filterValues = $context->getFilterValues();
-        $filters      = $context->getFilters();
+        $filters = $context->getFilters();
         foreach ($filters as $filterKey => $filter) {
             $filterValue = null;
             if ($filterValues->has($filterKey)) {
                 $filterValue = $filterValues->get($filterKey);
                 if ($filter instanceof StandaloneFilter) {
-                    $value = $this->valueNormalizer->normalizeValue(
-                        $filterValue->getValue(),
-                        $filter->getDataType(),
-                        $context->getRequestType(),
-                        $filter->isArrayAllowed($filterValue->getOperator())
-                    );
-                    $filterValue->setValue($value);
+                    $value = null;
+                    try {
+                        $value = $this->valueNormalizer->normalizeValue(
+                            $filterValue->getValue(),
+                            $filter->getDataType(),
+                            $context->getRequestType(),
+                            $filter->isArrayAllowed($filterValue->getOperator())
+                        );
+                        $filterValue->setValue($value);
+                    } catch (\Exception $e) {
+                        $error = Error::createByException($e)
+                            ->setStatusCode(Response::HTTP_BAD_REQUEST)
+                            ->setSource(ErrorSource::createByParameter($filterKey));
+                        $context->addError($error);
+                    }
                 }
             }
         }

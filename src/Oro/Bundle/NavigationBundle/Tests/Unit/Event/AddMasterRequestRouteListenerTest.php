@@ -42,7 +42,7 @@ class AddMasterRequestRouteListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMasterRequestEvent($route)
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
         return new GetResponseEvent(
             $kernel,
@@ -56,7 +56,7 @@ class AddMasterRequestRouteListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSubRequestEvent()
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
         return new GetResponseEvent(
             $kernel,

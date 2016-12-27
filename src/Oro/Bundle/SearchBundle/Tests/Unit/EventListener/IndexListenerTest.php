@@ -41,7 +41,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->searchIndexer = $this->getMock(IndexerInterface::class);
+        $this->searchIndexer = $this->createMock(IndexerInterface::class);
     }
 
     public function testOnFlush()

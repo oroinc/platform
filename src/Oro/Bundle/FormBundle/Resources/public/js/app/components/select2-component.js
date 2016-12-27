@@ -222,7 +222,7 @@ define(function(require) {
     }
     function highlightSelection(str, selection) {
         return str && selection && selection.term ?
-            str.replace(tools.safeRegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
+            str.replace(tools.safeRegExp(selection.term.trim(), 'ig'), '<span class="select2-match">$&</span>') : str;
     }
 
     function getTitle(data, properties) {

@@ -17,7 +17,7 @@ class FilterTypeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+        $validator = $this->createMock('Symfony\Component\Validator\ValidatorInterface');
         $validator->method('validate')->will($this->returnValue(new ConstraintViolationList()));
 
         $this->factory = Forms::createFormFactoryBuilder()
@@ -36,7 +36,7 @@ class FilterTypeTest extends \PHPUnit_Framework_TestCase
             )
             ->getFormFactory();
 
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
@@ -63,7 +63,7 @@ class FilterTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function getExtensions()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $filterType = new FilterType($translator);
 

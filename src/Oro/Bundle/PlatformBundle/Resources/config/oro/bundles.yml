@@ -13,7 +13,6 @@ bundles:
     - { name: FOS\RestBundle\FOSRestBundle, priority: -195 }
     - { name: FOS\JsRoutingBundle\FOSJsRoutingBundle, priority: -190 }
     - { name: Nelmio\ApiDocBundle\NelmioApiDocBundle, priority: -185 }
-    - { name: BeSimple\SoapBundle\BeSimpleSoapBundle, priority: -180 }
     - { name: Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle, priority: -175 }
     - { name: Escape\WSSEAuthenticationBundle\EscapeWSSEAuthenticationBundle, priority: -170 }
     - { name: Liip\ImagineBundle\LiipImagineBundle, priority: -165 }

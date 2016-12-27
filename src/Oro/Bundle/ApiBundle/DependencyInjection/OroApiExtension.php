@@ -106,7 +106,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
                     array_unshift(
                         $configs[$key]['format_listener']['rules'],
                         [
-                            'path'             => '^/api/(?!(soap|rest|doc)(/|$)+)',
+                            'path'             => '^/api/(?!(rest|doc)(/|$)+)',
                             'priorities'       => ['json'],
                             'fallback_format'  => 'json',
                             'prefer_extension' => false

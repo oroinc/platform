@@ -54,6 +54,7 @@ class WorkflowDefinition implements DomainObjectInterface
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
     const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
     const CONFIG_SCOPES = 'scopes';
+    const CONFIG_DATAGRIDS = 'datagrids';
 
     /**
      * @var string
@@ -912,6 +913,15 @@ class WorkflowDefinition implements DomainObjectInterface
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public function getDatagrids()
+    {
+        return array_key_exists(self::CONFIG_DATAGRIDS, $this->configuration)
+            ? (array)$this->configuration[self::CONFIG_DATAGRIDS]
+            : [];
+    }
     /**
      * @return array
      */

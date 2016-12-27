@@ -23,7 +23,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $this->contextConfigurator = new FormContextConfigurator($this->container);
     }
@@ -32,7 +32,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $this->container->expects($this->once())
             ->method('get')
             ->with('form_service_id')
@@ -63,7 +63,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $context['form']         = $form;
         $context['form_action']  = 'action';
@@ -90,7 +90,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $this->container->expects($this->once())
             ->method('get')
             ->with('form_service_id')
@@ -123,7 +123,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $context['form']                  = $form;
         $context['form_route_name']       = 'route';
@@ -178,7 +178,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $formAccessor    = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor    = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $context['form'] = $formAccessor;
 
         $this->contextConfigurator->configureContext($context);
@@ -191,7 +191,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $form       = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form       = $this->createMock('Symfony\Component\Form\FormInterface');
         $formAction = FormAction::createEmpty();
 
         $context['form']         = $form;
@@ -225,7 +225,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $context['form']        = $this->getMock('Symfony\Component\Form\FormInterface');
+        $context['form']        = $this->createMock('Symfony\Component\Form\FormInterface');
         $context['form_action'] = 123;
 
         $this->contextConfigurator->configureContext($context);
@@ -240,7 +240,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $context['form']            = $this->getMock('Symfony\Component\Form\FormInterface');
+        $context['form']            = $this->createMock('Symfony\Component\Form\FormInterface');
         $context['form_route_name'] = 123;
 
         $this->contextConfigurator->configureContext($context);
@@ -255,7 +255,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $context['form']        = $this->getMock('Symfony\Component\Form\FormInterface');
+        $context['form']        = $this->createMock('Symfony\Component\Form\FormInterface');
         $context['form_method'] = 123;
 
         $this->contextConfigurator->configureContext($context);
@@ -270,7 +270,7 @@ class FormContextConfiguratorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $context['form']         = $this->getMock('Symfony\Component\Form\FormInterface');
+        $context['form']         = $this->createMock('Symfony\Component\Form\FormInterface');
         $context['form_enctype'] = 123;
 
         $this->contextConfigurator->configureContext($context);

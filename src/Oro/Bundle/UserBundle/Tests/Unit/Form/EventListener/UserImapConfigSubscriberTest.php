@@ -88,7 +88,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $token = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
             ->disableOriginalConstructor()
-            ->setMethods(['getOrganizationContext'])
+            ->setMethods(['getOrganizationContext', 'getUser'])
             ->getMock();
 
         $token->expects($this->never())->method('getUser');

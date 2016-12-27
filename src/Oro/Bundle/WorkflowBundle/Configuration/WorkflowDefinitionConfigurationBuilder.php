@@ -199,6 +199,9 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             foreach ($startTransition->getInitRoutes() as $route) {
                 $initData[WorkflowConfiguration::NODE_INIT_ROUTES][$route][] = $startTransition->getName();
             }
+            foreach ($startTransition->getInitDatagrids() as $datagrid) {
+                $initData[WorkflowConfiguration::NODE_INIT_DATAGRIDS][$datagrid][] = $startTransition->getName();
+            }
         }
         $definition->setConfiguration(array_merge($definition->getConfiguration(), $initData));
     }
@@ -211,6 +214,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     {
         $configurationKeys = [
             WorkflowDefinition::CONFIG_SCOPES,
+            WorkflowDefinition::CONFIG_DATAGRIDS,
             WorkflowConfiguration::NODE_DISABLE_OPERATIONS,
             WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,
@@ -219,6 +223,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
             WorkflowConfiguration::NODE_INIT_ENTITIES,
             WorkflowConfiguration::NODE_INIT_ROUTES,
+            WorkflowConfiguration::NODE_INIT_DATAGRIDS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));

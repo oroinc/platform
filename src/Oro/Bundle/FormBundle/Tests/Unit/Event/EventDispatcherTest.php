@@ -23,7 +23,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->immutableDispatcher = new EventDispatcher($this->eventDispatcher);
     }
@@ -42,7 +42,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testDispatchFormEvent()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $form->expects($this->once())
             ->method('getName')
             ->will($this->returnValue('form_name'));

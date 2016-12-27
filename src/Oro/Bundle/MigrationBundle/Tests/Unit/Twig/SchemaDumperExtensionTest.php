@@ -26,7 +26,7 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->extension = new SchemaDumperExtension($this->managerRegistry);
     }
 

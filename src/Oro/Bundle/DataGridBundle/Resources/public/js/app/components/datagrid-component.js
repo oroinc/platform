@@ -146,12 +146,14 @@ define(function(require) {
          * @param {Object} options
          */
         initDataGrid: function(options) {
-            this.$el = $('<div>');
             this.$componentEl = options.$el;
-            this.$componentEl.append(this.$el);
+
+            this.insertDataGrid(options);
+
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
+
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
                 options: {},
@@ -172,6 +174,15 @@ define(function(require) {
             this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
                 this.grid.massActions.reset(this.buildMassActionsOptions(massActions));
             }, this);
+        },
+
+        /**
+         * Insert Grid to DOM
+         * @param {Object} options
+         */
+        insertDataGrid: function(options) {
+            this.$el = $('<div>');
+            this.$componentEl.append(this.$el);
         },
 
         /**
@@ -200,13 +211,16 @@ define(function(require) {
         /**
          * Build grid
          */
-        build: function() {
+        build: function(modules) {
             var collectionModels;
             var collectionOptions;
             var grid;
 
             var collectionName = this.gridName;
             var collection = gridContentManager.get(collectionName);
+
+            Grid =  modules.GridView || Grid;
+            PageableCollection = modules.PageableCollection || PageableCollection;
 
             collectionModels = {};
             if (this.data && this.data.data) {
@@ -227,10 +241,11 @@ define(function(require) {
             var options = this.combineGridOptions();
             mediator.trigger('datagrid_create_before', options, collection);
 
-            this.$el.hide();
             options.el = this.$el[0];
+
             options.themeOptionsConfigurator(Grid, options);
             grid = new Grid(_.extend({collection: collection}, options));
+
             this.grid = grid;
             grid.render();
             if (this.changeAppearanceEnabled) {
@@ -349,7 +364,7 @@ define(function(require) {
             // columns
             columns = _.map(metadata.columns, function(cell) {
                 var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'sortingType', 'align',
-                    'order', 'manageable', 'required'];
+                    'order', 'manageable', 'required', 'shortenableLabel'];
                 var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
                 var cellType = modules[helpers.cellType(cell.type)];

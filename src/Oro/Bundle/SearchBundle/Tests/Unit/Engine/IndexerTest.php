@@ -34,9 +34,9 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
-        $this->engine        = $this->getMock(EngineV2Interface::class);
+        $this->engine        = $this->createMock(EngineV2Interface::class);
         $this->mapper        = new ObjectMapper(
-            $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
+            $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
             $this->config
         );
 

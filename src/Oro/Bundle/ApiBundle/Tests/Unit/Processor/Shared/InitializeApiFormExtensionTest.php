@@ -27,7 +27,7 @@ class InitializeApiFormExtensionTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->formExtensionSwitcher = $this->getMock(FormExtensionSwitcherInterface::class);
+        $this->formExtensionSwitcher = $this->createMock(FormExtensionSwitcherInterface::class);
         $this->metadataTypeGuesser = $this->getMockBuilder(MetadataTypeGuesser::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -91,11 +91,11 @@ class InitializeApiFormExtensionTest extends FormProcessorTestCase
 
     public function testProcessWhenMetadataTypeGuesserHasContext()
     {
-        $currentIncludedEntities = $this->getMock(IncludedEntityCollection::class);
+        $currentIncludedEntities = $this->createMock(IncludedEntityCollection::class);
 
-        $includedEntities = $this->getMock(IncludedEntityCollection::class);
-        $metadataAccessor = $this->getMock(MetadataAccessorInterface::class);
-        $configAccessor = $this->getMock(ConfigAccessorInterface::class);
+        $includedEntities = $this->createMock(IncludedEntityCollection::class);
+        $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
+        $configAccessor = $this->createMock(ConfigAccessorInterface::class);
 
         $this->formExtensionSwitcher->expects($this->once())
             ->method('switchToApiFormExtension');

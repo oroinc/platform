@@ -58,7 +58,8 @@ class LimitsExtensionsCommandTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfTimeLimitExpressionIsNotValid()
     {
-        $this->setExpectedException(\Exception::class, 'Failed to parse time string (time is not valid) at position');
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Failed to parse time string (time is not valid) at position');
 
         $command = new LimitsExtensionsCommand('name');
 

@@ -28,7 +28,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityIdTransformer = $this->getMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
 
         $this->processor = new NormalizeRequestData($this->valueNormalizer, $this->entityIdTransformer);
     }

@@ -73,7 +73,7 @@ class TraceableMessageProducerTest extends \PHPUnit_Framework_TestCase
 
         $messageProducer = new TraceableMessageProducer($internalMessageProducer);
 
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\Exception::class);
 
         try {
             $messageProducer->send('aFooTopic', 'aFooBody');
@@ -101,6 +101,6 @@ class TraceableMessageProducerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProducer()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

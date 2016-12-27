@@ -16,7 +16,7 @@ class AssetsVersionHandlerTest extends \PHPUnit_Framework_TestCase
         $isAssetsVersionChanged,
         $isAssetsVersionStrategyChanged
     ) {
-        $io = $this->getMock('Composer\IO\IOInterface');
+        $io = $this->createMock('Composer\IO\IOInterface');
 
         $writeIndex = 0;
         if ($isAssetsVersionChanged) {

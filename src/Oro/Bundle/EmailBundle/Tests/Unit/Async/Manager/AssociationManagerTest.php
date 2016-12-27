@@ -48,7 +48,7 @@ class AssociationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->producer = $this->getMock(MessageProducerInterface::class);
+        $this->producer = $this->createMock(MessageProducerInterface::class);
 
         $this->associationManager = new AssociationManager(
             $this->doctrineHelper,

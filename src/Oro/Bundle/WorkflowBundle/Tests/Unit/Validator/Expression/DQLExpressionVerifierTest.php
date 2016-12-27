@@ -69,10 +69,8 @@ class DQLExpressionVerifierTest extends \PHPUnit_Framework_TestCase
         $query->expects($this->once())->method('setMaxResults')->with(1)->willReturnSelf();
         $query->expects($this->once())->method('execute')->willThrowException($exception);
 
-        $this->setExpectedException(
-            'Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException',
-            $exception->getMessage()
-        );
+        $this->expectException('Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException');
+        $this->expectExceptionMessage($exception->getMessage());
 
         $this->verifier->verify($query);
     }

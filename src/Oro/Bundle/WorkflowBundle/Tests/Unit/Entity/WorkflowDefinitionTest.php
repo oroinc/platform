@@ -69,6 +69,14 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->workflowDefinition->hasScopesConfig());
     }
 
+    public function testGetDatagrids()
+    {
+        $datagridsConfig = ['grid1', 'grid2'];
+        $this->workflowDefinition->setConfiguration(['datagrids' => $datagridsConfig]);
+
+        $this->assertSame($datagridsConfig, $this->workflowDefinition->getDatagrids());
+    }
+
     public function testGetHasDisabledOperations()
     {
         $definition = new WorkflowDefinition();

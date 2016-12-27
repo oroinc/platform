@@ -44,7 +44,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+        $this->contextRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
 
         $this->writer = new EntityWriter($this->doctrineHelper, $this->detachFixer, $this->contextRegistry);
     }
@@ -56,8 +56,8 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrite($configuration)
     {
-        $fooItem = $this->getMock('FooItem');
-        $barItem = $this->getMock('BarItem');
+        $fooItem = $this->createMock(\stdClass::class);
+        $barItem = $this->createMock(\ArrayObject::class);
 
         $this->detachFixer->expects($this->at(0))
             ->method('fixEntityAssociationFields')
@@ -83,7 +83,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue($configuration));
@@ -113,7 +113,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue([]));
@@ -134,7 +134,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue(['entityName' => '\stdClass']));

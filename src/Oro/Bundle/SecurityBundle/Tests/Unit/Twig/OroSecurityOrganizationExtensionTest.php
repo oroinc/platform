@@ -24,7 +24,7 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext  = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->twigExtension    = new OroSecurityOrganizationExtension($this->securityContext);
     }
 
@@ -56,7 +56,7 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
         $organization->setEnabled(true);
 
         $user->setOrganizations(new ArrayCollection(array($organization, $disabledOrganization)));
-        $token = $this->getMock('Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface');
+        $token = $this->createMock('Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface');
 
         $this->securityContext->expects($this->once())
             ->method('getToken')
@@ -75,9 +75,9 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCurrentOrganizationWorks()
     {
-        $organization = $this->getMock('Oro\\Bundle\\OrganizationBundle\\Entity\\Organization');
+        $organization = $this->createMock('Oro\\Bundle\\OrganizationBundle\\Entity\\Organization');
 
-        $token = $this->getMock(
+        $token = $this->createMock(
             'Oro\\Bundle\\SecurityBundle\\Authentication\\Token\\OrganizationContextTokenInterface'
         );
 
@@ -94,7 +94,7 @@ class OroSecurityOrganizationExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCurrentOrganizationWorksWithNotOrganizationContextToken()
     {
-        $token = $this->getMock(
+        $token = $this->createMock(
             'Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface'
         );
 

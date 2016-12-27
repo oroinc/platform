@@ -71,10 +71,8 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit_Framework_Te
      */
     public function testVerifyTriggerException($exceptionMessage, TransitionEventTrigger $trigger)
     {
-        $this->setExpectedException(
-            TransitionTriggerVerifierException::class,
-            $exceptionMessage
-        );
+        $this->expectException(TransitionTriggerVerifierException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->verifier->verifyTrigger($trigger);
     }
