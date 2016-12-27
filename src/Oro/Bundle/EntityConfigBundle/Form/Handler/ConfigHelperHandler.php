@@ -2,23 +2,45 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\UIBundle\Route\Router;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class ConfigHelperHandler
 {
     /** @var FormFactoryInterface */
     private $formFactory;
 
+    /** @var Session */
+    private $session;
+
+    /** @var Router */
+    private $router;
+
+    /** @var ConfigHelper */
+    private $configHelper;
+
     /**
      * @param FormFactoryInterface $formFactory
+     * @param Session $session
+     * @param Router $router
+     * @param ConfigHelper $configHelper
      */
-    public function __construct(FormFactoryInterface $formFactory)
-    {
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        Session $session,
+        Router $router,
+        ConfigHelper $configHelper
+    ) {
         $this->formFactory = $formFactory;
+        $this->session = $session;
+        $this->router = $router;
+        $this->configHelper = $configHelper;
     }
 
     /**
@@ -64,5 +86,44 @@ class ConfigHelperHandler
             null,
             ['config_model' => $fieldConfigModel]
         );
+    }
+
+    /**
+     * @param FieldConfigModel $fieldConfigModel
+     * @param string $successMessage
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function showSuccessMessageAndRedirect(FieldConfigModel $fieldConfigModel, $successMessage)
+    {
+        $this->session->getFlashBag()->add('success', $successMessage);
+
+        return $this->router->redirect($fieldConfigModel);
+    }
+
+    /**
+     * @param FieldConfigModel|string $fieldConfigModel
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function redirect($fieldConfigModel)
+    {
+        return $this->router->redirect($fieldConfigModel);
+    }
+
+    /**
+     * @param FieldConfigModel $fieldConfigModel
+     * @param FormInterface $form
+     * @param $formAction
+     * @return array
+     */
+    public function constructConfigResponse(FieldConfigModel $fieldConfigModel, FormInterface $form, $formAction)
+    {
+        return [
+            'entity_config' => $this->configHelper->getEntityConfigByField($fieldConfigModel, 'entity'),
+            'field_config' => $this->configHelper->getFieldConfig($fieldConfigModel, 'entity'),
+            'field' => $fieldConfigModel,
+            'form' => $form->createView(),
+            'formAction' => $formAction,
+            'require_js' => $this->configHelper->getExtendRequireJsModules()
+        ];
     }
 }
