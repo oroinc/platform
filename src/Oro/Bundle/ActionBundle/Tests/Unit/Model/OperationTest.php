@@ -616,13 +616,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $operation->getFormOptions($this->data);
 
         $newOperation = clone $operation;
-//        $this->assertNotEquals($operation, $newOperation);
 
-//        $this->assertAttributeEmpty('attributeManagers', $newOperation);
-//        $this->assertAttributeEmpty('formOptions', $newOperation);
-//        $this->assertAttributeEmpty('actions', $newOperation);
-//        $this->assertAttributeEmpty('conditions', $newOperation);
-
+        $this->assertEquals($operation, $newOperation);
         $this->assertEquals($operation->getDefinition(), $newOperation->getDefinition());
         $this->assertNotSame($operation->getDefinition(), $newOperation->getDefinition());
     }
