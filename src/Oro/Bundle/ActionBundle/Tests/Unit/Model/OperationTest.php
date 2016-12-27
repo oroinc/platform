@@ -506,12 +506,12 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects
      * @param ActionData $data
      * @return ActionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createAction(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
+        \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects,
         ActionData $data
     ) {
         /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -527,13 +527,13 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects
      * @param ActionData $data
      * @param bool $returnValue
      * @return ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createCondition(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
+        \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects,
         ActionData $data,
         $returnValue
     ) {
@@ -576,10 +576,54 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
     public function testClone()
     {
-        $currentDefinition = $this->operation->getDefinition();
+        $attributes = ['attribute' => ['label' => 'attr_label']];
 
-        $this->assertSame($currentDefinition, $this->operation->getDefinition());
-        $newOperation = clone $this->operation;
-        $this->assertNotSame($currentDefinition, $newOperation->getDefinition());
+        $definition = new OperationDefinition();
+        $definition->setAttributes($attributes)
+            ->setConditions(OperationDefinition::PRECONDITIONS, [])
+            ->setConditions(OperationDefinition::CONDITIONS, [])
+            ->setActions(OperationDefinition::PREACTIONS, [])
+            ->setActions(OperationDefinition::ACTIONS, []);
+
+        $this->actionFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->createAction($this->any(), $this->data));
+
+        $this->conditionFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->createCondition($this->any(), $this->data, true));
+
+        $attribute = new Attribute();
+        $attribute->setName('test_attr');
+
+        $this->attributeAssembler->expects($this->any())
+            ->method('assemble')
+            ->with($this->data, $attributes)
+            ->willReturn(new ArrayCollection([$attribute]));
+
+        $operation = new Operation(
+            $this->actionFactory,
+            $this->conditionFactory,
+            $this->attributeAssembler,
+            $this->formOptionsAssembler,
+            $definition
+        );
+
+        $operation->isAvailable($this->data);
+        $operation->init($this->data);
+        $operation->execute($this->data);
+        $operation->getAttributeManager($this->data);
+        $operation->getFormOptions($this->data);
+
+        $newOperation = clone $operation;
+//        $this->assertNotEquals($operation, $newOperation);
+
+//        $this->assertAttributeEmpty('attributeManagers', $newOperation);
+//        $this->assertAttributeEmpty('formOptions', $newOperation);
+//        $this->assertAttributeEmpty('actions', $newOperation);
+//        $this->assertAttributeEmpty('conditions', $newOperation);
+
+        $this->assertEquals($operation->getDefinition(), $newOperation->getDefinition());
+        $this->assertNotSame($operation->getDefinition(), $newOperation->getDefinition());
     }
 }

@@ -105,15 +105,11 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
         $actionData = $this->getActionData($buttonSearchContext);
         $result = $button->getOperation()->isAvailable($actionData);
 
-        $operation = clone $button->getOperation();
-        $operation->getDefinition()
-            ->setFrontendOptions(
-                $this->resolveOptions($actionData, $operation->getDefinition()->getFrontendOptions())
-            )->setButtonOptions(
-                $this->resolveOptions($actionData, $operation->getDefinition()->getButtonOptions())
-            );
-        $button->setData($actionData)
-            ->setOperation($operation);
+        $definition = $button->getOperation()->getDefinition();
+        $definition->setFrontendOptions($this->resolveOptions($actionData, $definition->getFrontendOptions()))
+            ->setButtonOptions($this->resolveOptions($actionData, $definition->getButtonOptions()));
+
+        $button->setData($actionData);
 
         return $result;
     }
