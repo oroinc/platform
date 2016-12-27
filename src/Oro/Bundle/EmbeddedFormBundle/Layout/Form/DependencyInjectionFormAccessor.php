@@ -71,4 +71,12 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
             $this->getForm()->setData($formData);
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
+        return $this->toString();
+    }
 }

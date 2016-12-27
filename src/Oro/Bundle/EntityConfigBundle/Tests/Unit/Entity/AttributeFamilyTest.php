@@ -48,11 +48,12 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($attributeGroups, $entity->getAttributeGroups());
     }
 
-    public function testToString()
+    public function testGetHash()
     {
         $group1 = $this->getEntity(AttributeGroup::class, ['id' => 1]);
         $group2 = $this->getEntity(AttributeGroup::class, ['id' => 2]);
         $attributeGroups = new ArrayCollection([$group1, $group2]);
+        /** @var AttributeFamily $entity */
         $entity = $this->getEntity(AttributeFamily::class, [
             'id' => 1,
             'attribute_groups' => $attributeGroups,
@@ -69,6 +70,13 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals(md5(serialize($result)), $entity->toString());
+        $this->assertEquals(md5(serialize($result)), $entity->getHash());
+    }
+
+    public function testToString()
+    {
+        /** @var AttributeFamily $entity */
+        $entity = $this->getEntity(AttributeFamily::class, ['id' => 1]);
+        $this->assertEquals('id: 1', $entity->toString());
     }
 }

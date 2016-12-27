@@ -339,6 +339,14 @@ class AttributeFamily extends ExtendAttributeFamily implements
      */
     public function toString()
     {
+        return 'id: ' . $this->getId();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
         $data = [];
 
         /** @var AttributeGroup $group */

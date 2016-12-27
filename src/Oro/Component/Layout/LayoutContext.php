@@ -206,7 +206,7 @@ class LayoutContext implements ContextInterface
         $items = $this->items;
         foreach ($items as &$item) {
             if ($item instanceof ContextItemInterface) {
-                $item = $item->toString();
+                $item = $item->getHash();
             }
         }
 
