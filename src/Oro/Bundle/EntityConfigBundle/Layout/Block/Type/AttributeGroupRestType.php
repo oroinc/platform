@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
+
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\Block\Type\Options;
@@ -14,6 +15,7 @@ class AttributeGroupRestType extends AbstractContainerType
 {
     const NAME = 'attribute_group_rest';
 
+    /** @var AttributeGroupRenderRegistry */
     protected $attributeGroupRenderRegistry;
 
     /**
@@ -24,6 +26,9 @@ class AttributeGroupRestType extends AbstractContainerType
         $this->attributeGroupRenderRegistry = $attributeGroupRenderRegistry;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         /** @var AttributeFamily $attributeFamily */

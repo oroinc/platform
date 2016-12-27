@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupRestType;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
+
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
@@ -19,6 +20,9 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
     /** @var AttributeGroupRenderRegistry */
     protected $attributeGroupRenderRegistry;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
