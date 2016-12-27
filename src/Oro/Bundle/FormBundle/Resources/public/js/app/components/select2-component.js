@@ -150,7 +150,12 @@ define(function(require) {
             if (config.multiple === true) {
                 callback(data);
             } else {
-                callback(data.pop());
+                var item = data.pop();
+                if (!_.isUndefined(item.children) && _.isArray(item.children)) {
+                    callback(item.children.pop());
+                } else {
+                    callback(item);
+                }
             }
         }
 
