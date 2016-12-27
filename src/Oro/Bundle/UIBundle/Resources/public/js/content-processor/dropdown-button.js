@@ -123,7 +123,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          * @private
          */
         _dropdownMenu: function($buttons) {
-            return $('<ul class="dropdown-menu"></ul>')
+            return $('<ul class="dropdown-menu" data-options="{&quot;align&quot;: &quot;right&quot;}"></ul>')
                 .append(this._prepareButtons($buttons));
         },
 
