@@ -113,7 +113,7 @@ class UserType extends AbstractType
                 'plainPassword',
                 'repeated',
                 [
-                    'invalid_message' => 'oro.user.password.password_mismatch',
+                    'invalid_message' => 'oro.user.message.password_mismatch',
                     'type'           => 'password',
                     'required'       => true,
                     'first_options' => [
