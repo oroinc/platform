@@ -41,7 +41,7 @@ class FormAccessor extends AbstractFormAccessor
      */
     public function toString()
     {
-        return $this->hash;
+        return 'name:' . $this->getName();
     }
 
     /**
@@ -49,6 +49,6 @@ class FormAccessor extends AbstractFormAccessor
      */
     public function getHash()
     {
-        return $this->toString();
+        return $this->hash;
     }
 }

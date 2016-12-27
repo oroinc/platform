@@ -12,7 +12,7 @@ class ContextItemStub implements ContextItemInterface
      */
     public function toString()
     {
-        return 'id:' . 1;
+        return 'id:1';
     }
 
     /**

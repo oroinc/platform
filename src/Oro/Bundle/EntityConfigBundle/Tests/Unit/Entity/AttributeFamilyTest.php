@@ -76,7 +76,8 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
     public function testToString()
     {
         /** @var AttributeFamily $entity */
-        $entity = $this->getEntity(AttributeFamily::class, ['id' => 1]);
-        $this->assertEquals('id: 1', $entity->toString());
+        $entity = new AttributeFamily();
+        $entity->setCode('default_family');
+        $this->assertEquals('code:default_family', $entity->toString());
     }
 }

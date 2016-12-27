@@ -182,6 +182,6 @@ class FormAction implements \ArrayAccess, ContextItemInterface
      */
     public function getHash()
     {
-        return $this->toString();
+        return md5($this->toString());
     }
 }

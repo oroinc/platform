@@ -339,7 +339,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
      */
     public function toString()
     {
-        return 'id: ' . $this->getId();
+        return 'code:' . $this->getCode();
     }
 
     /**
