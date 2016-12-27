@@ -172,11 +172,22 @@ class OperationButton implements ButtonInterface
 
     /**
      * @param ActionData $data
-     * @return Operation
+     * @return $this
      */
     public function setData(ActionData $data)
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @param Operation $operation
+     * @return $this
+     */
+    public function setOperation(Operation $operation)
+    {
+        $this->operation = $operation;
 
         return $this;
     }

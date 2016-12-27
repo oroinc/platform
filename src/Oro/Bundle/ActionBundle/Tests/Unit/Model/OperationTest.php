@@ -573,4 +573,13 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\AttributeManager', $attributeManager);
         $this->assertEquals(new ArrayCollection(['test_attr' => $attribute]), $attributeManager->getAttributes());
     }
+
+    public function testClone()
+    {
+        $currentDefinition = $this->operation->getDefinition();
+
+        $this->assertSame($currentDefinition, $this->operation->getDefinition());
+        $newOperation = clone $this->operation;
+        $this->assertNotSame($currentDefinition, $newOperation->getDefinition());
+    }
 }

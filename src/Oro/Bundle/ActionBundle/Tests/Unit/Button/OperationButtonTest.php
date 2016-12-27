@@ -152,6 +152,15 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($newData, $this->button->getTemplateData()['actionData']);
     }
 
+    public function testSetOperation()
+    {
+        $this->assertOperationMethodsCalled();
+        $newOperation = clone $this->operation;
+        $this->assertNotEquals($newOperation, $this->button->getOperation());
+        $this->button->setOperation($newOperation);
+        $this->assertEquals($newOperation, $this->button->getOperation());
+    }
+
     public function testGetTranslationDomain()
     {
         $this->assertNull($this->button->getTranslationDomain());
