@@ -21,7 +21,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext  = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->listener = new BuildTemplateFormSubscriber($this->securityContext);
     }
 
@@ -64,7 +64,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $notificationMock = $this->getMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
+        $notificationMock = $this->createMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
         $notificationMock->expects($this->once())
             ->method('getEntityName')
             ->will($this->returnValue(null));
@@ -78,7 +78,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetDataHasTemplates()
     {
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $token = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
         )
@@ -97,17 +97,17 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $notificationMock = $this->getMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
+        $notificationMock = $this->createMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
         $notificationMock->expects($this->exactly(2))
             ->method('getEntityName')
             ->will($this->returnValue('testEntity'));
 
-        $configMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $configMock = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $configMock->expects($this->once())
             ->method('getOptions')
             ->will($this->returnValue(array('auto_initialize' => true)));
 
-        $formType   = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $formType->expects($this->once())->method('getName')
             ->will($this->returnValue('template'));
         $configMock->expects($this->once())->method('getType')
@@ -143,7 +143,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSubmitData()
     {
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $token = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
         )
@@ -162,11 +162,11 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $configMock = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $configMock->expects($this->once())->method('getOptions')
             ->will($this->returnValue(array('auto_initialize' => true)));
 
-        $formType   = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $formType   = $this->createMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $formType->expects($this->once())->method('getName')
             ->will($this->returnValue('template'));
         $configMock->expects($this->once())->method('getType')

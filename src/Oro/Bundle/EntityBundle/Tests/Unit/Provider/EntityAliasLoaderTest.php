@@ -25,8 +25,8 @@ class EntityAliasLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadWhenSeveralProvidersReturnSameClass()
     {
-        $classProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
-        $classProvider2 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
+        $classProvider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
+        $classProvider2 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
 
         $classProvider1->expects($this->once())
             ->method('getClassNames')
@@ -38,7 +38,7 @@ class EntityAliasLoaderTest extends \PHPUnit_Framework_TestCase
         $this->loader->addEntityClassProvider($classProvider1);
         $this->loader->addEntityClassProvider($classProvider2);
 
-        $aliasProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $aliasProvider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $this->loader->addEntityAliasProvider($aliasProvider1);
         $aliasProvider1->expects($this->any())
             ->method('getEntityAlias')
@@ -67,18 +67,18 @@ class EntityAliasLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testThatEarlierAliasProviderWins()
     {
-        $classProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
+        $classProvider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
         $classProvider1->expects($this->once())
             ->method('getClassNames')
             ->willReturn(['Test\Entity1']);
         $this->loader->addEntityClassProvider($classProvider1);
 
-        $aliasProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $aliasProvider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $aliasProvider1->expects($this->once())
             ->method('getEntityAlias')
             ->with('Test\Entity1')
             ->willReturn(new EntityAlias('alias1', 'plural_alias1'));
-        $aliasProvider2 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $aliasProvider2 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $aliasProvider2->expects($this->never())
             ->method('getEntityAlias');
 
@@ -98,18 +98,18 @@ class EntityAliasLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testEntityAliasCanBeDisabled()
     {
-        $classProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
+        $classProvider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface');
         $classProvider1->expects($this->once())
             ->method('getClassNames')
             ->willReturn(['Test\Entity1']);
         $this->loader->addEntityClassProvider($classProvider1);
 
-        $aliasProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $aliasProvider1 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $aliasProvider1->expects($this->once())
             ->method('getEntityAlias')
             ->with('Test\Entity1')
             ->willReturn(false);
-        $aliasProvider2 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $aliasProvider2 = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $aliasProvider2->expects($this->never())
             ->method('getEntityAlias');
 

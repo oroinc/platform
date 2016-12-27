@@ -1,31 +1,17 @@
 services:
-    oro_test.dumper.mysql:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Dumper\MysqlDumper'
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: 'oro_test.db_dumper', driver: 'pdo_mysql' }
-
-    oro_test.dumper.pgsql:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Dumper\PgsqlDumper'
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: 'oro_test.db_dumper', driver: 'pdo_pgsql' }
-
-    oro_test.dumper.file_cache:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Dumper\FileCacheDumper
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: oro_test.dumper, priority: 20 }
-
     cli.controller.suite:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SuiteController
         arguments:
             - '@suite.registry'
             - '%suite.configurations%'
             - '%oro_test.application_suites%'
+        tags:
+            - { name: cli.controller, priority: 1100 }
+
+    cli.controller.available_suites:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
+        arguments:
+            - '@suite.registry'
         tags:
             - { name: cli.controller, priority: 1100 }
 
@@ -47,44 +33,20 @@ services:
         tags:
             - { name: event_dispatcher.subscriber, priority: 10 }
 
-    oro_test.listener.set_locale_subscriber:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SetLocaleSubscriber
-        arguments:
-            - '@oro_config.global'
-        tags:
-            - { name: event_dispatcher.subscriber, priority: 50 }
-
-    oro_test.listener.feature_isolation_subscriber:
-        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\FeatureIsolationSubscriber
-        arguments:
-            - ~
-            - '@oro_test.context.fixture_loader'
-            - '@oro_element_factory'
-            - '@oro_test.kernel_service_factory'
-            - '@oro_test.reference_repository_initializer'
-            - '@doctrine'
-        tags:
-            - { name: 'event_dispatcher.subscriber' }
-
-    oro_test.listener.message_queue_consumer_process_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueConsumerProcessSubscriber'
-        arguments:
-            - '@symfony2_extension.kernel'
-        tags:
-            - { name: 'event_dispatcher.subscriber' }
-
-    oro_test.listener.dump_environment_subscriber:
-        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\DumpEnvironmentSubscriber'
-        arguments:
-            - ~
-            - '@oro_test.dumper.file_cache'
-        tags:
-            - { name: 'event_dispatcher.subscriber' }
-
     oro_test.listener.step_duration_measure_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
         arguments:
             - '@definition.finder'
+
+    oro_test.listener.interactive_execution_subscriber:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
+
+    oro_test.listener.suite_aware_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
+        arguments:
+            - ~
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
 
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
@@ -103,7 +65,14 @@ services:
             - '@oro_test.listener.interactive_execution_subscriber'
             - '@event_dispatcher'
         tags:
-            - { name: 'cli.controller' }
+            - { name: 'cli.controller', priority: 500 }
+
+    cli.controller.input_output_conyroller:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
+        arguments:
+            - '@oro_behat_extension.isolation.test_isolation_subscriber'
+        tags:
+            - { name: 'cli.controller', priority: 100 }
 
     oro_element_factory:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory'
@@ -111,6 +80,8 @@ services:
             - '@mink'
             - '@mink.selectors_handler'
             - []
+        tags:
+            - { name: 'suite_aware' }
 
     oro_page_factory:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory'
@@ -136,10 +107,12 @@ services:
     oro_test.context.fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader
         arguments:
-            - '@doctrine'
+            - '@symfony2_extension.kernel'
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
+        tags:
+            - { name: 'suite_aware' }
 
     oro_test.entity_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
@@ -148,7 +121,7 @@ services:
     oro_test.entity_supplement:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement
         arguments:
-            - '@doctrine'
+            - '@symfony2_extension.kernel'
             - '@oro_test.reference_repository'
             - '@oro_security.owner.metadata_provider.chain'
 
@@ -159,15 +132,13 @@ services:
     oro_test.reference_repository_initializer:
         class: '%oro_test.reference_initializer_class%'
         arguments:
-            - '@doctrine'
+            - '@symfony2_extension.kernel'
             - '@oro_test.reference_repository'
 
     oro_test.alice_loader:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader
-        calls:
-            - [setDoctrine, ['@doctrine']]
 
-    oro_test.environment.handler.scenario_environment_handlre:
+    oro_test.environment.handler.feature_environment_handler:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
         arguments:
             - '@context.factory'

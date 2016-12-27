@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Autocomplete;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -58,7 +59,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())->method('trans')->willReturnArgument(0);
 
         $this->entityRepository->expects($this->any())->method('createQueryBuilder')->willReturn($this->queryBuilder);
@@ -151,7 +152,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')
-            ->with('entity1')
+            ->with('entity1', false)
             ->willReturn(null);
 
         $this->query->expects($this->once())->method('getResult')->willReturn([
@@ -188,13 +189,15 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')
-            ->with('entity1')
+            ->with('entity1', false)
             ->willReturn($workflow);
 
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByActiveGroups')
             ->with(['entity1_group'])
-            ->willReturn([$workflow, $this->getWorkflowMock('entity2'), $this->getWorkflowMock('entity3')]);
+            ->willReturn(
+                new ArrayCollection([$workflow, $this->getWorkflowMock('entity2'), $this->getWorkflowMock('entity3')])
+            );
 
         $this->query->expects($this->once())->method('getResult')->willReturn([
             $this->getDefinition('item3', 'label3', true),
@@ -267,7 +270,7 @@ class WorkflowReplacementSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_ENTITY_CLASS)
             ->willReturn($this->entityRepository);
 
-        $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(self::TEST_ENTITY_CLASS)

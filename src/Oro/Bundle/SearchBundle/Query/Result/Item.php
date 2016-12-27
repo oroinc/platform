@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Result;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\Common\Persistence\ObjectManager;
 
 use JMS\Serializer\Annotation\Type;
@@ -16,25 +14,21 @@ class Item
     /**
      * @var string
      * @Type("string")
-     * @Soap\ComplexType("string")
      */
     protected $entityName;
 
     /**
      * @var int
      * @Type("integer")
-     * @Soap\ComplexType("int")
      */
     protected $recordId;
 
     /**
-     * @Soap\ComplexType("string")
      * @var string
      */
     protected $recordTitle;
 
     /**
-     * @Soap\ComplexType("string")
      * @var string
      */
     protected $recordUrl;
@@ -51,7 +45,6 @@ class Item
     protected $em;
 
     /**
-     * @Soap\ComplexType("Oro\Bundle\SearchBundle\Soap\Type\SelectedValue[]")
      * @var string[]
      */
     protected $selectedData = [];
@@ -76,16 +69,16 @@ class Item
         $recordId = null,
         $recordTitle = null,
         $recordUrl = null,
-        $selectedData = [],
-        $entityConfig = []
+        array $selectedData = [],
+        array $entityConfig = []
     ) {
         $this->em           = $em;
         $this->entityName   = $entityName;
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
-        $this->selectedData = is_array($selectedData) ? $selectedData : [];
-        $this->entityConfig = empty($entityConfig) ? [] : $entityConfig;
+        $this->selectedData = $selectedData;
+        $this->entityConfig = $entityConfig;
 
         $this->propertyAccessor = new PropertyAccessor();
     }
@@ -148,6 +141,8 @@ class Item
 
     /**
      * Load related object
+     *
+     * @deprecated getEntity method will be removed in 2.0. Get entity manually by entityName and recordId
      * @return object
      */
     public function getEntity()

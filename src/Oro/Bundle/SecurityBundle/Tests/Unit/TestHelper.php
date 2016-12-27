@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
@@ -77,15 +77,20 @@ class TestHelper
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+     * @param EntityOwnerAccessor $entityOwnerAccessor
      * @param PermissionManager $permissionManager
      * @param AclGroupProviderInterface $groupProvider
      * @return EntityAclExtension
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function createEntityAclExtension(
         OwnershipMetadataProvider $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
+        EntityOwnerAccessor $entityOwnerAccessor = null,
         PermissionManager $permissionManager = null,
         AclGroupProviderInterface $groupProvider = null
     ) {
@@ -97,6 +102,9 @@ class TestHelper
         }
         if ($metadataProvider === null) {
             $metadataProvider = new OwnershipMetadataProviderStub($this->testCase);
+        }
+        if ($entityOwnerAccessor === null) {
+            $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider);
         }
         if ($ownerTree === null) {
             $ownerTree = new OwnerTree();
@@ -174,6 +182,7 @@ class TestHelper
             new EntityClassResolver($doctrine),
             $entityMetadataProvider,
             $metadataProvider,
+            $entityOwnerAccessor,
             $decisionMaker,
             $permissionManager ?: $this->getPermissionManagerMock($this->testCase),
             $groupProvider ?: $this->getGroupProviderMock($this->testCase),
@@ -186,7 +195,7 @@ class TestHelper
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param ConfigProvider $configProvider
+     * @param ConfigManager $configManager
      * @return FieldAclExtension
      */
     public function createFieldAclExtension(
@@ -194,7 +203,7 @@ class TestHelper
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
-        ConfigProvider $configProvider = null
+        ConfigManager $configManager = null
     ) {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -278,11 +287,10 @@ class TestHelper
                 ->getMock();
         return new FieldAclExtension(
             $idAccessor,
-            new EntityClassResolver($doctrine),
             $metadataProvider,
             $decisionMaker,
             $entityOwnerAccessor,
-            $configProvider,
+            $configManager,
             $entityMetadataProvider
         );
     }
@@ -318,7 +326,7 @@ class TestHelper
      */
     protected function getGroupProviderMock(\PHPUnit_Framework_TestCase $testCase)
     {
-        $mock = $testCase->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $mock = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface')->getMock();
         $mock->expects($testCase->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);

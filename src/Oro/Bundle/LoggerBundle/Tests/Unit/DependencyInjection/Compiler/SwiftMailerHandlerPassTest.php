@@ -5,6 +5,8 @@ namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\SwiftMailerHandlerPass;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +22,7 @@ class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessDoesntExecuteWhenMailersNotFound()
     {
-        $containerBuilder = $this->getMock(ContainerBuilder::class, [], [], '', false);
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
         $containerBuilder->expects($this->any())
             ->method('hasParameter')
             ->with('swiftmailer.mailers')
@@ -32,25 +34,29 @@ class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
+        $decorator = new DefinitionDecorator('swiftmailer.plugin.no_recipient.abstract');
         $containerBuilder = new ContainerBuilder();
         $mailers = [
-            'foo' => 'fooMailer',
-            'bar' => 'barMailer'
+            'foo' => 'foo.mailer',
+            'bar' => 'bar.mailer'
         ];
         $containerBuilder->setParameter('swiftmailer.mailers', $mailers);
+
+        $fooDefinition = $this->createMock(Definition::class);
+        $fooDefinition->expects($this->once())
+            ->method('addMethodCall')
+            ->with('registerPlugin', [$decorator]);
+        $containerBuilder->setDefinition('foo.mailer', $fooDefinition);
+
+        $barDefinition = $this->createMock(Definition::class);
+        $barDefinition->expects($this->once())
+            ->method('addMethodCall')
+            ->with('registerPlugin', [$decorator]);
+        $containerBuilder->setDefinition('bar.mailer', $barDefinition);
 
         $this->compilerPass->process($containerBuilder);
 
         $this->assertTrue($containerBuilder->hasDefinition('swiftmailer.mailer.foo.plugin.no_recipient'));
-        $this->assertEquals(
-            ["swiftmailer.mailer.foo.plugin.no_recipient"],
-            array_keys($containerBuilder->findTaggedServiceIds('swiftmailer.foo.plugin'))
-        );
-
         $this->assertTrue($containerBuilder->hasDefinition('swiftmailer.mailer.bar.plugin.no_recipient'));
-        $this->assertEquals(
-            ["swiftmailer.mailer.bar.plugin.no_recipient"],
-            array_keys($containerBuilder->findTaggedServiceIds('swiftmailer.bar.plugin'))
-        );
     }
 }

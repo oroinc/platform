@@ -7,7 +7,6 @@ services:
     oro_action.form.type.operation:
         class: %oro_action.form.type.operation.class%
         arguments:
-            - '@oro_action.operation_manager'
             - '@oro_action.form.event_listener.required_attributes'
             - '@oro_action.expression.context_accessor'
         tags:

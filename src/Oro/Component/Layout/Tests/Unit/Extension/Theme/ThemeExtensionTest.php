@@ -36,7 +36,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->pathProvider = $this
-            ->getMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
+            ->createMock('Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubContextAwarePathProvider');
         $this->yamlDriver = $this
             ->getMockBuilder('Oro\Component\Layout\Loader\Driver\DriverInterface')
             ->setMethods(['load', 'getUpdateFilenamePattern'])
@@ -52,7 +52,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->resourceProvider = $this
-            ->getMock('Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface');
+            ->createMock('Oro\Component\Layout\Extension\Theme\ResourceProvider\ResourceProviderInterface');
 
         $loader = new LayoutUpdateLoader();
         $loader->addDriver('yml', $this->yamlDriver);
@@ -99,8 +99,8 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
                 'oro-default/page/resource3.php'
             ]));
 
-        $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
-        $update2Mock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $updateMock = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $update2Mock = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->yamlDriver->expects($this->once())->method('load')
             ->with('oro-default/resource1.yml')
@@ -117,7 +117,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldPassDependenciesToUpdateInstance()
     {
         $themeName = 'oro-gold';
-        $update = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $update = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
         $this->pathProvider->expects($this->once())->method('getPaths')->willReturn([$themeName]);
 
         $this->resourceProvider

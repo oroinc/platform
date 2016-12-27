@@ -124,7 +124,7 @@ define(function(require) {
             $items.not('[data-close="false"]').each(function(i, el) {
                 //append close link
                 var content = $(el).data('content');
-                content += '<i class="icon-remove popover-close"></i>';
+                content += '<i class="fa-close popover-close"></i>';
                 $(el).data('content', content);
             });
 

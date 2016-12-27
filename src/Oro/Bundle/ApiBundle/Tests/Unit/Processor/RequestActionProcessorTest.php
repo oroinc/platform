@@ -69,7 +69,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function addProcessor($processorId, $groupName)
     {
-        $processor = $this->getMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
         $this->processorFactory->addProcessor($processorId, $processor);
         $this->processorBag->addProcessor(
             $processorId,
@@ -119,7 +119,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -169,7 +169,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -220,7 +220,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -271,7 +271,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -323,7 +323,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -349,10 +349,8 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor10->expects($this->never())
             ->method('process');
 
-        $this->setExpectedException(
-            get_class($exception),
-            $exception->getMessage()
-        );
+        $this->expectException(get_class($exception));
+        $this->expectExceptionMessage($exception->getMessage());
 
         if (null !== $logger) {
             $logger->expects($this->once())
@@ -372,7 +370,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -424,7 +422,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -454,10 +452,8 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor10->expects($this->never())
             ->method('process');
 
-        $this->setExpectedException(
-            '\Oro\Bundle\ApiBundle\Exception\RuntimeException',
-            sprintf('An unexpected error occurred: %s.', $error->getTitle())
-        );
+        $this->expectException('\Oro\Bundle\ApiBundle\Exception\RuntimeException');
+        $this->expectExceptionMessage(sprintf('An unexpected error occurred: %s.', $error->getTitle()));
 
         if (null !== $logger) {
             $logger->expects($this->once())
@@ -477,7 +473,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -530,7 +526,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -552,7 +548,8 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         $processor11->expects($this->never())
             ->method('process');
 
-        $this->setExpectedException(get_class($exception), $exception->getMessage());
+        $this->expectException(get_class($exception));
+        $this->expectExceptionMessage($exception->getMessage());
 
         if (null !== $logger) {
             $logger->expects($this->once())
@@ -572,7 +569,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -620,7 +617,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 
@@ -669,7 +666,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $logger = null;
         if ($withLogger) {
-            $logger = $this->getMock('Psr\Log\LoggerInterface');
+            $logger = $this->createMock('Psr\Log\LoggerInterface');
             $this->processor->setLogger($logger);
         }
 

@@ -39,7 +39,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->loader = $this->getMock('\Twig_Loader_String');
+        $this->loader = $this->createMock('\Twig_Loader_String');
 
         $this->securityPolicy = $this->getMockBuilder('\Twig_Sandbox_SecurityPolicy')
             ->disableOriginalConstructor()->getMock();
@@ -48,7 +48,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->sandbox->expects($this->once())->method('getName')
+        $this->sandbox->expects($this->exactly(3))->method('getName')
             ->will($this->returnValue('sandbox'));
         $this->sandbox->expects($this->once())->method('getSecurityPolicy')
             ->will($this->returnValue($this->securityPolicy));
@@ -172,7 +172,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1|oro_html_sanitize }} N/A';
         $subject = 'subject';
 
-        $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
+        $emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $emailTemplate->expects($this->once())->method('getContent')
             ->will($this->returnValue($content));
         $emailTemplate->expects($this->once())->method('getSubject')
@@ -270,7 +270,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
 
         $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1 }} {{ system.testVar }}';
 
-        $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
+        $emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $emailTemplate->expects($this->once())
             ->method('getContent')
             ->will($this->returnValue($content));
@@ -305,10 +305,9 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
             ->method('getManager')
             ->will($this->returnValue($em));
 
-        return $this->getMock(
-            'Oro\Bundle\EmailBundle\Provider\EmailRenderer',
-            array('render'),
-            array(
+        return $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
+            ->setMethods(array('render'))
+            ->setConstructorArgs(array(
                 $this->loader,
                 array(),
                 $this->variablesProvider,
@@ -316,7 +315,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 $this->cacheKey,
                 $this->sandbox,
                 $this->translation
-            )
-        );
+            ))
+            ->getMock();
     }
 }

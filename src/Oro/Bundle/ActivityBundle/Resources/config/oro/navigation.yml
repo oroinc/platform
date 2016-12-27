@@ -6,7 +6,7 @@ navigation:
                 uri: '#'
                 extras:
                     position: 30
-                    icon: icon-puzzle-piece
+                    icon: fa-puzzle-piece
 
         tree:
             application_menu:

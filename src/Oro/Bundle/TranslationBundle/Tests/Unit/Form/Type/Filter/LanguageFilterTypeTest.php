@@ -76,7 +76,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
                 ['Locale Label', 'Formatted Locale Label'],
             ]));
 
-        $this->type->finishView($view, $this->getMock(FormInterface::class), []);
+        $this->type->finishView($view, $this->createMock(FormInterface::class), []);
 
         $this->assertEquals(
             [

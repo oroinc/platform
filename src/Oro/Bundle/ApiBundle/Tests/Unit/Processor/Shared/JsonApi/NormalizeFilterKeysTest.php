@@ -74,7 +74,7 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
                 [
                     'id'   => [
                         'expectedKey' => 'filter[id]',
-                        'expectedDescription' => 'Filter records by the identifier field'
+                        'expectedDescription' => NormalizeFilterKeys::ID_FILTER_DESCRIPTION
                     ],
                     'name' => [
                         'expectedKey' => 'filter[name]',
@@ -87,7 +87,7 @@ class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase
                 [
                     'name'  => [
                         'expectedKey' => 'filter[id]',
-                        'expectedDescription' => 'Filter records by the identifier field'
+                        'expectedDescription' => NormalizeFilterKeys::ID_FILTER_DESCRIPTION
                     ],
                     'label' => [
                         'expectedKey' => 'filter[label]',

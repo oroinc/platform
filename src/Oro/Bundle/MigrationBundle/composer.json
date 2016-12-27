@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/MigrationBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/framework-bundle": "2.8.*",
         "oro/log": "dev-master"
     },
@@ -14,7 +14,6 @@
         "psr-0": { "Oro\\Bundle\\MigrationBundle": "" }
     },
     "target-dir": "Oro/Bundle/MigrationBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

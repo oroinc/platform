@@ -29,6 +29,13 @@ services:
         tags:
             - { name: oro_action.condition, alias: configurable }
 
+    oro_action.condition.extendable:
+        class: Oro\Component\Action\Condition\ExtendableCondition
+        arguments:
+            - '@event_dispatcher'
+        tags:
+            - { name: oro_action.condition, alias: extendable }
+
     oro_action.expression.andx:
         class: Oro\Component\ConfigExpression\Condition\Andx
         tags:
@@ -141,3 +148,19 @@ services:
         class: Oro\Component\ConfigExpression\Condition\NoElements
         tags:
             - { name: oro_action.condition, alias: no_elements }
+
+    oro_action.expression.condition_available:
+        class: 'Oro\Component\ConfigExpression\Condition\ExpressionAvailable'
+        arguments:
+            - '@oro_action.expression.factory'
+            - 'condition_available'
+        tags:
+            - { name: oro_action.condition, alias: condition_available }
+
+    oro_action.expression.action_available:
+        class: 'Oro\Component\ConfigExpression\Condition\ExpressionAvailable'
+        arguments:
+            - '@oro_action.action_factory'
+            - 'action_available'
+        tags:
+            - { name: oro_action.condition, alias: action_available }

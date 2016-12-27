@@ -61,6 +61,7 @@ datagrids:
                     data_name: language.createdAt
                 updatedAt:
                     data_name: language.updatedAt
+            disable_default_sorting: true
         filters:
             columns:
                 language:
@@ -152,7 +153,7 @@ datagrids:
                         query_parameter_names:
                             - key
                             - locale
-                            - domain 
+                            - domain
             key:
                 label: oro.translation.translation_key.key.label
             domain:
@@ -173,7 +174,7 @@ datagrids:
                 domain:
                     data_name: domain
             default:
-                language: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC                    
+                language: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
             columns:
                 language:

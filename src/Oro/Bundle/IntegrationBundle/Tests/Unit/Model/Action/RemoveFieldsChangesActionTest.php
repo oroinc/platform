@@ -36,10 +36,8 @@ class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
     public function testInitializeFailed(array $options, $message = null)
     {
         if ($message) {
-            $this->setExpectedException(
-                'Oro\Component\Action\Exception\InvalidParameterException',
-                $message
-            );
+            $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+            $this->expectExceptionMessage($message);
         }
 
         $this->action->initialize($options);

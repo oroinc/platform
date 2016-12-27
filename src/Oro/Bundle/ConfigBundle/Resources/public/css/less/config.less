@@ -95,7 +95,7 @@
 
 .system-configuration-search {
   padding: 15px;
-  .icon-search {
+  .fa-search {
     color: #ccc;
   }
   .input-append {
@@ -150,9 +150,18 @@
     .accordion-inner {
       border: 0;
       ul li a {
-        padding-left: 45px;
+        position: relative;
+        padding-left: 68px;
         &:before {
           display: none;
+        }
+        i {
+          position: absolute;
+          top: 0;
+          left: 40px;
+          min-width: 20px;
+          line-height: 36px;
+          text-align: center;
         }
       }
     }

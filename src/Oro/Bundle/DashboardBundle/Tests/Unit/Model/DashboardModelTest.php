@@ -36,7 +36,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dashboardEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $this->dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
 
         $this->widgets = new ArrayCollection(
             array(
@@ -98,7 +98,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStartDashboard()
     {
-        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $this->dashboardEntity->expects($this->once())
             ->method('getStartDashboard')
             ->will($this->returnValue($dashboard));
@@ -108,7 +108,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetStartDashboard()
     {
-        $dashboard = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
         $this->dashboardEntity->expects($this->once())
             ->method('setStartDashboard')
             ->with($dashboard);
@@ -118,7 +118,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     public function testAddWidget()
     {
-        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -140,7 +140,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddWidgetMinColumnPosition(array $layoutPositions, $column, array $expectedLayoutPosition)
     {
-        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
         $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
             ->disableOriginalConstructor()
             ->getMock();
@@ -287,7 +287,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
         $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
             ->disableOriginalConstructor()
             ->getMock();
-        $widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
 
         $widgetModel->expects($this->once())
             ->method('getEntity')
@@ -323,7 +323,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOwner()
     {
-        $owner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $owner = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $this->dashboardEntity->expects($this->once())
             ->method('getOwner')
             ->will($this->returnValue($owner));
@@ -333,7 +333,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOwner()
     {
-        $owner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $owner = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $this->dashboardEntity->expects($this->once())
             ->method('setOwner')
             ->with($owner);
@@ -343,7 +343,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOrganization()
     {
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $this->dashboardEntity->expects($this->once())
             ->method('getOrganization')
             ->will($this->returnValue($organization));
@@ -353,7 +353,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOrganization()
     {
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $this->dashboardEntity->expects($this->once())
             ->method('setOrganization')
             ->with($organization);

@@ -37,11 +37,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-        $this->functionProvider = $this->getMock(
+        $this->functionProvider = $this->createMock(
             'Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface'
         );
 
-        $this->virtualFieldProvider = $this->getMock(
+        $this->virtualFieldProvider = $this->createMock(
             'Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface'
         );
 
@@ -233,7 +233,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
                 'type'         => 'navigate',
                 'label'        => 'oro.report.datagrid.row.action.view',
                 'acl_resource' => 'VIEW;entity:Oro\Bundle\AddressBundle\Entity\Address',
-                'icon'         => 'eye-open',
+                'icon'         => 'eye',
                 'link'         => 'view_link',
                 'rowAction'    => true
             ]
@@ -273,7 +273,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit_Framework_TestCas
      */
     protected function prepareRepository($className, array $definition)
     {
-        $report     = $this->getMock('Oro\Bundle\ReportBundle\Entity\Report');
+        $report     = $this->createMock('Oro\Bundle\ReportBundle\Entity\Report');
         $definition = json_encode($definition);
 
         //only stub because of calls time depend on DatagridConfigurationBuilder realisation

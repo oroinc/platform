@@ -157,7 +157,7 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContextMock()
     {
-        return $this->getMock(Context::class, [], [], '', false);
+        return $this->createMock(Context::class);
     }
 
     /**
@@ -165,6 +165,6 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
      */
     protected function createExtension()
     {
-        return $this->getMock(ExtensionInterface::class);
+        return $this->createMock(ExtensionInterface::class);
     }
 }

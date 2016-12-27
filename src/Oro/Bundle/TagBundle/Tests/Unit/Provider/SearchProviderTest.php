@@ -96,7 +96,7 @@ class SearchProviderTest extends \PHPUnit_Framework_TestCase
             ->method('applyAcl')
             ->with($qb, 't');
 
-        $this->mapper->expects($this->once())->method('getEntityConfig')->with(self::TEST_ENTITY_NAME);
+        $this->mapper->expects($this->once())->method('getEntityConfig')->with(self::TEST_ENTITY_NAME)->willReturn([]);
 
         $this->assertInstanceOf('Oro\Bundle\SearchBundle\Query\Result', $this->provider->getResults(self::TEST_ID));
     }

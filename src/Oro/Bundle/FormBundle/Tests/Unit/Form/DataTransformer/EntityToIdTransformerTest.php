@@ -307,7 +307,7 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
     private function createMockEntity($property, $value)
     {
         $getter = 'get' . ucfirst($property);
-        $result = $this->getMock('MockEntity', array($getter));
+        $result = $this->getMockBuilder(\stdClass::class)->setMethods(array($getter))->getMock();
         $result->expects($this->any())->method($getter)->will($this->returnValue($value));
 
         return $result;

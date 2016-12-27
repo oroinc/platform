@@ -154,7 +154,7 @@ abstract class ConfigModel
      * @param array  $values
      * @param array  $indexed A list of indexed values. key = value code, value = true
      */
-    public function fromArray($scope, array $values, array $indexed)
+    public function fromArray($scope, array $values, array $indexed = [])
     {
         // ensure a scope initialized
         if (!isset($this->data[$scope])) {

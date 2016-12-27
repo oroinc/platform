@@ -59,7 +59,7 @@ class CreateQueuesCommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createDestinationMetaRegistryMock()
     {
-        return $this->getMock(DestinationMetaRegistry::class, [], [], '', false);
+        return $this->createMock(DestinationMetaRegistry::class);
     }
 
     /**
@@ -67,6 +67,6 @@ class CreateQueuesCommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createClientDriverMock()
     {
-        return $this->getMock(DriverInterface::class);
+        return $this->createMock(DriverInterface::class);
     }
 }

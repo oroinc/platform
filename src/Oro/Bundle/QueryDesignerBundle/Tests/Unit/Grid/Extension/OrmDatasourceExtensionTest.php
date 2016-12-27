@@ -39,9 +39,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $configManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $calendarFactory = $this->getMock('Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface');
+        $calendarFactory = $this->createMock('Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface');
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
         $localeSettings = new LocaleSettings($configManager, $calendarFactory);
 
@@ -68,7 +68,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                          array()
                      ),
                      new CsrfExtension(
-                         $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                         $this->createMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
                      )
                 )
             )
@@ -201,24 +201,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 AND ('
                     . '(user_status < :datetime2 OR user_status > :datetime3) '
-                    . 'AND ((EXISTS('
-                    . 'SELECT string4.id '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string4 '
-                    . 'INNER JOIN string4.address string5 '
-                    . 'WHERE string5.country LIKE :string4 AND string4.id = user.id)) '
-                    . 'OR (EXISTS('
-                    . 'SELECT string7.id '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string7 '
-                    . 'INNER JOIN string7.address string8 '
-                    . 'WHERE string8.city LIKE :string5 AND string7.id = user.id)) OR '
-                    . '(EXISTS('
-                    . 'SELECT string10.id '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string10 '
-                    . 'INNER JOIN string10.address string11 '
-                    . 'WHERE string11.zip LIKE :string6 AND string10.id = user.id'
-                    . '))'
-                    . ')'
-                    . ')'
+                    . 'AND (address.country LIKE :string4 '
+                    . 'OR address.city LIKE :string5 OR '
+                    . 'address.zip LIKE :string6))'
             ],
             'test with OR conditions' => [
                 'source'   => [
@@ -268,13 +253,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
                     . 'user_status < :datetime2 OR user_status > :datetime3 '
-                    . 'OR (EXISTS('
-                    . 'SELECT string4.id '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string4 '
-                    . 'INNER JOIN string4.address string5 '
-                    . 'WHERE string5.country LIKE :string4 AND string4.id = user.id'
-                    . '))'
-                    . ')'
+                    . 'OR address.country LIKE :string4)'
             ],
             'test with OR filters between simple and group conditions' => [
                 'source'   => [
@@ -324,13 +303,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     . 'INNER JOIN user.address address '
                     . 'WHERE user_name NOT LIKE :string1 OR ('
                     . '(user_status < :datetime2 OR user_status > :datetime3) '
-                    . 'AND (EXISTS('
-                    . 'SELECT string4.id '
-                    . 'FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string4 '
-                    . 'INNER JOIN string4.address string5 '
-                    . 'WHERE string5.country LIKE :string4 AND string4.id = user.id'
-                    . '))'
-                    . ')'
+                    . 'AND address.country LIKE :string4)'
             ],
         ];
     }

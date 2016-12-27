@@ -53,6 +53,10 @@ services:
             - '@oro_locale.manager.localization'
             - '@oro_locale.provider.current_localization'
 
+    oro_locale.helper.localization.link:
+        tags:
+            - { name: oro_service_link, service: oro_locale.helper.localization }
+
     oro_locale.listener.orm.localization_listener:
         class: 'Oro\Bundle\LocaleBundle\EventListener\ORM\LocalizationListener'
         public: false
@@ -308,7 +312,7 @@ services:
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'
         arguments:
-            - '@oro_locale.repository.localization'
+            - '@oro_entity.doctrine_helper'
             - '@oro_config.global'
 
     oro_locale.provider.current_localization:
@@ -334,3 +338,11 @@ services:
             - '@oro_locale.helper.localization'
         tags:
             - { name: layout.data_provider, alias: locale }
+
+    oro_locale.localization_scope_criteria_provider:
+        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationScopeCriteriaProvider'
+        public: false
+        arguments:
+            - "@oro_locale.provider.current_localization"
+        tags:
+            - {name: oro_scope.provider, scopeType: web_content, priority: 1}

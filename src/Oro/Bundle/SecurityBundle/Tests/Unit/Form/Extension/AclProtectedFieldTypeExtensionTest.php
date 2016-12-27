@@ -115,6 +115,10 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             ->with('Acme\Demo\TestEntity')
             ->willReturn(true);
         $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with('Acme\Demo\TestEntity')
+            ->willReturn(true);
+        $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with('Acme\Demo\TestEntity')
             ->willReturn($securityConfig);
@@ -226,7 +230,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $form->add('street');
         $form->add('country');
 
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $builder = new FormBuilder('postoffice', null, $dispatcher, $this->factory);
         $builder->setPropertyPath(new PropertyPath('zip'));
         $builder->setAttribute('error_mapping', array());
@@ -328,6 +332,10 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
         $this->entityClassResolver->expects($this->any())
             ->method('isEntity')
+            ->with($className)
+            ->willReturn(true);
+        $this->configProvider->expects($this->any())
+            ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
         $this->configProvider->expects($this->any())

@@ -516,6 +516,9 @@ disabled look for disabled choices in the results dropdown
   background-image: -o-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
   background-image: -ms-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
   background-image: linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
+
+  max-width: calc(~'100% - 10px');
+  word-wrap: break-word;
 }
 .select2-container-multi .select2-choices .select2-search-choice .select2-chosen {
   cursor: default;
@@ -526,7 +529,7 @@ disabled look for disabled choices in the results dropdown
 
 .select2-container a.select2-choice .select2-chosen {
   padding: 8px 30px 7px 8px;
-  & > i[class^=icon-] {
+  & > i[class^="fa-"] {
     height: 16px;
     margin-top: -3px;
     vertical-align: middle;
@@ -705,4 +708,21 @@ disabled look for disabled choices in the results dropdown
 .input-prepend .select2-container {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+
+.select2-container {
+  .select2-choice {
+    .separated-img {
+      margin-right: 5px;
+      margin-left: 2px;
+    }
+  }
+}
+.select2-results {
+  .select2-result-label {
+    .separated-img {
+      margin-right: 5px;
+      margin-left: 2px;
+    }
+  }
 }

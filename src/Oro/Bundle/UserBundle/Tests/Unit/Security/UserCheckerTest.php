@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Security\UserChecker;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 
 class UserCheckerTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,9 +47,9 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getService')
             ->willReturn($this->service);
 
-        $this->flashBag = $this->getMock('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
+        $this->flashBag = $this->createMock('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
@@ -76,10 +76,8 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
                 ->method('add')
                 ->with('error', 'oro.user.security.password_changed.message');
 
-            $this->setExpectedException(
-                'Oro\Bundle\UserBundle\Exception\PasswordChangedException',
-                'Invalid password.'
-            );
+            $this->expectException('Oro\Bundle\UserBundle\Exception\PasswordChangedException');
+            $this->expectExceptionMessage('Invalid password.');
         }
 
         $this->userChecker->checkPreAuth($user);
@@ -89,7 +87,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
     {
         $data = [];
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
         $data[] = [
             'user' => $user,
             'getTokenCalls' => 0,
@@ -106,7 +104,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $user2 = new User();
-        $user2->getPasswordChangedAt(new \DateTime());
+        $user2->setPasswordChangedAt(new \DateTime());
         $user2->setLastLogin((new \DateTime())->modify('+1 minute'));
         $data[] = [
             'user' => $user2,

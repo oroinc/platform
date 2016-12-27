@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation\Type;
@@ -18,21 +16,18 @@ class Result extends ArrayCollection
     protected $query;
 
     /**
-     * @Soap\ComplexType("int")
      * @Type("integer")
      * @var integer
      */
     protected $recordsCount;
 
     /**
-     * @Soap\ComplexType("int")
      * @Type("integer")
      * @var integer
      */
     protected $count;
 
     /**
-     * @Soap\ComplexType("Oro\Bundle\SearchBundle\Query\Result\Item[]")
      * @var Result\Item[]
      */
     protected $elements;
@@ -81,17 +76,17 @@ class Result extends ArrayCollection
      */
     public function toSearchResultData()
     {
-        $resultData['records_count'] = $this->recordsCount;
+        $resultData =[
+            'records_count' => $this->recordsCount,
+            'data' => [],
+            'count' => $this->count()
+        ];
 
         if ($this->count()) {
-            $resultData['count'] = $this->count();
-
             /** @var Result\Item $resultRecord */
             foreach ($this as $resultRecord) {
                 $resultData['data'][] = $resultRecord->toArray();
             }
-        } else {
-            $resultData['count'] = 0;
         }
 
         return $resultData;

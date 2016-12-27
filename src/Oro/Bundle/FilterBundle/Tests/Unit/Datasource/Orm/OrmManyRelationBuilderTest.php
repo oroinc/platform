@@ -61,7 +61,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
         );
         $this->assertFalse(
             $this->builder->supports(
-                $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface')
+                $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface')
             )
         );
     }
@@ -198,11 +198,10 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     protected function getFilterDatasourceAdapter(QueryBuilder $qb)
     {
         /** @var OrmFilterDatasourceAdapter|\PHPUnit_Framework_MockObject_MockObject $ds */
-        $ds = $this->getMock(
-            'Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter',
-            ['generateParameterName'],
-            [$qb]
-        );
+        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
+            ->setMethods(['generateParameterName'])
+            ->setConstructorArgs([$qb])
+            ->getMock();
         $ds->expects($this->any())
             ->method('generateParameterName')
             ->will($this->returnValue(sprintf('param%d', ++$this->paramIndex)));

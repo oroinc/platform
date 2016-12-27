@@ -176,8 +176,8 @@ define(function(require) {
 
         _updateDisplayDirection: function() {
             this.$('[data-name=order-toggle]')
-                .toggleClass('icon-sort-by-attributes', this.currentDirection === this.DIRECTIONS[0])
-                .toggleClass('icon-sort-by-attributes-alt', this.currentDirection === this.DIRECTIONS[1]);
+                .toggleClass('fa-sort-amount-asc', this.currentDirection === this.DIRECTIONS[0])
+                .toggleClass('fa-sort-amount-desc', this.currentDirection === this.DIRECTIONS[1]);
         },
 
         onDirectionToggle: function() {
@@ -289,7 +289,7 @@ define(function(require) {
             this._updateDisplayDirection();
 
             return this;
-        },
+        }
     });
 
     return SortingDropdown;

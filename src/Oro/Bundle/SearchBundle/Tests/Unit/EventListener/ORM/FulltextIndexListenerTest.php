@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener\ORM;
 
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
@@ -12,7 +13,7 @@ use Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener;
 class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var LoadClassMetadataEventArgs|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $event;
 
@@ -35,30 +36,65 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->metadata = $this
             ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->setMethods([])
+            ->setMethods(['getTable', 'getTableName'])
             ->disableOriginalConstructor()
             ->getMock();
+    }
 
-        $this->listener = new FulltextIndexListener(DatabaseDriverInterface::DRIVER_MYSQL);
+    /**
+     * @param string $databaseDriver
+     * @param string $textIndexTableName
+     * @param string $returnMysqlVersion
+     */
+    protected function initListener($databaseDriver, $textIndexTableName, $returnMysqlVersion = '5.5')
+    {
+        $connection = $this
+            ->getMockBuilder('Doctrine\DBAL\Connection')
+            ->setMethods(['getDriver', 'getName', 'fetchColumn'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $connection
+            ->expects($this->any())
+            ->method('getDriver')
+            ->willReturn($connection);
+        $connection
+            ->expects($this->any())
+            ->method('getName')
+            ->willReturn($databaseDriver);
+
+        $connection
+            ->expects($this->any())
+            ->method('fetchColumn')
+            ->with('select version()')
+            ->willReturn($returnMysqlVersion);
+
+        $this->listener = new FulltextIndexListener($textIndexTableName, $connection);
     }
 
     public function testPlatformNotMatch()
     {
-        $listener = new FulltextIndexListener('not_mysql');
+        $this->initListener('not_mysql', 'expectedTextIndexTableName');
 
         $this->event
             ->expects($this->never())
             ->method('getClassMetadata');
 
-        $listener->loadClassMetadata($this->event);
+        $this->metadata
+            ->expects($this->never())
+            ->method('getTable');
+
+        $this->listener->loadClassMetadata($this->event);
+        $this->assertNull($this->metadata->table);
     }
 
     public function testTableNotMatch()
     {
+        $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, 'expectedTextIndexTableName');
+
         $this->metadata
             ->expects($this->once())
             ->method('getTableName')
-            ->will($this->returnValue('not_search'));
+            ->will($this->returnValue('notExpectedTextIndexTableName'));
 
         $this->event
             ->expects($this->once())
@@ -66,10 +102,18 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->metadata));
 
         $this->listener->loadClassMetadata($this->event);
+        $this->assertNull($this->metadata->table);
     }
 
-    public function testAddedOptions()
+    /**
+     * @dataProvider getMysqlVersionsProvider
+     *
+     * @param string $mysqlVersion
+     */
+    public function testTableEngineDependsOnMysqlVersionOptions($mysqlVersion, $tableEngine)
     {
+        $this->initListener(DatabaseDriverInterface::DRIVER_MYSQL, IndexText::TABLE_NAME, $mysqlVersion);
+
         $this->metadata
             ->expects($this->once())
             ->method('getTableName')
@@ -84,10 +128,21 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'options' => ['engine' => PdoMysql::ENGINE_MYISAM],
+                'options' => ['engine' => $tableEngine],
                 'indexes' => ['value' => ['columns' => ['value'], 'flags' => ['fulltext']]],
             ],
             $this->metadata->table
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function getMysqlVersionsProvider()
+    {
+        return [
+            ['5.5.5', PdoMysql::ENGINE_MYISAM],
+            ['5.6.6', PdoMysql::ENGINE_INNODB]
+        ];
     }
 }

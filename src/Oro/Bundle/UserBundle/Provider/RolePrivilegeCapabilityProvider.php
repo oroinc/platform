@@ -24,12 +24,11 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
             $category = $this->getPrivilegeCategory($privilege, $categories);
             $permissions = $privilege->getPermissions()->toArray();
             $permission = reset($permissions);
-            $description = $privilege->getDescription() ? $this->translator->trans($privilege->getDescription()) : '';
             $capabilitiesData[$category]['items'][] = [
                 'id'                      => $privilege->getIdentity()->getId(),
                 'identity'                => $privilege->getIdentity()->getId(),
-                'label'                   => $this->translator->trans($privilege->getIdentity()->getName()),
-                'description'             => $description,
+                'label'                   => $privilege->getIdentity()->getName(),
+                'description'             => $privilege->getDescription(),
                 'name'                    => $permission->getName(),
                 'access_level'            => $permission->getAccessLevel(),
                 'selected_access_level'   => AccessLevel::SYSTEM_LEVEL,

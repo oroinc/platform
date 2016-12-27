@@ -44,12 +44,12 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $this->className = 'Oro\Bundle\NotificationBundle\Entity\EmailNotification';
         $this->handler = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entity = $this->getMock('Oro\Bundle\TagBundle\Entity\ContainAuthorInterface');
+        $this->entity = $this->createMock(\stdClass::class);
         $this->rules = new ArrayCollection(array());
 
         $repository = $this->getMockBuilder(
@@ -82,7 +82,7 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess($eventPropagationStopped)
     {
-        $notificationEventMock = $this->getMock(
+        $notificationEventMock = $this->createMock(
             'Oro\Bundle\NotificationBundle\Event\NotificationEvent',
             array(),
             array($this->entity)
@@ -104,7 +104,7 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->handler->expects($this->once())->method('handle');
 
-        $rule = $this->getMock($this->className);
+        $rule = $this->createMock($this->className);
         $rule->expects($this->exactly(2))->method('getEntityName')
             ->will($this->returnValue(get_class($this->entity)));
         $rule->expects($this->exactly(2))->method('getEvent')
@@ -134,7 +134,7 @@ class NotificationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertCount(1, $this->manager->getHandlers());
 
-        $handler = $this->getMock('Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface');
+        $handler = $this->createMock('Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface');
         $this->manager->addHandler($handler);
 
         $this->assertCount(2, $this->manager->getHandlers());

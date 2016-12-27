@@ -148,7 +148,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function getTargetEntities($entity)
     {
-        return $entity->getActivityTargetEntities();
+        return $entity->getActivityTargets();
     }
 
     /**

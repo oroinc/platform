@@ -110,10 +110,10 @@ class LimitConsumptionTimeExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContext()
     {
-        $context = new Context($this->getMock(SessionInterface::class));
-        $context->setLogger($this->getMock(LoggerInterface::class));
-        $context->setMessageConsumer($this->getMock(MessageConsumerInterface::class));
-        $context->setMessageProcessor($this->getMock(MessageProcessorInterface::class));
+        $context = new Context($this->createMock(SessionInterface::class));
+        $context->setLogger($this->createMock(LoggerInterface::class));
+        $context->setMessageConsumer($this->createMock(MessageConsumerInterface::class));
+        $context->setMessageProcessor($this->createMock(MessageProcessorInterface::class));
 
         return $context;
     }

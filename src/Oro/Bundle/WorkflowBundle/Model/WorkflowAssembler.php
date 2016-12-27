@@ -213,8 +213,9 @@ class WorkflowAssembler extends BaseAbstractAssembler
     protected function assembleAttributes(WorkflowDefinition $definition, array $configuration)
     {
         $attributesConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_ATTRIBUTES, []);
+        $transitionConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_TRANSITIONS);
 
-        return $this->attributeAssembler->assemble($definition, $attributesConfiguration);
+        return $this->attributeAssembler->assemble($definition, $attributesConfiguration, $transitionConfiguration);
     }
 
     /**

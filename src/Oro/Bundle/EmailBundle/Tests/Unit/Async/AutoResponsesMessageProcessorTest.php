@@ -1,14 +1,16 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Async\AutoResponsesMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,6 +18,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
     {
         new AutoResponsesMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $this->createLoggerMock()
         );
     }
@@ -31,6 +34,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = new AutoResponsesMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -48,7 +52,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $producer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::SEND_AUTO_RESPONSE, ['id' => 1])
+            ->with('oro.email.send_auto_response', ['id' => 1, 'jobId' => 12345])
         ;
 
         $logger = $this->createLoggerMock();
@@ -57,14 +61,39 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('error')
         ;
 
-        $processor = new AutoResponsesMessageProcessor($producer, $logger);
-
         $message = new NullMessage();
         $message->setBody(json_encode(
             ['ids' => [1]]
         ));
+        $message->setMessageId('message-id');
 
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runUnique')
+            ->with('message-id', 'oro.email.send_auto_responses' . ':'.md5('1'))
+            ->will($this->returnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+                $callback($jobRunner);
+
+                return true;
+            }))
+        ;
+
+        $jobRunner
+            ->expects($this->once())
+            ->method('createDelayed')
+            ->with('oro.email.send_auto_response' . ':1')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(12345);
+
+                $callback($jobRunner, $job);
+            }))
+        ;
+
+        $processor = new AutoResponsesMessageProcessor($producer, $jobRunner, $logger);
+
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -79,7 +108,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -87,7 +116,16 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     */
+    private function createJobRunnerMock()
+    {
+        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -95,6 +133,6 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 }

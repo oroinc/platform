@@ -24,7 +24,7 @@ class EnumFilterTypeTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->provider   = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider')
             ->disableOriginalConstructor()
             ->getMock();

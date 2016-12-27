@@ -14,6 +14,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
 class PdoMysql extends BaseDriver
 {
     const ENGINE_MYISAM = 'MyISAM';
+    const ENGINE_INNODB = 'InnoDB';
 
     /**
      * The value of ft_min_word_len
@@ -42,11 +43,14 @@ class PdoMysql extends BaseDriver
     /**
      * Sql plain query to create fulltext index for mySql.
      *
+     * @param string $tableName
+     * @param string $indexName
+     *
      * @return string
      */
-    public static function getPlainSql()
+    public static function getPlainSql($tableName = 'oro_search_index_text', $indexName = 'value')
     {
-        return "ALTER TABLE `oro_search_index_text` ADD FULLTEXT `value` ( `value`)";
+        return sprintf('ALTER TABLE `%s` ADD FULLTEXT `%s` (`value`)', $tableName, $indexName);
     }
 
     /**
@@ -79,6 +83,10 @@ class PdoMysql extends BaseDriver
 
             case Query::OPERATOR_NOT_CONTAINS:
                 $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
+                break;
+
+            case Query::OPERATOR_STARTS_WITH:
+                $whereExpr = $this->createStartWithExpr($qb, $fieldValue, $index, $searchCondition);
                 break;
 
             case Query::OPERATOR_EQUALS:
@@ -301,13 +309,34 @@ class PdoMysql extends BaseDriver
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param string $fieldValue
+     * @param int $index
+     * @param array $searchCondition
+     * @return string
+     */
+    public function createStartWithExpr(
+        QueryBuilder $qb,
+        $fieldValue,
+        $index,
+        array $searchCondition
+    ) {
+        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
+
+        $valueParameter = 'value' . $index;
+        $qb->setParameter($valueParameter, $fieldValue . '%');
+
+        return "$joinAlias.value LIKE :$valueParameter";
+    }
+
+    /**
      * @param  array $fieldName
      *
      * @return bool
      */
     protected function isConcreteField($fieldName)
     {
-        return $fieldName === '*' ? false : true;
+        return $fieldName !== '*';
     }
 
     /**

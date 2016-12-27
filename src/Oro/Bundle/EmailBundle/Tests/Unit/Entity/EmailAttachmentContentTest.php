@@ -16,7 +16,7 @@ class EmailAttachmentContentTest extends \PHPUnit_Framework_TestCase
 
     public function testEmailAttachmentGetterAndSetter()
     {
-        $emailAttachment = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
+        $emailAttachment = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
 
         $entity = new EmailAttachmentContent();
         $entity->setEmailAttachment($emailAttachment);

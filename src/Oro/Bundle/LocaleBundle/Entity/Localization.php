@@ -22,19 +22,25 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
  *      routeUpdate="oro_locale_localization_update",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-list"
+ *              "icon"="fa-list"
  *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"="",
  *              "category"="account_management"
- *          }
+ *          },
+ *          "form"={
+ *              "form_type"="oro_locale_localization_select",
+ *              "grid_name"="oro-locale-localizations-select-grid",
+ *          },
  *      }
  * )
  */
 class Localization extends ExtendLocalization implements DatesAwareInterface
 {
     use DatesAwareTrait;
+
+    const DEFAULT_LOCALIZATION = 'default';
 
     /**
      * @var int
@@ -208,7 +214,7 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     }
 
     /**
-     * @return Localization
+     * @return Localization|null
      */
     public function getParentLocalization()
     {
@@ -284,5 +290,33 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHierarchy()
+    {
+        return $this->getLocaleHierarchy($this);
+    }
+
+    /**
+     * @param Localization $localization
+     * @return array
+     */
+    protected function getLocaleHierarchy(Localization $localization)
+    {
+        $localeHierarchy = [];
+
+        $parent = $localization->getParentLocalization();
+        if ($parent) {
+            $localeHierarchy[] = $parent->getId();
+            $localeHierarchy = array_merge($localeHierarchy, $this->getLocaleHierarchy($parent));
+        } else {
+            // For default value without locale
+            $localeHierarchy = [null];
+        }
+
+        return $localeHierarchy;
     }
 }

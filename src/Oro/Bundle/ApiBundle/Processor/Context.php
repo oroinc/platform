@@ -71,6 +71,9 @@ class Context extends ApiContext implements ContextInterface
     /** a list of filters is used to add additional restrictions to a query is used to get result data */
     const FILTERS = 'filters';
 
+    /** @var array[]|null */
+    private $processed;
+
     /** @var FilterValueAccessorInterface */
     private $filterValues;
 
@@ -315,10 +318,7 @@ class Context extends ApiContext implements ContextInterface
     }
 
     /**
-     * Gets a value indicates whether errors should just stop processing
-     * or an exception should be thrown is any error occurred.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isSoftErrorsHandling()
     {
@@ -326,10 +326,7 @@ class Context extends ApiContext implements ContextInterface
     }
 
     /**
-     * Sets a value indicates whether errors should just stop processing
-     * or an exception should be thrown is any error occurred.
-     *
-     * @param bool $softErrorsHandling
+     * {@inheritdoc}
      */
     public function setSoftErrorsHandling($softErrorsHandling)
     {
@@ -338,6 +335,35 @@ class Context extends ApiContext implements ContextInterface
         } else {
             $this->remove(self::SOFT_ERRORS_HANDLING);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setProcessed($operationName)
+    {
+        $this->processed[$operationName] = true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clearProcessed($operationName)
+    {
+        if ($this->isProcessed($operationName)) {
+            unset($this->processed[$operationName]);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isProcessed($operationName)
+    {
+        return
+            null !== $this->processed
+            && array_key_exists($operationName, $this->processed)
+            && $this->processed[$operationName];
     }
 
     /**

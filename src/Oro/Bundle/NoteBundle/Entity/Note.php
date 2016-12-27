@@ -22,7 +22,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-comment-alt"
+ *              "icon"="fa-comment-o"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
@@ -36,8 +36,13 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
+ *          "grouping"={
+ *              "groups"={"activity"}
+ *          },
  *          "activity"={
- *              "immutable"=true
+ *              "acl"="oro_note_view",
+ *              "action_button_widget"="oro_add_note_button",
+ *              "action_link_widget"="oro_add_note_link"
  *          }
  *      }
  * )

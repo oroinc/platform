@@ -20,9 +20,9 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMock(ContextAccessorInterface::class);
+        $this->contextAccessor = $this->createMock(ContextAccessorInterface::class);
 
-        $this->extension = $this->getMock(ExtensionInterface::class);
+        $this->extension = $this->createMock(ExtensionInterface::class);
 
         $this->factory = new ExpressionFactory($this->contextAccessor);
         $this->factory->addExtension($this->extension);
@@ -139,5 +139,20 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory->addExtension($newExtension);
 
         $this->assertSame($types, $this->factory->getTypes());
+    }
+
+    public function testIsTypeExists()
+    {
+        $this->extension->expects($this->exactly(2))
+            ->method('hasExpression')
+            ->willReturnMap(
+                [
+                    ['not_exists', false],
+                    ['exists', true]
+                ]
+            );
+
+        $this->assertFalse($this->factory->isTypeExists('not_exists'));
+        $this->assertTrue($this->factory->isTypeExists('exists'));
     }
 }

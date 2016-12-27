@@ -378,7 +378,9 @@ define([
          */
         _onValueUpdated: function(newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
-            this.selectWidget.multiselect('refresh');
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('refresh');
+            }
         },
 
         /**

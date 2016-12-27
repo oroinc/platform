@@ -78,12 +78,27 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
+    oro_workflow.registry.definition_filter.features:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter'
+        public: false
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+
+    oro_workflow.registry.definition_filter.scopes:
+        class: Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionScopesRegistryFilter
+        public: false
+        arguments:
+            - '@oro_scope.scope_manager'
+            - '@doctrine'
+
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_featuretoggle.checker.feature_checker'
+        calls:
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
 
     oro_workflow.permission_registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry'
@@ -129,6 +144,12 @@ services:
             - '@oro_workflow.handler.transition_helper'
             - '@oro_featuretoggle.checker.feature_checker'
 
+    oro_workflow.handler.transition.form:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler'
+        arguments:
+            - '@request_stack'
+            - '@oro_entity.doctrine_helper'
+
     oro_workflow.validation_loader:
         class: 'Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader'
         public: false
@@ -152,6 +173,7 @@ services:
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
+            - '@oro_workflow.manager'
 
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
@@ -211,6 +233,14 @@ services:
         public: false
         arguments:
             - '@oro_workflow.manager'
+
+    oro_workflow.data_helper:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper'
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_security.security_facade'
+            - '@translator'
+            - '@router'
 
     oro_workflow.helper.transition_cron_trigger:
         class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionCronTriggerHelper'
@@ -302,6 +332,22 @@ services:
         tags:
             - { name: oro_translation.extension.translation_context_resolver }
 
+    oro_workflow.extension.start_transition_button_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension'
+        arguments:
+            - '@oro_workflow.registry'
+            - '@oro_workflow.provider.start_transition_route'
+        tags:
+           - { name: oro.action.extension.button_provider, priority: 110 }
+
+    oro_workflow.extension.transition_button_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
+        arguments:
+            - '@oro_workflow.registry'
+            - '@oro_workflow.provider.transition_route'
+        tags:
+           - { name: oro.action.extension.button_provider, priority: 120 }
+
     oro_workflow.translation.key_template_parameters_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
         arguments:
@@ -327,8 +373,49 @@ services:
             - { name: monolog.logger, channel: oro_workflow }
 
     oro_workflow.listener.grids_subscriber:
-        class: Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\GridsSubscriber'
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_workflow.manager.workflow_scope:
+        class: 'Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager'
+        arguments:
+            - '@doctrine'
+            - '@oro_scope.scope_manager'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
+
+    oro_workflow.provider.start_transition_route:
+        class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
+        arguments:
+            - 'oro_workflow_widget_start_transition_form'
+            - 'oro_workflow_start_transition_form'
+            - 'oro_api_workflow_start'
+
+    oro_workflow.provider.transition_route:
+        class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
+        arguments:
+            - 'oro_workflow_widget_transition_form'
+            - 'oro_workflow_transition_form'
+            - 'oro_api_workflow_transit'
+
+    oro_workflow.operation_registry.filter:
+        class: Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_action.operation_registry.filter }
+
+    oro_workflow.transition_data.provider:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider'
+        arguments:
+            - '@oro_workflow.manager'
+
+    oro_workflow.workflow_data.provider:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider'
+        arguments:
+            - '@oro_workflow.manager'
+            - '@oro_workflow.transition_data.provider'

@@ -20,15 +20,15 @@ class KernelProxyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->target = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $this->target = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
         $this->proxy = new KernelProxy($this->target);
     }
 
     public function testExclude()
     {
-        $bundle1 = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle1 = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
         $bundle1->expects($this->any())->method('getName')->will($this->returnValue('bundle1'));
-        $bundle2 = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle2 = $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
         $bundle2->expects($this->any())->method('getName')->will($this->returnValue('bundle2'));
 
         $this->target->expects($this->any())
@@ -45,10 +45,8 @@ class KernelProxyTest extends \PHPUnit_Framework_TestCase
         $this->proxy->excludeBundle('bundle2');
         $this->assertEquals([$bundle1], $this->proxy->getBundles());
 
-        $this->setExpectedException(
-            '\InvalidArgumentException',
-            'Bundle "bundle2" is in exclude list.'
-        );
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('Bundle "bundle2" is in exclude list.');
         $this->proxy->getBundle('bundle2');
     }
 
@@ -79,18 +77,18 @@ class KernelProxyTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['registerBundles', [], []],
-            ['registerContainerConfiguration', [$this->getMock('Symfony\Component\Config\Loader\Loader')], null],
+            ['registerContainerConfiguration', [$this->createMock('Symfony\Component\Config\Loader\Loader')], null],
             ['boot', [], null],
             ['shutdown', [], null],
             ['getBundles', [], []],
             ['isClassInActiveBundle', ['class'], true],
-            ['getBundle', ['name', false], $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface')],
+            ['getBundle', ['name', false], $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface')],
             ['locateResource', ['name', 'dir', false], 'test'],
             ['getName', [], 'test'],
             ['getEnvironment', [], 'test'],
             ['isDebug', [], false],
             ['getRootDir', [], 'test'],
-            ['getContainer', [], $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface')],
+            ['getContainer', [], $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface')],
             ['getStartTime', [], 111],
             ['getCacheDir', [], 'test'],
             ['getLogDir', [], 'test'],
@@ -100,12 +98,14 @@ class KernelProxyTest extends \PHPUnit_Framework_TestCase
                 [
                     $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
                         ->disableOriginalConstructor()
+                        ->disableOriginalClone()
                         ->getMock(),
                     HttpKernelInterface::SUB_REQUEST,
                     false
                 ],
                 $this->getMockBuilder('Symfony\Component\HttpFoundation\Response')
                     ->disableOriginalConstructor()
+                    ->disableOriginalClone()
                     ->getMock()
             ],
             ['serialize', [], 'test'],

@@ -21,7 +21,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $entityConfig = new EntityConfig(
-            $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
+            $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
             ['max_element_count' => self::MAX_ENTITIES_COUNT]
         );
         $entityConfigProvider->expects($this->any())
@@ -29,7 +29,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
             ->with('SomeEntityClass')
             ->willReturn($entityConfig);
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->target = new MergeMassAction($entityConfigProvider, $translator);
     }
@@ -60,7 +60,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'label'             => null,
                     'route_parameters'  => array(),
-                    'launcherOptions'   => array('iconClassName' => 'icon-random')
+                    'launcherOptions'   => array('iconClassName' => 'fa-random')
                 )
             ),
             'override_values' => array(
@@ -81,7 +81,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
-                    'launcherOptions'   => array('iconClassName' => 'icon-custom'),
+                    'launcherOptions'   => array('iconClassName' => 'fa-custom'),
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array(),

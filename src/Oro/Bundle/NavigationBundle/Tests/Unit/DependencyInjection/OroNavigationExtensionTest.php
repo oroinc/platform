@@ -208,7 +208,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     'tree' => array(
                         'application_menu' => array(
                             'type' => 'application_menu',
-                            'area' => 'default',
+                            'scope_type' => 'default',
                             'max_nesting_level' => 1,
                             'children' => array(
                                 'customers_tab' => array(
@@ -243,7 +243,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         ),
                         'shortcuts' => array(
                             'type' => 'shortcuts',
-                            'area' => 'custom',
+                            'scope_type' => 'custom',
                             'read_only' => true,
                             'children' => array(
                                 'shortcut_call_list' => array(

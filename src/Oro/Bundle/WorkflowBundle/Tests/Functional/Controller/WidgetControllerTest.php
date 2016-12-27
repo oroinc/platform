@@ -44,6 +44,7 @@ class WidgetControllerTest extends WebTestCase
         $this->workflowManager = $this->client->getContainer()->get('oro_workflow.manager');
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_INIT_OPTION);
         $this->entity = $this->createNewEntity();
     }
 
@@ -103,6 +104,36 @@ class WidgetControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $this->assertNotEmpty($crawler->html());
         $this->assertTransitionFromSubmit($crawler, $workflowItem);
+    }
+
+    public function testStartTransitionFormActionFromNonRelatedEntity()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_workflow_widget_start_transition_form', [
+                '_widgetContainer' => 'dialog',
+                'workflowName' => LoadWorkflowDefinitions::WITH_INIT_OPTION,
+                'transitionName' => LoadWorkflowDefinitions::START_FROM_ROUTE_TRANSITION_WITH_FORM,
+            ]),
+            [
+                'entityClass' => 'class1',
+                'route' => 'route1'
+            ],
+            [],
+            $this->generateBasicAuthHeader()
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        $this->assertNotEmpty($crawler->html());
+
+        $form = $crawler->selectButton('Submit')->form();
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form);
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains(LoadWorkflowDefinitions::WITH_INIT_OPTION, $crawler->html());
     }
 
     public function testTransitionFormAction()
@@ -168,8 +199,14 @@ class WidgetControllerTest extends WebTestCase
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
+
+        $transitionButton = $crawler->selectLink('oro.workflow.test_active_flow1.transition.transition1.label');
+        $this->assertCount(1, $transitionButton);
+        $this->assertSame('javascript:void(0);', $transitionButton->attr('href'));
         $this->assertContains('transition-test_multistep_flow-starting_point_transition', $crawler->html());
         $this->assertContains('transition-test_start_step_flow-start_transition', $crawler->html());
+        $this->assertContains('transition-test_start_init_option-start_transition', $crawler->html());
+        $this->assertNotContains('transition-test_start_init_option-start_transition_from_entities', $crawler->html());
     }
 
     /**

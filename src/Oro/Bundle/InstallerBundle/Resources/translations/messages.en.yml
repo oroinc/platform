@@ -78,6 +78,7 @@ process:
             fixtures:      Load fixtures
             permissions:   Load permissions configuration
             workflows:     Load workflow definitions
+            crons:         Load cron definitions
             processes:     Load processes configuration
         setup:
             header:        Administration setup
@@ -89,6 +90,7 @@ process:
             localization:  Dump localization
             assets:        Install assets
             assetic:       Dump assetic
+            translation-load: Load translations
             translation:   Prepare translations
             requirejs:     Optimize JS resources (optional)
             finish:        Clear cache to finalize installation

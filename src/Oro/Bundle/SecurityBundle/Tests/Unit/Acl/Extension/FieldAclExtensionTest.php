@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -24,6 +25,9 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var FieldAclExtension */
@@ -96,7 +100,7 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $config;
+    protected $configManager;
 
     protected function setUp()
     {
@@ -135,7 +139,7 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->tree));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface $container */
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
             ->will(
@@ -172,24 +176,16 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $this->decisionMaker->setContainer($container);
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configProvider->expects($this->any())
-            ->method('getConfig')
-            ->willReturn($this->config);
 
         $this->extension = TestHelper::get($this)->createFieldAclExtension(
             $this->metadataProvider,
             $this->tree,
             new ObjectIdAccessor($this->doctrineHelper),
             $this->decisionMaker,
-            $configProvider
+            $this->configManager
         );
     }
 
@@ -396,14 +392,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecideIsGranting($triggeredMask, $user, $organization, $object, $expectedResult)
     {
-        $this->config->expects($this->any())
-            ->method('get')
-            ->willReturnMap(
-                [
-                    ['field_acl_supported', false, null, true],
-                    ['field_acl_enabled', false, null, true]
-                ]
-            );
         $this->buildTestTree();
         if ($object instanceof TestEntity && $object->getOwner() !== null) {
             $owner = $object->getOwner();
@@ -449,10 +437,248 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals([new FieldMaskBuilder()], $this->extension->getAllMaskBuilders());
     }
-    
-    public function testAdaptRootMask()
+
+    public function testGetExtensionKey()
     {
-        $this->assertEquals(132, $this->extension->adaptRootMask(132, new \stdClass()));
+        $this->assertEquals(EntityAclExtension::NAME, $this->extension->getExtensionKey());
+    }
+
+    /**
+     * @dataProvider getServiceBitsProvider
+     */
+    public function testGetServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
+    }
+
+    public function getServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                FieldMaskBuilder::GROUP_NONE,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'zero mask, not zero identity'     => [
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+            'not zero mask, not zero identity' => [
+                (FieldMaskBuilder::REMOVE_SERVICE_BITS + 1) | FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider removeServiceBitsProvider
+     */
+    public function testRemoveServiceBits($mask, $expectedMask)
+    {
+        self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
+    }
+
+    public function removeServiceBitsProvider()
+    {
+        return [
+            'zero mask'                        => [
+                FieldMaskBuilder::GROUP_NONE,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask'                    => [
+                FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::MASK_EDIT_SYSTEM
+            ],
+            'zero mask, not zero identity'     => [
+                FieldMaskBuilder::REMOVE_SERVICE_BITS + 1,
+                FieldMaskBuilder::GROUP_NONE
+            ],
+            'not zero mask, not zero identity' => [
+                (FieldMaskBuilder::REMOVE_SERVICE_BITS + 1) | FieldMaskBuilder::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::MASK_EDIT_SYSTEM
+            ],
+        ];
+    }
+
+    public function testSupportsForRootObjectIdentity()
+    {
+        self::assertTrue(
+            $this->extension->supports(ObjectIdentityFactory::ROOT_IDENTITY_TYPE, '')
+        );
+    }
+
+    public function testSupportsForNotConfigurableEntity()
+    {
+        $entityClass = 'Test\Entity';
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(false);
+
+        self::assertFalse(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
+    public function testSupportsWhenFieldAclIsEnabled()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, true]
+                ]
+            );
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertTrue(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
+    public function testSupportsWhenFieldAclIsDisabled()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, false]
+                ]
+            );
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertFalse(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
+    public function testSupportsWhenFieldAclIsNotSupported()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->once())
+            ->method('get')
+            ->with('field_acl_supported', false, null)
+            ->willReturn(false);
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertFalse(
+            $this->extension->supports($entityClass, '')
+        );
+    }
+
+    public function testSupportsWhenTypeContainsFieldName()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, true]
+                ]
+            );
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertTrue(
+            $this->extension->supports($entityClass . '::testField', '')
+        );
+    }
+
+    public function testSupportsWhenTypeContainsGroupAndFieldName()
+    {
+        $entityClass = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['field_acl_supported', false, null, true],
+                    ['field_acl_enabled', false, null, true]
+                ]
+            );
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('security', $entityClass)
+            ->willReturn($config);
+
+        self::assertTrue(
+            $this->extension->supports($entityClass . '::testField@testGroup', '')
+        );
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetClasses()
+    {
+        $this->extension->getClasses();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetObjectIdentity()
+    {
+        $this->extension->getObjectIdentity('');
     }
 
     public function testGetAccessLevel()
@@ -777,7 +1003,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_BASIC],
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
         ];
@@ -807,7 +1032,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [FieldMaskBuilder::MASK_VIEW_BASIC],
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
         ];
@@ -838,7 +1062,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
     public static function validateMaskForUserOwnedInvalidProvider()
     {
         return [
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_DEEP | FieldMaskBuilder::MASK_VIEW_LOCAL],
             [FieldMaskBuilder::MASK_VIEW_LOCAL | FieldMaskBuilder::MASK_VIEW_BASIC],
@@ -863,7 +1086,6 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             [FieldMaskBuilder::MASK_VIEW_DEEP],
             [FieldMaskBuilder::MASK_VIEW_LOCAL],
             [FieldMaskBuilder::MASK_VIEW_BASIC],
-            [FieldMaskBuilder::MASK_VIEW_SYSTEM | FieldMaskBuilder::MASK_VIEW_GLOBAL],
             [FieldMaskBuilder::MASK_VIEW_GLOBAL | FieldMaskBuilder::MASK_VIEW_DEEP],
         ];
     }

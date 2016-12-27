@@ -120,7 +120,7 @@ menu_config:
     tree:
         <menu_alias>                            # menu alias
             type: <menu_type>                   # menu type code. Link to menu template section.
-            area: <string>                      # menu area identifier
+            scope_type: <string>                # menu scope type identifier
             read_only: <boolean>                # disable ability to edit menu in UI
             max_nesting_level: <integer>        # menu max nesting level
             merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
@@ -182,3 +182,15 @@ arguments and call KmpMenu renderer with the resulting options.
 {% endblock content %}
 ```
 
+## Disabling menu items as part of a feature
+
+The NavigationBundle offers a FeatureConfigurationExtension which introduces the ``navigation_items`` feature configuration
+option, which, if a menu item is defined in the feature definition in ``features.yml``, gives the possibility to disable a
+menu item as in the example below.
+The option supports 2 separators for the menu path: ``.`` and `` > ``.
+
+```yaml
+navigation_items:
+    - 'menu.submenu.child'
+    - 'menu > submenu > child'
+```

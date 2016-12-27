@@ -252,7 +252,7 @@ class UserTest extends AbstractUserTest
     public function testImapConfiguration()
     {
         $entity = $this->getUser();
-        $imapConfiguration = $this->getMock('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin');
+        $imapConfiguration = $this->createMock('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin');
         $imapConfiguration->expects($this->once())
             ->method('setActive')
             ->with(false);
@@ -407,13 +407,5 @@ class UserTest extends AbstractUserTest
                 'accountType' => AccountTypeModel::ACCOUNT_TYPE_OTHER
             ]
         ];
-    }
-
-    public function testLoginDisabled()
-    {
-        $user = $this->getUser();
-        $this->assertNotTrue($user->isLoginDisabled());
-        $user->setLoginDisabled(true);
-        $this->assertTrue($user->isLoginDisabled());
     }
 }

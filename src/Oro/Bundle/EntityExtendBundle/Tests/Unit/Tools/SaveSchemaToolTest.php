@@ -27,20 +27,19 @@ class SaveSchemaToolTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->connection    = $this->getMock('Doctrine\DBAL\Connection', [], [], '', false);
-        $this->configuration = $this->getMock('Doctrine\ORM\Configuration');
-        $this->em            = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $this->connection    = $this->createMock('Doctrine\DBAL\Connection');
+        $this->configuration = $this->createMock('Doctrine\ORM\Configuration');
+        $this->em            = $this->createMock('Doctrine\ORM\EntityManagerInterface');
 
         $this->em->expects($this->any())->method('getConnection')->willReturn($this->connection);
         $this->em->expects($this->any())->method('getConfiguration')->willReturn($this->configuration);
 
         $this->connection->expects($this->any())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
 
-        $this->schemaTool = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool',
-            ['getSchemaFromMetadata'],
-            [$this->em]
-        );
+        $this->schemaTool = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool')
+            ->setMethods(['getSchemaFromMetadata'])
+            ->setConstructorArgs([$this->em])
+            ->getMock();
     }
 
     protected function tearDown()

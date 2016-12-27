@@ -16,7 +16,7 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
             'old' => 'old value',
             'new' => 'default value'
         ],
-        'oro_user.level' => [
+        'oro_user.level'    => [
             'old' => 'pre value',
             'new' => 50
         ]
@@ -79,7 +79,7 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
     public function testValueRetrieving($key, array $expectedValues, $exception = false)
     {
         if (false !== $exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $new = $this->event->getNewValue($key);
@@ -107,6 +107,32 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
                 [],
                 '\LogicException'
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForScopes
+     * @param string|null $scope
+     * @param int|null    $scopeId
+     */
+    public function testScopes($scope, $scopeId)
+    {
+        $event = new ConfigUpdateEvent([], $scope, $scopeId);
+
+        $this->assertEquals($scope, $event->getScope());
+        $this->assertEquals($scopeId, $event->getScopeId());
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForScopes()
+    {
+        return [
+            ['website', null],
+            ['website', 1],
+            [null, 1],
+            [null, null],
         ];
     }
 }

@@ -29,7 +29,7 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMock(
+        $this->tokenStorage = $this->createMock(
             'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
         );
 
@@ -109,7 +109,7 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildEntityWithUnsupportedSecurityToken()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn('test');
@@ -127,9 +127,9 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function initSecurityContext()
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);

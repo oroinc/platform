@@ -8,7 +8,9 @@ use Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\UserBundle\Entity\User;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
@@ -55,20 +57,20 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->factory         = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->factory         = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
 
         $user = new User();
         $user->setEmail('some@email.com');
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())->method('getUser')
             ->will($this->returnValue($user));
 
         $this->securityContext->expects($this->any())->method('getToken')
             ->will($this->returnValue($token));
 
-        $this->item = $this->getMock('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
+        $this->item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
 
         $this->serializedTitle = json_encode(array('titleTemplate' => 'Test title template'));
     }
@@ -142,11 +144,40 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequestType')
             ->will($this->returnValue(HttpKernelInterface::SUB_REQUEST));
 
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->never())->method('getManagerForClass');
 
-        $titleService = $this->getMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
+        $titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
 
+        $listener = new ResponseHistoryListener($this->factory, $this->securityContext, $registry, $titleService);
+        $listener->onResponse($event);
+    }
+
+    public function testSkipErrorPages()
+    {
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterResponseEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $request->attributes = $this->createMock(ParameterBag::class);
+        $request->attributes->expects($this->once())
+            ->method('get')
+            ->with('_controller')
+            ->willReturn('Oro\Bundle\FrontendBundle\Controller\FrontendController::exceptionAction');
+
+        $event->expects($this->once())
+            ->method('getRequest')
+            ->willReturn($request);
+        $event->expects($this->never())
+            ->method('getResponse');
+        $event->expects($this->once())
+            ->method('getRequestType')
+            ->will($this->returnValue(HttpKernelInterface::MASTER_REQUEST));
+
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry->expects($this->never())->method('getManagerForClass');
+
+        $titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
         $listener = new ResponseHistoryListener($this->factory, $this->securityContext, $registry, $titleService);
         $listener->onResponse($event);
     }
@@ -212,7 +243,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function getRequest()
     {
-        $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
 
         $this->request->expects($this->once())
             ->method('getRequestFormat')
@@ -240,23 +271,17 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * Creates response object mock
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return Response
      */
     private function getResponse()
     {
-        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
-
-        $response->expects($this->once())
-            ->method('getStatusCode')
-            ->will($this->returnValue(200));
-
-        return $response;
+        return new Response('message', 200);
     }
 
     public function getTitleService()
     {
 
-        $this->titleService = $this->getMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
+        $this->titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
         $this->titleService->expects($this->once())
             ->method('getSerialized')
             ->will($this->returnValue($this->serializedTitle));
@@ -273,7 +298,7 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
      */
     private function getListener($factory, $securityContext, $entityManager)
     {
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->once())
             ->method('getManagerForClass')
             ->with('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')

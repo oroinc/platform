@@ -97,6 +97,20 @@ fieldset:
             get_subresource:
                 disable_fieldset: true
 
+meta_properties:
+    config:
+        actions:
+            get_list:
+                disable_meta_properties: false
+            get_subresource:
+                disable_meta_properties: true
+    expected:
+        actions:
+            get_list:
+                disable_meta_properties: false
+            get_subresource:
+                disable_meta_properties: true
+
 full:
     config:
         get: ~

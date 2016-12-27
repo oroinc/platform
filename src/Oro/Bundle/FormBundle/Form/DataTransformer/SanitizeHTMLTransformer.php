@@ -121,6 +121,8 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
         if ($this->allowedElements) {
             $config->set('HTML.AllowedElements', $converter->getElements($this->allowedElements));
             $config->set('HTML.AllowedAttributes', $converter->getAttributes($this->allowedElements));
+        } else {
+            $config->set('HTML.Allowed', '');
         }
     }
 }

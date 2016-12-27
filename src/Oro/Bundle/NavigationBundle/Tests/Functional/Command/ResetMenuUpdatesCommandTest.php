@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
+namespace Oro\Bundle\NavigationBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
  */
-class ResetMenuUpdatesCommand extends WebTestCase
+class ResetMenuUpdatesCommandTest extends WebTestCase
 {
     /**
      * {@inheritdoc}

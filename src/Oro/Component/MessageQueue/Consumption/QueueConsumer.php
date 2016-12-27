@@ -221,9 +221,12 @@ class QueueConsumer
     protected function onInterruptionByException(ExtensionInterface $extension, Context $context)
     {
         $logger = $context->getLogger();
-        $logger->error(sprintf('Consuming interrupted by exception'));
 
         $exception = $context->getException();
+        $logger->error(
+            sprintf('Consuming interrupted by exception. "%s"', $exception->getMessage()),
+            ['exception' => $exception]
+        );
 
         try {
             $extension->onInterrupted($context);

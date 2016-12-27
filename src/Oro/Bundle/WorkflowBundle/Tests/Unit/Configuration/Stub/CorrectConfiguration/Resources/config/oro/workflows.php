@@ -13,6 +13,16 @@ return [
         'defaults' => [
             'active' => true,
         ],
+        'scopes' => [
+           [
+               'scope1' => 'value1',
+               'scope2' => 'value2',
+           ],
+           [
+               'scope1' => 'value3',
+           ],
+        ],
+        'datagrids' => ['datagrid1', 'datagrid2'],
         'steps' => [
             'first_step' => [
                 'order' => 1,
@@ -45,6 +55,9 @@ return [
                 ]
             ]
         ],
+        'disable_operations' => [
+            'operation1' => ['entity1', 'entity2']
+        ],
         'transitions' => [
             'first_transition' => [
                 'step_to' => 'first_step',
@@ -72,6 +85,10 @@ return [
                         ]
                     ]
                 ],
+                'init_entities' => ['entity1'],
+                'init_routes' => ['route1'],
+                'init_datagrids' => ['datagrid1'],
+                'init_context_attribute' => 'test_init_context',
                 'triggers' => [
                     [
                         'event' => 'create',
@@ -156,6 +173,8 @@ return [
         'entity' => 'Second\Entity',
         'start_step' => 'second_step',
         'priority' => 0,
+        'scopes' => [],
+        'datagrids' => [],
         'defaults' => [
             'active' => false,
         ],
@@ -169,6 +188,7 @@ return [
                 'position' => []
             ]
         ],
+        'disable_operations' => [],
         'attributes' => [],
         'transitions' => [
             'second_transition' => [
@@ -187,7 +207,11 @@ return [
                 'form_options' => [],
                 'page_template' => null,
                 'dialog_template' => null,
-                'triggers' => []
+                'triggers' => [],
+                'init_entities' => [],
+                'init_routes' => [],
+                'init_datagrids' => [],
+                'init_context_attribute' => 'init_context',
             ]
         ],
         'transition_definitions' => [

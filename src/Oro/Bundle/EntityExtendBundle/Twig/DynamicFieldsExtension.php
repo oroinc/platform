@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -48,7 +49,6 @@ class DynamicFieldsExtension extends \Twig_Extension
     /** @var SecurityFacade */
     protected $securityFacade;
 
-
     /**
      * @param ConfigManager            $configManager
      * @param FieldTypeHelper          $fieldTypeHelper
@@ -77,6 +77,7 @@ class DynamicFieldsExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_get_dynamic_fields', [$this, 'getFields']),
+            new \Twig_SimpleFunction('oro_get_dynamic_field', [$this, 'getField']),
         ];
     }
 
@@ -100,6 +101,21 @@ class DynamicFieldsExtension extends \Twig_Extension
         }
 
         return $dynamicRows;
+    }
+
+    /**
+     * @param object $entity
+     * @param FieldConfigModel $field
+     * @return array
+     */
+    public function getField($entity, FieldConfigModel $field)
+    {
+        $fieldConfig = $this->extendProvider->getConfig($field->getEntity()->getClassName(), $field->getFieldName());
+        if ($row = $this->createDynamicFieldRow($fieldConfig->getId(), $field->getFieldName(), $entity)) {
+            unset($row['priority']);
+        }
+
+        return $row;
     }
 
     /**
@@ -157,12 +173,7 @@ class DynamicFieldsExtension extends \Twig_Extension
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $field->getId();
             $fieldName = $fieldConfigId->getFieldName();
-            
-            // Field ACL check
-            if (!$this->securityFacade->isGranted('VIEW', new FieldVote($entity, $fieldName))) {
-                continue;
-            }
-            
+
             if ($row = $this->createDynamicFieldRow($fieldConfigId, $fieldName, $entity)) {
                 $dynamicRows[$fieldName] = $row;
             }
@@ -179,8 +190,12 @@ class DynamicFieldsExtension extends \Twig_Extension
      */
     protected function createDynamicFieldRow(FieldConfigId $fieldConfigId, $fieldName, $entity)
     {
-        $fieldType = $fieldConfigId->getFieldType();
+        // Field ACL check
+        if (!$this->securityFacade->isGranted('VIEW', new FieldVote($entity, $fieldName))) {
+            return false;
+        }
 
+        $fieldType = $fieldConfigId->getFieldType();
         $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
         $event = new ValueRenderEvent($entity, $value, $fieldConfigId);

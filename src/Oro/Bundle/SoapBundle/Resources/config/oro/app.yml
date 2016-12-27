@@ -1,7 +1,8 @@
 security:
     firewalls:
         wsse_secured:
-            pattern: ^/api/(rest|soap).*
+            pattern: ^/api/rest.*
+            stateless:  true
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"
