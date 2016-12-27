@@ -90,17 +90,20 @@ define([
          * Send ajax request to server with query(ies) for update elements depends from event.
          *
          * @param {string} event name of fired event
+         * @param {Object} options
          */
-        _reloadLayouts: function(event) {
+        _reloadLayouts: function(event, options) {
             var self = this;
             var eventBlockIds = this.reloadEvents[event] || [];
             if (!(eventBlockIds instanceof Array) || !eventBlockIds.length) {
                 return;
             }
 
+            options = options || {};
+
             this._callViewMethod(eventBlockIds, 'beforeContentLoading');
             $.ajax({
-                url: this.url,
+                url: options.layoutSubtreeUrl || this.url,
                 type: this.method,
                 data: {
                     layout_block_ids: eventBlockIds
