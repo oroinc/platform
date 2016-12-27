@@ -8,10 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\UserBundle\Entity\User;
+
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
     use EntityTestCaseTrait;
 
     public function testProperties()
@@ -47,17 +50,21 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
 
     public function testToString()
     {
-        $entity = new AttributeFamily();
-        $attributeGroups = new ArrayCollection([new AttributeGroup(), new AttributeGroup()]);
-        $entity->setAttributeGroups($attributeGroups);
+        $group1 = $this->getEntity(AttributeGroup::class, ['id' => 1]);
+        $group2 = $this->getEntity(AttributeGroup::class, ['id' => 2]);
+        $attributeGroups = new ArrayCollection([$group1, $group2]);
+        $entity = $this->getEntity(AttributeFamily::class, [
+            'id' => 1,
+            'attribute_groups' => $attributeGroups,
+        ]);
 
-        $result[''] = [
+        $result[1] = [
             [
-                'group' => null,
+                'group' => 1,
                 'attributes' => []
             ],
             [
-                'group' => null,
+                'group' => 2,
                 'attributes' => []
             ],
         ];
