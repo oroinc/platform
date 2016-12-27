@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
 use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AttributeBlockTypeMapperInterface;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
+
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\Block\Type\Options;
@@ -22,11 +23,10 @@ class AttributeGroupType extends AbstractContainerType
     /** @var AttributeBlockTypeMapperInterface */
     protected $blockTypeMapper;
 
-    /** @var  AttributeManager */
+    /** @var AttributeManager */
     protected $attributeManager;
 
     /**
-     * AttributeGroupType constructor.
      * @param AttributeGroupRenderRegistry      $groupRenderRegistry
      * @param AttributeManager                  $attributeManager
      * @param AttributeBlockTypeMapperInterface $blockTypeMapper
@@ -68,7 +68,6 @@ class AttributeGroupType extends AbstractContainerType
         $attributeGroupBlockId = $builder->getId();
         $attributes = $this->attributeManager->getAttributesByGroup($attributeGroup);
         foreach ($attributes as $attribute) {
-            // $layoutManipulator->add()
             $field_name = $attribute->getFieldName();
             $blockType = $this->blockTypeMapper->getBlockType($attribute);
 

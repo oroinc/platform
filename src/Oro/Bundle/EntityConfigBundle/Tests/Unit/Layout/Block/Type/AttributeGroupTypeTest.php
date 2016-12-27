@@ -13,12 +13,13 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType;
+
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 
 class AttributeGroupTypeTest extends BlockTypeTestCase
 {
-    /** @var  AttributeGroupRenderRegistry */
+    /** @var AttributeGroupRenderRegistry */
     protected $attributeGroupRenderRegistry;
 
     /** @var AttributeManager|\PHPUnit_Framework_MockObject_MockObject $attributeManager */
@@ -27,6 +28,9 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
     /** @var AttributeBlockTypeMapperInterface|\PHPUnit_Framework_MockObject_MockObject $blockTypeMapper */
     protected $blockTypeMapper;
 
+    /**
+     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
+     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $this->attributeGroupRenderRegistry = new AttributeGroupRenderRegistry();
