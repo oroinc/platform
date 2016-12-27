@@ -24,6 +24,6 @@ before_script:
   - DIFF=$(git diff --name-only --diff-filter=ACMR $TRAVIS_COMMIT_RANGE | grep -e ".*\.php$")
 
 script:
-  - phpunit
+  - ./vendor/bin/phpunit
   - ./vendor/bin/phpcs ${DIFF} -p --encoding=utf-8 --extensions=php --standard=psr2
   - ./vendor/bin/phpmd ${DIFF//$"\n"/,} text codesize --suffixes php
