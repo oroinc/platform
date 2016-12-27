@@ -46,8 +46,12 @@ define(function(require) {
             if (!this.options.showLoading) {
                 return;
             }
+            var $container = this.$el.closest('[data-role="layout-subtree-loading-container"]');
+            if (!$container.length) {
+                $container = this.$el;
+            }
             this.subview('loadingMask', new LoadingMaskView({
-                container: this.$el
+                container: $container
             }));
             this.subview('loadingMask').show();
         },
