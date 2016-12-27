@@ -58,15 +58,21 @@ class OrmExpressionVisitor extends ExpressionVisitor
         if (in_array($comparison->getOperator(), SearchComparison::$filteringOperators, true)) {
             return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
-        if (mb_strpos($searchCondition['fieldName'], 'visibility_account') !== false) {
-            $this->qb->leftJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
+        if (is_string($searchCondition['fieldName'])) {
+            if (mb_strpos($searchCondition['fieldName'], 'visibility_account') !== false) {
+                $this->qb->leftJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
+            } else {
+                $this->qb->innerJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
+            }
+            $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
         } else {
-            $this->qb->innerJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
+            $this->qb->innerJoin($joinField, $joinAlias);
         }
-        $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
 
         if ($type === Query::TYPE_TEXT && !in_array($condition, [Query::OPERATOR_IN, Query::OPERATOR_NOT_IN], true)) {
             if ($searchCondition['fieldValue'] === '') {
+                $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
+
                 return $joinAlias . '.field = :field' . $index;
             } else {
                 return $this->driver->addTextField($this->qb, $index, $searchCondition, $this->setOrderBy);
