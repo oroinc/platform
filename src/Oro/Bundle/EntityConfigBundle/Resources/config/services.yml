@@ -290,3 +290,8 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_entity_config.provider.extend_entity_config_provider:
+        class: 'Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider'
+        arguments:
+            - '@oro_entity_config.config_manager'
+
