@@ -59,6 +59,6 @@ class DbalConnectionTest extends \PHPUnit_Framework_TestCase
      */
     private function createDBALConnectionMock()
     {
-        return $this->getMock(Connection::class, [], [], '', false);
+        return $this->createMock(Connection::class);
     }
 }

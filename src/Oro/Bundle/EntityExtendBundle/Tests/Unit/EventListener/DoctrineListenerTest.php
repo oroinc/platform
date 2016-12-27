@@ -28,7 +28,7 @@ class DoctrineListenerTest extends OrmTestCase
 
     protected function setUp()
     {
-        $this->enumManager     = $this->getMock('Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager');
+        $this->enumManager     = $this->createMock('Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager');
         $this->reader          = new AnnotationReader();
         $this->metadataBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\ORM\ExtendMetadataBuilder')
             ->disableOriginalConstructor()->getMock();
@@ -55,7 +55,7 @@ class DoctrineListenerTest extends OrmTestCase
     public function testProcessDiscriminatorValues($path, $namespace, array $expectedValues, $expectedException = null)
     {
         if (null !== $expectedException) {
-            $this->setExpectedException($expectedException);
+            $this->expectException($expectedException);
         }
 
         $metadataDriver = new AnnotationDriver($this->reader, $path);

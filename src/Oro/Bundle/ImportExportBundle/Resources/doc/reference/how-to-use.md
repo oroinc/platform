@@ -289,6 +289,19 @@ class ContactFixture implements TemplateFixtureInterface
 
         return new \ArrayIterator(array($contact));
     }
+    
+    public function getEntityClass()
+    {
+        return Contact::class;
+    }
+    
+    public function getEntity($key)
+    {
+        return new Contact();
+    }
+    
+    public function fillEntityData($key, $entity)
+    {}
 }
 
 ```

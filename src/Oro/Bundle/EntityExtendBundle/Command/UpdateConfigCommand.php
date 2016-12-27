@@ -37,6 +37,12 @@ class UpdateConfigCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'A path to a file contains initial states of entity configs'
+            )
+            ->addOption(
+                'attributes-only',
+                null,
+                InputOption::VALUE_NONE,
+                'Executes update config only for entities which has attributes.'
             );
     }
 
@@ -48,7 +54,11 @@ class UpdateConfigCommand extends ContainerAwareCommand
         $output->writeln($this->getDescription());
 
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
+        $dumper->updateConfig(
+            $this->getFilter($input),
+            $input->getOption('update-custom'),
+            $input->getOption('attributes-only')
+        );
     }
 
     /**

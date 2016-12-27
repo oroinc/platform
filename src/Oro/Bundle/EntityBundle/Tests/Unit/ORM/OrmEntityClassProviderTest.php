@@ -12,8 +12,8 @@ class OrmEntityClassProviderTest extends \PHPUnit_Framework_TestCase
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $managerBag = $this->getMock('Oro\Bundle\EntityBundle\ORM\ManagerBagInterface');
+        $em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $managerBag = $this->createMock('Oro\Bundle\EntityBundle\ORM\ManagerBagInterface');
         $managerBag->expects($this->any())
             ->method('getManagers')
             ->willReturn([$em]);

@@ -82,10 +82,12 @@ define([
             };
 
             if (options.addSorting) {
-                this.subviews.sortingDropdown = new this.sortingDropdown({
-                    collection: this.collection,
-                    columns: options.columns
-                });
+                this.subviews.sortingDropdown = new this.sortingDropdown(
+                    _.defaults({
+                        collection: this.collection,
+                        columns: options.columns
+                    }, options.addSorting)
+                );
             }
 
             if (options.actions) {
@@ -104,7 +106,7 @@ define([
 
             if (_.isFunction(options.template)) {
                 this.template = options.template;
-            } else {
+            } else if (options.template || this.template) {
                 this.template = _.template($(options.template || this.template).html());
             }
 

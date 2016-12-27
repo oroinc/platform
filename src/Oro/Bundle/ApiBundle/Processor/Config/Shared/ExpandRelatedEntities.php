@@ -110,6 +110,12 @@ class ExpandRelatedEntities implements ProcessorInterface
                 $requestType,
                 $extras
             );
+            $field = $definition->getField($fieldName);
+            if (null !== $field && $field->getTargetClass()) {
+                $field->setTargetType(
+                    $this->getAssociationTargetType($metadata->isCollectionValuedAssociation($propertyPath))
+                );
+            }
         }
     }
 
@@ -214,5 +220,15 @@ class ExpandRelatedEntities implements ProcessorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param bool $isCollection
+     *
+     * @return string
+     */
+    protected function getAssociationTargetType($isCollection)
+    {
+        return $isCollection ? 'to-many' : 'to-one';
     }
 }

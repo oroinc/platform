@@ -27,10 +27,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowIfTransportNotConfigured()
     {
-        $this->setExpectedException(
-            InvalidConfigurationException::class,
-            'The child node "transport" at path "oro_message_queue" must be configured.'
-        );
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The child node "transport" at path "oro_message_queue" must be configured.');
 
         $configuration = new Configuration([]);
 
@@ -58,8 +56,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $processor = new Processor();
 
-        $this->setExpectedException(
-            InvalidConfigurationException::class,
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
             'The path "oro_message_queue.transport.foo.foo_param" cannot contain an empty value, but got null.'
         );
 
@@ -187,8 +185,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowExceptionIfRouterDestinationIsEmpty()
     {
-        $this->setExpectedException(
-            InvalidConfigurationException::class,
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
             'The path "oro_message_queue.client.router_destination" cannot contain an empty value, but got "".'
         );
 
@@ -207,8 +205,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfDefaultDestinationIsEmpty()
     {
-        $this->setExpectedException(
-            InvalidConfigurationException::class,
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
             'The path "oro_message_queue.client.default_destination" cannot contain an empty value, but got "".'
         );
 

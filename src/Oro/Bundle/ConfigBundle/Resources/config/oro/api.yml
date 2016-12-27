@@ -1,6 +1,7 @@
 api:
     entities:
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
+            disable_meta_properties: true
             identifier_field_names: [id]
             fields:
                 id:
@@ -28,6 +29,7 @@ api:
                 get_relationship: false
 
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
+            disable_meta_properties: true
             identifier_field_names: [key]
             fields:
                 key:

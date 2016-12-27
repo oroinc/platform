@@ -83,6 +83,9 @@ class Transition
     /** @var array */
     protected $initRoutes = [];
 
+    /** @var array */
+    protected $initDatagrids = [];
+
     /** @var string */
     protected $initContextAttribute;
 
@@ -622,11 +625,31 @@ class Transition
     }
 
     /**
+     * @return array
+     */
+    public function getInitDatagrids()
+    {
+        return $this->initDatagrids;
+    }
+
+    /**
+     * @param array $initDatagrids
+     *
+     * @return $this
+     */
+    public function setInitDatagrids(array $initDatagrids)
+    {
+        $this->initDatagrids = $initDatagrids;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function isEmptyInitOptions()
     {
-        return !count($this->getInitEntities()) && !count($this->getInitRoutes());
+        return !count($this->getInitEntities()) && !count($this->getInitRoutes()) && !count($this->getInitDatagrids());
     }
 
     /**

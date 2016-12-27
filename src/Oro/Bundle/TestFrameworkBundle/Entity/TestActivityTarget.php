@@ -5,6 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamilyAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivityTarget;
 
 /**
@@ -18,7 +20,9 @@ use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivityTarget;
  *      }
  * )
  */
-class TestActivityTarget extends ExtendTestActivityTarget implements TestFrameworkEntityInterface
+class TestActivityTarget extends ExtendTestActivityTarget implements
+    TestFrameworkEntityInterface,
+    AttributeFamilyAwareInterface
 {
     /**
      * @var integer
@@ -28,6 +32,14 @@ class TestActivityTarget extends ExtendTestActivityTarget implements TestFramewo
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var AttributeFamily
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily")
+     * @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id", onDelete="RESTRICT")
+     */
+    protected $attributeFamily;
 
     /**
      * @return int
@@ -46,5 +58,24 @@ class TestActivityTarget extends ExtendTestActivityTarget implements TestFramewo
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * @param AttributeFamily $attributeFamily
+     * @return $this
+     */
+    public function setAttributeFamily(AttributeFamily $attributeFamily)
+    {
+        $this->attributeFamily = $attributeFamily;
+
+        return $this;
+    }
+
+    /**
+     * @return AttributeFamily
+     */
+    public function getAttributeFamily()
+    {
+        return $this->attributeFamily;
     }
 }

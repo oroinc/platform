@@ -33,7 +33,7 @@ class FormTypeTest extends TypeTestCase
             ->setMethods(['__construct', 'preSubmit'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $this->form = new FormType($this->subscriber, $this->container);
     }

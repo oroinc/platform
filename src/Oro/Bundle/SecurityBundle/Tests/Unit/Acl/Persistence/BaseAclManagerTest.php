@@ -24,7 +24,7 @@ class BaseAclManagerTest extends \PHPUnit_Framework_TestCase
             $this->manager->getSid('ROLE_TEST')
         );
 
-        $src = $this->getMock('Symfony\Component\Security\Core\Role\RoleInterface');
+        $src = $this->createMock('Symfony\Component\Security\Core\Role\RoleInterface');
         $src->expects($this->once())
             ->method('getRole')
             ->will($this->returnValue('ROLE_TEST'));
@@ -33,7 +33,7 @@ class BaseAclManagerTest extends \PHPUnit_Framework_TestCase
             $this->manager->getSid($src)
         );
 
-        $src = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $src = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
         $src->expects($this->once())
             ->method('getUsername')
             ->will($this->returnValue('Test'));
@@ -42,11 +42,11 @@ class BaseAclManagerTest extends \PHPUnit_Framework_TestCase
             $this->manager->getSid($src)
         );
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->once())
             ->method('getUsername')
             ->will($this->returnValue('Test'));
-        $src = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $src = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $src->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($user));
@@ -55,7 +55,7 @@ class BaseAclManagerTest extends \PHPUnit_Framework_TestCase
             $this->manager->getSid($src)
         );
 
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException('\InvalidArgumentException');
         $this->manager->getSid(new \stdClass());
     }
 }

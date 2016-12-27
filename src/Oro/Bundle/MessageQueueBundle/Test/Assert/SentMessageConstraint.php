@@ -13,12 +13,19 @@ class SentMessageConstraint extends \PHPUnit_Framework_Constraint
     protected $message;
 
     /**
-     * @param array $message ['topic' => topic name, 'message' => message] or ['topic' => topic name]
+     * @var bool
      */
-    public function __construct(array $message)
+    protected $isSubJobMessage;
+
+    /**
+     * @param array $message ['topic' => topic name, 'message' => message] or ['topic' => topic name]
+     * @param bool $isSubJobMessage
+     */
+    public function __construct(array $message, $isSubJobMessage = false)
     {
         parent::__construct();
         $this->message = $message;
+        $this->isSubJobMessage = $isSubJobMessage;
     }
 
     /**
@@ -33,6 +40,12 @@ class SentMessageConstraint extends \PHPUnit_Framework_Constraint
         if (array_key_exists('message', $this->message)) {
             $constraint = new \PHPUnit_Framework_Constraint_IsEqual($this->message);
             foreach ($other as $message) {
+                if ($this->isSubJobMessage && empty($message['message']['jobId'])) {
+                    return false;
+                }
+                if ($this->isSubJobMessage && is_array($message['message'])) {
+                    unset($message['message']['jobId']);
+                }
                 if ($constraint->evaluate($message, '', true)) {
                     return true;
                 }

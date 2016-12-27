@@ -303,7 +303,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
             }
 
             if (array() === $value) {
-                $data[$key] = array();
+                unset($data[$key]);
             } elseif (null !== $value) {
                 $hasValue = true;
             }

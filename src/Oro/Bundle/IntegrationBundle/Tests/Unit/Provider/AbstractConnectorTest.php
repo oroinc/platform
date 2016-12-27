@@ -34,8 +34,8 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getExecutionContext', 'getJobExecution'])
             ->disableOriginalConstructor()->getMock();
 
-        $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
-        $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+        $jobExecution = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
+        $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
         $jobExecution->expects($this->any())
             ->method('getJobInstance')
             ->will($this->returnValue($jobInstance));
@@ -49,7 +49,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('alias'));
 
         $this->transportSettings = $this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport');
-        $this->transportMock     = $this->getMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface');
+        $this->transportMock     = $this->createMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface');
     }
 
     protected function tearDown()
@@ -88,7 +88,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
 
         if (false !== $expectedException) {
-            $this->setExpectedException($expectedException);
+            $this->expectException($expectedException);
         } else {
             $transport->expects($this->once())->method('init')
                 ->with($this->equalTo($this->transportSettings));
@@ -111,12 +111,12 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
                 '\LogicException'
             ],
             'with regular iterator, correct initialization' => [
-                $this->getMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface'),
-                $this->getMock('\Iterator')
+                $this->createMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface'),
+                $this->createMock('\Iterator')
             ],
             'logger aware iterator should receive logger'   => [
-                $this->getMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface'),
-                $this->getMock('Oro\\Bundle\\IntegrationBundle\\Tests\Unit\Stub\\LoggerAwareIteratorSource')
+                $this->createMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface'),
+                $this->createMock('Oro\\Bundle\\IntegrationBundle\\Tests\Unit\Stub\\LoggerAwareIteratorSource')
             ]
         ];
     }
@@ -132,7 +132,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConnector($transport, $stepExecutionMock, $channel = null, $context = null)
     {
-        $contextRegistryMock = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+        $contextRegistryMock = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
         $contextMediatorMock = $this
             ->getMockBuilder('Oro\\Bundle\\IntegrationBundle\\Provider\\ConnectorContextMediator')
             ->disableOriginalConstructor()->getMock();

@@ -211,7 +211,8 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testVisitMetadataUnknownColumn(array $sorters, array $columns, $expectedMessage)
     {
-        $this->setExpectedException('\Oro\Bundle\DataGridBundle\Exception\LogicException', $expectedMessage);
+        $this->expectException('\Oro\Bundle\DataGridBundle\Exception\LogicException');
+        $this->expectExceptionMessage($expectedMessage);
         $config = DatagridConfiguration::create([Configuration::SORTERS_KEY => $sorters]);
 
         $data = MetadataObject::create([Configuration::COLUMNS_KEY => $columns]);
@@ -397,7 +398,7 @@ class SearchSorterExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->sorter->setParameters($mockParameterBag);
 
-        $this->setExpectedException(LogicException::class);
+        $this->expectException(LogicException::class);
         $this->sorter->visitDatasource($config, $mockDatasource);
     }
 

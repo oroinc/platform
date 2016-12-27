@@ -36,15 +36,15 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPostSubmit()
     {
-        $itemEmpty = $this->getMock('Oro\Bundle\FormBundle\Entity\EmptyItem');
+        $itemEmpty = $this->createMock('Oro\Bundle\FormBundle\Entity\EmptyItem');
         $itemEmpty->expects($this->once())
             ->method('isEmpty')
             ->will($this->returnValue(true));
-        $itemNotEmpty = $this->getMock('Oro\Bundle\FormBundle\Entity\EmptyItem');
+        $itemNotEmpty = $this->createMock('Oro\Bundle\FormBundle\Entity\EmptyItem');
         $itemNotEmpty->expects($this->once())
             ->method('isEmpty')
             ->will($this->returnValue(false));
-        $itemNotEmptyType = $this->getMock('SomeClass');
+        $itemNotEmptyType = $this->createMock(\stdClass::class);
         $itemNotEmptyType->expects($this->never())->method($this->anything());
 
         $data = new ArrayCollection(array($itemEmpty, $itemNotEmpty, $itemNotEmptyType));
@@ -61,7 +61,7 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPostSubmitNotCollectionData()
     {
-        $data = $this->getMock('SomeClass');
+        $data = $this->createMock(\stdClass::class);
         $data->expects($this->never())->method($this->anything());
 
         $this->subscriber->postSubmit($this->createEvent($data));
@@ -102,8 +102,8 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSubmitWithIgnorePrimaryBehaviour()
     {
-        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $form->expects($this->once())->method('getConfig')
             ->will($this->returnValue($formConfig));
         $formConfig->expects($this->once())->method('getOption')
@@ -130,8 +130,8 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreSubmit(array $data, array $expected)
     {
-        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $form->expects($this->once())->method('getConfig')
             ->will($this->returnValue($formConfig));
         $formConfig->expects($this->once())->method('getOption')
@@ -205,7 +205,7 @@ class CollectionTypeSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function createEvent($data, FormInterface $form = null)
     {
-        $form = $form ? $form : $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $form ? $form : $this->createMock('Symfony\Component\Form\Test\FormInterface');
         return new FormEvent($form, $data);
     }
 }

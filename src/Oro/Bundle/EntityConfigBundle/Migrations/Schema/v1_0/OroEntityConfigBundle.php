@@ -119,7 +119,6 @@ class OroEntityConfigBundle implements Migration
         $table->addColumn('field_id', 'integer', ['notnull' => false]);
         $table->addColumn('label', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('priority', 'smallint', ['notnull' => false]);
-        $table->addColumn('is_default', 'boolean', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['field_id'], 'IDX_CDC152C4443707B0', []);
         /** End of generate table oro_entity_config_optionset **/

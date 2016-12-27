@@ -198,7 +198,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $messages = $this->messages;
         $obj = $this;
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader = $this->createMock('Symfony\Component\Translation\Loader\LoaderInterface');
         $loader
             ->expects($this->any())
             ->method('load')
@@ -220,7 +220,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     protected function getStrategyProvider(array $fallbackLocales = [])
     {
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $strategy */
-        $strategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $strategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
 
         /** @var TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject $strategyProvider */
         $strategyProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider')
@@ -251,7 +251,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ['oro_translation.strategy.provider', $exceptionFlag, $strategyProvider]
         ];
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
             ->expects($this->any())
             ->method('get')
@@ -325,7 +325,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testDynamicResourcesWithoutDatabaseTranslationMetadataCache()
     {
         $locale     = 'en';
-        $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
             ->willReturn($this->getStrategyProvider());
@@ -348,7 +348,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ['code' => $locale, 'domain' => 'domain3'],
         ];
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $databaseCache = $this
             ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
@@ -402,7 +402,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $fallbackLocales = ['en'];
 
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $strategy */
-        $strategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $strategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $strategy->expects($this->any())
             ->method('getName')
             ->willReturn($strategyName);
@@ -442,13 +442,13 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $secondStrategyName = 'second';
 
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $firstStrategy */
-        $firstStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $firstStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $firstStrategy->expects($this->any())
             ->method('getName')
             ->willReturn($firstStrategyName);
 
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $secondStrategy */
-        $secondStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $secondStrategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $secondStrategy->expects($this->any())
             ->method('getName')
             ->willReturn($secondStrategyName);

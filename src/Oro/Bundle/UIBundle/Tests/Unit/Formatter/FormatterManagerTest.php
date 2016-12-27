@@ -30,10 +30,8 @@ class FormatterManagerTest extends \PHPUnit_Framework_TestCase
             $this->manager->format('test_parameter', 'test_format_name', $arguments)
         );
         $this->assertEquals('test_value', $this->manager->format(null, 'test_format_name'));
-        $this->setExpectedException(
-            'Oro\Bundle\UIBundle\Exception\InvalidFormatterException',
-            'Formatter not_existing_formatter not found'
-        );
+        $this->expectException('Oro\Bundle\UIBundle\Exception\InvalidFormatterException');
+        $this->expectExceptionMessage('Formatter not_existing_formatter not found');
         $this->manager->format('test_parameter', 'not_existing_formatter');
     }
 

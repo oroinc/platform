@@ -127,6 +127,6 @@ class ChainOwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProviderMock()
     {
-        return $this->getMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
+        return $this->createMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
     }
 }

@@ -100,10 +100,8 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessInvalidConfiguration(array $config, $message)
     {
-        $this->setExpectedException(
-            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-            $message
-        );
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage($message);
 
         $this->configuration->processConfiguration($config);
     }

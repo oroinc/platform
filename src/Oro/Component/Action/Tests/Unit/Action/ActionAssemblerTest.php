@@ -22,7 +22,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $test = $this;
 
-        $actionFactory = $this->getMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        $actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
         $actionFactory->expects($this->any())
             ->method('create')
             ->will(

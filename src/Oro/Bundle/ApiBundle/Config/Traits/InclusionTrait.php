@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 trait InclusionTrait
 {
     /**
-     * Indicates whether whether an inclusion of related entities is enabled.
+     * Indicates whether an inclusion of related entities is enabled.
      *
      * @return bool
      */

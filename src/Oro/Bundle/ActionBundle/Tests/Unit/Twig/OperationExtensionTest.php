@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
@@ -38,7 +38,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->routeProvider = $this->getMock(RouteProviderInterface::class);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()

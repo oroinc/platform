@@ -224,7 +224,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('getConnectorType')
             ->with('theIntegrationType', 'theConnector')
-            ->willReturn($this->getMock(ConnectorInterface::class));
+            ->willReturn($this->createMock(ConnectorInterface::class));
 
         $reversSyncProcessorMock = $this->createReversSyncProcessorMock();
         $reversSyncProcessorMock
@@ -267,7 +267,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
         $typeRegistryMock
             ->expects(self::once())
             ->method('getConnectorType')
-            ->willReturn($this->getMock(TwoWaySyncConnectorInterface::class));
+            ->willReturn($this->createMock(TwoWaySyncConnectorInterface::class));
 
         $jobRunner = new JobRunner();
 
@@ -312,7 +312,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects(self::once())
             ->method('getConnectorType')
             ->with('theIntegrationType', 'theConnector')
-            ->willReturn($this->getMock(TwoWaySyncConnectorInterface::class));
+            ->willReturn($this->createMock(TwoWaySyncConnectorInterface::class));
 
         $processor = new ReversSyncIntegrationProcessor(
             $doctrineHelperStub,
@@ -335,7 +335,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createTypeRegistryMock()
     {
-        return $this->getMock(TypesRegistry::class, [], [], '', false);
+        return $this->createMock(TypesRegistry::class);
     }
 
     /**
@@ -343,7 +343,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createReversSyncProcessorMock()
     {
-        $reverseSyncProcessor =  $this->getMock(ReverseSyncProcessor::class, [], [], '', false);
+        $reverseSyncProcessor =  $this->createMock(ReverseSyncProcessor::class);
         $reverseSyncProcessor
             ->expects($this->any())
             ->method('getLoggerStrategy')
@@ -360,13 +360,13 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $configuration = new Configuration();
 
-        $connectionMock = $this->getMock(Connection::class, [], [], '', false);
+        $connectionMock = $this->createMock(Connection::class);
         $connectionMock
             ->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $entityManagerMock = $this->getMock(EntityManagerInterface::class);
+        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock
             ->expects($this->any())
             ->method('getConnection')
@@ -380,7 +380,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineHelperStub($entityManager = null)
     {
-        $helperMock = $this->getMock(DoctrineHelper::class, [], [], '', false);
+        $helperMock = $this->createMock(DoctrineHelper::class);
         $helperMock
             ->expects($this->any())
             ->method('getEntityManagerForClass')
@@ -394,6 +394,6 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

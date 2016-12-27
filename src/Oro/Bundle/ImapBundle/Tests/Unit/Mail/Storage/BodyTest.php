@@ -179,13 +179,13 @@ class BodyTest extends \PHPUnit_Framework_TestCase
         $obj->expects($this->once())->method('getContent')
             ->will($this->returnValue($contentValue));
 
-        $contentTypeHeader = $this->getMock('Zend\Mail\Header\ContentType');
+        $contentTypeHeader = $this->createMock('Zend\Mail\Header\ContentType');
         $contentTypeHeader->expects($this->any())->method('getType')
             ->will($this->returnValue($contentType));
         $contentTypeHeader->expects($this->any())->method('getParameter')
             ->will($this->returnValue($contentEncoding));
 
-        $contentEncodingHeader = $this->getMock('Zend\Mail\Header\HeaderInterface');
+        $contentEncodingHeader = $this->createMock('Zend\Mail\Header\HeaderInterface');
         $contentEncodingHeader->expects($this->any())->method('getFieldValue')
             ->will($this->returnValue($contentTransferEncoding));
 

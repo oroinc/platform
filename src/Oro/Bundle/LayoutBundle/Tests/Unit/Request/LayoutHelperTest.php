@@ -29,9 +29,9 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
+        $this->requestStack = $this->createMock('Symfony\Component\HttpFoundation\RequestStack');
 
-        $this->configManager = $this->getMock('Oro\Bundle\ConfigBundle\Config\ConfigManager', [], [], '', false);
+        $this->configManager = $this->createMock('Oro\Bundle\ConfigBundle\Config\ConfigManager');
 
         $this->helper = new LayoutHelper($this->requestStack, $this->configManager);
     }
@@ -64,11 +64,11 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
                 'annotation' => $this->getLayoutAnnotationMock(),
             ],
             [
-                'request' => $this->getMock('Symfony\Component\HttpFoundation\Request'),
+                'request' => $this->createMock('Symfony\Component\HttpFoundation\Request'),
                 'annotation' => null,
             ],
             [
-                'request' => $this->getMock('Symfony\Component\HttpFoundation\Request'),
+                'request' => $this->createMock('Symfony\Component\HttpFoundation\Request'),
                 'annotation' => $this->getLayoutAnnotationMock(),
             ],
         ];
@@ -145,14 +145,14 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
             $this->requestStack->expects($this->never())
                 ->method('getCurrentRequest');
         } else {
-            $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+            $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
             $this->requestStack->expects($this->once())
                 ->method('getCurrentRequest')
                 ->willReturn($request);
         }
 
         /** @var ParameterBag|\PHPUnit_Framework_MockObject_MockObject $attributes */
-        $attributes = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
+        $attributes = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
         $request->attributes = $attributes;
         $attributes->expects($this->at(0))
             ->method('get')

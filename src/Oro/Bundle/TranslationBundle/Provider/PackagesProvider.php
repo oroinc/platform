@@ -22,6 +22,9 @@ class PackagesProvider
     /** @var  string */
     protected $composerCacheHome;
 
+    /** @var array|TranslationPackagesProviderExtensionInterface[] */
+    protected $extensions = [];
+
     /**
      * @param ServiceLink $pmLink
      * @param array $bundles
@@ -34,6 +37,14 @@ class PackagesProvider
         $this->bundles           = $bundles;
         $this->kernelRootDir     = $kernelRootDir;
         $this->composerCacheHome = $composerCacheHome;
+    }
+
+    /**
+     * @param TranslationPackagesProviderExtensionInterface $extension
+     */
+    public function addExtension(TranslationPackagesProviderExtensionInterface $extension)
+    {
+        $this->extensions[] = $extension;
     }
 
     /**
@@ -75,6 +86,13 @@ class PackagesProvider
         foreach ($this->bundles as $bundle) {
             $namespaceParts = explode('\\', $bundle);
             $packages[]     = reset($namespaceParts);
+        }
+
+        // collect extra package names from different extensions
+        foreach ($this->extensions as $extension) {
+            foreach ($extension->getPackageNames() as $packageName) {
+                $packages[] = $packageName;
+            }
         }
 
         return array_unique($packages);

@@ -49,8 +49,6 @@ class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->method('findTaggedServiceIds')
             ->with('oro_workflow.changes.listener')->willReturn([]);
 
-        $definition->expects($this->never())->method('addListener')->with($this->anything());
-
         //subscribers
         $this->containerBuilderMock->expects($this->at(3))
             ->method('findTaggedServiceIds')
@@ -104,15 +102,13 @@ class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->method('findTaggedServiceIds')
             ->with('oro_workflow.changes.subscriber')->willReturn([]);
 
-        $definition->expects($this->never())->method('addSubscriber');
-
         $this->pass->process($this->containerBuilderMock);
     }
 
     public function testProcessListenersWithoutMethod()
     {
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage(
             'Service "service1" must define the "method" attribute on "oro_workflow.changes.listener" tags.'
         );
 
@@ -142,8 +138,8 @@ class WorkflowChangesEventsCompilerPassTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->setExpectedException(
-            'InvalidArgumentException',
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage(
             'An "event" attribute for tag `oro_workflow.changes.listener` in service `service1` must be defined'
         );
         $this->pass->process($this->containerBuilderMock);

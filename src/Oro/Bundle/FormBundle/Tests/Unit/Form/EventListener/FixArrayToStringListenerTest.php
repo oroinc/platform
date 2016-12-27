@@ -19,7 +19,7 @@ class FixArrayToStringListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreBind($delimiter, $data, $expectedData)
     {
-        $event = new FormEvent($this->getMock('Symfony\Component\Form\Test\FormInterface'), $data);
+        $event = new FormEvent($this->createMock('Symfony\Component\Form\Test\FormInterface'), $data);
         $listener = new FixArrayToStringListener($delimiter);
         $listener->preSubmit($event);
         $this->assertEquals($expectedData, $event->getData());

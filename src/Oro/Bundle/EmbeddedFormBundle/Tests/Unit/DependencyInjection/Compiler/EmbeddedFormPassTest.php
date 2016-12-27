@@ -67,7 +67,7 @@ class EmbeddedFormPassTest extends \PHPUnit_Framework_TestCase
             ->with('oro_embedded_form.manager')
             ->will($this->returnValue(true));
 
-        $managerDefinition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $managerDefinition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
         $container->expects($this->once())
             ->method('getDefinition')
             ->with('oro_embedded_form.manager')
@@ -111,6 +111,6 @@ class EmbeddedFormPassTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContainerBuilderMock()
     {
-        return $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        return $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
     }
 }

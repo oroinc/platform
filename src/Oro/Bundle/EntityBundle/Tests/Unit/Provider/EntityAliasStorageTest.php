@@ -126,8 +126,8 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalidEntityAlias($value)
     {
-        $this->setExpectedException(
-            '\InvalidArgumentException',
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The string "%s" cannot be used as the alias for the "Test\Entity1" entity '
                 . 'because it contains illegal characters. '
@@ -148,8 +148,8 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateInvalidEntityPluralAlias($value)
     {
-        $this->setExpectedException(
-            '\InvalidArgumentException',
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The string "%s" cannot be used as the plural alias for the "Test\Entity1" entity '
                 . 'because it contains illegal characters. '
@@ -181,8 +181,8 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias', 'plural_alias1')
         );
 
-        $this->setExpectedException(
-            '\Oro\Bundle\EntityBundle\Exception\RuntimeException',
+        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectExceptionMessage(
             'The alias "alias" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
             . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
@@ -224,8 +224,8 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias1', 'plural_alias')
         );
 
-        $this->setExpectedException(
-            '\Oro\Bundle\EntityBundle\Exception\RuntimeException',
+        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectExceptionMessage(
             'The plural alias "plural_alias" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
             . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
@@ -268,8 +268,8 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias1', 'plural_alias1')
         );
 
-        $this->setExpectedException(
-            '\Oro\Bundle\EntityBundle\Exception\RuntimeException',
+        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectExceptionMessage(
             'The plural alias "alias1" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used as an alias for the entity "Test\Entity1". To solve this problem you can use "entity_aliases" or '
             . '"entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '
@@ -311,8 +311,8 @@ class EntityAliasStorageTest extends \PHPUnit_Framework_TestCase
             new EntityAlias('alias1', 'plural_alias1')
         );
 
-        $this->setExpectedException(
-            '\Oro\Bundle\EntityBundle\Exception\RuntimeException',
+        $this->expectException('\Oro\Bundle\EntityBundle\Exception\RuntimeException');
+        $this->expectExceptionMessage(
             'The alias "plural_alias1" cannot be used for the entity "Test\Entity2" because it is already '
             . 'used as a plural alias for the entity "Test\Entity1". To solve this problem you can use "entity_aliases"'
             . ' or "entity_alias_exclusions" section in the "Resources/config/oro/entity.yml" of your bundle or '

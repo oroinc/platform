@@ -30,7 +30,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
         $this->expressionLanguage = new ExpressionLanguage();
 
         /** @var ExpressionEncoderRegistry|\PHPUnit_Framework_MockObject_MockObject $encoderRegistry */
-        $encoderRegistry = $this->getMock(ExpressionEncoderRegistry::class, [], [], '', false);
+        $encoderRegistry = $this->createMock(ExpressionEncoderRegistry::class);
 
         $this->encoder = new JsonExpressionEncoder(new ExpressionManipulator());
 
@@ -52,7 +52,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
 
         $trueExpr = new ParsedExpression('true', new ConstantNode(true));
 
@@ -141,7 +141,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
 
         $values['first'] = '=second';
         $values['second'] = '=third';
@@ -158,7 +158,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessExpressionsWithDataKey()
     {
         $context = new LayoutContext();
-        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
         $values['data'] = 'test';
 
         $this->processor->processExpressions($values, $context, $data, true, null);
@@ -171,7 +171,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessExpressionsWithContextKey()
     {
         $context = new LayoutContext();
-        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
         $values['context'] = 'test';
 
         $this->processor->processExpressions($values, $context, $data, true, null);
@@ -180,7 +180,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessExpressionsDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet()
     {
         $context = new LayoutContext();
-        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
 
         $expr = $this->getMockBuilder(ParsedExpression::class)
             ->disableOriginalConstructor()
@@ -203,7 +203,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessExpressionsEncodesAllExpressions()
     {
         $context = new LayoutContext();
-        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
         $trueExpr = new ParsedExpression('true', new ConstantNode(true));
 
         $classAttr = new OptionValueBag();
@@ -267,7 +267,7 @@ class ExpressionProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessExpressionsWithVisibleFalse()
     {
         $context = new LayoutContext();
-        $data = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
+        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
 
         $values['expr_string'] = '=true';
         $values['scalar'] = 123;

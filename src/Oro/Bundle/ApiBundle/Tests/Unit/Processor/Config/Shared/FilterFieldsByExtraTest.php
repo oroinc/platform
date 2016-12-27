@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
-use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 {
@@ -236,7 +236,9 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                         'id'        => null,
                         'field1'    => null,
                         'field2'    => null,
-                        '__class__' => null,
+                        '__class__' => [
+                            'meta_property' => true
+                        ],
                     ]
                 ],
                 'association2' => [
@@ -370,7 +372,9 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
                             'field2'    => [
                                 'exclude' => true
                             ],
-                            '__class__' => null,
+                            '__class__' => [
+                                'meta_property' => true
+                            ],
                         ]
                     ],
                     'association2' => [

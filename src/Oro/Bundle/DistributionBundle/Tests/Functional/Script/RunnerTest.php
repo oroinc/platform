@@ -279,7 +279,7 @@ class RunnerTest extends WebTestCase
      */
     protected function createPackageMock()
     {
-        return $this->getMock('Composer\Package\PackageInterface');
+        return $this->createMock('Composer\Package\PackageInterface');
     }
 
     /**
@@ -290,7 +290,7 @@ class RunnerTest extends WebTestCase
      */
     protected function createInstallationManagerMock(PackageInterface $package = null, $targetDir = null)
     {
-        $im = $this->getMock('Composer\Installer\InstallationManager');
+        $im = $this->createMock('Composer\Installer\InstallationManager');
         if ($package) {
             $im->expects($this->any())
                 ->method('getInstallPath')
@@ -321,7 +321,7 @@ class RunnerTest extends WebTestCase
      */
     protected function createLoggerMock()
     {
-        return $this->getMock('Psr\Log\LoggerInterface');
+        return $this->createMock('Psr\Log\LoggerInterface');
     }
 
     /**

@@ -29,7 +29,7 @@ define([
                 pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
                 function doRedirect(redirectUrl) {
-                    mediator.execute('redirectTo', {url: redirectUrl});
+                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }
                 function doReload() {
                     mediator.execute('refreshPage');

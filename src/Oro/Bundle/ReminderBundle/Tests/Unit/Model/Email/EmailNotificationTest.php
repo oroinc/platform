@@ -41,7 +41,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->em = $this
-            ->getMock('Doctrine\Common\Persistence\ObjectManager');
+            ->createMock('Doctrine\Common\Persistence\ObjectManager');
 
         $this->provider = $this
             ->getMockBuilder('\Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -53,7 +53,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->sender = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $this->sender = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
         $this->sender->expects($this->any())
             ->method('getEmail')
             ->will($this->returnValue(self::SENDER_EMAIL));
@@ -75,10 +75,8 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTemplateFromRepository($exceptionMessage, $templates)
     {
-        $this->setExpectedException(
-            'Oro\\Bundle\\ReminderBundle\\Exception\\InvalidArgumentException',
-            $exceptionMessage
-        );
+        $this->expectException('Oro\\Bundle\\ReminderBundle\\Exception\\InvalidArgumentException');
+        $this->expectExceptionMessage($exceptionMessage);
 
         $notification = $this->createNotification(true, false, false, false, $templates);
         $notification->getTemplate();
@@ -179,7 +177,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $hasSender = false,
         $templates = null
     ) {
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository
             ->expects($this->any())
             ->method('find')

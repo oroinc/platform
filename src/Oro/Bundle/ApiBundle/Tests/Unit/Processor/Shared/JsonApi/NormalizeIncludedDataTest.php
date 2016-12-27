@@ -46,7 +46,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->valueNormalizer = $this->getMockBuilder(ValueNormalizer::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityIdTransformer = $this->getMock(EntityIdTransformerInterface::class);
+        $this->entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
 
         $this->processor = new NormalizeIncludedData(
             $this->doctrineHelper,

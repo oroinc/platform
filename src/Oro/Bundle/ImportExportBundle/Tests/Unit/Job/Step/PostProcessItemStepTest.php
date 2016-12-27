@@ -28,15 +28,15 @@ class PostProcessItemStepTest extends \PHPUnit_Framework_TestCase
         $this->itemStep->setJobExecutor($jobExecutor);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ItemReaderInterface $reader */
-        $reader = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
+        $reader = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface');
         $this->itemStep->setReader($reader);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ItemProcessorInterface $processor */
-        $processor = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
+        $processor = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface');
         $this->itemStep->setProcessor($processor);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ItemWriterInterface $writer */
-        $writer = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
+        $writer = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface');
         $this->itemStep->setWriter($writer);
 
         $this->itemStep->setBatchSize(1);
@@ -55,9 +55,9 @@ class PostProcessItemStepTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $executionContext = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
-        $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
-        $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
+        $jobExecution = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
+        $jobInstance = $this->createMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
         $jobExecution->expects($this->any())
             ->method('getJobInstance')
             ->will($this->returnValue($jobInstance));

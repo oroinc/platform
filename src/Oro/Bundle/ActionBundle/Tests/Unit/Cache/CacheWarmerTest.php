@@ -38,7 +38,7 @@ class CacheWarmerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProviderMock()
     {
-        $provider = $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
         $provider->expects($this->once())->method('warmUpCache');
 
         return $provider;

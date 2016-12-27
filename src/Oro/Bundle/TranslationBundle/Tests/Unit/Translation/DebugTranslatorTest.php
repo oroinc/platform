@@ -154,7 +154,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $messages = $this->messages;
         $obj = $this;
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader = $this->createMock('Symfony\Component\Translation\Loader\LoaderInterface');
         $loader
             ->expects($this->any())
             ->method('load')
@@ -176,7 +176,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
     protected function getStrategyProvider(array $fallbackLocales = [])
     {
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $strategy */
-        $strategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $strategy = $this->createMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
 
         /** @var TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject $strategyProvider */
         $strategyProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider')
@@ -207,7 +207,7 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
             ['oro_translation.strategy.provider', $exceptionFlag, $strategyProvider]
         ];
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
             ->expects($this->any())
             ->method('get')

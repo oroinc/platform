@@ -107,7 +107,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
-        $statement = $this->getMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
+        $statement = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
         $statement->expects($this->exactly(count($records) + 1))
             ->method('fetch')
             ->will(
@@ -146,7 +146,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getDriverConnectionMock(EntityManagerMock $em)
     {
-        $conn = $this->getMock('\Doctrine\DBAL\Driver\Connection');
+        $conn = $this->createMock('\Doctrine\DBAL\Driver\Connection');
         $this->setDriverConnection($conn, $em);
 
         return $conn;
@@ -160,11 +160,71 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function createCountStatementMock($numberOfRecords)
     {
-        $countStatement = $this->getMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
+        $countStatement = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
         $countStatement->expects($this->once())->method('fetchColumn')
             ->will($this->returnValue($numberOfRecords));
 
         return $countStatement;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param string                                   $sql
+     * @param array                                    $result
+     * @param array                                    $params
+     * @param array                                    $types
+     */
+    protected function setQueryExpectation(
+        \PHPUnit_Framework_MockObject_MockObject $conn,
+        $sql,
+        $result,
+        $params = [],
+        $types = []
+    ) {
+        $stmt = $this->createFetchStatementMock($result, $params, $types);
+        if ($params) {
+            $conn->expects($this->once())
+                ->method('prepare')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        } else {
+            $conn
+                ->expects($this->once())
+                ->method('query')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        }
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $conn
+     * @param int                                      $expectsAt
+     * @param string                                   $sql
+     * @param array                                    $result
+     * @param array                                    $params
+     * @param array                                    $types
+     */
+    protected function setQueryExpectationAt(
+        \PHPUnit_Framework_MockObject_MockObject $conn,
+        $expectsAt,
+        $sql,
+        $result,
+        $params = [],
+        $types = []
+    ) {
+        $stmt = $this->createFetchStatementMock($result, $params, $types);
+        if ($params) {
+            $conn->expects($this->at($expectsAt))
+                ->method('prepare')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        } else {
+            $conn
+                ->expects($this->at($expectsAt))
+                ->method('query')
+                ->with($sql)
+                ->will($this->returnValue($stmt));
+        }
     }
 
     private static function getSharedMetadataCacheImpl()

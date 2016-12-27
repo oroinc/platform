@@ -22,7 +22,7 @@ class TranslationManager
     protected $registry;
 
     /** @var TranslationDomainProvider */
-    protected $domainProvier;
+    protected $domainProvider;
 
     /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
@@ -41,16 +41,16 @@ class TranslationManager
 
     /**
      * @param ManagerRegistry $registry
-     * @param TranslationDomainProvider $domainProvier
+     * @param TranslationDomainProvider $domainProvider
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
         ManagerRegistry $registry,
-        TranslationDomainProvider $domainProvier,
+        TranslationDomainProvider $domainProvider,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
         $this->registry = $registry;
-        $this->domainProvier = $domainProvier;
+        $this->domainProvider = $domainProvider;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
@@ -106,15 +106,14 @@ class TranslationManager
             return null;
         }
 
-        if (!$value && null !== $translation) {
+        if (null === $value && null !== $translation) {
             $cacheKey = $this->getCacheKey($locale, $domain, $key);
             $translation->setValue($value);
             $this->translations[$cacheKey] = $translation;
-
             return null;
         }
 
-        if ($value && null === $translation) {
+        if (null !== $value && null === $translation) {
             $translation = $this->createTranslation($key, $value, $locale, $domain);
         }
 
@@ -206,7 +205,7 @@ class TranslationManager
 
         $em = $this->getEntityManager(Translation::class);
         foreach ($this->translations as $key => $translation) {
-            if ($translation->getValue()) {
+            if (null !== $translation->getValue()) {
                 $em->persist($translation);
             } elseif ($translation->getId()) {
                 $em->remove($translation);
@@ -238,7 +237,7 @@ class TranslationManager
         $this->translationKeys = [];
         $this->translationKeysToRemove = [];
         $this->translations = [];
-        $this->domainProvier->clearCache();
+        $this->domainProvider->clearCache();
     }
 
     /**

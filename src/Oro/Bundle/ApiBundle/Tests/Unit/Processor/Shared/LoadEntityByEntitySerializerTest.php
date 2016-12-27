@@ -93,10 +93,8 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
             ->willReturn($dataFromSerializer);
 
         if ($isThrowable) {
-            $this->setExpectedException(
-                '\Oro\Bundle\ApiBundle\Exception\RuntimeException',
-                'The result must have one or zero items.'
-            );
+            $this->expectException('\Oro\Bundle\ApiBundle\Exception\RuntimeException');
+            $this->expectExceptionMessage('The result must have one or zero items.');
         }
 
         $this->context->setClassName($entityClass);

@@ -20,7 +20,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
 
     protected function setUp()
     {
-        $this->environment = $this->getMock('\Twig_Environment', [], [], '', false);
+        $this->environment = $this->createMock('\Twig_Environment');
 
         $this->engine = $this->createRendererEngine();
         $this->engine->setEnvironment($this->environment);
@@ -35,7 +35,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $resource = [$template, $blockName];
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->environment->expects($this->any())
@@ -59,7 +59,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $secondTheme = $this->createTheme($blockName);
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme, $secondTheme]);
@@ -85,7 +85,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $fourthTheme = $this->createTheme($blockName);
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme, $secondTheme, $thirdTheme, $fourthTheme]);
@@ -115,7 +115,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $thirdTheme = $this->createTheme($blockName);
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme, $secondTheme, $thirdTheme]);
@@ -143,7 +143,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
         $thirdTheme = $this->createTheme($blockName);
 
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $view */
-        $view = $this->getMock('Symfony\Component\Form\FormView', [], [], '', false);
+        $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = $cacheKey;
 
         $this->engine->addDefaultThemes([$firstTheme, $secondTheme, $thirdTheme]);
@@ -167,7 +167,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
      */
     protected function createTheme($blockName)
     {
-        $theme = $this->getMock('\Twig_Template', [], [], '', false);
+        $theme = $this->createMock('\Twig_Template');
         $theme->expects($this->any())
             ->method('getBlocks')
             ->willReturn([$blockName => [$theme, $blockName]]);
