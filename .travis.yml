@@ -20,10 +20,10 @@ before_script:
   - phpenv config-add travis.php.ini
   - composer self-update
   - composer global show fxp/composer-asset-plugin 1.2.2 || composer global require fxp/composer-asset-plugin:1.2.2
-  - travis_wait composer install --prefer-dist --optimize-autoloader --no-interaction
-  - DIFF=$(git diff --name-only --diff-filter=ACMR $TRAVIS_COMMIT_RANGE)
+  - travis_wait composer update --prefer-dist --optimize-autoloader --no-interaction --prefer-lowest --no-suggest --prefer-stable
+  - DIFF=$(git diff --name-only --diff-filter=ACMR $TRAVIS_COMMIT_RANGE | grep -e ".*\.php$")
 
 script:
   - phpunit
   - ./vendor/bin/phpcs ${DIFF} -p --encoding=utf-8 --extensions=php --standard=psr2
-  - ./vendor/bin/phpmd ${DIFF//$'\n'/,} text codesize --suffixes php
+  - ./vendor/bin/phpmd ${DIFF//$"\n"/,} text codesize --suffixes php
