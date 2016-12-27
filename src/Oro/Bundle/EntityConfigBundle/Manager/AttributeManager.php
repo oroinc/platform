@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Manager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -13,14 +13,16 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\AttributeGroupRepository;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class AttributeManager
 {
     /**
-     * @var ConfigModelManager
+     * @var ConfigManager
      */
-    private $configModelManager;
+    private $configManager;
 
     /**
      * @var DoctrineHelper
@@ -28,38 +30,22 @@ class AttributeManager
     private $doctrineHelper;
 
     /**
-     * @var ConfigProvider
-     */
-    private $attributeConfigProvider;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $entityConfigProvider;
-
-    /**
      * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @param ConfigModelManager $configModelManager
+     * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
-     * @param ConfigProvider $attributeConfigProvider
-     * @param ConfigProvider $entityConfigProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        ConfigModelManager $configModelManager,
+        ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
-        ConfigProvider $attributeConfigProvider,
-        ConfigProvider $entityConfigProvider,
         TranslatorInterface $translator
     ) {
-        $this->configModelManager = $configModelManager;
+        $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
-        $this->attributeConfigProvider = $attributeConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
         $this->translator = $translator;
     }
 
@@ -111,6 +97,17 @@ class AttributeManager
      * @param string $className
      * @return FieldConfigModel[]
      */
+    public function getActiveAttributesByClass($className)
+    {
+        $this->checkDatabase();
+
+        return $this->getRepository()->getActiveAttributesByClass($className);
+    }
+
+    /**
+     * @param string $className
+     * @return FieldConfigModel[]
+     */
     public function getSystemAttributesByClass($className)
     {
         $this->checkDatabase();
@@ -144,9 +141,11 @@ class AttributeManager
      */
     public function isSystem(FieldConfigModel $attribute)
     {
-        return $this->attributeConfigProvider
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+
+        return $extendConfigProvider
             ->getConfig($attribute->getEntity()->getClassName(), $attribute->getFieldName())
-            ->is('is_system');
+            ->is('owner', ExtendScope::OWNER_SYSTEM);
     }
 
     /**
@@ -155,7 +154,8 @@ class AttributeManager
      */
     public function getAttributeLabel(FieldConfigModel $attribute)
     {
-        $labelValue = $this->entityConfigProvider
+        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $labelValue = $entityConfigProvider
             ->getConfig($attribute->getEntity()->getClassName(), $attribute->getFieldName())
             ->get('label');
 
@@ -176,6 +176,31 @@ class AttributeManager
     public function getAttributesMapByGroupIds(array $groupIds)
     {
         return $this->getAttributeGroupRelationRepository()->getAttributesMapByGroupIds($groupIds);
+    }
+
+    /**
+     * @param AttributeFamily $attributeFamily
+     * @return array [['group' => $group1, 'attributes' => [$attribute1, $attribute2, ...]], ...]
+     */
+    public function getGroupsWithAttributes(AttributeFamily $attributeFamily)
+    {
+        /** @var AttributeGroupRepository $groupRepository */
+        $groupRepository = $this->doctrineHelper->getEntityRepositoryForClass(AttributeGroup::class);
+        $groups = $groupRepository->getGroupsWithAttributeRelations($attributeFamily);
+        $attributes = $this->getAttributesByFamily($attributeFamily);
+
+        $data = [];
+        /** @var AttributeGroup $group */
+        foreach ($groups as $group) {
+            $item = ['group' => $group, 'attributes' => []];
+            /** @var AttributeGroupRelation$attributeRelation */
+            foreach ($group->getAttributeRelations() as $attributeRelation) {
+                $item['attributes'][] = $attributes[$attributeRelation->getEntityConfigFieldId()];
+            }
+            $data[] = $item;
+        }
+
+        return $data;
     }
 
     /**
@@ -234,8 +259,7 @@ class AttributeManager
      */
     private function checkDatabase()
     {
-        $dbCheck = $this->configModelManager->checkDatabase();
-        if (!$dbCheck) {
+        if (!$this->configManager->isDatabaseReadyToWork()) {
             throw new LogicException(
                 'Cannot use config database when a db schema is not synced.'
             );

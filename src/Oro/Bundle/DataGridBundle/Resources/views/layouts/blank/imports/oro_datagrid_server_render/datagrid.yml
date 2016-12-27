@@ -1,0 +1,20 @@
+layout:
+    imports:
+        -
+            id: datagrid
+            root: __root
+
+    actions:
+        - '@setBlockTheme':
+            themes:
+                - 'server_render_datagrid.html.twig'
+                - 'server_render_datagrid_toolbar.html.twig'
+
+        - '@setOption':
+            id: __datagrid
+            optionName: split_to_cells
+            optionValue: true
+
+        - '@move':
+            id: __datagrid_toolbar
+            parentId: __datagrid

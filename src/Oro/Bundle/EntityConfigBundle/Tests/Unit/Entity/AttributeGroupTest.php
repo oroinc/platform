@@ -17,7 +17,6 @@ class AttributeGroupTest extends \PHPUnit_Framework_TestCase
         $properties = [
             ['id', 777],
             ['attributeFamily', new AttributeFamily()],
-            ['isDefault', true],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
             ['updatedAtSet', true]

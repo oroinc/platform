@@ -4,7 +4,7 @@ define(function(require) {
     'use strict';
 
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var ActionManager = require('oroaction/js/action-manager');
+    var ButtonManager = require('oroaction/js/button-manager');
     var _ = require('underscore');
     var $ = require('jquery');
 
@@ -37,24 +37,24 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onClick: function(e) {
-            this._getActionManager($(e.currentTarget)).execute(e);
+            this._getButtonManager($(e.currentTarget)).execute(e);
 
             return false;
         },
 
         /**
          * @param {jQuery.Element} $element
-         * @returns {ActionManager}
+         * @returns {ButtonManager}
          * @private
          */
-        _getActionManager: function($element) {
-            if (!$element.data('action-manager')) {
+        _getButtonManager: function($element) {
+            if (!$element.data('button-manager')) {
                 var options = $element.data('options') || {};
 
-                $element.data('action-manager', new ActionManager(options));
+                $element.data('button-manager', new ButtonManager(options));
             }
 
-            return $element.data('action-manager');
+            return $element.data('button-manager');
         },
 
         dispose: function() {

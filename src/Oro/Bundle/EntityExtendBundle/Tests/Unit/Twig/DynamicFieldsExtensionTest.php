@@ -5,9 +5,13 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
+use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
@@ -16,6 +20,8 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /**
      * @var DynamicFieldsExtension
      */
@@ -254,6 +260,96 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $rows = $this->extension->getFields($entity);
 
         $this->assertEquals(json_encode($expected), json_encode($rows));
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldDataProvider()
+    {
+        return [
+            'granted and visible field' => [
+                'fieldName' => 'name',
+                'fieldValue' => 'Nuts',
+                'fieldType' => 'bigint',
+                'isVisible' => true,
+                'isGranted' => true,
+                'expectedData' => [
+                    'type' => 'bigint',
+                    'label' => 'name',
+                    'value' => 'Nuts'
+                ],
+            ],
+            'granted and not visible field' => [
+                'fieldName' => 'name',
+                'fieldValue' => 'Nuts',
+                'fieldType' => 'bigint',
+                'isVisible' => false,
+                'isGranted' => true,
+                'expectedData' => false
+            ],
+            'not granted and visible field' => [
+                'fieldName' => 'name',
+                'fieldValue' => 'Nuts',
+                'fieldType' => 'bigint',
+                'isVisible' => true,
+                'isGranted' => false,
+                'expectedData' => false
+            ],
+            'not granted and not visible field' => [
+                'fieldName' => 'name',
+                'fieldValue' => 'Nuts',
+                'fieldType' => 'bigint',
+                'isVisible' => false,
+                'isGranted' => false,
+                'expectedData' => false
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getFieldDataProvider
+     *
+     * @param string $fieldName
+     * @param mixed $fieldValue
+     * @param string $fieldType
+     * @param bool $isVisible
+     * @param bool $isGranted
+     * @param bool|array $expectedData
+     */
+    public function testGetField($fieldName, $fieldValue, $fieldType, $isVisible, $isGranted, $expectedData)
+    {
+        $config = $this->getFieldMock($fieldName, $fieldType);
+        /** @var FieldConfigModel $field */
+        $field = $this->getEntity(FieldConfigModel::class, [
+            'fieldname' => $fieldName,
+            'entity' => $this->getEntity(EntityConfigModel::class)
+        ]);
+
+        $entity = $this->getEntity(TestProduct::class, ['name' => $fieldValue]);
+
+        $this->configProvider
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
+
+        $this->configProvider
+            ->expects($this->any())
+            ->method('getConfigById')
+            ->willReturn($config);
+
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->willReturn($isGranted);
+
+        $this->dispatcher
+            ->expects($this->exactly((int)$isGranted))
+            ->method('dispatch')
+            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) use ($isVisible) {
+                $event->setFieldVisibility($isVisible);
+            });
+
+        $this->assertEquals($expectedData, $this->extension->getField($entity, $field));
     }
 
     /**

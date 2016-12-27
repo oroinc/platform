@@ -43,17 +43,16 @@ class FieldConfigModelRepositoryTest extends WebTestCase
 
     public function testGetAttributesByIds()
     {
-        $attributes = $this->repository->getAttributesByIds([
-            LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1),
-            LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_2),
-            LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1)
-        ]);
+        $attribute1Id = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1);
+        $attribute2Id = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_2);
+        $attribute3Id = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
+        $attributes = $this->repository->getAttributesByIds([$attribute1Id, $attribute2Id, $attribute3Id]);
 
         $this->assertCount(3, $attributes);
         $this->assertInstanceOf(FieldConfigModel::class, reset($attributes));
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_1, $attributes[0]->getFieldName());
-        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_2, $attributes[1]->getFieldName());
-        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_1, $attributes[2]->getFieldName());
+        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_1, $attributes[$attribute1Id]->getFieldName());
+        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_2, $attributes[$attribute2Id]->getFieldName());
+        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_1, $attributes[$attribute3Id]->getFieldName());
     }
 
     public function testGetAttributesByIdsWithIndexEmpty()
@@ -106,6 +105,21 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_1, $attributes[2]->getFieldName());
         $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_2, $attributes[3]->getFieldName());
         $this->assertEquals(LoadAttributeData::NOT_USED_ATTRIBUTE, $attributes[4]->getFieldName());
+    }
+
+    public function testGetActiveAttributesByClass()
+    {
+        /** @var AttributeFamily $family */
+        $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
+
+        $attributes = $this->repository->getActiveAttributesByClass($family->getEntityClass());
+
+        $this->assertCount(4, $attributes);
+        $this->assertInstanceOf(FieldConfigModel::class, reset($attributes));
+        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_1, $attributes[0]->getFieldName());
+        $this->assertEquals(LoadAttributeData::SYSTEM_ATTRIBUTE_2, $attributes[1]->getFieldName());
+        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_1, $attributes[2]->getFieldName());
+        $this->assertEquals(LoadAttributeData::REGULAR_ATTRIBUTE_2, $attributes[3]->getFieldName());
     }
 
     public function testGetAttributesByClassAndIsSystemTrue()

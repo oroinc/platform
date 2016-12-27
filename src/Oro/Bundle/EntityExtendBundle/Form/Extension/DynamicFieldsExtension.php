@@ -76,6 +76,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $viewConfigProvider   = $this->configManager->getProvider('view');
+        $attributeConfigProvider  = $this->configManager->getProvider('attribute');
 
         $fields      = [];
         $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
@@ -87,8 +88,13 @@ class DynamicFieldsExtension extends AbstractTypeExtension
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $formConfig->getId();
             $fieldName     = $fieldConfigId->getFieldName();
-            $extendConfig  = $extendConfigProvider->getConfig($className, $fieldName);
 
+            $attributeConfig = $attributeConfigProvider->getConfig($className, $fieldName);
+            if ($attributeConfig->is('is_attribute')) {
+                continue;
+            }
+
+            $extendConfig  = $extendConfigProvider->getConfig($className, $fieldName);
             if (!$this->isApplicableField($extendConfig, $extendConfigProvider)) {
                 continue;
             }
@@ -119,6 +125,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
         $className = $options['data_class'];
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
+        $attributeConfigProvider  = $this->configManager->getProvider('attribute');
 
         $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
@@ -129,6 +136,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $formConfig->getId();
             $fieldName     = $fieldConfigId->getFieldName();
+
+            $attributeConfig = $attributeConfigProvider->getConfig($className, $fieldName);
+            if ($attributeConfig->is('is_attribute')) {
+                continue;
+            }
 
             $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
             if (!$this->isApplicableField($extendConfig, $extendConfigProvider)) {
