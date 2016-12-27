@@ -2,15 +2,15 @@ UPGRADE FROM 1.10 to 2.0
 ========================
 
 ####General
+- Upgrade to 2.0 is available only from 1.10 version. For this update
+  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted.
+  Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
+  Upgrade from version less then 1.10 is not supported.
 - Changed minimum required php version to 5.6
 - PhpUnit 5.7 support
 - LiipImagineBundle was updated to 1.5.* version.
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
-- Upgrade to 2.0 is available only from 1.10 version. For this update
-  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted.
-  Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
-  Upgrade from version less then 1.10 is not supported.
   
 ####SOAP API was removed
 - removed all dependencies to the `besimple/soap-bundle` bundle. 
