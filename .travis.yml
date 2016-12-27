@@ -25,5 +25,5 @@ before_script:
 
 script:
   - ./vendor/bin/phpunit
-  - ./vendor/bin/phpcs ${DIFF} -p --encoding=utf-8 --extensions=php --standard=psr2
+  - ./vendor/bin/phpcs ./src -p --encoding=utf-8 --extensions=php --standard=psr2
   - ./vendor/bin/phpmd ${DIFF//$"\n"/,} text codesize --suffixes php
