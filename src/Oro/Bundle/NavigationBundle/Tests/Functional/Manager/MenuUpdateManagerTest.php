@@ -159,12 +159,12 @@ class MenuUpdateManagerTest extends WebTestCase
 
         $this->assertCount(2, $updates);
 
-        $this->assertEquals(1, $updates[0]->getPriority());
+        $this->assertEquals(0, $updates[0]->getPriority());
         $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_3_1, $updates[0]->getKey());
         $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2, $updates[0]->getParentKey());
 
         $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2_1, $updates[1]->getKey());
-        $this->assertEquals(2, $updates[1]->getPriority());
+        $this->assertEquals(1, $updates[1]->getPriority());
     }
 
     public function testDeleteMenuUpdates()
