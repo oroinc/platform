@@ -154,7 +154,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         }
 
         $writer = $this->writerChain->getWriter($body['format']);
-        if (!$writer || ! $writer instanceof FileStreamWriter) {
+        if (! $writer instanceof FileStreamWriter) {
             $this->logger->critical(
                 sprintf('[DataGridExportMessageProcessor] Invalid writer alias: "%s"', $body['format']),
                 ['message' => $message]
