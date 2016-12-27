@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnClearEventArgs;
@@ -9,8 +11,6 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
-
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
@@ -56,19 +56,19 @@ class IndexListener implements OptionalListenerInterface
     protected $enabled = true;
 
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param IndexerInterface $searchIndexer
-     * @param PropertyAccessor $propertyAccessor
+     * @param PropertyAccessorInterface $propertyAccessor
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         IndexerInterface $searchIndexer,
-        PropertyAccessor $propertyAccessor
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->doctrineHelper   = $doctrineHelper;
         $this->searchIndexer    = $searchIndexer;
@@ -116,11 +116,13 @@ class IndexListener implements OptionalListenerInterface
         // inserted and updated entities should be processed as is
         $inserts = $unitOfWork->getScheduledEntityInsertions();
         $updates = $unitOfWork->getScheduledEntityUpdates();
+        $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
         $savedEntities = array_merge(
             $inserts,
             $this->getEntitiesWithUpdatedIndexedFields($unitOfWork),
             $this->getAssociatedEntitiesToReindex($entityManager, $inserts),
-            $this->getAssociatedEntitiesToReindex($entityManager, $updates)
+            $this->getAssociatedEntitiesToReindex($entityManager, $updates),
+            $this->getAssociatedEntitiesToReindex($entityManager, $deletedEntities)
         );
         foreach ($savedEntities as $hash => $entity) {
             if (empty($this->savedEntities[$hash]) && $this->isSupported($entity)) {
@@ -130,7 +132,6 @@ class IndexListener implements OptionalListenerInterface
 
         // schedule deleted entities
         // deleted entities should be processed as references because on postFlush they are already deleted
-        $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
         foreach ($deletedEntities as $hash => $entity) {
             if (empty($this->deletedEntities[$hash]) && $this->isSupported($entity)) {
                 $this->deletedEntities[$hash] = $entityManager->getReference(
@@ -191,13 +192,13 @@ class IndexListener implements OptionalListenerInterface
                 if (!empty($association['inversedBy'])) {
                     $targetClass = $association['targetEntity'];
 
-                    if (!$this->mappingProvider->hasFieldsMapping($targetClass)) {
+                    if (!$this->hasFieldMapping($targetClass, $association['inversedBy'])) {
                         continue;
                     }
 
-                    if ($association['type'] == ClassMetadataInfo::MANY_TO_ONE) {
+                    if ($association['type'] === ClassMetadataInfo::MANY_TO_ONE) {
                         $targetEntity = $this->propertyAccessor->getValue($entity, $association['fieldName']);
-                        if (null != $targetEntity) {
+                        if ($targetEntity) {
                             $targetHash = spl_object_hash($targetEntity);
                             $entitiesToReindex[$targetHash] = $targetEntity;
                         }
@@ -270,5 +271,24 @@ class IndexListener implements OptionalListenerInterface
     protected function hasEntitiesToIndex()
     {
         return !empty($this->savedEntities) || !empty($this->deletedEntities);
+    }
+
+    /**
+     * @param string $targetClass
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function hasFieldMapping($targetClass, $fieldName)
+    {
+        $fieldsMapping = $this->mappingProvider->getFieldsMapping($targetClass);
+
+        foreach ($fieldsMapping as $fieldMapping) {
+            if ($fieldMapping['name'] === $fieldName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

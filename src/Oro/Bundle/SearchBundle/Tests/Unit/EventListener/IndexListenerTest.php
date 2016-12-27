@@ -275,7 +275,7 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $meta
             ->expects($this->any())
             ->method('getAssociationMappings')
-            ->will($this->onConsecutiveCalls($metaProperties, [], [], []));
+            ->will($this->onConsecutiveCalls($metaProperties, [], [], [], $metaProperties, [], [], []));
 
         return $meta;
     }

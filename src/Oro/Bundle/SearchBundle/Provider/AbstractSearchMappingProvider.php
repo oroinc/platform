@@ -148,6 +148,23 @@ abstract class AbstractSearchMappingProvider
         && !empty($mappingConfig[$className]['fields']);
     }
 
+
+    /**
+     * Return fields mapping for the given class name
+     *
+     * @param string $className
+     *
+     * @return array
+     */
+    public function getFieldsMapping($className)
+    {
+        $mappingConfig = $this->getMappingConfig();
+
+        return $this->hasFieldsMapping($className)
+            ? $mappingConfig[$className]['fields']
+            : [];
+    }
+
     /**
      * Get mapping parameter for entity
      *
