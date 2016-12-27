@@ -25,4 +25,20 @@ class AttributeFamilyRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @param string $entityClass
+     * @return int
+     */
+    public function countFamiliesByEntityClass($entityClass)
+    {
+        $queryBuilder = $this->createQueryBuilder('family');
+
+        return (int) $queryBuilder
+            ->select($queryBuilder->expr()->count('family.id'))
+            ->andWhere($queryBuilder->expr()->eq('family.entityClass', ':entityClass'))
+            ->setParameter('entityClass', $entityClass)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

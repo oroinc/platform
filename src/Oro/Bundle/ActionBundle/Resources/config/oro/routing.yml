@@ -6,4 +6,4 @@ oro_action_widget:
 oro_action_ajax:
     resource:     "@OroActionBundle/Controller/AjaxController.php"
     type:         annotation
-    prefix:       /actionajax
+    prefix:       /ajax

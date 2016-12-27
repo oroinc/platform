@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\PrePersist;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
@@ -16,7 +17,8 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
  * @ORM\Table(name="oro_attribute_group")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EntityExtendBundle\Entity\Repository\AttributeGroupRepository")
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      mode="hidden"
  * )
@@ -62,6 +64,13 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     protected $labels;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="code", type="string", length=255, unique=false, nullable=true)
+     */
+    private $code;
+
+    /**
      * @var AttributeFamily
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups")
      * @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id")
@@ -78,12 +87,6 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
      * )
      */
     private $attributeRelations;
-
-    /**
-     * @var bool
-     * @ORM\Column(name="is_default", type="boolean")
-     */
-    private $isDefault = false;
 
     /**
      * {@inheritdoc}
@@ -166,22 +169,22 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     }
 
     /**
-     * @param bool $isDefault
+     * @param string $code
      * @return $this
      */
-    public function setIsDefault($isDefault)
+    public function setCode($code)
     {
-        $this->isDefault = $isDefault;
+        $this->code = $code;
 
         return $this;
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function getIsDefault()
+    public function getCode()
     {
-        return $this->isDefault;
+        return $this->code;
     }
 
     /**
@@ -209,5 +212,15 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @PrePersist
+     */
+    public function prePersist()
+    {
+        if (!$this->code) {
+            $this->code = uniqid('group_code', false); //Todo: should be removed in #BB-6143 for real code generating
+        }
     }
 }

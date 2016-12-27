@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -138,8 +138,8 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     public function testAssemble(
         $configuration,
         $expectedAttribute,
-        array $guessedParameters = array(),
-        array $transitionConfigurations = array()
+        array $guessedParameters = [],
+        array $transitionConfigurations = []
     ) {
         $relatedEntity = '\stdClass';
 

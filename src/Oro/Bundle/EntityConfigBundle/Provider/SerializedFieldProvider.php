@@ -81,7 +81,8 @@ class SerializedFieldProvider
         foreach ($propertyValues as $propertyValue) {
             $fieldValue = $getFieldValueCallback($propertyValue['config_id']['scope'], $propertyValue['code']);
 
-            if (!isset($fieldValue) || $fieldValue != $propertyValue['value']) {
+            // Please don't change to strict comparison to be able to compare empty data with false value.
+            if ($fieldValue != $propertyValue['value']) {
                 return false;
             }
         }

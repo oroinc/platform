@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -216,11 +217,13 @@ class AttributeController extends Controller
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
         $this->ensureEntityConfigSupported($entityConfigModel);
+        list ($layoutActions) = $this->getConfigProviderHelper()->getLayoutParams($entityConfigModel, 'attribute');
 
         $response = [
             'entity' => $entityConfigModel,
             'fieldClassName' => $this->container->getParameter('oro_entity_config.entity.entity_field.class'),
             'params' => ['entityId' => $entityConfigModel->getId()],
+            'layoutActions' => $layoutActions
         ];
 
         return $this->addInfoToResponse($response, $alias);
@@ -239,6 +242,8 @@ class AttributeController extends Controller
      *      type="action",
      *      group_name=""
      * )
+     * @param FieldConfigModel $field
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function removeAction(FieldConfigModel $field)
     {
@@ -266,6 +271,8 @@ class AttributeController extends Controller
      *      type="action",
      *      group_name=""
      * )
+     * @param FieldConfigModel $field
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function unremoveAction(FieldConfigModel $field)
     {
@@ -277,5 +284,13 @@ class AttributeController extends Controller
                 $this->get('translator')->trans('oro.entity_config.attribute.cannot_be_restored'),
                 $this->get('translator')->trans('oro.entity_config.attribute.was_restored')
             );
+    }
+
+    /**
+     * @return EntityConfigProviderHelper
+     */
+    private function getConfigProviderHelper()
+    {
+        return $this->get('oro_entity_config.helper.entity_config_provider_helper');
     }
 }

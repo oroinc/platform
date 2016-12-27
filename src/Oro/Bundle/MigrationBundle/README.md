@@ -155,7 +155,7 @@ Examples of database structure migrations
 
 Extensions for database structure migrations
 --------------------------------------------
-Sometime you cannot use standard Doctrime methods for database structure modification. For example `Schema::renameTable` does not work because it drops existing table and then creates a new table. To help you to manage such case and allow to add some useful functionality to any migration a extensions mechanism was designed. The following example shows how [RenameExtension][5] can be used:
+Sometime you cannot use standard Doctrine methods for database structure modification. For example `Schema::renameTable` does not work because it drops existing table and then creates a new table. To help you to manage such case and allow to add some useful functionality to any migration a extensions mechanism was designed. The following example shows how [RenameExtension][5] can be used:
 ``` php
 <?php
 

@@ -292,25 +292,28 @@ class MenuUpdateManager
         $currentUpdate = $this->findOrCreateMenuUpdate($menuName, $key, $scope);
 
         $parent = $this->findMenuItem($menuName, $parentKey, $scope);
-        $currentUpdate
-            ->setParentKey($parent ? $parent->getName() : null)
-            ->setUpdatedAt(new \DateTime('UTC'))
-        ;
+        if ($menuName !== $parentKey) {
+            $currentUpdate
+                ->setParentKey($parent ? $parent->getName() : null)
+                ->setUpdatedAt(new \DateTime('UTC'))
+            ;
+        }
 
-        $i = 0;
         $order = [];
 
+        $i = 0;
         /** @var ItemInterface $child */
         foreach ($parent->getChildren() as $child) {
-            if ($position == $i++) {
+            if ($i === (int) $position) {
                 $currentUpdate
-                    ->setPriority($i++)
+                    ->setPriority($i)
                     ->setUpdatedAt(new \DateTime('UTC'))
                 ;
+                $i++;
             }
 
             if ($child->getName() != $key) {
-                $order[$i] = $child;
+                $order[$i++] = $child;
             }
         }
 

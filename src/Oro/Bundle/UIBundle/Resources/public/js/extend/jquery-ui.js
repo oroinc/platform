@@ -190,7 +190,9 @@ define(function(require) {
              * Replace method because some browsers return string 'auto' if property z-index not specified.
              * */
             _moveToTop: function() {
-                if (typeof this.uiDialog.css('z-index') === 'string') {
+                var zIndex = this.uiDialog.css('z-index');
+                var numberRegexp = /^\d+$/;
+                if (typeof zIndex === 'string' && !numberRegexp.test(zIndex)) {
                     this.uiDialog.css('z-index', 910);
                 }
                 oldMoveToTop.apply(this);
