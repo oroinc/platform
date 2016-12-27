@@ -92,6 +92,27 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getActiveWorkflows()
+    {
+        $exclusiveGroups = [];
+        return parent::getActiveWorkflows()->filter(
+            function (Workflow $workflow) use (&$exclusiveGroups) {
+                $currentGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
+
+                if (array_intersect($exclusiveGroups, $currentGroups)) {
+                    return false;
+                }
+
+                $exclusiveGroups += $currentGroups;
+
+                return true;
+            }
+        );
+    }
+
+    /**
      * @param $value
      * @param array|null $data
      *
