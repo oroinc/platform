@@ -59,13 +59,12 @@ class OrmExpressionVisitor extends ExpressionVisitor
             return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
 
-        $this->qb->innerJoin($joinField, $joinAlias);
+        $this->qb->innerJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
+        $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
 
         if ($type === Query::TYPE_TEXT && !in_array($condition, [Query::OPERATOR_IN, Query::OPERATOR_NOT_IN], true)) {
             if ($searchCondition['fieldValue'] === '') {
-                $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
-
-                return $joinAlias . '.field = :field' . $index;
+                return '';
             } else {
                 return $this->driver->addTextField($this->qb, $index, $searchCondition, $this->setOrderBy);
             }
