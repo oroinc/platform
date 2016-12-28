@@ -12,8 +12,8 @@ class LexerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $translatorMock = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $providerMock   = $this->getMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
+        $translatorMock = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $providerMock   = $this->createMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
         $this->lexer    = new Lexer($translatorMock, $providerMock);
     }
 
@@ -32,7 +32,7 @@ class LexerTest extends \PHPUnit_Framework_TestCase
     public function testTokenize($input, array $expectedTokens, $expectedException = null)
     {
         if (null !== $expectedException) {
-            $this->setExpectedException($expectedException);
+            $this->expectException($expectedException);
         }
 
         $result = $this->lexer->tokenize($input);

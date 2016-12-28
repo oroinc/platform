@@ -57,7 +57,7 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $expr = $this->getMock('Doctrine\ORM\Query\Expr');
+        $expr = $this->createMock('Doctrine\ORM\Query\Expr');
 
         $qb->expects($this->once())
             ->method('select')

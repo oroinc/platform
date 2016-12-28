@@ -139,7 +139,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
         /** @var $statement Statement|\PHPUnit_Framework_MockObject_MockObject */
         list($entityManager, , $statement) = $this->prepareMocks();
 
-        $dbalQb = $this->getMock(
+        $dbalQb = $this->createMock(
             'Doctrine\DBAL\Query\QueryBuilder',
             ['getSQL', 'resetQueryParts', 'select', 'from', 'execute'],
             [],
@@ -201,7 +201,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
 
         $configuration->addEntityNamespace('Stub', 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub');
 
-        $classMetadata = new ClassMetadata('Entity');
+        $classMetadata = new ClassMetadata(\stdClass::class);
         $classMetadata->mapField(['fieldName' => 'a', 'columnName' => 'a']);
         $classMetadata->mapField(['fieldName' => 'b', 'columnName' => 'b']);
         $classMetadata->setIdentifier(['a']);

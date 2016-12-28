@@ -16,7 +16,7 @@ class EmailThreadTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmailsGetterAndSetter()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
 
         $entity = new EmailThread();
         $entity->addEmail($email);

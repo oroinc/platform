@@ -59,7 +59,7 @@ class ConfigFieldGridController extends Controller
         $formAction = $this->generateUrl('oro_entityextend_field_create', ['id' => $entityConfigModel->getId()]);
 
         return $this
-            ->get('oro_entity_extend.form.handler.create_update_config_field_handler')
+            ->get('oro_entity_config.form.handler.create_update_config_field_handler')
             ->handleCreate($request, $fieldConfigModel, $formAction);
     }
 
@@ -83,7 +83,7 @@ class ConfigFieldGridController extends Controller
         $formAction = $this->generateUrl('oro_entityextend_field_update', ['id' => $entity->getId()]);
 
         return $this
-            ->get('oro_entity_extend.form.handler.create_update_config_field_handler')
+            ->get('oro_entity_config.form.handler.create_update_config_field_handler')
             ->handleFieldSave($request, $entity, $redirectUrl, $formAction, $successMessage);
     }
 
@@ -127,7 +127,7 @@ class ConfigFieldGridController extends Controller
         $successMessage = $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.deleted');
 
         $response = $this
-            ->get('oro_entity_extend.form.handler.remove_restore_field_handler')
+            ->get('oro_entity_config.form.handler.remove_restore_field_handler')
             ->handleRemove($field, $successMessage);
 
         return $response;
@@ -153,7 +153,7 @@ class ConfigFieldGridController extends Controller
     {
         $this->ensureFieldConfigModelIsCustom($field);
 
-        return $this->get('oro_entity_extend.form.handler.remove_restore_field_handler')->handleRestore(
+        return $this->get('oro_entity_config.form.handler.remove_restore_field_handler')->handleRestore(
             $field,
             $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.cannot_be_restored'),
             $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.restored')

@@ -39,7 +39,7 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
             ->disableOriginalConstructor()
@@ -78,7 +78,7 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
             ->method('getPath')
             ->will($this->returnValue('/tmp/test{_locale}'));
 
-        $routeCollectionMock = $this->getMock('Symfony\Component\Routing\RouteCollection');
+        $routeCollectionMock = $this->createMock('Symfony\Component\Routing\RouteCollection');
         $routeCollectionMock->expects($this->once())
             ->method('get')
             ->will($this->returnValue($routeMock));
@@ -111,7 +111,7 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
             ->method('getPath')
             ->will($this->returnValue('/tmp/test{_locale}'));
 
-        $routeCollectionMock = $this->getMock('Symfony\Component\Routing\RouteCollection');
+        $routeCollectionMock = $this->createMock('Symfony\Component\Routing\RouteCollection');
         $routeCollectionMock->expects($this->once())
             ->method('get')
             ->will($this->returnValue($routeMock));

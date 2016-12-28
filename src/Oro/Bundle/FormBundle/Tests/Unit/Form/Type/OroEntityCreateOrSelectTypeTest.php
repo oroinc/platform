@@ -430,7 +430,8 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
      */
     public function testExecuteException(array $options, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         $this->factory->create($this->formType, null, $options);
     }

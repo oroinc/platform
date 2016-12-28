@@ -39,7 +39,7 @@ class GridViewsLoadListenerTest extends \PHPUnit_Framework_TestCase
         $gridViewManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->registry
             ->expects($this->any())

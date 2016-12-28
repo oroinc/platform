@@ -30,7 +30,7 @@ class EntityRoutingHelperTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->urlGenerator   = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        $this->urlGenerator   = $this->createMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
 
         $this->entityRoutingHelper = new EntityRoutingHelper(
             $entityClassNameHelper,

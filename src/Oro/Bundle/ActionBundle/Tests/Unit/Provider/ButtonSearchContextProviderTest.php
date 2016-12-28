@@ -46,7 +46,7 @@ class ButtonSearchContextProviderTest extends \PHPUnit_Framework_TestCase
         $buttonSearchContext = $this->provider->getButtonSearchContext($context);
 
         $this->assertSame($context[ContextHelper::GROUP_PARAM], $buttonSearchContext->getGroup());
-        $this->assertSame($context[ContextHelper::DATAGRID_PARAM], $buttonSearchContext->getGridName());
+        $this->assertSame($context[ContextHelper::DATAGRID_PARAM], $buttonSearchContext->getDatagrid());
         $this->assertSame($context[ContextHelper::ENTITY_CLASS_PARAM], $buttonSearchContext->getEntityClass());
         $this->assertSame($context[ContextHelper::ENTITY_ID_PARAM], $buttonSearchContext->getEntityId());
         $this->assertSame($context[ContextHelper::FROM_URL_PARAM], $buttonSearchContext->getReferrer());

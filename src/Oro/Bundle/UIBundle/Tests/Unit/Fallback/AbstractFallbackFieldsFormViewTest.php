@@ -48,14 +48,14 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->requestStack = $this->getMock(RequestStack::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
         $this->event = $this->getMockBuilder(BeforeListRenderEvent::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(
@@ -68,7 +68,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit_Framework_TestCase
             $this->doctrine,
             $this->translator
         );
-        $this->scrollData = $this->getMock(ScrollData::class);
+        $this->scrollData = $this->createMock(ScrollData::class);
     }
 
     public function testAddBlockToEntityView()

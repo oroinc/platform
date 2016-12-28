@@ -43,7 +43,7 @@ class TemplateFixtureRelationCalculatorTest extends \PHPUnit_Framework_TestCase
     {
         $entityName = 'stdClass';
 
-        $fixture = $this->getMock('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface');
+        $fixture = $this->createMock('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface');
         $fixture->expects($this->once())
             ->method('getData')
             ->will($this->returnValue($fixtureData));

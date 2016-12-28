@@ -35,7 +35,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit_Framework_TestCase
         $this->systemConfigFallbackProvider = new SystemConfigFallbackProvider($this->configManager);
         $this->configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
         $this->systemConfigFallbackProvider->setConfigProvider($this->configProvider);
-        $this->configInterface = $this->getMock(ConfigInterface::class);
+        $this->configInterface = $this->createMock(ConfigInterface::class);
     }
 
     public function testIsFallbackSupportedReturnsTrue()
@@ -45,7 +45,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFallbackHolderEntityThrowsExceptionIfNoConfigFound()
     {
-        $this->setExpectedException(FallbackFieldConfigurationMissingException::class);
+        $this->expectException(FallbackFieldConfigurationMissingException::class);
         $entityConfig = $this->getEntityConfiguration();
         $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST][SystemConfigFallbackProvider::FALLBACK_ID] = [];
         $this->setUpFallbackConfig($entityConfig);

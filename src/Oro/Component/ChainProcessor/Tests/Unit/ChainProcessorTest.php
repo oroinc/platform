@@ -11,10 +11,10 @@ class ChainProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testExecuteProcessors()
     {
-        $processor1 = $this->getMock('Oro\Component\ChainProcessor\ProcessorInterface');
-        $processor2 = $this->getMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor1 = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor2 = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
 
-        $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $factory->expects($this->exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);
@@ -39,10 +39,10 @@ class ChainProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteProcessorsFailure()
     {
-        $processor1 = $this->getMock('Oro\Component\ChainProcessor\ProcessorInterface');
-        $processor2 = $this->getMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor1 = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
+        $processor2 = $this->createMock('Oro\Component\ChainProcessor\ProcessorInterface');
 
-        $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $factory->expects($this->exactly(2))
             ->method('getProcessor')
             ->willReturnOnConsecutiveCalls($processor1, $processor2);

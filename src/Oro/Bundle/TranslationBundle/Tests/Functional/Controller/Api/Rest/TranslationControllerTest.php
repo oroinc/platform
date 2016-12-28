@@ -125,9 +125,14 @@ class TranslationControllerTest extends WebTestCase
                 'expectedValue' => 'value1',
                 'expectedStatus' => true,
             ],
-            'delete value' => [
+            'empty string value' => [
                 'input' => '',
                 'expectedValue' => '',
+                'expectedStatus' => true,
+            ],
+            'null value' => [
+                'input' => null,
+                'expectedValue' => null,
                 'expectedStatus' => false,
             ],
         ];

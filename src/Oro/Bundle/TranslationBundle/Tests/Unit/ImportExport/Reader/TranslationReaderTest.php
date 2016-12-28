@@ -39,11 +39,11 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock(TranslatorBagInterface::class);
+        $this->translator = $this->createMock(TranslatorBagInterface::class);
         $this->stepExecution = $this->getMockBuilder(StepExecution::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->context = $this->getMock(ContextInterface::class);
+        $this->context = $this->createMock(ContextInterface::class);
 
         $this->contextRegistry->expects($this->any())
             ->method('getByStepExecution')

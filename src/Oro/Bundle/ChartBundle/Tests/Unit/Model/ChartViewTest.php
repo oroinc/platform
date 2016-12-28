@@ -27,8 +27,8 @@ class ChartViewTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->twig = $this->getMock('Twig_Environment');
-        $this->data = $this->getMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $this->twig = $this->createMock('Twig_Environment');
+        $this->data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
         $this->chartView = new ChartView(
             $this->twig,
             self::TEMPLATE,

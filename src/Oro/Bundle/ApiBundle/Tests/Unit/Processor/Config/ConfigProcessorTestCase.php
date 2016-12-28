@@ -37,7 +37,7 @@ class ConfigProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $actionProcessorBag = $this->getMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
+        $actionProcessorBag = $this->createMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
         $actionProcessorBag->expects($this->any())
             ->method('getActions')
             ->willReturn(

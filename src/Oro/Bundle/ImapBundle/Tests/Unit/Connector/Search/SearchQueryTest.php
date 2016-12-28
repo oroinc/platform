@@ -125,7 +125,7 @@ class SearchQueryTest extends \PHPUnit_Framework_TestCase
 
     private function createSearchQuery()
     {
-        $searchStringManager = $this->getMock('Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface');
+        $searchStringManager = $this->createMock('Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface');
         $searchStringManager
             ->expects($this->any())
             ->method('isAcceptableItem')

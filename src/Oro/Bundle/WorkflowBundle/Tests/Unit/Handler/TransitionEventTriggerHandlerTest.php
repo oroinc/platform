@@ -46,7 +46,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
 
-        $this->objectManager = $this->getMock(ObjectManager::class);
+        $this->objectManager = $this->createMock(ObjectManager::class);
 
         /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $registry */
         $registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
@@ -153,7 +153,8 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit_Framework_TestCase
             ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
             ->willReturn(true);
 
-        $this->setExpectedException($expectedException, $expectedMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedMessage);
 
         $this->handler->process($this->trigger, $message);
     }

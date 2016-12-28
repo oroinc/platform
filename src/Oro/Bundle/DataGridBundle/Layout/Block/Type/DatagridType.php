@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Layout\Block\Type;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -13,6 +12,7 @@ use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ImportLayoutManipulator;
 use Oro\Component\Layout\Util\BlockUtils;
 
 class DatagridType extends AbstractContainerType
@@ -54,7 +54,7 @@ class DatagridType extends AbstractContainerType
             ->setDefaults([
                 'grid_parameters' => [],
                 'grid_render_parameters' => [],
-                'split_to_cells' => false
+                'split_to_cells' => false,
             ]);
     }
 
@@ -66,26 +66,44 @@ class DatagridType extends AbstractContainerType
         if ($options['split_to_cells']) {
             $columns = $this->getGridColumns($options['grid_name']);
             if ($columns) {
-                $id = $builder->getId();
+                $rootId = $builder->getId();
 
-                $headerRowId = $this->generateName([$id, 'header', 'row']);
-                $builder->getLayoutManipulator()->add($headerRowId, $id, 'datagrid_header_row');
+                $headerRowId = $this->generateName([$rootId, 'header', 'row']);
+                $this->addChild($builder, $rootId, $options, $headerRowId, 'datagrid_header_row');
 
-                $rowId = $this->generateName([$id, 'row']);
-                $builder->getLayoutManipulator()->add($rowId, $id, 'datagrid_row');
+                $rowId = $this->generateName([$rootId, 'row']);
+                $this->addChild($builder, $rootId, $options, $rowId, 'datagrid_row');
 
                 foreach ($columns as $columnName => $column) {
-                    $headerCellId = $this->generateName([$id, 'header', 'cell', $columnName]);
-                    $builder->getLayoutManipulator()
-                        ->add($headerCellId, $headerRowId, 'datagrid_header_cell', ['column_name' => $columnName]);
+                    $headerCellId = $this->generateName([$rootId, 'header', 'cell', $columnName]);
+                    $this->addChild(
+                        $builder,
+                        $headerRowId,
+                        $options,
+                        $headerCellId,
+                        'datagrid_header_cell',
+                        ['column_name' => $columnName]
+                    );
 
-                    $cellId = $this->generateName([$id, 'cell', $columnName]);
-                    $builder->getLayoutManipulator()
-                        ->add($cellId, $rowId, 'datagrid_cell', ['column_name' => $columnName]);
+                    $cellId = $this->generateName([$rootId, 'cell', $columnName]);
+                    $this->addChild(
+                        $builder,
+                        $rowId,
+                        $options,
+                        $cellId,
+                        'datagrid_cell',
+                        ['column_name' => $columnName]
+                    );
 
-                    $cellValueId = $this->generateName([$id, 'cell', $columnName, 'value']);
-                    $builder->getLayoutManipulator()
-                        ->add($cellValueId, $cellId, 'datagrid_cell_value', ['column_name' => $columnName]);
+                    $cellValueId = $this->generateName([$rootId, 'cell', $columnName, 'value']);
+                    $this->addChild(
+                        $builder,
+                        $cellId,
+                        $options,
+                        $cellValueId,
+                        'datagrid_cell_value',
+                        ['column_name' => $columnName]
+                    );
                 }
             }
         }
@@ -96,7 +114,11 @@ class DatagridType extends AbstractContainerType
      */
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
-        BlockUtils::setViewVarsFromOptions($view, $options, ['grid_name', 'grid_parameters', 'grid_render_parameters']);
+        BlockUtils::setViewVarsFromOptions($view, $options, [
+            'grid_name',
+            'grid_parameters',
+            'grid_render_parameters',
+        ]);
 
         $view->vars['split_to_cells'] = $options['split_to_cells'];
         if (!empty($options['grid_scope'])) {
@@ -121,7 +143,7 @@ class DatagridType extends AbstractContainerType
     /**
      * @param string $gridName
      *
-     * @return DatagridInterface
+     * @return array
      */
     private function getGridColumns($gridName)
     {
@@ -154,11 +176,58 @@ class DatagridType extends AbstractContainerType
     }
 
     /**
+     * @param BlockBuilderInterface $builder
+     * @param string                $rootId
+     * @param Options               $rootOptions
+     * @param string                $childId
+     * @param string                $childType
+     * @param array                 $childOptions
+     *
+     * @return DatagridType
+     */
+    private function addChild(
+        BlockBuilderInterface $builder,
+        $rootId,
+        Options $rootOptions,
+        $childId,
+        $childType,
+        array $childOptions = []
+    ) {
+        $options = $this->getChildOptions($rootOptions, $childType, $childOptions);
+        $builder->getLayoutManipulator()->add($childId, $rootId, $childType, $options);
+
+        return $this;
+    }
+
+    /**
+     * @param Options $rootOptions
+     * @param string  $childBlockType
+     * @param array   $childOptions
+     *
+     * @return array
+     */
+    private function getChildOptions(Options $rootOptions, $childBlockType, array $childOptions = [])
+    {
+        $name = ImportLayoutManipulator::NAMESPACE_PLACEHOLDER . $childBlockType;
+
+        $options = $rootOptions->toArray();
+        if (array_key_exists('additional_block_prefixes', $options)) {
+            foreach ($options['additional_block_prefixes'] as $prefix) {
+                $parts = explode(ImportLayoutManipulator::NAMESPACE_PLACEHOLDER, $prefix);
+                $lastPart = ImportLayoutManipulator::NAMESPACE_PLACEHOLDER . end($parts);
+                $childOptions['additional_block_prefixes'][] = preg_replace('/' . $lastPart . '$/', $name, $prefix);
+            }
+        }
+
+        return $childOptions;
+    }
+
+    /**
      * @param array $parts
      *
      * @return string
      */
-    private function generateName($parts = [])
+    private function generateName(array $parts = [])
     {
         return implode('_', $parts);
     }

@@ -58,7 +58,8 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         $message = new NullMessage();
         $message->setBody('{]');
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'The malformed json given.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The malformed json given.');
         $processor->process($message, new NullSession());
     }
 
@@ -149,7 +150,6 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldExecuteProcessJob()
     {
-
         $processJob = new ProcessJob();
 
         $entityManager = $this->createEntityManagerMock();
@@ -160,7 +160,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $entityRepository = $this->createEntityRepositoryMock();
         $entityRepository
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('find')
             ->with('theProcessJobId')
             ->willReturn($processJob)
@@ -168,15 +168,15 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processHandle = $this->createProcessHandlerMock();
         $processHandle
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('handleJob')
-            ->with(self::identicalTo($processJob))
+            ->with($processJob)
         ;
 
         $processHandle
             ->expects($this->once())
             ->method('finishJob')
-            ->with(self::identicalTo($processJob))
+            ->with($processJob)
         ;
 
         $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
@@ -195,12 +195,75 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $status);
     }
 
+    public function testFinishJobOnException()
+    {
+        $processJob = new ProcessJob();
+
+        $entityManager = $this->createEntityManagerMock();
+        $entityManager
+            ->expects(self::never())
+            ->method('commit')
+        ;
+        $entityManager
+            ->expects(self::once())
+            ->method('rollback')
+        ;
+
+        $entityRepository = $this->createEntityRepositoryMock();
+        $entityRepository
+            ->expects(self::once())
+            ->method('find')
+            ->with('theProcessJobId')
+            ->willReturn($processJob)
+        ;
+
+        $exception = new \Exception('unexpected');
+
+        $processHandle = $this->createProcessHandlerMock();
+        $processHandle
+            ->expects(self::once())
+            ->method('handleJob')
+            ->with(self::identicalTo($processJob))
+            ->willThrowException(new \Exception('unexpected'))
+        ;
+
+        $processHandle
+            ->expects(self::once())
+            ->method('finishJob')
+            ->with(self::identicalTo($processJob))
+        ;
+
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects(self::once())
+            ->method('critical')
+            ->with(
+                '[ExecuteProcessJobProcessor] Raised exception for job with id {process_job_id}',
+                [
+                    'process_job_id' => 'theProcessJobId',
+                    'exception' => $exception
+                ]
+            )
+        ;
+
+        $doctrineHelper = $this->createDoctrineHelperStub($entityManager, $entityRepository);
+
+        $processor = new ExecuteProcessJobProcessor($doctrineHelper, $processHandle, $logger);
+
+        $message = new NullMessage();
+        $message->setBody(JSON::encode(['process_job_id' => 'theProcessJobId']));
+
+        $status = $processor->process($message, new NullSession());
+
+        self::assertEquals(MessageProcessorInterface::REJECT, $status);
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ProcessHandler
      */
     private function createProcessHandlerMock()
     {
-        return $this->getMock(ProcessHandler::class, [], [], '', false);
+        return $this->createMock(ProcessHandler::class);
     }
 
     /**
@@ -208,7 +271,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityManagerMock()
     {
-        return $this->getMock(EntityManagerInterface::class);
+        return $this->createMock(EntityManagerInterface::class);
     }
 
     /**
@@ -216,7 +279,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityRepositoryMock()
     {
-        return $this->getMock(EntityRepository::class, [], [], '', false);
+        return $this->createMock(EntityRepository::class);
     }
 
     /**
@@ -224,15 +287,18 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
+     * @param null $entityManager
+     * @param null $entityRepository
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
      */
     private function createDoctrineHelperStub($entityManager = null, $entityRepository = null)
     {
-        $doctrineHelper =  $this->getMock(DoctrineHelper::class, [], [], '', false);
+        $doctrineHelper =  $this->createMock(DoctrineHelper::class);
         $doctrineHelper
             ->expects($this->any())
             ->method('getEntityRepository')

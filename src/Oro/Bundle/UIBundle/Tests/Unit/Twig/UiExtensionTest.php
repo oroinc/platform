@@ -23,7 +23,7 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->extension = new UiExtension($this->eventDispatcher);
     }
@@ -55,12 +55,12 @@ class UiExtensionTest extends \PHPUnit_Framework_TestCase
     public function testOnScrollDataBefore()
     {
         /** @var \Twig_Environment $environment */
-        $environment = $this->getMock('\Twig_Environment');
+        $environment = $this->createMock('\Twig_Environment');
         $pageIdentifier = 'test-page';
         $data = new ScrollData(['fields']);
         $alteredData = new ScrollData(['altered', 'fields']);
         /** @var FormView $formView */
-        $formView = $this->getMock('Symfony\Component\Form\FormView');
+        $formView = $this->createMock('Symfony\Component\Form\FormView');
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')

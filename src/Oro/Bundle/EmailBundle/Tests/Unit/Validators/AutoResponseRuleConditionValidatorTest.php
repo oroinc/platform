@@ -18,7 +18,7 @@ class AutoResponseRuleConditionValidatorTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->constraint = new AutoResponseRuleConditionConstraint();
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
+        $this->context = $this->createMock('Symfony\Component\Validator\ExecutionContextInterface');
     }
 
     /**

@@ -37,7 +37,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $regionMock = $this->getMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
+        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
 
         return array(
             'country'      => array('country', $countryMock),
@@ -233,7 +233,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMockRegion($name)
     {
-        $result = $this->getMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
+        $result = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
         $result->expects($this->any())
             ->method('__toString')
             ->will($this->returnValue($name));
@@ -257,7 +257,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
 
     public function testIsRegionValidNoCountry()
     {
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->never())
             ->method('addViolationAt');
 
@@ -275,7 +275,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             ->method('hasRegions')
             ->will($this->returnValue(false));
 
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->never())
             ->method('addViolationAt');
 
@@ -297,7 +297,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('Country'));
 
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->once())
             ->method('getPropertyPath')
             ->will($this->returnValue('test'));
@@ -342,7 +342,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $countryMock = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
             ->disableOriginalConstructor()
             ->getMock();
-        $regionMock = $this->getMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
+        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
         return array(
             'lastName' => array('lastName', 'last name'),
             'firstName' => array('firstName', 'first_name'),

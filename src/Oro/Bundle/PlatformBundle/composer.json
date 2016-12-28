@@ -15,7 +15,6 @@
         "psr-0": { "Oro\\Bundle\\PlatformBundle": "" }
     },
     "target-dir": "Oro/Bundle/PlatformBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

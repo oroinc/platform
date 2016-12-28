@@ -88,11 +88,11 @@ class EntityPoolTest extends \PHPUnit_Framework_TestCase
 
     protected function createEntityManager()
     {
-        return $this->getMock('TestEntity');
+        return $this->createMock(\ArrayObject::class);
     }
 
     protected function createTestEntity()
     {
-        return $this->getMock('TestEntity');
+        return $this->createMock(\ArrayObject::class);
     }
 }

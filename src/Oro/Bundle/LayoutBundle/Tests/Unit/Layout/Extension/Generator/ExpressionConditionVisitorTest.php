@@ -23,7 +23,7 @@ class ExpressionConditionVisitorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         
-        $expressionLanguage = $this->getMock(ExpressionLanguage::class);
+        $expressionLanguage = $this->createMock(ExpressionLanguage::class);
         $expressionLanguage->expects($this->once())
             ->method('compile')
             ->with($expression)

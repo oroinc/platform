@@ -100,8 +100,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         $migrations = [
             new MigrationState($migration)
         ];
-        $this->setExpectedException(
-            '\RuntimeException',
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration.'
         );
         $this->executor->executeUp($migrations);
@@ -126,8 +126,8 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         $migrations = [
             new MigrationState($migration)
         ];
-        $this->setExpectedException(
-            '\RuntimeException',
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage(
             'Failed migrations: Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration.'
         );
         $this->executor->executeUp($migrations);

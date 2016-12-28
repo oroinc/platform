@@ -29,7 +29,7 @@ class StatusManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repository = $this->getMock(
+        $this->repository = $this->createMock(
             'Doctrine\Common\Persistence\ObjectRepository',
             array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName')
         );

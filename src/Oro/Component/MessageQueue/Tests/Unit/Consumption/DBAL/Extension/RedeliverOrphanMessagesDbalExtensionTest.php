@@ -63,10 +63,6 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
     public function testShouldDoNothingIfNotInstanceOfDbalSession()
     {
         $session = $this->createNullSessionMock();
-        $session
-            ->expects($this->never())
-            ->method('getConnection')
-        ;
 
         $context = new Context($session);
 
@@ -79,7 +75,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
      */
     private function createNullSessionMock()
     {
-        return $this->getMock(NullSession::class, [], [], '', false);
+        return $this->createMock(NullSession::class);
     }
 
     /**
@@ -87,7 +83,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class, [], [], '', false);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -95,7 +91,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
      */
     private function createSessionMock()
     {
-        return $this->getMock(DbalSession::class, [], [], '', false);
+        return $this->createMock(DbalSession::class);
     }
 
     /**
@@ -103,7 +99,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
      */
     private function createConnectionMock()
     {
-        return $this->getMock(DbalConnection::class, [], [], '', false);
+        return $this->createMock(DbalConnection::class);
     }
 
     /**
@@ -111,6 +107,6 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
      */
     private function createDBALConnection()
     {
-        return $this->getMock(Connection::class, [], [], '', false);
+        return $this->createMock(Connection::class);
     }
 }

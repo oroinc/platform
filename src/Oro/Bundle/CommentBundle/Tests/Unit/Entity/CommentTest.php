@@ -37,8 +37,8 @@ class CommentTest extends AbstractEntityTestCase
      */
     public function getSetDataProvider()
     {
-        $owner        = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $owner        = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $createdAt    = new \DateTime('now');
         $updatedAt    = new \DateTime('now');
 

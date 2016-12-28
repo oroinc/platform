@@ -43,8 +43,8 @@ class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
 
         $emptyDataNormalizer = $options['empty_data'];
 
-        $form = $this->getMock(FormInterface::class);
-        $formConfig = $this->getMock(FormConfigInterface::class);
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
@@ -72,8 +72,8 @@ class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
 
         $emptyDataNormalizer = $options['empty_data'];
 
-        $form = $this->getMock(FormInterface::class);
-        $formConfig = $this->getMock(FormConfigInterface::class);
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
@@ -93,7 +93,7 @@ class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
 
         $emptyDataNormalizer = $options['empty_data'];
 
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
         $form->expects(self::once())
             ->method('isEmpty')
             ->willReturn(true);
@@ -116,7 +116,7 @@ class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
 
         $emptyDataNormalizer = $options['empty_data'];
 
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
         $form->expects(self::once())
             ->method('isEmpty')
             ->willReturn(true);
@@ -142,7 +142,7 @@ class EmptyDataExtensionTest extends \PHPUnit_Framework_TestCase
 
         $emptyDataNormalizer = $options['empty_data'];
 
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
         $form->expects(self::once())
             ->method('isEmpty')
             ->willReturn(false);

@@ -34,10 +34,11 @@ class WorkflowAwareEntityFetcherTest extends WebTestCase
 
         $helper = $this->getContainer()->get('oro_workflow.helper.workflow_aware_entity_fetcher');
 
-        $this->assertEquals(
-            [$entity1, $entity2],
-            $helper->getEntitiesWithoutWorkflowItem($workflow->getDefinition())
-        );
+        $result = $helper->getEntitiesWithoutWorkflowItem($workflow->getDefinition());
+
+        $this->assertCount(2, $result);
+        $this->assertContains($entity1, $result);
+        $this->assertContains($entity2, $result);
 
         $this->assertEquals(
             [$entity1],
