@@ -121,9 +121,11 @@ define(function(require) {
 
             var options = $dropdownMenu.data('options');
             if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - $parent.outerWidth();
+                css.right = $(window).width() - css.left - (options.attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
                 css.left = 'auto';
-                css.width = $parent.outerWidth();
+                if (options.attachToParent) {
+                    css.width = $parent.outerWidth();
+                }
             }
 
             var containerOffset = $container.offset();
@@ -187,10 +189,13 @@ define(function(require) {
         };
         var options = $dropdownMenu.data('options');
         if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - $parent.outerWidth();
+            css.right = $(window).width() - css.left - (options.attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
             css.left = 'auto';
-            css.width = $parent.outerWidth();
+            if (options.attachToParent) {
+                css.width = $parent.outerWidth();
+            }
         }
+
         $dropdownMenu.css(css);
     };
 
