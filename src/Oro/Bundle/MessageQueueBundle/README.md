@@ -25,18 +25,40 @@ a web gui where you can monitor jobs status and interrupt jobs.
 
 ## Usage
 
-First, you have to configure a transport layer and set one to be default.
+First, you have to configure a transport layer and set one to be default. For the config settings
 
 ```yaml
 # app/config/config.yml
 
 oro_message_queue:
     transport:
-        default: 'dbal'
-        dbal: true
+        default: '%message_queue_transport%'
+        '%message_queue_transport%': '%message_queue_transport_config%'
     client: ~
 ```
+
+we can configure one of the supported transports via parameters:
+
+###DBAL transport 
+
+
+```yaml
+# app/config/parameters.yml
+
+    message_queue_transport: DBAL
+    message_queue_transport_config: ~
+```
 [DBAL transport options](./Resources/doc/dbal.md)
+
+###Rabbiq MQ transport
+```yaml
+# app/config/parameters.yml
+
+    message_queue_transport: 'amqp'
+    message_queue_transport_config: { host: 'localhost', port: '5672', user: 'guest', password: 'guest', vhost: 'oro' }
+```
+
+[AMQP transport options](./Resources/doc/amqp.md)
 
 Once you configured everything you can start producing messages:
 
