@@ -102,7 +102,7 @@ class ChangePasswordType extends AbstractType
                 'inherit_data' => true,
                 'cascade_validation' => true,
                 'current_password_label' => 'oro.user.password.label',
-                'plain_password_invalid_message' => 'The password fields must match.',
+                'plain_password_invalid_message' => 'oro.user.message.password_mismatch',
                 'first_options_label' => 'oro.user.new_password.label',
                 'second_options_label' => 'oro.user.new_password_re.label',
             ]

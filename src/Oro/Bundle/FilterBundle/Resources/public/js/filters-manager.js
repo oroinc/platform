@@ -101,13 +101,11 @@ define(function(require) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
-            this.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
 
-            _.extend(this, _.pick(options, ['addButtonHint', 'stateViewElement']));
+            _.extend(this, _.pick(options, ['addButtonHint', 'stateViewElement', 'viewMode']));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);

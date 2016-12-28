@@ -9,6 +9,11 @@ use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
 class NavigationItemsListener
 {
+    protected static $menuPathSeparators = [
+        '.',
+        ' > ',
+    ];
+
     /** @var FeatureChecker */
     protected $featureChecker;
 
@@ -31,15 +36,17 @@ class NavigationItemsListener
         }
 
         $root = $event->getMenu();
-        foreach ($disabledItems as $disabledItem) {
-            $path = explode('.', $disabledItem);
-            if ($root->getName() !== array_shift($path)) {
-                continue;
-            }
+        foreach (self::$menuPathSeparators as $menuPathSeparator) {
+            foreach ($disabledItems as $disabledItem) {
+                $path = explode($menuPathSeparator, $disabledItem);
+                if ($root->getName() !== array_shift($path)) {
+                    continue;
+                }
 
-            $item = $this->getItemByPath($root, $path);
-            if ($item) {
-                $this->disableItem($item);
+                $item = $this->getItemByPath($root, $path);
+                if ($item) {
+                    $this->disableItem($item);
+                }
             }
         }
     }

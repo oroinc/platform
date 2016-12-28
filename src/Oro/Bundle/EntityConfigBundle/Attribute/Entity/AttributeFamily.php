@@ -320,4 +320,12 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getDefaultLabel()->getString();
+    }
 }

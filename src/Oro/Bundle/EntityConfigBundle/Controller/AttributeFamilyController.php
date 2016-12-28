@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -15,7 +17,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -45,6 +46,7 @@ class AttributeFamilyController extends Controller
     public function createAction($alias)
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
+        $attributeManager = $this->get('oro_entity_config.manager.attribute_manager');
 
         $this->ensureEntityConfigSupported($entityConfigModel);
 
@@ -52,7 +54,16 @@ class AttributeFamilyController extends Controller
         $attributeFamily->setEntityClass($entityConfigModel->getClassName());
 
         $defaultGroup = new AttributeGroup();
-        $defaultGroup->setIsDefault(true);
+        $systemAttributes = $attributeManager->getSystemAttributesByClass($entityConfigModel->getClassName());
+
+        /** @var FieldConfigModel $systemAttribute */
+        foreach ($systemAttributes as $systemAttribute) {
+            $attributeGroupRelation = new AttributeGroupRelation();
+            $attributeGroupRelation->setEntityConfigFieldId($systemAttribute->getId());
+
+            $defaultGroup->addAttributeRelation($attributeGroupRelation);
+        }
+
         $defaultGroup->setDefaultLabel(
             $this->get('translator')->trans('oro.entity_config.form.default_group_label')
         );
@@ -84,7 +95,7 @@ class AttributeFamilyController extends Controller
      */
     public function updateAction(AttributeFamily $attributeFamily)
     {
-        $successMsg = $this->get('translator')->trans('oro.entity_config.controller.attribute_family.message.updated');
+        $successMsg = $this->get('translator')->trans('oro.entity_config.attribute_family.message.updated');
         $response = $this->update($attributeFamily, $successMsg);
 
         if (is_array($response)) {
@@ -138,18 +149,23 @@ class AttributeFamilyController extends Controller
      *      group_name=""
      * )
      * @param AttributeFamily $attributeFamily
-     * @return Response
+     * @return JsonResponse
      */
     public function deleteAction(AttributeFamily $attributeFamily)
     {
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
-        $entityManager = $doctrineHelper->getEntityManagerForClass(AttributeFamily::class);
+        if ($this->isGranted('delete', $attributeFamily)) {
+            $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+            $entityManager = $doctrineHelper->getEntityManagerForClass(AttributeFamily::class);
+            $entityManager->remove($attributeFamily);
+            $entityManager->flush();
+            $successful = true;
+            $message = $this->get('translator')->trans('oro.entity_config.attribute_family.message.deleted');
+        } else {
+            $successful = false;
+            $message = $this->get('translator')->trans('oro.entity_config.attribute_family.message.cant_delete');
+        }
 
-        $entityManager->remove($attributeFamily);
-        $entityManager->flush();
-        $deleted = $this->get('translator')->trans('oro.entity_config.attribute_family.message.deleted');
-
-        return new JsonResponse(['message' => $deleted, 'successful' => true]);
+        return new JsonResponse(['message' => $message, 'successful' => $successful]);
     }
 
     /**

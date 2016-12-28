@@ -16,7 +16,12 @@ class FieldConfigModelRepository extends EntityRepository
      */
     public function getAttributesByIds(array $ids)
     {
+        if (empty($ids)) {
+            return [];
+        }
+
         $attributes = $this->getBaseAttrubuteQueryBuilderByIds($ids)
+            ->indexBy('f', 'f.id')
             ->getQuery()
             ->getResult();
 
@@ -52,6 +57,28 @@ class FieldConfigModelRepository extends EntityRepository
 
     /**
      * @param string $className
+     * @return FieldConfigModel[]
+     */
+    public function getActiveAttributesByClass($className)
+    {
+        $attributes = $this->getBaseAttributeQueryBuilderByClass($className)
+            ->innerJoin(
+                'f.indexedValues',
+                's',
+                'WITH',
+                's.scope = :extendScope AND s.code = :stateCode AND s.value = :stateValue'
+            )
+            ->setParameter('stateCode', 'state')
+            ->setParameter('extendScope', 'extend')
+            ->setParameter('stateValue', ExtendScope::STATE_ACTIVE)
+            ->getQuery()
+            ->getResult();
+
+        return $attributes;
+    }
+
+    /**
+     * @param string $className
      * @param bool $isSystem
      * @return FieldConfigModel[]
      */
@@ -62,10 +89,11 @@ class FieldConfigModelRepository extends EntityRepository
                 'f.indexedValues',
                 's',
                 'WITH',
-                's.scope = :attributeScope AND s.code = :isSystemCode AND s.value = :isSystemValue'
+                's.scope = :extendScope AND s.code = :ownerCode AND s.value = :ownerValue'
             )
-            ->setParameter('isSystemCode', 'is_system')
-            ->setParameter('isSystemValue', $isSystem ? '1' : '0')
+            ->setParameter('ownerCode', 'owner')
+            ->setParameter('extendScope', 'extend')
+            ->setParameter('ownerValue', ($isSystem ? ExtendScope::OWNER_SYSTEM : ExtendScope::OWNER_CUSTOM))
             ->getQuery()
             ->getResult();
 

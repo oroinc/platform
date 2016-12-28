@@ -39,7 +39,7 @@ class AttributeMultiSelectType extends AbstractType
     private function getChoices($entityClass)
     {
         if (!$this->choices) {
-            $fields = $this->attributeManager->getAttributesByClass($entityClass);
+            $fields = $this->attributeManager->getActiveAttributesByClass($entityClass);
 
             /** @var FieldConfigModel $field */
             foreach ($fields as $field) {

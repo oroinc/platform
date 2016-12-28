@@ -19,7 +19,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      name="oro_email_user",
  *      indexes={
  *        @ORM\Index(name="seen_idx", columns={"is_seen", "mailbox_owner_id"}),
- *        @ORM\Index(name="received_idx", columns={"received", "is_seen", "mailbox_owner_id"})
+ *        @ORM\Index(name="received_idx", columns={"received", "is_seen", "mailbox_owner_id"}),
+ *        @ORM\Index(
+ *          name="user_owner_id_mailbox_owner_id_organization_id",
+ *          columns={"user_owner_id", "mailbox_owner_id", "organization_id"}
+ *        )
  *     }
  * )
  * @ORM\HasLifecycleCallbacks
