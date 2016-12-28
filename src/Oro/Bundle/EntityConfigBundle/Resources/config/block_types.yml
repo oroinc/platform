@@ -68,6 +68,6 @@ services:
         arguments:
             - '@oro_entity_config.attribute_group_rendrer_registry'
             - '@oro_entity_config.manager.attribute_manager'
-            - '@oro_entity_config.layout.attribute_block_type_mapper'
+            - '@oro_entity_config.block_type.chain_attribute_block_type_mapper'
         tags:
             - { name: layout.block_type, alias: attribute_group }
