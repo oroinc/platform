@@ -50,7 +50,7 @@ we can configure one of the supported transports via parameters:
 ```
 [DBAL transport options](./Resources/doc/dbal.md)
 
-###Rabbiq MQ transport
+###RabbiqMQ transport
 ```yaml
 # app/config/parameters.yml
 
