@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional;
 
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
 
 /**
@@ -13,28 +16,30 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
  */
 class WorkflowActivationTest extends WebTestCase
 {
-    const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
+    /** @var WorkflowManager */
+    protected $workflowManager;
+
+    /** @var EntityManager */
+    protected $entityManager;
 
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures(
-            [
-                'Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups'
-            ]
-        );
+        $this->loadFixtures([LoadWorkflowDefinitionsWithGroups::class]);
+
+        $this->workflowManager = $this->getContainer()->get('oro_workflow.manager');
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1);
+        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2);
+
+        $this->entityManager = $this->getContainer()->get('doctrine')->getManagerForClass(WorkflowAwareEntity::class);
     }
 
     public function testStartTransitionFormActionExclusiveGroups()
     {
-        $workflowManager = $this->getContainer()->get('oro_workflow.manager');
-        $workflowManager->activateWorkflow(LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1);
-        $workflowManager->activateWorkflow(LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2);
-
         $entity = $this->createNewEntity();
 
-        $this->assertNotEmpty($this->getWorkflowItem($entity, LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1));
-        $this->assertEmpty($this->getWorkflowItem($entity, LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2));
+        $this->assertNull($this->getWorkflowItem($entity, LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1));
+        $this->assertNotNull($this->getWorkflowItem($entity, LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2));
     }
 
     /**
@@ -42,24 +47,24 @@ class WorkflowActivationTest extends WebTestCase
      */
     protected function createNewEntity()
     {
-        $testEntity = new WorkflowAwareEntity();
-        $testEntity->setName('test_' . uniqid('test', true));
+        $entity = new WorkflowAwareEntity();
+        $entity->setName(uniqid('test_', true));
 
-        $entityManager = $this->getContainer()->get('doctrine')->getManagerForClass(self::ENTITY_CLASS);
-        $entityManager->persist($testEntity);
-        $entityManager->flush($testEntity);
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush($entity);
+        $this->entityManager->clear();
 
-        return $testEntity;
+        return $entity;
     }
 
     /**
      * @param WorkflowAwareEntity $entity
-     * @param $workflowName
+     * @param string $workflowName
      *
      * @return null|WorkflowItem
      */
     protected function getWorkflowItem(WorkflowAwareEntity $entity, $workflowName)
     {
-        return $this->getContainer()->get('oro_workflow.manager')->getWorkflowItem($entity, $workflowName);
+        return $this->workflowManager->getWorkflowItem($entity, $workflowName);
     }
 }

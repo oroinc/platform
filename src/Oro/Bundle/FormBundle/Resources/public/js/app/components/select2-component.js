@@ -182,6 +182,7 @@ define(function(require) {
                         handleResults(response.results);
                     }
                     element.trigger({type: 'select2-data-loaded', items: response});
+                    element.data('selected-data', element.select2('data'));
                 }
             });
         }

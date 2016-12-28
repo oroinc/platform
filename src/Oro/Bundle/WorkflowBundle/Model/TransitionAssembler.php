@@ -182,7 +182,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $aclResource = $this->getOption($options, 'acl_resource');
 
         if ($aclResource) {
-            $aclPreConditionDefinition = ['parameters' => [$aclResource]];
+            $aclPreConditionDefinition = ['parameters' => $aclResource];
             $aclMessage = $this->getOption($options, 'acl_message');
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;
