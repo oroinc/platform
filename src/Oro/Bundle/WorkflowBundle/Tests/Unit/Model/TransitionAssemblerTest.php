@@ -534,7 +534,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
                 ['@and' => [
                     ['@acl_granted' => [
-                        'parameters' => [$configuration['acl_resource']], 'message' => $configuration['acl_message']
+                        'parameters' => $configuration['acl_resource'], 'message' => $configuration['acl_message']
                     ]],
                     ['@true' => null]
                 ]]
@@ -621,7 +621,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             '@and' => [
                 ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
                 ['@acl_granted' => [
-                    'parameters' => [$configuration['acl_resource']],
+                    'parameters' => $configuration['acl_resource'],
                     'message' => $configuration['acl_message']
                 ]]
             ]
