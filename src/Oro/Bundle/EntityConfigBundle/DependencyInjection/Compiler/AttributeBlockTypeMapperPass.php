@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AttributeBlockTypeMapperPass implements CompilerPassInterface
 {
-    const CHAIN_SERVICE = 'oro_entity_config.block_type.chain_attribute_block_type_mapper';
-    const TAG           = 'oro_entity_config.block_type.attribute_block_type_mapper';
+    const CHAIN_SERVICE = 'oro_entity_config.layout.chain_attribute_block_type_mapper';
+    const TAG           = 'oro_entity_config.layout.attribute_block_type_mapper';
 
     /**
      * {@inheritDoc}
