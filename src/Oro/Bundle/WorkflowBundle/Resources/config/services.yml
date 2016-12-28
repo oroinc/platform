@@ -78,6 +78,12 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
+    oro_workflow.registry.definition_filter.applications:
+        class: Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionApplicationsRegistryFilter
+        public: false
+        arguments:
+            - '@oro_action.provider.current_application'
+
     oro_workflow.registry.definition_filter.features:
         class: 'Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter'
         public: false
@@ -97,6 +103,7 @@ services:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
         calls:
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.applications']]
             - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
             - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
 
