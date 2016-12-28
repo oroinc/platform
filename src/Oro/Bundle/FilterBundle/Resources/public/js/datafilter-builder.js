@@ -11,6 +11,7 @@ define(function(require) {
     var FiltersManager = require('orofilter/js/collection-filters-manager');
     var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
     var module = require('module');
+    var persistentStorage = require('oroui/js/persistent-storage');
     var moduleConfigs = module.config();
     var cachedFilters = {};
 
@@ -49,8 +50,14 @@ define(function(require) {
             var options = methods.combineOptions.call(this);
             options.collection = this.collection;
             options.el = $('<div/>').prependTo(this.$el);
-            if (this.enableToggleFilters) {
-                options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo(this.$el);
+            if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
+                options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
+            } else {
+                var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
+                options.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
+                if (this.enableToggleFilters) {
+                    options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo(this.$el);
+                }
             }
             filtersList = new FiltersManager(options);
             filtersList.render();
