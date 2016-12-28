@@ -57,3 +57,6 @@ services:
             - '@oro_config.global'
             - '@oro_email.email_renderer'
             - '@doctrine'
+
+    oro_importexport.writer.writer_chain:
+        class: Oro\Bundle\ImportExportBundle\Writer\WriterChain

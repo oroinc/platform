@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class GridController extends Controller
 {
@@ -133,32 +133,25 @@ class GridController extends Controller
      */
     public function exportAction(Request $request, $gridName)
     {
-        $isSuccessful = false;
-
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
         $gridParameters = $this->getRequestParametersFactory()->fetchParameters($gridName);
         $userId = $this->getUser()->getId();
 
-        $topicName = Topics::getTopicNameByExportFormat($format);
 
-        if ($topicName) {
-            $this->getMessageProducer()->send($topicName, [
-                'format' => $format,
-                'batchSize' => self::EXPORT_BATCH_SIZE,
-                'parameters' => [
-                    'gridName' => $gridName,
-                    'gridParameters' => $gridParameters,
-                    FormatterProvider::FORMAT_TYPE => $formatType,
-                ],
-                'userId' => $userId,
-            ]);
-
-            $isSuccessful = true;
-        }
+        $this->getMessageProducer()->send(Topics::EXPORT, [
+            'format' => $format,
+            'batchSize' => self::EXPORT_BATCH_SIZE,
+            'parameters' => [
+                'gridName' => $gridName,
+                'gridParameters' => $gridParameters,
+                FormatterProvider::FORMAT_TYPE => $formatType,
+            ],
+            'userId' => $userId,
+        ]);
 
         return new JsonResponse([
-            'successful' => $isSuccessful,
+            'successful' => true,
         ]);
     }
 

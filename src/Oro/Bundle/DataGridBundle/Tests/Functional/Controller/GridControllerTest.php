@@ -40,7 +40,7 @@ class GridControllerTest extends WebTestCase
         $this->assertCount(1, $result);
         $this->assertTrue($result['successful']);
 
-        $this->assertMessageSent(Topics::EXPORT_CSV, [
+        $this->assertMessageSent(Topics::EXPORT, [
             'format' => 'csv',
             'batchSize' => GridController::EXPORT_BATCH_SIZE,
             'parameters' => [

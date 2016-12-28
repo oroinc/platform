@@ -1,19 +1,18 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Async;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
+
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
+use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\NotificationBundle\Async\Topics as EmailTopics;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -24,8 +23,10 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-abstract class AbstractExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
      * @var ExportHandler
@@ -63,6 +64,11 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
     private $exportProcessor;
 
     /**
+     * @var WriterChain
+     */
+    private $writerChain;
+
+    /**
      * @var FileStreamWriter
      */
     private $exportWriter;
@@ -85,6 +91,7 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
      * @param DoctrineHelper $doctrineHelper
      * @param DatagridExportConnector $exportConnector
      * @param ExportProcessor $exportProcessor
+     * @param WriterChain $writerChain
      * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
      */
@@ -96,6 +103,7 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
         DoctrineHelper $doctrineHelper,
         DatagridExportConnector $exportConnector,
         ExportProcessor $exportProcessor,
+        WriterChain $writerChain,
         TokenStorageInterface $tokenStorage,
         LoggerInterface $logger
     ) {
@@ -106,6 +114,7 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
         $this->doctrineHelper = $doctrineHelper;
         $this->exportConnector = $exportConnector;
         $this->exportProcessor = $exportProcessor;
+        $this->writerChain = $writerChain;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
     }
@@ -135,8 +144,7 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
             'userId' => null,
         ], $body);
 
-        if (! is_array($body['parameters'])
-                || ! isset($body['userId'], $body['parameters'], $body['parameters']['gridName'], $body['format'])) {
+        if (! isset($body['userId'], $body['parameters']['gridName'], $body['format'])) {
             $this->logger->critical(
                 sprintf('[DataGridExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
                 ['message' => $message]
@@ -144,6 +152,18 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
 
             return self::REJECT;
         }
+
+        $writer = $this->writerChain->getWriter($body['format']);
+        if (! $writer instanceof FileStreamWriter) {
+            $this->logger->critical(
+                sprintf('[DataGridExportMessageProcessor] Invalid writer alias: "%s"', $body['format']),
+                ['message' => $message]
+            );
+
+            return self::REJECT;
+        }
+
+        $this->exportWriter = $writer;
 
         /** @var User $user */
         $user = $this->doctrineHelper->getEntityRepository(User::class)->find($body['userId']);
@@ -235,5 +255,13 @@ abstract class AbstractExportMessageProcessor implements MessageProcessorInterfa
             'subject' => $subject,
             'body' => $body,
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedTopics()
+    {
+        return [Topics::EXPORT];
     }
 }
