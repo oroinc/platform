@@ -4,7 +4,6 @@ services:
         arguments:
             - '@oro_layout.helper'
             - '@oro_layout.layout_manager'
-            - '@oro_layout.layout_context_holder'
         tags:
             # process the '@Layout' annotation before the '@Template' annotation
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView, priority: 10 }
