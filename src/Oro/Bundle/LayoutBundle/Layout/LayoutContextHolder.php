@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout;
 
-use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\ContextInterface;
 
 class LayoutContextHolder
 {
-    /** @var LayoutContext|null */
+    /** @var ContextInterface|null */
     protected $context;
 
     /**
@@ -18,9 +18,9 @@ class LayoutContextHolder
     }
 
     /**
-     * @param LayoutContext $context
+     * @param ContextInterface $context
      */
-    public function setContext(LayoutContext $context)
+    public function setContext(ContextInterface $context)
     {
         $this->context = $context;
     }
