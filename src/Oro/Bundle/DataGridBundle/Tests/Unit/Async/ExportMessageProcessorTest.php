@@ -136,7 +136,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DataGridExportMessageProcessor] Invalid writer alias: "csv"')
+            ->with('[DataGridExportMessageProcessor] Invalid format: "csv"')
         ;
 
         $writerChain = $this->createWriterChainMock();
@@ -173,7 +173,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DataGridExportMessageProcessor] Invalid writer alias: "csv"')
+            ->with('[DataGridExportMessageProcessor] Invalid format: "csv"')
         ;
 
         $writerChain = $this->createWriterChainMock();

@@ -1,16 +1,14 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Async;
 
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
+
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
@@ -26,10 +24,11 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-
     const TEMPLATE_EXPORT_RESULT = 'datagrid_export_result';
 
     /**
@@ -71,11 +70,6 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @var WriterChain
      */
     private $writerChain;
-
-    /**
-     * @var FileStreamWriter
-     */
-    private $exportWriter;
 
     /**
      * @var TokenStorageInterface
@@ -132,13 +126,6 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->renderer = $renderer;
     }
 
-    /**
-     * @param FileStreamWriter $exportWriter
-     */
-    public function setWriter(FileStreamWriter $exportWriter)
-    {
-        $this->exportWriter = $exportWriter;
-    }
 
     /**
      * {@inheritdoc}
@@ -169,14 +156,12 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $writer = $this->writerChain->getWriter($body['format']);
         if (! $writer instanceof FileStreamWriter) {
             $this->logger->critical(
-                sprintf('[DataGridExportMessageProcessor] Invalid writer alias: "%s"', $body['format']),
+                sprintf('[DataGridExportMessageProcessor] Invalid format: "%s"', $body['format']),
                 ['message' => $message]
             );
 
             return self::REJECT;
         }
-
-        $this->exportWriter = $writer;
 
         /** @var User $user */
         $user = $this->doctrineHelper->getEntityRepository(User::class)->find($body['userId']);
@@ -204,11 +189,11 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
             $jobUniqueName,
-            function () use ($body, $jobUniqueName, $user) {
+            function () use ($body, $jobUniqueName, $user, $writer) {
                 $exportResult = $this->exportHandler->handle(
                     $this->exportConnector,
                     $this->exportProcessor,
-                    $this->exportWriter,
+                    $writer,
                     $body['parameters'],
                     $body['batchSize'],
                     $body['format']
@@ -257,7 +242,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
 
         list($subject, $body) = $this->renderer->compileMessage(
             $emailTemplate,
-            ['exportResult' => $exportResult, 'jobName' => $jobUniqueName,]
+            ['exportResult' => $exportResult, 'jobName' => $jobUniqueName, ]
         );
 
         $this->producer->send(EmailTopics::SEND_NOTIFICATION_EMAIL, [
