@@ -120,11 +120,13 @@ define(function(require) {
             });
 
             var options = $dropdownMenu.data('options');
-            var attachToParent = options.attachToParen || false;
+            var attachToParent = options.attachToParent || false;
+
             if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - (attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
+                css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
                 css.left = 'auto';
-                if (options.attachToParent) {
+
+                if (attachToParent) {
                     css.width = $parent.outerWidth();
                 }
             }
@@ -190,11 +192,13 @@ define(function(require) {
         };
 
         var options = $dropdownMenu.data('options');
-        var attachToParent = options.attachToParen || false;
+        var attachToParent = options.attachToParent || false;
+
         if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - (attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
+            css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
             css.left = 'auto';
-            if (options.attachToParent) {
+
+            if (attachToParent) {
                 css.width = $parent.outerWidth();
             }
         }
