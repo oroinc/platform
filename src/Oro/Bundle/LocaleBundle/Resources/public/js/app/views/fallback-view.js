@@ -12,6 +12,8 @@ define(function(require) {
      * @class orolocale.app.views.FallbackView
      */
     FallbackView = BaseView.extend({
+        autoRender: true,
+
         /**
          * @property {Object}
          */
@@ -60,11 +62,20 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
+            FallbackView.__super__.initialize.call(this, options);
+        },
 
+        /**
+         * @inheritDoc
+         */
+        render: function() {
             var self = this;
+            this._deferredRender();
             this.initLayout().done(function() {
                 self.handleLayoutInit();
+                self._resolveDeferredRender();
             });
+            return this;
         },
 
         /**
