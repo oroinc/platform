@@ -1,6 +1,6 @@
 # AMQP (RabbitMQ) Transport
 
-Rabbit MQ provides better and faster messages delivery than DBAL. We should prefer to use it if possible.
+RabbitMQ provides better and faster messages delivery than DBAL. We should prefer to use it if possible.
 
 ### Options
 
