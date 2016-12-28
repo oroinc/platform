@@ -322,5 +322,4 @@ services:
             - [addBlockType, ['date', 'attribute_date']]
             - [addBlockType, ['datetime', 'attribute_datetime']]
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
-            - [addBlockType, ['product_prices', 'attribute_prices']]
             - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localize_fallback']]
