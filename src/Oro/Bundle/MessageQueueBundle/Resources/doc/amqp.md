@@ -62,3 +62,8 @@ rabbitmq-plugins enable --offline rabbitmq_delayed_message_exchange
 
 [More about RabbitMQ plugins management](https://www.rabbitmq.com/plugins.html)
   
+### RabbitMQ Useful Hints
+
+* You can see the RabbitMQ default web interface here: `http://localhost:15672/`
+* You can temporary stop RabbitMQ by running the command `rabbitmqctl stop_app`. The command will stop the RabbitMQ application, leaving the Erlang node running.
+* You can resume it with the command `rabbitmqctl start_app"` 
