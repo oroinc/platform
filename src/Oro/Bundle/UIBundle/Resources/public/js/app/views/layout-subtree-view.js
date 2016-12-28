@@ -28,9 +28,9 @@ define(function(require) {
 
         setContent: function(content) {
             this._hideLoading();
-            this.$el.html($(content).children());
-
             this.disposePageComponents();
+            this.$el.trigger('content:remove');
+            this.$el.html($(content).children());
             this.initLayout();
         },
 

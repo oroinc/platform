@@ -99,7 +99,10 @@ define([
                 return;
             }
 
-            options = options || {};
+            options = options || {
+                layoutSubtreeUrl: null,
+                layoutSubtreeCallback: null
+            };
 
             this._callViewMethod(eventBlockIds, 'beforeContentLoading');
             $.ajax({
@@ -113,6 +116,9 @@ define([
                     self._callViewMethod(eventBlockIds, 'setContent', function(blockId) {
                         return [content[blockId] || ''];
                     });
+                    if (options.layoutSubtreeCallback) {
+                        options.layoutSubtreeCallback();
+                    }
                 })
                 .fail(function(jqxhr) {
                     self._callViewMethod(eventBlockIds, 'contentLoadingFail');
