@@ -202,7 +202,7 @@ define([
                 _.bind(this._onRequireJsError, this, initDeferred)
             );
 
-            return initDeferred.promise();
+            return initDeferred.promise({targetData: data});
         },
 
         /**
