@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class DatabasePersister
 {
@@ -53,9 +54,19 @@ class DatabasePersister
         try {
             $connection->beginTransaction();
             $translationsTableName = $this->nativeQueryExecutorHelper->getTableName(Translation::ENTITY_NAME);
+            $dbDriver = $connection->getDriver()->getName();
+            switch ($dbDriver) {
+                case DatabaseDriverInterface::DRIVER_POSTGRESQL:
+                    $queryPart = 'SELECT id, key, value FROM ';
+                    break;
+                case DatabaseDriverInterface::DRIVER_MYSQL:
+                default:
+                    $queryPart = 'SELECT id, `key`, `value` FROM ';
+                    break;
+            }
 
             foreach ($data as $domain => $domainData) {
-                $fetchStatement = 'SELECT id, `key`, `value` FROM ' . $translationsTableName .
+                $fetchStatement = $queryPart . $translationsTableName .
                     ' WHERE locale = :locale' .
                     ' AND domain = :domain' .
                     ' AND scope = :scope';
