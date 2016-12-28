@@ -239,6 +239,7 @@ class DatagridTypeTest extends BlockTypeTestCase
             'block_prefixes' => ['block', 'datagrid_toolbar', '_product_datagrid_toolbar'],
         ];
 
+        /** @var BlockView|\PHPUnit_Framework_MockObject_MockObject $view */
         $view = $this->createMock(BlockView::class);
         $view->vars = [
             'block_type' => 'datagrid',
@@ -247,6 +248,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         ];
         $view->children = [$childView];
 
+        /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
         $block = $this->createMock(BlockInterface::class);
         $block->expects($this->any())
             ->method('getId')

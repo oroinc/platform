@@ -121,8 +121,9 @@ define(function(require) {
 
             var options = $dropdownMenu.data('options');
             if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - $dropdownMenu.outerWidth();
+                css.right = $(window).width() - css.left - $parent.outerWidth();
                 css.left = 'auto';
+                css.width = $parent.outerWidth();
             }
 
             var containerOffset = $container.offset();
@@ -186,8 +187,9 @@ define(function(require) {
         };
         var options = $dropdownMenu.data('options');
         if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - $dropdownMenu.outerWidth();
+            css.right = $(window).width() - css.left - $parent.outerWidth();
             css.left = 'auto';
+            css.width = $parent.outerWidth();
         }
         $dropdownMenu.css(css);
     };

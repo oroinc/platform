@@ -1,17 +1,29 @@
 define([
     'jquery',
+    'underscore',
     './select2-view'
-], function($, Select2View) {
+], function($, _, Select2View) {
     'use strict';
 
     var Select2AutocompleteView;
     Select2AutocompleteView = Select2View.extend({
         events: {
             'change': function(e) {
-                var selectedData = this.$el.data('selected-data') || [];
-                if (e.added) {
-                    selectedData = selectedData.push(e.added);
-                    $(this).data('selected-data', selectedData);
+                if (this.$el.data('select2').opts.multiple) {
+                    var selectedData = this.$el.data('selected-data') || [];
+                    if (e.added) {
+                        selectedData.push(e.added);
+                    }
+                    if (e.removed) {
+                        var index = _.findIndex(selectedData, function(obj) {
+                            return obj.id === e.removed.id;
+                        });
+                        if (index !== -1) {
+                            selectedData.splice(index, 1);
+                        }
+                    }
+                } else {
+                    this.$el.data('selected-data', e.added);
                 }
             }
         }
