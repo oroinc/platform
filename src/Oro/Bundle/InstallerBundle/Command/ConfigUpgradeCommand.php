@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
