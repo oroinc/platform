@@ -5,11 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\ImportExport;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * @dbIsolation
@@ -99,7 +99,6 @@ class ImportExportTest extends WebTestCase
             $this->getFilePath('@OroEntityConfigBundle/Tests/Functional/ImportExport/data/system_fields.csv')
         );
 
-        // @todo - must be refactored in BAP-12713
         $this->doImport(0, 0);
         $this->assertCount(count($this->fields), $this->getEntityFields());
     }
