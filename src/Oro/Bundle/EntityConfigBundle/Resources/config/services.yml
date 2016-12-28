@@ -295,3 +295,9 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
 
+    oro_entity_config.twig.extension.dynamic_fields_attribute_decorator:
+        class: 'Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator'
+        decorates: oro_entity_extend.twig.extension.dynamic_fields
+        arguments:
+            - "@oro_entity_extend.twig.extension.dynamic_fields_attribute_decorator.inner"
+            - "@oro_entity_config.config.attributes_config_helper"
