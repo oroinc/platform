@@ -57,11 +57,8 @@ To enable it use the command
 rabbitmq-plugins enable --offline rabbitmq_delayed_message_exchange
 ```
 
-See also:
 
 [More about RabbitMQ plugins](https://www.rabbitmq.com/community-plugins.html)
-
-and
 
 [More about RabbitMQ plugins management](https://www.rabbitmq.com/plugins.html)
   
