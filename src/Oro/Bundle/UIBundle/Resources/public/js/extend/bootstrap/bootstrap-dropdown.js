@@ -120,7 +120,7 @@ define(function(require) {
             });
 
             var options = $dropdownMenu.data('options');
-            var attachToParent = options.attachToParent && options.attachToParent !== undefined;
+            var attachToParent = options.attachToParen || false;
             if (options && options.align === 'right') {
                 css.right = $(window).width() - css.left - (attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
                 css.left = 'auto';
@@ -190,7 +190,7 @@ define(function(require) {
         };
 
         var options = $dropdownMenu.data('options');
-        var attachToParent = options.attachToParent && options.attachToParent !== undefined;
+        var attachToParent = options.attachToParen || false;
         if (options && options.align === 'right') {
             css.right = $(window).width() - css.left - (attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
             css.left = 'auto';
