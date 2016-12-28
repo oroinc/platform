@@ -97,6 +97,7 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
     protected function getActiveWorkflows()
     {
         $exclusiveGroups = [];
+
         return parent::getActiveWorkflows()->filter(
             function (Workflow $workflow) use (&$exclusiveGroups) {
                 $currentGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
@@ -105,7 +106,7 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
                     return false;
                 }
 
-                $exclusiveGroups += $currentGroups;
+                $exclusiveGroups = array_merge($exclusiveGroups, $currentGroups);
 
                 return true;
             }
