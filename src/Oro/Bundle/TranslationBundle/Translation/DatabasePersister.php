@@ -9,7 +9,6 @@ use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class DatabasePersister
 {
