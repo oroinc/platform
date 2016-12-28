@@ -120,8 +120,9 @@ define(function(require) {
             });
 
             var options = $dropdownMenu.data('options');
+            var attachToParent = options.attachToParent && options.attachToParent !== undefined;
             if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - (options.attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
+                css.right = $(window).width() - css.left - (attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
                 css.left = 'auto';
                 if (options.attachToParent) {
                     css.width = $parent.outerWidth();
@@ -187,9 +188,11 @@ define(function(require) {
             top: dropdownMenuOriginalPosition.top + parentPosition.top - parentOriginalPosition.top,
             left: dropdownMenuOriginalPosition.left + parentPosition.left - parentOriginalPosition.left
         };
+
         var options = $dropdownMenu.data('options');
+        var attachToParent = options.attachToParent && options.attachToParent !== undefined;
         if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - (options.attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
+            css.right = $(window).width() - css.left - (attachToParent ? $parent.outerWidth() : $dropdownMenu.outerWidth());
             css.left = 'auto';
             if (options.attachToParent) {
                 css.width = $parent.outerWidth();
