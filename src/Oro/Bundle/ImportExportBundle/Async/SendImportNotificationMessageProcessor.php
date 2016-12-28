@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Psr\Log\LoggerInterface;
@@ -53,6 +51,14 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     private $doctrine;
 
 
+    /**
+     * @param MessageProducerInterface $producer
+     * @param LoggerInterface $logger
+     * @param JobStorage $jobStorage
+     * @param ImportExportJobSummaryResultService $importJobSummaryResultService
+     * @param ConfigManager $configManager
+     * @param RegistryInterface $doctrine
+     */
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,

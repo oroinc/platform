@@ -253,15 +253,6 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     protected function sendNotificationMessage($jobUniqueName, array $exportResult, User $user)
     {
-//        $subject = sprintf('Grid export result for job %s', $jobUniqueName);
-//
-//        if ($exportResult['success']) {
-//            $body = sprintf('Grid export performed successfully. Download link: %s', $exportResult['url']);
-//        } else {
-//            $body = 'Grid export operation fails.';
-//        }
-
-//
         $emailTemplate = $this->findEmailTemplateByName(self::TEMPLATE_EXPORT_RESULT);
 
         list($subject, $body) = $this->renderer->compileMessage(
