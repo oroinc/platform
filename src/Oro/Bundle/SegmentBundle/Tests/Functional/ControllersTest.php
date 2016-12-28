@@ -174,7 +174,7 @@ class ControllersTest extends WebTestCase
         $this->assertTrue($response['successful']);
 
         $this->assertMessageSent(
-            Topics::EXPORT_CSV,
+            Topics::EXPORT,
             [
                 'format' => 'csv',
                 'batchSize' => 200,

@@ -1,11 +1,14 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Async;
 
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
-
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -23,11 +26,12 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
+
+    const TEMPLATE_EXPORT_RESULT = 'datagrid_export_result';
+
     /**
      * @var ExportHandler
      */
@@ -84,6 +88,12 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $logger;
 
     /**
+     * @var EmailRenderer
+     */
+    private $renderer;
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      * @param ExportHandler $exportHandler
      * @param JobRunner $jobRunner
      * @param MessageProducerInterface $producer
@@ -94,6 +104,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      * @param WriterChain $writerChain
      * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
+     * @param EmailRenderer $renderer
      */
     public function __construct(
         ExportHandler $exportHandler,
@@ -105,7 +116,8 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         ExportProcessor $exportProcessor,
         WriterChain $writerChain,
         TokenStorageInterface $tokenStorage,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        EmailRenderer $renderer
     ) {
         $this->exportHandler = $exportHandler;
         $this->jobRunner = $jobRunner;
@@ -117,6 +129,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $this->writerChain = $writerChain;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
+        $this->renderer = $renderer;
     }
 
     /**
@@ -240,13 +253,21 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
      */
     protected function sendNotificationMessage($jobUniqueName, array $exportResult, User $user)
     {
-        $subject = sprintf('Grid export result for job %s', $jobUniqueName);
+//        $subject = sprintf('Grid export result for job %s', $jobUniqueName);
+//
+//        if ($exportResult['success']) {
+//            $body = sprintf('Grid export performed successfully. Download link: %s', $exportResult['url']);
+//        } else {
+//            $body = 'Grid export operation fails.';
+//        }
 
-        if ($exportResult['success']) {
-            $body = sprintf('Grid export performed successfully. Download link: %s', $exportResult['url']);
-        } else {
-            $body = 'Grid export operation fails.';
-        }
+//
+        $emailTemplate = $this->findEmailTemplateByName(self::TEMPLATE_EXPORT_RESULT);
+
+        list($subject, $body) = $this->renderer->compileMessage(
+            $emailTemplate,
+            ['exportResult' => $exportResult, 'jobName' => $jobUniqueName,]
+        );
 
         $this->producer->send(EmailTopics::SEND_NOTIFICATION_EMAIL, [
             'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),

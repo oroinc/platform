@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Writer\CsvFileWriter;
@@ -217,7 +218,8 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 'exportProcessor' => $this->createExportProcessorMock(),
                 'writerChain' => $this->createWriterChainMock(),
                 'tokenStorage' => $this->createTokenStorageInterfaceMock(),
-                'logger' => $this->createLoggerInterfaceMock()
+                'logger' => $this->createLoggerInterfaceMock(),
+                'renderer' => $this->createRenderMock(),
             ],
             $arguments
         );
@@ -324,5 +326,13 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createSessionInterfaceMock()
     {
         return $this->createMock(SessionInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|EmailRenderer
+     */
+    private function createRenderMock()
+    {
+        return $this->createMock(EmailRenderer::class);
     }
 }

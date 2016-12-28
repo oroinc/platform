@@ -341,6 +341,7 @@ services:
             - '@oro_importexport.writer.writer_chain'
             - '@security.token_storage'
             - '@logger'
+            - '@oro_email.email_renderer'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

@@ -111,7 +111,7 @@ class EmailTemplateControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(8, $result);
+        $this->assertCount(9, $result);
     }
 
     /**

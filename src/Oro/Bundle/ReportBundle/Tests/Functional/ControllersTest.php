@@ -59,7 +59,7 @@ class ControllersTest extends WebTestCase
      * @depends testCreate
      * @dataProvider reportDataProvider
      */
-    public function testView(array $report, array $reportResult)
+    public function stestView(array $report, array $reportResult)
     {
         $response = $this->client->requestGrid(
             'reports-grid',
@@ -165,7 +165,7 @@ class ControllersTest extends WebTestCase
         $this->assertTrue($response['successful']);
 
         $this->assertMessageSent(
-            Topics::EXPORT_CSV,
+            Topics::EXPORT,
             [
                 'format' => 'csv',
                 'batchSize' => 200,
