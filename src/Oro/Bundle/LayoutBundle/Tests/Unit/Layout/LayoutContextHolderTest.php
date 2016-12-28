@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
-use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\ContextInterface;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 
 class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
@@ -13,7 +13,7 @@ class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
     protected $layoutContextHolder;
 
     /**
-     * @var LayoutContext
+     * @var ContextInterface
      */
     protected $context;
 
@@ -21,8 +21,8 @@ class LayoutContextHolderTest extends \PHPUnit_Framework_TestCase
     {
         $this->layoutContextHolder = new LayoutContextHolder();
 
-        /** @var LayoutContext|\PHPUnit_Framework_MockObject_MockObject $context **/
-        $this->context = $this->createMock(LayoutContext::class);
+        /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject $context **/
+        $this->context = $this->createMock(ContextInterface::class);
     }
 
     public function testContextAccessor()
