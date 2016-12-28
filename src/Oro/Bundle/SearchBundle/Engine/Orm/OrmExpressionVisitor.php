@@ -59,11 +59,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
             return $this->driver->addFilteringField($this->qb, $index, $searchCondition);
         }
         if (is_string($searchCondition['fieldName'])) {
-            if (mb_strpos($searchCondition['fieldName'], 'visibility_account') !== false) {
-                $this->qb->leftJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
-            } else {
-                $this->qb->innerJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
-            }
+            $this->qb->leftJoin($joinField, $joinAlias, 'WITH', $joinAlias . '.field = :field' . $index);
             $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
         } else {
             $this->qb->innerJoin($joinField, $joinAlias);
