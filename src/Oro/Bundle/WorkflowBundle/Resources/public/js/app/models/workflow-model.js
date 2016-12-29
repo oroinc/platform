@@ -31,7 +31,8 @@ define(function(require) {
             translateLinkLabel: null,
             priority: 0,
             exclusive_active_groups: [],
-            exclusive_record_groups: []
+            exclusive_record_groups: [],
+            applications: []
         },
 
         MAX_HISTORY_LENGTH: 50,
