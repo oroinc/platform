@@ -2,25 +2,31 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
+use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+
+use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
+use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
-use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
-use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class ImportExportController extends Controller
 {
@@ -52,11 +58,15 @@ class ImportExportController extends Controller
                 $file           = $data->getFile();
                 $processorAlias = $data->getProcessorAlias();
 
-                $this->getImportHandler()->saveImportingFile($file, $processorAlias, 'csv');
+                $fileName = $this->getImportHandler()->saveImportingFile($file, $processorAlias);
 
                 return $this->forward(
-                    'OroImportExportBundle:ImportExport:importValidate',
-                    ['processorAlias' => $processorAlias],
+                    'OroImportExportBundle:ImportExport:importProcess',
+                    [
+                        'processorAlias' => $processorAlias,
+                        'fileName' => $fileName,
+                        'originFileName' => $file->getClientOriginalName()
+                    ],
                     $request->query->all()
                 );
             }
@@ -65,7 +75,58 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form' => $importForm->createView(),
-            'options' => $this->getOptionsFromRequest(),
+            'options' => $this->getOptionsFromRequest($request),
+            'importJob' => $importJob,
+            'importValidateJob' => $importValidateJob
+        ];
+    }
+
+    /**
+     * Take uploaded file and move it to temp dir
+     *
+     * @Route("/import-validate", name="oro_importexport_import_validation_form")
+     * @AclAncestor("oro_importexport_import")
+     * @Template("OroImportExportBundle:ImportExport:importValidationForm.html.twig")
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function importValidateFormAction(Request $request)
+    {
+        $entityName = $request->get('entity');
+        $importJob = $request->get('importJob');
+        $importValidateJob = $request->get('importValidateJob');
+
+        $importForm = $this->getImportForm($entityName);
+
+        if ($request->isMethod('POST')) {
+            $importForm->submit($request);
+
+            if ($importForm->isValid()) {
+                /** @var ImportData $data */
+                $data           = $importForm->getData();
+                $file           = $data->getFile();
+                $processorAlias = $data->getProcessorAlias();
+
+                $fileName = $this->getImportHandler()->saveImportingFile($file, $processorAlias);
+
+                return $this->forward(
+                    'OroImportExportBundle:ImportExport:importValidate',
+                    [
+                        'processorAlias' => $processorAlias,
+                        'fileName' => $fileName,
+                        'originFileName' => $file->getClientOriginalName()
+                    ],
+                    $request->query->all()
+                );
+            }
+        }
+
+        return [
+            'entityName' => $entityName,
+            'form' => $importForm->createView(),
+            'options' => $this->getOptionsFromRequest($request),
             'importJob' => $importJob,
             'importValidateJob' => $importValidateJob
         ];
@@ -85,7 +146,6 @@ class ImportExportController extends Controller
      *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importValidate.html.twig")
      *
      * @param Request $request
      * @param string $processorAlias
@@ -94,24 +154,23 @@ class ImportExportController extends Controller
      */
     public function importValidateAction(Request $request, $processorAlias)
     {
-        $processorRegistry = $this->get('oro_importexport.processor.registry');
-        $entityName        = $processorRegistry
-            ->getProcessorEntityName(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $processorAlias);
-        $existingAliases   = $processorRegistry
-            ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
-
         $jobName = $request->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
-        $result = $this->getImportHandler()->handleImportValidation(
-            $jobName,
-            $processorAlias,
-            'csv',
-            null,
-            $this->getOptionsFromRequest()
-        );
-        $result['showStrategy'] = count($existingAliases) > 1;
-        $result['importJob'] = $request->get('importJob');
+        $fileName = $request->get('fileName', null);
+        $originFileName = $request->get('originFileName', null);
 
-        return $result;
+        $this->getMessageProducer()->send(
+            Topics::IMPORT_HTTP_VALIDATION_PREPARING,
+            [
+                'filePath' => $fileName,
+                'originFileName' => $originFileName,
+                'userId' => $this->getUser()->getId(),
+                'jobName' => $jobName,
+                'processorAlias' => $processorAlias,
+                $this->getOptionsFromRequest($request)
+            ]
+        );
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**
@@ -119,21 +178,30 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     * @param Request $request
      *
      * @return JsonResponse
      */
-    public function importProcessAction($processorAlias)
+    public function importProcessAction(Request $request, $processorAlias)
     {
-        $jobName = $this->getRequest()->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
-        $result  = $this->getImportHandler()->handleImport(
-            $jobName,
-            $processorAlias,
-            'csv',
-            null,
-            $this->getOptionsFromRequest()
+        $jobName = $request->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
+        $fileName = $request->get('fileName', null);
+        $originFileName = $request->get('originFileName', null);
+
+        $this->getMessageProducer()->send(
+            Topics::IMPORT_HTTP_PREPARING,
+            [
+                'filePath' => $fileName,
+                'originFileName' => $originFileName,
+                'userId' => $this->getUser()->getId(),
+                'jobName' => $jobName,
+                'processorAlias' => $processorAlias,
+                $this->getOptionsFromRequest($request)
+            ]
         );
 
-        return new JsonResponse($result);
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**
@@ -147,18 +215,22 @@ class ImportExportController extends Controller
     public function instantExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
+        $filePrefix = $request->get('filePrefix', null);
+        $options = $this->getOptionsFromRequest($request);
 
-        return $this->getExportHandler()->handleExport(
-            $jobName,
-            $processorAlias,
-            ProcessorRegistry::TYPE_EXPORT,
-            'csv',
-            $request->get('filePrefix', null),
-            array_merge(
-                $this->getOptionsFromRequest(),
-                ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
-            )
-        );
+        $organization = $this->getSecurityFacade()->getOrganization();
+        $organizationId = $organization ? $organization->getId() : null;
+
+        $this->getMessageProducer()->send(Topics::EXPORT, [
+            'jobName' => $jobName,
+            'processorAlias' => $processorAlias,
+            'outputFilePrefix' => $filePrefix,
+            'options' => $options,
+            'userId' => $this->getUser()->getId(),
+            'organizationId' => $organizationId,
+        ]);
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**
@@ -196,7 +268,7 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form' => $exportForm->createView(),
-            'options' => $this->getOptionsFromRequest(),
+            'options' => $this->getOptionsFromRequest($request),
             'exportJob' => $request->get('exportJob')
         ];
     }
@@ -233,7 +305,7 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form' => $exportForm->createView(),
-            'options' => $this->getOptionsFromRequest()
+            'options' => $this->getOptionsFromRequest($request)
         ];
     }
 
@@ -242,19 +314,20 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     * @param Request $request
      *
      * @return Response
      */
-    public function templateExportAction($processorAlias)
+    public function templateExportAction($processorAlias, Request $request)
     {
-        $jobName = $this->getRequest()->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
+        $jobName = $request->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
         $result  = $this->getExportHandler()->getExportResult(
             $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             'csv',
             null,
-            $this->getOptionsFromRequest()
+            $this->getOptionsFromRequest($request)
         );
 
         return $this->redirect($result['url']);
@@ -300,6 +373,32 @@ class ImportExportController extends Controller
     }
 
     /**
+     * @Route("/import_export/import-error/{jobId}.log", name="oro_importexport_import_error_log")
+     *
+     * @param $jobId
+     * @return Response
+     */
+    public function importErrorLogAction($jobId)
+    {
+        $securityFacade = $this->get('oro_security.security_facade');
+        if (!$securityFacade->isGranted('oro_importexport_import') &&
+            !$securityFacade->isGranted('oro_importexport_export')
+        ) {
+            throw new AccessDeniedException('Insufficient permission');
+        }
+
+        $job = $this->getDoctrine()->getManager()->getRepository(Job::class)->find($jobId);
+
+        if (!$job) {
+            throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
+        }
+
+        $content = $this->getImportJobSummaryResultService()->getErrorLog($job);
+
+        return new Response($content, 200, ['Content-Type' => 'text/x-log']);
+    }
+
+    /**
      * @return HttpImportHandler
      */
     protected function getImportHandler()
@@ -316,6 +415,14 @@ class ImportExportController extends Controller
     }
 
     /**
+     * @return ImportExportJobSummaryResultService
+     */
+    protected function getImportJobSummaryResultService()
+    {
+        return $this->get('oro_importexport.async.import_export_job_summary_result_service');
+    }
+
+    /**
      * @return JobExecutor
      */
     protected function getJobExecutor()
@@ -324,16 +431,34 @@ class ImportExportController extends Controller
     }
 
     /**
+     * @param Request $request
+     *
      * @return array
      */
-    protected function getOptionsFromRequest()
+    protected function getOptionsFromRequest(Request $request)
     {
-        $options = $this->getRequest()->get('options', []);
+        $options = $request->get('options', []);
 
         if (!is_array($options)) {
             throw new InvalidArgumentException('Request parameter "options" must be array.');
         }
 
         return $options;
+    }
+
+    /**
+     * @return MessageProducerInterface
+     */
+    protected function getMessageProducer()
+    {
+        return $this->get('oro_message_queue.client.message_producer');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->get('oro_security.security_facade');
     }
 }

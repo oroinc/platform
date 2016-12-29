@@ -37,6 +37,11 @@ datagrids:
             stoppedAt:
                 label: oro.message_queue_job.grid.columns.stoppedAt
                 frontend_type: datetime
+            percent:
+                label: 'Progress'
+                type: twig
+                template: OroMessageQueueBundle:Job:Datagrid/percent.html.twig
+                frontend_type: html
         sorters:
             columns:
                 id: { data_name: j.id }
