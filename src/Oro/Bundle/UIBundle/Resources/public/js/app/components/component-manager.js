@@ -35,15 +35,9 @@ define([
                 });
             });
 
-            // order init data by their dependencies (dependant components go after)
-            items.sort(function(item1, item2) {
-                if (item1.subItems.indexOf(item2) !== -1) {
-                    return 1;
-                } else if (item2.subItems.indexOf(item1) !== -1) {
-                    return -1;
-                }
-                return 0;
-            });
+            // initialize components in order reversed to what jQuery returns
+            // (nested items have to be initialized first)
+            items.reverse();
 
             var promises = _.map(items, function(item) {
                 // collect promises of dependencies
@@ -202,7 +196,7 @@ define([
                 _.bind(this._onRequireJsError, this, initDeferred)
             );
 
-            return initDeferred.promise({targetData: data});
+            return initDeferred.promise(Object.create({targetData: data}));
         },
 
         /**
