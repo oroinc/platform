@@ -172,7 +172,11 @@ class UnderlyingAclCache
      */
     protected function getBatchNumber(ObjectIdentityInterface $oid)
     {
-        return (int)floor($oid->getIdentifier() / $this->batchSize) + 1;
+        $identifier = $oid->getIdentifier();
+        if (!is_int($identifier)) {
+            return 1;
+        }
+        return (int)floor($identifier / $this->batchSize) + 1;
     }
 
     /**
