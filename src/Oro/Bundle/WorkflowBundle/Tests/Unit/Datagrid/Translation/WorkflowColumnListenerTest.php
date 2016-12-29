@@ -31,7 +31,7 @@ class WorkflowColumnListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildBefore()
     {
-        $event = new BuildBefore($this->getMock(DatagridInterface::class), DatagridConfiguration::create([]));
+        $event = new BuildBefore($this->createMock(DatagridInterface::class), DatagridConfiguration::create([]));
 
         $this->listener->onBuildBefore($event);
 

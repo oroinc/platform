@@ -64,7 +64,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTest
 
         $this->logger = $this->getMockBuilder(ProcessLogger::class)->disableOriginalConstructor()->getMock();
 
-        $this->schedulePolicy = $this->getMock(ProcessSchedulePolicy::class);
+        $this->schedulePolicy = $this->createMock(ProcessSchedulePolicy::class);
 
         $this->extension = new ProcessTriggerExtension(
             $this->doctrineHelper,

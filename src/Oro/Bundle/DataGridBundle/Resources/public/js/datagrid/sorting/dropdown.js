@@ -289,7 +289,7 @@ define(function(require) {
             this._updateDisplayDirection();
 
             return this;
-        },
+        }
     });
 
     return SortingDropdown;

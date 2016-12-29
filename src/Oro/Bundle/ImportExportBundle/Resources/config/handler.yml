@@ -24,9 +24,6 @@ services:
     oro_importexport.handler.import.http:
         class: %oro_importexport.handler.import.http.class%
         parent: oro_importexport.handler.import.abstract
-        calls:
-            - [setSession, ['@session']]
-            - [setRouter, ['@router']]
         lazy: true
 
     oro_importexport.handler.export:
@@ -35,6 +32,7 @@ services:
         calls:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
             - [setRouter, ['@router']]
+            - [setConfigManager, ['@oro_config.global']]
         lazy: true
 
     oro_importexport.handler.import.cli:

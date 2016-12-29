@@ -28,8 +28,8 @@ class ObjectIdentityFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('entity', $id->getIdentifier());
         $this->assertEquals(ObjectIdentityFactory::ROOT_IDENTITY_TYPE, $id->getType());
 
-        $id = $this->factory->root('Entity');
-        $this->assertEquals('entity', $id->getIdentifier());
+        $id = $this->factory->root(\stdClass::class);
+        $this->assertEquals('stdclass', $id->getIdentifier());
         $this->assertEquals(ObjectIdentityFactory::ROOT_IDENTITY_TYPE, $id->getType());
 
         $id = $this->factory->root($this->factory->get('Entity: Test:TestEntity'));
@@ -146,7 +146,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit_Framework_TestCase
     public static function getProvider()
     {
         return array(
-            'Entity' => array(
+            \stdClass::class => array(
                 'Entity:Test:TestEntity',
                 'entity',
                 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity'

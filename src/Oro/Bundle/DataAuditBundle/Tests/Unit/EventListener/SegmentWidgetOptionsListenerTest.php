@@ -27,7 +27,7 @@ class SegmentWidgetOptionsListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->httpKernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $this->httpKernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $this->request    = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')
             ->disableOriginalConstructor()
             ->getMock();

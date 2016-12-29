@@ -14,7 +14,6 @@
         "psr-0": { "Oro\\Bundle\\SegmentBundle": "" }
     },
     "target-dir": "Oro/Bundle/SegmentBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

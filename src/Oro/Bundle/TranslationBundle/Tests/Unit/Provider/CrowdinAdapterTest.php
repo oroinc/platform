@@ -26,15 +26,15 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
-        $this->client = $this->getMock('Guzzle\Http\Client');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
+        $this->client = $this->createMock('Guzzle\Http\Client');
         $this->request = $this->getMockBuilder('Guzzle\Http\Message\Request')
             ->disableOriginalConstructor()
             ->getMock();
         $this->response = $this->getMockBuilder('Guzzle\Http\Message\Response')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->query = $this->getMock('Guzzle\Http\QueryString');
+        $this->query = $this->createMock('Guzzle\Http\QueryString');
 
         $this->adapter = new CrowdinAdapter($this->client);
         $this->adapter->setApiKey('some-api-key');

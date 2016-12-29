@@ -118,17 +118,23 @@ class FieldTypeTest extends TypeTestCase
 
     /**
      * @param array $defaultFieldTypeChoices
+     * @param array $attributes
      *
      * @return array
      */
-    protected function prepareExpectedChoicesView($defaultFieldTypeChoices)
+    protected function prepareExpectedChoicesView($defaultFieldTypeChoices, array $attributes = [])
     {
         $choiceCounter = 0;
         $expectedChoicesView = [];
         foreach ($defaultFieldTypeChoices as $fieldGroup => $fields) {
             $preparedFields = [];
             foreach ($fields as $fieldValue => $fieldLabel) {
-                $preparedFields[$choiceCounter++] = new ChoiceView($fieldValue, $fieldValue, $fieldLabel);
+                $preparedFields[$choiceCounter++] = new ChoiceView(
+                    $fieldValue,
+                    $fieldValue,
+                    $fieldLabel,
+                    !empty($attributes[$fieldValue]) ? $attributes[$fieldValue] : []
+                );
             }
             $expectedChoicesView[$fieldGroup] = new ChoiceGroupView(
                 $fieldGroup,
@@ -243,7 +249,19 @@ class FieldTypeTest extends TypeTestCase
             ]
         );
 
-        $expectedChoicesView = $this->prepareExpectedChoicesView($expectedChoices);
+        $attributes = [
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m||sourceentity_rel_m_t_m' => [
+                'data-fieldname' => 'sourceentity_rel_m_t_m',
+            ],
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o||' => [
+                'data-fieldname' => '',
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m||sourceentity_rel_o_t_m'  => [
+                'data-fieldname' => 'sourceentity_rel_o_t_m',
+            ]
+        ];
+
+        $expectedChoicesView = $this->prepareExpectedChoicesView($expectedChoices, $attributes);
 
         $this->assertEquals(
             $expectedChoicesView,
@@ -667,7 +685,19 @@ class FieldTypeTest extends TypeTestCase
             ]
         );
 
-        $expectedChoicesView = $this->prepareExpectedChoicesView($expectedChoices);
+        $attributes = [
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m||sourceentity_rel_m_t_m' => [
+                'data-fieldname' => 'sourceentity_rel_m_t_m',
+            ],
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o||rev_rel_m_t_o' => [
+                'data-fieldname' => 'rev_rel_m_t_o',
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m||sourceentity_rel_o_t_m' => [
+                'data-fieldname' => 'sourceentity_rel_o_t_m',
+            ],
+        ];
+
+        $expectedChoicesView = $this->prepareExpectedChoicesView($expectedChoices, $attributes);
 
         $this->assertEquals(
             $expectedChoicesView,

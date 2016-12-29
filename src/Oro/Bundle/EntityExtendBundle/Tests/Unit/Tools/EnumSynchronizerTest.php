@@ -43,7 +43,7 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
         $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->translationHelper = $this
             ->getMockBuilder(ConfigTranslationHelper::class)
@@ -106,16 +106,15 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($enumFieldConfig1));
 
         /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
-        $synchronizer = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer',
-            ['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions', 'updateEnumFieldConfig'],
-            [
+        $synchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
+            ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions', 'updateEnumFieldConfig'])
+            ->setConstructorArgs([
                 $this->configManager,
                 $this->doctrine,
                 $this->translator,
                 $this->translationHelper,
-            ]
-        );
+            ])
+            ->getMock();
 
         $synchronizer->expects($this->never())
             ->method('updateEnumFieldConfig');
@@ -163,16 +162,15 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('persist');
 
         /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
-        $synchronizer = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer',
-            ['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'],
-            [
+        $synchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
+            ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
+            ->setConstructorArgs([
                 $this->configManager,
                 $this->doctrine,
                 $this->translator,
                 $this->translationHelper,
-            ]
-        );
+            ])
+            ->getMock();
 
         $synchronizer->expects($this->never())
             ->method('applyEnumNameTrans');
@@ -241,16 +239,15 @@ class EnumSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
 
         /** @var EnumSynchronizer|\PHPUnit_Framework_MockObject_MockObject $synchronizer */
-        $synchronizer = $this->getMock(
-            'Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer',
-            ['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'],
-            [
+        $synchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
+            ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
+            ->setConstructorArgs([
                 $this->configManager,
                 $this->doctrine,
                 $this->translator,
                 $this->translationHelper,
-            ]
-        );
+            ])
+            ->getMock();
 
         $synchronizer->expects($this->once())
             ->method('applyEnumNameTrans')

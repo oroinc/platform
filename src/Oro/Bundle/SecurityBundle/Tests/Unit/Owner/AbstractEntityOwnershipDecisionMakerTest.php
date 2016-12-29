@@ -55,7 +55,7 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()

@@ -145,7 +145,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                         [['join' => sprintf('%s.%s', $alias, $fieldName), 'alias' => $fieldName]]
                     );
 
-                    $dataName = $fieldName.'_data';
+                    $dataName = $fieldName.'_target_field';
                     $targetField = $extendFieldConfig->get('target_field', false, 'id');
                     $dataFieldName = sprintf('%s.%s', $fieldName, $targetField);
 
@@ -157,6 +157,12 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                         );
                     }
                     $selectExpr = sprintf('%s as %s', $dataFieldName, $dataName);
+
+                    $config->offsetAddToArrayByPath(
+                        '[source][query][select]',
+                        [sprintf('IDENTITY(%s.%s) as %s_identity', $alias, $fieldName, $fieldName)]
+                    );
+
                     $columnDataName = $sorterDataName = $dataName;
                     $filterDataName = sprintf('IDENTITY(%s.%s)', $alias, $fieldName);
                     break;

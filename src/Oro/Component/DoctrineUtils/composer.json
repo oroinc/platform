@@ -12,7 +12,6 @@
         "psr-0": { "Oro\\Component\\DoctrineUtils": "" }
     },
     "target-dir": "Oro/Component/DoctrineUtils",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

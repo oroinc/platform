@@ -374,7 +374,7 @@ class EntitySerializer
                 $result[$field] = $value;
             } elseif (null !== $fieldConfig) {
                 $propertyPath = $fieldConfig->getPropertyPath($field);
-                if (ConfigUtil::isMetadataProperty($propertyPath)) {
+                if ($this->fieldAccessor->isMetadataProperty($propertyPath)) {
                     $result[$field] = $this->fieldAccessor->getMetadataProperty(
                         $entity,
                         $propertyPath,

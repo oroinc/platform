@@ -34,12 +34,12 @@ class WorkflowFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->formFactory = $this->getMock(FormFactoryInterface::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->datasourceAdapter = $this->getMock(FilterDatasourceAdapterInterface::class);
-        $this->expressionBuilder = $this->getMock(ExpressionBuilderInterface::class);
+        $this->datasourceAdapter = $this->createMock(FilterDatasourceAdapterInterface::class);
+        $this->expressionBuilder = $this->createMock(ExpressionBuilderInterface::class);
 
         $this->filter = new WorkflowFilter(
             $this->formFactory,

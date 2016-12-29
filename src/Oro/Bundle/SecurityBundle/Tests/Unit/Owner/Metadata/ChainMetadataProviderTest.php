@@ -18,10 +18,10 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function testAddProvider()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider1 */
-        $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider2 */
-        $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         $chain = new ChainMetadataProvider();
         $chain->addProvider('alias1', $provider1);
@@ -177,7 +177,7 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     protected function getMetadataProviderMock($isSupports = true, array $metadata = [])
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
         $provider->expects($this->any())
             ->method('supports')
             ->willReturn($isSupports);
@@ -192,7 +192,7 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetMaxAccessLevel()
     {
         $accessLevel = AccessLevel::SYSTEM_LEVEL;
-        $object = 'SomeClass';
+        $object = \stdClass::class;
 
         $provider = $this->getMetadataProviderMock(true);
         $provider->expects($this->once())
@@ -209,7 +209,7 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function testSupportedProvider()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
         $provider->expects($this->any())->method('supports')->willReturn(true);
 
         $chain = new ChainMetadataProvider();
@@ -223,11 +223,11 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function testEmulatedProvider()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider */
-        $provider = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
         $provider->expects($this->any())->method('supports')->willReturn(true);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $emulated */
-        $emulated = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $emulated = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         $chain = new ChainMetadataProvider();
         $chain->addProvider('alias', $provider);
@@ -255,13 +255,13 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function testClearCache()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider1 */
-        $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider2 */
-        $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $default */
-        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $default = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         $chain = new ChainMetadataProvider();
         $chain->setDefaultProvider($default);
@@ -278,13 +278,13 @@ class ChainMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function testWarmUpCache()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider1 */
-        $provider1 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $provider2 */
-        $provider2 = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|MetadataProviderInterface $default */
-        $default = $this->getMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
+        $default = $this->createMock('Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface');
 
         $chain = new ChainMetadataProvider();
         $chain->setDefaultProvider($default);

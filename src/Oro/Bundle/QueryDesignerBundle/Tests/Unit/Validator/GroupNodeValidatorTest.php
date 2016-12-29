@@ -17,7 +17,7 @@ class GroupNodeValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->executionContext = $this->getMock('\Symfony\Component\Validator\ExecutionContextInterface');
+        $this->executionContext = $this->createMock('\Symfony\Component\Validator\ExecutionContextInterface');
 
         $this->validator = new GroupNodeValidator();
         $this->validator->initialize($this->executionContext);

@@ -89,7 +89,9 @@ class EntityTypeTest extends OrmRelatedTestCase
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $stmt = $this->createFetchStatementMock(
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?',
             [
                 [
                     'id_1'   => $entity->getId(),
@@ -99,10 +101,6 @@ class EntityTypeTest extends OrmRelatedTestCase
             [1 => $value['id']],
             [1 => \PDO::PARAM_INT]
         );
-        $this->getDriverConnectionMock($this->em)->expects($this->any())
-            ->method('prepare')
-            ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
-            ->willReturn($stmt);
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
@@ -124,7 +122,9 @@ class EntityTypeTest extends OrmRelatedTestCase
         $entity->setId($value['id']);
         $entity->setName('test');
 
-        $stmt = $this->createFetchStatementMock(
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?',
             [
                 [
                     'id_1'   => $entity->getId(),
@@ -134,10 +134,6 @@ class EntityTypeTest extends OrmRelatedTestCase
             [1 => $value['id']],
             [1 => \PDO::PARAM_INT]
         );
-        $this->getDriverConnectionMock($this->em)->expects($this->any())
-            ->method('prepare')
-            ->with('SELECT t0.id AS id_1, t0.name AS name_2 FROM group_table t0 WHERE t0.id = ?')
-            ->willReturn($stmt);
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);

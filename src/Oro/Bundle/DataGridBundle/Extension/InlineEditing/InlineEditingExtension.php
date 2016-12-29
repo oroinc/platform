@@ -111,15 +111,16 @@ class InlineEditingExtension extends AbstractExtension
                     continue;
                 }
 
-                // frontend type key must not be replaced with default value
-                $frontendTypeKey = PropertyInterface::FRONTEND_TYPE_KEY;
-                if (!empty($newColumn[$frontendTypeKey])) {
-                    $column[$frontendTypeKey] = $newColumn[$frontendTypeKey];
-                }
-                // type key must not be replaced with default value
-                $typeKey = PropertyInterface::TYPE_KEY;
-                if (!empty($newColumn[$typeKey])) {
-                    $column[$typeKey] = $newColumn[$typeKey];
+                // frontend type, type, data_name keys must not be replaced with default value
+                $keys = [
+                    PropertyInterface::FRONTEND_TYPE_KEY,
+                    PropertyInterface::TYPE_KEY,
+                    PropertyInterface::DATA_NAME_KEY,
+                ];
+                foreach ($keys as $key) {
+                    if (!empty($newColumn[$key])) {
+                        $column[$key] = $newColumn[$key];
+                    }
                 }
 
                 $column = array_replace_recursive($newColumn, $column);

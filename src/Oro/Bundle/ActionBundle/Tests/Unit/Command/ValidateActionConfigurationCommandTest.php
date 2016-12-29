@@ -40,15 +40,15 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->provider = $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
+        $this->provider = $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
             ->with('oro_action.configuration.provider.operations', 1)
             ->willReturn($this->provider);
 
-        $this->input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $this->input = $this->createMock('Symfony\Component\Console\Input\InputInterface');
 
         $this->output = new OutputStub();
 

@@ -84,9 +84,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
@@ -536,7 +534,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
                 ['@and' => [
                     ['@acl_granted' => [
-                        'parameters' => [$configuration['acl_resource']], 'message' => $configuration['acl_message']
+                        'parameters' => $configuration['acl_resource'], 'message' => $configuration['acl_message']
                     ]],
                     ['@true' => null]
                 ]]
@@ -623,7 +621,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             '@and' => [
                 ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
                 ['@acl_granted' => [
-                    'parameters' => [$configuration['acl_resource']],
+                    'parameters' => $configuration['acl_resource'],
                     'message' => $configuration['acl_message']
                 ]]
             ]
@@ -700,7 +698,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createCondition()
     {
-        return $this->getMock(ExpressionInterface::class);
+        return $this->createMock(ExpressionInterface::class);
     }
 
     /**
@@ -708,6 +706,6 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createAction()
     {
-        return $this->getMock(ActionInterface::class);
+        return $this->createMock(ActionInterface::class);
     }
 }

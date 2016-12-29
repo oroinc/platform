@@ -3,28 +3,28 @@
 {% set isAjax = false %}
 
 {% block button %}
-
-    {% if actionData is defined %}
-        {% set options = oro_action_frontend_options(operation, null, actionData) %}
-    {% else %}
-        {% set options = oro_action_frontend_options(operation) %}
-    {% endif %}
-
-    {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder">{% endif %}
+    {% set options = oro_action_frontend_options(button) %}
+    {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
         {% block link %}
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
-                href="{{ (options.options.url and not isAjax) ? options.options.url : 'javascript:void(0);' }}"
-                class="{{ params.buttonOptions.class|default('back icons-holder-text action-button') }} {{ aClass|default('') }} {{ params.buttonOptions.aCss|default('') }}"
+                href="javascript:void(0);"
+                class="{{ params.buttonOptions.class|default('back icons-holder-text operation-button') }} {{ aClass|default('') }} {{ params.buttonOptions.aCss|default('') }}"
                 title="{{ linkTitle }}"
                 {% for name,value in options.data %}
                     data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
                 {% endfor %}
+                data-operation-url="{{ options.options.url }}"
                 data-options="{{ options.options|json_encode }}"
                 data-page-component-module="oroaction/js/app/components/button-component"
+                {% if not button.buttonContext.enabled %}
+                    disabled="disabled"
+                {% endif %}
             >
-                <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text">{{ linkLabel }}</i>
+                {% if not noIcon|default(false) %}
+                    <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text"></i>
+                {% endif %}
                 {{ linkLabel|trim }}
             </a>
         {% endblock %}
-    {% if onlyLink is not defined %}</div>{% endif %}
+    {% if not onlyLink|default(false) %}</div>{% endif %}
 {% endblock %}

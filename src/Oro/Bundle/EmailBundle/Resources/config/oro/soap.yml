@@ -1,2 +1,0 @@
-classes:
-    - Oro\Bundle\EmailBundle\Controller\Api\Soap\EmailController

@@ -60,7 +60,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
 
-        $cache = $this->getMock(ClearableCache::class);
+        $cache = $this->createMock(ClearableCache::class);
         $cache->expects($this->once())
             ->method('deleteAll')
             ->willReturn(true);

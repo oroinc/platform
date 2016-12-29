@@ -89,7 +89,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
             new ChoiceView($testIntegration2, $testIntegration2Id, $testIntegration2Label),
         ];
 
-        $this->type->finishView($view, $this->getMock('Symfony\Component\Form\Test\FormInterface'), []);
+        $this->type->finishView($view, $this->createMock('Symfony\Component\Form\Test\FormInterface'), []);
 
         $this->assertEquals($testIntegration1Label, $view->vars['choices'][0]->label);
         $this->assertEquals($testIntegration2Label, $view->vars['choices'][1]->label);

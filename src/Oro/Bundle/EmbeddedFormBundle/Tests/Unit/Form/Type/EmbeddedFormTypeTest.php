@@ -21,7 +21,7 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
     public function shouldBuildForm()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject | FormBuilderInterface $builder */
-        $builder = $this->getMock('\Symfony\Component\Form\FormBuilder', [], [], '', false);
+        $builder = $this->createMock('\Symfony\Component\Form\FormBuilder');
         $builder->expects($this->at(0))
             ->method('add')
             ->with('title', 'text')
@@ -49,7 +49,7 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
     public function shouldSetDefaultOptions()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject | OptionsResolverInterface $resolver */
-        $resolver = $this->getMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm']);

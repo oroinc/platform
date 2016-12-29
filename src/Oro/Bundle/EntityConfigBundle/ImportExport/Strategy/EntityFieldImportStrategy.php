@@ -101,6 +101,8 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
             }
         }
 
+        $this->context->setValue('existingEntity', $existingEntity);
+
         return $entity;
     }
 

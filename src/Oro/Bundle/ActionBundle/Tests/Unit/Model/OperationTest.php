@@ -48,9 +48,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
@@ -161,10 +159,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             });
 
         if ($exceptionMessage) {
-            $this->setExpectedException(
-                'Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException',
-                $exceptionMessage
-            );
+            $this->expectException('Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException');
+            $this->expectExceptionMessage($exceptionMessage);
         }
 
         $errors = new ArrayCollection();
@@ -510,12 +506,12 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects
      * @param ActionData $data
      * @return ActionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createAction(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
+        \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects,
         ActionData $data
     ) {
         /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -531,13 +527,13 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
+     * @param \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects
      * @param ActionData $data
      * @param bool $returnValue
      * @return ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createCondition(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
+        \PHPUnit_Framework_MockObject_Matcher_InvokedRecorder $expects,
         ActionData $data,
         $returnValue
     ) {
@@ -576,5 +572,53 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\AttributeManager', $attributeManager);
         $this->assertEquals(new ArrayCollection(['test_attr' => $attribute]), $attributeManager->getAttributes());
+    }
+
+    public function testClone()
+    {
+        $attributes = ['attribute' => ['label' => 'attr_label']];
+
+        $definition = new OperationDefinition();
+        $definition->setAttributes($attributes)
+            ->setConditions(OperationDefinition::PRECONDITIONS, [])
+            ->setConditions(OperationDefinition::CONDITIONS, [])
+            ->setActions(OperationDefinition::PREACTIONS, [])
+            ->setActions(OperationDefinition::ACTIONS, []);
+
+        $this->actionFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->createAction($this->any(), $this->data));
+
+        $this->conditionFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->createCondition($this->any(), $this->data, true));
+
+        $attribute = new Attribute();
+        $attribute->setName('test_attr');
+
+        $this->attributeAssembler->expects($this->any())
+            ->method('assemble')
+            ->with($this->data, $attributes)
+            ->willReturn(new ArrayCollection([$attribute]));
+
+        $operation = new Operation(
+            $this->actionFactory,
+            $this->conditionFactory,
+            $this->attributeAssembler,
+            $this->formOptionsAssembler,
+            $definition
+        );
+
+        $operation->isAvailable($this->data);
+        $operation->init($this->data);
+        $operation->execute($this->data);
+        $operation->getAttributeManager($this->data);
+        $operation->getFormOptions($this->data);
+
+        $newOperation = clone $operation;
+
+        $this->assertEquals($operation, $newOperation);
+        $this->assertEquals($operation->getDefinition(), $newOperation->getDefinition());
+        $this->assertNotSame($operation->getDefinition(), $newOperation->getDefinition());
     }
 }

@@ -1,0 +1,7 @@
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+
+{{ ui.renderHtmlProperty(
+    label|trans,
+    value
+) }}

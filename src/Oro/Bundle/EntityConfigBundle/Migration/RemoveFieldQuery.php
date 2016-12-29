@@ -9,19 +9,19 @@ use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 class RemoveFieldQuery extends ParametrizedMigrationQuery
 {
     /** @var string  */
-    protected $entityClass = '';
+    protected $entityClass;
 
     /** @var string  */
-    protected $enumField = '';
+    protected $entityField;
 
     /**
      * @param string $entityClass
-     * @param string $enumField
+     * @param string $entityField
      */
-    public function __construct($entityClass, $enumField)
+    public function __construct($entityClass, $entityField)
     {
         $this->entityClass = $entityClass;
-        $this->enumField = $enumField;
+        $this->entityField = $entityField;
     }
 
     /**
@@ -36,7 +36,7 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
             AND field_name = ?
             LIMIT 1';
 
-        $fieldRow = $this->connection->fetchAssoc($sql, [$this->entityClass, $this->enumField]);
+        $fieldRow = $this->connection->fetchAssoc($sql, [$this->entityClass, $this->entityField]);
 
         if ($fieldRow) {
             $this->executeQuery($logger, 'DELETE FROM oro_entity_config_field WHERE id = ?', [$fieldRow['id']]);
@@ -61,6 +61,6 @@ class RemoveFieldQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Remove config for field ' . $this->enumField . ' of entity' . $this->entityClass;
+        return 'Remove config for field ' . $this->entityField . ' of entity' . $this->entityClass;
     }
 }

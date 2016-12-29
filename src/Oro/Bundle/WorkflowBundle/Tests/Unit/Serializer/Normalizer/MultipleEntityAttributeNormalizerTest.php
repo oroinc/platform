@@ -39,7 +39,7 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->setMethods(array('getReference'))
@@ -78,8 +78,8 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue($attributeName));
 
-        $this->setExpectedException(
-            'Oro\Bundle\WorkflowBundle\Exception\SerializerException',
+        $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
+        $this->expectExceptionMessage(
             sprintf(
                 'Attribute "test_attribute" of workflow "test_workflow" must be a collection or an array,'
                 . ' but "%s" given',
@@ -107,8 +107,8 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue($attributeName));
 
-        $this->setExpectedException(
-            'Oro\Bundle\WorkflowBundle\Exception\SerializerException',
+        $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
+        $this->expectExceptionMessage(
             sprintf(
                 'Each value of attribute "test_attribute" of workflow "test_workflow" must be an instance of "%s",'
                 . ' but "%s" found',
@@ -137,8 +137,8 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->expects($this->once())->method('getManagerForClass')->with(get_class($attributeValue[0]));
 
-        $this->setExpectedException(
-            'Oro\Bundle\WorkflowBundle\Exception\SerializerException',
+        $this->expectException('Oro\Bundle\WorkflowBundle\Exception\SerializerException');
+        $this->expectExceptionMessage(
             sprintf(
                 'Attribute "%s" of workflow "%s" contains object of "%s", but it\'s not managed entity class',
                 $attributeName,
@@ -229,7 +229,7 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalizeEntity()
     {
-        $expectedValue  = array($this->getMock('EntityReference'), $this->getMock('EntityReference'));
+        $expectedValue  = array($this->createMock(\stdClass::class), $this->createMock(\stdClass::class));
         $attributeValue = array(array('id' => 123), array('id' => 456));
 
         $this->workflow->expects($this->never())->method($this->anything());
@@ -317,6 +317,6 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function getEntityMock()
     {
-        return $this->getMock('FooEntity');
+        return $this->createMock(\stdClass::class);
     }
 }

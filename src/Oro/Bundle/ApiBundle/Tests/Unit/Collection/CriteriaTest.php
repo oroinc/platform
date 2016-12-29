@@ -200,8 +200,8 @@ class CriteriaTest extends OrmRelatedTestCase
      */
     public function testAddJoinConflictsWithExistingJoin($joinType, $addMethodName)
     {
-        $this->setExpectedException(
-            '\LogicException',
+        $this->expectException('\LogicException');
+        $this->expectExceptionMessage(
             'The join definition for "products" conflicts with already added join.'
             . ' Existing join: "LEFT JOIN ' . $this->getEntityClass('Product') . '".'
             . ' New join: "' . $joinType . ' JOIN ' . $this->getEntityClass('Category') . '".'

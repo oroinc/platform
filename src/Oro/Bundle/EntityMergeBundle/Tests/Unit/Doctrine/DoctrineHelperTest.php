@@ -68,7 +68,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->setMethods(array('execute'))
             ->getMockForAbstractClass();
 
-        $this->expression = $this->getMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
+        $this->expression = $this->createMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
 
         $additionalMetadataProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider')

@@ -57,7 +57,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->with($this->testContext);
 
-        $condition = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $condition = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $condition->expects($this->never())
             ->method('evaluate');
 

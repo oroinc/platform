@@ -1,36 +1,33 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
-{% set params = {
-    workflowName: workflow.name,
-    transitionName: transition.name,
-    entityClass: context.entityClass,
-    entityId: context.entityId,
-    route: context.routeName,
-    datagrid: context.datagridName,
-    group: context.group,
-} %}
-
-{% if transition.displayType == 'dialog' %}
-    {% if transition.hasForm() %}
-        {% set transitionData = transitionData|merge({'dialog-url': path(transitionData['dialog-route'], params) }) %}
-    {% endif %}
-    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['transition-route'], params) }) %}
-{% else %}
-    {% set transitionData = transitionData|merge({'transition-url': path(transitionData['page-route'], params) }) %}
-{% endif %}
-
 {# Show button for start or transit workflow #}
-{% set transitionMessage = transition.message|trans({},'workflows') %}
-{% if transitionMessage == transition.message %}
+{% set transitionMessage = button.transition.message|trans({}, button.translationDomain) %}
+{% if transitionMessage == button.transition.message %}
     {# if no translation for message then do not show message #}
     {% set transitionMessage = '' %}
 {% endif %}
 
-{% set transitionData = transitionData|merge({
-    'transition-label': transition.label|trans({},'workflows'),
-    'message': transitionMessage|nl2br
-}) %}
+{% set transitionData = {
+    'transition-label': button.label|trans({},'workflows'),
+    'message': transitionMessage|nl2br,
+    'transition-condition-messages': button.buttonContext.errors,
+    'enabled': button.buttonContext.enabled,
+    'transition-url': path(executionRoute, routeParams),
+} %}
 
-<div class="pull-left btn-group icons-holder">
-    {{ workflowMacros.renderTransitionButton(workflow, transition, null, transitionData) }}
-</div>
+{% set transitionData = frontendOptions.data|default({})|merge(transitionData) %}
+{% if hasForm and showDialog %}
+    {% set transitionData = transitionData|merge({'dialog-url': path(dialogRoute, routeParams) }) %}
+{% endif %}
+{% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
+    {{ workflowMacros.renderTransitionButton(
+        button.workflow,
+        button.transition,
+        workflowItem|default(null),
+        transitionData,
+        onlyLink|default(false),
+        noIcon|default(false),
+        noIconText|default(false),
+        aClass|default('')
+    ) }}
+{% if not onlyLink|default(false) %}</div>{% endif %}

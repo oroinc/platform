@@ -62,10 +62,10 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         }
 
         $ef    = new EncoderFactory([static::USER_CLASS => new MessageDigestPasswordEncoder('sha512')]);
-        $class = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $class = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
 
-        $this->om         = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->om         = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock()
@@ -84,7 +84,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($class));
 
 
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->will($this->returnValue($this->om));
@@ -121,7 +121,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_sso.enable_google_sso'))
             ->will($this->returnValue(false));
 
-        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
 
         $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
     }
@@ -140,7 +140,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue([]));
 
-        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse
             ->expects($this->any())
             ->method('getUsername')
@@ -149,7 +149,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $userResponse
             ->expects($this->any())
             ->method('getResourceOwner')
-            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
 
         $userResponse
             ->expects($this->any())
@@ -187,7 +187,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue([]));
 
-        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse
             ->expects($this->any())
             ->method('getUsername')
@@ -196,7 +196,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $userResponse
             ->expects($this->any())
             ->method('getResourceOwner')
-            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
 
         $userResponse
             ->expects($this->any())
@@ -231,7 +231,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue([]));
 
-        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse
             ->expects($this->any())
             ->method('getUsername')
@@ -240,7 +240,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $userResponse
             ->expects($this->any())
             ->method('getResourceOwner')
-            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
 
         $userResponse
             ->expects($this->any())
@@ -281,7 +281,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue(['example.com']));
 
-        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse
             ->expects($this->any())
             ->method('getUsername')
@@ -290,7 +290,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $userResponse
             ->expects($this->any())
             ->method('getResourceOwner')
-            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
 
         $userResponse
             ->expects($this->any())
@@ -334,7 +334,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue(['google.com']));
 
-        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse
             ->expects($this->any())
             ->method('getUsername')
@@ -343,7 +343,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $userResponse
             ->expects($this->any())
             ->method('getResourceOwner')
-            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
 
         $this->repository
             ->expects($this->never())

@@ -41,10 +41,10 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         /* @var $formFactory FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         /* @var $filterUtility FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
-        $filterUtility = $this->getMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
+        $filterUtility = $this->createMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
 
         $this->filter = new NumberFilter($formFactory, $filterUtility);
         $this->filter->init($this->filterName, [
@@ -212,7 +212,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
     protected function prepareDatasource()
     {
         /* @var $em EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $em->expects($this->any())
             ->method('getExpressionBuilder')
             ->willReturn(new Query\Expr())

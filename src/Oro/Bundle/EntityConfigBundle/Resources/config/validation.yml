@@ -1,0 +1,21 @@
+namespaces:
+    doctrine: Symfony\Bridge\Doctrine\Validator\Constraints\
+    oro_entity_config: Oro\Bundle\EntityConfigBundle\Validator\Constraints\
+    oro_entity_extend: Oro\Bundle\EntityExtendBundle\Validator\Constraints\
+
+Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily:
+    constraints:
+        - oro_entity_config:AttributeFamilyGroups: ~
+        - oro_entity_config:GroupAttributes: ~
+        - doctrine:UniqueEntity: [code]
+    properties:
+        code:
+            - NotBlank: ~
+            - Regex:
+                pattern: "/^[a-z]+[a-z0-9_]*$/i"
+                message: "This value should start with a symbol and contain only alphabetic symbols, underscore and numbers."
+            - Regex:
+                pattern: "/^id$/i"
+                match:   false
+                message: "The '{{ value }}' cannot be used as a code value."
+            - oro_entity_extend:NotSqlKeyword: ~

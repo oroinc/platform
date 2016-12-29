@@ -40,7 +40,7 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->context->getIncludedEntities());
 
-        $includedEntities = $this->getMock(IncludedEntityCollection::class);
+        $includedEntities = $this->createMock(IncludedEntityCollection::class);
         $this->context->setIncludedEntities($includedEntities);
         $this->assertSame($includedEntities, $this->context->getIncludedEntities());
 
@@ -50,7 +50,7 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
 
     public function testFormBuilder()
     {
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $this->assertFalse($this->context->hasFormBuilder());
         $this->assertNull($this->context->getFormBuilder());
@@ -66,7 +66,7 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
 
     public function testForm()
     {
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $this->assertFalse($this->context->hasForm());
         $this->assertNull($this->context->getForm());

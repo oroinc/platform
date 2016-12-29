@@ -45,6 +45,10 @@ class ComputeFileContent implements ProcessorInterface
         }
 
         $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $contentField = $config->getField('content');
         if (!$contentField || $contentField->isExcluded()) {
             return;

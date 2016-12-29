@@ -23,7 +23,7 @@ class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit_Framework_Te
         $removeManager = $this->getMockBuilder('Oro\Bundle\ImapBundle\Sync\ImapEmailRemoveManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $knownEmailAddressChecker = $this->getMock('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface');
+        $knownEmailAddressChecker = $this->createMock('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface');
 
 
         $doctrine->expects($this->exactly(2))

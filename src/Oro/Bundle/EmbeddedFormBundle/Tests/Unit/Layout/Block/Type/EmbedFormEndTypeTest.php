@@ -22,7 +22,7 @@ class EmbedFormEndTypeTest extends BlockTypeTestCase
         $formName = 'test_form';
         $formView = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with(null)

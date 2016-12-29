@@ -34,7 +34,7 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
     public function testConfigureOptions()
     {
         /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver **/
-        $resolver = $this->getMock(OptionsResolver::class);
+        $resolver = $this->createMock(OptionsResolver::class);
 
         $resolver->expects($this->once())
             ->method('setRequired')
@@ -49,7 +49,8 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                ScopeType::SCOPE_FIELDS_OPTION => []
+                ScopeType::SCOPE_FIELDS_OPTION => [],
+                'error_bubbling' => false
             ]);
 
         $resolver->expects($this->once())
@@ -121,7 +122,7 @@ class ScopeTypeTest extends \PHPUnit_Framework_TestCase
         $scopeTransformer = new ScopeTransformer($this->scopeManager, $scopeType);
 
         /** @var FormBuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builder */
-        $builder = $this->getMock(FormBuilderInterface::class);
+        $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('addModelTransformer')
             ->with($scopeTransformer);

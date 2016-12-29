@@ -27,7 +27,11 @@ define([
             } else {
                 // render a yes/no text for non editable cell
                 this.$el.empty();
-                var text = this.formatter.fromRaw(this.model.get(this.column.get('name'))) ? __('Yes') : __('No');
+                var text = '';
+                var columnData = this.model.get(this.column.get('name'));
+                if (columnData !== null) {
+                    text = this.formatter.fromRaw(columnData) ? __('Yes') : __('No');
+                }
                 this.$el.append('<span>').text(text);
                 this.delegateEvents();
             }

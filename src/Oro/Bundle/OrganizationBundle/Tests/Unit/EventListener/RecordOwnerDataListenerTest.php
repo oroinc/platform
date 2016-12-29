@@ -52,7 +52,7 @@ class RecordOwnerDataListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->will($this->returnValue($token));
 
-        $args = new LifecycleEventArgs($entity, $this->getMock('Doctrine\Common\Persistence\ObjectManager'));
+        $args = new LifecycleEventArgs($entity, $this->createMock('Doctrine\Common\Persistence\ObjectManager'));
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
             ->will($this->returnValue(true));

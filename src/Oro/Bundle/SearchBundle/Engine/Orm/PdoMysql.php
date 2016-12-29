@@ -14,6 +14,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
 class PdoMysql extends BaseDriver
 {
     const ENGINE_MYISAM = 'MyISAM';
+    const ENGINE_INNODB = 'InnoDB';
 
     /**
      * The value of ft_min_word_len

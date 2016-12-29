@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -322,6 +322,11 @@ class WorkflowControllerTest extends WebTestCase
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertArrayHasKey('id', $result['workflowItem']);
+        $this->assertArrayHasKey('entity_id', $result['workflowItem']);
+        $this->assertArrayHasKey('entity_class', $result['workflowItem']);
+        $this->assertArrayHasKey('workflow_name', $result['workflowItem']);
 
         $workflowItem = $this->getRepository(WorkflowItem::class)
             ->find($result['workflowItem']['id']);
