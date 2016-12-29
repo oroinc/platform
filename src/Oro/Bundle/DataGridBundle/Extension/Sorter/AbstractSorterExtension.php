@@ -304,10 +304,12 @@ abstract class AbstractSorterExtension extends AbstractExtension
             if (!$sortBy) {
                 $sortBy = $defaultSorters;
             }
-        } elseif (!$disableDefaultSorting) {
-            $sortBy = $defaultSorters;
         } else {
-            // when disable sorting option is set up, do not use any sorters
+            $sortBy = $defaultSorters;
+        }
+
+        // when disable sorting option is set up, do not use any sorters
+        if ($sortBy === $defaultSorters && $disableDefaultSorting) {
             return [];
         }
 
