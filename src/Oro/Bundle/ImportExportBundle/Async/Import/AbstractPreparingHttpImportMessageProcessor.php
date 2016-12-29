@@ -1,10 +1,12 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-
 use Oro\Bundle\ImportExportBundle\File\SplitterCsvFile;
-
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -17,8 +19,6 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 abstract class AbstractPreparingHttpImportMessageProcessor implements
     MessageProcessorInterface,
@@ -54,6 +54,11 @@ abstract class AbstractPreparingHttpImportMessageProcessor implements
      * @var RegistryInterface
      */
     protected $doctrine;
+
+    /**
+     * @var DependentJobService
+     */
+    protected $dependentJob;
 
     /**
      * @param HttpImportHandler $httpImportHandler

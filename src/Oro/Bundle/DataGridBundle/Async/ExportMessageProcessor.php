@@ -1,13 +1,17 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
-
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
@@ -24,8 +28,6 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -252,6 +254,18 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             'subject' => $subject,
             'body' => $body,
         ]);
+    }
+
+    /**
+     * @param string $emailTemplateName
+     *
+     * @return null|EmailTemplateInterface
+     */
+    protected function findEmailTemplateByName($emailTemplateName)
+    {
+        return $this->doctrineHelper
+            ->getEntityRepository(EmailTemplate::class)
+            ->findOneBy(['name' => $emailTemplateName]);
     }
 
     /**
