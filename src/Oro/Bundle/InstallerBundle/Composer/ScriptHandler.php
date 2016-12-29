@@ -139,7 +139,7 @@ class ScriptHandler extends SensioScriptHandler
         $pluginInstalled = array_filter(
             $event->getComposer()->getPluginManager()->getPlugins(),
             function ($plugin) {
-                return is_a($plugin, 'Fxp\Composer\AssetPlugin\FxpAssetPlugin');
+                return false !== strpos(get_class($plugin), 'Fxp\Composer\AssetPlugin\FxpAssetPlugin');
             }
         );
 
