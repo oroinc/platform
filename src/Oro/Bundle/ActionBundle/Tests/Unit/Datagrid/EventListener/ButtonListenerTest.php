@@ -504,7 +504,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createButtonsCollection(array $buttons)
     {
-        $extension = $this->getMock(ButtonProviderExtensionInterface::class);
+        $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())->method('find')->willReturn($buttons);
         $extension->expects($this->any())
             ->method('isAvailable')

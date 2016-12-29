@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -311,6 +312,9 @@ class OperationTypeTest extends FormIntegrationTestCase
         $operation->expects($this->any())
             ->method('getName')
             ->willReturn('test_operation');
+        $operation->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn(new OperationDefinition());
 
         return $operation;
     }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
@@ -50,7 +52,7 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
             return $buttons;
         }
 
-        foreach ($this->workflowRegistry->getActiveWorkflows() as $workflow) {
+        foreach ($this->getActiveWorkflows() as $workflow) {
             $transitions = $this->getTransitions($workflow, $buttonSearchContext);
 
             foreach ($transitions as $transition) {
@@ -106,6 +108,14 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
                 get_class($this)
             )
         );
+    }
+
+    /**
+     * @return Workflow[]|ArrayCollection
+     */
+    protected function getActiveWorkflows()
+    {
+        return $this->workflowRegistry->getActiveWorkflows();
     }
 
     /**

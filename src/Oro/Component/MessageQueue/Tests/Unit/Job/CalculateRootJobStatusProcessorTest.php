@@ -32,6 +32,8 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+
+
     public function testShouldLogErrorAndRejectMessageIfMessageIsInvalid()
     {
         $message = new NullMessage();

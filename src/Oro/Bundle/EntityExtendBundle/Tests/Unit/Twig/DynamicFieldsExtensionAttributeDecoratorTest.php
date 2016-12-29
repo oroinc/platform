@@ -3,9 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
+use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtensionAttributeDecorator;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -17,7 +16,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_Te
     const ENTITY_CLASS_NAME = 'entity_class';
 
     /**
-     * @var DynamicFieldsExtension|\PHPUnit_Framework_MockObject_MockObject
+     * @var AbstractDynamicFieldsExtension|\PHPUnit_Framework_MockObject_MockObject
      */
     private $extension;
 
@@ -33,7 +32,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_Te
 
     protected function setUp()
     {
-        $this->extension = $this->getMockBuilder(DynamicFieldsExtension::class)
+        $this->extension = $this->getMockBuilder(AbstractDynamicFieldsExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -49,27 +48,15 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_Te
 
     public function testGetName()
     {
-        $name = 'oro_entity_config_fields';
-        $this->extension
-            ->expects($this->once())
-            ->method('getName')
-            ->willReturn($name);
-
-        $this->assertEquals($name, $this->decorator->getName());
+        $this->assertEquals(AbstractDynamicFieldsExtension::NAME, $this->decorator->getName());
     }
 
     public function testGetFunctions()
     {
-        $simpleFunction = $this->getMockBuilder(\Twig_SimpleFunction::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $functions = [$simpleFunction];
-        $this->extension
-            ->expects($this->once())
-            ->method('getFunctions')
-            ->willReturn($functions);
-
-        $this->assertEquals($functions, $this->decorator->getFunctions());
+        $functions = $this->decorator->getFunctions();
+        $this->assertCount(2, $functions);
+        $this->assertInstanceOf(\Twig_SimpleFunction::class, $functions[0]);
+        $this->assertInstanceOf(\Twig_SimpleFunction::class, $functions[1]);
     }
 
     public function testGetField()
@@ -88,20 +75,6 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit_Framework_Te
         /** @var FieldConfigModel $field */
         $field = $this->getEntity(FieldConfigModel::class);
         $this->assertEquals($expectedData, $this->decorator->getField($entity, $field));
-    }
-
-    public function testFilterFields()
-    {
-        $returnValue = false;
-        /** @var ConfigInterface $config */
-        $config = $this->createMock(ConfigInterface::class);
-        $this->extension
-            ->expects($this->once())
-            ->method('filterFields')
-            ->with($config)
-            ->willReturn($returnValue);
-
-        $this->assertEquals($returnValue, $this->decorator->filterFields($config));
     }
 
     /**
