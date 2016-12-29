@@ -198,6 +198,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
                     'class' => AttributeFamily::class,
                     'label' => 'oro.entity_config.attribute_family.entity_label',
                     'choices' => [],
+                    'required' => true,
                     'constraints' => [new NotBlank()]
                 ]
             );
