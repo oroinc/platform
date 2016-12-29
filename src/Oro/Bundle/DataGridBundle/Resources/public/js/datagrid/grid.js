@@ -460,9 +460,9 @@ define(function(require) {
                 $parents = $parents.add(document);
                 $parents.on('scroll' + this.eventNamespace(), _.bind(this.trigger, this, 'scroll'));
                 this._$boundScrollHandlerParents = $parents;
-            }
 
-            this.listenTo(this.collection, 'backgrid:sort', this.sort);
+                this.listenTo(this.collection, 'backgrid:sort', _.debounce(this.sort, 50), this);
+            }
             return this;
         },
 
@@ -477,7 +477,7 @@ define(function(require) {
                 delete this._$boundScrollHandlerParents;
             }
 
-            this.collection.off('backgrid:sort');
+            this.stopListening(this.collection, 'backgrid:sort');
 
             return this;
         },

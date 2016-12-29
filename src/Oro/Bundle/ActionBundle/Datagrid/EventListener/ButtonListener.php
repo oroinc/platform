@@ -157,11 +157,11 @@ class ButtonListener
                     $name = strtolower($button->getName());
                     $enabled = false;
 
+                    $newButton = clone $button;
                     if (!array_key_exists($name, $configuration) || $configuration[$name] !== false) {
-                        $enabled = $extension->isAvailable($button, $searchContext);
+                        $enabled = $extension->isAvailable($newButton, $searchContext);
                     }
 
-                    $newButton = clone $button;
                     $newButton->getButtonContext()
                         ->setEnabled($enabled)
                         ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId());

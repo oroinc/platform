@@ -12,7 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
-use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 use Symfony\Component\Form\FormConfigInterface;
@@ -20,8 +19,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,11 +41,6 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
      * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
      */
     private $configManager;
-
-    /**
-     * @var Router|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $router;
 
     /**
      * @var ConfigHelper|\PHPUnit_Framework_MockObject_MockObject
@@ -75,10 +67,6 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->configHelper = $this->getMockBuilder(ConfigHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -90,7 +78,6 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler = new CreateUpdateConfigFieldHandler(
             $this->configHelperHandler,
             $this->configManager,
-            $this->router,
             $this->configHelper,
             $this->sessionStorage
         );
@@ -120,7 +107,10 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             $properties
         );
 
-        return $this->getEntity(EntityConfigModel::class, $properties);
+        /** @var EntityConfigModel $entityConfigModel */
+        $entityConfigModel = $this->getEntity(EntityConfigModel::class, $properties);
+
+        return $entityConfigModel;
     }
 
     /**
@@ -270,7 +260,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->router
+        $this->configHelperHandler
             ->expects($this->once())
             ->method('redirect')
             ->with($entityConfigModel)
@@ -353,7 +343,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->router
+        $this->configHelperHandler
             ->expects($this->once())
             ->method('redirect')
             ->with(self::CREATE_ACTION_REDIRECT_URL)
@@ -383,49 +373,15 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         EntityConfigModel $entityConfigModel,
         FieldConfigModel $newFieldModel
     ) {
-        $formView = $this->getMockBuilder(FormView::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $form
-            ->expects($this->once())
-            ->method('createView')
-            ->willReturn($formView);
+        $expectedResponse = [
+            'someKey' => 'someValue'
+        ];
 
         $this->configHelperHandler
             ->expects($this->once())
-            ->method('createSecondStepFieldForm')
-            ->with($newFieldModel)
-            ->willReturn($form);
-
-        $requireJsModules = ['some', 'thing'];
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getExtendRequireJsModules')
-            ->willReturn($requireJsModules);
-
-        $fieldConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getFieldConfig')
-            ->with($newFieldModel, 'entity')
-            ->willReturn($fieldConfig);
-
-        $entityConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper
-            ->expects($this->once())
-            ->method('getEntityConfigByField')
-            ->with($newFieldModel, 'entity')
-            ->willReturn($entityConfig);
-
-        $expectedResponse = [
-            'entity_config' => $entityConfig,
-            'field_config' => $fieldConfig,
-            'field' => $newFieldModel,
-            'form' => $formView,
-            'formAction' => self::FORM_ACTION,
-            'require_js' => $requireJsModules
-        ];
+            ->method('constructConfigResponse')
+            ->with($newFieldModel, $form, self::FORM_ACTION)
+            ->willReturn($expectedResponse);
 
         $response = $this->handler->handleFieldSave(
             $request,
@@ -452,6 +408,12 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->configHelperHandler
             ->expects($this->once())
+            ->method('createSecondStepFieldForm')
+            ->with($newFieldModel)
+            ->willReturn($form);
+
+        $this->configHelperHandler
+            ->expects($this->once())
             ->method('isFormValidAfterSubmit')
             ->with($request, $form)
             ->willReturn(false);
@@ -466,36 +428,14 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Request|\PHPUnit_Framework_MockObject_MockObject $request
      * @param FieldConfigModel $newFieldModel
      * @param ConfigInterface|\PHPUnit_Framework_MockObject_MockObject $extendEntityConfig
      * @return RedirectResponse|\PHPUnit_Framework_MockObject_MockObject
      */
     private function expectsConfigSavingAndRedirect(
-        Request $request,
         FieldConfigModel $newFieldModel,
         ConfigInterface $extendEntityConfig
     ) {
-        $session = $this->getMockBuilder(Session::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $flashBag = $this->createMock(FlashBag::class);
-        $flashBag
-            ->expects($this->once())
-            ->method('add')
-            ->with('success', self::SUCCESS_MESSAGE);
-
-        $session
-            ->expects($this->once())
-            ->method('getFlashBag')
-            ->willReturn($flashBag);
-
-        $request
-            ->expects($this->once())
-            ->method('getSession')
-            ->willReturn($session);
-
         $extendEntityConfig ->expects($this->once())
             ->method('set')
             ->with('upgradeable', true);
@@ -509,14 +449,11 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('flush');
 
-        $redirectResponse = $this->getMockBuilder(RedirectResponse::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->router
+        $redirectResponse = new RedirectResponse('some_redirect_url');
+        $this->configHelperHandler
             ->expects($this->once())
-            ->method('redirect')
-            ->with($newFieldModel)
+            ->method('showSuccessMessageAndRedirect')
+            ->with($newFieldModel, self::SUCCESS_MESSAGE)
             ->willReturn($redirectResponse);
 
         return $redirectResponse;
@@ -551,7 +488,7 @@ class CreateUpdateConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($newFieldModel)
             ->willReturn($form);
 
-        $redirectResponse = $this->expectsConfigSavingAndRedirect($request, $newFieldModel, $extendEntityConfig);
+        $redirectResponse = $this->expectsConfigSavingAndRedirect($newFieldModel, $extendEntityConfig);
 
         $response = $this->handler->handleFieldSave(
             $request,

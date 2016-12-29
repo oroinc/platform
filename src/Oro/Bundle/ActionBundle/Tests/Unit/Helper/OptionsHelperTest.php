@@ -106,7 +106,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected function getButton($label, array $templateData)
     {
-        $button = $this->getMock(ButtonInterface::class);
+        $button = $this->createMock(ButtonInterface::class);
         $button->expects($this->any())->method('getTemplateData')->willReturn($templateData);
         $button->expects($this->any())->method('getLabel')->willReturn($label);
 

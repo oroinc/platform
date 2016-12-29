@@ -28,9 +28,6 @@ class NamespaceMigration
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * @param bool $skipp
-     */
     public function migrate()
     {
         foreach ($this->providers as $provider) {
