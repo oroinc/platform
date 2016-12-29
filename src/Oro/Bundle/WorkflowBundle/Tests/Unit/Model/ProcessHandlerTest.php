@@ -38,7 +38,7 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->handler = new ProcessHandler($this->factory, $this->logger, $this->eventDispatcher);
     }
@@ -57,8 +57,8 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function prepareHandleTrigger($processData)
     {
-        $processDefinition = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition');
-        $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
+        $processDefinition = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition');
+        $processTrigger = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
         $processTrigger->expects($this->once())
             ->method('getDefinition')
             ->will($this->returnValue($processDefinition));
@@ -118,7 +118,7 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $processTrigger = $this->prepareHandleTrigger($data);
 
-        $processJob = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
+        $processJob = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
         $processJob->expects($this->once())
             ->method('getProcessTrigger')
             ->will($this->returnValue($processTrigger));
@@ -150,7 +150,7 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testFinishTrigger()
     {
-        $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
+        $processTrigger = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
         $processData = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessData')
             ->disableOriginalConstructor()->getMock();
 
@@ -173,11 +173,11 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testFinishJob()
     {
-        $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
+        $processTrigger = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
         $processData = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessData')
             ->disableOriginalConstructor()->getMock();
 
-        $processJob = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
+        $processJob = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
         $processJob->expects($this->once())
             ->method('getProcessTrigger')
             ->will($this->returnValue($processTrigger));

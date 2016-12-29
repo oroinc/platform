@@ -24,7 +24,7 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
     {
         $event = new TestSubscriber();
         $this->type->setEventSubscriber($event);
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $builder->expects($this->once())
             ->method('addEventSubscriber')
             ->with($event);
@@ -42,7 +42,7 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildFormWithoutEventSubscriber()
     {
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
 
         $builder->expects($this->once())
             ->method('add')
@@ -57,7 +57,7 @@ class FileTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(

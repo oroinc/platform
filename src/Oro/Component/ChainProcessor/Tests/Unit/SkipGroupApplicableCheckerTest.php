@@ -62,7 +62,7 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProcessorFactory(array $callbacks = [])
     {
-        $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $factory->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(

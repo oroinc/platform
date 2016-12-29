@@ -91,7 +91,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             return $result;
         }
 
-        $targets = $entity->getActivityTargetEntities();
+        $targets = $entity->getActivityTargets();
         $entityProvider = $this->configManager->getProvider('entity');
 
         foreach ($targets as $target) {

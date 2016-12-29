@@ -19,7 +19,7 @@ class OroEventManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->manager   = new OroEventManager($this->container);
     }
 
@@ -43,7 +43,7 @@ class OroEventManagerTest extends \PHPUnit_Framework_TestCase
         $affectedListener = new StubEventListener();
         $this->assertFalse($affectedListener->isFlushed);
 
-        $notAffectedListener = $this->getMock('Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener');
+        $notAffectedListener = $this->createMock('Oro\Bundle\EntityBundle\Tests\Unit\Event\Stub\StubEventListener');
         $notAffectedListener->expects($this->once())->method($eventName);
 
         $listenerService = 'test.listener.service';

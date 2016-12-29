@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -152,18 +153,32 @@ class Workflow
      *
      * @param object $entity
      * @param array $data
-     * @param string $startTransitionName
+     * @param string|Transition $startTransition
      *
      * @return WorkflowItem
      */
-    public function start($entity, array $data = [], $startTransitionName = null)
+    public function start($entity, array $data = [], $startTransition = null)
     {
-        if (null === $startTransitionName) {
-            $startTransitionName = TransitionManager::DEFAULT_START_TRANSITION_NAME;
+        if (null === $startTransition) {
+            $startTransition = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         }
 
         $workflowItem = $this->createWorkflowItem($entity, $data);
-        $this->transit($workflowItem, $startTransitionName);
+        $this->transit($workflowItem, $startTransition);
+
+        // transition started without related entity, workflow item must be created for specified entity
+        if (!$this->doctrineHelper->getSingleEntityIdentifier($entity)) {
+            $currentEntity = $workflowItem->getData()->get($this->getDefinition()->getEntityAttributeName());
+            $entityClass = $this->doctrineHelper->getEntityClass($currentEntity);
+            $entityId = $this->doctrineHelper->getSingleEntityIdentifier($currentEntity);
+
+            // find existing workflow item, if transition autostarted inside transit, data will be updated
+            if (null === ($currentItem = $this->findWorkflowItem($entityClass, $entityId))) {
+                $currentItem = $this->createWorkflowItem($currentEntity, $data);
+            }
+
+            return $currentItem->merge($workflowItem);
+        }
 
         return $workflowItem;
     }
@@ -274,6 +289,23 @@ class Workflow
     }
 
     /**
+     * @param string $entityClass
+     * @param int|string $entityId
+     * @return null|WorkflowItem
+     */
+    protected function findWorkflowItem($entityClass, $entityId)
+    {
+        if (null === $entityId) {
+            return null;
+        }
+
+        /** @var WorkflowItemRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepositoryForClass(WorkflowItem::class);
+
+        return $repo->findOneByEntityMetadata($entityClass, $entityId, $this->getName());
+    }
+
+    /**
      * Create workflow item.
      *
      * @param object $entity
@@ -285,19 +317,9 @@ class Workflow
     {
         $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
 
-        $repo = $this->doctrineHelper->getEntityRepositoryForClass('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
-
-        $workflowItem = null;
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
-        if ($entityId !== null) {
-            $workflowItem = $repo->findOneBy([
-                'workflowName' => $this->getName(),
-                'entityId' => $entityId,
-                'entityClass' => $entityClass
-            ]);
-        }
+        $workflowItem = $this->findWorkflowItem($entityClass, $entityId);
 
         if (!$workflowItem) {
             $workflowItem = new WorkflowItem();
@@ -319,6 +341,15 @@ class Workflow
         $workflowItem->setDefinition($this->getDefinition());
 
         return $workflowItem;
+    }
+
+    /**
+     * @param string $entityId
+     * @return null|WorkflowItem
+     */
+    public function getWorkflowItemByEntityId($entityId)
+    {
+        return $this->findWorkflowItem($this->getDefinition()->getRelatedEntity(), $entityId);
     }
 
     /**
@@ -518,6 +549,14 @@ class Workflow
     }
 
     /**
+     * @return array[]
+     */
+    public function getInitDatagrids()
+    {
+        return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_DATAGRIDS, []);
+    }
+
+    /**
      * @param string $nodeName
      * @param mixed|null $default
      *
@@ -525,7 +564,7 @@ class Workflow
      */
     private function getConfigurationOption($nodeName, $default = null)
     {
-        $configuration = $this->definition->getConfiguration();
+        $configuration = $this->getDefinition()->getConfiguration();
 
         return isset($configuration[$nodeName]) ? $configuration[$nodeName] : $default;
     }

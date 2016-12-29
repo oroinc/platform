@@ -174,7 +174,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
         $emailOriginsTimes,
         $exactly
     ) {
-        $organization  = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
+        $organization  = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
         $collection    = new ArrayCollection([$origin]);
         $originName    = 'origin name';
         $campaignOwner = null;

@@ -20,7 +20,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->type = new LocalizedFallbackValueCollectionType($this->registry);
     }
 
@@ -37,7 +37,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
             'options' => [],
         ];
 
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($expectedOptions);
@@ -51,7 +51,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit_Framework_TestCa
         $options = ['key' => 'value'];
         $field = 'text';
 
-        $builder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
         $builder->expects($this->at(0))
             ->method('add')
             ->with(

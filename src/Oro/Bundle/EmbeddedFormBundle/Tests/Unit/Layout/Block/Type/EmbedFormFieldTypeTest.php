@@ -53,7 +53,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $formPath = 'firstName';
         $formView = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with($formPath)
@@ -106,7 +106,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $formPath = 'firstName';
         $formView = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with($formPath)
@@ -144,7 +144,7 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $formPath = 'firstName';
         $formView = new FormView();
 
-        $formAccessor = $this->getMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with($formPath)

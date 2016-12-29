@@ -144,6 +144,10 @@ datagrids:
                                 JOIN act_f.origin act_o
                                 WHERE act_o.isActive = true AND eu.id = act_eu.id
                             )
+            count_hints:
+                - { name: oro.use_index, value: user_owner_id_mailbox_owner_id_organization_id }
+            hints:
+                - { name: oro.use_index, value: user_owner_id_mailbox_owner_id_organization_id }
 
         columns:
             contacts:
@@ -380,7 +384,7 @@ datagrids:
                 type: dialog
                 label: oro.email.datagrid.emails.action.view
                 link: view_thread_link
-                icon: eye-open
+                icon: eye
                 rowAction: true
                 widgetOptions:
                     options:

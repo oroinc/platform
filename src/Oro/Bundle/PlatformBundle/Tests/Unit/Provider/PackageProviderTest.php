@@ -27,7 +27,7 @@ class PackageProviderTest extends \PHPUnit_Framework_TestCase
     {
         $packages = [new Package('oro/platform', '1.0.0', '1.0.0')];
 
-        $repository = $this->getMock('Composer\Repository\InstalledRepositoryInterface');
+        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
         $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
         $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
 
@@ -39,7 +39,7 @@ class PackageProviderTest extends \PHPUnit_Framework_TestCase
         $thirdPartyPackage = new Package('not-oro/platform', '1.0.0', '1.0.0');
         $packages = [new Package('oro/platform', '1.0.0', '1.0.0'), $thirdPartyPackage];
 
-        $repository = $this->getMock('Composer\Repository\InstalledRepositoryInterface');
+        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
         $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
         $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
 
@@ -53,7 +53,7 @@ class PackageProviderTest extends \PHPUnit_Framework_TestCase
     {
         $packages = [new Package('not-oro/platform', '1.0.0', '1.0.0')];
 
-        $repository = $this->getMock('Composer\Repository\InstalledRepositoryInterface');
+        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
         $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
         $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
 
@@ -66,7 +66,7 @@ class PackageProviderTest extends \PHPUnit_Framework_TestCase
         $oroPackage = new Package('oro/platform', '1.0.0', '1.0.0');
         $packages = [$oroPackage, $thirdPartyPackage];
 
-        $repository = $this->getMock('Composer\Repository\InstalledRepositoryInterface');
+        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
         $repository->expects($this->once())->method('getCanonicalPackages')->willReturn($packages);
         $this->factory->expects($this->once())->method('getLocalRepository')->willReturn($repository);
 
@@ -82,7 +82,7 @@ class PackageProviderTest extends \PHPUnit_Framework_TestCase
         $oroExtension = new Package('oro/some-extension', '1.0.0', '1.0.0');
         $packages = [$oroPackage, $oroExtension];
 
-        $repository = $this->getMock('Composer\Repository\InstalledRepositoryInterface');
+        $repository = $this->createMock('Composer\Repository\InstalledRepositoryInterface');
         $repository->expects($this->atLeastOnce())->method('getCanonicalPackages')->willReturn($packages);
         $this->factory->expects($this->atLeastOnce())->method('getLocalRepository')->willReturn($repository);
 

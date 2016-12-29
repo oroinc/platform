@@ -10,6 +10,7 @@ use Oro\Component\Layout\RawLayout;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RawLayoutTest extends \PHPUnit_Framework_TestCase
 {
@@ -158,8 +159,8 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddWithInvalidId($id)
     {
-        $this->setExpectedException(
-            '\Oro\Component\Layout\Exception\InvalidArgumentException',
+        $this->expectException('\Oro\Component\Layout\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The "%s" string cannot be used as the item id because it contains illegal characters. '
                 . 'The valid item id should start with a letter and only contain '
@@ -768,8 +769,8 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAliasWithInvalidAlias($alias)
     {
-        $this->setExpectedException(
-            '\Oro\Component\Layout\Exception\InvalidArgumentException',
+        $this->expectException('\Oro\Component\Layout\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The "%s" string cannot be used as the item alias because it contains illegal characters. '
                 . 'The valid alias should start with a letter and only contain '
@@ -785,8 +786,8 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAliasWithInvalidId($id)
     {
-        $this->setExpectedException(
-            '\Oro\Component\Layout\Exception\InvalidArgumentException',
+        $this->expectException('\Oro\Component\Layout\Exception\InvalidArgumentException');
+        $this->expectExceptionMessage(
             sprintf(
                 'The "%s" string cannot be used as the item id because it contains illegal characters. '
                 . 'The valid item id should start with a letter and only contain '

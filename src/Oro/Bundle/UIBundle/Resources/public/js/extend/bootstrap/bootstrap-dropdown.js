@@ -121,8 +121,9 @@ define(function(require) {
 
             var options = $dropdownMenu.data('options');
             if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - $dropdownMenu.outerWidth();
+                css.right = $(window).width() - css.left - $parent.outerWidth();
                 css.left = 'auto';
+                css.width = $parent.outerWidth();
             }
 
             var containerOffset = $container.offset();
@@ -186,8 +187,9 @@ define(function(require) {
         };
         var options = $dropdownMenu.data('options');
         if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - $dropdownMenu.outerWidth();
+            css.right = $(window).width() - css.left - $parent.outerWidth();
             css.left = 'auto';
+            css.width = $parent.outerWidth();
         }
         $dropdownMenu.css(css);
     };
@@ -197,9 +199,14 @@ define(function(require) {
         var documentClickEvents = $._data(document, 'events').click;
         var event = _.find(documentClickEvents, function(event) {
             // the only named original handler on click event with "data-api.dropdown" NS is "clearMenus"
-            return event.namespace === 'data-api.dropdown' && event.handler.name;
+            // since minification of javascript code leads to loosing original function names
+            // search just for non anonymous function
+            return event.namespace === 'data-api.dropdown' &&
+                !/^function\s*\(/.test(event.handler.toString());
         });
-        $(document).off('click', event.handler);
+        if (event) {
+            $(document).off('click', event.handler);
+        }
     })();
 
     $(document)
@@ -371,7 +378,9 @@ define(function(require) {
             var eventData = e && e.data || {};
             var $toggle = $(toggleDropdown, $dropdown);
             var $dropdownMenu = $('>.dropdown-menu', $dropdown);
-            var scrollableRect = scrollHelper.getFinalVisibleRect($toggle.closest('.ui-dialog-content')[0]);
+            var dropdownMenuContainer = $toggle.closest('.ui-dialog-content')[0] ||
+                $toggle.closest('.scrollable-container')[0];
+            var scrollableRect = scrollHelper.getFinalVisibleRect(dropdownMenuContainer);
             var toggleRect = $toggle[0].getBoundingClientRect();
 
             $dropdownMenu.css({position: 'absolute', display: '', top: '', left: '', bottom: '', right: ''});
@@ -380,6 +389,11 @@ define(function(require) {
 
             if ($dropdown.is('.dropdown') && scrollableRect.top > Math.min(dropdownMenuRect.top, toggleRect.bottom)) {
                 // whole toggle-item is hidden at the top of scrollable container
+                flipToOpposite($dropdown);
+            }
+
+            if ($dropdown.is('.dropdown') && scrollableRect.bottom < dropdownMenuRect.bottom) {
+                // dropdown menu goes beyond the bottom of scrollable container
                 flipToOpposite($dropdown);
             }
 
@@ -428,8 +442,10 @@ define(function(require) {
                     return;
                 }
                 var $dropdown = $(this);
-                if (!$dropdown.is('.ui-dialog .dropdown, .ui-dialog .dropup') ||
-                    $dropdown.has('>.dropdown-menu').length === 0) {
+                var $dropdownMenu = $('>.dropdown-menu', $dropdown);
+                var options = $dropdownMenu.data('options');
+                if ($dropdownMenu.length === 0 || ($dropdown.closest('.ui-dialog').length === 0 &&
+                    !_.result(options, 'flipMode'))) {
                     // handles only case when dropdown id opened in dialog
                     return;
                 }
@@ -444,6 +460,7 @@ define(function(require) {
                 $dropdown.on('shown.autoflip-dropdown', null, {preferCurrentState: true}, handlePositionChange);
                 $dropdown.closest('.ui-dialog').on(dialogEvents.join(' '), handlePositionChange);
                 $dropdown.parents().on('scroll.autoflip-dropdown', handlePositionChange);
+                $dropdown.on('content:changed.autoflip-dropdown', handlePositionChange);
                 $(window).on('resize.autoflip-dropdown', handlePositionChange);
                 handlePositionChange();
             })

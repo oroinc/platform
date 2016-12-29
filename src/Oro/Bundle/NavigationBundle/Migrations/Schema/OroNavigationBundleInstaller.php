@@ -39,6 +39,7 @@ class OroNavigationBundleInstaller implements Installation
         $this->addOroNavigationPageStateForeignKeys($schema);
         $this->addOroNavigationMenuUpdateTitleForeignKeys($schema);
         $this->addOroNavigationMenuUpdateDescriptionForeignKeys($schema);
+        $this->addOroNavigationMenuUpdateForeignKeys($schema);
     }
 
     /**
@@ -154,15 +155,14 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('parent_key', 'string', ['length' => 100, 'notnull' => false]);
         $table->addColumn('uri', 'string', ['length' => 1023, 'notnull' => false]);
         $table->addColumn('menu', 'string', ['length' => 100]);
-        $table->addColumn('ownership_type', 'string');
-        $table->addColumn('owner_id', 'integer', ['notnull' => true]);
         $table->addColumn('icon', 'string', ['length' => 150, 'notnull' => false]);
         $table->addColumn('is_active', 'boolean', []);
         $table->addColumn('is_divider', 'boolean', []);
         $table->addColumn('is_custom', 'boolean', []);
         $table->addColumn('priority', 'integer', ['notnull' => false]);
+        $table->addColumn('scope_id', 'integer', ['notnull' => true]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['key', 'ownership_type', 'owner_id'], 'oro_navigation_menu_upd_uidx');
+        $table->addUniqueIndex(['key', 'scope_id', 'menu'], 'oro_navigation_menu_upd_uidx');
     }
 
     /**
@@ -311,6 +311,21 @@ class OroNavigationBundleInstaller implements Installation
             ['menu_update_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    /**
+     * Add `oro_navigation_menu_upd` foreign keys.
+     *
+     * @param Schema $schema
+     */
+    protected function addOroNavigationMenuUpdateForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_navigation_menu_upd');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_scope'),
+            ['scope_id'],
+            ['id']
         );
     }
 }

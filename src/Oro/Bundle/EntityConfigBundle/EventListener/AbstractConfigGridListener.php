@@ -4,8 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -20,7 +18,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class AbstractConfigGridListener implements EventSubscriberInterface
+abstract class AbstractConfigGridListener
 {
     const TYPE_HTML     = 'html';
     const TYPE_TWIG     = 'twig';
@@ -46,17 +44,6 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     {
         $this->configManager    = $configManager;
         $this->datagridResolver = $datagridResolver;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return [
-            'oro_datagrid.datagrid.build.after.' . static::GRID_NAME  => 'onBuildAfter',
-            'oro_datagrid.datagrid.build.before.' . static::GRID_NAME => 'onBuildBefore',
-        ];
     }
 
     /**
@@ -228,8 +215,15 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     'icon'  => isset($config['icon']) ? $config['icon'] : 'question-sign',
                     'link'  => strtolower($config['name']) . '_link',
                     'type'  => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,
-                    //'confirmation' => isset($config['confirmation']) ? $config['confirmation'] : false
                 ];
+
+                if (isset($config['acl_resource'])) {
+                    $configItem['acl_resource'] = $config['acl_resource'];
+                }
+
+                if (isset($config['defaultMessages'])) {
+                    $configItem['defaultMessages'] = $config['defaultMessages'];
+                }
 
                 $actions = array_merge($actions, [strtolower($config['name']) => $configItem]);
             }

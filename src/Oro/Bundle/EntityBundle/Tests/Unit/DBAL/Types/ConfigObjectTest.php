@@ -41,8 +41,8 @@ class ConfigObjectTest extends \PHPUnit_Framework_TestCase
     public function testConvertToPHPValue($inputData, $expectedResult, $exception = false)
     {
         if ($exception) {
-            $this->setExpectedException(
-                'Doctrine\DBAL\Types\ConversionException',
+            $this->expectException('Doctrine\DBAL\Types\ConversionException');
+            $this->expectExceptionMessage(
                 'Could not convert database value "' . $inputData . '" to Doctrine Type config_object'
             );
         }

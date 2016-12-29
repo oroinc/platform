@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var FiltersManager;
-    var DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -91,7 +90,7 @@ define(function(require) {
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
             'click .reset-filter-button': '_onReset',
-            'click a.dropdown-toggle': '_onDropdownToggle'
+            'click a[data-name="filters-dropdown"]': '_onDropdownToggle'
         },
 
         /**
@@ -102,13 +101,11 @@ define(function(require) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
-            this.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
 
-            _.extend(this, _.pick(options, ['addButtonHint', 'stateViewElement']));
+            _.extend(this, _.pick(options, ['addButtonHint', 'stateViewElement', 'viewMode']));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);
@@ -116,12 +113,14 @@ define(function(require) {
 
             var filterListeners = {
                 'update': this._onFilterUpdated,
-                'disable': this._onFilterDisabled
+                'disable': this._onFilterDisabled,
+                'showCriteria': this._onFilterShowCriteria
             };
 
             if (tools.isMobile()) {
+                var outsideActionEvents = 'click.' + this.cid + ' shown.bs.dropdown.' + this.cid;
                 filterListeners.updateCriteriaClick = this._onUpdateCriteriaClick;
-                $('body').on('click.' + this.cid, DROPDOWN_TOGGLE_SELECTOR, _.bind(this._onBodyClick, this));
+                $('body').on(outsideActionEvents, this._onOutsideActionEvent.bind(this));
             }
 
             _.each(this.filters, function(filter) {
@@ -188,6 +187,14 @@ define(function(require) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
             this.trigger('afterDisableFilter', filter);
+        },
+
+        _onFilterShowCriteria: function(shownFilter) {
+            _.each(this.filters, function(filter) {
+                if (filter !== shownFilter) {
+                    _.result(filter, 'ensurePopupCriteriaClosed');
+                }
+            });
         },
 
         /**
@@ -454,13 +461,8 @@ define(function(require) {
          * @private
          */
         _onDropdownToggle: function(e) {
-            var $dropdown = this.$('.dropdown');
             e.preventDefault();
-            e.stopPropagation();
-            if (!$dropdown.hasClass('oro-open')) {
-                $(DROPDOWN_TOGGLE_SELECTOR).trigger('tohide.bs.dropdown');
-            }
-            $dropdown.toggleClass('oro-open');
+            this.$('.filter-box > .dropdown').toggleClass('open');
         },
 
         /**
@@ -470,7 +472,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          * @protected
          */
-        _onBodyClick: function(e) {
+        _onOutsideActionEvent: function(e) {
             if (!_.contains($(e.target).parents(), this.el)) {
                 this.closeDropdown();
             }

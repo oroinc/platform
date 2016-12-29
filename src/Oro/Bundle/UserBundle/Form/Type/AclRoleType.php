@@ -69,7 +69,7 @@ class AclRoleType extends AbstractType
     }
 
     /**
-     *M-BM- {@inheritdoc}
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
@@ -82,7 +82,7 @@ class AclRoleType extends AbstractType
     }
 
     /**
-     *M-BM- {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

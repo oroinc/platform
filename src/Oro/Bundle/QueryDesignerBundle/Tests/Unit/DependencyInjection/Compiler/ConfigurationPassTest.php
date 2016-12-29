@@ -26,7 +26,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $result     = null;
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with(ConfigurationPass::MANAGER_SERVICE_ID)

@@ -41,8 +41,8 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container     = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
-        $this->doctrine      = $this->getMock('Doctrine\\Common\\Persistence\\ManagerRegistry');
+        $this->container     = $this->createMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
+        $this->doctrine      = $this->createMock('Doctrine\\Common\\Persistence\\ManagerRegistry');
         $this->entityManager = $this->getMockBuilder('Doctrine\\ORM\\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -83,8 +83,8 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
-        $input  = $this->getMock('Symfony\\Component\\Console\\Input\\InputInterface');
-        $output = $this->getMock('Symfony\\Component\\Console\\Output\\OutputInterface');
+        $input  = $this->createMock('Symfony\\Component\\Console\\Input\\InputInterface');
+        $output = $this->createMock('Symfony\\Component\\Console\\Output\\OutputInterface');
 
         $reminders = array($this->createReminder(), $this->createReminder(), $this->createReminder());
 
@@ -161,8 +161,8 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteNoRemindersToSend()
     {
-        $input  = $this->getMock('Symfony\\Component\\Console\\Input\\InputInterface');
-        $output = $this->getMock('Symfony\\Component\\Console\\Output\\OutputInterface');
+        $input  = $this->createMock('Symfony\\Component\\Console\\Input\\InputInterface');
+        $output = $this->createMock('Symfony\\Component\\Console\\Output\\OutputInterface');
 
         $this->repository->expects($this->once())
             ->method('findRemindersToSend')
@@ -179,8 +179,8 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteRollbackTransation()
     {
-        $input  = $this->getMock('Symfony\\Component\\Console\\Input\\InputInterface');
-        $output = $this->getMock('Symfony\\Component\\Console\\Output\\OutputInterface');
+        $input  = $this->createMock('Symfony\\Component\\Console\\Input\\InputInterface');
+        $output = $this->createMock('Symfony\\Component\\Console\\Output\\OutputInterface');
 
         $reminder = $this->createReminder();
 
@@ -205,6 +205,6 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function createReminder()
     {
-        return $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
+        return $this->createMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
     }
 }

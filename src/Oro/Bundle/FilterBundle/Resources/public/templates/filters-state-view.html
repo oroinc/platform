@@ -1,4 +1,4 @@
-<div class="filters-state"><%
+<div class="filters-state"><% if (filters.length > 0) { %><i class="fa-filter hide-text"></i><% }
     _.each(filters, function(filter, i) {
         if (i > 0) {
             %>, <%

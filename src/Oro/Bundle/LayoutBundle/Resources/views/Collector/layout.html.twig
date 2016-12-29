@@ -61,6 +61,12 @@
             margin-left: 500px;
             padding: 0;
             border: none;
+            width: 550px;
+        }
+
+        #tree-details-container.fixed {
+            position: fixed;
+            top: 10px;
         }
 
         #tree-menu ul {
@@ -364,6 +370,14 @@
 
                 clickHandler(target, toggleAll);
             })();
+
+            window.onscroll = function (e) {
+                if (window.scrollY > 130) {
+                    Sfjs.addClass(document.getElementById('tree-details-container'), 'fixed');
+                } else {
+                    Sfjs.removeClass(document.getElementById('tree-details-container'), 'fixed');
+                }
+            };
         }());
     </script>
 {% endblock %}
@@ -393,33 +407,34 @@
 
 {% macro view_tree_details(name, data) %}
     {% import _self as tree %}
-    <div class="tree-details" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
+    <div class="tree-details"{% if data.id is defined %} id="{{ data.id }}-details"{% endif %}>
         <h2>
             {{ name|default('(no name)') }}
             {% if data.type_class is defined and data.type is defined %}
                 <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
             {% endif %}
         </h2>
+        <div class="sf-tabs">
+            {% if data.context.items|length %}
+                {{ tree.view_block_details(data.id, 'Context', {'Items': data.context.items}, 'context_items', true) }}
+            {% endif %}
 
-        {% if data.context.items|length %}
-            {{ tree.view_block_details(data.id, 'Context Items', data.context.items, 'context_items', true) }}
-        {% endif %}
+            {% if data.context.data|length %}
+                {{ tree.view_block_details(data.id, 'Context Data', {'Items': data.context.data}, 'context_items', true) }}
+            {% endif %}
 
-        {% if data.context.data|length %}
-            {{ tree.view_block_details(data.id, 'Context Data Items', data.context.data, 'context_data_items', true) }}
-        {% endif %}
+            {% if data.build_block_options is defined %}
+                {{ tree.view_block_details(data.id, 'Build Block', {'Options': data.build_block_options}, 'build_block_options', true) }}
+            {% endif %}
 
-        {% if data.build_block_options is defined %}
-            {{ tree.view_block_details(data.id, 'Build Block Options', data.build_block_options, 'build_block_options', true) }}
-        {% endif %}
+            {% if data.build_view_options is defined %}
+                {{ tree.view_block_details(data.id, 'Build View', {'Options': data.build_view_options}, 'build_view_options', true) }}
+            {% endif %}
 
-        {% if data.build_view_options is defined %}
-            {{ tree.view_block_details(data.id, 'Build View Options', data.build_view_options, 'build_view_options', true) }}
-        {% endif %}
-
-        {% if data.view_vars is defined %}
-            {{ tree.view_block_details(data.id, 'View Variables', data.view_vars, 'view_vars') }}
-        {% endif %}
+            {% if data.view_vars is defined %}
+                {{ tree.view_block_details(data.id, 'Variables', {'Variables': data.view_vars}, 'view_vars') }}
+            {% endif %}
+        </div>
     </div>
 
     {% for childName, childData in data.children %}
@@ -433,39 +448,41 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro view_block_details(id, title, options, class, hidden) %}
-    <h3>
-        <a class="toggle-button" data-toggle-target-id="{{ id }}-{{ class }}" href="#">
-            {{ title }} <span class="toggle-icon"></span>
-        </a>
-    </h3>
-
-    <div id="{{ id }}-{{ class }}"{% if hidden %} class="hidden"{% endif %}>
-        <table>
-            <thead>
-            <tr>
-                <th width="180">Key</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for option, value in options %}
-                <tr>
-                    <th scope="row">{{ option }}</th>
-                    <td>
-                        {% if value is same as(true) %}
-                            true
-                        {% elseif value is same as(false) %}
-                            false
-                        {% elseif value is same as(null) %}
-                            NULL
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </td>
-                </tr>
+{% macro view_block_details(id, title, groups, class, hidden) %}
+    <div class="tab">
+        <h3 class="tab-title">{{ title }}</h3>
+        <div class="tab-content">
+            {% for name, options in groups %}
+                {% if options %}
+                    <h4>{{ name }}</h4>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th width="180">Key</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for option, value in options %}
+                            <tr>
+                                <th scope="row">{{ option }}</th>
+                                <td>
+                                    {% if value is same as(true) %}
+                                        true
+                                    {% elseif value is same as(false) %}
+                                        false
+                                    {% elseif value is same as(null) %}
+                                        NULL
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             {% endfor %}
-            </tbody>
-        </table>
+        </div>
     </div>
 {% endmacro %}

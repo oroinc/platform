@@ -118,7 +118,7 @@ class MassNotificationSenderTest extends \PHPUnit_Framework_TestCase
             $this->returnValue($this->userRepository)
         );
 
-        $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
+        $template = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $template->expects($this->once())->method('getType')->will($this->returnValue('html'));
         $template->expects($this->once())->method('getContent')->will($this->returnValue('test content'));
         $template->expects($this->once())->method('getSubject')->will($this->returnValue('subject'));

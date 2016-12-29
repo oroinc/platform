@@ -35,8 +35,8 @@ class WidgetModelTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->widgetEntity = $this->getMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $this->widgetState  = $this->getMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
+        $this->widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $this->widgetState  = $this->createMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
 
         $this->widgetState
             ->expects($this->any())

@@ -12,7 +12,7 @@ class TwigLayoutRendererTest extends \PHPUnit_Framework_TestCase
     public function testEnvironmentSet()
     {
         /** @var TwigRendererInterface|\PHPUnit_Framework_MockObject_MockObject $innerRenderer */
-        $innerRenderer = $this->getMock('Oro\Bundle\LayoutBundle\Form\TwigRendererInterface');
+        $innerRenderer = $this->createMock('Oro\Bundle\LayoutBundle\Form\TwigRendererInterface');
         /** @var \Twig_Environment $environment */
         $environment   = $this->getMockBuilder('\Twig_Environment')->getMock();
 
@@ -20,7 +20,7 @@ class TwigLayoutRendererTest extends \PHPUnit_Framework_TestCase
             ->method('setEnvironment')
             ->with($this->identicalTo($environment));
         /** @var FormRendererEngineInterface $formRenderer */
-        $formRenderer = $this->getMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');
+        $formRenderer = $this->createMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');
 
         new TwigLayoutRenderer($innerRenderer, $formRenderer, $environment);
     }

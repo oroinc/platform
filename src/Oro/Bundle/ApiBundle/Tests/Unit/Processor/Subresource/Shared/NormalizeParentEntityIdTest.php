@@ -18,7 +18,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityIdTransformer = $this->getMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
+        $this->entityIdTransformer = $this->createMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
 
         $this->processor = new NormalizeParentEntityId($this->entityIdTransformer);
     }

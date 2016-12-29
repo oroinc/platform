@@ -92,17 +92,19 @@ abstract class OroKernel extends Kernel
             if (!is_dir($root)) {
                 continue;
             }
-            $root   = realpath($root);
-            $dir    = new \RecursiveDirectoryIterator($root, \FilesystemIterator::FOLLOW_SYMLINKS);
+            $root = realpath($root);
+            $dir = new \RecursiveDirectoryIterator(
+                $root,
+                \FilesystemIterator::FOLLOW_SYMLINKS | \FilesystemIterator::SKIP_DOTS
+            );
             $filter = new \RecursiveCallbackFilterIterator(
                 $dir,
                 function (\SplFileInfo $current) use (&$paths) {
+                    if (!$current->getRealPath()) {
+                        return false;
+                    }
                     $fileName = strtolower($current->getFilename());
-                    if ($fileName === '.'
-                        || $fileName === '..'
-                        || $fileName === 'tests'
-                        || $current->isFile()
-                    ) {
+                    if ($fileName === 'tests' || $current->isFile()) {
                         return false;
                     }
                     if (!is_dir($current->getPathname() . '/Resources')) {

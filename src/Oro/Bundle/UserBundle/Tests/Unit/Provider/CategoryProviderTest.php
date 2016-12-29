@@ -12,7 +12,7 @@ class CategoryProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->categoryProvider = new RolePrivilegeCategoryProvider($translator);
     }
 

@@ -62,6 +62,6 @@ class ReindexCommandTest extends \PHPUnit_Framework_TestCase
      */
     private function createSearchIndexerMock()
     {
-        return $this->getMock(IndexerInterface::class);
+        return $this->createMock(IndexerInterface::class);
     }
 }

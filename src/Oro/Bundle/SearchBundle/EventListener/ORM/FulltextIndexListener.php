@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener\ORM;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql;
 
 class FulltextIndexListener
 {
     /**
-     * @var string
-     */
-    protected $databaseDriver;
+    * @var Connection
+    */
+    protected $connection;
 
     /**
      * @var string
@@ -21,13 +21,13 @@ class FulltextIndexListener
     protected $textIndexTableName;
 
     /**
-     * @param string $databaseDriver
      * @param string $textIndexTableName
+     * @param Connection $connection
      */
-    public function __construct($databaseDriver, $textIndexTableName)
+    public function __construct($textIndexTableName, Connection $connection)
     {
-        $this->databaseDriver = $databaseDriver;
         $this->textIndexTableName = $textIndexTableName;
+        $this->connection = $connection;
     }
 
     /**
@@ -35,7 +35,8 @@ class FulltextIndexListener
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
-        if ($this->databaseDriver !== DatabaseDriverInterface::DRIVER_MYSQL) {
+        $driverName = $this->connection->getDriver()->getName();
+        if (in_array($driverName, ['pdo_mysql', 'mysqli']) === false) {
             return;
         }
 
@@ -46,7 +47,13 @@ class FulltextIndexListener
             return;
         }
 
-        $classMetadata->table['options']['engine'] = PdoMysql::ENGINE_MYISAM;
+        $engine = PdoMysql::ENGINE_MYISAM;
+        $version = $this->connection->fetchColumn('select version()');
+        if (version_compare($version, '5.6.0', '>=')) {
+            $engine = PdoMysql::ENGINE_INNODB;
+        }
+
+        $classMetadata->table['options']['engine'] = $engine;
         $classMetadata->table['indexes']['value'] = ['columns' => ['value'], 'flags' => ['fulltext']];
     }
 }

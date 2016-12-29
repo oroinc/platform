@@ -1,0 +1,27 @@
+<% if (workflowsData && workflowsData.length > 0) { %>
+    <% _.each(workflowsData, function(workflow) { %>
+        <% if (workflow.transitionsData.length > 0) { %>
+            <li role="separator" class="divider">&nbsp;</li>
+            <% _.each(workflow.transitionsData, function(transition) { %>
+                <li>
+                    <a href="<%- transition.transitionUrl %>" class="transition-item"
+                       id="transition-<%- workflow.name %>-<%- transition.name %>"
+                       data-transition-url="<%- transition.transitionUrl %>"
+                       data-transition-label="<%- transition.label %>"
+                       data-message="<%- transition.message %>"
+                       data-dialog-url="<%- transition.dialogUrl %>"
+                        <% if (transition.frontendOptions && transition.frontendOptions.dialog) { %>
+                            data-dialog-options="<%- JSON.stringify(transition.frontendOptions.dialog) %>"
+                        <% } %>
+                    >
+                        <i class="<%- transition.frontendOptions && transition.frontendOptions.icon
+                                ? transition.frontendOptions.icon
+                                : 'icon-empty'
+                            %> hide-text"><%- transition.label %></i>
+                        <%- transition.label %>
+                    </a>
+                </li>
+            <% }) %>
+        <% } %>
+    <% }) %>
+<% } %>

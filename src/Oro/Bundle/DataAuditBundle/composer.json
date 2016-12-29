@@ -21,7 +21,6 @@
         "psr-0": { "Oro\\Bundle\\DataAuditBundle": "" }
     },
     "target-dir": "Oro/Bundle/DataAuditBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

@@ -24,11 +24,17 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
                     'navigation_items',
                     [
                         'root.child2.disabled',
+                        'root > child2_1 > disabled',
                         'root.child2_2.disabled',
+                        'root > child2_3 > disabled',
                         'root.child3.disabled',
                         'root.child3.disabled2',
+                        'root > child3_1 > disabled',
+                        'root > child3_1 > disabled2',
                         'root.child3_2.disabled',
                         'root.child3_2.disabled2',
+                        'root > child3_3 > disabled',
+                        'root > child3_3 > disabled2',
                     ],
                 ],
             ]));
@@ -45,9 +51,12 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $event->getMenu());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function onNavigationConfigureProvider()
     {
-        $factory = $this->getMock('Knp\Menu\FactoryInterface');
+        $factory = $this->createMock('Knp\Menu\FactoryInterface');
         
         return [
             [
@@ -66,9 +75,26 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
                                     new MenuItem('enabled', $factory),
                                 ]
                             ),
+                            // unclickable menu with enabled item with ' > ' delimiter
+                            $this->addChildren(
+                                (new MenuItem('child2_1', $factory))
+                                    ->setUri('#'),
+                                [
+                                    new MenuItem('disabled', $factory),
+                                    new MenuItem('enabled', $factory),
+                                ]
+                            ),
                             // clickable menu with enabled item
                             $this->addChildren(
                                 new MenuItem('child2_2', $factory),
+                                [
+                                    new MenuItem('disabled', $factory),
+                                    new MenuItem('enabled', $factory),
+                                ]
+                            ),
+                            // clickable menu with enabled item with ' > ' delimiter
+                            $this->addChildren(
+                                new MenuItem('child2_3', $factory),
                                 [
                                     new MenuItem('disabled', $factory),
                                     new MenuItem('enabled', $factory),
@@ -83,9 +109,26 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
                                     new MenuItem('disabled2', $factory),
                                 ]
                             ),
+                            // unclickable menu without enabled item with ' > ' delimiter
+                            $this->addChildren(
+                                (new MenuItem('child3_1', $factory))
+                                    ->setUri('#'),
+                                [
+                                    new MenuItem('disabled', $factory),
+                                    new MenuItem('disabled2', $factory),
+                                ]
+                            ),
                             // clickable menu without enabled item
                             $this->addChildren(
                                 new MenuItem('child3_2', $factory),
+                                [
+                                    new MenuItem('disabled', $factory),
+                                    new MenuItem('disabled2', $factory),
+                                ]
+                            ),
+                            // clickable menu without enabled item with ' > ' delimiter
+                            $this->addChildren(
+                                new MenuItem('child3_3', $factory),
                                 [
                                     new MenuItem('disabled', $factory),
                                     new MenuItem('disabled2', $factory),
@@ -108,9 +151,28 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
                                 new MenuItem('enabled', $factory),
                             ]
                         ),
+                        // unclickable menu with enabled item with ' > ' delimiter
+                        $this->addChildren(
+                            (new MenuItem('child2_1', $factory))
+                                ->setUri('#'),
+                            [
+                                (new MenuItem('disabled', $factory))
+                                    ->setDisplay(false),
+                                new MenuItem('enabled', $factory),
+                            ]
+                        ),
                         // clickable menu with enabled item
                         $this->addChildren(
                             new MenuItem('child2_2', $factory),
+                            [
+                                (new MenuItem('disabled', $factory))
+                                    ->setDisplay(false),
+                                new MenuItem('enabled', $factory),
+                            ]
+                        ),
+                        // clickable menu with enabled item with ' > ' delimiter
+                        $this->addChildren(
+                            new MenuItem('child2_3', $factory),
                             [
                                 (new MenuItem('disabled', $factory))
                                     ->setDisplay(false),
@@ -129,9 +191,31 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
                                     ->setDisplay(false),
                             ]
                         ),
+                        // unclickable menu without enabled item with ' > ' delimiter
+                        $this->addChildren(
+                            (new MenuItem('child3_1', $factory))
+                                ->setUri('#')
+                                ->setDisplay(false),
+                            [
+                                (new MenuItem('disabled', $factory))
+                                    ->setDisplay(false),
+                                (new MenuItem('disabled2', $factory))
+                                    ->setDisplay(false),
+                            ]
+                        ),
                         // clickable menu without enabled item
                         $this->addChildren(
                             new MenuItem('child3_2', $factory),
+                            [
+                                (new MenuItem('disabled', $factory))
+                                    ->setDisplay(false),
+                                (new MenuItem('disabled2', $factory))
+                                    ->setDisplay(false),
+                            ]
+                        ),
+                        // clickable menu without enabled item with ' > ' delimiter
+                        $this->addChildren(
+                            new MenuItem('child3_3', $factory),
                             [
                                 (new MenuItem('disabled', $factory))
                                     ->setDisplay(false),

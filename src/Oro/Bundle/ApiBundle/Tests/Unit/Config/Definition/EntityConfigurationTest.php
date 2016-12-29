@@ -30,13 +30,11 @@ class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testLoadConfiguration(array $config, array $expected, $error = null)
     {
         if (null !== $error) {
-            $this->setExpectedException(
-                '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-                $error
-            );
+            $this->expectException('\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+            $this->expectExceptionMessage($error);
         }
 
-        $actionProcessorBag = $this->getMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
+        $actionProcessorBag = $this->createMock('Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface');
         $actionProcessorBag->expects($this->any())
             ->method('getActions')
             ->willReturn(

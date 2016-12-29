@@ -25,7 +25,7 @@ class ConstraintsProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $this->metadataFactory = $this->createMock('Symfony\Component\Validator\MetadataFactoryInterface');
         $this->constraintsProvider = new ConstraintsProvider($this->metadataFactory);
     }
 
@@ -168,7 +168,7 @@ class ConstraintsProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function createForm($name, $dataClass = null, array $options = array(), FormInterface $parent = null)
     {
-        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $config = new FormConfigBuilder($name, $dataClass, $eventDispatcher, $options);
 

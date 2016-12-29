@@ -41,9 +41,9 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->repository = $this->getMock(ObjectRepository::class);
+        $this->repository = $this->createMock(ObjectRepository::class);
 
-        $this->manager = $this->getMock(ObjectManager::class);
+        $this->manager = $this->createMock(ObjectManager::class);
         $this->manager->expects($this->any())
             ->method('getRepository')
             ->with(self::ENTITY_CLASS)
@@ -61,7 +61,7 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->scopeManager = $this->getMockBuilder(ScopeManager::class)->disableOriginalConstructor()->getMock();
 
-        $this->logger = $this->getMock(LoggerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->workflowScopeManager = new WorkflowScopeManager($registry, $this->scopeManager, $this->logger);
     }
@@ -95,8 +95,8 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findOrCreate')
             ->willReturnMap(
                 [
-                    [WorkflowScopeManager::SCOPE_TYPE, [self::FIELD_NAME => $entity], $scope1],
-                    [WorkflowScopeManager::SCOPE_TYPE, ['extraField' => $entity], $scope2]
+                    [WorkflowScopeManager::SCOPE_TYPE, [self::FIELD_NAME => $entity], true, $scope1],
+                    [WorkflowScopeManager::SCOPE_TYPE, ['extraField' => $entity], true, $scope2]
                 ]
             );
 
@@ -150,7 +150,8 @@ class WorkflowScopeManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->setExpectedException($exception, $exceptionMessage);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->workflowScopeManager->updateScopes($definition);
     }

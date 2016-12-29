@@ -59,9 +59,15 @@ class MapPrimaryField extends AbstractProcessor
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function processPreSubmit(CustomizeFormDataContext $context)
     {
+        $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $submittedData = $context->getData();
         if (!is_array($submittedData) && !$submittedData instanceof \ArrayAccess) {
             return;
@@ -73,7 +79,7 @@ class MapPrimaryField extends AbstractProcessor
         if (empty($submittedData[$this->primaryFieldName]) || !$form->has($this->primaryFieldName)) {
             return;
         }
-        $associationField = $context->getConfig()->getField($this->associationName);
+        $associationField = $config->getField($this->associationName);
         if (null === $associationField) {
             return;
         }
@@ -95,17 +101,22 @@ class MapPrimaryField extends AbstractProcessor
      */
     public function processPostSubmit(CustomizeFormDataContext $context)
     {
+        $config = $context->getConfig();
+        if (null === $config) {
+            return;
+        }
+
         $primaryFieldForm = $context->getForm()->get($this->primaryFieldName);
         if (!$primaryFieldForm->isSubmitted()) {
             // the primary field does not exist in the submitted data
             return;
         }
 
-        $primaryField = $context->getConfig()->getField($this->primaryFieldName);
+        $primaryField = $config->getField($this->primaryFieldName);
         if (null === $primaryField) {
             return;
         }
-        $associationField = $context->getConfig()->getField($this->associationName);
+        $associationField = $config->getField($this->associationName);
         if (null === $associationField) {
             return;
         }

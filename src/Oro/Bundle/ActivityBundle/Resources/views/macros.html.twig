@@ -3,18 +3,17 @@
     Parameters:
         entity - activity entity Oro\Bundle\ActivityBundle\Model\ActivityInterface
 #}
-{% macro activity_contexts(entity, target, checkTarget) %}
+{% macro activity_contexts(entity, target, checkTarget, component) %}
     <script type="text/template" id="activity-context-activity-list">
         <div class="context-item" style="border: none" data-cid="<%- entity.cid %>">
                 <span data-id="<%- entity.get('targetId') %>">
                     <span class="<%- entity.get('icon') %>"></span>
-
                     <% if (entity.get('link')) { %>
                         <a href="<%- entity.get('link') %>">
-                            <span class="context-label"><%- entity.get('title') %></span>
+                            <span class="context-label" title="<%- entity.get('title') %>"><%- entity.get('title') %></span>
                         </a>
                     <% } else { %>
-                        <span class="context-label"><%- entity.get('title') %></span>
+                        <span class="context-label" title="<%- entity.get('title') %>"><%- entity.get('title') %></span>
                     <% }  %>
                     {% if  resource_granted('EDIT', entity) %}
                         <i class="fa-close"></i>
@@ -47,8 +46,12 @@
         {% set options = options|merge(targetEntity) %}
     {% endif %}
 
+    {% set component = component is defined and component
+        ? component
+        : 'oroactivity/js/app/components/activity-context-activity-component' %}
+
     <div class="activity-context-activity"
-         data-page-component-module="oroactivity/js/app/components/activity-context-activity-component"
+         data-page-component-module="{{ component }}"
          data-page-component-options="{{ options|json_encode }}"
          data-layout="separate">
         <div class="activity-context-activity-label">
@@ -59,7 +62,7 @@
     </div>
 {% endmacro %}
 
-{% macro activity_context_link() %}
+{% macro activity_context_link(hideText) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
        data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
@@ -82,6 +85,7 @@
             }
         }) }}>
         <i class="fa-link hide-text">{{ 'oro.activity.contexts.placeholder'|trans|raw }}</i>
+        {{ hideText ? '' : 'oro.activity.contexts.placeholder'|trans|raw }}
     </a>
 {% endmacro %}
 

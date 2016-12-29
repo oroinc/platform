@@ -32,7 +32,7 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->annotationProvider =
             $this->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider')
                 ->disableOriginalConstructor()
@@ -41,7 +41,7 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $this->classResolver =
             $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')

@@ -34,8 +34,8 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $resolver = new SystemAwareResolver();
 
-        $this->menuFactory = $this->getMock('Knp\Menu\FactoryInterface');
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->menuFactory = $this->createMock('Knp\Menu\FactoryInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->configurationBuilder = new ConfigurationBuilder($resolver, $this->menuFactory, $this->eventDispatcher);
 
@@ -90,13 +90,13 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, [], 'navbar');
 
-        $this->assertEquals($expectedArea, $menu->getExtra('area'));
+        $this->assertEquals($expectedArea, $menu->getExtra('scope_type'));
     }
 
     public function setAreaToExtraProvider()
     {
         return [
-            'with no area specified' => [
+            'with no scope type specified' => [
                 'options' => [
                     'items' => [
                         'homepage' => [
@@ -121,9 +121,9 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ],
-                'expectedArea' => 'default',
+                'expectedArea' => 'menu_default_visibility',
             ],
-            'with area' => [
+            'with scope type' => [
                 'options' => [
                     'items' => [
                         'homepage' => [
@@ -139,7 +139,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'tree' => [
                         'navbar' => [
                             'type' => 'navbar',
-                            'area' => 'frontend',
+                            'scope_type' => 'frontend',
                             'children' => [
                                 'homepage' => [
                                     'position' => 7,

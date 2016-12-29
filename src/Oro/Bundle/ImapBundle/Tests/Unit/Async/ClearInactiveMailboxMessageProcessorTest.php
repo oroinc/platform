@@ -55,7 +55,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit_Framework_TestCa
         ;
 
         $processor = new ClearInactiveMailboxMessageProcessor($clearManager, $jobRunner, $logger);
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -87,6 +87,6 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit_Framework_TestCa
      */
     protected function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

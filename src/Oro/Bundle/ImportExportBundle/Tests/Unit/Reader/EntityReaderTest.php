@@ -40,7 +40,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->reader = new EntityReaderTestAdapter(
             $this->contextRegistry,
             $this->managerRegistry,
@@ -50,12 +50,12 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadMockIterator()
     {
-        $iterator = $this->getMock('\Iterator');
+        $iterator = $this->createMock('\Iterator');
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
-        $fooEntity = $this->getMock('FooEntity');
-        $barEntity = $this->getMock('BarEntity');
-        $bazEntity = $this->getMock('BazEntity');
+        $fooEntity = $this->createMock(\stdClass::class);
+        $barEntity = $this->createMock(\ArrayObject::class);
+        $bazEntity = $this->createMock(\ArrayAccess::class);
 
         $iterator->expects($this->at(0))->method('rewind');
 
@@ -94,9 +94,9 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
-        $fooEntity = $this->getMock('FooEntity');
-        $barEntity = $this->getMock('BarEntity');
-        $bazEntity = $this->getMock('BazEntity');
+        $fooEntity = $this->createMock(\stdClass::class);
+        $barEntity = $this->createMock(\ArrayObject::class);
+        $bazEntity = $this->createMock(\ArrayAccess::class);
 
         $iterator = new \ArrayIterator(array($fooEntity, $barEntity, $bazEntity));
 
@@ -379,5 +379,14 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($context));
 
         return $stepExecution;
+    }
+
+    public function testSetNullIterator()
+    {
+        $iterator = $this->createMock('\Iterator');
+        $this->reader->setSourceIterator($iterator);
+        $this->assertSame($iterator, $this->reader->getSourceIterator());
+        $this->reader->setSourceIterator();
+        $this->assertNull($this->reader->getSourceIterator());
     }
 }

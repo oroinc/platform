@@ -3,8 +3,12 @@
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -12,14 +16,25 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OroOrganizationBundleInstaller implements Installation
+class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
+    /** @var ExtendExtension */
+    private $extendExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -33,6 +48,8 @@ class OroOrganizationBundleInstaller implements Installation
 
         /** Foreign keys generation **/
         $this->addOroBusinessUnitForeignKeys($schema);
+
+        $this->addRelationsToScope($schema);
     }
 
     /**
@@ -118,5 +135,30 @@ class OroOrganizationBundleInstaller implements Installation
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addRelationsToScope(Schema $schema)
+    {
+        if ($schema->hasTable('oro_scope')) {
+            $this->extendExtension->addManyToOneRelation(
+                $schema,
+                'oro_scope',
+                'organization',
+                'oro_organization',
+                'id',
+                [
+                    'extend' => [
+                        'owner' => ExtendScope::OWNER_CUSTOM,
+                        'cascade' => ['all'],
+                        'on_delete' => 'CASCADE',
+                        'nullable' => true
+                    ]
+                ],
+                RelationType::MANY_TO_ONE
+            );
+        }
     }
 }

@@ -18,7 +18,7 @@ class MenuUpdateDatasource implements DatasourceInterface
     protected $menuManipulator;
 
     /** @var string */
-    protected $area;
+    protected $scopeType;
 
     /** @var array */
     protected $menuConfiguration;
@@ -26,13 +26,13 @@ class MenuUpdateDatasource implements DatasourceInterface
     /**
      * @param BuilderChainProvider $chainProvider
      * @param MenuManipulator $menuManipulator
-     * @param string $area
+     * @param string $scopeType
      */
-    public function __construct(BuilderChainProvider $chainProvider, MenuManipulator $menuManipulator, $area)
+    public function __construct(BuilderChainProvider $chainProvider, MenuManipulator $menuManipulator, $scopeType)
     {
         $this->chainProvider = $chainProvider;
         $this->menuManipulator = $menuManipulator;
-        $this->area = $area;
+        $this->scopeType = $scopeType;
     }
 
     /**
@@ -64,7 +64,7 @@ class MenuUpdateDatasource implements DatasourceInterface
 
         foreach ($this->menuConfiguration['tree'] as $name => $item) {
             $menuItem = $this->chainProvider->get($name);
-            if ($menuItem->getExtra('area') === $this->area && !$menuItem->getExtra('read_only')) {
+            if ($menuItem->getExtra('scope_type') === $this->scopeType && !$menuItem->getExtra('read_only')) {
                 $rows[] = new ResultRecord($this->menuManipulator->toArray($menuItem));
             }
         }

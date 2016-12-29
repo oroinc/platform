@@ -27,7 +27,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
     {
         $this->scopeManager = $this->getMockBuilder(ScopeManager::class)
             ->disableOriginalConstructor()->getMock();
-        $this->doctrine = $this->getMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->filter = new WorkflowDefinitionScopesRegistryFilter($this->scopeManager, $this->doctrine);
     }
@@ -69,7 +69,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit_Framework_Test
         $repository = $this->getMockBuilder(WorkflowDefinitionRepository::class)
             ->disableOriginalConstructor()->getMock();
 
-        $manager = $this->getMock(ObjectManager::class);
+        $manager = $this->createMock(ObjectManager::class);
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')->with(WorkflowDefinition::class)

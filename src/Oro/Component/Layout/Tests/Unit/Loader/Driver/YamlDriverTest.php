@@ -37,13 +37,13 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function testEmptyCacheDirException()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->createMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $this->getLoader($generator);
     }
 
     public function testLoadInDebugMode()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->createMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
@@ -57,7 +57,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadInProductionMode()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->createMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
@@ -72,7 +72,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testPassElementVisitor()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->createMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/_header.yml';
@@ -96,7 +96,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testPassesParsedYamlContentToGenerator()
     {
-        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->createMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.yml';
@@ -124,7 +124,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update5.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $generator = $this->createMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $exception = new SyntaxException(
@@ -143,7 +143,8 @@ add:
 
 Filename: $path
 MESSAGE;
-        $this->setExpectedException('\RuntimeException', $message);
+        $this->expectException('\RuntimeException');
+        $this->expectExceptionMessage($message);
 
         $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
@@ -186,7 +187,7 @@ CLASS;
     protected function getLoader($generator = null, $debug = false, $cache = false)
     {
         $generator = null === $generator
-            ? $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface')
+            ? $this->createMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface')
             : $generator;
 
         return new YamlDriver($generator, $debug, $cache);

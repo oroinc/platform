@@ -23,7 +23,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configurationPass = $this->getMock(
+        $this->configurationPass = $this->createMock(
             'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
         );
 
@@ -93,7 +93,8 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
         $expectedException,
         $expectedExceptionMessage
     ) {
-        $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->assembler->assemble($options, $attributes);
     }
 

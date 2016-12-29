@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsByIdsMessageProcessor;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -39,8 +40,22 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         }, $allAttachments);
         $expectedId = array_pop($ids);
 
+        $rootJob = new Job();
+        $rootJob->setName('Root Job');
+        $rootJob->setStatus(Job::STATUS_NEW);
+        $rootJob->setCreatedAt(new \DateTime());
+        $subJob = new Job();
+        $subJob->setName('Child Job');
+        $subJob->setStatus(Job::STATUS_NEW);
+        $subJob->setCreatedAt(new \DateTime());
+        $subJob->setRootJob($rootJob);
+
+        $this->getEntityManager()->persist($rootJob);
+        $this->getEntityManager()->persist($subJob);
+        $this->getEntityManager()->flush();
+
         $message = new NullMessage();
-        $message->setBody(json_encode(['ids' => $ids]));
+        $message->setBody(json_encode(['jobId' => $subJob->getId(), 'ids' => $ids]));
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
 
@@ -65,8 +80,22 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
             return $attachment->getId();
         }, $allAttachments);
 
+        $rootJob = new Job();
+        $rootJob->setName('Root Job');
+        $rootJob->setStatus(Job::STATUS_NEW);
+        $rootJob->setCreatedAt(new \DateTime());
+        $subJob = new Job();
+        $subJob->setName('Child Job');
+        $subJob->setStatus(Job::STATUS_NEW);
+        $subJob->setCreatedAt(new \DateTime());
+        $subJob->setRootJob($rootJob);
+
+        $this->getEntityManager()->persist($rootJob);
+        $this->getEntityManager()->persist($subJob);
+        $this->getEntityManager()->flush();
+
         $message = new NullMessage();
-        $message->setBody(json_encode(['ids' => $ids, 'size' => 3]));
+        $message->setBody(json_encode(['jobId' => $subJob->getId(), 'ids' => $ids, 'size' => 3]));
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
 
@@ -112,6 +141,6 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 }

@@ -23,7 +23,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $configurationProvider = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProvider')
             ->disableOriginalConstructor()
@@ -100,7 +100,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $gridConfig = DatagridConfiguration::create($gridConfig);
 
-        $innerQuery = $this->getMock(Query::class);
+        $innerQuery = $this->createMock(Query::class);
 
         $query = $this->getMockBuilder(IndexerQuery::class)
             ->disableOriginalConstructor()
@@ -120,7 +120,7 @@ class SearchFilterExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getSearchQuery')
             ->will($this->returnValue($query));
 
-        $filter = $this->getMock('Oro\Bundle\FilterBundle\Filter\FilterInterface');
+        $filter = $this->createMock('Oro\Bundle\FilterBundle\Filter\FilterInterface');
         $filter
             ->expects($this->any())
             ->method('getName')

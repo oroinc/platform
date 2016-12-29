@@ -21,7 +21,7 @@ class ExpressionNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization((object)[]));
         $this->assertTrue($this->normalizer->supportsNormalization(
-            $this->getMock(ParsedExpression::class, [], [], '', false)
+            $this->createMock(ParsedExpression::class)
         ));
     }
 
@@ -29,9 +29,9 @@ class ExpressionNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $expression = '5';
 
-        $parsedExpression = $this->getMock(ParsedExpression::class, [], [], '', false);
+        $parsedExpression = $this->createMock(ParsedExpression::class);
 
-        $nodes = $this->getMock(ConstantNode::class, [], [], '', false);
+        $nodes = $this->createMock(ConstantNode::class);
 
         $parsedExpression->expects($this->once())->method('getNodes')->willReturn($nodes);
         $parsedExpression->expects($this->once())->method('__toString')->willReturn($expression);
@@ -52,7 +52,7 @@ class ExpressionNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalize()
     {
-        $nodes = $this->getMock(ConstantNode::class, [], [], '', false);
+        $nodes = $this->createMock(ConstantNode::class);
 
         $data = [
             'expression' => '5',

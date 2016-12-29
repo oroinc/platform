@@ -9,6 +9,7 @@ define(function() {
             selectrow:   'select-row',
             multichoice: 'multiselect',
             boolean:     'select',
+            duplicate:   'select',
             dictionary:  'dictionary'
         };
 

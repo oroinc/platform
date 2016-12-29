@@ -8,7 +8,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 
-use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
@@ -25,12 +24,10 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->configurationProvider =
-            $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
+            $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory $actionFactory */
-        $actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $conditionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
@@ -112,16 +109,15 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('action_group1', $group->getDefinition()->getName());
     }
 
+    /**
+     * @expectedException \Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException
+     * @expectedExceptionMessage ActionGroup with name "not exists" not found
+     */
     public function testGetException()
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn([]);
-
-        $this->setExpectedException(
-            'Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException',
-            'ActionGroup with name "not exists" not found'
-        );
 
         $this->registry->get('not exists');
     }

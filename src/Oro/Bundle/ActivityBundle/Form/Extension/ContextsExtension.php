@@ -75,23 +75,26 @@ class ContextsExtension extends AbstractTypeExtension
         $className = $options['data_class'];
         $alias     = $this->entityAliasResolver->getPluralAlias($className);
 
+        $defaultOptions = [
+            'label'          => 'oro.activity.contexts.label',
+            'tooltip'        => 'oro.activity.contexts.tooltip',
+            'required'       => false,
+            'read_only'      => false,
+            'mapped'         => false,
+            'error_bubbling' => false,
+            'configs'   => [
+                'route_name'       => 'oro_activity_form_autocomplete_search',
+                'route_parameters' => [
+                    'activity' => $alias,
+                    'name'     => $alias
+                ],
+            ]
+        ];
+
         $builder->add(
             'contexts',
             'oro_activity_contexts_select',
-            [
-                'label'     => 'oro.activity.contexts.label',
-                'tooltip'   => 'oro.activity.contexts.tooltip',
-                'required'  => false,
-                'read_only' => false,
-                'mapped'    => false,
-                'configs'   => [
-                    'route_name'       => 'oro_activity_form_autocomplete_search',
-                    'route_parameters' => [
-                        'activity' => $alias,
-                        'name'     => $alias
-                    ],
-                ]
-            ]
+            array_merge($defaultOptions, $options['contexts_options'])
         );
 
         $builder->addEventListener(
@@ -117,7 +120,7 @@ class ContextsExtension extends AbstractTypeExtension
             $contexts          = [];
 
             if ($entity->getId()) {
-                $contexts = $entity->getActivityTargetEntities();
+                $contexts = $entity->getActivityTargets();
             } elseif ($targetEntityClass && $this->request->getMethod() === 'GET') {
                 $contexts[] = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
             }
@@ -143,7 +146,12 @@ class ContextsExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['contexts_disabled' => false]);
+        $resolver->setDefaults(
+            [
+                'contexts_disabled' => false,
+                'contexts_options' => []
+            ]
+        );
     }
 
     /**

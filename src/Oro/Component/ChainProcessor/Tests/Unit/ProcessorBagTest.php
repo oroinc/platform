@@ -12,7 +12,7 @@ class ProcessorBagTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $factory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $factory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $factory->expects($this->any())
             ->method('getProcessor')
             ->willReturnCallback(

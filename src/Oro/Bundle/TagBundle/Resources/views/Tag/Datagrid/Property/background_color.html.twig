@@ -1,0 +1,7 @@
+{% set backgroundColor = record.getValue('backgroundColor') %}
+
+<span class="tags-container">
+        <a href=""
+           class="tags-container__tag-entry"
+           style="width: 45px; {% if (backgroundColor) %}background-color:{{ backgroundColor }}{% endif %}">&nbsp;</a>
+</span>

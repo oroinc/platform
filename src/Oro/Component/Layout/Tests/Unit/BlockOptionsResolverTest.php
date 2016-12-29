@@ -16,7 +16,7 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry             = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->registry             = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->blockOptionsResolver = new BlockOptionsResolver($this->registry);
     }
 

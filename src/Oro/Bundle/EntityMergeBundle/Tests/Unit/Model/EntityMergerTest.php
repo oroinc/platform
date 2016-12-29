@@ -26,10 +26,10 @@ class StrategyTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->steps = array(
-            $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface'),
-            $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface')
+            $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface'),
+            $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface')
         );
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->merger = new EntityMerger($this->steps, $this->eventDispatcher);
     }
 

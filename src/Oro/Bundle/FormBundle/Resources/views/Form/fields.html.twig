@@ -17,6 +17,10 @@
     {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
         {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
     {% endif %}
+    {% set configs = {
+        containerCssClass: 'oro-select2',
+        dropdownCssClass: 'oro-select2__dropdown'
+    }|merge(configs) %}
     {% if configs.component is defined %}
         {% set component = 'oro/select2-'~configs.component~'-component' %}
     {%  else %}
@@ -220,8 +224,9 @@
     {% endif %}
 
     {% set options = {
+        component: 'oroui/js/app/components/view-component',
         view: 'oroui/js/app/views/datepicker/datepicker-view',
-        nativeMode: isMobileVersion(),
+        screenType: 'desktop',
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
@@ -239,7 +244,7 @@
     } %}
 
     {% set attr = attr|merge({
-        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-module': 'oroui/js/app/components/viewport-component',
         'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))
     }) %}
 
@@ -262,8 +267,9 @@
     {% endif %}
 
     {% set options = {
+        component: 'oroui/js/app/components/view-component',
         view: 'oroui/js/app/views/datepicker/datetimepicker-view',
-        nativeMode: isMobileVersion(),
+        screenType: 'desktop',
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
@@ -290,7 +296,7 @@
     } %}
 
     {% set attr = attr|merge({
-        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-module': 'oroui/js/app/components/viewport-component',
         'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))
     }) %}
 
@@ -684,4 +690,22 @@
          data-layout="separate" >
         {{ form_widget(form) }}
     </div>
+{% endblock %}
+
+{% block oro_entity_tree_select_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_entity_tree_select_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {{ UI.renderJsTree(
+        {
+            'module': form.vars.pageComponentModule,
+            'treeOptions': form.vars.treeOptions
+        },
+        ['expand', 'collapse']
+    ) }}
+
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
 {% endblock %}

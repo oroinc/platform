@@ -31,7 +31,7 @@ class ProcessConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $this->definitionsConfigurator = $this
             ->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator')
@@ -131,9 +131,9 @@ class ProcessConfiguratorTest extends \PHPUnit_Framework_TestCase
      */
     private function assertObjectManagerCalledForRepository($entityClass)
     {
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
 
-        $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $objectManager->expects($this->once())
             ->method('getRepository')
             ->with($entityClass)

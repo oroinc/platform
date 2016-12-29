@@ -1,10 +1,10 @@
 // Default
 $checkbox-icon-size: auto;
+$checkbox-icon-min-width: 15px;
 $checkbox-icon-border: 1px solid transparent;
 $checkbox-icon-bg-color: transparent;
-$checkbox-icon-font: $base-font-icon;
-$checkbox-icon-checked-code: '\e834';
-$checkbox-icon-unchecked-code: '\e835';
+$checkbox-icon-checked: $fa-var-check-square;
+$checkbox-icon-unchecked: $fa-var-square-o;
 
 // Checked
 $checkbox-icon-bg-color-focus-state: transparent;

@@ -36,6 +36,18 @@
 
         vertical-align: middle;
 
+        text-decoration: none;
+
+        touch-action: manipulation;
+
+        white-space: nowrap;
+
+        user-select: none;
+
+        box-sizing: border-box;
+
+        -webkit-appearance: none;
+
         &--full,
         &.full {
             width: 100%;
@@ -44,13 +56,19 @@
 }
 
 @mixin element-state($state) {
-    @if $state == 'hover' {
+    @if $state == 'active' {
+        &:active {
+            @content;
+        }
+    }
+
+    @else if $state == 'hover' {
         &:hover {
             @content;
         }
     }
 
-    @if $state == 'focus' {
+    @else if $state == 'focus' {
         &:focus {
             @content;
         }
@@ -73,6 +91,13 @@
     @else if $state == 'error' {
         &--error,
         &.error {
+            @content;
+        }
+    }
+
+    @else if $state == 'disabled' {
+        &.disabled,
+        &:disabled {
             @content;
         }
     }
