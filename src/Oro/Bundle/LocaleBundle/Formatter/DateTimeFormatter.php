@@ -261,7 +261,7 @@ class DateTimeFormatter
      */
     public function getDateTime($date)
     {
-        if (!$date) {
+        if (is_null($date) || $date === false) {
             return false;
         }
 
