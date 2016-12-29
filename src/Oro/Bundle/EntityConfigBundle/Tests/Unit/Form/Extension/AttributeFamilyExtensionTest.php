@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Extension;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
