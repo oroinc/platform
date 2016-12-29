@@ -318,8 +318,6 @@ abstract class AbstractSorterExtension extends AbstractExtension
             $names           = array_keys($sorters);
             $firstSorterName = reset($names);
             $sortBy          = [$firstSorterName => self::DIRECTION_ASC];
-
-            return $sortBy;
         }
 
         return $sortBy;
