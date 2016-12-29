@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\Entity\Repository;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeGroupData;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\AttributeGroupRepository;
+use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**

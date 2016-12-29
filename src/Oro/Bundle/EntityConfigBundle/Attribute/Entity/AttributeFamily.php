@@ -45,6 +45,7 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      */
     private $id;
 
@@ -83,6 +84,13 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     /**
      * @var string
      * @ORM\Column(name="code", type="string", length=255, unique=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     *  )
      */
     private $code;
 

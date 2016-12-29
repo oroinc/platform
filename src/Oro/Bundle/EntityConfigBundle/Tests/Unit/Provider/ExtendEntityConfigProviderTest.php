@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 
 class ExtendEntityConfigProviderTest extends \PHPUnit_Framework_TestCase
 {
