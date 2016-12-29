@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
@@ -17,6 +18,11 @@ class MigrationExtensionManager
     protected $extensions = [];
 
     /**
+     * @var Connection
+     */
+    protected $connection;
+
+    /**
      * @var AbstractPlatform
      */
     protected $platform;
@@ -30,6 +36,22 @@ class MigrationExtensionManager
      * @var bool
      */
     private $isDependenciesUpToDate = false;
+
+    /**
+     * Sets a database connection
+     *
+     * @param Connection $connection
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
+
+        foreach ($this->extensions as $extension) {
+            if ($extension[0] instanceof ConnectionAwareInterface) {
+                $extension[0]->setConnection($this->connection);
+            }
+        }
+    }
 
     /**
      * Sets a database platform
@@ -71,6 +93,9 @@ class MigrationExtensionManager
      */
     public function addExtension($name, $extension)
     {
+        if ($this->connection && $extension instanceof ConnectionAwareInterface) {
+            $extension->setConnection($this->connection);
+        }
         if ($this->platform && $extension instanceof DatabasePlatformAwareInterface) {
             $extension->setDatabasePlatform($this->platform);
         }
@@ -95,6 +120,9 @@ class MigrationExtensionManager
      */
     public function applyExtensions(Migration $migration)
     {
+        if ($this->connection && $migration instanceof ConnectionAwareInterface) {
+            $migration->setConnection($this->connection);
+        }
         if ($this->platform && $migration instanceof DatabasePlatformAwareInterface) {
             $migration->setDatabasePlatform($this->platform);
         }

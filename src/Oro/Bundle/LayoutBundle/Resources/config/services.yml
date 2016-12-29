@@ -1,6 +1,5 @@
 parameters:
     oro_layout.layout_factory_builder.class:    Oro\Component\Layout\LayoutFactoryBuilder
-    oro_layout.layout_manager.class:            Oro\Component\Layout\LayoutManager
 
 services:
     oro_layout.extension:
@@ -27,9 +26,11 @@ services:
             - [setDebug, ['%kernel.debug%']]
 
     oro_layout.layout_manager:
-        class: %oro_layout.layout_manager.class%
+        class: 'Oro\Bundle\LayoutBundle\Layout\LayoutManager'
         arguments:
             - '@oro_layout.layout_factory_builder'
+            - '@oro_layout.layout_context_holder'
+            - '%oro_layout.default_active_theme%'
 
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper

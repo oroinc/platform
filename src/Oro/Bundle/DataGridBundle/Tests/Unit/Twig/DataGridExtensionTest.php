@@ -52,7 +52,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->datagridRouteHelper = $this->getMockBuilder(DatagridRouteHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->requestStack = $this->getMock(RequestStack::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->twigExtension = new DataGridExtension(
             $this->manager,
@@ -331,7 +331,8 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             'type' => 'string'
         ];
 
-        $metadata = $this->getMock(MetadataObject::class, [], [], '', false);
+        /** @var MetadataObject|\PHPUnit_Framework_MockObject_MockObject $metadata */
+        $metadata = $this->createMock(MetadataObject::class);
         $metadata->expects($this->exactly(2))
             ->method('toArray')
             ->willReturn([
@@ -339,7 +340,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ]);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
-        $grid = $this->getMock(DatagridInterface::class);
+        $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->exactly(2))
             ->method('getMetadata')
             ->willReturn($metadata);
@@ -359,7 +360,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $gridName = 'test';
 
-        $request = $this->getMock(Request::class);
+        $request = $this->createMock(Request::class);
         $request->expects($this->once())->method('getQueryString')->willReturn($queryString);
         $request->expects($this->once())->method('get')->with('_route')->willReturn('test_route');
 
@@ -367,7 +368,8 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getCurrentRequest')
             ->willReturn($request);
 
-        $grid = $this->getMock(DatagridInterface::class);
+        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $grid */
+        $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->any())->method('getName')->willReturn($gridName);
 
         $this->router

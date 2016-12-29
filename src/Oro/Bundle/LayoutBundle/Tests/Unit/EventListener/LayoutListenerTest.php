@@ -16,7 +16,6 @@ use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -32,26 +31,18 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutHelper;
 
-    /** @var LayoutContextHolder|\PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutContextHolder;
-
     protected function setUp()
     {
-        $this->layoutManager = $this->getMockBuilder('Oro\Component\Layout\LayoutManager')
+        $this->layoutManager = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\LayoutManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->layoutHelper = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Request\LayoutHelper')
             ->disableOriginalConstructor()->getMock();
 
-        $this->layoutContextHolder = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->listener = new LayoutListener(
             $this->layoutHelper,
-            $this->layoutManager,
-            $this->layoutContextHolder
+            $this->layoutManager
         );
     }
 
@@ -327,11 +318,11 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             $builder = $this->createMock('Oro\Component\Layout\LayoutBuilderInterface');
         }
         $callCount = $renderBlocks ? count($renderBlocks) : 1;
-        $this->layoutManager->expects($this->exactly($callCount))
+        $this->layoutManager->expects($this->any())
             ->method('getLayoutBuilder')
             ->willReturn($builder);
 
-        $builder->expects($this->exactly($callCount))
+        $this->layoutManager->expects($this->exactly($callCount))
             ->method('getLayout')
             ->willReturnCallback(
                 function (ContextInterface $context, $blockId) use ($assertContextCallback, $renderBlocks) {
