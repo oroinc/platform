@@ -8,7 +8,6 @@ branches:
     - /^1\.\d+$/
 
 php:
-    - 5.5
     - 5.6
     - 7.0
 
@@ -20,6 +19,7 @@ before_script:
   - phpenv config-rm xdebug.ini
   - phpenv config-add travis.php.ini
   - composer self-update
+  - composer global require "fxp/composer-asset-plugin:~1.2"
   - composer install
 
 script:
