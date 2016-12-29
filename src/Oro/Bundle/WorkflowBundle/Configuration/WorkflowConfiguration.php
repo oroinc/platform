@@ -523,6 +523,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         $rootNode
             ->beforeNormalization()
                 ->always()
+                ->ifTrue(function ($v) {
+                    return is_array($v);
+                })
                 ->then(function ($v) {
                     return array_map('strtolower', $v);
                 })
@@ -543,6 +546,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         $rootNode
             ->beforeNormalization()
                 ->always()
+                ->ifTrue(function ($v) {
+                    return is_array($v);
+                })
                 ->then(function ($v) {
                     return array_map('strtolower', $v);
                 })
