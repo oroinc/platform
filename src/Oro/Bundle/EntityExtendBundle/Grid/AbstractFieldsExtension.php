@@ -140,14 +140,15 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                 case RelationType::MANY_TO_ONE:
                 case RelationType::ONE_TO_ONE:
                     $extendFieldConfig = $this->getFieldConfig('extend', $field);
+                    $joinAlias = sprintf($relationTemplate, ++$relationIndex);
                     $config->offsetAddToArrayByPath(
                         '[source][query][join][left]',
-                        [['join' => sprintf('%s.%s', $alias, $fieldName), 'alias' => $fieldName]]
+                        [['join' => sprintf('%s.%s', $alias, $fieldName), 'alias' => $joinAlias]]
                     );
 
-                    $dataName = $fieldName.'_target_field';
+                    $dataName = $fieldName . '_target_field';
                     $targetField = $extendFieldConfig->get('target_field', false, 'id');
-                    $dataFieldName = sprintf('%s.%s', $fieldName, $targetField);
+                    $dataFieldName = sprintf('%s.%s', $joinAlias, $targetField);
 
                     $groupBy = $config->offsetGetByPath('[source][query][groupBy]');
                     if ($groupBy) {
