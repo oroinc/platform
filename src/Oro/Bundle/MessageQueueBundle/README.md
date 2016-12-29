@@ -41,7 +41,6 @@ we can configure one of the supported transports via parameters:
 
 ###DBAL transport 
 
-
 ```yaml
 # app/config/parameters.yml
 
@@ -49,16 +48,6 @@ we can configure one of the supported transports via parameters:
     message_queue_transport_config: ~
 ```
 [DBAL transport options](./Resources/doc/dbal.md)
-
-###RabbiqMQ transport
-```yaml
-# app/config/parameters.yml
-
-    message_queue_transport: 'amqp'
-    message_queue_transport_config: { host: 'localhost', port: '5672', user: 'guest', password: 'guest', vhost: 'oro' }
-```
-
-[AMQP transport options](./Resources/doc/amqp.md)
 
 Once you configured everything you can start producing messages:
 
