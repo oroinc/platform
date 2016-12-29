@@ -1,6 +1,9 @@
-(function (files, callback) {
+(function(files, callback) {
     'use strict';
-    var file, match, tests = [], libs = {};
+    var file;
+    var match;
+    var tests = [];
+    var libs = {};
 
     for (file in files) {
         if (files.hasOwnProperty(file)) {
