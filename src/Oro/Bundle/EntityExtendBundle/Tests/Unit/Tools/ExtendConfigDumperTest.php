@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -192,7 +192,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateConfig()
     {
-        $this->markTestSkipped('Return after extendEntityConfigProvider logic fixed');
+        $this->markTestSkipped('Should be changed in scope of #BB-6620');
         $this->entityManagerBag->expects($this->exactly(2))
             ->method('getEntityManagers')
             ->willReturn([]);
