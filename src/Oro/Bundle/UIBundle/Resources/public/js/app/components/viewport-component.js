@@ -56,7 +56,7 @@ define(function(require) {
         },
 
         onViewportChange: function(viewport) {
-            if (this.options.screenType === 'any' || viewport.screenTypes[this.options.screenType]) {
+            if (viewport.screenTypes[this.options.screenType]) {
                 this.initializeComponent();
             } else {
                 this.disposeComponent();

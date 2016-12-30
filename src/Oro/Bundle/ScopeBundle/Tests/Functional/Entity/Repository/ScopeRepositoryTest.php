@@ -55,6 +55,16 @@ class ScopeRepositoryTest extends WebTestCase
         $this->assertSame([$scope->getId()], $ids);
     }
 
+    public function testFindMostSuitable()
+    {
+        $criteria = new ScopeCriteria([]);
+        $actualScope = $this->getRepository()->findMostSuitable($criteria);
+
+        /** @var Scope $expectedScope */
+        $expectedScope = $this->getReference(LoadScopeData::DEFAULT_SCOPE);
+        $this->assertSame($expectedScope->getId(), $actualScope->getId());
+    }
+
     /**
      * @return ScopeRepository
      */

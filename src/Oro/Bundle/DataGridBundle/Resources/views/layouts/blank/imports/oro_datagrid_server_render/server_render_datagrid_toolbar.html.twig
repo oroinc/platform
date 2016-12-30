@@ -19,7 +19,7 @@
         {% set currentPage = metadata.state.currentPage %}
         {% set totalPages = pageSize == 0 ? 1 : (totalRecords / pageSize)|round %}
 
-        <span>{{ "oro.datagrid.pagination.label"|trans }}:</span>
+        <span class="hidden-xs">{{ "oro.datagrid.pagination.label"|trans }}:</span>
         <div class="oro-pagination__pager">
             <a href="{% if currentPage <= 1 %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage - 1) }}{% endif %}"
                class="oro-pagination__pager__prev{% if currentPage <= 1 %} disabled{% endif %}"
@@ -53,7 +53,7 @@
     {% if pageSize.hide == false and pageSize.items|length > 0 %}
         <div{{ block('block_attributes') }}>
             <div class="page-size pull-right form-horizontal">
-                <span class="fs14 va-m_md">{{ "oro.datagrid.pagesize.label"|trans }}: &nbsp;</span>
+                <span class="fs14 va-m_md hidden-xs">{{ "oro.datagrid.pagesize.label"|trans }}: &nbsp;</span>
                 <div class="action-selectbox_custom_in-pager">
                     <select class="select select--size-s" name="action" data-grid-pagesize-selector>
                         {% for value in pageSize.items %}

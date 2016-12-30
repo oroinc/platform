@@ -4,19 +4,35 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ActionConfiguration
+     */
+    private $actionConfiguration;
+
+    /**
+     * @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $typesRegistryMock;
+
+    public function setUp()
+    {
+        $this->typesRegistryMock = $this->createMock(TypesRegistry::class);
+
+        $this->actionConfiguration = new ActionConfiguration($this->typesRegistryMock);
+    }
+
     public function testShouldReturnConfigForEnabledChannel()
     {
-        $configuration = new ActionConfiguration();
-
-        $callable = $configuration->getIsSyncAvailableCondition();
-
-        $result = $callable(new ResultRecord([
+        $record = new ResultRecord([
             'enabled' => 'enabled',
             'editMode' => Channel::EDIT_MODE_ALLOW
-        ]));
+        ]);
+
+        $result = $this->actionConfiguration->getIsSyncAvailableCondition($record);
 
         $expected = [
             'activate' => false,
@@ -27,14 +43,12 @@ class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnConfigForDisabledChannel()
     {
-        $configuration = new ActionConfiguration();
-
-        $callable = $configuration->getIsSyncAvailableCondition();
-
-        $result = $callable(new ResultRecord([
+        $record = new ResultRecord([
             'enabled' => 'disabled',
             'editMode' => Channel::EDIT_MODE_ALLOW
-        ]));
+        ]);
+
+        $result = $this->actionConfiguration->getIsSyncAvailableCondition($record);
 
         $expected = [
             'deactivate' => false,
@@ -46,19 +60,39 @@ class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldReturnConfigForEditModeDisallow()
     {
-        $configuration = new ActionConfiguration();
-
-        $callable = $configuration->getIsSyncAvailableCondition();
-
-        $result = $callable(new ResultRecord([
+        $record = new ResultRecord([
             'enabled' => 'enabled',
             'editMode' => Channel::EDIT_MODE_DISALLOW
-        ]));
+        ]);
+
+        $result = $this->actionConfiguration->getIsSyncAvailableCondition($record);
 
         $this->assertEquals([
             'activate' => false,
             'delete' => false,
             'deactivate' => false,
+        ], $result);
+    }
+
+    public function testDoesNotSupportSync()
+    {
+        $record = new ResultRecord([
+            'enabled' => 'enabled',
+            'editMode' => Channel::EDIT_MODE_DISALLOW
+        ]);
+
+        $this->typesRegistryMock
+            ->expects($this->once())
+            ->method('supportsSync')
+            ->willReturn(false);
+
+        $result = $this->actionConfiguration->getIsSyncAvailableCondition($record);
+
+        $this->assertEquals([
+            'activate' => false,
+            'delete' => false,
+            'deactivate' => false,
+            'schedule' => false
         ], $result);
     }
 }

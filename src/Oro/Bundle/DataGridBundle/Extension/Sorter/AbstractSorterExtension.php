@@ -293,7 +293,17 @@ abstract class AbstractSorterExtension extends AbstractExtension
     private function getSortBy($readParameters, array $defaultSorters, array $sorters, $disableDefaultSorting)
     {
         if ($readParameters) {
-            $sortBy = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ?: $defaultSorters;
+            $sortBy = (array)$this->getParameters()->get(self::SORTERS_ROOT_PARAM);
+            $sortBy = array_filter(
+                $sortBy,
+                function ($sortColumn) use ($sorters) {
+                    return array_key_exists($sortColumn, $sorters);
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+            if (!$sortBy) {
+                $sortBy = $defaultSorters;
+            }
         } else {
             $sortBy = $defaultSorters;
         }
@@ -308,8 +318,6 @@ abstract class AbstractSorterExtension extends AbstractExtension
             $names           = array_keys($sorters);
             $firstSorterName = reset($names);
             $sortBy          = [$firstSorterName => self::DIRECTION_ASC];
-
-            return $sortBy;
         }
 
         return $sortBy;

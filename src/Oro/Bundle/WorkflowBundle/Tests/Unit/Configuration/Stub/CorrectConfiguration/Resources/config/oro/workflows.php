@@ -200,7 +200,6 @@ return [
                 'is_start' => false,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
-                'acl_resource' => null,
                 'acl_message' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'display_type' => 'dialog',

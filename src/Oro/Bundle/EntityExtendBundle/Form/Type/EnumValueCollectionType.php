@@ -69,6 +69,7 @@ class EnumValueCollectionType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['multiple'] = $this->isMultipleSelectEnable($options['config_id']);
+        $view->vars['show_form_when_empty'] = false;
     }
 
     /**

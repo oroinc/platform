@@ -37,11 +37,14 @@ class EmailConfigurationConfigurator
                 ConfigManager::SECTION_VIEW_SEPARATOR
             );
 
-            if (isset($data[$passwordKey]['value'])
-                && empty($data[$passwordKey]['value'])
-                && $event->getForm()->has($passwordKey)) {
-                $oldPassword = $event->getForm()->get($passwordKey)->getData()['value'];
-                $data[$passwordKey]['value'] = $oldPassword;
+            if (!isset($data[$passwordKey]['value'])
+                || (
+                    isset($data[$passwordKey]['value'])
+                    && empty($data[$passwordKey]['value'])
+                    && $event->getForm()->has($passwordKey)
+                )
+            ) {
+                $data[$passwordKey]['value'] = $event->getForm()->get($passwordKey)->getData()['value'];
             } else {
                 $data[$passwordKey]['value'] = $encryptor->encryptData($data[$passwordKey]['value']);
             }

@@ -9,13 +9,12 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutManager;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Exception\LogicException;
 
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
+use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 
 /**
  * The LayoutListener class handles the @Layout annotation.
@@ -33,23 +32,15 @@ class LayoutListener
     protected $layoutManager;
 
     /**
-     * @var LayoutContextHolder
-     */
-    protected $layoutContextHolder;
-
-    /**
-     * @param LayoutHelper $layoutHelper
+     * @param LayoutHelper  $layoutHelper
      * @param LayoutManager $layoutManager
-     * @param LayoutContextHolder $layoutContextHolder
      */
     public function __construct(
         LayoutHelper $layoutHelper,
-        LayoutManager $layoutManager,
-        LayoutContextHolder $layoutContextHolder
+        LayoutManager $layoutManager
     ) {
         $this->layoutHelper = $layoutHelper;
         $this->layoutManager = $layoutManager;
-        $this->layoutContextHolder = $layoutContextHolder;
     }
 
     /**
@@ -78,12 +69,13 @@ class LayoutListener
         $context = null;
         $parameters = $event->getControllerResult();
         if (is_array($parameters)) {
-            $context = new LayoutContext();
-            foreach ($parameters as $key => $value) {
-                $context->set($key, $value);
-            }
+            $context = new LayoutContext($parameters, (array) $layoutAnnotation->getVars());
         } elseif ($parameters instanceof ContextInterface) {
             $context = $parameters;
+            $vars = $layoutAnnotation->getVars();
+            if (!empty($vars)) {
+                $context->getResolver()->setRequired($vars);
+            }
         } elseif ($parameters instanceof Layout) {
             if (!$layoutAnnotation->isEmpty()) {
                 throw new LogicException(
@@ -100,34 +92,13 @@ class LayoutListener
             $response = new Response($layout->render());
         } else {
             $this->configureContext($context, $layoutAnnotation);
-            $this->layoutContextHolder->setContext($context);
-            $response = $this->getLayoutResponse($context, $layoutAnnotation, $request);
+            $blockThemes = $layoutAnnotation->getBlockThemes();
+            $this->layoutManager->getLayoutBuilder()->setBlockTheme($blockThemes);
+
+            $response = $this->getLayoutResponse($context, $request);
         }
 
         $event->setResponse($response);
-    }
-
-    /**
-     * Get the layout and add parameters to the layout context.
-     *
-     * @param ContextInterface $context
-     * @param LayoutAnnotation $layoutAnnotation
-     * @param string|null $rootId
-     *
-     * @return Layout
-     */
-    protected function getLayout(ContextInterface $context, LayoutAnnotation $layoutAnnotation, $rootId = null)
-    {
-        $layoutBuilder = $this->layoutManager->getLayoutBuilder();
-        // TODO discuss adding root automatically
-        $layoutBuilder->add('root', null, 'root');
-
-        $blockThemes = $layoutAnnotation->getBlockThemes();
-        if (!empty($blockThemes)) {
-            $layoutBuilder->setBlockTheme($blockThemes);
-        }
-
-        return $layoutBuilder->getLayout($context, $rootId);
     }
 
     /**
@@ -153,22 +124,15 @@ class LayoutListener
                 $context->set('theme', $theme);
             }
         }
-
-        $vars = $layoutAnnotation->getVars();
-        if (!empty($vars)) {
-            $context->getResolver()->setRequired($vars);
-        }
     }
 
     /**
      * @param ContextInterface $context
-     * @param LayoutAnnotation $layoutAnnotation
-     * @param Request $request
+     * @param Request          $request
      * @return Response
      */
     protected function getLayoutResponse(
         ContextInterface $context,
-        LayoutAnnotation $layoutAnnotation,
         Request $request
     ) {
         $blockIds = $request->get('layout_block_ids');
@@ -176,13 +140,13 @@ class LayoutListener
             $response = [];
             foreach ($blockIds as $blockId) {
                 if ($blockId) {
-                    $layout = $this->getLayout($context, $layoutAnnotation, $blockId);
+                    $layout = $this->layoutManager->getLayout($context, $blockId);
                     $response[$blockId] = $layout->render();
                 }
             }
             $response = new JsonResponse($response);
         } else {
-            $layout = $this->getLayout($context, $layoutAnnotation);
+            $layout = $this->layoutManager->getLayout($context);
             $response = new Response($layout->render());
         }
         return $response;

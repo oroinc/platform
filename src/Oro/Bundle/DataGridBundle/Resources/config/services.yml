@@ -270,7 +270,11 @@ services:
     oro_datagrid.handler.export:
         class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
         arguments:
-            - '@oro_importexport.file.mime_type_guesser'
+            - '@oro_importexport.file.file_system_operator'
+        calls:
+            - [setRouter, ['@router']]
+            - [setLogger, ['@logger']]
+            - [setConfigManager, ['@oro_config.global']]
 
     oro_datagrid.columns.helper:
         class: %oro_datagrid.columns.helper.class%
@@ -324,3 +328,21 @@ services:
         class: 'Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper'
         arguments:
             - '@router.default'
+
+    oro_datagrid.async.export:
+        class: Oro\Bundle\DataGridBundle\Async\ExportMessageProcessor
+        arguments:
+            - '@oro_datagrid.handler.export'
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_config.user'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_datagrid.importexport.export_connector'
+            - '@oro_datagrid.importexport.processor.export'
+            - '@oro_importexport.writer.writer_chain'
+            - '@security.token_storage'
+            - '@logger'
+            - '@oro_email.email_renderer'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+

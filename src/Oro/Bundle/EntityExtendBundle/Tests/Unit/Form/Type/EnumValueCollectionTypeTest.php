@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -16,14 +18,14 @@ class EnumValueCollectionTypeTest extends TypeTestCase
     /** @var EnumValueCollectionType */
     protected $type;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EnumTypeHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $typeHelper;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->typeHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper')
+        $this->typeHelper = $this->getMockBuilder(EnumTypeHelper::class)
             ->disableOriginalConstructor()
             ->setMethods(['getEnumCode', 'isImmutable'])
             ->getMock();
@@ -258,6 +260,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
     {
         $configId = new FieldConfigId('enum', 'Test\Entity', 'testField', 'enum');
 
+        /** @var FormInterface $form */
         $form    = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -266,12 +269,14 @@ class EnumValueCollectionTypeTest extends TypeTestCase
 
         $this->type->buildView($view, $form, $options);
         $this->assertFalse($view->vars['multiple']);
+        $this->assertFalse($view->vars['show_form_when_empty']);
     }
 
     public function testBuildViewForMultiEnum()
     {
         $configId = new FieldConfigId('enum', 'Test\Entity', 'testField', 'multiEnum');
 
+        /** @var FormInterface $form */
         $form    = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -280,6 +285,7 @@ class EnumValueCollectionTypeTest extends TypeTestCase
 
         $this->type->buildView($view, $form, $options);
         $this->assertTrue($view->vars['multiple']);
+        $this->assertFalse($view->vars['show_form_when_empty']);
     }
 
     public function testGetName()

@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -132,10 +133,14 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
         $operationAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operationAvailable->expects($this->once())
             ->method('isAvailable')->with($actionData)->willReturn(true);
+        $operationAvailable->expects($this->once())
+            ->method('getDefinition')->willReturn(new OperationDefinition());
 
         $operationNotAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operationNotAvailable->expects($this->once())
             ->method('isAvailable')->with($actionData)->willReturn(false);
+        $operationNotAvailable->expects($this->once())
+            ->method('getDefinition')->willReturn(new OperationDefinition());
 
         return [
             [

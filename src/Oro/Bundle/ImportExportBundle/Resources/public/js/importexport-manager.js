@@ -6,7 +6,6 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
     var DialogWidget = require('oro/dialog-widget');
     var exportHandler = require('oroimportexport/js/export-handler');
 
@@ -23,7 +22,9 @@ define(function(require) {
             entity: null,
 
             importTitle: 'Import',
+            importValidationTitle: 'Import Validation',
             importRoute: 'oro_importexport_import_form',
+            importValidationRoute: 'oro_importexport_import_validation_form',
             importJob: null,
             importValidateJob: null,
 
@@ -80,35 +81,21 @@ define(function(require) {
         },
 
         handleImport: function() {
-            var widget = this._renderDialogWidget({
+            this._renderDialogWidget({
                 url: routing.generate(this.options.importRoute, $.extend({}, this.routeOptions)),
                 dialogOptions: {
                     title: this.options.importTitle
                 }
             });
+        },
 
-            if (!_.isEmpty(this.options.datagridName) || this.options.refreshPageOnSuccess) {
-                var self = this;
-
-                widget.on('importComplete', function(data) {
-                    if (data.success) {
-                        if (self.options.refreshPageOnSuccess) {
-                            if (!_.isEmpty(self.options.afterRefreshPageMessage)) {
-                                mediator.once('page:afterChange', function() {
-                                    mediator.execute(
-                                        'showFlashMessage',
-                                        'warning',
-                                        self.options.afterRefreshPageMessage
-                                    );
-                                });
-                            }
-                            mediator.execute('refreshPage');
-                        } else if (!_.isEmpty(self.options.datagridName)) {
-                            mediator.trigger('datagrid:doRefresh:' + self.options.datagridName);
-                        }
-                    }
-                });
-            }
+        handleImportValidation: function() {
+            this._renderDialogWidget({
+                url: routing.generate(this.options.importValidationRoute, $.extend({}, this.routeOptions)),
+                dialogOptions: {
+                    title: this.options.importValidationTitle
+                }
+            });
         },
 
         handleExport: function() {
@@ -136,11 +123,9 @@ define(function(require) {
                     filePrefix: this.options.filePrefix
                 }));
 
-                var exportStartedMessage = exportHandler.startExportNotificationMessage();
                 $.getJSON(
                     exportUrl,
                     function(data) {
-                        exportStartedMessage.close();
                         exportHandler.handleExportResponse(data);
                     }
                 );
