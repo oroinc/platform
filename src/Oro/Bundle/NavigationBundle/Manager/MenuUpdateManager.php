@@ -277,19 +277,22 @@ class MenuUpdateManager
         $currentUpdate = $this->findOrCreateMenuUpdate($menuName, $key, $scope);
 
         $parent = $this->findMenuItem($menuName, $parentKey, $scope);
-        $currentUpdate->setParentKey($parent ? $parent->getName() : null);
+        if ($menuName !== $parentKey) {
+            $currentUpdate->setParentKey($parent ? $parent->getName() : null);
+        }
 
-        $i = 0;
         $order = [];
 
+        $i = 0;
         /** @var ItemInterface $child */
         foreach ($parent->getChildren() as $child) {
-            if ($position == $i++) {
-                $currentUpdate->setPriority($i++);
+            if ($i === (int) $position) {
+                $currentUpdate->setPriority($i);
+                $i++;
             }
 
             if ($child->getName() != $key) {
-                $order[$i] = $child;
+                $order[$i++] = $child;
             }
         }
 

@@ -54,7 +54,7 @@ abstract class UpdateNoteAssociationKindForRenamedEntitiesMigration implements
     /**
      * @param Schema $schema
      *
-     * @return array ['current class name' => 'old class name']
+     * @return array [current class name => old class name, ...]
      */
     abstract protected function getRenamedEntitiesNames(Schema $schema);
 

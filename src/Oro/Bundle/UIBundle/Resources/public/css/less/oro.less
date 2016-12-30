@@ -401,6 +401,26 @@ body .select2-container {
 .label-info,
 .badge-info { background:#92b2d6; }
 
+.job-progress {
+  background-image: linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -moz-linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -webkit-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -webkit-linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -o-linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  position: relative;
+  .label {
+    height: 100%;
+    span {
+      width: 100%;
+      text-align: center;
+      z-index: 2;
+      display: block;
+      position: absolute;
+      top: 3px;
+    }
+  }
+}
+
 .widget-content > .label-info:first-child {
   margin-bottom: 10px;
 }
@@ -2328,6 +2348,10 @@ div.selector.active:hover {
   background-position: -483px -208px;
 }
 
+div.selector.disabled {
+  background-position: left top !important;
+}
+
 div.selector.disabled span {
   color:#aaa;
   &:after {
@@ -2454,6 +2478,10 @@ div.uploader.focus,
   }
   .input-append.error > *, .input-prepend.error > * {
     border: 1px solid #e9322d;
+  }
+  .entity-create-dropdown > .dropdown-toggle {
+    border-width: 0;
+    height: 28px;
   }
   div.selector {
     display: inline-block;
@@ -3292,9 +3320,10 @@ label .popover-content {
   .btn-group.entity-create-dropdown {
     display: inline-block;
     vertical-align: top;
+    margin-left: 3px;
+    border-radius: 0 4px 4px 0;
     & > .btn {
       font-size: 14px;
-      margin-left: 3px;
     }
   }
 }

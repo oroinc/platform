@@ -9,6 +9,17 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 class ConsoleToken extends AbstractToken implements OrganizationContextTokenInterface
 {
     use OrganizationContextTokenTrait;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(array $roles = array())
+    {
+        parent::__construct($roles);
+
+        parent::setAuthenticated(true);
+    }
+
     /**
      * {@inheritdoc}
      */

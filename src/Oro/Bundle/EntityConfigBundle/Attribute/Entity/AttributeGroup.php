@@ -6,8 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\PrePersist;
 
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
@@ -17,7 +15,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
  * @ORM\Table(name="oro_attribute_group")
- * @ORM\Entity(repositoryClass="Oro\Bundle\EntityExtendBundle\Entity\Repository\AttributeGroupRepository")
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      mode="hidden"

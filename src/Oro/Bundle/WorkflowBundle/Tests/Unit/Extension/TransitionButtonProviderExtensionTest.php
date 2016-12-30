@@ -203,7 +203,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
             if (true === $isExistWorkflowItem) {
                 $workflow->expects($this->once())
                     ->method('getWorkflowItemByEntityId')
-                    ->willReturn($this->getMock(WorkflowItem::class));
+                    ->willReturn($this->createMock(WorkflowItem::class));
             }
 
             $button = $this->getMockBuilder(TransitionButton::class)
