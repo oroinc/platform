@@ -96,13 +96,12 @@ class EmailTest extends \PHPUnit_Framework_TestCase
 
     public function testBeforeSave()
     {
+        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity = new Email();
         $entity->beforeSave();
 
-        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-
         $this->assertEquals(Email::NORMAL_IMPORTANCE, $entity->getImportance());
-        $this->assertGreaterThanOrEqual($entity->getCreated(), $createdAt);
+        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
     }
 
     public function testIsHeadGetterAndSetter()

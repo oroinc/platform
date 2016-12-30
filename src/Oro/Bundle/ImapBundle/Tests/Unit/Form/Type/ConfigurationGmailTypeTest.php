@@ -141,7 +141,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
      */
     public function setDataProvider()
     {
-        $tokenDateTime = new \DateTime();
+        $accessTokenExpiresAt = new \DateTime();
 
         return [
             'should bind correct data' => [
@@ -153,7 +153,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => $tokenDateTime,
+                    'accessTokenExpiresAt' => $accessTokenExpiresAt,
                     'accessToken' => '1',
                     'refreshToken' => '111'
                 ],
@@ -165,7 +165,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => $tokenDateTime,
+                    'accessTokenExpiresAt' => $accessTokenExpiresAt,
                     'accessToken' => '1',
                     'refreshToken' => '111'
                 ],
@@ -177,7 +177,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => $tokenDateTime,
+                    'accessTokenExpiresAt' => $accessTokenExpiresAt,
                     'accessToken' => '1',
                     'refreshToken' => '111'
                 ],

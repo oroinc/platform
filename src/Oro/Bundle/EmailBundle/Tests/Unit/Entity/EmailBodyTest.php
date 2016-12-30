@@ -58,15 +58,14 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
 
     public function testBeforeSave()
     {
+        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity = new EmailBody();
         $entity->beforeSave();
-
-        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $this->assertEquals(false, $entity->getBodyIsText());
         $this->assertEquals(false, $entity->getHasAttachments());
         $this->assertEquals(false, $entity->getPersistent());
-        $this->assertGreaterThanOrEqual($entity->getCreated(), $createdAt);
+        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
     }
 
     public function testTextBodyGetterAndSetter()
