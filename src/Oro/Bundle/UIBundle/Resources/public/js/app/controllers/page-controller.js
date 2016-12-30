@@ -288,10 +288,10 @@ define([
                 // fetch from URL only pathname and query
                 parser = document.createElement('a');
                 parser.href = pathDesc.url;
-                pathname = parser.pathname;
-                query = parser.search.substr(1);
                 // IE removes starting slash
-                pathDesc.url = (pathname[0] === '/' ? '' : '/') + pathname + (query && ('?' + query));
+                pathname = (parser.pathname[0] === '/' ? '' : '/') + parser.pathname;
+                query = parser.search.substr(1);
+                pathDesc.url = pathname + (query && ('?' + query));
             }
             options = _.defaults(options, {
                 fullRedirect: this.fullRedirect

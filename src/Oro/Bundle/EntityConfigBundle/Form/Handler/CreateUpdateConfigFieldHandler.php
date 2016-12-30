@@ -8,11 +8,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage;
-use Oro\Bundle\UIBundle\Route\Router;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class CreateUpdateConfigFieldHandler
 {
@@ -21,9 +19,6 @@ class CreateUpdateConfigFieldHandler
 
     /** @var ConfigManager */
     private $configManager;
-
-    /** @var Router */
-    private $router;
 
     /** @var ConfigHelper */
     private $configHelper;
@@ -34,20 +29,17 @@ class CreateUpdateConfigFieldHandler
     /**
      * @param ConfigHelperHandler $configHelperHandler
      * @param ConfigManager $configManager
-     * @param Router $router
      * @param ConfigHelper $configHelper
      * @param FieldSessionStorage $sessionStorage
      */
     public function __construct(
         ConfigHelperHandler $configHelperHandler,
         ConfigManager $configManager,
-        Router $router,
         ConfigHelper $configHelper,
         FieldSessionStorage $sessionStorage
     ) {
         $this->configHelperHandler = $configHelperHandler;
         $this->configManager = $configManager;
-        $this->router = $router;
         $this->configHelper = $configHelper;
         $this->sessionStorage = $sessionStorage;
     }
@@ -72,7 +64,7 @@ class CreateUpdateConfigFieldHandler
 
             $this->sessionStorage->saveFieldInfo($entityConfigModel, $fieldName, $fieldConfigModel->getType());
 
-            return $this->router->redirect($entityConfigModel);
+            return $this->configHelperHandler->redirect($entityConfigModel);
         }
 
         return [
@@ -101,7 +93,7 @@ class CreateUpdateConfigFieldHandler
         array $additionalFieldOptions = []
     ) {
         if (!$this->sessionStorage->hasFieldInfo($entityConfigModel)) {
-            return $this->router->redirect($createActionRedirectUrl);
+            return $this->configHelperHandler->redirect($createActionRedirectUrl);
         }
 
         list($fieldName, $fieldType) = $this->sessionStorage->getFieldInfo($entityConfigModel);
@@ -125,25 +117,15 @@ class CreateUpdateConfigFieldHandler
         $form = $this->configHelperHandler->createSecondStepFieldForm($newFieldModel);
 
         if ($this->configHelperHandler->isFormValidAfterSubmit($request, $form)) {
-            /** @var Session $session */
-            $session = $request->getSession();
-            $session->getFlashBag()->add('success', $successMessage);
             $extendEntityConfig->set('upgradeable', true);
 
             //persist data inside the form
             $this->configManager->persist($extendEntityConfig);
             $this->configManager->flush();
 
-            return $this->router->redirect($newFieldModel);
+            return $this->configHelperHandler->showSuccessMessageAndRedirect($newFieldModel, $successMessage);
         }
 
-        return [
-            'entity_config' => $this->configHelper->getEntityConfigByField($newFieldModel, 'entity'),
-            'field_config' => $this->configHelper->getFieldConfig($newFieldModel, 'entity'),
-            'field' => $newFieldModel,
-            'form' => $form->createView(),
-            'formAction' => $formAction,
-            'require_js' => $this->configHelper->getExtendRequireJsModules()
-        ];
+        return $this->configHelperHandler->constructConfigResponse($newFieldModel, $form, $formAction);
     }
 }

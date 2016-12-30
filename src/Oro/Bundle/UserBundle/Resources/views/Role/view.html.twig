@@ -4,7 +4,7 @@
 
 {% oro_title_set({params : {"%label%": entity.label }}) %}
 
-{% set gridName = 'role-users-grid' %}
+{% set gridName = 'role-view-users-grid' %}
 
 {% block pageHeader %}
     {% set breadcrumbs = {
@@ -90,7 +90,7 @@
             'title' : null,
             'useSpan': false,
             'data' : [
-                dataGrid.renderGrid(gridName, {role: entity.id}, { cssClass: 'inner-grid' })
+                dataGrid.renderGrid(gridName, {role_id: entity.id}, { cssClass: 'inner-grid' })
             ]
         }]
     }] ) %}
