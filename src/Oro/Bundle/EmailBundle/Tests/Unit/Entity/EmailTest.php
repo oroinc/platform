@@ -102,7 +102,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $this->assertEquals(Email::NORMAL_IMPORTANCE, $entity->getImportance());
-        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
+        $this->assertGreaterThanOrEqual($entity->getCreated(), $createdAt);
     }
 
     public function testIsHeadGetterAndSetter()
