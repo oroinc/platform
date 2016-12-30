@@ -27,7 +27,7 @@ class AttributeFamilyFormViewListener
     public function onEdit(BeforeListRenderEvent $event)
     {
         $template = $event->getEnvironment()->render(
-            'OroEntityExtendBundle:AttributeFamily:familyField.html.twig',
+            'OroEntityConfigBundle:AttributeFamily:familyField.html.twig',
             ['form' => $event->getFormView()]
         );
 

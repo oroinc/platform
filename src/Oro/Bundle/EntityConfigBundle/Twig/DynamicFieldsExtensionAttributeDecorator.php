@@ -1,15 +1,17 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Twig;
+namespace Oro\Bundle\EntityConfigBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
+
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension
 {
     /**
-     * @var DynamicFieldsExtension
+     * @var AbstractDynamicFieldsExtension
      */
     private $extension;
 
@@ -19,7 +21,7 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
     private $attributeHelper;
 
     /**
-     * @param DynamicFieldsExtension $extension
+     * @param AbstractDynamicFieldsExtension $extension
      * @param AttributeConfigHelper $attributeHelper
      */
     public function __construct(AbstractDynamicFieldsExtension $extension, AttributeConfigHelper $attributeHelper)
