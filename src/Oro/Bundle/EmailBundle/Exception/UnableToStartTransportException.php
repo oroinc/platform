@@ -2,6 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Exception;
 
-class UnableToStartTransportException extends \RuntimeException implements  MailerExceptionInterface
+class UnableToStartTransportException extends \RuntimeException implements MailerExceptionInterface
 {
 }
