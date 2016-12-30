@@ -31,7 +31,7 @@ class EmailThreadTest extends \PHPUnit_Framework_TestCase
         $entity->beforeSave();
 
         $this->assertEquals(Email::NORMAL_IMPORTANCE, $entity->getImportance());
-        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
+        $this->assertGreaterThanOrEqual($entity->getCreated(), $createdAt);
     }
 
     /**

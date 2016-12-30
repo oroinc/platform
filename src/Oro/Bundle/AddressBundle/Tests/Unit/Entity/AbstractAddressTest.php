@@ -74,7 +74,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($address->getCreated());
         $this->assertNotNull($address->getUpdated());
 
-        $this->assertEquals($address->getCreated(), $address->getUpdated());
+        $this->assertEquals($address->getCreated(), $address->getUpdated(), '', 1);
     }
 
     public function testBeforeUpdate()
