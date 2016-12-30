@@ -41,7 +41,7 @@
     {% elseif renderParams.enableToggleFilters is defined %}
         {% set enableToggleFilters = renderParams.enableToggleFilters %}
     {% else %}
-        {% set enableToggleFilters = true %}
+        {% set enableToggleFilters = false %}
     {% endif %}
     {% set options  = {
         el: '#' ~ gridId,
