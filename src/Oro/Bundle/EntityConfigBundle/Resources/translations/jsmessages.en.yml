@@ -8,5 +8,3 @@ oro:
         noname: No name
         remove_confirmation_title: Remove Attribute Group with system attributes
         remove_confirmation_text: Are you sure to delete this Attribute Group? All system attributes will be moved to first one automatically.
-
-
