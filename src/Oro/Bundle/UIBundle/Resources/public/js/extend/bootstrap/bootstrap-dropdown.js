@@ -120,10 +120,15 @@ define(function(require) {
             });
 
             var options = $dropdownMenu.data('options');
+            var attachToParent = options.attachToParent || false;
+
             if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - $parent.outerWidth();
+                css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
                 css.left = 'auto';
-                css.width = $parent.outerWidth();
+
+                if (attachToParent) {
+                    css.width = $parent.outerWidth();
+                }
             }
 
             var containerOffset = $container.offset();
@@ -185,12 +190,19 @@ define(function(require) {
             top: dropdownMenuOriginalPosition.top + parentPosition.top - parentOriginalPosition.top,
             left: dropdownMenuOriginalPosition.left + parentPosition.left - parentOriginalPosition.left
         };
+
         var options = $dropdownMenu.data('options');
+        var attachToParent = options.attachToParent || false;
+
         if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - $parent.outerWidth();
+            css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
             css.left = 'auto';
-            css.width = $parent.outerWidth();
+
+            if (attachToParent) {
+                css.width = $parent.outerWidth();
+            }
         }
+
         $dropdownMenu.css(css);
     };
 
