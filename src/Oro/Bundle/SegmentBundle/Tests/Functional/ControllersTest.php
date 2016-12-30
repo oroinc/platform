@@ -4,6 +4,8 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -12,6 +14,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
+    use MessageQueueExtension;
+
     protected function setUp()
     {
         $this->initClient(
@@ -19,6 +23,8 @@ class ControllersTest extends WebTestCase
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
         $this->client->useHashNavigation(true);
+
+        $this->setUpMessageCollector();
     }
 
     public function testIndex()
@@ -133,39 +139,28 @@ class ControllersTest extends WebTestCase
         $this->verifyReport($reportResult, $data, (int)$options['totalRecords']);
     }
 
-    /**
-     * @param array $report
-     * @param array $reportResult
-     * @param array $segmentExport
-     * @param array|null $segmentExportFilter
-     *
-     * @depends testView
-     * @dataProvider segmentsDataProvider
-     */
-    public function testExport(array $report, array $reportResult, array $segmentExport, $segmentExportFilter)
+    public function testExport()
     {
         $response = $this->client->requestGrid(
             'oro_segments-grid',
-            array('oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated')
+            ['oro_segments-grid[_filter][name][value]' => 'Users Filterd Dynamic_updated']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
 
-        $keys = array_keys($segmentExportFilter);
-        $filter = array_values($segmentExportFilter);
+        $keys = ['oro_segment_grid_$id[_filter][c1][value]', 'oro_segment_grid_$id[_filter][c1][type]'];
+        $filter = ['321admin123', 1];
         $keys = str_replace('$id', $id, $keys);
         $filter = array_combine($keys, $filter);
 
-        //capture output content
-        ob_start();
         $this->client->request(
             'GET',
             $this->getUrl(
                 'oro_datagrid_export_action',
                 array_merge(
-                    array('gridName' => Segment::GRID_PREFIX . $id, "format" => 'csv'),
+                    ['gridName' => Segment::GRID_PREFIX . $id, 'format' => 'csv'],
                     $filter
                 )
             ),
@@ -174,24 +169,30 @@ class ControllersTest extends WebTestCase
             $this->generateNoHashNavigationHeader()
         );
 
-        $content = ob_get_contents();
-        // Clean the output buffer and end it
-        ob_end_clean();
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertCount(1, $response);
+        $this->assertTrue($response['successful']);
 
-        $result = $this->client->getResponse();
-        $this->assertResponseStatusCodeEquals($result, 200);
-        $this->assertResponseContentTypeEquals($result, 'text/csv; charset=UTF-8');
-
-        //file to array
-        $content = str_getcsv($content, "\n", '"', '"');
-        //remove headers
-        unset($content[0]);
-        $content = array_values($content);
-        //row to array
-        foreach ($content as &$row) {
-            $row = str_getcsv($row, ',', '"', '"');
-        }
-        $this->verifyReport($segmentExport, $content, count($content));
+        $this->assertMessageSent(
+            Topics::EXPORT,
+            [
+                'format' => 'csv',
+                'batchSize' => 200,
+                'parameters' => [
+                    'gridName' => 'oro_segment_grid_3',
+                    'gridParameters' => [
+                        '_filter' => [
+                            'c1' => [
+                                'value' => '321admin123',
+                                'type' => '1'
+                            ],
+                        ],
+                    ],
+                    'format_type' => 'excel'
+                ],
+                'userId' => 1
+            ]
+        );
     }
 
     /**

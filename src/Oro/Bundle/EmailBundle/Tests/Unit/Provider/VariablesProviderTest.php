@@ -16,7 +16,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSystemVariableDefinitions()
     {
-        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
         $provider1->expects($this->once())
             ->method('getVariableDefinitions')
             ->will(
@@ -28,7 +28,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
         $provider2->expects($this->once())
             ->method('getVariableDefinitions')
             ->will(
@@ -55,7 +55,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'TestEntity';
 
-        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider1->expects($this->once())
             ->method('getVariableDefinitions')
             ->with($entityClass)
@@ -68,7 +68,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider2->expects($this->once())
             ->method('getVariableDefinitions')
             ->with($entityClass)
@@ -97,7 +97,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity1Class = 'TestEntity1';
         $entity2Class = 'TestEntity2';
 
-        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider1->expects($this->once())
             ->method('getVariableDefinitions')
             ->with(null)
@@ -112,7 +112,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider2->expects($this->once())
             ->method('getVariableDefinitions')
             ->with(null)
@@ -122,7 +122,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider3 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider3 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider3->expects($this->once())
             ->method('getVariableDefinitions')
             ->with(null)
@@ -154,7 +154,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSystemVariableValues()
     {
-        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
         $provider1->expects($this->once())
             ->method('getVariableValues')
             ->will(
@@ -163,7 +163,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Provider\SystemVariablesProviderInterface');
         $provider2->expects($this->once())
             ->method('getVariableValues')
             ->will(
@@ -189,7 +189,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'TestEntity';
 
-        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider1->expects($this->once())
             ->method('getVariableGetters')
             ->with($entityClass)
@@ -199,7 +199,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider2->expects($this->once())
             ->method('getVariableGetters')
             ->with($entityClass)
@@ -227,7 +227,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity1Class = 'TestEntity1';
         $entity2Class = 'TestEntity2';
 
-        $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider1 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider1->expects($this->once())
             ->method('getVariableGetters')
             ->with(null)
@@ -237,7 +237,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider2 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider2->expects($this->once())
             ->method('getVariableGetters')
             ->with(null)
@@ -247,7 +247,7 @@ class VariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $provider3 = $this->getMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
+        $provider3 = $this->createMock('Oro\Bundle\EmailBundle\Provider\EntityVariablesProviderInterface');
         $provider3->expects($this->once())
             ->method('getVariableGetters')
             ->with(null)

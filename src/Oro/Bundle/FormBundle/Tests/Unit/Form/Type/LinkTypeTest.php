@@ -28,7 +28,7 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
 
         $resolver
             ->expects($this->once())
@@ -64,7 +64,7 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testFinishView(array $options, array $expected)
     {
-        $formView = $this->getMock('Symfony\Component\Form\FormView');
+        $formView = $this->createMock('Symfony\Component\Form\FormView');
         $form     = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();

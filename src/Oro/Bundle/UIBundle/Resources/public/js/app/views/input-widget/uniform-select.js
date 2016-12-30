@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var UniformSelectInputWidget;
+    var $ = require('jquery');
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     require('jquery.uniform');
 
@@ -17,10 +18,12 @@ define(function(require) {
          */
         initializeWidget: function() {
             //support for readonly attr
-            if (this.$el.is('[readonly]')) {
-                this.$el.on('click mousedown', function(e) {
+            this.$el.on('click mousedown', function(e) {
+                if ($(e.currentTarget).is('[readonly],[disabled]')) {
                     return false;
-                });
+                }
+            });
+            if (this.$el.is('[readonly]')) {
                 this.$el.find('option:not(:selected), [value=""]').remove();
             }
 

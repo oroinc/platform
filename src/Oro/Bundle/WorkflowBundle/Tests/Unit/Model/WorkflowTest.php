@@ -12,11 +12,11 @@ use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
@@ -25,6 +25,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class WorkflowTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,7 +62,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function propertiesDataProvider()
     {
         return array(
-            'definition' => array('definition', $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'))
+            'definition' => array(
+                'definition',
+                $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            )
         );
     }
 
@@ -187,7 +191,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $workflow->getStepManager()->setSteps(array($step));
 
         if ($expectedResult instanceof \Exception) {
-            $this->setExpectedException(get_class($expectedResult), $expectedResult->getMessage());
+            $this->expectException(get_class($expectedResult));
+            $this->expectExceptionMessage($expectedResult->getMessage());
         }
 
         $actualResult = $workflow->isTransitionAllowed($workflowItem, 'test_transition', $errors, $fireExceptions);
@@ -950,6 +955,38 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetInitDatagrids()
+    {
+        $workflow = $this->createWorkflow();
+        $data = ['datagrid1' => ['trans1']];
+        $workflow->getDefinition()->setConfiguration([
+            WorkflowConfiguration::NODE_INIT_DATAGRIDS => $data,
+        ]);
+        $this->assertEquals($data, $workflow->getInitDatagrids());
+    }
+
+    public function testGetWorkflowItemByEntityId()
+    {
+        $workflow = $this->createWorkflow('test_workflow');
+        $definition = $workflow->getDefinition();
+        $definition->setRelatedEntity('entity');
+        $entity = new \stdClass();
+
+        $repository = $this->getMockBuilder(WorkflowItemRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('findOneByEntityMetadata')
+            ->with('entity', 10, 'test_workflow')
+            ->willReturn($entity);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->willReturn($repository);
+
+        $this->assertSame($entity, $workflow->getWorkflowItemByEntityId(10));
+    }
+
     /**
      * @param object $entity
      * @param string $workflowName
@@ -963,8 +1000,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $repository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['workflowName' => $workflowName, 'entityId' => $entityId, 'entityClass' => $entityClass])
+            ->method('findOneByEntityMetadata')
+            ->with($entityClass, $entityId, $workflowName)
             ->willReturn(null);
 
         $this->doctrineHelper->expects($this->once())

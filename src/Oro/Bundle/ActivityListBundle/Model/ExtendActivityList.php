@@ -54,26 +54,14 @@ class ExtendActivityList
     }
 
     /**
-     * Gets entities of the given type associated with this entity
+     * Gets entities associated with this entity
      *
      * The real implementation of this method is auto generated.
      *
-     * @param string $targetClass The class name of the target entity
+     * @param string|null $targetClass The class name of the target entity
      * @return object[]
      */
-    public function getActivityListTargets($targetClass)
-    {
-        return [];
-    }
-
-    /**
-     * Returns array with all associated entities
-     *
-     * The real implementation of this method is auto generated.
-     *
-     * @return array
-     */
-    public function getActivityListTargetEntities()
+    public function getActivityListTargets($targetClass = null)
     {
         return [];
     }

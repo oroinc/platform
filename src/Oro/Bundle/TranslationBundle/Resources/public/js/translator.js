@@ -28,10 +28,18 @@ function(_, Translator, module) {
      * but before checks if the id was registered in dictionary
      *
      * @param {string} id
+     * @param {Object} placeholders
+     * @param {Number} number
      * @returns {string}
      */
-    Translator.get = function(id) {
-        var string = get.apply(Translator, arguments);
+    Translator.get = function(id, placeholders, number) {
+        // The Translator lib deletes all properties from placeholders Object
+        // We should clone it to prevent loosing placeholders data from Object given by reference
+        if (typeof placeholders !== 'undefined') {
+            placeholders = _.clone(placeholders);
+        }
+        var string = get.call(Translator, id, placeholders, number);
+
         var hasTranslation = checkTranslation(id);
 
         if (!config.debugTranslator) {

@@ -30,3 +30,77 @@ entity_config:
                         sortable:           true
                         filterable:         true
                         show_filter:        true
+    attribute:
+        entity:
+            items:
+                has_attributes:
+                    options:
+                        require_schema_update: false
+                        value_type: boolean
+                        default_value: false
+        field:
+            items:
+                is_attribute:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                        indexed: true
+                    grid:
+                        type: boolean
+                        label: oro.entity_config.entity_config.attribute.field.items.is_attribute
+                        renderable: false
+                        is_visible: false
+                        visible: false
+                is_system:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                        indexed: true
+                searchable:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                    form:
+                        type: choice
+                        options:
+                            choices: ['No', 'Yes']
+                            empty_value: false
+                            block: other
+                            subblock: frontend
+                            label: oro.entity_config.entity_config.attribute.field.items.searchable
+                filterable:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                    form:
+                        type: choice
+                        options:
+                            choices: ['No', 'Yes']
+                            empty_value: false
+                            block: other
+                            subblock: frontend
+                            label: oro.entity_config.entity_config.attribute.field.items.filterable
+                sortable:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                    form:
+                        type: choice
+                        options:
+                            choices: ['No', 'Yes']
+                            empty_value: false
+                            block: other
+                            subblock: frontend
+                            label: oro.entity_config.entity_config.attribute.field.items.sortable
+                enabled:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                    form:
+                        type: choice
+                        options:
+                            choices: ['No', 'Yes']
+                            empty_value: false
+                            block: other
+                            subblock: frontend
+                            label: oro.entity_config.entity_config.attribute.field.items.enabled

@@ -48,8 +48,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $menu = $this->getMock('Knp\Menu\ItemInterface');
-        $item = $this->getMock('Knp\Menu\ItemInterface');
+        $menu = $this->createMock('Knp\Menu\ItemInterface');
+        $item = $this->createMock('Knp\Menu\ItemInterface');
 
         $event->expects($this->exactly(2))->method('getMenu')->will($this->returnValue($menu));
 
@@ -118,12 +118,12 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $menu = $this->getMock('Knp\Menu\ItemInterface');
-        $item = $this->getMock('Knp\Menu\ItemInterface');
-        $child = $this->getMock('Knp\Menu\ItemInterface');
+        $menu = $this->createMock('Knp\Menu\ItemInterface');
+        $item = $this->createMock('Knp\Menu\ItemInterface');
+        $child = $this->createMock('Knp\Menu\ItemInterface');
         $child->expects($this->atLeastOnce())->method('setAttribute')->with('data-menu')->will($this->returnSelf());
 
-        $divider = $this->getMock('Knp\Menu\ItemInterface');
+        $divider = $this->createMock('Knp\Menu\ItemInterface');
         $divider->expects($this->once())->method('setLabel')->with('')->will($this->returnSelf());
         $divider->expects($this->once())->method('setAttribute')->with('class', 'menu-divider')
             ->will($this->returnSelf());

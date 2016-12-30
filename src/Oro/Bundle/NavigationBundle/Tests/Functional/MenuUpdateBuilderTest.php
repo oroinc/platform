@@ -116,12 +116,12 @@ class MenuUpdateBuilderTest extends WebTestCase
         $repo = $this->getMockBuilder(MenuUpdateRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $manager = $this->getMock(ObjectManager::class);
+        $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->any())
             ->method('getRepository')
             ->with(MenuUpdate::class)
             ->willReturn($repo);
-        $doctrine = $this->getMock(ManagerRegistry::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->with(MenuUpdate::class)

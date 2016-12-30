@@ -27,7 +27,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         parent::setUp();
 
         /** @var TranslatorInterface $translator */
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator->expects($this->any())
             ->method('trans')
             ->with('oro.locale.fallback.type.parent_localization')
@@ -128,7 +128,7 @@ class FallbackPropertyTypeTest extends FormIntegrationTestCase
         $parentCode = 'en';
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|FormInterface $form */
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $formView = new FormView();
         $this->formType->finishView($formView, $form, [

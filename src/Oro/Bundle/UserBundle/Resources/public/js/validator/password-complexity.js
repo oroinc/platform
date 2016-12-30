@@ -27,6 +27,11 @@ define([
         function(value, element, param) {
             var messages = [];
 
+            // if the password field is not required and value is empty, skip validation
+            if (!element.required && value.length === 0) {
+                return true;
+            }
+
             if (value.length < param.requireMinLength) {
                 messages.push(param.requireMinLengthKey);
             }

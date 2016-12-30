@@ -36,7 +36,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
-        $this->updateDecider = $this->getMock(TransitionTriggersUpdateDecider::class);
+        $this->updateDecider = $this->createMock(TransitionTriggersUpdateDecider::class);
         $this->cronScheduler = $this->getMockBuilder(TransitionTriggerCronScheduler::class)
             ->disableOriginalConstructor()
             ->getMock();

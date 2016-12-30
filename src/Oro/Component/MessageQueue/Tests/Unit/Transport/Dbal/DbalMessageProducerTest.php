@@ -20,8 +20,8 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowIfBodyOfInvalidType()
     {
-        $this->setExpectedException(
-            InvalidMessageException::class,
+        $this->expectException(InvalidMessageException::class);
+        $this->expectExceptionMessage(
             'The message body must be a scalar or null. Got: stdClass'
         );
 
@@ -35,8 +35,8 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowIfDestinationOfInvalidType()
     {
-        $this->setExpectedException(
-            InvalidDestinationException::class,
+        $this->expectException(InvalidDestinationException::class);
+        $this->expectExceptionMessage(
             'The destination must be an instance of '.
             'Oro\Component\MessageQueue\Transport\Dbal\DbalDestination but it is '.
             'Oro\Component\MessageQueue\Transport\Null\NullQueue.'
@@ -66,8 +66,8 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
         $destination = new DbalDestination('queue-name');
         $message = new DbalMessage();
 
-        $this->setExpectedException(
-            Exception::class,
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage(
             'The transport fails to send the message due to some internal error.'
         );
 
@@ -120,7 +120,7 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
      */
     private function createConnectionMock()
     {
-        return $this->getMock(DbalConnection::class, [], [], '', false);
+        return $this->createMock(DbalConnection::class);
     }
 
     /**
@@ -128,6 +128,6 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
      */
     private function createDBALConnectionMock()
     {
-        return $this->getMock(Connection::class, [], [], '', false);
+        return $this->createMock(Connection::class);
     }
 }

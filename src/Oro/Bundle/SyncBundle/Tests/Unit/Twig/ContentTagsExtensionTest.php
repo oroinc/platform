@@ -19,7 +19,7 @@ class ContentTagsExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->service   = $this->getMock('Oro\Bundle\SyncBundle\Content\TagGeneratorChain');
+        $this->service   = $this->createMock('Oro\Bundle\SyncBundle\Content\TagGeneratorChain');
         $this->extension = new ContentTagsExtension($this->service);
     }
 

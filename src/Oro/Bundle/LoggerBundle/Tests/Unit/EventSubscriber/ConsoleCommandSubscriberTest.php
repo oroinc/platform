@@ -24,7 +24,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->logger = $this->getMock(Logger::class, [], [], '', false);
+        $this->logger = $this->createMock(Logger::class);
 
         $this->subscriber = new ConsoleCommandSubscriber($this->logger);
     }
@@ -43,7 +43,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testOnConsoleCommandNotRun()
     {
         /** @var ConsoleCommandEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->getMock(ConsoleCommandEvent::class, [], [], '', false);
+        $event = $this->createMock(ConsoleCommandEvent::class);
         $event->expects($this->once())
             ->method('commandShouldRun')
             ->will($this->returnValue(false));
@@ -69,7 +69,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
         $input = new InputStub('test:command', $arguments, $options);
 
         /** @var ConsoleCommandEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->getMock(ConsoleCommandEvent::class, [], [], '', false);
+        $event = $this->createMock(ConsoleCommandEvent::class);
         $event->expects($this->once())
             ->method('commandShouldRun')
             ->will($this->returnValue(true));
@@ -107,7 +107,7 @@ class ConsoleCommandSubscriberTest extends \PHPUnit_Framework_TestCase
         $input = new InputStub('test:command', $arguments, $options);
 
         /** @var ConsoleExceptionEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->getMock(ConsoleExceptionEvent::class, [], [], '', false);
+        $event = $this->createMock(ConsoleExceptionEvent::class);
 
         $event->expects($this->once())
             ->method('getInput')

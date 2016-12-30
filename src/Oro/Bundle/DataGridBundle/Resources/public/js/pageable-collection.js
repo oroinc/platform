@@ -1012,6 +1012,9 @@ define([
 
             // getPage has inconsistent return value: collection or promise,
             // so we have to check it's a promise
+
+            result = result || {};
+
             if (_.isFunction(result.fail)) {
                 result.fail(_.bind(function() {
                     // revert state if page change fail

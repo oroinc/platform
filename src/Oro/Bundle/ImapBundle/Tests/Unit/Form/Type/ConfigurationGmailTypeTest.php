@@ -34,7 +34,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
             ->setMethods(['getOrganization'])
             ->getMock();
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
         $user->expects($this->any())
             ->method('getOrganization')
@@ -141,6 +141,8 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
      */
     public function setDataProvider()
     {
+        $tokenDateTime = new \DateTime();
+
         return [
             'should bind correct data' => [
                 [
@@ -151,7 +153,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => new \DateTime(),
+                    'accessTokenExpiresAt' => $tokenDateTime,
                     'accessToken' => '1',
                     'refreshToken' => '111'
                 ],
@@ -163,7 +165,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => new \DateTime(),
+                    'accessTokenExpiresAt' => $tokenDateTime,
                     'accessToken' => '1',
                     'refreshToken' => '111'
                 ],
@@ -175,7 +177,7 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
                     'smtpHost' => 'smtp.gmail.com',
                     'smtpPort' => '993',
                     'smtpEncryption' => 'ssl',
-                    'accessTokenExpiresAt' => new \DateTime(),
+                    'accessTokenExpiresAt' => $tokenDateTime,
                     'accessToken' => '1',
                     'refreshToken' => '111'
                 ],

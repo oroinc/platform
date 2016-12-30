@@ -148,8 +148,8 @@ class CalculateRootJobStatusServiceTest extends \PHPUnit_Framework_TestCase
 
         $case = new CalculateRootJobStatusService($storage);
 
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'Got unsupported job status: id: "12345" status: "invalid-status"'
         );
 
@@ -355,6 +355,6 @@ class CalculateRootJobStatusServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobStorageMock()
     {
-        return $this->getMock(JobStorage::class, [], [], '', false);
+        return $this->createMock(JobStorage::class);
     }
 }

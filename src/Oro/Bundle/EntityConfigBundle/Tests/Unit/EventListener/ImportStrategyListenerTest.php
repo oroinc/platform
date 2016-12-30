@@ -24,7 +24,7 @@ class ImportStrategyListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->strategyHelper = $this->getMockBuilder(ImportStrategyHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -34,10 +34,10 @@ class ImportStrategyListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnProcessAfter()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|StrategyInterface $strategy */
-        $strategy = $this->getMock(StrategyInterface::class);
+        $strategy = $this->createMock(StrategyInterface::class);
         $entity = new FieldConfigModel();
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContextInterface $context */
-        $context = $this->getMock(ContextInterface::class);
+        $context = $this->createMock(ContextInterface::class);
         $event = new StrategyEvent($strategy, $entity, $context);
 
         $entity->fromArray('attribute', ['is_attribute' => false]);

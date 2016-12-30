@@ -13,7 +13,7 @@ class ActionButtonLabelProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testProvider($obj, $expectedLabel, $expectedWidgetTitle)
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $provider   = new ActionButtonLabelProvider(
             $translator,
             [

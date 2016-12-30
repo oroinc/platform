@@ -106,10 +106,10 @@ class ImportProcessorTest extends \PHPUnit_Framework_TestCase
         $entityName = 'TestEntity';
 
         $dataConverter
-            = $this->getMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter');
+            = $this->createMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter');
         $dataConverter->expects($this->once())->method('setEntityName')->with($entityName);
 
-        $strategy = $this->getMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\EntityNameAwareStrategy');
+        $strategy = $this->createMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\EntityNameAwareStrategy');
         $strategy->expects($this->once())->method('setEntityName')->with($entityName);
 
         $this->processor->setDataConverter($dataConverter);

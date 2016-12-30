@@ -35,9 +35,9 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->publisher       = $this->getMock('Oro\Bundle\SyncBundle\Wamp\TopicPublisher');
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->logger          = $this->getMock('Psr\Log\LoggerInterface');
+        $this->publisher       = $this->createMock('Oro\Bundle\SyncBundle\Wamp\TopicPublisher');
+        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->logger          = $this->createMock('Psr\Log\LoggerInterface');
         $this->generator       = new TagGeneratorChain();
         $container             = new Container();
         $container->set('generator', $this->generator);
@@ -66,7 +66,7 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMockForAbstractClass('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->any())->method('getUserName')->will($this->returnValue(self::TEST_USERNAME));
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())->method('getUser')->will($this->returnValue($user));
 
         $this->securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));

@@ -22,7 +22,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $processorFactory = $this->getMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
+        $processorFactory = $this->createMock('Oro\Component\ChainProcessor\ProcessorFactoryInterface');
         $processorBag     = new ProcessorBag($processorFactory);
 
         $entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
@@ -456,7 +456,8 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeInvalidValue($expectedExceptionMessage, $value, $dataType, $requestType)
     {
-        $this->setExpectedException('\UnexpectedValueException', $expectedExceptionMessage);
+        $this->expectException('\UnexpectedValueException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true);
     }
 

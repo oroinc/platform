@@ -54,6 +54,13 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -20 }
 
+    oro_api.get.handle_meta_property_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
+        arguments:
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: -20 }
+
     oro_api.get.json_api.add_include_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter
         tags:
@@ -65,6 +72,11 @@ services:
             - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -200 }
+
+    oro_api.get.add_meta_property_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\AddMetaPropertyFilter
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, priority: -200 }
 
     #
     # normalize_input
@@ -159,6 +171,14 @@ services:
     #
     # finalize
     #
+
+    oro_api.get.load_title_meta_property:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForSingleItem
+        arguments:
+            - '@oro_api.entity_title_provider'
+            - '@oro_api.expanded_association_extractor'
+        tags:
+            - { name: oro.api.processor, action: get, group: finalize, priority: -10 }
 
     oro_api.get.validate_result:
         class: Oro\Bundle\ApiBundle\Processor\Get\ValidateResult

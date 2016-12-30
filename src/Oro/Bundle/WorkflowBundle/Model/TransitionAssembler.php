@@ -135,6 +135,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setDialogTemplate($this->getOption($options, 'dialog_template'))
             ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
             ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+            ->setInitDatagrids($this->getOption($options, WorkflowConfiguration::NODE_INIT_DATAGRIDS, []))
             ->setInitContextAttribute($this->getOption($options, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE));
 
         if (!empty($definition['preactions'])) {
@@ -181,7 +182,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $aclResource = $this->getOption($options, 'acl_resource');
 
         if ($aclResource) {
-            $aclPreConditionDefinition = ['parameters' => [$aclResource]];
+            $aclPreConditionDefinition = ['parameters' => $aclResource];
             $aclMessage = $this->getOption($options, 'acl_message');
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;

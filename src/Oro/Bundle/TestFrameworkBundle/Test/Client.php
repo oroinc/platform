@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\DBAL\Driver\PDOConnection;
 
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,6 +72,10 @@ class Client extends BaseClient
         if ($this->isHashNavigationRequest($uri, $parameters, $server)) {
             $server[$hashNavigationHeader] = 1;
         }
+
+        // set the session cookie
+        $sessionOptions = $this->kernel->getContainer()->getParameter('session.storage.options');
+        $this->getCookieJar()->set(new Cookie($sessionOptions['name'], 'test'));
 
         parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 

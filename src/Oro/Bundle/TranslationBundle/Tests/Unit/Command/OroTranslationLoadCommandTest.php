@@ -63,7 +63,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->translationLoader = new EmptyArrayLoader();
 
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
@@ -73,7 +73,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 ['oro_translation.database_translation.loader', 1, $this->translationLoader],
             ]));
 
-        $this->input = $this->getMock(InputInterface::class);
+        $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
 
         $this->command = new OroTranslationLoadCommand();

@@ -30,13 +30,13 @@ class TranslationHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $manager = $this->getMock(ObjectManager::class);
+        $manager = $this->createMock(ObjectManager::class);
         $manager->expects($this->any())
             ->method('getRepository')
             ->with(Translation::class)
             ->willReturn($this->repository);
 
-        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with(Translation::class)

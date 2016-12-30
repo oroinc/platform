@@ -16,7 +16,7 @@ class EmailThreadTest extends \PHPUnit_Framework_TestCase
 {
     public function testEmailsGetterAndSetter()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
 
         $entity = new EmailThread();
         $entity->addEmail($email);
@@ -32,7 +32,7 @@ class EmailThreadTest extends \PHPUnit_Framework_TestCase
         $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $this->assertEquals(Email::NORMAL_IMPORTANCE, $entity->getImportance());
-        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
+        $this->assertGreaterThanOrEqual($entity->getCreated(), $createdAt);
     }
 
     /**

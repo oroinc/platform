@@ -28,7 +28,7 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->resolver       = $this->getMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $this->resolver       = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();

@@ -29,7 +29,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
 
     public function testFromEmailAddressGetterAndSetter()
     {
-        $emailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $emailAddress = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
 
         $entity = new Email();
         $entity->setFromEmailAddress($emailAddress);
@@ -39,17 +39,17 @@ class EmailTest extends \PHPUnit_Framework_TestCase
 
     public function testRecipientGetterAndSetter()
     {
-        $toRecipient = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $toRecipient = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
         $toRecipient->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('to'));
 
-        $ccRecipient = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $ccRecipient = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
         $ccRecipient->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('cc'));
 
-        $bccRecipient = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
+        $bccRecipient = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailRecipient');
         $bccRecipient->expects($this->any())
             ->method('getType')
             ->will($this->returnValue('bcc'));
@@ -86,7 +86,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
 
     public function testEmailBodyGetterAndSetter()
     {
-        $emailBody = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $emailBody = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
 
         $entity = new Email();
         $entity->setEmailBody($emailBody);
@@ -102,7 +102,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $this->assertEquals(Email::NORMAL_IMPORTANCE, $entity->getImportance());
-        $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
+        $this->assertGreaterThanOrEqual($entity->getCreated(), $createdAt);
     }
 
     public function testIsHeadGetterAndSetter()

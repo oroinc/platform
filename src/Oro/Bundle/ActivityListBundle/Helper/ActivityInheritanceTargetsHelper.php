@@ -92,6 +92,20 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
+     * @param  string $entityClass
+     * @return array
+     */
+    public function getInheritanceTargets($entityClass)
+    {
+        $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
+        if ($this->hasValueInInheritanceTargets($configValues)) {
+            return $configValues['inheritance_targets'];
+        }
+
+        return [];
+    }
+
+    /**
      * @param string   $target
      * @param string[] $path
      * @param string   $entityIdExpr

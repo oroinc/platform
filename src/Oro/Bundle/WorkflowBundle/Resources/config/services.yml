@@ -332,13 +332,21 @@ services:
         tags:
             - { name: oro_translation.extension.translation_context_resolver }
 
+    oro_workflow.extension.start_transition_button_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension'
+        arguments:
+            - '@oro_workflow.registry'
+            - '@oro_workflow.provider.start_transition_route'
+        tags:
+           - { name: oro.action.extension.button_provider, priority: 110 }
+
     oro_workflow.extension.transition_button_provider:
         class: 'Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension'
         arguments:
             - '@oro_workflow.registry'
-            - '@oro_workflow.provider.route'
+            - '@oro_workflow.provider.transition_route'
         tags:
-           - { name: oro.action.extension.button_provider, priority: 110 }
+           - { name: oro.action.extension.button_provider, priority: 120 }
 
     oro_workflow.translation.key_template_parameters_resolver:
         class: 'Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver'
@@ -380,12 +388,19 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
-    oro_workflow.provider.route:
+    oro_workflow.provider.start_transition_route:
         class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
         arguments:
             - 'oro_workflow_widget_start_transition_form'
             - 'oro_workflow_start_transition_form'
             - 'oro_api_workflow_start'
+
+    oro_workflow.provider.transition_route:
+        class: 'Oro\Bundle\ActionBundle\Provider\RouteProvider'
+        arguments:
+            - 'oro_workflow_widget_transition_form'
+            - 'oro_workflow_transition_form'
+            - 'oro_api_workflow_transit'
 
     oro_workflow.operation_registry.filter:
         class: Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter

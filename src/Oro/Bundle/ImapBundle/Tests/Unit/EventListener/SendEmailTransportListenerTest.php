@@ -63,7 +63,7 @@ class SendEmailTransportListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getEncoderMock($password)
     {
-        $encoder = $this->getMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
+        $encoder = $this->createMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
         $encoder->expects($this->once())
             ->method('decryptData')
             ->willReturn($password);

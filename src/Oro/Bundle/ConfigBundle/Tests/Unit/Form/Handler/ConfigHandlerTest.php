@@ -33,8 +33,8 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $this->request = $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $this->request = $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
 
         $this->handler = new ConfigHandler($this->configManager);
     }
@@ -71,7 +71,7 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('save');
 
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $this->form->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig);
@@ -114,7 +114,7 @@ class ConfigHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($changeSet);
 
         $isAdditionalHandlerCalled = false;
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $this->form->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig);

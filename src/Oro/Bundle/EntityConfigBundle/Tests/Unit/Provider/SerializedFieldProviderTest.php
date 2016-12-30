@@ -198,4 +198,21 @@ class SerializedFieldProviderTest extends \PHPUnit_Framework_TestCase
         
         $this->assertTrue($isSerialized);
     }
+
+    /**
+     * @return array
+     */
+    public function allowEmptyDataProvider()
+    {
+        return [
+            'empty allowed' => [
+                'allowEmpty' => true,
+                'isSerialized' => true
+            ],
+            'empty not allowed' => [
+                'allowEmpty' => false,
+                'isSerialized' => false
+            ]
+        ];
+    }
 }

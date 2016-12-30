@@ -155,7 +155,7 @@ class LocalizationControllerTest extends WebTestCase
                 [
                     'operationName' => 'DELETE',
                     'entityId' => $id,
-                    'entityClass' => $this->getContainer()->getParameter('oro_locale.entity.localization.class')
+                    'entityClass' => 'Oro\Bundle\LocaleBundle\Entity\Localization'
                 ]
             ),
             [],
@@ -195,18 +195,12 @@ class LocalizationControllerTest extends WebTestCase
     }
 
     /**
-     * @param string|null $name
+     * @param string $name
      * @return Localization
      */
-    private function getLocalization($name = null)
+    private function getLocalization($name)
     {
-        $localization = $this->getRepository()->findOneBy($name ? ['name' => $name] : []);
-
-        if (!$localization) {
-            throw new \LogicException('At least one localization must be defined');
-        }
-
-        return $localization;
+        return $this->getRepository()->findOneBy(['name' => $name]);
     }
 
     /**

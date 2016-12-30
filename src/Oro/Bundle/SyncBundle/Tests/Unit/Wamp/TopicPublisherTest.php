@@ -16,7 +16,7 @@ class TopicPublisherTest extends \PHPUnit_Framework_TestCase
     protected $socket;
     protected function setUp()
     {
-        $this->socket = $this->getMock('WebSocket', array('sendData'), array(), '', false);
+        $this->socket = $this->createMock('Oro\Bundle\SyncBundle\Wamp\WebSocket');
 
         $this->wamp = new TopicPublisher();
         /** @var  \ReflectionClass $reflection */

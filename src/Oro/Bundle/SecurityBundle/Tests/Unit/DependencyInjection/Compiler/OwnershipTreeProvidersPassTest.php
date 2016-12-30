@@ -21,7 +21,7 @@ class OwnershipTreeProvidersPassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->containerBuilder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->containerBuilder = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $this->compilerPass = new OwnershipTreeProvidersPass();
     }
 
@@ -46,7 +46,7 @@ class OwnershipTreeProvidersPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
 
         $definition->expects($this->at(0))
             ->method('addMethodCall')
@@ -78,7 +78,7 @@ class OwnershipTreeProvidersPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessNoTagged()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
 
         $definition->expects($this->never())
             ->method('addMethodCall');

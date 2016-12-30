@@ -75,7 +75,7 @@ class GridViewManagerTest extends \PHPUnit_Framework_TestCase
         $systemView = new View('view1');
         $systemView->setDefault(true);
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $viewList = new ViewListStub($translator);
         
         $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')

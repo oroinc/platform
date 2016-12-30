@@ -80,9 +80,9 @@ class MigrationExecutor
     public function setExtensionManager(MigrationExtensionManager $extensionManager)
     {
         $this->extensionManager = $extensionManager;
-        $this->extensionManager->setDatabasePlatform(
-            $this->queryExecutor->getConnection()->getDatabasePlatform()
-        );
+        $connection = $this->queryExecutor->getConnection();
+        $this->extensionManager->setConnection($connection);
+        $this->extensionManager->setDatabasePlatform($connection->getDatabasePlatform());
     }
 
     /**

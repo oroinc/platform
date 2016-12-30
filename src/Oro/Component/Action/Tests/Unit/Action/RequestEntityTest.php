@@ -69,10 +69,8 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $options, $expectedMessage)
     {
-        $this->setExpectedException(
-            '\Oro\Component\Action\Exception\InvalidParameterException',
-            $expectedMessage
-        );
+        $this->expectException('\Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectExceptionMessage($expectedMessage);
 
         $this->action->initialize($options);
     }

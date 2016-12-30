@@ -270,10 +270,8 @@ class ConfigurationMergerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeConfigurationException(array $rawConfig, $expectedMessage)
     {
-        $this->setExpectedException(
-            'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
-            $expectedMessage
-        );
+        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectExceptionMessage($expectedMessage);
 
         $this->merger->mergeConfiguration($rawConfig);
     }

@@ -25,13 +25,15 @@ define([
                 var $dataAuditCondition = $criteria.find('[data-criteria=condition-data-audit]');
                 if (!_.isEmpty($dataAuditCondition)) {
                     this.on('auditFieldsLoaded', function(className, data) {
-                        $dataAuditCondition.toggleClass('disabled', !data[className]);
+                        $dataAuditCondition.toggle(className in data);
                     });
                     $.extend(true, $dataAuditCondition.data('options'), {
                         fieldChoice: this.options.fieldChoiceOptions,
                         filters: this.options.auditFilters,
                         hierarchy: this.options.metadata.hierarchy
                     });
+                    var fieldsData = this.$auditFieldsLoader.fieldsLoader('getFieldsData');
+                    $dataAuditCondition.toggle(this.$entityChoice.val() in fieldsData);
                 }
 
                 originalConfigureFilters.apply(this, arguments);
@@ -47,9 +49,15 @@ define([
             var originalInitEntityChangeEvents = segment.initEntityChangeEvents;
             segment.initEntityChangeEvents = function() {
                 this.trigger(
-                this.options.auditFieldsLoader.loadEvent,
-                this.$auditFieldsLoader.val(),
-                this.$auditFieldsLoader.fieldsLoader('getFieldsData'));
+                    this.options.auditFieldsLoader.loadEvent,
+                    this.$auditFieldsLoader.val(),
+                    this.$auditFieldsLoader.fieldsLoader('getFieldsData')
+                );
+                this.$auditFieldsLoader.on('fieldsloaderupdate', _.bind(function(e, data) {
+                    var entityClassName = this.$entityChoice.val();
+                    var $criteriaList = $(this.options.filters.criteriaList);
+                    $criteriaList.find('[data-criteria=condition-data-audit]').toggle(entityClassName in data);
+                }, this));
 
                 return originalInitEntityChangeEvents.apply(this, arguments);
             };

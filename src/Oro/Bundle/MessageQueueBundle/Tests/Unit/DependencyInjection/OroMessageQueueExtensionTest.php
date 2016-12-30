@@ -35,7 +35,8 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = new OroMessageQueueExtension();
 
-        $this->setExpectedException(\LogicException::class, 'Transport factory name cannot be empty');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Transport factory name cannot be empty');
         $extension->addTransportFactory(new FooTransportFactory(null));
     }
 
@@ -45,7 +46,8 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->addTransportFactory(new FooTransportFactory('foo'));
 
-        $this->setExpectedException(\LogicException::class, 'Transport factory with such name already added. Name foo');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Transport factory with such name already added. Name foo');
         $extension->addTransportFactory(new FooTransportFactory('foo'));
     }
 

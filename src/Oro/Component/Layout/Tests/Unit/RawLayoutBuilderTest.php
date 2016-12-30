@@ -153,7 +153,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
 
     public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
     {
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $this->rawLayoutBuilder->add('root', null, $type);
         $this->assertSame(
             $type,
@@ -190,8 +190,8 @@ class RawLayoutBuilderTest extends LayoutTestCase
      */
     public function testAddWithInvalidBlockTypeName($blockType)
     {
-        $this->setExpectedException(
-            '\Oro\Component\Layout\Exception\LogicException',
+        $this->expectException('\Oro\Component\Layout\Exception\LogicException');
+        $this->expectExceptionMessage(
             sprintf(
                 'Cannot add "root" item to the layout. ParentId: . BlockType: %1$s. SiblingId: . Reason: '
                 . 'The "%1$s" string cannot be used as the name of the block type '
@@ -500,7 +500,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
 
     public function testChangeBlockTypeWithAlreadyCreatedBlockTypeObject()
     {
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
         $this->rawLayoutBuilder->add('root', null, $type);
         $this->assertSame(
             $type,
@@ -555,8 +555,8 @@ class RawLayoutBuilderTest extends LayoutTestCase
      */
     public function testChangeBlockTypeWithInvalidBlockTypeName($blockType)
     {
-        $this->setExpectedException(
-            '\Oro\Component\Layout\Exception\LogicException',
+        $this->expectException('\Oro\Component\Layout\Exception\LogicException');
+        $this->expectExceptionMessage(
             sprintf(
                 'Cannot change block type to "%1$s" for "root" item. Reason: '
                 . 'The "%1$s" string cannot be used as the name of the block type '

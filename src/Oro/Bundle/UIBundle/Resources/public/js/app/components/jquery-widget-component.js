@@ -19,7 +19,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.$el = options._sourceElement;
-            var widgetOptions = _.omit(options, ['_sourceElement', 'widgetModule', 'widgetName']);
+            var widgetOptions = _.omit(options, ['_sourceElement', '_subPromises', 'widgetModule', 'widgetName']);
 
             this._deferredInit();
 

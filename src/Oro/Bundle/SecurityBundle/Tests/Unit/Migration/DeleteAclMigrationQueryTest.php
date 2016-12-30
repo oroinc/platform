@@ -20,7 +20,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container   = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container   = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->oid         = new ObjectIdentity('entity', 'Test\Class');
         $this->aclProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
             ->disableOriginalConstructor()
@@ -63,7 +63,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
             ->method('info')
             ->with(sprintf('Remove ACL for %s.', (string)$this->oid));
@@ -83,7 +83,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
         $query = new DeleteAclMigrationQuery($this->container, $this->oid);
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
         $logger->expects($this->never())
             ->method('info');
         $this->aclProvider->expects($this->never())

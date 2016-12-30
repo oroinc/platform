@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ScopeBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -162,13 +161,7 @@ class ScopeCriteria implements \IteratorAggregate
             }
             $qb->setParameter($paramName, $value);
             if ($withPriority) {
-                // TODO: Make this code platform independent. BB-6090
-                // NULLs are sorted to end on mysql for DESC and to top on PostgreSQL
-                $sortOrder = Criteria::DESC;
-                if ($qb->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform) {
-                    $sortOrder = Criteria::ASC;
-                }
-                $qb->addOrderBy($aliasedField, $sortOrder);
+                $qb->addOrderBy($aliasedField, Criteria::DESC);
             }
         }
 

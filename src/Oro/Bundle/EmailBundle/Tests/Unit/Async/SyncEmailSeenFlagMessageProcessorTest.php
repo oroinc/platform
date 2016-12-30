@@ -254,7 +254,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -262,7 +262,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityManagerMock()
     {
-        return $this->getMock(EntityManager::class, [], [], '', false);
+        return $this->createMock(EntityManager::class);
     }
 
     /**
@@ -270,7 +270,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEmailUserRepositoryMock()
     {
-        return $this->getMock(EmailUserRepository::class, [], [], '', false);
+        return $this->createMock(EmailUserRepository::class);
     }
 
     /**
@@ -278,7 +278,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEmailFlagManagerMock()
     {
-        return $this->getMock(EmailFlagManager::class, [], [], '', false);
+        return $this->createMock(EmailFlagManager::class);
     }
 
     /**
@@ -286,7 +286,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createDoctrineMock()
     {
-        return $this->getMock(Registry::class, [], [], '', false);
+        return $this->createMock(Registry::class);
     }
 
     /**
@@ -294,6 +294,6 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class, [], [], '', false);
+        return $this->createMock(LoggerInterface::class);
     }
 }
