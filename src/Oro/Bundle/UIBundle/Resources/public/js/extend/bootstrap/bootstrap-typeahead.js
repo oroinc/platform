@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
     require('bootstrap');
 
     /**
@@ -20,8 +21,8 @@ define(function(require) {
             this.$menu
                 .insertAfter(this.$element)
                 .css({
-                    top: pos.top + pos.height + this.scrollOffset(this.$element)
-                    , left: pos.left
+                    top: pos.top + pos.height + this.scrollOffset(this.$element),
+                    left: pos.left
                 })
                 .show();
 
@@ -29,8 +30,8 @@ define(function(require) {
             return this;
         },
         scrollOffset: function($el) { // calculates additional offset of all scrolled on parents, except body and html
-            var offset = 0,
-                stopProcess = false;
+            var offset = 0;
+            var stopProcess = false;
 
             $el.parents().each(function(i, el) {
                 if (el !== document.body && el !== document.html && !stopProcess) {
@@ -50,6 +51,8 @@ define(function(require) {
         _.each(opts, function(value, name) {
             _this[name] = value || _this[name];
         });
+
+        this.$holder = $(opts.holder || '');
 
         origTypeahead.apply(this, arguments);
     };
