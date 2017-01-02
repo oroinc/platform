@@ -13,6 +13,7 @@ class TransitionEventTriggerHelper
 {
     const TRIGGER_ENTITY = 'entity';
     const TRIGGER_WORKFLOW_ENTITY = 'mainEntity';
+    const TRIGGER_PREVIOUS_ENTITY = 'prevEntity';
     const TRIGGER_WORKFLOW_DEFINITION = 'wd';
     const TRIGGER_WORKFLOW_ITEM = 'wi';
 
@@ -30,9 +31,11 @@ class TransitionEventTriggerHelper
     /**
      * @param TransitionEventTrigger $trigger
      * @param object $entity
+     * @param object $prevEntity
+     *
      * @return bool
      */
-    public function isRequirePass(TransitionEventTrigger $trigger, $entity)
+    public function isRequirePass(TransitionEventTrigger $trigger, $entity, $prevEntity)
     {
         $require = $trigger->getRequire();
         if (!$require) {
@@ -49,7 +52,7 @@ class TransitionEventTriggerHelper
                     $require
                 ]
             ),
-            $this->getExpressionValues($trigger, $entity)
+            $this->getExpressionValues($trigger, $entity, $prevEntity)
         );
 
         return !empty($result);
@@ -82,21 +85,23 @@ class TransitionEventTriggerHelper
     /**
      * @param TransitionEventTrigger $trigger
      * @param object $entity
+     * @param object $prevEntity
      * @return array
      */
-    private function getExpressionValues(TransitionEventTrigger $trigger, $entity)
+    private function getExpressionValues(TransitionEventTrigger $trigger, $entity, $prevEntity)
     {
         $mainEntity = $this->getMainEntity($trigger, $entity);
         $workflowDefinition = $trigger->getWorkflowDefinition();
 
         $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $workflowDefinition->getName());
 
-        return self::buildContextValues($workflowDefinition, $entity, $mainEntity, $workflowItem);
+        return self::buildContextValues($workflowDefinition, $entity, $prevEntity, $mainEntity, $workflowItem);
     }
 
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @param object $entity
+     * @param object $prevEntity
      * @param object $mainEntity
      * @param WorkflowItem $item
      * @return array
@@ -104,6 +109,7 @@ class TransitionEventTriggerHelper
     public static function buildContextValues(
         WorkflowDefinition $workflowDefinition = null,
         $entity = null,
+        $prevEntity = null,
         $mainEntity = null,
         WorkflowItem $item = null
     ) {
@@ -111,7 +117,8 @@ class TransitionEventTriggerHelper
             self::TRIGGER_WORKFLOW_DEFINITION => $workflowDefinition,
             self::TRIGGER_WORKFLOW_ITEM => $item,
             self::TRIGGER_ENTITY => $entity,
-            self::TRIGGER_WORKFLOW_ENTITY => $mainEntity
+            self::TRIGGER_WORKFLOW_ENTITY => $mainEntity,
+            self::TRIGGER_PREVIOUS_ENTITY => $prevEntity
         ];
     }
 }
