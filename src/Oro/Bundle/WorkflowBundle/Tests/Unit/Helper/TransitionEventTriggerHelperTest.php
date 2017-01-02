@@ -37,11 +37,15 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $require
      * @param bool $expected
+     * @param ob
      */
     public function testIsRequirePass($require, $expected)
     {
         $entity1 = new \stdClass();
         $entity1->testField1 = 'test value 1';
+
+        $prevEntity = new \stdClass();
+        $prevEntity->testField = 'test value 1';
 
         $entity2 = new \stdClass();
         $entity2->testField2 = 'test value 2';
@@ -49,7 +53,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->trigger->setRequire($require)->setRelation('mainEntity');
 
-        $this->assertEquals($expected, $this->helper->isRequirePass($this->trigger, $entity2));
+        $this->assertEquals($expected, $this->helper->isRequirePass($this->trigger, $entity2, $prevEntity));
     }
 
     /**
@@ -64,6 +68,14 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'for entity wrong' => [
                 'require' => 'entity.testField2 == "test value 3"',
+                'expected' => false,
+            ],
+            'for previous entity right' => [
+                'require' => 'prevEntity.testField == "test value 1"',
+                'expected' => true,
+            ],
+            'for previous entity wrong' => [
+                'require' => 'prevEntity.testField == "test value 2"',
                 'expected' => false,
             ],
             'for mainEntity right' => [
@@ -93,7 +105,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->trigger->setRequire('mainEntity.field')->setRelation('mainEntity');
 
-        $this->assertFalse($this->helper->isRequirePass($this->trigger, $entity));
+        $this->assertFalse($this->helper->isRequirePass($this->trigger, $entity, new \stdClass()));
     }
 
     public function testGetMainEntityWrongEntity()
@@ -132,6 +144,7 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
         $definition = new WorkflowDefinition();
         $triggerEntity = new \stdClass();
         $workflowEntity = new \stdClass();
+        $prevEntity = new \stdClass();
 
         return [
             'emptyness' => [
@@ -139,9 +152,11 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
                     TransitionEventTriggerHelper::TRIGGER_WORKFLOW_DEFINITION => null,
                     TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ITEM => null,
                     TransitionEventTriggerHelper::TRIGGER_ENTITY => null,
-                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ENTITY => null
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ENTITY => null,
+                    TransitionEventTriggerHelper::TRIGGER_PREVIOUS_ENTITY => null
                 ],
                 [
+                    null,
                     null,
                     null,
                     null,
@@ -153,10 +168,11 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
                     TransitionEventTriggerHelper::TRIGGER_WORKFLOW_DEFINITION => $definition,
                     TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ITEM => $item,
                     TransitionEventTriggerHelper::TRIGGER_ENTITY => $triggerEntity,
-                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ENTITY => $workflowEntity
+                    TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ENTITY => $workflowEntity,
+                    TransitionEventTriggerHelper::TRIGGER_PREVIOUS_ENTITY => $prevEntity,
                 ],
                 [
-                    $definition, $triggerEntity, $workflowEntity, $item
+                    $definition, $triggerEntity, $workflowEntity, $item, $prevEntity
                 ]
             ]
         ];

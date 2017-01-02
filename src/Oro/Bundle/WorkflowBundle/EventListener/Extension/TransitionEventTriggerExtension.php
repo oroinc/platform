@@ -164,7 +164,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      *
      * @return object
      */
-    private function createEntityFromChangeSet($entity, array $changeSet)
+    private function createEntityFromChangeSet($entity, array $changeSet = null)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $newEntity = clone $entity;

@@ -95,7 +95,7 @@ class TransitionEventTriggerHelper
 
         $workflowItem = $this->workflowManager->getWorkflowItem($mainEntity, $workflowDefinition->getName());
 
-        return self::buildContextValues($workflowDefinition, $entity, $prevEntity, $mainEntity, $workflowItem);
+        return self::buildContextValues($workflowDefinition, $entity, $mainEntity, $workflowItem, $prevEntity);
     }
 
     /**
@@ -109,9 +109,9 @@ class TransitionEventTriggerHelper
     public static function buildContextValues(
         WorkflowDefinition $workflowDefinition = null,
         $entity = null,
-        $prevEntity = null,
         $mainEntity = null,
-        WorkflowItem $item = null
+        WorkflowItem $item = null,
+        $prevEntity = null
     ) {
         return [
             self::TRIGGER_WORKFLOW_DEFINITION => $workflowDefinition,
