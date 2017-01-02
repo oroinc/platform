@@ -10,7 +10,7 @@ class ChainAttributeBlockTypeMapper extends AbstractAttributeBlockTypeMapper
     private $defaultBlockType;
 
     /** @var AttributeBlockTypeMapperInterface[] */
-    private $mappers;
+    private $mappers = [];
 
     /**
      * @param AttributeBlockTypeMapperInterface $mapper

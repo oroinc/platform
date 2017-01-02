@@ -12,6 +12,9 @@ use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class AttributeGroupType extends AbstractContainerType
 {
@@ -82,6 +85,14 @@ class AttributeGroupType extends AbstractContainerType
                 ]
             );
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    {
+        BlockUtils::setViewVarsFromOptions($view, $options, ['group']);
     }
 
     /**

@@ -10,6 +10,9 @@ use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Util\BlockUtils;
 
 class AttributeGroupRestType extends AbstractContainerType
 {
@@ -49,10 +52,22 @@ class AttributeGroupRestType extends AbstractContainerType
                 [
                     'entity' => $entity,
                     'attribute_family' => $attributeFamily,
-                    'group' => $group->getCode()
+                    'group' => $group->getCode(),
+                    'exclude_from_rest' => $options['exclude_from_rest'],
+                    'additional_block_prefixes' => [
+                        'attribute_group_rest_child'
+                    ]
                 ]
             );
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(BlockView $view, BlockInterface $block, Options $options)
+    {
+        BlockUtils::setViewVarsFromOptions($view, $options, ['options']);
     }
 
     /**
@@ -72,12 +87,13 @@ class AttributeGroupRestType extends AbstractContainerType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'attribute_family',
-                'entity'
-            ]
-        );
+        $resolver->setRequired([
+            'attribute_family',
+            'entity',
+        ])->setDefaults([
+            'options' => [],
+            'exclude_from_rest' => false,
+        ]);
     }
 
     /**

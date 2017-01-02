@@ -309,7 +309,7 @@ services:
             - "@oro_entity_config.twig.extension.dynamic_fields_attribute_decorator.inner"
             - "@oro_entity_config.config.attributes_config_helper"
 
-  oro_entity_config.entity_listener.attribute_group:
+    oro_entity_config.entity_listener.attribute_group:
         class: Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener
         public: false
         arguments:
@@ -337,5 +337,12 @@ services:
             - [addBlockType, ['date', 'attribute_date']]
             - [addBlockType, ['datetime', 'attribute_datetime']]
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
-            - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localize_fallback']]
+            - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localized_fallback']]
 
+    oro_entity_config.layout.data_provider.attribute_group_rest:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeGroupRestProvider'
+        arguments:
+            - '@oro_entity_config.attribute_group_rendrer_registry'
+            - '@oro_locale.helper.localization'
+        tags:
+            - { name: layout.data_provider, alias: attribute_group_rest }

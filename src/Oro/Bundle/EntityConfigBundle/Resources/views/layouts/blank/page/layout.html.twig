@@ -1,0 +1,35 @@
+{% block attribute_group_rest_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ block('block_attributes') }}>
+        <div {{ UI.renderPageComponentAttributes({
+            module: 'oroentityconfig/js/attribute-group-tabs-component',
+            options: options.tabsOptions
+        }) }}></div>
+
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block attribute_group_rest_child_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        'data-page-component-module': 'oroentityconfig/js/attribute-group-tab-content-component',
+        'data-page-component-options': {'id': group}|json_encode
+    }) %}
+
+    <div {{ block('block_attributes') }} style="display: none;">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block attribute_group_widget %}
+    {{ block_widget(block) }}
+{% endblock %}
+
+{% block attribute_text_widget %}
+    {{ label }}: {{ value }}
+{% endblock %}
+
+{% block attribute_localized_fallback_widget %}
+    {{ label }}: {{ translated_value }}
+{% endblock %}

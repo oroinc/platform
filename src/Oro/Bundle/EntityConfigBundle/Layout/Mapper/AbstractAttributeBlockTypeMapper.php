@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
-abstract class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
+class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMapperInterface
 {
     /** @var array */
     protected $attributeTypesRegistry = [];
@@ -65,7 +65,12 @@ abstract class AbstractAttributeBlockTypeMapper implements AttributeBlockTypeMap
             $className = $attribute->getEntity()->getClassName();
             $em = $this->registry->getManagerForClass($className);
             $metadata = $em->getClassMetadata($className);
+            $fieldName = $attribute->getFieldName();
             foreach ($metadata->getAssociationNames() as $associationName) {
+                if ($associationName !== $fieldName) {
+                    continue;
+                }
+
                 $targetClass = $metadata->getAssociationTargetClass($associationName);
                 if (array_key_exists($targetClass, $this->targetClassesRegistry)) {
                     return $this->targetClassesRegistry[$targetClass];
