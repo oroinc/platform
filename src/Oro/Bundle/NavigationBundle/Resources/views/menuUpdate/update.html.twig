@@ -164,14 +164,16 @@
                 'onMoveRoute' : 'oro_navigation_menuupdate_move'
             } %}
 
-            {{ UI.renderJsTree(
+            <div class="scrollable-container">
+                {{ UI.renderJsTree(
                 {
                     'module': 'oronavigation/js/app/components/tree-manage-component',
                     'label': 'oro.navigation.menu.menu_list_default.label'|trans,
                     'treeOptions': treeOptions
                 },
                 ['expand', 'collapse']
-            ) }}
+                ) }}
+            </div>
         </div>
     </div>
     <div class="menuitem-data">
