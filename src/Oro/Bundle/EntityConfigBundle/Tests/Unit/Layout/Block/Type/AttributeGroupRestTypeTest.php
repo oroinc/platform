@@ -37,7 +37,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
                 'entity' => ['required' => true],
                 'group' => ['required' => true],
                 'attribute_family' => ['required' => true],
-
+                'exclude_from_rest' => ['default' => false],
             ]
         );
         $layoutFactoryBuilder

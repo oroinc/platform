@@ -47,6 +47,7 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit_Framework_TestCase
 
         $attribute = new FieldConfigModel();
         $attribute->setEntity($entity);
+        $attribute->setFieldName('metadata_attribute');
 
         $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
         $metadata->expects($this->once())

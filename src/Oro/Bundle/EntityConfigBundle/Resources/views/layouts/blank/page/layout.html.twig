@@ -27,9 +27,9 @@
 {% endblock %}
 
 {% block attribute_text_widget %}
-    {{ label }}: {{ value }}
+    {{ value }}
 {% endblock %}
 
 {% block attribute_localized_fallback_widget %}
-    {{ label }}: {{ translated_value }}
+    {{ translated_value|raw }}
 {% endblock %}
