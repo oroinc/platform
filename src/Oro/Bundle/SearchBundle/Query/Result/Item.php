@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Result;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
 use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
-
-use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class Item
 {
@@ -39,23 +34,11 @@ class Item
     protected $entityConfig;
 
     /**
-     * @var ObjectManager
-     * @Exclude
-     */
-    protected $em;
-
-    /**
      * @var string[]
      */
     protected $selectedData = [];
 
     /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
-
-    /**
-     * @param ObjectManager $em
      * @param string|null   $entityName
      * @param string|null   $recordId
      * @param string|null   $recordTitle
@@ -64,7 +47,6 @@ class Item
      * @param array         $entityConfig
      */
     public function __construct(
-        ObjectManager $em,
         $entityName = null,
         $recordId = null,
         $recordTitle = null,
@@ -72,15 +54,12 @@ class Item
         array $selectedData = [],
         array $entityConfig = []
     ) {
-        $this->em           = $em;
         $this->entityName   = $entityName;
         $this->recordId     = empty($recordId) ? 0 : $recordId;
         $this->recordTitle  = $recordTitle;
         $this->recordUrl    = $recordUrl;
         $this->selectedData = $selectedData;
         $this->entityConfig = $entityConfig;
-
-        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -137,17 +116,6 @@ class Item
     public function getId()
     {
         return $this->getRecordId();
-    }
-
-    /**
-     * Load related object
-     *
-     * @deprecated getEntity method will be removed in 2.0. Get entity manually by entityName and recordId
-     * @return object
-     */
-    public function getEntity()
-    {
-        return $this->em->getRepository($this->entityName)->find($this->recordId);
     }
 
     /**

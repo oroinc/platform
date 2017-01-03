@@ -433,6 +433,9 @@ To migrate all labels from configuration translatable fields automatically you c
 - `\Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider::getEntityModeConfig` default value is Mode::NORMAL if configurations is mepty
 - `\Oro\Bundle\SearchBundle\Engine\ObjectMapper::mapSelectedData` returns empty array if data fields not found
 - `\Oro\Bundle\SearchBundle\Query\Result\Item::_construct` signature changed, array type hintings added
+- Constructor of class `Oro\Bundle\SearchBundle\Datagrid\Extension\SearchResultsExtension` was changed. Dependency on `Doctrine\ORM\EntityManager` was removed.
+- Constructor of class `Oro\Bundle\SearchBundle\Query\Result\Item` was changed. Dependency on `Doctrine\ORM\EntityManager` was removed.
+- Method `getEntity` was removed from `Oro\Bundle\SearchBundle\Query\Result\Item`.
 - Changed signature of the constructor of `Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener`. Removed `$databaseDriver` parameter.
 - Changed signature of the constructor of `Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener`. Added `Connection $connection` parameter.
 
@@ -886,6 +889,7 @@ placeholders:
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` was changed. Added `ConfigManager $configManager` as last argument.
 - Constructor of `Oro\Bundle\EmailBundle\EventListener\EntityListener` was changed. Added `MessageProducerInterface $producer` as last argument.
 - Constructor of `Oro\Bundle\EmailBundle\EventListener\AutoResponseListener` was changed. Added `MessageProducerInterface $producer` as last argument.
+- Constructor of `Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener` was changed. Added `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` as last argument.
 - Moved class `Oro\Bundle\EmailBundle\Command\Manager\AssociationManager` to `Oro\Bundle\EmailBundle\Async\Manager`. Constructor of `Oro\Bundle\EmailBundle\Command\Manager\AssociationManager` was changed. Added `MessageProducerInterface` as last argument.
 - Service name `oro_email.command.association_manager` was changed to `oro_email.async.manager.association_manager`
 - `Oro/Bundle/EmailBundle/Cache/EntityCacheClearer` deprecated, tag on `oro_email.entity.cache.clearer` removed
@@ -907,7 +911,6 @@ placeholders:
 - Added `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction`.
 - Added `Oro\Bundle\EmailBundle\Mailer\DirectMailer::afterPrepareSmtpTransport`.
 - Added `Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider` to get smtp settings from configuration.
-
 ####EntityBundle
 - Added possibility to define
 [entity repositories as a services](./src/Oro/Bundle/EntityBundle/Resources/doc/repositories_as_a_services.md)
@@ -1119,6 +1122,7 @@ After
 - Removed parameter `oro_note.manager.class` from DIC.
 
 #### TagBundle
+- Constructor of `Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension` was changed. Dependency on `Doctrine\ORM\EntityManager` was removed.
 - Removed constant `GRID_FROM_PATH` from `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
 - Removed constant `GRID_COLUMN_ALIAS_PATH` from `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
 - Changed signature of constructor of `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
