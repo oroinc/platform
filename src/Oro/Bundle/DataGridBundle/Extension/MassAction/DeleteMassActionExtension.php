@@ -5,8 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class DeleteMassActionExtension extends AbstractExtension
 {
@@ -20,8 +20,8 @@ class DeleteMassActionExtension extends AbstractExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
 
     /** @var array */
     protected $actions = [];
@@ -30,13 +30,13 @@ class DeleteMassActionExtension extends AbstractExtension
     protected $entityClassName;
 
     /**
-     * @param DoctrineHelper          $doctrineHelper
-     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param DoctrineHelper      $doctrineHelper
+     * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(DoctrineHelper $doctrineHelper, GridConfigurationHelper $gridConfigurationHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, EntityClassResolver $entityClassResolver)
     {
-        $this->doctrineHelper          = $doctrineHelper;
-        $this->gridConfigurationHelper = $gridConfigurationHelper;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
@@ -80,7 +80,7 @@ class DeleteMassActionExtension extends AbstractExtension
         return
             $entity &&
             $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity, false) &&
-            $this->gridConfigurationHelper->getEntityRootAlias($config);
+            $config->getOrmQuery()->getRootAlias();
     }
 
     /**
@@ -140,7 +140,7 @@ class DeleteMassActionExtension extends AbstractExtension
     protected function getEntity(DatagridConfiguration $config)
     {
         if ($this->entityClassName === null) {
-            $this->entityClassName = $this->gridConfigurationHelper->getEntity($config);
+            $this->entityClassName = $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
         }
 
         return $this->entityClassName;
@@ -155,7 +155,7 @@ class DeleteMassActionExtension extends AbstractExtension
     {
         $entity     = $this->getEntity($config);
         $identifier = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity);
-        $rootAlias  = $this->gridConfigurationHelper->getEntityRootAlias($config);
+        $rootAlias  = $config->getOrmQuery()->getRootAlias();
 
         return sprintf('%s.%s', $rootAlias, $identifier);
     }

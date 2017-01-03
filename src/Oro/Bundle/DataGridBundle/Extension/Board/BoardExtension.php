@@ -14,7 +14,7 @@ use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -63,8 +63,8 @@ class BoardExtension extends AbstractExtension
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
 
     /**
      * @param SecurityFacade $securityFacade
@@ -72,7 +72,7 @@ class BoardExtension extends AbstractExtension
      * @param RestrictionManager $restrictionManager
      * @param Configuration $configuration
      * @param EntityClassNameHelper $entityClassNameHelper
-     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param EntityClassResolver $entityClassResolver
      */
     public function __construct(
         SecurityFacade $securityFacade,
@@ -80,14 +80,14 @@ class BoardExtension extends AbstractExtension
         RestrictionManager $restrictionManager,
         Configuration $configuration,
         EntityClassNameHelper $entityClassNameHelper,
-        GridConfigurationHelper $gridConfigurationHelper
+        EntityClassResolver $entityClassResolver
     ) {
         $this->securityFacade = $securityFacade;
         $this->translator     = $translator;
         $this->restrictionManager = $restrictionManager;
         $this->configuration = $configuration;
         $this->entityClassNameHelper = $entityClassNameHelper;
-        $this->gridConfigurationHelper = $gridConfigurationHelper;
+        $this->entityClassResolver = $entityClassResolver;
         $this->processors = [];
         $this->boards = [];
     }
@@ -259,7 +259,7 @@ class BoardExtension extends AbstractExtension
 
                 if (is_null($resultOptions[Configuration::TRANSITION_KEY][Configuration::TRANSITION_API_ACCESSOR_KEY]
                 ['default_route_parameters']['className'])) {
-                    $entityName = $this->gridConfigurationHelper->getEntity($config);
+                    $entityName = $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
                     $resultOptions[Configuration::TRANSITION_KEY][Configuration::TRANSITION_API_ACCESSOR_KEY]
                     ['default_route_parameters']['className'] =
                         $this->entityClassNameHelper->getUrlSafeClassName($entityName);

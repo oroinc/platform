@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
@@ -16,22 +16,22 @@ class RestrictionManager
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param UserAgentProvider $userAgentProvider
-     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param EntityClassResolver $entityClassResolver
      */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         UserAgentProvider $userAgentProvider,
-        GridConfigurationHelper $gridConfigurationHelper
+        EntityClassResolver $entityClassResolver
     ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->userAgentProvider = $userAgentProvider;
-        $this->gridConfigurationHelper = $gridConfigurationHelper;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
@@ -46,9 +46,13 @@ class RestrictionManager
             return false;
         }
 
-        $entityName = $this->gridConfigurationHelper->getEntity($config);
+        $entityName = $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
 
-        return $this->userAgentProvider->getUserAgent()->isDesktop() &&
-            (!$entityName || $this->workflowRegistry->getActiveWorkflowsByEntityClass($entityName)->isEmpty());
+        return
+            $this->userAgentProvider->getUserAgent()->isDesktop()
+            && (
+                !$entityName
+                || $this->workflowRegistry->getActiveWorkflowsByEntityClass($entityName)->isEmpty()
+            );
     }
 }

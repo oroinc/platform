@@ -11,9 +11,9 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
-use Oro\Bundle\DataGridBundle\EventListener\AbstractDatagridListener;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
@@ -22,7 +22,7 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class WorkflowStepColumnListener extends AbstractDatagridListener
+class WorkflowStepColumnListener
 {
     use WorkflowQueryTrait;
 
@@ -31,14 +31,16 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
     const WORKFLOW_FILTER = 'workflowStepLabelByWorkflow';
     const WORKFLOW_STEP_FILTER = 'workflowStepLabelByWorkflowStep';
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /** @var ConfigProvider */
     protected $configProvider;
 
-    /**
-     * @var WorkflowRegistry
-     */
+    /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
     /**
@@ -52,16 +54,19 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
     protected $workflows = [];
 
     /**
-     * @param DoctrineHelper  $doctrineHelper
-     * @param ConfigProvider  $configProvider
-     * @param WorkflowRegistry $workflowRegistry
+     * @param DoctrineHelper      $doctrineHelper
+     * @param EntityClassResolver $entityClassResolver
+     * @param ConfigProvider      $configProvider
+     * @param WorkflowRegistry    $workflowRegistry
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
+        EntityClassResolver $entityClassResolver,
         ConfigProvider $configProvider,
         WorkflowRegistry $workflowRegistry
     ) {
-        parent::__construct($doctrineHelper);
+        $this->doctrineHelper = $doctrineHelper;
+        $this->entityClassResolver = $entityClassResolver;
         $this->configProvider = $configProvider;
         $this->workflowRegistry = $workflowRegistry;
     }
@@ -89,9 +94,12 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
         }
 
         // get root entity
-        list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
-
-        if (!$rootEntity || !$rootEntityAlias) {
+        $rootEntity = $config->getOrmQuery()->getRootEntity($this->entityClassResolver);
+        if (!$rootEntity) {
+            return;
+        }
+        $rootEntityAlias = $config->getOrmQuery()->getRootAlias();
+        if (!$rootEntityAlias) {
             return;
         }
 
@@ -144,7 +152,7 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
         }
 
         // get root entity
-        list($rootEntity) = $this->getRootEntityNameAndAlias($config);
+        $rootEntity = $config->getOrmQuery()->getRootEntity($this->entityClassResolver);
 
         /** @var ResultRecord[] $records */
         $records = $event->getRecords();
@@ -316,7 +324,8 @@ class WorkflowStepColumnListener extends AbstractDatagridListener
         $filters = $parameters->get('_filter', []);
 
         if (array_key_exists($filter, $filters) && array_key_exists('value', $filters[$filter])) {
-            list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($datagrid->getConfig());
+            $rootEntity = $datagrid->getConfig()->getOrmQuery()->getRootEntity($this->entityClassResolver);
+            $rootEntityAlias = $datagrid->getConfig()->getOrmQuery()->getRootAlias();
 
             $items = $this->getWorkflowItemRepository()
                 ->$repositoryMethod($rootEntity, (array)$filters[$filter]['value']);

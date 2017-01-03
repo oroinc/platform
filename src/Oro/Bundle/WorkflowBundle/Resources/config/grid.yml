@@ -25,6 +25,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener'
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_entity_config.provider.workflow'
             - '@oro_workflow.registry'
         tags:
@@ -45,7 +46,7 @@ services:
     oro_workflow.datagrid.extension.restrictions:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension'
         arguments:
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_workflow.restriction.manager'
         tags:
             - { name: oro_datagrid.extension }

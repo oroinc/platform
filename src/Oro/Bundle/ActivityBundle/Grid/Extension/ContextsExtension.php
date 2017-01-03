@@ -12,7 +12,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -50,8 +49,6 @@ class ContextsExtension extends AbstractExtension
     const CONTEXTS_ENABLED_PATH = '[options][contexts][enabled]';
     const CONTEXTS_COLUMN_PATH = '[options][contexts][column_name]';
     const CONTEXTS_ENTITY_PATH = '[options][contexts][entity_name]';
-    const GRID_EXTENDED_ENTITY_PATH = '[extended_entity_name]';
-    const GRID_FROM_PATH = '[source][query][from]';
     const GRID_COLUMNS_PATH = '[columns]';
     const DEFAULT_COLUMN_NAME = 'contexts';
     const DEFAULT_COLUMN_LABEL = 'oro.activity.contexts.column.label';
@@ -59,9 +56,6 @@ class ContextsExtension extends AbstractExtension
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
-
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
 
     /** @var ActivityManager */
     protected $activityManager;
@@ -73,20 +67,17 @@ class ContextsExtension extends AbstractExtension
     protected $router;
 
     /**
-     * @param GridConfigurationHelper $gridConfigurationHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ActivityManager $activityManager
      * @param ConfigProvider $entityConfigProvider
      * @param RouterInterface $router
      */
     public function __construct(
-        GridConfigurationHelper $gridConfigurationHelper,
         EntityClassResolver $entityClassResolver,
         ActivityManager $activityManager,
         ConfigProvider $entityConfigProvider,
         RouterInterface $router
     ) {
-        $this->gridConfigurationHelper = $gridConfigurationHelper;
         $this->entityClassResolver = $entityClassResolver;
         $this->activityManager = $activityManager;
         $this->entityConfigProvider = $entityConfigProvider;
@@ -215,16 +206,7 @@ class ContextsExtension extends AbstractExtension
      */
     protected function getEntityClassName(DatagridConfiguration $config)
     {
-        $entityClassName = $config->offsetGetByPath(self::GRID_EXTENDED_ENTITY_PATH);
-
-        if (!$entityClassName) {
-            $from = $config->offsetGetByPath(self::GRID_FROM_PATH);
-            if (!$from) {
-                $entityClassName = $this->entityClassResolver->getEntityClass($from[0]['table']);
-            }
-        }
-
-        return $entityClassName;
+        return $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
     }
 
     /**
