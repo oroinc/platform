@@ -168,7 +168,7 @@ class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
                 'result' => array(
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                    'jobTitle'  => '',
+                    'jobTitle'  => ''
                 ),
                 'skipNull' => false
             ),

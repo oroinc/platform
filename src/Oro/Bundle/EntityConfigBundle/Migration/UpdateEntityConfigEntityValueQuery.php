@@ -41,7 +41,7 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
      * @param string $entityName
      * @param string $scope
      * @param string $code
-     * @param string $value
+     * @param string|array $value
      */
     public function __construct($entityName, $scope, $code, $value)
     {
@@ -93,7 +93,15 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
                 scope = ? AND
                 code = ?
             ";
-        $parameters = [$this->value, $this->entityName, $this->scope, $this->code];
+
+        $value = $this->value;
+
+        // array values are not supported
+        if (is_array($value)) {
+            return;
+        }
+
+        $parameters = [$value, $this->entityName, $this->scope, $this->code];
         $statement = $this->connection->prepare($sql);
         $statement->execute($parameters);
         $this->logQuery($logger, $sql, $parameters);

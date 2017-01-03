@@ -28,7 +28,7 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
@@ -49,7 +49,7 @@ class EmailTemplateSelectTypeTest extends \PHPUnit_Framework_TestCase
     {
         $optionKey = 'testKey';
 
-        $formConfigMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfigMock = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formConfigMock->expects($this->exactly(3))
             ->method('getOption')
             ->will(

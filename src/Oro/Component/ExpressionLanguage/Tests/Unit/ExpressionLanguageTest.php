@@ -20,7 +20,7 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->cacheMock = $this->getMock(ParserCacheInterface::class);
+        $this->cacheMock = $this->createMock(ParserCacheInterface::class);
         $this->expressionLanguage = new ExpressionLanguage($this->cacheMock);
     }
 

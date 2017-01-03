@@ -109,14 +109,18 @@ define([
             this.$el.empty();
 
             var label = this.column.get('label');
-            var abbreviation = textUtil.abbreviate(label, this.minWordsToAbbreviate);
 
-            this.isLabelAbbreviated = abbreviation !== label;
-
-            this.$el.toggleClass('abbreviated', this.isLabelAbbreviated);
+            if (this.column.get('shortenableLabel') !== false) {
+                label = textUtil.abbreviate(label, this.minWordsToAbbreviate);
+                this.isLabelAbbreviated = label !== this.column.get('label');
+                if (!this.isLabelAbbreviated) {
+                    // if abbreviation was not created -- add class to make label shorten over styles
+                    this.$el.addClass('shortenable-label');
+                }
+            }
 
             this.$el.append(this.template({
-                label: abbreviation,
+                label: label,
                 sortable: this.column.get('sortable')
             }));
 
@@ -124,8 +128,9 @@ define([
                 this.$el.width(this.column.get('width'));
             }
 
-            if (!_.isFunction(this.column.attributes.cell.prototype.className)) {
-                this.$el.addClass(this.column.attributes.cell.prototype.className);
+            var cell = this.column.get('oldCell') || this.column.get('cell');
+            if (!_.isFunction(cell.prototype.className)) {
+                this.$el.addClass(cell.prototype.className);
             }
 
             if (this.column.has('align')) {

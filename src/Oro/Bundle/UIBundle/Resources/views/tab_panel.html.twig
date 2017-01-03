@@ -1,23 +1,32 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set options = {
-    useDropdown: false
+    useDropdown: false,
+    verticalTabs: false,
+    subtitle: false
 }|merge(options|default({})) %}
 
 {% set containerAlias = 'tab' %}
+{% set activeTabAlias = null %}
 {% for tab in tabs %}
     {% set containerAlias = containerAlias ~ '-' ~ tab.alias %}
+    {% if (options.activeTabAlias is defined and options.activeTabAlias == tab.alias) %}
+        {% set activeTabAlias = options.activeTabAlias %}
+    {% endif %}
 {% endfor %}
 
-<div class="oro-tabs"
+<div class="oro-tabs{{ options.verticalTabs ? ' oro-tabs__vertical' }}"
      data-page-component-module="oroui/js/app/components/tabs-component"
      data-page-component-options="{{ options|json_encode }}">
+    {% if (options.subtitle) %}
+        <div class="tabs-subtitle">{{ options.subtitle }}</div>
+    {% endif %}
     <ul class="nav nav-tabs{{ options.useDropdown ? ' nav-tabs-dropdown' }}">
         {% for tab in tabs %}
-            {% set isFirstLoop = loop.index == 1 %}
-            <li class="tab {% if isFirstLoop %} active{% endif %}">
+            {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
+            <li class="tab {% if isActiveTab %} active{% endif %}">
                 {% set widgetOptions = {
-                    'type': 'block',
+                    'type': tab.widgetType|default('block'),
                     'event': 'shown.bs.tab',
                     'multiple': false,
                     'options': {
@@ -33,7 +42,7 @@
                     'url': tab.url
                 } %}
 
-                {% if tab.content|default('') or isFirstLoop %}
+                {% if tab.content|default('') or isActiveTab %}
                     {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
                 {% endif %}
 
@@ -58,11 +67,11 @@
 
     <div class="tab-content" id="{{ containerAlias }}">
         {% for tab in tabs %}
-            {% set isFirstLoop = loop.index == 1 %}
-            <div class="tab-pane{% if isFirstLoop %} active{% endif %}" id="{{ tab.alias }}">
+            {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
+            <div class="tab-pane{% if isActiveTab %} active{% endif %}" id="{{ tab.alias }}">
                 {% if tab.content|default('') %}
                     {{ tab.content|raw }}
-                {% elseif isFirstLoop %}
+                {% elseif isActiveTab %}
                     {{ oro_widget_render(tab) }}
                 {% endif %}
             </div>

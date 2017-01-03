@@ -19,7 +19,12 @@ class CurrencyNameHelperStub extends CurrencyNameHelper
         if (ViewTypeProviderInterface::VIEW_TYPE_ISO_CODE === $nameViewStyle) {
             return $currencyIsoCode;
         }
-        return $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode);
+
+        if (ViewTypeProviderInterface::VIEW_TYPE_FULL_NAME === $nameViewStyle) {
+            return $this->intlCurrencyBundle->getCurrencyName($currencyIsoCode);
+        }
+
+        return $this->intlCurrencyBundle->getCurrencySymbol($currencyIsoCode);
     }
 
     public function getCurrencyChoices($nameViewStyle = null)

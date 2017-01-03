@@ -26,8 +26,8 @@ class ContainerListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->provider = $this->getMock(ResourceProviderInterface::class);
-        $this->dumper = $this->getMock(ConfigMetadataDumperInterface::class);
+        $this->provider = $this->createMock(ResourceProviderInterface::class);
+        $this->dumper = $this->createMock(ConfigMetadataDumperInterface::class);
 
         $this->listener = new ContainerListener($this->provider, $this->dumper);
     }
@@ -52,7 +52,7 @@ class ContainerListenerTest extends \PHPUnit_Framework_TestCase
             ->with($container);
 
         /** @var GetResponseEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->getMock(GetResponseEvent::class, [], [], '', false);
+        $event = $this->createMock(GetResponseEvent::class);
         $this->listener->onKernelRequest($event);
     }
 }

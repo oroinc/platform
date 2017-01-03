@@ -55,6 +55,7 @@ services:
         class: Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser
         arguments:
             - '@oro_currency.helper.currency_name'
+            - '@oro_currency.converter.currency_to_string'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 91 }
 
@@ -116,4 +117,18 @@ services:
     oro_currency.converter.rate.link:
         tags:
             - { name: oro_service_link, service: oro_currency.converter.rate }
+
+    oro_currency.datagrid.listener.column_config:
+        class: Oro\Bundle\CurrencyBundle\Datagrid\EventListener\ColumnConfigListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore, priority: 255 }
+
+    oro_currency.workflow.condition.in_currency_list:
+        class: Oro\Bundle\CurrencyBundle\Model\Condition\InCurrencyList
+        arguments:
+            - '@oro_currency.config.currency'
+        tags:
+            - { name: oro_action.condition, alias: in_currency_list }
 

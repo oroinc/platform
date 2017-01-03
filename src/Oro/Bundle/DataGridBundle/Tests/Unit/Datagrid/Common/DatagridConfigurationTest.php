@@ -166,22 +166,16 @@ class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptions()
     {
-        $this->setExpectedException(
-            'BadMethodCallException',
-            'DatagridConfiguration::addColumn: name should not be empty'
-        );
+        $this->expectException('BadMethodCallException');
+        $this->expectExceptionMessage('DatagridConfiguration::addColumn: name should not be empty');
         $this->configuration->addColumn(null, []);
 
-        $this->setExpectedException(
-            'BadMethodCallException',
-            'DatagridConfiguration::updateLabel: name should not be empty'
-        );
+        $this->expectException('BadMethodCallException');
+        $this->expectExceptionMessage('DatagridConfiguration::updateLabel: name should not be empty');
         $this->configuration->updateLabel(null, []);
 
-        $this->setExpectedException(
-            'BadMethodCallException',
-            'DatagridConfiguration::addSelect: select should not be empty'
-        );
+        $this->expectException('BadMethodCallException');
+        $this->expectExceptionMessage('DatagridConfiguration::addSelect: select should not be empty');
         $this->configuration->addSelect(null);
     }
 

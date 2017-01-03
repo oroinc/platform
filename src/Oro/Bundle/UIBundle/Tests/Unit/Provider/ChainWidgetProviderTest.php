@@ -23,11 +23,11 @@ class ChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
         $this->chainProvider = new ChainWidgetProvider();
 
         $this->highPriorityProvider =
-            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
+            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
         $this->lowPriorityProvider  =
-            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
+            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
         $this->unsupportedProvider  =
-            $this->getMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
+            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
 
         $this->chainProvider->addProvider($this->lowPriorityProvider);
         $this->chainProvider->addProvider($this->highPriorityProvider);

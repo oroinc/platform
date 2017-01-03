@@ -41,7 +41,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures',
             'Test%sProxy'
         );
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcher');
 
         $this->batch = new EmailEntityBatchProcessor($this->addrManager, $this->ownerProvider, $this->eventDispatcher);
     }
@@ -60,7 +60,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test@example.com', $this->batch->getAddress('TeST@example.com')->getEmail());
         $this->assertNull($this->batch->getAddress('Another@example.com'));
 
-        $this->setExpectedException('LogicException');
+        $this->expectException('LogicException');
         $this->batch->addAddress($this->addrManager->newEmailAddress()->setEmail('TEST@example.com'));
     }
 
@@ -86,7 +86,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', $this->batch->getFolder('trash', 'TeST')->getFullName());
         $this->assertNull($this->batch->getFolder('trash', 'Another'));
 
-        $this->setExpectedException('LogicException');
+        $this->expectException('LogicException');
         $folder2 = new EmailFolder();
         $folder2->setType('sent');
         $folder2->setName('TEST');
@@ -229,7 +229,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
             ->with(array('messageId' => array('email1', 'email2', 'some_email')))
             ->will($this->returnValue([$existingEmail]));
 
-        $owner = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface');
+        $owner = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface');
 
         $this->ownerProvider->expects($this->any())
             ->method('findEmailOwner')

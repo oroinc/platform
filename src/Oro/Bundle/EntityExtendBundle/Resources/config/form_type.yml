@@ -248,7 +248,7 @@ services:
             # custom types
             - [addExtendTypeMapping, ["percent", "oro_percent"]]
             - [addExtendTypeMapping, ["money", "oro_money"]]
-            - [addExtendTypeMapping, ["boolean", "choice"]] # extended boolean fields should be choice type
+            - [addExtendTypeMapping, ["boolean", "oro_choice"]]
 
             - [addExtendTypeMapping, ["file", "oro_file"]]
             - [addExtendTypeMapping, ["image", "oro_image"]]
@@ -266,3 +266,9 @@ services:
             - '@router'
         tags:
             - { name: form.type, alias: oro_entity_extend_multiple_entity }
+
+    oro_entity_extend.form.util.field_session_storage:
+        class: 'Oro\Bundle\EntityExtendBundle\Form\Util\FieldSessionStorage'
+        public: false
+        arguments:
+            - '@session'

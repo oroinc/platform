@@ -51,7 +51,7 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($config, $this->context->getRootConfig());
     }
 
-    public function testConfig()
+    public function testConfigForKnownField()
     {
         $this->assertNull($this->context->getConfig());
 
@@ -70,8 +70,38 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
             $config->getField('field1')->getTargetEntity()->getField('field11')->getTargetEntity(),
             $this->context->getConfig()
         );
+    }
+
+    public function testConfigForUnknownField()
+    {
+        $this->assertNull($this->context->getConfig());
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1');
+
+        $this->context->setConfig($config);
+        $this->assertSame($config, $this->context->getConfig());
 
         $this->context->setPropertyPath('unknownField.field11');
+        $this->assertNull($this->context->getConfig());
+    }
+
+    public function testConfigForExcludedField()
+    {
+        $this->assertNull($this->context->getConfig());
+
+        $config = new EntityDefinitionConfig();
+        $config
+            ->addField('field1')
+            ->createAndSetTargetEntity()
+            ->addField('field11')
+            ->createAndSetTargetEntity();
+        $config->getField('field1')->setExcluded();
+
+        $this->context->setConfig($config);
+        $this->assertSame($config, $this->context->getConfig());
+
+        $this->context->setPropertyPath('field1.field11');
         $this->assertNull($this->context->getConfig());
     }
 
@@ -79,7 +109,7 @@ class CustomizeFormDataContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->context->getForm());
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->context->setForm($form);
         $this->assertSame($form, $this->context->getForm());
     }

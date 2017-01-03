@@ -31,8 +31,8 @@ class TransitionEventTriggerRelationVerifierTest extends \PHPUnit_Framework_Test
         $trigger->setTransitionName('test_transition');
         $trigger->setEvent('update');
 
-        $this->setExpectedException(
-            TransitionTriggerVerifierException::class,
+        $this->expectException(TransitionTriggerVerifierException::class);
+        $this->expectExceptionMessage(
             'Relation option is mandatory for non workflow related entity based event triggers. ' .
             'Empty relation property met in `test_workflow` workflow for `test_transition` transition ' .
             'with entity `stdClass` by event `update`'

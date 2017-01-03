@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Twig;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -30,25 +31,31 @@ class DataGridExtension extends \Twig_Extension
     /** @var DatagridRouteHelper */
     protected $datagridRouteHelper;
 
+    /** @var RequestStack */
+    protected $requestStack;
+
     /**
      * @param ManagerInterface $manager
      * @param NameStrategyInterface $nameStrategy
      * @param RouterInterface $router
      * @param SecurityFacade $securityFacade
      * @param DatagridRouteHelper $datagridRouteHelper
+     * @param RequestStack $requestStack
      */
     public function __construct(
         ManagerInterface $manager,
         NameStrategyInterface $nameStrategy,
         RouterInterface $router,
         SecurityFacade $securityFacade,
-        DatagridRouteHelper $datagridRouteHelper
+        DatagridRouteHelper $datagridRouteHelper,
+        RequestStack $requestStack
     ) {
         $this->manager = $manager;
         $this->nameStrategy = $nameStrategy;
         $this->router = $router;
         $this->securityFacade = $securityFacade;
         $this->datagridRouteHelper = $datagridRouteHelper;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -72,6 +79,8 @@ class DataGridExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
             new \Twig_SimpleFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
             new \Twig_SimpleFunction('oro_datagrid_link', [$this->datagridRouteHelper, 'generate']),
+            new \Twig_SimpleFunction('oro_datagrid_column_attributes', [$this, 'getColumnAttributes']),
+            new \Twig_SimpleFunction('oro_datagrid_get_page_url', [$this, 'getPageUrl']),
         ];
     }
 
@@ -166,6 +175,55 @@ class DataGridExtension extends \Twig_Extension
     public function buildGridInputName($name)
     {
         return $this->nameStrategy->getGridUniqueName($name);
+    }
+
+    /**
+     * @param DatagridInterface $grid
+     * @param string            $columnName
+     *
+     * @return array|null
+     */
+    public function getColumnAttributes(DatagridInterface $grid, $columnName)
+    {
+        $metadata = $grid->getMetadata()->toArray();
+
+        if (array_key_exists('columns', $metadata)) {
+            foreach ($metadata['columns'] as $column) {
+                if ($columnName === $column['name']) {
+                    return $column;
+                }
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Generates url based on current uri with replaced current page parameter
+     *
+     * @param DatagridInterface $grid
+     * @param integer           $page
+     *
+     * @return string
+     */
+    public function getPageUrl(DatagridInterface $grid, $page)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $queryString = $request->getQueryString();
+        parse_str($queryString, $queryStringComponents);
+
+        $gridParams = [];
+        if (isset($queryStringComponents['grid'][$grid->getName()])) {
+            parse_str($queryStringComponents['grid'][$grid->getName()], $gridParams);
+        }
+
+        $gridParams['i'] = $page;
+        $queryStringComponents['grid'][$grid->getName()] = http_build_query($gridParams);
+
+        $route = $request->get('_route');
+
+        return $this->router->generate($route, $queryStringComponents);
     }
 
     /**

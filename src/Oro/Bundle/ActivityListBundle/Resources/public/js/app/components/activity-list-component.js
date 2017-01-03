@@ -157,7 +157,13 @@ define(function(require) {
          * @param {ActivityModel} model
          */
         onViewActivity: function(model) {
-            this.initComments(model);
+            if (model.get('is_loaded') === true) {
+                this.initComments(model);
+            } else {
+                model.once('change:contentHTML', function(model) {
+                    this.initComments(model);
+                }, this);
+            }
         },
 
         /**

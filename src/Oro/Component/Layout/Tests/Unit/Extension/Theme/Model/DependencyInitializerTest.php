@@ -32,7 +32,7 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoKnownDependenciesShouldNotDoAnything()
     {
-        $object = $this->getMock(
+        $object = $this->createMock(
             'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithDependency'
         );
         $object->expects($this->never())
@@ -43,9 +43,9 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldInitializeDependencies()
     {
-        $dependency = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $dependency = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $object = $this->getMock(
+        $object = $this->createMock(
             'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\LayoutUpdateWithDependency'
         );
         $object->expects($this->once())

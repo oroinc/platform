@@ -335,6 +335,20 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testMetaPropertiesFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertTrue($config->isMetaPropertiesEnabled());
+
+        $config->disableMetaProperties();
+        $this->assertFalse($config->isMetaPropertiesEnabled());
+        $this->assertEquals(['disable_meta_properties' => true], $config->toArray());
+
+        $config->enableMetaProperties();
+        $this->assertTrue($config->isMetaPropertiesEnabled());
+        $this->assertEquals([], $config->toArray());
+    }
+
     public function testIdentifierFieldNames()
     {
         $config = new EntityDefinitionConfig();

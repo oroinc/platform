@@ -18,6 +18,8 @@ define([
     SelectCell = Backgrid.SelectCell.extend({
         events: {},
 
+        optionValues: [],
+
         /**
          * @inheritDoc
          */
@@ -26,9 +28,10 @@ define([
                 this.editor = SelectCellRadioEditor;
             }
 
-            if (options.column.get('metadata').choices) {
+            var choices = options.column.get('metadata').choices;
+            if (choices) {
                 this.optionValues = [];
-                _.each(options.column.get('metadata').choices, function(value, key) {
+                _.each(choices, function(value, key) {
                     this.optionValues.push([_.escape(textUtil.prepareText(value)), key]);
                 }, this);
             } else {

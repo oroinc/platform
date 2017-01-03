@@ -78,7 +78,9 @@ abstract class AbstractEntityClassNameProvider
      */
     protected function getLabelName($entityClass, $isPlural = false)
     {
-        if (!$this->configManager->hasConfig($entityClass)) {
+        if (!$this->configManager->hasConfig($entityClass)
+            || $this->configManager->isHiddenModel($entityClass)
+        ) {
             return null;
         }
 
@@ -94,7 +96,9 @@ abstract class AbstractEntityClassNameProvider
      */
     protected function getFieldLabelName($entityClass, $fieldName)
     {
-        if (!$this->configManager->hasConfig($entityClass, $fieldName)) {
+        if (!$this->configManager->hasConfig($entityClass, $fieldName)
+            || $this->configManager->isHiddenModel($entityClass, $fieldName)
+        ) {
             return null;
         }
 

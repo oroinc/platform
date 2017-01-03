@@ -34,24 +34,8 @@ class EntityToEntityChangeArrayConverter
     {
         $sanitizedChangeSet = [];
         foreach ($changeSet as $property => $change) {
-            $sanitizedNew = $new = $change[1];
-            $sanitizedOld = $old = $change[0];
-
-            if ($old instanceof \DateTime) {
-                $sanitizedOld = $old->format(DATE_ISO8601);
-            } elseif (is_object($old) && $em->contains($old)) {
-                $sanitizedOld = $this->convertEntityToArray($em, $old, []);
-            } elseif (is_object($old)) {
-                continue;
-            }
-
-            if ($new instanceof \DateTime) {
-                $sanitizedNew = $new->format(DATE_ISO8601);
-            } elseif (is_object($new) && $em->contains($new)) {
-                $sanitizedNew = $this->convertEntityToArray($em, $new, []);
-            } elseif (is_object($new)) {
-                continue;
-            }
+            $sanitizedOld = $this->convertFieldValue($em, $change[0]);
+            $sanitizedNew = $this->convertFieldValue($em, $change[1]);
 
             if ($sanitizedOld === $sanitizedNew) {
                 continue;
@@ -61,6 +45,30 @@ class EntityToEntityChangeArrayConverter
         }
 
         return $sanitizedChangeSet;
+    }
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param mixed $value
+     * @return mixed
+     */
+    private function convertFieldValue(EntityManagerInterface $em, $value)
+    {
+        $sanitized = $value;
+        if ($value instanceof \DateTime) {
+            $sanitized = $value->format(DATE_ISO8601);
+        } elseif (is_object($value) && $em->contains($value)) {
+            $sanitized = $this->convertEntityToArray($em, $value, []);
+        } elseif (is_array($value)) {
+            $sanitized = [];
+            foreach ($value as $key => $item) {
+                $sanitized[$key] = $this->convertFieldValue($em, $item);
+            }
+        } elseif (is_object($value)) {
+            $sanitized = null;
+        }
+
+        return $sanitized;
     }
 
     /**

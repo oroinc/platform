@@ -5,7 +5,7 @@ oro.currency:
             currency_settings.title: 'Currency settings'
         fields:
             allowed_currencies.label: 'Allowed Currencies'
-            default_currency.lable: 'Default Currency'
+            default_currency.label: 'Default Currency'
             currency_display:
                   label: 'Display format'
                   choices:

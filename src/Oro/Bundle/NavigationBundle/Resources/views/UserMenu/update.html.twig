@@ -5,7 +5,6 @@
 {% set menuCreateRoute = 'oro_navigation_user_menu_create' %}
 {% set menuUpdateRoute = 'oro_navigation_user_menu_update' %}
 
-{% set ownerId = null %}
 {% set fullname = app.user|oro_format_name|default('N/A') %}
 
 {% oro_title_set({params : {"%username%": fullname, "%title%": entity.title|trans()}}) %}

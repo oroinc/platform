@@ -36,7 +36,7 @@ class ActionGroupListConfiguration implements ConfigurationDefinitionInterface
                         ->children()
                             ->scalarNode('type')->end()
                             ->scalarNode('message')->end()
-                            ->scalarNode('default')->end()
+                            ->variableNode('default')->end()
                         ->end()
                     ->end()
                 ->end()

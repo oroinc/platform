@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Guesser;
 
-use Symfony\Component\Form\Guess;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\Form\Guesser\AbstractFormGuesser;
@@ -79,21 +77,27 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $formConfig->getId();
         $fieldName     = $fieldConfigId->getFieldName();
-        $extendConfig  = $this->extendConfigProvider->getConfig($className, $fieldName);
 
+        $typeOptions = [];
         if ($formConfig->has('type')) {
             $isTypeNotExists = false;
             $type = $formConfig->get('type');
         } else {
             $isTypeNotExists = empty($this->typeMap[$fieldConfigId->getFieldType()]);
-            $type = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
+            $type = null;
+            if (!$isTypeNotExists) {
+                $type = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
+                $typeOptions = $this->typeMap[$fieldConfigId->getFieldType()]['options'];
+            }
+        }
+
+        $extendConfig  = $this->extendConfigProvider->getConfig($className, $fieldName);
+        if (!$this->isApplicableField($extendConfig) || $isTypeNotExists) {
+            return $this->createDefaultTypeGuess();
         }
 
         $options = $this->getOptions($extendConfig, $fieldConfigId);
         $options = $this->addConstraintsToOptions($options, $extendConfig, $fieldConfigId);
-        if (!$this->isApplicableField($extendConfig) || $isTypeNotExists) {
-            return $this->createDefaultTypeGuess();
-        }
 
         $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
 
@@ -104,7 +108,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 'block'    => 'general',
             ],
             $options,
-            $this->typeMap[$fieldConfigId->getFieldType()]['options']
+            $typeOptions
         );
 
         return $this->createTypeGuess($type, $options);
@@ -125,7 +129,9 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
 
         switch ($fieldConfigId->getFieldType()) {
             case 'boolean':
-                $options['empty_value'] = false;
+                // Doctrine DBAL can't save null to boolean field
+                // see https://github.com/doctrine/dbal/issues/2580
+                $options['configs']['allowClear'] = false;
                 $options['choices'] = ['No', 'Yes'];
                 break;
             case 'enum':

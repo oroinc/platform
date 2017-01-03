@@ -30,8 +30,8 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
     {
         parent::setUp();
 
-        $this->processorBag = $this->getMock(ActionProcessorBagInterface::class);
-        $this->errorCompleter = $this->getMock(ErrorCompleterInterface::class);
+        $this->processorBag = $this->createMock(ActionProcessorBagInterface::class);
+        $this->errorCompleter = $this->createMock(ErrorCompleterInterface::class);
 
         $this->processor = new ProcessIncludedEntitiesStub(
             $this->processorBag,
@@ -82,7 +82,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionMetadata = new EntityMetadata();
 
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
-        $actionProcessor = $this->getMock(ActionProcessorInterface::class);
+        $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
             ->with(ApiActions::CREATE)
@@ -138,7 +138,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionMetadata = new EntityMetadata();
 
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
-        $actionProcessor = $this->getMock(ActionProcessorInterface::class);
+        $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
             ->with(ApiActions::CREATE)
@@ -194,7 +194,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionMetadata = new EntityMetadata();
 
         $actionContext = new UpdateContext($this->configProvider, $this->metadataProvider);
-        $actionProcessor = $this->getMock(ActionProcessorInterface::class);
+        $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
             ->with(ApiActions::UPDATE)
@@ -250,7 +250,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $actionMetadata = new EntityMetadata();
 
         $actionContext = new UpdateContext($this->configProvider, $this->metadataProvider);
-        $actionProcessor = $this->getMock(ActionProcessorInterface::class);
+        $actionProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->processorBag->expects(self::once())
             ->method('getProcessor')
             ->with(ApiActions::UPDATE)

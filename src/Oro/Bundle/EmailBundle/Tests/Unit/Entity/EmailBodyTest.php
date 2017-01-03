@@ -44,7 +44,7 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
 
     public function testAttachmentGetterAndSetter()
     {
-        $attachment = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
+        $attachment = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
 
         $entity = new EmailBody();
         $entity->addAttachment($attachment);
@@ -58,10 +58,9 @@ class EmailBodyTest extends \PHPUnit_Framework_TestCase
 
     public function testBeforeSave()
     {
+        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity = new EmailBody();
         $entity->beforeSave();
-
-        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $this->assertEquals(false, $entity->getBodyIsText());
         $this->assertEquals(false, $entity->getHasAttachments());

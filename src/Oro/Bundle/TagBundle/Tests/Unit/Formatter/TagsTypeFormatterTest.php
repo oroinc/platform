@@ -25,7 +25,7 @@ class TagsTypeFormatterTest extends \PHPUnit_Framework_TestCase
     public function testFormatType($value, $type, $exception, $expected)
     {
         if ($exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $val = $this->formatter->formatType($value, $type);

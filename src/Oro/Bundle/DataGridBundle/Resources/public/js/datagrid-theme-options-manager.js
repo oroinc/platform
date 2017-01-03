@@ -12,7 +12,9 @@ define(function(require) {
             className: '',
             hide: false,
             template: null,
-            templateSelector: null
+            templateSelector: null,
+            el: null,
+            elFilter: null
         },
 
         createConfigurator: function(gridThemeOptions) {
@@ -22,7 +24,7 @@ define(function(require) {
             return _.bind(configurator.configure, configurator);
         },
 
-        configure: function(view, options) {
+        configure: function(view, options, parentView) {
             var themeOptions = options.themeOptions = $.extend(
                 true,
                 {},
@@ -47,7 +49,7 @@ define(function(require) {
             _.each(themeOptions, _.bind(function(value, option) {
                 var configurator = option + 'Option';
                 if (_.isFunction(this[configurator])) {
-                    this[configurator](view, options, value);
+                    this[configurator](view, options, value, parentView);
                 }
             }, this));
         },
@@ -99,6 +101,16 @@ define(function(require) {
         templateSelectorOption: function(view, options, template) {
             if (template) {
                 options.template = _.template($(template).html());
+            }
+        },
+
+        elOption: function(view, options, el, parentView) {
+            if (el) {
+                el = parentView.$el.find(el);
+                if (options.elFilter) {
+                    el = el.filter(options.elFilter);
+                }
+                options.el = el.get(0) || null;
             }
         }
     };

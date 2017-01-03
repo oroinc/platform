@@ -16,6 +16,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -54,13 +55,17 @@ class ExtendConfigDumper
     /** @var AbstractEntityConfigDumperExtension[]|null */
     protected $sortedExtensions;
 
+    /** @var ExtendEntityConfigProvider */
+    protected $extendEntityConfigProvider;
+
     /**
-     * @param EntityManagerBag                $entityManagerBag
-     * @param ConfigManager                   $configManager
+     * @param EntityManagerBag $entityManagerBag
+     * @param ConfigManager $configManager
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param FieldTypeHelper                 $fieldTypeHelper
-     * @param EntityGenerator                 $entityGenerator
-     * @param string                          $cacheDir
+     * @param FieldTypeHelper $fieldTypeHelper
+     * @param EntityGenerator $entityGenerator
+     * @param ExtendEntityConfigProvider $extendEntityConfigProvider
+     * @param string $cacheDir
      */
     public function __construct(
         EntityManagerBag $entityManagerBag,
@@ -68,6 +73,7 @@ class ExtendConfigDumper
         ExtendDbIdentifierNameGenerator $nameGenerator,
         FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
+        ExtendEntityConfigProvider $extendEntityConfigProvider,
         $cacheDir
     ) {
         $this->entityManagerBag = $entityManagerBag;
@@ -75,6 +81,7 @@ class ExtendConfigDumper
         $this->nameGenerator    = $nameGenerator;
         $this->fieldTypeHelper  = $fieldTypeHelper;
         $this->entityGenerator  = $entityGenerator;
+        $this->extendEntityConfigProvider = $extendEntityConfigProvider;
         $this->cacheDir         = $cacheDir;
     }
 
@@ -112,8 +119,9 @@ class ExtendConfigDumper
      *
      * @param callable|null $filter function (ConfigInterface $config) : bool
      * @param bool $updateCustom
+     * @param bool $attributesOnly
      */
-    public function updateConfig($filter = null, $updateCustom = false)
+    public function updateConfig($filter = null, $updateCustom = false, $attributesOnly = false)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
@@ -131,7 +139,6 @@ class ExtendConfigDumper
         }
 
         $configProvider = $this->configManager->getProvider('extend');
-
         $extendConfigs = null === $filter
             ? $configProvider->getConfigs(null, true)
             : $configProvider->filter($filter, null, true);
@@ -140,7 +147,6 @@ class ExtendConfigDumper
                 if ($extendConfig->is('is_extend')) {
                     $this->checkSchema($extendConfig, $configProvider, $aliases, $filter);
                 }
-
                 $this->updateStateValues($extendConfig, $configProvider);
             }
         }

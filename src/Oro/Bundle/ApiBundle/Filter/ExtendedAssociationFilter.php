@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
+use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\CompositeExpression;
+
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * A filter that can be used to filter data by an extended association.
@@ -61,12 +65,17 @@ class ExtendedAssociationFilter extends AssociationFilter
     {
         $this->assertFilterValuePath($field, $path);
 
-        return parent::doBuildExpression(
-            $this->getFieldName(substr($path, strlen($field) + 1)),
-            $path,
-            $operator,
-            $value
-        );
+        $fieldName = $this->getFieldName(substr($path, strlen($field) + 1));
+        if (RelationType::MANY_TO_MANY === $this->associationType) {
+            $expr = new Comparison($fieldName, 'MEMBER OF', $value);
+            if (self::NEQ === $operator) {
+                $expr = new CompositeExpression('NOT', [$expr]);
+            }
+
+            return $expr;
+        }
+
+        return parent::doBuildExpression($fieldName, $path, $operator, $value);
     }
 
     /**

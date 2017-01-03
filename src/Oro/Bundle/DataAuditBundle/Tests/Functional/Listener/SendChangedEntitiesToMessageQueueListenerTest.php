@@ -288,7 +288,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
     public function testShouldNotSendLoggedInUserInfoIfPresentButNotUserInstance()
     {
-        $token = new UsernamePasswordToken($this->getMock(UserInterface::class), 'someCredentinals', 'aProviderKey');
+        $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'someCredentinals', 'aProviderKey');
 
         /** @var TokenStorageInterface $tokenStorage */
         $tokenStorage = $this->getContainer()->get('security.token_storage');

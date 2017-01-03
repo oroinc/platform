@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\ApiBundle\EventListener\SecurityFirewallContextListener;
@@ -11,74 +12,99 @@ use Oro\Bundle\ApiBundle\Http\Firewall\ApiExceptionListener;
 
 class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
 {
-    /** @var string */
-    protected $firewallName;
-
-    /**
-     * @param string $firewallName
-     */
-    public function __construct($firewallName)
-    {
-        $this->firewallName = $firewallName;
-    }
+    /** @var array */
+    private $contextListeners = [];
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
+        // config does not contains firewalls config
+        $securityConfigs = $container->getExtensionConfig('security');
+        if (!array_key_exists('firewalls', $securityConfigs[0])) {
+            return;
+        }
+
+        // firewalls config is empty
+        $firewalls = $securityConfigs[0]['firewalls'];
+        if (empty($firewalls)) {
+            return;
+        }
+
         $sessionOptions = $container->getParameter('session.storage.options');
+        foreach ($firewalls as $firewallName => $firewallConfig) {
+            // process firewall only if it is stateless and have context parameter
+            if (!array_key_exists('stateless', $firewallConfig)
+                || !array_key_exists('context', $firewallConfig)
+                || !$firewallConfig['stateless']
+                || null === $firewallConfig['context']
+            ) {
+                continue;
+            }
 
-        $contextId = 'security.firewall.map.context.' . $this->firewallName;
-        if (!$container->hasDefinition($contextId)) {
-            return;
+            $contextId = 'security.firewall.map.context.' . $firewallName;
+            if (!$container->hasDefinition($contextId)) {
+                continue;
+            }
+
+            $contextDef = $container->getDefinition($contextId);
+
+            // add the context listener
+            $listeners = $contextDef->getArgument(0);
+            $contextKey = $firewallConfig['context'];
+            // get new context listener reference
+            $listenerRef = new Reference($this->createContextListener($container, $contextKey));
+            // create decorator for the Context serializer listener
+            $apiContextSerializerListenerId = (string)$listenerRef . '.' . $firewallName;
+            $container
+                ->register($apiContextSerializerListenerId, SecurityFirewallContextListener::class)
+                ->setArguments(
+                    [
+                        $listenerRef,
+                        $sessionOptions,
+                        new Reference('security.token_storage')
+                    ]
+                );
+            $apiContextSerializerListener = new Reference($apiContextSerializerListenerId);
+            $contextListeners = [];
+            /** @var Reference $listener */
+            foreach ($listeners as $listener) {
+                // Context serializer listener should does before the access listener
+                if ((string)$listener === 'security.access_listener') {
+                    $contextListeners[] = $apiContextSerializerListener;
+                }
+                $contextListeners[] = $listener;
+            }
+
+            $contextDef->replaceArgument(0, $contextListeners);
+
+            // replace the exception listener class
+            $exceptionListenerRef = $contextDef->getArgument(1);
+            $exceptionDefinition = $container->getDefinition($exceptionListenerRef);
+            $exceptionDefinition->setClass(ApiExceptionListener::class);
+            $exceptionDefinition->addMethodCall('setSessionOptions', [$sessionOptions]);
         }
-
-        // replace the context listener
-        $contextDef = $container->getDefinition($contextId);
-        $listeners = $contextDef->getArgument(0);
-        list($listenerIndex, $listenerRef) = $this->getContextListener($container, $listeners);
-        if (null === $listenerIndex) {
-            return;
-        }
-
-        $apiListenerId = (string) $listenerRef . '.' . $this->firewallName;
-        $container
-            ->register($apiListenerId, SecurityFirewallContextListener::class)
-            ->setArguments([$listenerRef, $sessionOptions]);
-
-        $listeners[$listenerIndex] = new Reference($apiListenerId);
-        $contextDef->replaceArgument(0, $listeners);
-
-        // replace the exception listener class
-        $exceptionListenerRef = $contextDef->getArgument(1);
-        $exceptionDefinition = $container->getDefinition($exceptionListenerRef);
-        $exceptionDefinition->setClass(ApiExceptionListener::class);
-        $exceptionDefinition->addMethodCall('setSessionOptions', [$sessionOptions]);
     }
 
     /**
      * @param ContainerBuilder $container
-     * @param Reference[]      $listeners
+     * @param string           $contextKey
      *
-     * @return array [index, Reference]
+     * @return string
      */
-    protected function getContextListener(ContainerBuilder $container, array $listeners)
+    protected function createContextListener(ContainerBuilder $container, $contextKey)
     {
-        $securityContextListenerClass = $container->getParameter('security.context_listener.class');
-
-        $index = 0;
-        foreach ($listeners as $listener) {
-            $serviceId = (string) $listener;
-            if ($container->hasDefinition($serviceId)) {
-                $serviceDef = $container->getDefinition($serviceId);
-                if ($securityContextListenerClass === $serviceDef->getClass()) {
-                    return [$index, $listener];
-                }
-            }
-            $index++;
+        if (isset($this->contextListeners[$contextKey])) {
+            return $this->contextListeners[$contextKey];
         }
 
-        return [null, null];
+        $listenerId = 'security.context_listener_.' . count($this->contextListeners);
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.context_listener'));
+        $listener->replaceArgument(2, $contextKey);
+
+        $this->contextListeners[$contextKey] = $listenerId;
+
+        return $listenerId;
     }
 }

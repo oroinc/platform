@@ -39,9 +39,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $configManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $calendarFactory = $this->getMock('Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface');
+        $calendarFactory = $this->createMock('Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface');
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
         $localeSettings = new LocaleSettings($configManager, $calendarFactory);
 
@@ -68,7 +68,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                          array()
                      ),
                      new CsrfExtension(
-                         $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                         $this->createMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
                      )
                 )
             )

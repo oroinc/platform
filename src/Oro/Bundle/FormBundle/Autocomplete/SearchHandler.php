@@ -241,11 +241,20 @@ class SearchHandler implements SearchHandlerInterface
      */
     protected function getEntitiesByIds(array $entityIds)
     {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->entityRepository->createQueryBuilder('e');
-        $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
+        $entityIds = array_filter(
+            $entityIds,
+            function ($id) {
+                return $id !== null && $id !== '';
+            }
+        );
+        if ($entityIds) {
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $this->entityRepository->createQueryBuilder('e');
+            $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
+            return $queryBuilder->getQuery()->getResult();
+        }
 
-        return $queryBuilder->getQuery()->getResult();
+        return [];
     }
 
     /**
@@ -276,7 +285,12 @@ class SearchHandler implements SearchHandlerInterface
      */
     protected function findById($query)
     {
-        return $this->getEntitiesByIds(explode(',', $query));
+        $ids = [];
+        if ($query) {
+            $ids = explode(',', $query);
+        }
+
+        return $this->getEntitiesByIds($ids);
     }
 
     /**

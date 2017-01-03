@@ -21,23 +21,23 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
     protected $menuManipulator;
 
     /** @var string */
-    protected $area = 'default';
+    protected $scopeType = 'default';
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->chainProvider = $this->getMock(BuilderChainProvider::class, [], [], '', false);
-        $this->menuManipulator = $this->getMock(MenuManipulator::class);
+        $this->chainProvider = $this->createMock(BuilderChainProvider::class);
+        $this->menuManipulator = $this->createMock(MenuManipulator::class);
 
-        $this->datasource = new MenuUpdateDatasource($this->chainProvider, $this->menuManipulator, $this->area);
+        $this->datasource = new MenuUpdateDatasource($this->chainProvider, $this->menuManipulator, $this->scopeType);
     }
 
     public function testProcess()
     {
         /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $grid */
-        $grid = $this->getMock(DatagridInterface::class);
+        $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())
             ->method('setDatasource')
             ->with($this->datasource);
@@ -84,14 +84,14 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     'name' => 'default_menu',
-                    'extras' => ['area' => 'default']
+                    'extras' => ['scope_type' => 'default']
                 ],
                 'result_count' => 1
             ],
             [
                 [
                     'name' => 'default_menu',
-                    'extras' => ['area' => 'custom']
+                    'extras' => ['scope_type' => 'custom']
                 ],
                 'result_count' => 0
             ],

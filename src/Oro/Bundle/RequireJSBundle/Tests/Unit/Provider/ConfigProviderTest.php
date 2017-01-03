@@ -38,8 +38,8 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->engineInterface = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $this->cache = $this->getMock('Doctrine\Common\Cache\CacheProvider');
+        $this->engineInterface = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $this->cache = $this->createMock('Doctrine\Common\Cache\CacheProvider');
 
         $this->config = [
             'build_path'    => './build/path',

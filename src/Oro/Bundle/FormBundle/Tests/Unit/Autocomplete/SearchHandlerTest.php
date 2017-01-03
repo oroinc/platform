@@ -18,6 +18,9 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_ID_FIELD = 'id';
@@ -127,7 +130,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
-        $this->managerRegistry = $this->getMock(ManagerRegistry::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(self::TEST_ENTITY_CLASS)
@@ -462,7 +465,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
         foreach (array_keys($data) as $name) {
             $methods[$name] = 'get' . ucfirst($name);
         }
-        $result = $this->getMock('stdClass', array_values($methods));
+        $result = $this->createPartialMock(\stdClass::class, array_values($methods));
         foreach ($data as $name => $property) {
             $result->expects($this->any())
                 ->method($methods[$name])
@@ -533,5 +536,121 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     protected function createStdClass(array $properties)
     {
         return json_decode(json_encode($properties));
+    }
+
+    public function testSearchByIds()
+    {
+        $searchQuery = '1,2';
+        $searchIds = ['1', '2'];
+        $expected = [
+            'results' => [
+                [self::TEST_ID_FIELD => 1, 'name' => 'Jane1', 'email' => 'jane1@example.com', 'property.path' => null],
+                [self::TEST_ID_FIELD => 2, 'name' => 'Jane2', 'email' => 'jane2@example.com', 'property.path' => null]
+            ],
+            'more' => false
+        ];
+
+        $expr = new Expr();
+        $qb = $this->getMockBuilder(QueryBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
+        $qb->expects($this->once())
+            ->method('where')
+            ->with($expr->in('e.id', $searchIds));
+
+        $this->entityRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
+        $result = [
+            $this->createMockEntity([self::TEST_ID_FIELD => 1, 'name' => 'Jane1', 'email' => 'jane1@example.com']),
+            $this->createMockEntity([self::TEST_ID_FIELD => 2, 'name' => 'Jane2', 'email' => 'jane2@example.com'])
+        ];
+        $query = $this->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn($result);
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
+    }
+
+    public function testSearchByIdsWithEmptyString()
+    {
+        $searchQuery = '1,,2';
+        $searchIds = [0 => '1', 2 => '2'];
+        $expected = [
+            'results' => [
+                [self::TEST_ID_FIELD => 1, 'name' => 'Jane1', 'email' => 'jane1@example.com', 'property.path' => null],
+                [self::TEST_ID_FIELD => 2, 'name' => 'Jane2', 'email' => 'jane2@example.com', 'property.path' => null]
+            ],
+            'more' => false
+        ];
+
+        $expr = new Expr();
+        $qb = $this->getMockBuilder(QueryBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
+        $qb->expects($this->once())
+            ->method('where')
+            ->with($expr->in('e.id', $searchIds));
+
+        $this->entityRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
+
+        $result = [
+            $this->createMockEntity([self::TEST_ID_FIELD => 1, 'name' => 'Jane1', 'email' => 'jane1@example.com']),
+            $this->createMockEntity([self::TEST_ID_FIELD => 2, 'name' => 'Jane2', 'email' => 'jane2@example.com'])
+        ];
+        $query = $this->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+        $query->expects($this->once())
+            ->method('getResult')
+            ->willReturn($result);
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
+    }
+
+    public function testSearchByIdsEmptySearch()
+    {
+        $searchQuery = '';
+        $expected = [
+            'results' => [],
+            'more' => false
+        ];
+
+        $this->entityRepository->expects($this->never())
+            ->method('createQueryBuilder');
+        $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
+    }
+
+    public function testSearchByIdsIncorrectSearchString()
+    {
+        $searchQuery = ',';
+        $expected = [
+            'results' => [],
+            'more' => false
+        ];
+
+        $this->entityRepository->expects($this->never())
+            ->method('createQueryBuilder');
+        $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
     }
 }

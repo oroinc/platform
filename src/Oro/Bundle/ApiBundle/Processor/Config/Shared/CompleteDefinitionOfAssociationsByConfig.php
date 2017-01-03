@@ -91,14 +91,23 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
                 continue;
             }
 
+            if (!$fieldName) {
+                $fieldName = $propertyPath;
+            }
             $this->completeAssociation(
                 $definition,
-                $fieldName ?: $propertyPath,
+                $fieldName,
                 $mapping['targetEntity'],
                 $version,
                 $requestType,
                 $extras
             );
+            $field = $definition->getField($fieldName);
+            if (null !== $field && $field->getTargetClass()) {
+                $field->setTargetType(
+                    $this->getAssociationTargetType(!($mapping['type'] & ClassMetadata::TO_ONE))
+                );
+            }
         }
     }
 
@@ -176,5 +185,15 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
             }
             $field->setTargetEntity($targetEntity);
         }
+    }
+
+    /**
+     * @param bool $isCollection
+     *
+     * @return string
+     */
+    protected function getAssociationTargetType($isCollection)
+    {
+        return $isCollection ? 'to-many' : 'to-one';
     }
 }

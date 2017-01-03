@@ -7,10 +7,6 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class CliImportHandler extends AbstractImportHandler
 {
-    /**
-     * @var string
-     */
-    protected $importingFileName;
 
     /**
      * {@inheritdoc}
@@ -18,13 +14,8 @@ class CliImportHandler extends AbstractImportHandler
     public function handleImportValidation(
         $jobName,
         $processorAlias,
-        $inputFormat = 'csv',
-        $inputFilePrefix = null,
         array $options = []
     ) {
-        if ($inputFilePrefix === null) {
-            $inputFilePrefix = $processorAlias;
-        }
         $entityName = $this->processorRegistry->getProcessorEntityName(
             ProcessorRegistry::TYPE_IMPORT_VALIDATION,
             $processorAlias
@@ -33,8 +24,6 @@ class CliImportHandler extends AbstractImportHandler
         $jobResult = $this->executeValidation(
             $jobName,
             $processorAlias,
-            $inputFormat,
-            $inputFilePrefix,
             $options,
             $entityName
         );
@@ -61,11 +50,9 @@ class CliImportHandler extends AbstractImportHandler
     public function handleImport(
         $jobName,
         $processorAlias,
-        $inputFormat = 'csv',
-        $inputFilePrefix = null,
         array $options = []
     ) {
-        $jobResult = $this->executeJob($jobName, $processorAlias, $inputFormat, $options);
+        $jobResult = $this->executeJob($jobName, $processorAlias, $options);
 
         $counts = $this->getValidationCounts($jobResult);
 
@@ -86,22 +73,6 @@ class CliImportHandler extends AbstractImportHandler
             'errors'  => $errors,
             'message' => $message,
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getImportingFileName($inputFormat, $inputFilePrefix = null)
-    {
-        return $this->importingFileName;
-    }
-
-    /**
-     * @param string $fileName
-     */
-    public function setImportingFileName($fileName)
-    {
-        $this->importingFileName = $fileName;
     }
 
     /**

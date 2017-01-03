@@ -51,7 +51,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessUnsupportedMethod()
     {
         $entity = new SomeEntity();
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $data = ['a' => 1];
         $method = 'UNSUP';
 
@@ -73,7 +73,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessDataEmpty()
     {
         $entity = new SomeEntity();
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $data = [];
         $method = 'PATCH';
 
@@ -95,7 +95,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessInvalid()
     {
         $entity = new SomeEntity();
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $data = ['a' => '1', 'b' => '2'];
         $method = 'PATCH';
 
@@ -132,7 +132,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
     public function testProcessValid()
     {
         $entity = new SomeEntity();
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
         $data = ['a' => '1', 'b' => '2'];
         $method = 'PATCH';
 

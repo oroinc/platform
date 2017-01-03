@@ -100,7 +100,8 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeException(array $options, $exception, $exceptionMessage)
     {
-        $this->setExpectedException($exception, $exceptionMessage);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $this->condition->initialize($options);
     }

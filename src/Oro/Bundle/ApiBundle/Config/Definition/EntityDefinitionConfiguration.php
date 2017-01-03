@@ -21,6 +21,7 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
             ->end()
             ->booleanNode(EntityDefinitionConfig::DISABLE_INCLUSION)->end()
             ->booleanNode(EntityDefinitionConfig::DISABLE_FIELDSET)->end()
+            ->booleanNode(EntityDefinitionConfig::DISABLE_META_PROPERTIES)->end()
             ->scalarNode(EntityDefinitionConfig::DELETE_HANDLER)->cannotBeEmpty()->end()
             ->scalarNode(EntityDefinitionConfig::DOCUMENTATION_RESOURCE)->cannotBeEmpty()->end();
     }

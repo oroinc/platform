@@ -236,11 +236,12 @@ define([
                         my: 'left top',
                         at: 'left bottom',
                         of: this.$el,
-                        collision: 'fit flip',
+                        collision: 'fit none',
                         within: $dropdownContainer
                     },
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
+                        this.trigger('showCriteria', this);
                         this._setDropdownWidth();
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
@@ -378,7 +379,9 @@ define([
          */
         _onValueUpdated: function(newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
-            this.selectWidget.multiselect('refresh');
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('refresh');
+            }
         },
 
         /**

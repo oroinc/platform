@@ -20,7 +20,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $manager        = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();

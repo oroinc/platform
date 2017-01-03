@@ -59,7 +59,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
-        $exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+        $exclusionProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
 
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->setMethods(['isResourceEnabled'])

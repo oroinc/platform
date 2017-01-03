@@ -184,7 +184,7 @@ class ActivityManager
     {
         $hasChanges = false;
 
-        $oldTargetEntities = $activityEntity->getActivityTargetEntities();
+        $oldTargetEntities = $activityEntity->getActivityTargets();
 
         foreach ($oldTargetEntities as $oldTargetEntity) {
             if (!in_array($oldTargetEntity, $targetEntities)) {

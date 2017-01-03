@@ -29,7 +29,8 @@ class CronExpressionVerifierTest extends \PHPUnit_Framework_TestCase
     public function testExpression($expression, \Exception $exception = null)
     {
         if ($exception) {
-            $this->setExpectedException(get_class($exception), $exception->getMessage());
+            $this->expectException(get_class($exception));
+            $this->expectExceptionMessage($exception->getMessage());
         }
 
         $this->assertTrue($this->verifier->verify($expression));

@@ -254,7 +254,8 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
             MockHelper::addMockExpectedCalls($mock, $calls, $this);
         }
 
-        $this->setExpectedException($expectedException, $expectedExceptionMessage);
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
         $this->factory->create($this->type, null, $options);
     }
 
@@ -369,7 +370,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     private function createMockEntity($property, $value)
     {
         $getter = 'get' . ucfirst($property);
-        $result = $this->getMock('MockEntity', [$getter]);
+        $result = $this->createPartialMock(\ArrayObject::class, [$getter]);
         $result->expects($this->any())->method($getter)->will($this->returnValue($value));
 
         return $result;
@@ -416,7 +417,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-            $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+            $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
             $this->configProvider
                 ->expects($this->any())
@@ -433,7 +434,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     public function getMockConverter()
     {
         if (!$this->converter) {
-            $this->converter = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface');
+            $this->converter = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface');
         }
 
         return $this->converter;
@@ -453,7 +454,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     public function getMockSearchHandler()
     {
         if (!$this->searchHandler) {
-            $this->searchHandler = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
+            $this->searchHandler = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
         }
 
         return $this->searchHandler;

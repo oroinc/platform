@@ -31,7 +31,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
 
         $this->assertTrue($this->normalizer->supportsNormalization(
-            $this->getMock(OptionValueBag::class, [], [], '', false)
+            $this->createMock(OptionValueBag::class)
         ));
     }
 

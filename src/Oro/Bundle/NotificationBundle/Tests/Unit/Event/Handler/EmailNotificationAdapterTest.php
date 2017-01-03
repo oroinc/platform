@@ -53,7 +53,7 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTemplate()
     {
-        $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
+        $template = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
 
         $this->emailNotification->expects($this->once())
             ->method('getTemplate')

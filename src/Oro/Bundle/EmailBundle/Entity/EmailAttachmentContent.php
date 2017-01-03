@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
  * Email Attachment
@@ -37,7 +36,6 @@ class EmailAttachmentContent
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=false)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $content;
@@ -46,7 +44,6 @@ class EmailAttachmentContent
      * @var string
      *
      * @ORM\Column(name="content_transfer_encoding", type="string", length=20, nullable=false)
-     * @Soap\ComplexType("string")
      * @JMS\Type("string")
      */
     protected $contentTransferEncoding;
