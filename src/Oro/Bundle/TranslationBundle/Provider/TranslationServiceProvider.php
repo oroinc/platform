@@ -63,15 +63,18 @@ class TranslationServiceProvider
      * merge generated files over downloaded and upload result back to remote
      *
      * @param array|string[] $dirs
+     * @param bool           $force
+     *
+     * @return void
      */
-    public function update($dirs)
+    public function update($dirs, $force)
     {
         $targetDir  = $this->getTmpDir('oro-trans');
         $pathToSave = $targetDir . DIRECTORY_SEPARATOR . 'update';
         $targetDir  = $targetDir . DIRECTORY_SEPARATOR . self::DEFAULT_SOURCE_LOCALE . DIRECTORY_SEPARATOR;
 
         $isDownloaded = $this->download($pathToSave, [], self::DEFAULT_SOURCE_LOCALE, false);
-        if (!$isDownloaded) {
+        if (!$isDownloaded && !$force) {
             return false;
         }
 
@@ -83,7 +86,7 @@ class TranslationServiceProvider
                 $localContents = file($fileInfo);
                 $remoteFile    = $targetDir . $fileInfo->getRelativePathname();
 
-                if (file_exists($remoteFile)) {
+                if (file_exists($remoteFile) && !$force) {
                     $remoteContents = file($remoteFile);
                     array_shift($remoteContents); // remove dashes from the beginning of file
                 } else {
@@ -109,20 +112,31 @@ class TranslationServiceProvider
     /**
      * Upload translations
      *
-     * @param string $dir
+     * @param string|array $dirs
      * @param string $mode
      *
      * @return mixed
      */
-    public function upload($dir, $mode = 'add')
+    public function upload($dirs, $mode = 'add')
     {
-        $finder = Finder::create()->files()->name('*.yml')->in($dir);
+        $dirs = $this->processDirs($dirs);
+
+        $finder = Finder::create()->files()->name('*.yml')->in($dirs);
 
         /** $file \SplFileInfo */
         $files = [];
         foreach ($finder->files() as $file) {
+            $apiPath = (string)$file;
+            foreach ($dirs as $dir) {
+                if (strpos($apiPath, $dir) !== false) {
+                    $apiPath = str_replace($dir, '', $apiPath);
+                    break;
+                }
+            }
+
             // crowdin understand only "/" as directory separator :)
-            $apiPath         = str_replace([$dir, DIRECTORY_SEPARATOR], ['', '/'], (string)$file);
+            $apiPath = str_replace(DIRECTORY_SEPARATOR, '/', $apiPath);
+
             $files[$apiPath] = (string)$file;
         }
 
@@ -166,7 +180,23 @@ class TranslationServiceProvider
             $this->jsTranslationDumper->dumpTranslations([$locale]);
         }
 
-        return $isExtracted && $isDownloaded;
+        return $isExtracted;
+    }
+
+    /**
+     * @param string|array $dirs
+     * @return array
+     */
+    protected function processDirs($dirs)
+    {
+        $dirs = is_array($dirs) ? $dirs : [$dirs];
+
+        return array_map(
+            function ($path) {
+                return rtrim($path, DIRECTORY_SEPARATOR);
+            },
+            $dirs
+        );
     }
 
     /**
