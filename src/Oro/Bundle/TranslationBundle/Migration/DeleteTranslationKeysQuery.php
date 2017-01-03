@@ -33,7 +33,7 @@ class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return 'Remove unused translation keys for RFQ status field';
+        return 'Remove unused translation keys';
     }
 
     /**
