@@ -183,7 +183,6 @@ services:
         class: Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension
         arguments:
             - '@oro_search.formatter.result_formatter'
-            - '@doctrine.orm.entity_manager'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         tags:
