@@ -187,3 +187,6 @@ services:
         class: '%oro_translation.strategy.provider.class%'
         arguments:
             - '@oro_translation.strategy.default'
+
+    oro_translation.utils.translation_dump_helper:
+        class: Oro\Bundle\TranslationBundle\Utils\TranslationDumpHelper
