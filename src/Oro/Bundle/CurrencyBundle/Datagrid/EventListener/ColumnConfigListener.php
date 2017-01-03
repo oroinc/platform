@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CurrencyBundle\Datagrid\EventListener;
 
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser as Guesser;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -36,7 +35,7 @@ class ColumnConfigListener
         $config = $event->getConfig();
 
         // datasource type other than ORM is not supported yet
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+        if (!$config->isOrmDatasource()) {
             return;
         }
 

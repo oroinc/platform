@@ -7,7 +7,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardException;
 use Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException;
@@ -114,7 +113,7 @@ class BoardExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+        if (!$config->isOrmDatasource()) {
             return false;
         }
 

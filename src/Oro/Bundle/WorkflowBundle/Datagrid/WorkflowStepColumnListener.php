@@ -89,7 +89,7 @@ class WorkflowStepColumnListener
         $config = $event->getConfig();
 
         // datasource type other than ORM is not supported yet
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+        if (!$config->isOrmDatasource()) {
             return;
         }
 

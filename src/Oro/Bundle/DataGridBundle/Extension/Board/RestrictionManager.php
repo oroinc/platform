@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Board;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
@@ -42,7 +41,7 @@ class RestrictionManager
      */
     public function boardViewEnabled(DatagridConfiguration $config)
     {
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+        if (!$config->isOrmDatasource()) {
             return false;
         }
 

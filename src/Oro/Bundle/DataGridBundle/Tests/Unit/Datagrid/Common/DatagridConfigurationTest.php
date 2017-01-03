@@ -37,6 +37,18 @@ class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->configuration->getOrmQuery();
     }
 
+    public function testIsOrmDatasource()
+    {
+        // the datasource type is not set
+        self::assertFalse($this->configuration->isOrmDatasource());
+        // ORM datasource
+        $this->configuration->setDatasourceType(OrmDatasource::TYPE);
+        self::assertTrue($this->configuration->isOrmDatasource());
+        // not ORM datasource
+        $this->configuration->setDatasourceType('another');
+        self::assertFalse($this->configuration->isOrmDatasource());
+    }
+
     public function testDatasourceType()
     {
         // test initial value

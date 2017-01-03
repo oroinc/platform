@@ -9,7 +9,6 @@ use Symfony\Component\Routing\RouterInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -97,13 +96,10 @@ class ContextsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $isEnabled = !empty($config->offsetGetByPath(self::CONTEXTS_ENABLED_PATH, false));
-        $entityClassName = $config->offsetGetByPath(self::CONTEXTS_ENTITY_PATH, $this->getEntityClassName($config));
-        $activityTypes = $this->activityManager->getActivityTypes();
-
-        return $isEnabled &&
-               OrmDatasource::TYPE == $config->getDatasourceType() &&
-               in_array($entityClassName, $activityTypes);
+        return
+            $config->isOrmDatasource()
+            && $config->offsetGetByPath(self::CONTEXTS_ENABLED_PATH)
+            && in_array($this->getEntityClassName($config), $this->activityManager->getActivityTypes(), true);
     }
 
     /**
@@ -111,7 +107,7 @@ class ContextsExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $entityClassName = $config->offsetGetByPath(self::CONTEXTS_ENTITY_PATH, $this->getEntityClassName($config));
+        $entityClassName = $this->getEntityClassName($config);
         $config->offsetSetByPath(self::CONTEXTS_ENTITY_PATH, $entityClassName);
 
         $columnName = $config->offsetGetByPath(self::CONTEXTS_COLUMN_PATH, self::DEFAULT_COLUMN_NAME);
@@ -206,7 +202,12 @@ class ContextsExtension extends AbstractExtension
      */
     protected function getEntityClassName(DatagridConfiguration $config)
     {
-        return $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
+        $entityClass = $config->offsetGetByPath(self::CONTEXTS_ENTITY_PATH);
+        if (!$entityClass) {
+            $entityClass = $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
+        }
+
+        return $entityClass;
     }
 
     /**

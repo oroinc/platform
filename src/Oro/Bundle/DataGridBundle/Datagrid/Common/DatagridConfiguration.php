@@ -79,6 +79,16 @@ class DatagridConfiguration extends ConfigObject
     }
 
     /**
+     * Indicates whether the grid is based on ORM query.
+     *
+     * @return bool
+     */
+    public function isOrmDatasource()
+    {
+        return OrmDatasource::TYPE === $this->getDatasourceType();
+    }
+
+    /**
      * @return string
      */
     public function getDatasourceType()
