@@ -111,13 +111,20 @@ class OrmQueryConfiguration
     /**
      * Adds an item to SELECT part of the query.
      *
-     * @param string $select
+     * @param mixed $select
      *
      * @return self
      */
     public function addSelect($select)
     {
-        $this->config->offsetAddToArrayByPath(self::SELECT_PATH, [$select]);
+        if (is_array($select)) {
+            $this->config->offsetSetByPath(
+                self::SELECT_PATH,
+                array_merge($this->config->offsetGetByPath(self::SELECT_PATH, []), $select)
+            );
+        } else {
+            $this->config->offsetAddToArrayByPath(self::SELECT_PATH, [$select]);
+        }
 
         return $this;
     }

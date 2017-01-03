@@ -120,6 +120,35 @@ class OrmQueryConfigurationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddSelectForMultipleItems()
+    {
+        self::assertSame($this->query, $this->query->addSelect(['column1']));
+        self::assertSame(['column1'], $this->query->getSelect());
+        self::assertSame(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => ['column1']
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+
+        self::assertSame($this->query, $this->query->addSelect(['column2']));
+        self::assertSame(['column1', 'column2'], $this->query->getSelect());
+        self::assertSame(
+            [
+                'source' => [
+                    'query' => [
+                        'select' => ['column1', 'column2']
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
     public function testGetRootAliasWhenNoFromPart()
     {
         self::assertNull($this->query->getRootAlias());
@@ -706,6 +735,39 @@ class OrmQueryConfigurationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAddAndWhereForMultipleItems()
+    {
+        self::assertSame($this->query, $this->query->addAndWhere(['column1 = 123']));
+        self::assertSame(['and' => ['column1 = 123']], $this->query->getWhere());
+        self::assertSame(
+            [
+                'source' => [
+                    'query' => [
+                        'where' => [
+                            'and' => ['column1 = 123']
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+
+        self::assertSame($this->query, $this->query->addAndWhere(['column2 = 456']));
+        self::assertSame(['and' => ['column1 = 123', 'column2 = 456']], $this->query->getWhere());
+        self::assertSame(
+            [
+                'source' => [
+                    'query' => [
+                        'where' => [
+                            'and' => ['column1 = 123', 'column2 = 456']
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
     public function testAddOrWhere()
     {
         self::assertSame($this->query, $this->query->addOrWhere('column1 = 123'));
@@ -724,6 +786,39 @@ class OrmQueryConfigurationTest extends \PHPUnit_Framework_TestCase
         );
 
         self::assertSame($this->query, $this->query->addOrWhere('column2 = 456'));
+        self::assertSame(['or' => ['column1 = 123', 'column2 = 456']], $this->query->getWhere());
+        self::assertSame(
+            [
+                'source' => [
+                    'query' => [
+                        'where' => [
+                            'or' => ['column1 = 123', 'column2 = 456']
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+    }
+
+    public function testAddOrWhereForMultipleItems()
+    {
+        self::assertSame($this->query, $this->query->addOrWhere(['column1 = 123']));
+        self::assertSame(['or' => ['column1 = 123']], $this->query->getWhere());
+        self::assertSame(
+            [
+                'source' => [
+                    'query' => [
+                        'where' => [
+                            'or' => ['column1 = 123']
+                        ]
+                    ]
+                ]
+            ],
+            $this->config->toArray()
+        );
+
+        self::assertSame($this->query, $this->query->addOrWhere(['column2 = 456']));
         self::assertSame(['or' => ['column1 = 123', 'column2 = 456']], $this->query->getWhere());
         self::assertSame(
             [
