@@ -40,10 +40,7 @@ class MaxNestedLevelValidator extends ConstraintValidator
     {
         $options = [
             'ignoreCache' => true,
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => [
-                'organization' => $entity->getScope()->getOrganization(),
-                'user' => $entity->getScope()->getUser()
-            ]
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $entity->getScope()
         ];
 
         $menu = $this->builderChainProvider->get($entity->getMenu(), $options);

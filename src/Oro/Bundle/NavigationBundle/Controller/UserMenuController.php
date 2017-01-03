@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
-use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -27,7 +24,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function indexAction()
     {
-        return parent::index($this->getUserScope());
+        return parent::index($this->getContext());
     }
 
     /**
@@ -41,7 +38,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return parent::view($menuName, $this->getUserScope(), $this->getMenuTreeContext());
+        return parent::view($menuName, $this->getContext());
     }
 
     /**
@@ -56,7 +53,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey, $this->getUserScope(), $this->getMenuTreeContext());
+        return parent::create($menuName, $parentKey, $this->getContext());
     }
 
     /**
@@ -71,29 +68,15 @@ class UserMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key, $this->getUserScope(), $this->getMenuTreeContext());
+        return parent::update($menuName, $key, $this->getContext());
     }
 
     /**
-     * @return Scope
+     * @return array
      */
-    private function getUserScope()
+    private function getContext()
     {
-        return $this->getScope([ScopeUserCriteriaProvider::SCOPE_KEY => $this->getUser()]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    private function getMenuTreeContext()
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        return [
-            ScopeOrganizationCriteriaProvider::SCOPE_KEY => $user->getOrganization(),
-            ScopeUserCriteriaProvider::SCOPE_KEY => $user
-        ];
+        return [ScopeUserCriteriaProvider::SCOPE_KEY => $this->getUser()->getId()];
     }
 
     /**

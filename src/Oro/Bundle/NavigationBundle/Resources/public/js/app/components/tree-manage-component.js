@@ -22,9 +22,9 @@ define(function(require) {
         menu: '',
 
         /**
-         * @property {Number}
+         * @property {Object}
          */
-        scopeId: 0,
+        context: {},
 
         /**
          * @param {Object} options
@@ -33,7 +33,7 @@ define(function(require) {
             TreeManageComponent.__super__.initialize.call(this, options);
 
             this.menu = options.menu;
-            this.scopeId = options.scopeId;
+            this.context = options.context;
         },
 
         /**
@@ -50,11 +50,11 @@ define(function(require) {
             var routeParams;
             if (this.onRootSelectRoute && selected.node.parent === '#') {
                 route = this.onRootSelectRoute;
-                routeParams = {menuName: this.menu, scopeId: this.scopeId};
+                routeParams = {menuName: this.menu, context: this.context};
             } else {
                 route = this.onSelectRoute;
                 routeParams = {
-                    scopeId: this.scopeId,
+                    context: this.context,
                     menuName: this.menu,
                     key: selected.node.id
                 };
@@ -78,7 +78,7 @@ define(function(require) {
                 async: false,
                 type: 'PUT',
                 url: routing.generate(self.onMoveRoute, {
-                    scopeId: this.scopeId,
+                    context: this.context,
                     menuName: this.menu
                 }),
                 data: {

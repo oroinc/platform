@@ -5,7 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 use Doctrine\ORM\EntityManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,24 +12,30 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
+// todo check acl
 class AjaxMenuController extends Controller
 {
     /**
-     * @Route("/menu/reset/{scopeId}/{menuName}", name="oro_navigation_menuupdate_reset")
-     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
+     * @Route("/menu/reset/{menuName}", name="oro_navigation_menuupdate_reset")
      * @Method("DELETE")
      *
      * @param string  $menuName
-     * @param Scope   $scope
+     * @param Request $request
      *
      * @return Response
      */
-    public function resetAction($menuName, Scope $scope)
+    public function resetAction($menuName, Request $request)
     {
+        $context = $this->getContextFromRequest($request);
+        $scope = $this->get('oro_scope.scope_manager')->find($context);
+        if (null === $scope) {
+            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        }
         $updates = $this->getMenuUpdateManager()->getRepository()->findMenuUpdatesByScope($menuName, $scope);
 
         /** @var EntityManager $em */
@@ -46,25 +51,24 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/create/{menuName}/{parentKey}/{scopeId}", name="oro_navigation_menuupdate_create")
-     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
+     * @Route("/menu/create/{menuName}/{parentKey}", name="oro_navigation_menuupdate_create")
      * @Method("POST")
      *
      * @param Request $request
      * @param string  $menuName
      * @param string  $parentKey
-     * @param Scope   $scope
      *
      * @return Response
      */
-    public function createAction(Request $request, $menuName, $parentKey, Scope $scope)
+    public function createAction(Request $request, $menuName, $parentKey)
     {
+        $scope = $this->findOrCreateScope($request, $menuName);
         $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
             $scope,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
-                'isDivider'=> $request->get('isDivider'),
+                'isDivider' => $request->get('isDivider'),
                 'custom' => true
             ]
         );
@@ -83,21 +87,28 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/delete/{scopeId}/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
-     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
+     * @Route("/menu/delete/{menuName}/{key}", name="oro_navigation_menuupdate_delete")
      * @Method("DELETE")
      *
-     * @param string $menuName
-     * @param string $key
-     * @param Scope  $scope
+     * @param string  $menuName
+     * @param string  $key
+     * @param Request $request
      *
      * @return Response
      */
-    public function deleteAction($menuName, $key, Scope $scope)
+    public function deleteAction($menuName, $key, Request $request)
     {
+        $context = $this->getContextFromRequest($request);
+
+        $scope = $this->get('oro_scope.scope_manager')->find($context);
+
+        if (!$scope) {
+            throw $this->createNotFoundException();
+        }
+
         $manager = $this->getMenuUpdateManager();
 
-        $menuUpdate = $manager->findOrCreateMenuUpdate($menuName, $key, $scope);
+        $menuUpdate = $manager->findMenuUpdate($menuName, $key, $scope);
         if ($menuUpdate === null || $menuUpdate->getId() === null) {
             throw $this->createNotFoundException();
         }
@@ -118,53 +129,51 @@ class AjaxMenuController extends Controller
     }
 
     /**
-     * @Route("/menu/show/{scopeId}/{menuName}/{key}", name="oro_navigation_menuupdate_show")
-     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
+     * @Route("/menu/show/{menuName}/{key}", name="oro_navigation_menuupdate_show")
      * @Method("PUT")
      *
      * @param string  $menuName
      * @param string  $key
-     * @param Scope   $scope
+     * @param Request $request
      *
      * @return Response
      */
-    public function showAction($menuName, $key, Scope $scope)
+    public function showAction($menuName, $key, Request $request)
     {
+        $scope = $this->findOrCreateScope($request, $menuName);
         $this->getMenuUpdateManager()->showMenuItem($menuName, $key, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
     /**
-     * @Route("/menu/hide/{scopeId}/{menuName}/{key}", name="oro_navigation_menuupdate_hide")
-     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
+     * @Route("/menu/hide/{menuName}/{key}", name="oro_navigation_menuupdate_hide")
      * @Method("PUT")
      *
      * @param string  $menuName
      * @param string  $key
-     * @param Scope   $scope
+     * @param Request $request
      *
      * @return Response
      */
-    public function hideAction($menuName, $key, Scope $scope)
+    public function hideAction($menuName, $key, Request $request)
     {
+        $scope = $this->findOrCreateScope($request, $menuName);
         $this->getMenuUpdateManager()->hideMenuItem($menuName, $key, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
     /**
-     * @Route("/menu/move/{scopeId}/{menuName}", name="oro_navigation_menuupdate_move")
-     * @ParamConverter("scope", class="OroScopeBundle:Scope", options={"id" = "scopeId"})
+     * @Route("/menu/move/{menuName}", name="oro_navigation_menuupdate_move")
      * @Method("PUT")
      *
      * @param Request $request
      * @param string  $menuName
-     * @param Scope   $scope
      *
      * @return Response
      */
-    public function moveAction(Request $request, $menuName, Scope $scope)
+    public function moveAction(Request $request, $menuName)
     {
         $manager = $this->getMenuUpdateManager();
 
@@ -175,7 +184,10 @@ class AjaxMenuController extends Controller
         /** @var EntityManager $entityManager */
         $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-        $updates = $manager->moveMenuItem($menuName, $key, $scope, $parentKey, $position);
+        $scope = $this->findOrCreateScope($request, $menuName);
+        $updates = $manager->moveMenuItem($menuName, $key,
+            $scope, $parentKey,
+            $position);
         foreach ($updates as $update) {
             $errors = $this->get('validator')->validate($update);
             if (count($errors)) {
@@ -197,6 +209,35 @@ class AjaxMenuController extends Controller
      */
     protected function getMenuUpdateManager()
     {
+        // todo select right manager here
         return $this->get('oro_navigation.manager.menu_update');
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    protected function getContextFromRequest(Request $request)
+    {
+        $context = (array)$request->query->get('context', []);
+        if (empty($context)) {
+            throw $this->createNotFoundException('Context can\'t be empty');
+        }
+
+        return $context;
+    }
+
+    /**
+     * @param Request $request
+     * @param string  $menuName
+     * @return \Extend\Entity\EX_OroScopeBundle_Scope|Scope
+     */
+    protected function findOrCreateScope(Request $request, $menuName)
+    {
+        $context = $this->getContextFromRequest($request);
+        $menu = $this->getMenuUpdateManager()->getMenu($menuName);
+        $scopeType = $menu->getExtra('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE);
+
+        return $this->get('oro_scope.scope_manager')->findOrCreate($scopeType, $context);
     }
 }

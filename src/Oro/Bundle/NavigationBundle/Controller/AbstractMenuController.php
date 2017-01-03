@@ -7,6 +7,7 @@ use Knp\Menu\ItemInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
@@ -57,52 +58,53 @@ abstract class AbstractMenuController extends Controller
     abstract protected function checkAcl();
 
     /**
-     * @param Scope $scope
+     * @param array $context
      * @return array
      */
-    protected function index(Scope $scope)
+    protected function index(array $context = [])
     {
         $this->checkAcl();
 
-        return [
-            'entityClass' => $this->getEntityClass(),
-            'scope' => $scope
-        ];
+        return array_merge(
+            [
+                'entityClass' => $this->getEntityClass(),
+                'context' => $context
+            ],
+            $this->denormalizeContext($context)
+        );
     }
 
     /**
      * @param string $menuName
-     * @param Scope  $scope
-     * @param array  $menuTreeContext
+     * @param array  $context
      * @return array
      */
-    protected function view($menuName, Scope $scope, array $menuTreeContext = [])
+    protected function view($menuName, array $context = [])
     {
         $this->checkAcl();
+        $menu = $this->getMenu($menuName, $context);
 
-        $menu = $this->getMenu($menuName, $menuTreeContext);
-
-        return [
-            'entity' => $menu,
-            'scope' => $scope,
-            'tree' => $this->createMenuTree($menu)
-        ];
+        return array_merge(
+            [
+                'entity' => $menu,
+                'context' => $context,
+                'tree' => $this->createMenuTree($menu)
+            ],
+            $this->denormalizeContext($context)
+        );
     }
 
     /**
      * @param string $menuName
      * @param string $parentKey
-     * @param Scope  $scope
-     * @param array  $menuTreeContext
+     * @param array  $context
      * @return array|RedirectResponse
      */
-    protected function create($menuName, $parentKey, Scope $scope, array $menuTreeContext = [])
+    protected function create($menuName, $parentKey, array $context = [])
     {
         $this->checkAcl();
-
-        /** @var MenuUpdateInterface $menuUpdate */
         $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
-            $scope,
+            $context,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
@@ -110,39 +112,52 @@ abstract class AbstractMenuController extends Controller
             ]
         );
 
-        return $this->handleUpdate($menuUpdate, $scope, $menuTreeContext);
+        return $this->handleUpdate($menuUpdate, $context);
     }
 
     /**
      * @param string $menuName
      * @param string $key
-     * @param Scope  $scope
-     * @param array  $menuTreeContext
+     * @param array  $context
      * @return array|RedirectResponse
      */
-    protected function update($menuName, $key, Scope $scope, array $menuTreeContext = [])
+    protected function update($menuName, $key, array $context = [])
     {
         $this->checkAcl();
 
-        $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menuName, $key, $scope);
+        $scope = $this->get('oro_scope.scope_manager')->find($this->getScopeType(), $context);
+        $menuUpdate = null;
+        if ($scope) {
+            $menuUpdate = $this->getMenuUpdateManager()->findMenuUpdate($menuName, $key, $scope);
+        }
+        if (null === $menuUpdate) {
+            $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
+                $context,
+                [
+                    'menu' => $menuName,
+                    'key' => $key,
+                    'custom' => true
+                ]
+            );
+        }
+
         if (!$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
                 sprintf("Item \"%s\" in \"%s\" not found.", $key, $menuName)
             );
         }
 
-        return $this->handleUpdate($menuUpdate, $scope, $menuTreeContext);
+        return $this->handleUpdate($menuUpdate, $context);
     }
 
     /**
      * @param MenuUpdateInterface $menuUpdate
-     * @param Scope               $scope
-     * @param array               $menuTreeContext
+     * @param array               $context
      * @return array|RedirectResponse
      */
-    protected function handleUpdate(MenuUpdateInterface $menuUpdate, Scope $scope, array $menuTreeContext = [])
+    protected function handleUpdate(MenuUpdateInterface $menuUpdate, array $context)
     {
-        $menu = $this->getMenu($menuUpdate->getMenu(), $menuTreeContext);
+        $menu = $this->getMenu($menuUpdate->getMenu(), $context);
         $menuItem = null;
         if (!$menuUpdate->isCustom()) {
             $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
@@ -157,36 +172,42 @@ abstract class AbstractMenuController extends Controller
         );
 
         if (is_array($response)) {
-            $response['scope'] = $scope;
+            $response['context'] = $context;
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
             $response['menuItem'] = $menuItem;
         }
 
-        return $response;
+        return array_merge($response, $this->denormalizeContext($context));
     }
 
     /**
      * @param array $context
-     * @return Scope
+     * @return string[]
      */
-    protected function getScope(array $context = [])
+    protected function normalizeContext(array $context)
     {
-        return $this->get('oro_scope.scope_manager')->findOrCreate(
-            $this->getScopeType(),
-            $context
-        );
+        return $this->get('oro_scope.context_normalizer')->normalizeContext($context);
     }
 
     /**
-     * @param       $menuName
-     * @param array $menuTreeContext
+     * @param array $context
+     * @return object[]
+     */
+    protected function denormalizeContext(array $context)
+    {
+        return $this->get('oro_scope.context_normalizer')->denormalizeContext($this->getScopeType(), $context);
+    }
+
+    /**
+     * @param string $menuName
+     * @param array  $context
      * @return ItemInterface
      */
-    protected function getMenu($menuName, array $menuTreeContext = [])
+    protected function getMenu($menuName, array $context)
     {
         $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $menuTreeContext
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context
         ];
         $menu = $this->getMenuUpdateManager()->getMenu($menuName, $options);
         if (!count($menu->getChildren())) {
@@ -215,5 +236,19 @@ abstract class AbstractMenuController extends Controller
         }
 
         return $token instanceof OrganizationContextTokenInterface ? $token->getOrganizationContext() : null;
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    protected function getContextFromRequest(Request $request)
+    {
+        $context = (array)$request->query->get('context', []);
+        if (empty($context)) {
+            throw $this->createNotFoundException('Context can\'t be empty');
+        }
+
+        return $context;
     }
 }

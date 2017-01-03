@@ -23,7 +23,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function indexAction()
     {
-        return $this->index($this->getScope());
+        return $this->index();
     }
 
     /**
@@ -37,7 +37,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return $this->view($menuName, $this->getScope());
+        return $this->view($menuName);
     }
 
     /**
@@ -52,7 +52,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey, $this->getScope());
+        return parent::create($menuName, $parentKey);
     }
 
     /**
@@ -67,7 +67,7 @@ class GlobalMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key, $this->getScope());
+        return parent::update($menuName, $key);
     }
 
     /**

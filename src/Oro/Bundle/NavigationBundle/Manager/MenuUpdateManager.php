@@ -78,29 +78,25 @@ class MenuUpdateManager
     /**
      * Create menu update entity
      *
-     * @param Scope $scope
+     * @param mixed $context
      * @param array $options
-     *
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate(Scope $scope, array $options = [])
+    public function createMenuUpdate($context, array $options = [])
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
-        $entity = $entity->setScope($scope);
 
         if (isset($options['key'])) {
             $entity->setKey($options['key']);
         }
-        $isCustom = isset($options['custom']) && $options['custom'];
-        $entity->setCustom($isCustom);
 
         if (!isset($options['menu'])) {
             throw new \InvalidArgumentException('options["menu"] should be defined.');
         }
         $entity->setMenu($options['menu']);
         if (isset($options['parentKey'])) {
-            $parent = $this->findMenuItem($options['menu'], $options['parentKey'], $scope);
+            $parent = $this->findMenuItem($options['menu'], $options['parentKey'], $context);
             if (!$parent) {
                 throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
             }
@@ -113,7 +109,32 @@ class MenuUpdateManager
             $entity->setUri('#');
         }
 
+        $item = $this->findMenuItem($entity->getMenu(), $entity->getKey(), $context);
+        if ($item) {
+            $entity->setCustom(false);
+            MenuUpdateUtils::updateMenuUpdate($entity, $item, $entity->getMenu(), $this->menuUpdateHelper);
+        } else {
+            $entity->setCustom(true);
+        }
+
         return $entity;
+    }
+
+    /**
+     * @param $menuName
+     * @param $key
+     * @param $scope
+     * @return null|MenuUpdateInterface
+     */
+    public function findMenuUpdate($menuName, $key, $scope)
+    {
+        return $this->getRepository()->findOneBy(
+            [
+                'menu' => $menuName,
+                'key' => $key,
+                'scope' => $scope,
+            ]
+        );
     }
 
     /**
@@ -121,30 +142,16 @@ class MenuUpdateManager
      *
      * @param string $menuName
      * @param string $key
-     * @param Scope  $scope
-     *
+     * @param Scope $scope
      * @return null|MenuUpdateInterface
+     *
      */
-    public function findOrCreateMenuUpdate($menuName, $key, Scope $scope)
+    protected function findOrCreateMenuUpdate($menuName, $key, Scope $scope)
     {
-        /** @var MenuUpdateInterface $update */
-        $update = $this->getRepository()->findOneBy(
-            [
-                'menu' => $menuName,
-                'key' => $key,
-                'scope' => $scope,
-            ]
-        );
+        $update = $this->findMenuUpdate($menuName, $key, $scope);
 
-        if (!$update) {
+        if (null === $update) {
             $update = $this->createMenuUpdate($scope, ['key' => $key, 'menu' => $menuName]);
-        }
-
-        $item = $this->findMenuItem($update->getMenu(), $update->getKey(), $update->getScope());
-        if ($item) {
-            MenuUpdateUtils::updateMenuUpdate($update, $item, $update->getMenu(), $this->menuUpdateHelper);
-        } else {
-            $update->setCustom(true);
         }
 
         return $update;
@@ -153,18 +160,13 @@ class MenuUpdateManager
     /**
      * @param string $menuName
      * @param string $key
-     * @param Scope  $scope
+     * @param mixed  $context
      *
      * @return ItemInterface|null
      */
-    protected function findMenuItem($menuName, $key, Scope $scope)
+    protected function findMenuItem($menuName, $key, $context)
     {
-        $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => [
-                'organization' => $scope->getOrganization(),
-                'user' => $scope->getUser(),
-            ]
-        ];
+        $options[MenuUpdateBuilder::SCOPE_CONTEXT_OPTION] = $context;
         $menu = $this->getMenu($menuName, $options);
         if ($menuName === $key) {
             return $menu;
@@ -234,7 +236,7 @@ class MenuUpdateManager
      */
     public function hideMenuItem($menuName, $key, Scope $scope)
     {
-        $item = $this->findMenuItem($menuName, $key, $scope);
+        $item = $this->findMenuItem($menuName, $key, $context);
         if ($item !== null) {
             $update = $this->findOrCreateMenuUpdate($menuName, $item->getName(), $scope);
             $update->setActive(false);
@@ -286,7 +288,7 @@ class MenuUpdateManager
         $i = 0;
         /** @var ItemInterface $child */
         foreach ($parent->getChildren() as $child) {
-            if ($i === (int) $position) {
+            if ($i === (int)$position) {
                 $currentUpdate->setPriority($i);
                 $i++;
             }
