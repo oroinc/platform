@@ -100,16 +100,15 @@ abstract class AbstractFieldsExtension extends AbstractExtension
      */
     public function buildExpression(array $fields, DatagridConfiguration $config, $alias)
     {
-        $relationIndex    = 0;
-        $relationTemplate = 'auto_rel_%d';
         $query = $config->getOrmQuery();
         foreach ($fields as $field) {
             $fieldName = $field->getFieldName();
             switch ($field->getFieldType()) {
                 case 'enum':
                     $extendFieldConfig = $this->getFieldConfig('extend', $field);
-                    $joinAlias = sprintf($relationTemplate, ++$relationIndex);
-                    $query->addLeftJoin(sprintf('%s.%s', $alias, $fieldName), $joinAlias);
+                    $join = sprintf('%s.%s', $alias, $fieldName);
+                    $joinAlias = $query->getJoinAlias($join);
+                    $query->addLeftJoin($join, $joinAlias);
                     $columnDataName = $fieldName;
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
                     $selectExpr = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
@@ -124,8 +123,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                 case RelationType::MANY_TO_ONE:
                 case RelationType::ONE_TO_ONE:
                     $extendFieldConfig = $this->getFieldConfig('extend', $field);
-                    $joinAlias = sprintf($relationTemplate, ++$relationIndex);
-                    $query->addLeftJoin(sprintf('%s.%s', $alias, $fieldName), $joinAlias);
+                    $join = sprintf('%s.%s', $alias, $fieldName);
+                    $joinAlias = $query->getJoinAlias($join);
+                    $query->addLeftJoin($join, $joinAlias);
 
                     $dataName = $fieldName . '_target_field';
                     $targetField = $extendFieldConfig->get('target_field', false, 'id');

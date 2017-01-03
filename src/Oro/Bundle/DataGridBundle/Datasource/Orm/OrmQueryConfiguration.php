@@ -13,6 +13,7 @@ class OrmQueryConfiguration
     const DISTINCT_PATH   = '[source][query][distinct]';
     const SELECT_PATH     = '[source][query][select]';
     const FROM_PATH       = '[source][query][from]';
+    const JOIN_PATH       = '[source][query][join]';
     const INNER_JOIN_PATH = '[source][query][join][inner]';
     const LEFT_JOIN_PATH  = '[source][query][join][left]';
     const WHERE_PATH      = '[source][query][where]';
@@ -33,8 +34,13 @@ class OrmQueryConfiguration
     const NAME_KEY           = 'name';
     const VALUE_KEY          = 'value';
 
+    const GENERATED_JOIN_ALIAS_TEMPLATE = 'auto_rel_%d';
+
     /** @var DatagridConfiguration */
     private $config;
+
+    /** @var array */
+    private $generatedJoinAliases = [];
 
     /**
      * @param DatagridConfiguration $config
@@ -209,6 +215,37 @@ class OrmQueryConfiguration
     }
 
     /**
+     * Gets an alias for the given join.
+     * If the query does not contain the specified join, its alias will be generated automatically.
+     * This might be helpful if you need to get an alias to extended association that will be
+     * joined later.
+     *
+     * @param string      $join          The relationship to join.
+     * @param string|null $conditionType The condition type constant. Either "ON" or "WITH".
+     * @param string|null $condition     The condition for the join.
+     *
+     * @return string
+     */
+    public function getJoinAlias($join, $conditionType = null, $condition = null)
+    {
+        $joinAlias = $this->findJoinAlias($join, $conditionType, $condition);
+        if (!$joinAlias) {
+            foreach ($this->generatedJoinAliases as $item) {
+                if ($this->isJoinEqual($item, $join, $conditionType, $condition)) {
+                    $joinAlias = $item[self::ALIAS_KEY];
+                    break;
+                }
+            }
+            if (!$joinAlias) {
+                $joinAlias = sprintf(self::GENERATED_JOIN_ALIAS_TEMPLATE, count($this->generatedJoinAliases) + 1);
+                $this->generatedJoinAliases[] = $this->buildJoin($join, $joinAlias, $conditionType, $condition);
+            }
+        }
+
+        return $joinAlias;
+    }
+
+    /**
      * Gets FROM part of the query.
      *
      * @return array [['table' => entity class name, 'alias' => entity alias], ...]
@@ -322,14 +359,10 @@ class OrmQueryConfiguration
      */
     public function addInnerJoin($join, $alias, $conditionType = null, $condition = null)
     {
-        $item = [self::JOIN_KEY => $join, self::ALIAS_KEY => $alias];
-        if ($conditionType) {
-            $item[self::CONDITION_TYPE_KEY] = $conditionType;
-        }
-        if ($condition) {
-            $item[self::CONDITION_KEY] = $condition;
-        }
-        $this->config->offsetAddToArrayByPath(self::INNER_JOIN_PATH, [$item]);
+        $this->config->offsetAddToArrayByPath(
+            self::INNER_JOIN_PATH,
+            [$this->buildJoin($join, $alias, $conditionType, $condition)]
+        );
 
         return $this;
     }
@@ -346,14 +379,10 @@ class OrmQueryConfiguration
      */
     public function addLeftJoin($join, $alias, $conditionType = null, $condition = null)
     {
-        $item = [self::JOIN_KEY => $join, self::ALIAS_KEY => $alias];
-        if ($conditionType) {
-            $item[self::CONDITION_TYPE_KEY] = $conditionType;
-        }
-        if ($condition) {
-            $item[self::CONDITION_KEY] = $condition;
-        }
-        $this->config->offsetAddToArrayByPath(self::LEFT_JOIN_PATH, [$item]);
+        $this->config->offsetAddToArrayByPath(
+            self::LEFT_JOIN_PATH,
+            [$this->buildJoin($join, $alias, $conditionType, $condition)]
+        );
 
         return $this;
     }
@@ -646,5 +675,87 @@ class OrmQueryConfiguration
         }
 
         return $this;
+    }
+
+    /**
+     * @param string      $join
+     * @param string      $alias
+     * @param string|null $conditionType
+     * @param string|null $condition
+     *
+     * @return array
+     */
+    private function buildJoin($join, $alias, $conditionType = null, $condition = null)
+    {
+        $result = [self::JOIN_KEY => $join, self::ALIAS_KEY => $alias];
+        if ($conditionType) {
+            $result[self::CONDITION_TYPE_KEY] = $conditionType;
+        }
+        if ($condition) {
+            $result[self::CONDITION_KEY] = $condition;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string      $join
+     * @param string|null $conditionType
+     * @param string|null $condition
+     *
+     * @return string|null
+     */
+    private function findJoinAlias($join, $conditionType = null, $condition = null)
+    {
+        $joinAlias = null;
+
+        $allJoins = $this->config->offsetGetByPath(self::JOIN_PATH, []);
+        foreach ($allJoins as $joins) {
+            foreach ($joins as $item) {
+                if ($this->isJoinEqual($item, $join, $conditionType, $condition)) {
+                    $joinAlias = $item[self::ALIAS_KEY];
+                    break;
+                }
+            }
+        }
+
+        return $joinAlias;
+    }
+
+    /**
+     * @param array       $item
+     * @param string      $join
+     * @param string|null $conditionType
+     * @param string|null $condition
+     *
+     * @return bool
+     */
+    private function isJoinEqual(array $item, $join, $conditionType = null, $condition = null)
+    {
+        if (!$this->isJoinAttributeEqual($item, self::JOIN_KEY, $join)) {
+            return false;
+        }
+        if ($conditionType && !$this->isJoinAttributeEqual($item, self::CONDITION_TYPE_KEY, $conditionType)) {
+            return false;
+        }
+        if ($condition && !$this->isJoinAttributeEqual($item, self::CONDITION_KEY, $condition)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array  $item
+     * @param string $attributeName
+     * @param mixed  $attributeValue
+     *
+     * @return bool
+     */
+    private function isJoinAttributeEqual(array $item, $attributeName, $attributeValue)
+    {
+        return
+            array_key_exists($attributeName, $item)
+            && $attributeValue === $item[$attributeName];
     }
 }

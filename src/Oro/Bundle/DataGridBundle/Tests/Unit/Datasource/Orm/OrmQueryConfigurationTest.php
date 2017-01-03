@@ -312,6 +312,66 @@ class OrmQueryConfigurationTest extends \PHPUnit_Framework_TestCase
         self::assertEquals('testAlias2', $this->query->findRootAlias('Test\Entity2', $entityClassResolver));
     }
 
+    public function testGetJoinAliasForQueryWithoutJoins()
+    {
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        self::assertEquals('auto_rel_1', $this->query->getJoinAlias('rootAlias.association1'));
+        // ensure that joins was not changed
+        self::assertEmpty($this->query->getInnerJoins());
+        self::assertEmpty($this->query->getLeftJoins());
+        // test that the same alias is returned for the same join
+        self::assertEquals('auto_rel_1', $this->query->getJoinAlias('rootAlias.association1'));
+    }
+
+    public function testGetJoinAliasForJoinWithConditionForQueryWithoutJoins()
+    {
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        self::assertEquals('auto_rel_1', $this->query->getJoinAlias('rootAlias.association1'));
+        self::assertEquals(
+            'auto_rel_2',
+            $this->query->getJoinAlias('rootAlias.association1', 'WITH', 'joinAlias2.id = 123')
+        );
+        // ensure that joins was not changed
+        self::assertEmpty($this->query->getInnerJoins());
+        self::assertEmpty($this->query->getLeftJoins());
+        // test that the same alias is returned for the same join
+        self::assertEquals(
+            'auto_rel_2',
+            $this->query->getJoinAlias('rootAlias.association1', 'WITH', 'joinAlias2.id = 123')
+        );
+    }
+
+    public function testGetJoinAliasForExistingJoin()
+    {
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin('rootAlias.association1', 'joinAlias');
+        self::assertEquals('joinAlias', $this->query->getJoinAlias('rootAlias.association1'));
+    }
+
+    public function testGetJoinAliasForExistingJoinWithCondition()
+    {
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin('rootAlias.association1', 'joinAlias1');
+        $this->query->addLeftJoin('rootAlias.association1', 'joinAlias2', 'WITH', 'joinAlias2.id = 123');
+        self::assertEquals('joinAlias1', $this->query->getJoinAlias('rootAlias.association1'));
+        self::assertEquals(
+            'joinAlias2',
+            $this->query->getJoinAlias('rootAlias.association1', 'WITH', 'joinAlias2.id = 123')
+        );
+    }
+
+    public function testGetJoinAliasWhenExistingJoinHasDifferentCondition()
+    {
+        $this->query->addFrom('Test\RootEntity', 'rootAlias');
+        $this->query->addLeftJoin('rootAlias.association1', 'joinAlias1');
+        $this->query->addLeftJoin('rootAlias.association1', 'joinAlias2', 'WITH', 'joinAlias2.id = 123');
+        self::assertEquals('joinAlias1', $this->query->getJoinAlias('rootAlias.association1'));
+        self::assertEquals(
+            'auto_rel_1',
+            $this->query->getJoinAlias('rootAlias.association1', 'WITH', 'joinAlias2.id = 456')
+        );
+    }
+
     public function testInitialFrom()
     {
         self::assertSame([], $this->query->getFrom());
