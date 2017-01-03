@@ -31,7 +31,6 @@ class AttributeFamilyVoter extends AbstractEntityVoter
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
-        $foo = 1;
         return $this->familyManager->isAttributeFamilyDeletable($identifier) ?
             self::ACCESS_ABSTAIN :
             self::ACCESS_DENIED;
