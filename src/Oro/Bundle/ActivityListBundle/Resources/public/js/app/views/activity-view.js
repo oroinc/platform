@@ -24,7 +24,8 @@ define(function(require) {
                 deleteItem: null
             },
             infoBlock: '> .accordion-group > .accordion-body .message .info',
-            commentsBlock: '> .accordion-group > .accordion-body .message .comment',
+            // commentsBlock is placed in next container after infoBlock
+            commentsBlock: '> .accordion-group > .accordion-body .message > .info + * > .comment',
             commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },

@@ -39,10 +39,12 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
 
         $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region', array(), array('combinedCode'));
 
+        $createdDateTime = new \DateTime();
+
         return array(
             'country'      => array('country', $countryMock),
             'city'         => array('city', 'city'),
-            'created'      => array('created', new \DateTime()),
+            'created'      => array('created', $createdDateTime),
             'firstName'    => array('firstName', 'first_name'),
             'id'           => array('id', 1),
             'label'        => array('label', 'Shipping'),
@@ -56,7 +58,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             'regionText'   => array('regionText', 'test region'),
             'street'       => array('street', 'street'),
             'street2'      => array('street2', 'street2'),
-            'updated'      => array('updated', new \DateTime()),
+            'updated'      => array('updated', $createdDateTime),
         );
     }
 
@@ -72,7 +74,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($address->getCreated());
         $this->assertNotNull($address->getUpdated());
 
-        $this->assertEquals($address->getCreated(), $address->getUpdated());
+        $this->assertEquals($address->getCreated(), $address->getUpdated(), '', 1);
     }
 
     public function testBeforeUpdate()
