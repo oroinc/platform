@@ -238,7 +238,7 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager
      * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getWorkflow(TransitionManager $transitionManager)
+    protected function getWorkflow(TransitionManager $transitionManager)
     {
         /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
