@@ -26,7 +26,7 @@ datagrids:
 Modification of a query configuration from PHP code
 ---------------------------------------------------
 
-Sometime it is required to modify a query configuration from PHP code, for example from datagrid [extensions](../extensions.md) or [listeners](../datagrid.md#extendability). This can be done using [OrmQueryConfiguration](../../../Datasource/Orm/OrmQueryConfiguration.php) class. To get an instance of this class use `getOrmQuery` method of [DatagridConfiguration](../../../Datagrid/Common/DatagridConfiguration.php). For example:
+Sometime it is required to modify a query configuration from PHP code, for example from datagrid [extensions](../extensions.md) or [listeners](../datagrid.md#extendability). This can be done using [OrmQueryConfiguration](../../../../Datasource/Orm/OrmQueryConfiguration.php) class. To get an instance of this class use `getOrmQuery` method of [DatagridConfiguration](../../../../Datagrid/Common/DatagridConfiguration.php). For example:
 
 ```php
 $query = $config->getOrmQuery();
@@ -34,7 +34,7 @@ $rootAlias = $query->getRootAlias();
 $query->addSelect($rootAlias . '.myField');
 ```
 
-In additional to a query modification methods, the [OrmQueryConfiguration](../../../Datasource/Orm/OrmQueryConfiguration.php) contains several useful methods like:
+In additional to a query modification methods, the [OrmQueryConfiguration](../../../../Datasource/Orm/OrmQueryConfiguration.php) contains several useful methods like:
 
 - `getRootAlias()` - Returns the FIRST root alias of the query.
 - `getRootEntity($entityClassResolver = null, $lookAtExtendedEntityClassName = false)` - Returns the FIRST root entity of the query.
