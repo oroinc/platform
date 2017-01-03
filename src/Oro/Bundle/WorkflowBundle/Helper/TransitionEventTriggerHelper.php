@@ -101,9 +101,9 @@ class TransitionEventTriggerHelper
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @param object $entity
-     * @param object $prevEntity
      * @param object $mainEntity
      * @param WorkflowItem $item
+     * @param object $prevEntity
      * @return array
      */
     public static function buildContextValues(
@@ -118,7 +118,7 @@ class TransitionEventTriggerHelper
             self::TRIGGER_WORKFLOW_ITEM => $item,
             self::TRIGGER_ENTITY => $entity,
             self::TRIGGER_WORKFLOW_ENTITY => $mainEntity,
-            self::TRIGGER_PREVIOUS_ENTITY => $prevEntity
+            self::TRIGGER_PREVIOUS_ENTITY => $prevEntity,
         ];
     }
 }
