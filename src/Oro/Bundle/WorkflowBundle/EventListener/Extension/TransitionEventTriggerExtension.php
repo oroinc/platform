@@ -88,8 +88,8 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
     /**
      * @param TransitionEventTrigger $trigger
      * @param object $entity
-     * @param object $prevEntity
      * @param string $entityClass
+     * @param object $prevEntity
      */
     protected function addSchedule(TransitionEventTrigger $trigger, $entity, $entityClass, $prevEntity)
     {
