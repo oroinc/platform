@@ -37,7 +37,6 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $require
      * @param bool $expected
-     * @param ob
      */
     public function testIsRequirePass($require, $expected)
     {
@@ -153,14 +152,14 @@ class TransitionEventTriggerHelperTest extends \PHPUnit_Framework_TestCase
                     TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ITEM => null,
                     TransitionEventTriggerHelper::TRIGGER_ENTITY => null,
                     TransitionEventTriggerHelper::TRIGGER_WORKFLOW_ENTITY => null,
-                    TransitionEventTriggerHelper::TRIGGER_PREVIOUS_ENTITY => null
+                    TransitionEventTriggerHelper::TRIGGER_PREVIOUS_ENTITY => null,
                 ],
                 [
                     null,
                     null,
                     null,
                     null,
-                    null
+                    null,
                 ]
             ],
             'types' => [

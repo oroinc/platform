@@ -134,7 +134,7 @@ abstract class AbstractEventTriggerExtensionTest extends \PHPUnit_Framework_Test
      * @param array $fields
      * @return WorkflowAwareEntity|object
      */
-    protected function getMainEntity($id = 42, array $fields = [])
+    protected function getMainEntity($id = self::ENTITY_ID, array $fields = [])
     {
         return $this->getEntity(
             self::ENTITY_CLASS,
