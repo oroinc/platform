@@ -55,7 +55,10 @@ class DatabasePersister
             $translationsTableName = $this->nativeQueryExecutorHelper->getTableName(Translation::ENTITY_NAME);
 
             foreach ($data as $domain => $domainData) {
-                $fetchStatement = 'SELECT id, `key`, `value` FROM ' . $translationsTableName .
+                $fetchStatement = 'SELECT id, ' .
+                    $connection->quoteIdentifier('key') . ', ' .
+                    $connection->quoteIdentifier('value') .
+                    ' FROM ' . $translationsTableName .
                     ' WHERE locale = :locale' .
                     ' AND domain = :domain' .
                     ' AND scope = :scope';

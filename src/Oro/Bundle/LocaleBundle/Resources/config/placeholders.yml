@@ -1,9 +1,9 @@
 placeholders:
-    scripts_after:
+    requirejs_config_extend:
         items:
-            locale_settings:
-                order: 500
+            locale_requirejs_config:
+                order: 100
 
 items:
-    locale_settings:
-        template: OroLocaleBundle::locale_settings.html.twig
+    locale_requirejs_config:
+        template: OroLocaleBundle::requirejs.config.js.twig

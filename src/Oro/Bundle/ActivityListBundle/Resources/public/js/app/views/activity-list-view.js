@@ -326,8 +326,7 @@ define(function(require) {
                     model = this.collection.findSameActivity(oldViewState.attrs);
                     if (model) {
                         view = this.getItemView(model);
-                        model.set('is_loaded', false);
-                        if (view && !oldViewState.collapsed) {
+                        if (view && !oldViewState.collapsed && view.isCollapsed()) {
                             view.toggle();
                             view.getAccorditionBody().addClass('in');
                             view.getAccorditionToggle().removeClass('collapsed');

@@ -105,7 +105,7 @@ define([
          * @protected
          */
         _onCollectionReset: function(collection) {
-            var hasRecords = collection.state.totalRecords > 0;
+            var hasRecords = collection.length > 0;
             var hasFiltersState = !_.isEmpty(collection.state.filters);
             if (hasRecords || hasFiltersState) {
                 if (!this.isVisible) {
@@ -156,6 +156,7 @@ define([
         _applyState: function(state) {
             var toEnable = [];
             var toDisable = [];
+            var valuesToApply = {};
 
             _.each(this.filters, function(filter, name) {
                 var shortName = '__' + name;
@@ -178,7 +179,7 @@ define([
                             value: filterState
                         };
                     }
-                    filter.setValue(filterState);
+                    valuesToApply[name] = filterState;
                     toEnable.push(filter);
                 } else if (_.has(state, shortName)) {
                     filter.reset();
@@ -194,6 +195,10 @@ define([
 
             this.enableFilters(toEnable);
             this.disableFilters(toDisable);
+
+            _.each(valuesToApply, function(filterState, name) {
+                this.filters[name].setValue(filterState);
+            }, this);
 
             return this;
         }

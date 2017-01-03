@@ -64,7 +64,7 @@ class MassNotificationListenerTest extends \PHPUnit_Framework_TestCase
                 $this->assertEquals($logEntity->getSender(), 'test <from@test.com>');
                 $this->assertEquals($logEntity->getSubject(), 'test subject');
                 $this->assertEquals($logEntity->getBody(), 'test body');
-                $this->assertEquals($logEntity->getScheduledAt(), $date);
+                $this->assertEquals($logEntity->getScheduledAt(), $date, '', 1);
                 $this->assertEquals($logEntity->getStatus(), MassNotification::STATUS_SUCCESS);
 
                 return true;

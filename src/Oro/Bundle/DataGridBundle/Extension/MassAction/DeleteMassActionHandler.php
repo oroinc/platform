@@ -235,7 +235,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
             if ($entity) {
                 $deletedIds[] = $identifierValue;
-                $manager->remove($entity);
+                $this->processDelete($entity, $manager);
                 $iteration++;
 
                 if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
@@ -250,5 +250,18 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         }
 
         return $this->getDeleteResponse($args, $iteration);
+    }
+
+    /**
+     * @param object $entity
+     * @param EntityManager $manager
+     *
+     * @return DeleteMassActionHandler
+     */
+    protected function processDelete($entity, EntityManager $manager)
+    {
+        $manager->remove($entity);
+
+        return $this;
     }
 }
