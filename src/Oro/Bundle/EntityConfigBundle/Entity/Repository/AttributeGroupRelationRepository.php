@@ -64,4 +64,19 @@ class AttributeGroupRelationRepository extends EntityRepository
 
         return $attributeIds;
     }
+
+    /**
+     * @param int $fieldId
+     * @return mixed
+     */
+    public function removeByFieldId($fieldId)
+    {
+        $qb = $this->createQueryBuilder('attributeGroupRelation');
+        $qb
+            ->delete()
+            ->where($qb->expr()->eq('attributeGroupRelation.entityConfigFieldId', ':id'))
+            ->setParameter('id', $fieldId);
+
+        return $qb->getQuery()->execute();
+    }
 }
