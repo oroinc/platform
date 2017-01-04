@@ -4,6 +4,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
   * Changed minimum required php version to 5.6
   * PhpUnit 5.7 support
   * Extend fields default mode is `Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_READONLY`
+  * Added support of PHP 7.1
 
 CHANGELOG for 1.10.0
 ===================

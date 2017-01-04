@@ -198,7 +198,7 @@
         {% endif %}
         class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
         {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
-        {{ parameters.label|trim }}
+        {{- parameters.label|trim }}
     </a>
     {% endspaceless %}
 {% endmacro %}

@@ -7,8 +7,8 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension as BaseDeleteMassActionExtension;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class DeleteMassActionExtension extends BaseDeleteMassActionExtension
 {
@@ -25,17 +25,17 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param EntityClassResolver $entityClassResolver
      * @param OperationRegistry $operationRegistry
      * @param ContextHelper $contextHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        GridConfigurationHelper $gridConfigurationHelper,
+        EntityClassResolver $entityClassResolver,
         OperationRegistry $operationRegistry,
         ContextHelper $contextHelper
     ) {
-        parent::__construct($doctrineHelper, $gridConfigurationHelper);
+        parent::__construct($doctrineHelper, $entityClassResolver);
 
         $this->operationRegistry = $operationRegistry;
         $this->contextHelper = $contextHelper;
@@ -78,7 +78,7 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
     protected function getDatagridContext(DatagridConfiguration $config)
     {
         return [
-            ContextHelper::ENTITY_CLASS_PARAM => $this->gridConfigurationHelper->getEntity($config),
+            ContextHelper::ENTITY_CLASS_PARAM => $this->getEntity($config),
             ContextHelper::DATAGRID_PARAM => $config->getName(),
             ContextHelper::GROUP_PARAM => $this->groups,
         ];

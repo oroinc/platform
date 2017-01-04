@@ -18,6 +18,8 @@ parameters:
 
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
+    oro_ui.config_settings.listener.class:                 Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener
+
     oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
     oro_ui.user_agent_provider.class:                      Oro\Bundle\UIBundle\Provider\UserAgentProvider
 
@@ -73,6 +75,11 @@ services:
             - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_ui.config_settings.listener:
+        class: %oro_ui.config_settings.listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_config.settings_before_save, method: onBeforeSave }
 
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%

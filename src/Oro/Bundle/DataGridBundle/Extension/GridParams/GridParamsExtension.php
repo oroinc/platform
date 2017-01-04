@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridParams;
 
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -17,7 +16,7 @@ class GridParamsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->getDatasourceType() === OrmDatasource::TYPE;
+        return $config->isOrmDatasource();
     }
 
     /**

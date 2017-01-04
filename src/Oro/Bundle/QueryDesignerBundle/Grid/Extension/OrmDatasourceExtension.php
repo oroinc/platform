@@ -6,9 +6,9 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\QueryDesignerBundle\Grid\QueryDesignerQueryConfiguration;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 
 class OrmDatasourceExtension extends AbstractExtension
@@ -39,8 +39,8 @@ class OrmDatasourceExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->getDatasourceType() === OrmDatasource::TYPE
-            && $config->offsetGetByPath('[source][query_config][filters]');
+            $config->isOrmDatasource()
+            && $config->offsetGetByPath(QueryDesignerQueryConfiguration::FILTERS);
     }
 
     /**
@@ -58,7 +58,7 @@ class OrmDatasourceExtension extends AbstractExtension
         /** @var QueryBuilder $qb */
         $qb      = $datasource->getQueryBuilder();
         $ds      = $this->createDatasourceAdapter($qb);
-        $filters = $config->offsetGetByPath('[source][query_config][filters]');
+        $filters = $config->offsetGetByPath(QueryDesignerQueryConfiguration::FILTERS);
         $this->restrictionBuilder->buildRestrictions($filters, $ds);
         $this->appliedFor[$gridName . $parametersKey] = true;
     }
