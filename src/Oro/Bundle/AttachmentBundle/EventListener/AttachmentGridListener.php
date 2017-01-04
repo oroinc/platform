@@ -10,8 +10,6 @@ class AttachmentGridListener
 {
     const GRID_PARAM_FIELD_NAME = 'entityField';
 
-    const GRID_LEFT_JOIN_PATH = '[source][query][join][left]';
-
     /** @var array */
     protected $paramsToBind = [];
 
@@ -28,12 +26,8 @@ class AttachmentGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $config    = $event->getConfig();
         $fieldName = $event->getDatagrid()->getParameters()->get(self::GRID_PARAM_FIELD_NAME);
-
-        $leftJoins   = $config->offsetGetByPath(self::GRID_LEFT_JOIN_PATH, []);
-        $leftJoins[] = ['join' => 'attachment.' . $fieldName, 'alias' => 'entity'];
-        $config->offsetSetByPath(self::GRID_LEFT_JOIN_PATH, $leftJoins);
+        $event->getConfig()->getOrmQuery()->addLeftJoin('attachment.' . $fieldName, 'entity');
     }
 
     /**

@@ -80,7 +80,7 @@ class PostgresqlGridModifier extends AbstractExtension
 
         /** @var From $fromPart */
         foreach ($fromParts as $fromPart) {
-            if ($this->entityClassResolver->getEntityClass($fromPart->getFrom()) == $entityClassName) {
+            if ($this->entityClassResolver->getEntityClass($fromPart->getFrom()) === $entityClassName) {
                 $alias = $fromPart->getAlias();
                 break;
             }
@@ -105,17 +105,7 @@ class PostgresqlGridModifier extends AbstractExtension
      */
     protected function getEntityClassName(DatagridConfiguration $config)
     {
-        $entityClassName = $config->offsetGetByPath('[extended_entity_name]');
-        if ($entityClassName) {
-            return $entityClassName;
-        }
-
-        $from = $config->offsetGetByPath('[source][query][from]');
-        if (count($from) !== 0) {
-            return $this->entityClassResolver->getEntityClass($from[0]['table']);
-        }
-
-        return null;
+        return $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
     }
 
     /**

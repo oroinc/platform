@@ -48,42 +48,30 @@ class BusinessUnitGridListener
         $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
         $accessLevel = $observer->getAccessLevel();
 
-        $where = $config->offsetGetByPath('[source][query][where][and]', []);
+        $query = $config->getOrmQuery();
 
-        if ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
-            $leftJoins = $config->offsetGetByPath('[source][query][join][inner]', []);
-            $leftJoins[] = ['join' => 'u.organization', 'alias' => 'org'];
-            $config->offsetSetByPath('[source][query][join][inner]', $leftJoins);
-
-            $where = array_merge(
-                $where,
-                ['org.id in (' . $organization->getId() . ')']
-            );
-        } elseif ($accessLevel !== AccessLevel::SYSTEM_LEVEL) {
+        if (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
+            $query->addInnerJoin('u.organization', 'org');
+            $query->addAndWhere('org.id in (' . $organization->getId() . ')');
+        } elseif (AccessLevel::SYSTEM_LEVEL !== $accessLevel) {
             $resultBuIds = [];
-            if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
+            if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
                 $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()
                 );
-            } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
+            } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
                 $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()
                 );
             }
             if (count($resultBuIds)) {
-                $where = array_merge(
-                    $where,
-                    ['u.id in (' . implode(', ', $resultBuIds) . ')']
-                );
+                $query->addAndWhere('u.id in (' . implode(', ', $resultBuIds) . ')');
             } else {
                 // There are no records to show, make query to return empty result
-                $where = array_merge($where, ['1 = 0']);
+                $query->addAndWhere('1 = 0');
             }
-        }
-        if (count($where)) {
-            $config->offsetSetByPath('[source][query][where][and]', $where);
         }
     }
 

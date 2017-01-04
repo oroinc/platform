@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
@@ -79,7 +78,6 @@ class Orm extends AbstractEngine
                 }
 
                 $results[$id] = new ResultItem(
-                    $this->registry->getManagerForClass($item['entity']),
                     $item['entity'],
                     $item['recordId'],
                     $item['title'],
@@ -117,7 +115,7 @@ class Orm extends AbstractEngine
     /**
      * Get search index repository
      *
-     * @return OroEntitymanager
+     * @return OroEntityManager
      */
     protected function getIndexManager()
     {
