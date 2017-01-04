@@ -51,4 +51,11 @@ class ChannelRepositoryTest extends WebTestCase
             $this->repository->getLastStatusForConnector($barIntegration, 'first_connector', Status::STATUS_COMPLETED)
         );
     }
+
+    public function testFindByTypeReturnsCorrectData()
+    {
+        $fooIntegration = $this->getReference('oro_integration:foo_integration');
+
+        static::assertSame([$fooIntegration], $this->repository->findByType('foo'));
+    }
 }

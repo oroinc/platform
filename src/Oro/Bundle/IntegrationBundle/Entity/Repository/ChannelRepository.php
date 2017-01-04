@@ -158,4 +158,16 @@ class ChannelRepository extends EntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+     * @param string $type
+     *
+     * @return array|Integration[]
+     */
+    public function findByType($type)
+    {
+        return $this->findBy([
+            'type' => $type
+        ]);
+    }
 }
