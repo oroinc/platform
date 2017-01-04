@@ -39,7 +39,7 @@ class AclListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if(!$event->isMasterRequest()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 
