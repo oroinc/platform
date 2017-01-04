@@ -39,6 +39,10 @@ class AclListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
+        if(!$event->isMasterRequest()) {
+            return;
+        }
+
         if (!$this->isFresh()) {
             $this->cacheProvider->warmUpCache();
             $this->dumper->dump();
