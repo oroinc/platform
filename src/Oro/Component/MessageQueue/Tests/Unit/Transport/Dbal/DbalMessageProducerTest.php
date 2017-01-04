@@ -21,9 +21,7 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
     public function testShouldThrowIfBodyOfInvalidType()
     {
         $this->expectException(InvalidMessageException::class);
-        $this->expectExceptionMessage(
-            'The message body must be a scalar or null. Got: stdClass'
-        );
+        $this->expectExceptionMessage('The message body must be a scalar or null. Got: stdClass');
 
         $producer = new DbalMessageProducer($this->createConnectionMock());
 
@@ -67,10 +65,7 @@ class DbalMessageProducerTest extends \PHPUnit_Framework_TestCase
         $message = new DbalMessage();
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage(
-            'The transport fails to send the message due to some internal error.'
-        );
-
+        $this->expectExceptionMessage('The transport fails to send the message due to some internal error.');
         $producer = new DbalMessageProducer($connection);
         $producer->send($destination, $message);
     }

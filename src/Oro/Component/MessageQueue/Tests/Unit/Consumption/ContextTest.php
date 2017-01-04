@@ -111,10 +111,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $context = new Context($this->createSession());
 
         $this->expectException(IllegalContextModificationException::class);
-        $this->expectExceptionMessage(
-            'The message could be set once'
-        );
-
+        $this->expectExceptionMessage('The message could be set once');
         $context->setMessage($message);
         $context->setMessage($message);
     }
@@ -146,10 +143,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $status = 'aStatus';
 
         $context = new Context($this->createSession());
-
         $this->expectException(IllegalContextModificationException::class);
         $this->expectExceptionMessage('The status modification is not allowed');
-
         $context->setStatus($status);
         $context->setStatus($status);
     }
@@ -171,10 +166,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $context = new Context($this->createSession());
 
         $this->expectException(IllegalContextModificationException::class);
-        $this->expectExceptionMessage(
-            'The execution once interrupted could not be roll backed'
-        );
-
+        $this->expectExceptionMessage('The execution once interrupted could not be roll backed');
         $context->setExecutionInterrupted(true);
         $context->setExecutionInterrupted(false);
     }
@@ -203,11 +195,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $context = new Context($this->createSession());
 
         $context->setLogger(new NullLogger());
-
         $this->expectException(IllegalContextModificationException::class);
-        $this->expectExceptionMessage(
-            'The logger modification is not allowed'
-        );
+        $this->expectExceptionMessage('The logger modification is not allowed');
         $context->setLogger(new NullLogger());
     }
 
@@ -225,11 +214,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $context = new Context($this->createSession());
 
         $context->setQueueName('theQueueName');
-
         $this->expectException(IllegalContextModificationException::class);
-        $this->expectExceptionMessage(
-            'The queueName modification is not allowed'
-        );
+        $this->expectExceptionMessage('The queueName modification is not allowed');
         $context->setQueueName('theAnotherQueueName');
     }
 

@@ -19,7 +19,6 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected memory limit is int but got: "double"');
-
         new LimitConsumerMemoryExtension(0.0);
     }
 
