@@ -171,7 +171,6 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Expected record was removed but it is not. id: "123"');
-
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
         $consumer->acknowledge($message);
     }
@@ -370,9 +369,10 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $message = new DbalMessage();
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Expected record was inserted but it is not. message: '.
-            '"{"body":null,"headers":"[]","properties":"[]","priority":0,"queue":"queue","redelivered":true}"');
-
+        $this->expectExceptionMessage(
+            'Expected record was inserted but it is not. message: '.
+            '"{"body":null,"headers":"[]","properties":"[]","priority":0,"queue":"queue","redelivered":true}"'
+        );
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
         $consumer->reject($message, true);
     }
@@ -531,10 +531,8 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->method('getConnection')
             ->will($this->returnValue($connection))
         ;
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Expected one record but got nothing. consumer_id:');
-
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
         $consumer->receive();
     }
@@ -587,7 +585,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
      */
     private function createDBALStatementMock()
     {
-        return $this->createMock(Statement::class, [], [], '', false);
+        return $this->createMock(Statement::class);
     }
 
     /**
@@ -595,7 +593,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
      */
     private function createDBALConnectionMock()
     {
-        return $this->createMock(Connection::class, [], [], '', false);
+        return $this->createMock(Connection::class);
     }
 
     /**
@@ -603,7 +601,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
      */
     private function createConnectionMock()
     {
-        return $this->createMock(DbalConnection::class, [], [], '', false);
+        return $this->createMock(DbalConnection::class);
     }
 
     /**
@@ -611,6 +609,6 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->createMock(DbalSession::class, [], [], '', false);
+        return $this->createMock(DbalSession::class);
     }
 }
