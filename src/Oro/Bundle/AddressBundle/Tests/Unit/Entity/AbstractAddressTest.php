@@ -189,6 +189,28 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
                     'country' => $this->createMockCountry('Ukraine'),
                 ),
                 'FirstName LastName , Street   some region , Ukraine 12345'
+            ),
+            array(
+                array(
+                    'firstName' => '',
+                    'lastName' => 'LastName',
+                    'street' => 'Street',
+                    'region' => $this->createMockRegion('some region'),
+                    'postalCode' => '',
+                    'country' => $this->createMockCountry('Ukraine'),
+                ),
+                'LastName , Street   some region , Ukraine'
+            ),
+            array(
+                array(
+                    'firstName' => '',
+                    'lastName' => '',
+                    'street' => '',
+                    'region' => '',
+                    'postalCode' => '',
+                    'country' => '',
+                ),
+                ''
             )
         );
     }

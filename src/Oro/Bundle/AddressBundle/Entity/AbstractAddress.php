@@ -800,9 +800,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
             $this->getPostalCode(),
         );
 
-        $str = implode(' ', $data);
-        $check = trim(str_replace(',', '', $str));
-        return empty($check) ? '' : $str;
+        return trim(implode(' ', $data), " \t\n\r\0\x0B,");
     }
 
     /**
