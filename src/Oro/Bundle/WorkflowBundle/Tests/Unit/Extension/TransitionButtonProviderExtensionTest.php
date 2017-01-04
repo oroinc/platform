@@ -7,53 +7,36 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
+class TransitionButtonProviderExtensionTest extends AbstractTransitionButtonProviderExtensionTest
 {
     const DATAGRID_NAME = 'datagrid1';
     const ENTITY = 'entity1';
 
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowRegistry;
-
-    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $routeProvider;
-
-    /** @var TransitionButtonProviderExtension */
-    protected $extension;
-
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    protected function setUp()
+    protected function getApplication()
     {
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
-            ->disableOriginalConstructor()->getMock();
-
-        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-
-        $this->extension = new TransitionButtonProviderExtension(
-            $this->workflowRegistry,
-            $this->routeProvider
-        );
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
     }
 
     /**
-     * {@inheritdoc}
+     * @return AbstractButtonProviderExtension
      */
-    protected function tearDown()
+    protected function createExtension()
     {
-        unset($this->workflowRegistry, $this->routeProvider, $this->extension);
+        return new TransitionButtonProviderExtension($this->workflowRegistry, $this->routeProvider);
     }
 
     /**
@@ -109,27 +92,28 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFind($expected, $entityClass = null, $datagrid = null)
     {
-        /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
-        $transition = $this->createMock(Transition::class);
+        $this->applicationProvider->expects($this->atLeastOnce())
+            ->method('getCurrentApplication')
+            ->willReturn($expected ? $this->getApplication() : null);
 
-        $transitionManager = $this->createMock(TransitionManager::class);
-        $transitionManager->expects($this->any())
-            ->method('getTransitions')
-            ->willReturn(new ArrayCollection([$transition]));
-
-        $workflow = $this->getWorkflow($transitionManager);
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflows')
-            ->willReturn(new ArrayCollection([$workflow]));
+        $buttons = [];
 
         if ($expected) {
+            /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
+            $transition = $this->createMock(Transition::class);
+
+            $transitionManager = $this->getTransitionManager([$transition], 'getTransitions');
+
+            $workflow = $this->getWorkflow($transitionManager);
+
+            $this->workflowRegistry->expects($this->once())
+                ->method('getActiveWorkflows')
+                ->willReturn(new ArrayCollection([$workflow]));
+
             $buttonContext = (new ButtonContext())
                 ->setEntity($entityClass)
                 ->setDatagridName($datagrid);
             $buttons = [new TransitionButton($transition, $workflow, $buttonContext)];
-        } else {
-            $buttons = [];
         }
 
         $this->assertEquals(
@@ -255,45 +239,5 @@ class TransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
         $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
 
         return $workflow;
-    }
-
-    /**
-     * @param string $entityClass
-     * @return ButtonContext
-     */
-    protected function getButtonContext($entityClass)
-    {
-        $context = new ButtonContext();
-        $context->setEntity($entityClass)
-            ->setEnabled(true)
-            ->setUnavailableHidden(false);
-
-        return $context;
-    }
-
-    /**
-     * @param array $transitions
-     * @return TransitionManager|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getTransitionManager(array $transitions)
-    {
-        $manager = $this->createMock(TransitionManager::class);
-        $manager->expects($this->any())
-            ->method('getStartTransitions')
-            ->willReturn(new ArrayCollection($transitions));
-
-        return $manager;
-    }
-
-    /**
-     * @param string $name
-     * @return Transition
-     */
-    protected function getTransition($name)
-    {
-        $transition = new Transition();
-        $transition->setName($name);
-
-        return $transition;
     }
 }

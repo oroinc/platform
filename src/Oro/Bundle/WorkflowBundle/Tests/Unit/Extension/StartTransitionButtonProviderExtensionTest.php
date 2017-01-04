@@ -8,51 +8,36 @@ use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
+class StartTransitionButtonProviderExtensionTest extends AbstractTransitionButtonProviderExtensionTest
 {
     const ENTITY_CLASS = 'entity1';
     const ROUTE_NAME = 'route1';
     const DATAGRID = 'datagrid1';
 
-    /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowRegistry;
-
-    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $routeProvider;
-
-    /** @var StartTransitionButtonProviderExtension */
-    protected $extension;
-
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    protected function setUp()
+    protected function getApplication()
     {
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-
-        $this->extension = new StartTransitionButtonProviderExtension($this->workflowRegistry, $this->routeProvider);
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
     }
 
     /**
-     * {@inheritdoc}
+     * @return AbstractButtonProviderExtension
      */
-    protected function tearDown()
+    protected function createExtension()
     {
-        unset($this->workflowRegistry, $this->routeProvider, $this->extension);
+        return new StartTransitionButtonProviderExtension($this->workflowRegistry, $this->routeProvider);
     }
 
     /**
@@ -65,44 +50,46 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
      */
     public function testFind($expected, $entityClass = null, $routeName = null, $datagrid = null)
     {
-        $transition = new Transition();
-        $transition->setName('transition1')
-            ->setInitEntities($entityClass ? [$entityClass] : [])
-            ->setInitRoutes($routeName ? [$routeName] : [])
-            ->setInitDatagrids($datagrid ? [$datagrid] : []);
+        $this->applicationProvider->expects($this->atLeastOnce())
+            ->method('getCurrentApplication')
+            ->willReturn($expected ? $this->getApplication() : null);
 
-        $transitionManager = $this->createMock(TransitionManager::class);
-        $transitionManager->expects($this->once())
-            ->method('getStartTransitions')
-            ->willReturn(new ArrayCollection([$transition]));
-
-        $workflow = $this->getWorkflow(
-            $transitionManager,
-            [
-                'init_entities' => [
-                    self::ENTITY_CLASS => ['transition1', 'transition2'],
-                ],
-                'init_datagrids' => [
-                    self::DATAGRID => ['transition1', 'transition2'],
-                ],
-                'init_routes' => [
-                    self::ROUTE_NAME => ['transition1', 'transition2'],
-                ],
-            ]
-        );
-
-        $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflows')
-            ->willReturn(new ArrayCollection([$workflow]));
+        $buttons = [];
 
         if ($expected) {
+            $transition = new Transition();
+            $transition->setName('transition1')
+                ->setInitEntities($entityClass ? [$entityClass] : [])
+                ->setInitRoutes($routeName ? [$routeName] : [])
+                ->setInitDatagrids($datagrid ? [$datagrid] : []);
+
+            $transitionManager = $this->getTransitionManager([$transition], 'getStartTransitions');
+
+            $workflow = $this->getWorkflow(
+                $transitionManager,
+                [
+                    'init_entities' => [
+                        self::ENTITY_CLASS => ['transition1', 'transition2'],
+                    ],
+                    'init_datagrids' => [
+                        self::DATAGRID => ['transition1', 'transition2'],
+                    ],
+                    'init_routes' => [
+                        self::ROUTE_NAME => ['transition1', 'transition2'],
+                    ],
+                ]
+            );
+
+            $this->workflowRegistry->expects($this->once())
+                ->method('getActiveWorkflows')
+                ->willReturn(new ArrayCollection([$workflow]));
+
             $buttonContext = (new ButtonContext())
                 ->setEntity($entityClass)
                 ->setRouteName($routeName)
                 ->setDatagridName($datagrid);
+
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
-        } else {
-            $buttons = [];
         }
 
         $this->assertEquals(
@@ -150,19 +137,28 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
         ];
 
         $workflow1 = $this->getWorkflow(
-            $this->getTransitionManager([$this->getTransition('transition1'), $this->getTransition('transition2')]),
+            $this->getTransitionManager(
+                [$this->getTransition('transition1'), $this->getTransition('transition2')],
+                'getStartTransitions'
+            ),
             $configuration,
             ['group1', 'group2']
         );
 
         $workflow2 = $this->getWorkflow(
-            $this->getTransitionManager([$this->getTransition('transition3'), $this->getTransition('transition4')]),
+            $this->getTransitionManager(
+                [$this->getTransition('transition3'), $this->getTransition('transition4')],
+                'getStartTransitions'
+            ),
             $configuration,
             ['group2', 'group3']
         );
 
         $workflow3 = $this->getWorkflow(
-            $this->getTransitionManager([$this->getTransition('transition5'), $this->getTransition('transition6')]),
+            $this->getTransitionManager(
+                [$this->getTransition('transition5'), $this->getTransition('transition6')],
+                'getStartTransitions'
+            ),
             $configuration,
             ['group3', 'group4']
         );
@@ -173,6 +169,10 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
 
         $buttonContext = new ButtonContext();
         $buttonContext->setEntity('entity1');
+
+        $this->applicationProvider->expects($this->atLeastOnce())
+            ->method('getCurrentApplication')
+            ->willReturn($this->getApplication());
 
         $this->assertEquals(
             [
@@ -226,10 +226,11 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
         $stubButton = new StubButton();
 
         $this->expectException(UnsupportedButtonException::class);
-        $this->expectExceptionMessage(
-            'Button Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton is not supported by ' .
-            'Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension. Can not determine availability'
-        );
+        $this->expectExceptionMessage(sprintf(
+            '%s is not supported by %s. Can not determine availability',
+            StubButton::class,
+            get_class($this->extension)
+        ));
 
         $this->extension->isAvailable($stubButton, new ButtonSearchContext());
     }
@@ -251,6 +252,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
      * @param TransitionManager|\PHPUnit_Framework_MockObject_MockObject $transitionManager
      * @param array $configuration
      * @param array $exclusiveRecordGroups
+     *
      * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
      */
     private function getWorkflow(
@@ -274,46 +276,6 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
         $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
 
         return $workflow;
-    }
-
-    /**
-     * @param string $entityClass
-     * @return ButtonContext
-     */
-    protected function getButtonContext($entityClass)
-    {
-        $context = new ButtonContext();
-        $context->setEntity($entityClass)
-            ->setEnabled(true)
-            ->setUnavailableHidden(false);
-
-        return $context;
-    }
-
-    /**
-     * @param array $transitions
-     * @return TransitionManager|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getTransitionManager(array $transitions)
-    {
-        $manager = $this->createMock(TransitionManager::class);
-        $manager->expects($this->any())
-            ->method('getStartTransitions')
-            ->willReturn(new ArrayCollection($transitions));
-
-        return $manager;
-    }
-
-    /**
-     * @param string $name
-     * @return Transition
-     */
-    protected function getTransition($name)
-    {
-        $transition = new Transition();
-        $transition->setName($name);
-
-        return $transition;
     }
 
     /**
