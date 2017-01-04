@@ -202,11 +202,7 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('groups', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
-        $table->addColumn(
-            'applications',
-            'simple_array',
-            ['comment' => '(DC2Type:simple_array)']
-        );
+        $table->addColumn('applications', 'simple_array', ['comment' => '(DC2Type:simple_array)', 'notnull' => true]);
         $table->addIndex(['start_step_id'], 'idx_6f737c368377424f', []);
         $table->setPrimaryKey(['name']);
     }
