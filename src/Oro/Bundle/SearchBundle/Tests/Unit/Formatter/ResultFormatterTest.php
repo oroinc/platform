@@ -69,7 +69,7 @@ class ResultFormatterTest extends \PHPUnit_Framework_TestCase
         // create product stubs
         $productEntities = array();
         for ($i = 1; $i <= 5; $i++) {
-            $indexerItem = new Item($this->entityManager, Product::getEntityName(), $i);
+            $indexerItem = new Item(Product::getEntityName(), $i);
             $entity = new Product($i);
             $productEntities[$i] = $entity;
 
@@ -91,7 +91,7 @@ class ResultFormatterTest extends \PHPUnit_Framework_TestCase
         // create category stubs
         $categoryEntities = array();
         for ($i = 1; $i <= 3; $i++) {
-            $indexerItem = new Item($this->entityManager, Category::getEntityName(), $i);
+            $indexerItem = new Item(Category::getEntityName(), $i);
             $entity = new Category($i);
             $categoryEntities[$i] = $entity;
 

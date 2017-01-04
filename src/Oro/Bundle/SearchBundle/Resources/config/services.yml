@@ -115,7 +115,6 @@ services:
         class: %oro_search.extension.search_results.class%
         arguments:
             - '@oro_search.formatter.result_formatter'
-            - '@doctrine.orm.entity_manager'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         tags:

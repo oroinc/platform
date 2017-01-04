@@ -12,7 +12,7 @@ define(function(require) {
     });
 
     InputWidgetManager.addWidget('uniform-file', {
-        selector: 'input:file',
+        selector: 'input:file:not(.no-uniform)',
         Widget: UniformFileInputWidget
     });
 

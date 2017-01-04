@@ -37,7 +37,7 @@ class MixinConfigurationHelper
     public function extendConfiguration(DatagridConfiguration $configuration, $gridName)
     {
         $gridConfiguration = $this->configurationProvider->getConfiguration($gridName);
-        $basicAlias        = $configuration->offsetGetByPath('[source][query][from][0][alias]');
+        $basicAlias = $configuration->getOrmQuery()->getRootAlias();
         foreach ($this->pathsToFix as $path) {
             $forFix = $gridConfiguration->offsetGetByPath($path);
             if ($forFix) {
