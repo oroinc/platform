@@ -61,7 +61,7 @@ define(function(require) {
                 success: function(response) {
                     if (_.result(response, 'successful') !== true) {
                         model.set('seen', status);
-                        mediator.execute('showErrorMessage', __('Sorry, unexpected error was occurred'), 'error');
+                        mediator.execute('showErrorMessage', __('Sorry, an unexpected error has occurred.'), 'error');
                     }
                 },
                 error: function(xhr, err, message) {
