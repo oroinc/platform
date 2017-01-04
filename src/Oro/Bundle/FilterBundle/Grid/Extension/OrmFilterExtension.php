@@ -14,13 +14,9 @@ class OrmFilterExtension extends AbstractFilterExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $filters = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-
-        if ($filters === null) {
-            return false;
-        }
-
-        return $config->getDatasourceType() === OrmDatasource::TYPE;
+        return
+            $config->isOrmDatasource()
+            && null !== $config->offsetGetByPath(Configuration::COLUMNS_PATH);
     }
 
     /**

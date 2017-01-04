@@ -105,7 +105,7 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit_Framework_TestCase
 
         $foundSearchRecords = [];
         foreach ($foundUsers as $userId) {
-            $foundSearchRecords[] = new Item($this->manager, self::NAME, $userId);
+            $foundSearchRecords[] = new Item(self::NAME, $userId);
         }
 
         $this->securityFacade->expects($this->any())

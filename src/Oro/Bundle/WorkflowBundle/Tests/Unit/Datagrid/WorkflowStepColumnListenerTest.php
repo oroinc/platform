@@ -37,6 +37,11 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $entityClassResolver;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $configProvider;
 
     /**
@@ -55,6 +60,10 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -65,6 +74,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener = new WorkflowStepColumnListener(
             $this->doctrineHelper,
+            $this->entityClassResolver,
             $this->configProvider,
             $this->workflowRegistry
         );
@@ -775,6 +785,11 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->with($entity)
             ->willReturn($entityManager);
+
+        $this->entityClassResolver->expects($this->any())
+            ->method('getEntityClass')
+            ->with(self::ENTITY)
+            ->willReturn(self::ENTITY_FULL_NAME);
     }
 
     /**
