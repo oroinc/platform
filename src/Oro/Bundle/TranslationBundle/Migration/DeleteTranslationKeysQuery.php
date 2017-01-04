@@ -60,13 +60,14 @@ class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
         $keyField = $this->connection->getDatabasePlatform() instanceof MySqlPlatform ? '`key`' : 'key';
 
         $types  = [
-            'translation_keys'   => Connection::PARAM_STR_ARRAY,
-            'domain' => Type::STRING
+            'translation_keys' => Connection::PARAM_STR_ARRAY,
+            'domain' => Type::STRING,
         ];
 
-        $sql = "DELETE FROM oro_translation_key" .
-            " WHERE " . $keyField . " IN (:translation_keys)" .
-            " AND domain = :domain ";
+        $sql = sprintf(
+            'DELETE FROM oro_translation_key WHERE %s IN (:translation_keys) AND domain = :domain',
+            $keyField
+        );
 
         $this->logQuery($logger, $sql, $params, $types);
         $this->connection->executeUpdate($sql, $params, $types);
