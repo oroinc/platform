@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
@@ -83,5 +84,13 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
         ButtonContext $buttonContext
     ) {
         return new TransitionButton($transition, $workflow, $buttonContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getApplication()
+    {
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
     }
 }

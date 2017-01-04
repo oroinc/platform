@@ -9,14 +9,20 @@ use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareInterface;
+use Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareTrait;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-abstract class AbstractButtonProviderExtension implements ButtonProviderExtensionInterface
+abstract class AbstractButtonProviderExtension implements
+    ButtonProviderExtensionInterface,
+    ApplicationProviderAwareInterface
 {
+    use ApplicationProviderAwareTrait;
+
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
@@ -42,7 +48,12 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
     public function find(ButtonSearchContext $buttonSearchContext)
     {
         $buttons = [];
-        $groups = (array) $buttonSearchContext->getGroup();
+        $groups = (array)$buttonSearchContext->getGroup();
+
+        // Skip if wrong application
+        if (!$this->checkApplication()) {
+            return $buttons;
+        }
 
         // Skip if custom buttons group defined
         if ($groups &&
@@ -138,4 +149,20 @@ abstract class AbstractButtonProviderExtension implements ButtonProviderExtensio
         Workflow $workflow,
         ButtonContext $buttonContext
     );
+
+    /**
+     * @return string
+     */
+    abstract protected function getApplication();
+
+    /**
+     * @return bool
+     */
+    protected function checkApplication()
+    {
+        $application = $this->getApplication();
+
+        return (null !== $this->applicationProvider->getCurrentApplication()) &&
+        ($application === $this->applicationProvider->getCurrentApplication());
+    }
 }

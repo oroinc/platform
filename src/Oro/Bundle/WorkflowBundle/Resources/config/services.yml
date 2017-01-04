@@ -344,6 +344,8 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+        calls:
+            - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 110 }
 
@@ -352,6 +354,8 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.transition_route'
+        calls:
+            - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 120 }
 
