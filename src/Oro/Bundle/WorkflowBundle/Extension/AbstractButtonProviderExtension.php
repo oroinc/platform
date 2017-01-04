@@ -154,6 +154,7 @@ abstract class AbstractButtonProviderExtension implements
      * @return string
      */
     abstract protected function getApplication();
+
     /**
      * @return bool
      */
