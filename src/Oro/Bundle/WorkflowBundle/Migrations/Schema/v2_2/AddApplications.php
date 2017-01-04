@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_1;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_2;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
