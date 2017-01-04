@@ -43,7 +43,7 @@ define(function(require) {
                 this.showRemoveButton(groups);
             }
             var self = this;
-            $(this.options._sourceElement).parent().find(this.removeBtn).on('click', function (event) {
+            $(this.options._sourceElement).parent().find(this.removeBtn).on('click', function(event) {
                 var systemAttributesSelected = self.getAttributeSelect().find('option[locked="locked"]:selected');
                 if (systemAttributesSelected.length) {
                     self.showConfirmModal(this);
@@ -55,7 +55,7 @@ define(function(require) {
             $(this.options._sourceElement).parents().find('.oro-item-collection .row-oro').width(960);
         },
 
-        showConfirmModal: function (removeBtn) {
+        showConfirmModal: function(removeBtn) {
             var confirmDialog = new Modal({
                 title:  _.__('oro.attribute.remove_confirmation_title'),
                 content: _.__('oro.attribute.remove_confirmation_text'),
