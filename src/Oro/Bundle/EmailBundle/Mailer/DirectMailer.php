@@ -6,7 +6,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\EmailBundle\Exception\UnableToStartTransportException;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
@@ -165,7 +164,6 @@ class DirectMailer extends \Swift_Mailer
      *
      * @return int The number of recipients who were accepted for delivery
      * @throws \Exception
-     * @throws UnableToStartTransportException
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
@@ -173,11 +171,7 @@ class DirectMailer extends \Swift_Mailer
         // start a transport if needed
         $needToStopRealTransport = false;
         if (!$this->getTransport()->isStarted()) {
-            try {
-                $this->getTransport()->start();
-            } catch (\Swift_TransportException $e) {
-                throw new UnableToStartTransportException($e->getMessage(), $e->getCode(), $e);
-            }
+            $this->getTransport()->start();
             $needToStopRealTransport = true;
         }
         // send a mail
