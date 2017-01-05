@@ -3,12 +3,12 @@ namespaces:
     oro_entity_extend: Oro\Bundle\EntityExtendBundle\Validator\Constraints\
 
 Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
-    group_sequence: [FieldConfigModel, fieldName]
+    group_sequence: [FieldConfigModel, Sql, UniqueField, UniqueMethod]
     constraints:
-        - oro_entity_extend:UniqueExtendEntityField: {groups: fieldName}
-        - oro_entity_extend:DefaultRelationField: {groups: fieldName}
-        - oro_entity_extend:MultiEnumSnapshotField: {groups: fieldName}
-        - oro_entity_extend:UniqueExtendEntityMethodName: {groups: fieldName}
+        - oro_entity_extend:UniqueExtendEntityField: {groups: UniqueField}
+        - oro_entity_extend:DefaultRelationField: {groups: UniqueField}
+        - oro_entity_extend:MultiEnumSnapshotField: {groups: UniqueField}
+        - oro_entity_extend:UniqueExtendEntityMethodName: {groups: DuplicateMethod}
     properties:
         fieldName:
             - NotBlank: ~
@@ -19,7 +19,7 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
                 pattern: "/^id$/i"
                 match:   false
                 message: "The '{{ value }}' cannot be used as a field name."
-            - oro_entity_extend:NotSqlKeyword: ~
+            - oro_entity_extend:NotSqlKeyword: {groups: Sql}
         type:
             - NotBlank: ~
 

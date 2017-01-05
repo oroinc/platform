@@ -43,20 +43,12 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
             return $configuration;
         }
 
-        $fromPart = $configuration->offsetGetByPath('[source][query][from]');
-
         $entityAlias = null;
         $doctrineMetadata = $this->doctrine->getManagerForClass($className)
             ->getClassMetadata($className);
         $identifiers = $doctrineMetadata->getIdentifier();
         $primaryKey = array_shift($identifiers);
-
-        foreach ($fromPart as $piece) {
-            if ($piece['table'] == $className) {
-                $entityAlias = $piece['alias'];
-                break;
-            }
-        }
+        $entityAlias = $configuration->getOrmQuery()->findRootAlias($className);
 
         if (!$entityAlias || !$primaryKey || count($identifiers) > 1 || !$this->isActionSupported($primaryKey)) {
             return $configuration;
@@ -82,10 +74,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
             ]
         ];
 
-        $configuration->offsetAddToArrayByPath(
-            '[source][query][select]',
-            ["{$entityAlias}.{$primaryKey}"]
-        );
+        $configuration->getOrmQuery()->addSelect("{$entityAlias}.{$primaryKey}");
         $configuration->offsetAddToArrayByPath('[properties]', $properties);
         $configuration->offsetAddToArrayByPath('[actions]', $viewAction);
 

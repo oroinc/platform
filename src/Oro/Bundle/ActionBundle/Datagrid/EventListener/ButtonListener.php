@@ -13,13 +13,11 @@ use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class ButtonListener
 {
@@ -35,8 +33,8 @@ class ButtonListener
     /** @var OptionsHelper */
     protected $optionsHelper;
 
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -55,7 +53,7 @@ class ButtonListener
      * @param ContextHelper $contextHelper
      * @param MassActionProviderRegistry $providerRegistry
      * @param OptionsHelper $optionsHelper
-     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param EntityClassResolver $entityClassResolver
      * @param TranslatorInterface $translator
      */
     public function __construct(
@@ -63,14 +61,14 @@ class ButtonListener
         ContextHelper $contextHelper,
         MassActionProviderRegistry $providerRegistry,
         OptionsHelper $optionsHelper,
-        GridConfigurationHelper $gridConfigurationHelper,
+        EntityClassResolver $entityClassResolver,
         TranslatorInterface $translator
     ) {
         $this->buttonProvider = $buttonProvider;
         $this->contextHelper = $contextHelper;
         $this->providerRegistry = $providerRegistry;
         $this->optionsHelper = $optionsHelper;
-        $this->gridConfigurationHelper = $gridConfigurationHelper;
+        $this->entityClassResolver = $entityClassResolver;
         $this->translator = $translator;
     }
 
@@ -90,7 +88,7 @@ class ButtonListener
         $config = $event->getConfig();
 
         // datasource types other than ORM are not handled
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+        if (!$config->isOrmDatasource()) {
             return;
         }
 
@@ -157,11 +155,11 @@ class ButtonListener
                     $name = strtolower($button->getName());
                     $enabled = false;
 
+                    $newButton = clone $button;
                     if (!array_key_exists($name, $configuration) || $configuration[$name] !== false) {
-                        $enabled = $extension->isAvailable($button, $searchContext);
+                        $enabled = $extension->isAvailable($newButton, $searchContext);
                     }
 
-                    $newButton = clone $button;
                     $newButton->getButtonContext()
                         ->setEnabled($enabled)
                         ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId());
@@ -315,7 +313,7 @@ class ButtonListener
     {
         $context = new ButtonSearchContext();
         $context->setDatagrid($config->getName())
-            ->setEntity($this->gridConfigurationHelper->getEntity($config))
+            ->setEntity($config->getOrmQuery()->getRootEntity($this->entityClassResolver, true))
             ->setGroup($this->groups);
 
         return $context;

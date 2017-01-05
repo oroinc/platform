@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
-use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 
 class UpdateSchemaCommand extends ContainerAwareCommand
 {
@@ -64,7 +64,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
 
         /** @var ExtendEntityConfigProvider $attributeProvider */
         $extendEntityConfigProvider = $this->getContainer()
-            ->get('oro_entity_extend.provider.extend_entity_config_provider');
+            ->get('oro_entity_config.provider.extend_entity_config_provider');
 
         $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs($input->getOption('attributes-only'));
         $metadata = [];

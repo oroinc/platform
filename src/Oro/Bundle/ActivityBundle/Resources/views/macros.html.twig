@@ -8,13 +8,12 @@
         <div class="context-item" style="border: none" data-cid="<%- entity.cid %>">
                 <span data-id="<%- entity.get('targetId') %>">
                     <span class="<%- entity.get('icon') %>"></span>
-
                     <% if (entity.get('link')) { %>
                         <a href="<%- entity.get('link') %>">
-                            <span class="context-label"><%- entity.get('title') %></span>
+                            <span class="context-label" title="<%- entity.get('title') %>"><%- entity.get('title') %></span>
                         </a>
                     <% } else { %>
-                        <span class="context-label"><%- entity.get('title') %></span>
+                        <span class="context-label" title="<%- entity.get('title') %>"><%- entity.get('title') %></span>
                     <% }  %>
                     {% if  resource_granted('EDIT', entity) %}
                         <i class="fa-close"></i>

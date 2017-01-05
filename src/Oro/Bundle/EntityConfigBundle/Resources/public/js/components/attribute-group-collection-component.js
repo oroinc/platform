@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var Modal = require('oroui/js/modal');
 
     AttributeGroupComponent = BaseComponent.extend({
 
@@ -41,8 +42,39 @@ define(function(require) {
             } else {
                 this.showRemoveButton(groups);
             }
+            var self = this;
+            $(this.options._sourceElement).parent().find(this.removeBtn).on('click', function(event) {
+                var systemAttributesSelected = self.getAttributeSelect().find('option[locked="locked"]:selected');
+                if (systemAttributesSelected.length) {
+                    self.showConfirmModal(this);
+                    return false;
+                }
+                return true;
+            });
             //temporary width fix
             $(this.options._sourceElement).parents().find('.oro-item-collection .row-oro').width(960);
+        },
+
+        showConfirmModal: function(removeBtn) {
+            var confirmDialog = new Modal({
+                title:  _.__('oro.attribute.remove_confirmation_title'),
+                content: _.__('oro.attribute.remove_confirmation_text'),
+                className: 'modal oro-modal-danger'
+            });
+
+            confirmDialog.on('ok', function() {
+                var item;
+                var closest = '*[data-content]';
+                if ($(removeBtn).data('closest')) {
+                    closest = $(removeBtn).data('closest');
+                }
+
+                item = $(removeBtn).closest(closest);
+                item.trigger('content:remove').remove();
+                confirmDialog.close();
+            });
+
+            confirmDialog.open();
         },
 
         getAllGroups: function() {
@@ -50,11 +82,11 @@ define(function(require) {
         },
 
         showRemoveButton: function(groups) {
-            groups.parent().find('.removeRow.btn-link').show();
+            groups.parent().find(this.removeBtn).show();
         },
 
         hideRemoveButton: function(groups) {
-            groups.parent().find('.removeRow.btn-link').hide();
+            groups.parent().find(this.removeBtn).hide();
         },
 
         getAttributeSelect: function() {

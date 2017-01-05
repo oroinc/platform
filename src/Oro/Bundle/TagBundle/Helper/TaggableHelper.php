@@ -29,6 +29,7 @@ class TaggableHelper
         return
             self::isImplementsTaggable($entity) ||
             (
+                $entity &&
                 $this->tagConfigProvider->hasConfig($entity) &&
                 $this->tagConfigProvider->getConfig($entity)->is('enabled')
             );

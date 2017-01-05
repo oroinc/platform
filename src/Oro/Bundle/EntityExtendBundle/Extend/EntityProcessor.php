@@ -103,7 +103,7 @@ class EntityProcessor
             'oro:entity-extend:update-schema' => []
         ];
 
-      /*  Uncomment after extendEntityConfigProvider logic restored
+      /*  Should be changed in scope of #BB-6620
       if ($attributesOnly) {
             $commands = [
                 'oro:entity-extend:update-config' => [

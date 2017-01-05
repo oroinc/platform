@@ -17,7 +17,8 @@ class InstallTest extends Selenium2TestCase
     {
         parent::setUp();
         //to prevent timeout exception on step pages
-        $this->setSeleniumServerRequestsTimeout((int)(MAX_EXECUTION_TIME / 1000));
+        // todo: Remove x2 multipler when CRM-7303 will resolved
+        $this->setSeleniumServerRequestsTimeout((int)(MAX_EXECUTION_TIME / 1000 * 2));
     }
 
     public function testInstallation()

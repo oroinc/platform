@@ -53,6 +53,7 @@ class DefaultDataConverter implements DataConverterInterface
                     $plainData[$compositeKey] = $tmpValue;
                 }
             } elseif ($value !== null || !$skipNullValues) {
+                $value = is_bool($value) ? (int)$value : $value;
                 $plainData[$key] = (string)$value;
             }
         }

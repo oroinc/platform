@@ -46,8 +46,8 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
 
         $configuration = new Configuration();
 
-        $gridConfigurationHelper = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper')
+        $entityClassResolver = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -62,7 +62,7 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
             $this->restrictionManager,
             $configuration,
             $entityClassNameHelper,
-            $gridConfigurationHelper
+            $entityClassResolver
         );
 
         $parameters = new ParameterBag(
@@ -88,7 +88,8 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
                 'type' => 'orm',
             ],
         ]);
-        $this->restrictionManager->expects($this->once())->method('boardViewEnabled')
+        $this->restrictionManager->expects($this->once())
+            ->method('boardViewEnabled')
             ->with($config)
             ->will($this->returnValue(false));
         $this->assertFalse($this->extension->isApplicable($config));
@@ -113,18 +114,28 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
                 'type' => 'orm',
             ],
         ]);
-        $this->restrictionManager->expects($this->once())->method('boardViewEnabled')->will($this->returnValue(true));
+        $this->restrictionManager->expects($this->once())
+            ->method('boardViewEnabled')
+            ->will($this->returnValue(true));
         $this->assertTrue($this->extension->isApplicable($config));
 
         $processor = $this->createMock('Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface');
-        $processor->expects($this->once())->method('getName')->will($this->returnValue('default'));
-        $processor->expects($this->once())->method('getBoardOptions')->will($this->returnValue(['options']));
+        $processor->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('default'));
+        $processor->expects($this->once())
+            ->method('getBoardOptions')
+            ->will($this->returnValue(['options']));
         $this->extension->addProcessor($processor);
 
-        $this->translator->expects($this->once())->method('trans')->with('board label')
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('board label')
             ->will($this->returnValue('translated board label'));
 
-        $this->securityFacade->expects($this->once())->method('isGranted')->with('update_acl_resource')
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->with('update_acl_resource')
             ->will($this->returnValue(true));
 
         $data = MetadataObject::create([]);
@@ -180,7 +191,9 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
                 'type' => 'orm',
             ],
         ]);
-        $this->restrictionManager->expects($this->once())->method('boardViewEnabled')->will($this->returnValue(true));
+        $this->restrictionManager->expects($this->once())
+            ->method('boardViewEnabled')
+            ->will($this->returnValue(true));
         $this->extension->isApplicable($config);
         $this->expectException('Oro\Bundle\DataGridBundle\Exception\NotFoundBoardProcessorException');
         $data = MetadataObject::create([]);
@@ -205,12 +218,16 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $processor = $this->createMock('Oro\Bundle\DataGridBundle\Extension\Board\Processor\BoardProcessorInterface');
-        $processor->expects($this->once())->method('getName')->will($this->returnValue('default'));
+        $processor->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('default'));
         $options = [
             ['ids' => ['in_progress']],
             ['ids' => ['lost']]
         ];
-        $processor->expects($this->once())->method('getBoardOptions')->will($this->returnValue($options));
+        $processor->expects($this->once())
+            ->method('getBoardOptions')
+            ->will($this->returnValue($options));
         $this->extension->addProcessor($processor);
 
 
@@ -223,12 +240,12 @@ class BoardExtensionTest extends \PHPUnit_Framework_TestCase
             'property' => 'group_field'
         ];
         $dataSource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
-        $processor->expects($this->once())->method('processDatasource')->with(
-            $dataSource,
-            $appearanceData,
-            $config
-        );
-        $this->restrictionManager->expects($this->once())->method('boardViewEnabled')->will($this->returnValue(true));
+        $processor->expects($this->once())
+            ->method('processDatasource')
+            ->with($dataSource, $appearanceData, $config);
+        $this->restrictionManager->expects($this->once())
+            ->method('boardViewEnabled')
+            ->will($this->returnValue(true));
         $this->extension->isApplicable($config);
 
         $this->extension->visitDatasource($config, $dataSource);

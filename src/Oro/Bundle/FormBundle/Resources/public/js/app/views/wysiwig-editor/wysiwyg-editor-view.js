@@ -12,7 +12,7 @@ define(function(require) {
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 3,
         TEXTAREA_UI_HEIGHT: 22,
-        TINYMCE_TIMEOUT: 1000, //after this time view promise will be resolved anyway
+        TINYMCE_TIMEOUT: 30000, //after this time view promise will be resolved anyway
 
         autoRender: true,
         firstRender: true,
