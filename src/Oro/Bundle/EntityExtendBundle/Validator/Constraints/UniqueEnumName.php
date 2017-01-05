@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueEnumName extends Constraint
 {
-    public $message = "An enum with this name already exist.";
+    public $message = 'An enum with this name already exist.';
 
     /** @var string */
     public $entityClassName;

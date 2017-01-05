@@ -442,17 +442,17 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
                             'select' => [
                                 'IDENTITY(o.testField) as testField_identity',
-                                'testField.name as testField_target_field',
+                                'auto_rel_1.name as testField_target_field',
                             ],
                             'join' => [
                                 'left' => [
                                     [
                                         'join' => 'o.testField',
-                                        'alias' => 'testField',
+                                        'alias' => 'auto_rel_1',
                                     ],
                                 ],
                             ],
-                            'groupBy' => 'o.someField,testField.name'
+                            'groupBy' => 'o.someField,auto_rel_1.name'
                         ],
                     ],
                     'fields_acl' => ['columns' => ['testField_target_field' => ['data_name' => 'o.testField']]],

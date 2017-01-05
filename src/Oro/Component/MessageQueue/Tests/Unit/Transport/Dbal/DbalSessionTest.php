@@ -110,12 +110,4 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
     {
         return $this->createMock(DbalConnection::class);
     }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSchema
-     */
-    private function createDbalSchemaMock()
-    {
-        return $this->createMock(DbalSchema::class);
-    }
 }

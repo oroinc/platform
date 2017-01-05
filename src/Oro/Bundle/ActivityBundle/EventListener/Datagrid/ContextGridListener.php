@@ -36,17 +36,14 @@ class ContextGridListener
     public function onBuildAfter(BuildAfter $event)
     {
         /** @var OrmDatasource $dataSource */
-        $datagrid         = $event->getDatagrid();
-        $config           = $datagrid->getConfig();
-        $configParameters = $config->toArray();
+        $datagrid = $event->getDatagrid();
+        $config = $datagrid->getConfig();
 
-        if (!array_key_exists('extended_entity_name', $configParameters) ||
-            !$configParameters['extended_entity_name']
-        ) {
+        $targetClass = $config->getExtendedEntityClassName();
+        if (!$targetClass) {
             return;
         }
 
-        $targetClass  = $configParameters['extended_entity_name'];
         $parameters   = $datagrid->getParameters();
         $dataSource   = $datagrid->getDatasource();
         $queryBuilder = $dataSource->getQueryBuilder();
