@@ -402,7 +402,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                         error: function() {
                             var message;
                             message = el.data('error-message') ||
-                                __('Unexpected error occurred. Please contact system administrator.');
+                                __('An unexpected error occurred. Please contact the system administrator.');
                             mediator.execute('hideLoading');
                             mediator.execute('showMessage', 'error', message);
                         }
