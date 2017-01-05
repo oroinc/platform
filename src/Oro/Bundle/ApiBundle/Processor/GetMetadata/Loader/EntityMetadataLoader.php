@@ -237,16 +237,7 @@ class EntityMetadataLoader
                     && !$entityMetadata->hasField($fieldName)
                     && !$entityMetadata->hasAssociation($fieldName)
                 ) {
-                    $targetClass = $field->getTargetClass();
-                    if ($targetClass) {
-                        $this->objectMetadataFactory->createAndAddAssociationMetadata(
-                            $entityMetadata,
-                            $entityClass,
-                            $fieldName,
-                            $field,
-                            $targetAction
-                        );
-                    } elseif (DataType::isNestedObject($dataType)) {
+                    if (DataType::isNestedObject($dataType)) {
                         $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
                             $entityMetadata,
                             $classMetadata,
@@ -255,6 +246,14 @@ class EntityMetadataLoader
                             $fieldName,
                             $field,
                             $withExcludedProperties,
+                            $targetAction
+                        );
+                    } elseif ($field->getTargetClass()) {
+                        $this->objectMetadataFactory->createAndAddAssociationMetadata(
+                            $entityMetadata,
+                            $entityClass,
+                            $fieldName,
+                            $field,
                             $targetAction
                         );
                     } else {

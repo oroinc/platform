@@ -47,13 +47,15 @@ class ObjectMetadataLoader
             if (!$withExcludedProperties && $field->isExcluded()) {
                 continue;
             }
-            $targetClass = $field->getTargetClass();
-            if ($targetClass) {
-                $this->objectMetadataFactory->createAndAddAssociationMetadata(
+            $dataType = $field->getDataType();
+            if (DataType::isNestedObject($dataType)) {
+                $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
                     $entityMetadata,
+                    $config,
                     $entityClass,
                     $fieldName,
                     $field,
+                    $withExcludedProperties,
                     $targetAction
                 );
             } elseif ($field->isMetaProperty()) {
@@ -67,14 +69,12 @@ class ObjectMetadataLoader
                 if (ConfigUtil::CLASS_NAME === $fieldName) {
                     $entityMetadata->setInheritedType(true);
                 }
-            } elseif (DataType::isNestedObject($field->getDataType())) {
-                $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
+            } elseif ($field->getTargetClass()) {
+                $this->objectMetadataFactory->createAndAddAssociationMetadata(
                     $entityMetadata,
-                    $config,
                     $entityClass,
                     $fieldName,
                     $field,
-                    $withExcludedProperties,
                     $targetAction
                 );
             } else {

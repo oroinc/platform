@@ -27,7 +27,7 @@ class ConfigUpdateCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configManager = $this->getContainer()->get('oro_config.scope.global');
+        $configManager = $this->getContainer()->get('oro_config.global');
         $configManager->set($input->getArgument('name'), $input->getArgument('value'));
         $configManager->flush();
     }

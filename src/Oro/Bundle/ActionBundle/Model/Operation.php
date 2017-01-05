@@ -247,4 +247,9 @@ class Operation
 
         return !empty($formOptionsConfig['attribute_fields']);
     }
+
+    public function __clone()
+    {
+        $this->definition = clone $this->getDefinition();
+    }
 }

@@ -84,7 +84,7 @@ class ContainsPrimaryValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $context->expects($this->once())
             ->method('addViolation')
-            ->with('One of items must be set as primary.');
+            ->with('One of the items must be set as primary.');
 
         $constraint = $this->createMock('Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary');
         $validator = new ContainsPrimaryValidator();

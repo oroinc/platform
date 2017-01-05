@@ -182,9 +182,13 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.attributes-grid, method: onResultAfter }
 
     oro_entity_config.form.handler.config_helper_handler:
-            class: 'Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler'
-            arguments:
-                - '@form.factory'
+        scope: request
+        class: 'Oro\Bundle\EntityConfigBundle\Form\Handler\ConfigHelperHandler'
+        arguments:
+            - '@form.factory'
+            - '@session'
+            - '@oro_ui.router'
+            - '@oro_entity_config.config.config_helper'
 
     oro_entity_config.manager.attribute_manager:
         class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeManager'
@@ -225,7 +229,6 @@ services:
         arguments:
             - '@oro_entity_config.form.handler.config_helper_handler'
             - '@oro_entity_config.config_manager'
-            - '@oro_ui.router'
             - '@oro_entity_config.config.config_helper'
             - '@oro_entity_extend.form.util.field_session_storage'
 
@@ -263,6 +266,7 @@ services:
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.manager.attribute_family_manager'
         tags:
             - { name: security.voter }
 
@@ -290,3 +294,25 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_entity_config.provider.extend_entity_config_provider:
+        class: 'Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider'
+        arguments:
+            - '@oro_entity_config.config_manager'
+
+    oro_entity_config.twig.extension.dynamic_fields_attribute_decorator:
+        class: 'Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtensionAttributeDecorator'
+        decorates: oro_entity_extend.twig.extension.dynamic_fields
+        arguments:
+            - "@oro_entity_config.twig.extension.dynamic_fields_attribute_decorator.inner"
+            - "@oro_entity_config.config.attributes_config_helper"
+
+    oro_entity_config.datagrid.attribute_family_actions_configuration:
+        class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
+        arguments:
+            - '@oro_entity_config.manager.attribute_family_manager'
+
+    oro_entity_config.manager.attribute_family_manager:
+        class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager'
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'

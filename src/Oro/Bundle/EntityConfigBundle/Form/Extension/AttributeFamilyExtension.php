@@ -67,6 +67,7 @@ class AttributeFamilyExtension extends AbstractTypeExtension
                 'class' => AttributeFamily::class,
                 'choices' => $families,
                 'label' => 'oro.entity_config.attribute_family.entity_label',
+                'required' => true,
                 'constraints' => [
                     new NotBlank(),
                 ]

@@ -1,12 +1,14 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Job\Topics;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 
 class JobProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +20,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     public function testCreateRootJobShouldThrowIfOwnerIdIsEmpty()
     {
         $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('OwnerId must not be empty');
 
@@ -100,7 +101,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Job name must not be empty');
-
         $processor->findOrCreateChildJob(null, new Job());
     }
 
@@ -167,13 +167,18 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($job))
         ;
 
+        $message = new Message();
+        $message->setBody(['jobId' => 12345]);
+        $message->setPriority(MessagePriority::HIGH);
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
-            ->with(Topics::CALCULATE_ROOT_JOB_STATUS, ['jobId' => 12345])
+            ->withConsecutive(
+                [$this->equalTo(Topics::CALCULATE_ROOT_JOB_STATUS), ['jobId' => 12345]],
+                [$this->equalTo(Topics::CALCULATE_ROOT_JOB_PROGRESS), $message]
+            )
         ;
-
         $processor = new JobProcessor($storage, $producer);
 
         $result = $processor->findOrCreateChildJob('job-name', $job);
@@ -196,7 +201,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t start root jobs. id: "12345"');
-
         $processor->startChildJob($rootJob);
     }
 
@@ -267,7 +271,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t success root jobs. id: "12345"');
-
         $processor->successChildJob($rootJob);
     }
 
@@ -292,7 +295,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionMessage(
             'Can success only running jobs. id: "12345", status: "oro.message_queue_job.status.cancelled"'
         );
-
         $processor->successChildJob($job);
     }
 
@@ -318,7 +320,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
         ;
 
@@ -338,7 +340,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t fail root jobs. id: "12345"');
-
         $processor->failChildJob($rootJob);
     }
 
@@ -389,7 +390,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
         ;
 
@@ -409,7 +410,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t cancel root jobs. id: "12345"');
-
         $processor->cancelChildJob($rootJob);
     }
 
@@ -460,7 +460,7 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $producer = $this->createMessageProducerMock();
         $producer
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('send')
         ;
 

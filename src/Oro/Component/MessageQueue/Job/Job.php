@@ -69,6 +69,11 @@ class Job
      */
     protected $data;
 
+    /**
+     * @var float
+     */
+    protected $jobProgress;
+
     public function __construct()
     {
         $this->interrupted = false;
@@ -316,6 +321,14 @@ class Job
     }
 
     /**
+     * @param Job $childJob
+     */
+    public function addChildJob(Job $childJob)
+    {
+        $this->childJobs[] = $childJob;
+    }
+
+    /**
      * @return array
      */
     public function getData()
@@ -329,5 +342,21 @@ class Job
     public function setData(array $data)
     {
         $this->data = $data;
+    }
+
+    /**
+     * @return float
+     */
+    public function getJobProgress()
+    {
+        return $this->jobProgress;
+    }
+
+    /**
+     * @param float $jobProgress
+     */
+    public function setJobProgress($jobProgress)
+    {
+        $this->jobProgress = $jobProgress;
     }
 }

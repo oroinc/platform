@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\InstallerBundle\Migration;
 
-use Doctrine\DBAL\Types\Type;
-
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class UpdateExtendRelationQuery extends ParametrizedMigrationQuery
 {
@@ -84,58 +83,95 @@ class UpdateExtendRelationQuery extends ParametrizedMigrationQuery
         );
         if ($row) {
             $id = $row['id'];
-            $originalData = $row['data'];
-            $originalData = $originalData ? $this->connection->convertToPHPValue($originalData, Type::TARRAY) : [];
+            $data = $this->connection->convertToPHPValue($row['data'], 'array');
 
-            $data = $originalData;
-            $fullRelationFrom = implode(
-                '|',
-                [$this->relationType, $this->entityFrom, $this->entityTo, $this->relationFrom]
-            );
-            $fullRelationTo = implode(
-                '|',
-                [$this->relationType, $this->entityFrom, $this->entityTo, $this->relationTo]
-            );
-            if (isset($data['extend']['relation'][$fullRelationFrom])) {
-                $data['extend']['relation'][$fullRelationTo] =
-                    $data['extend']['relation'][$fullRelationFrom];
-                unset($data['extend']['relation'][$fullRelationFrom]);
+            $hasChanges = false;
+            $relationKeyFrom = $this->buildRelationKey($this->relationFrom);
+            if (isset($data['extend']['relation'][$relationKeyFrom])) {
+                $relationKeyTo = $this->buildRelationKey($this->relationTo);
+                $data['extend']['relation'][$relationKeyTo] =
+                    $data['extend']['relation'][$relationKeyFrom];
+                unset($data['extend']['relation'][$relationKeyFrom]);
 
-                if (isset($data['extend']['relation'][$fullRelationTo]['field_id'])) {
+                if (isset($data['extend']['relation'][$relationKeyTo]['field_id'])) {
                     /** @var FieldConfigId $fieldId */
-                    $fieldId = $data['extend']['relation'][$fullRelationTo]['field_id'];
+                    $fieldId = $data['extend']['relation'][$relationKeyTo]['field_id'];
                     $reflectionProperty = new \ReflectionProperty(get_class($fieldId), 'fieldName');
                     $reflectionProperty->setAccessible(true);
                     $reflectionProperty->setValue($fieldId, $this->relationTo);
-                    $data['extend']['relation'][$fullRelationTo]['field_id'] = $fieldId;
+                    $data['extend']['relation'][$relationKeyTo]['field_id'] = $fieldId;
                 }
+
+                $hasChanges = true;
             }
             if (isset($data['extend']['schema']['relation'][$this->relationFrom])) {
                 $data['extend']['schema']['relation'][$this->relationTo] =
                     $data['extend']['schema']['relation'][$this->relationFrom];
                 unset($data['extend']['schema']['relation'][$this->relationFrom]);
+
+                $hasChanges = true;
             }
             if (isset($data['extend']['schema']['addremove'][$this->relationFrom])) {
                 $data['extend']['schema']['addremove'][$this->relationTo] =
                     $data['extend']['schema']['addremove'][$this->relationFrom];
                 unset($data['extend']['schema']['addremove'][$this->relationFrom]);
+
+                $hasChanges = true;
             }
 
-            if ($data !== $originalData) {
-                $query = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
-                $parameters = [$this->connection->convertToDatabaseValue($data, Type::TARRAY), $id];
-
-                $this->logQuery($logger, $query, $parameters);
-                if (!$dryRun) {
-                    $this->connection->executeUpdate($query, $parameters);
-                }
+            if ($hasChanges) {
+                $this->updateEntityConfig($id, $data, $logger, $dryRun);
             }
+            $this->updateEntityFieldConfig($id, $logger, $dryRun);
+        }
+    }
 
-            $query = 'UPDATE oro_entity_config_field SET field_name = ? WHERE entity_id = ? and field_name = ?';
-            $parameters = [$this->relationTo, $id, $this->relationFrom];
-            if (!$dryRun) {
-                $this->connection->executeUpdate($query, $parameters);
-            }
+    /**
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    private function buildRelationKey($fieldName)
+    {
+        return ExtendHelper::buildRelationKey(
+            $this->entityFrom,
+            $fieldName,
+            $this->relationType,
+            $this->entityTo
+        );
+    }
+
+    /**
+     * @param int             $id
+     * @param array           $data
+     * @param LoggerInterface $logger
+     * @param bool            $dryRun
+     */
+    protected function updateEntityConfig($id, array $data, LoggerInterface $logger, $dryRun)
+    {
+        $query = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
+        $params = ['data' => $data, 'id' => $id];
+        $types = ['data' => 'array', 'id' => 'integer'];
+        $this->logQuery($logger, $query, $params, $types);
+        if (!$dryRun) {
+            $this->connection->executeUpdate($query, $params, $types);
+        }
+    }
+
+    /**
+     * @param int             $entityId
+     * @param LoggerInterface $logger
+     * @param bool            $dryRun
+     */
+    protected function updateEntityFieldConfig($entityId, LoggerInterface $logger, $dryRun)
+    {
+        $query = 'UPDATE oro_entity_config_field SET field_name = :newField'
+            . ' WHERE entity_id = :entityId and field_name = :oldField';
+        $params = ['oldField' => $this->relationFrom, 'newField' => $this->relationTo, 'entityId' => $entityId];
+        $types = ['oldField' => 'string', 'newField' => 'string', 'entityId' => 'integer'];
+        $this->logQuery($logger, $query, $params, $types);
+        if (!$dryRun) {
+            $this->connection->executeUpdate($query, $params, $types);
         }
     }
 }

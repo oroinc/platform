@@ -6,10 +6,10 @@ use Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -20,9 +20,6 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
     protected $entityClassResolver;
-
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
     protected $registry;
@@ -41,14 +38,12 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->gridConfigurationHelper = new GridConfigurationHelper($this->entityClassResolver);
-
         $this->registry = $this->getMockBuilder(OperationRegistry::class)->disableOriginalConstructor()->getMock();
         $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
 
         $this->extension = new DeleteMassActionExtension(
             $this->doctrineHelper,
-            $this->gridConfigurationHelper,
+            $this->entityClassResolver,
             $this->registry,
             $this->contextHelper
         );
@@ -59,7 +54,6 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
         unset(
             $this->extension,
             $this->doctrineHelper,
-            $this->gridConfigurationHelper,
             $this->entityClassResolver,
             $this->registry
         );
@@ -132,10 +126,14 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
         $operationAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operationAvailable->expects($this->once())
             ->method('isAvailable')->with($actionData)->willReturn(true);
+        $operationAvailable->expects($this->once())
+            ->method('getDefinition')->willReturn(new OperationDefinition());
 
         $operationNotAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operationNotAvailable->expects($this->once())
             ->method('isAvailable')->with($actionData)->willReturn(false);
+        $operationNotAvailable->expects($this->once())
+            ->method('getDefinition')->willReturn(new OperationDefinition());
 
         return [
             [

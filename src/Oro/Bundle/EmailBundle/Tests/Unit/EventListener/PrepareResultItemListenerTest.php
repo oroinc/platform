@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Symfony\Component\Routing\Router;
-
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 
 class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
@@ -17,6 +17,9 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|Router */
     protected $router;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|Item */
     protected $item;
 
@@ -26,11 +29,15 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->item = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new PrepareResultItemListener($this->router);
+        $this->listener = new PrepareResultItemListener($this->router, $this->doctrineHelper);
     }
 
     public function testPrepareEmailItemDataEventSkippEntity()
@@ -38,8 +45,6 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->item->expects($this->once())
             ->method('getEntityName')
             ->willReturn('test');
-        $this->item->expects($this->never())
-            ->method('getEntity');
 
         $event = new PrepareResultItemEvent($this->item);
         $this->listener->prepareEmailItemDataEvent($event);
@@ -50,19 +55,35 @@ class PrepareResultItemListenerTest extends \PHPUnit_Framework_TestCase
         $entity = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->disableOriginalConstructor()
             ->getMock();
+
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->item->expects($this->once())
+        $repository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->item->expects($this->exactly(1))
+            ->method('getId');
+
+        $this->item->expects($this->exactly(1))
             ->method('getEntityName')
             ->willReturn(EmailUser::ENTITY_CLASS);
-        $this->item->expects($this->once())
-            ->method('getEntity')
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->with(EmailUser::ENTITY_CLASS)
+            ->willReturn($repository);
+
+        $repository->expects($this->once())
+            ->method('find')
             ->willReturn($entity);
+
         $entity->expects($this->once())
             ->method('getEmail')
             ->willReturn($email);
+
         $email->expects($this->once())
             ->method('getId');
 

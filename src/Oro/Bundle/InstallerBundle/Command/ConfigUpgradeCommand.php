@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,8 +37,12 @@ class ConfigUpgradeCommand extends ContainerAwareCommand
         $force = $input->getOption('force');
 
         if ($force) {
-            $this->getContainer()->get('oro_installer.namespace_migration')->migrate();
-            $this->getContainer()->get('oro_entity_config.config_manager')->clear();
+            try {
+                $this->getContainer()->get('oro_installer.namespace_migration')->migrate();
+                $this->getContainer()->get('oro_entity_config.config_manager')->clear();
+            } catch (\InvalidArgumentException $e) {
+                $output->writeln('Nothing to update in configs');
+            }
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'

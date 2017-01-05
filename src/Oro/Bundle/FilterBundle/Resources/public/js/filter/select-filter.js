@@ -236,11 +236,12 @@ define([
                         my: 'left top',
                         at: 'left bottom',
                         of: this.$el,
-                        collision: 'fit flip',
+                        collision: 'fit none',
                         within: $dropdownContainer
                     },
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
+                        this.trigger('showCriteria', this);
                         this._setDropdownWidth();
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();

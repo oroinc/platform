@@ -99,11 +99,15 @@ class ExtendHelper
     /**
      * @param string $relationKey
      *
-     * @return string
+     * @return string|null
      */
     public static function getRelationType($relationKey)
     {
         $parts = explode('|', $relationKey);
+        $numberOfParts = count($parts);
+        if ($numberOfParts < 4 || $numberOfParts > 5) {
+            return null;
+        }
 
         return reset($parts);
     }

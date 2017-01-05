@@ -53,8 +53,7 @@ class OroApiBundle extends Bundle
             PassConfig::TYPE_BEFORE_REMOVING
         );
         $container->addCompilerPass(
-            new ApiSecurityFirewallCompilerPass('api_wsse_secured'),
-            PassConfig::TYPE_BEFORE_REMOVING
+            new ApiSecurityFirewallCompilerPass()
         );
     }
 }

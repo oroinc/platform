@@ -16,7 +16,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
-use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

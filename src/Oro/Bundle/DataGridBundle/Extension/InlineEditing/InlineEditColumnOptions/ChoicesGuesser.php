@@ -63,6 +63,12 @@ class ChoicesGuesser implements GuesserInterface
                         ->getChoices($targetEntity, $keyField, $labelField);
                 }
 
+                if (array_key_exists(PropertyInterface::DATA_NAME_KEY, $column)
+                    && false !== strpos($column[PropertyInterface::DATA_NAME_KEY], '_target_field')
+                ) {
+                    $result[PropertyInterface::DATA_NAME_KEY] = $columnName.'_identity';
+                }
+
                 $isConfiguredInlineEdit = array_key_exists(Configuration::BASE_CONFIG_KEY, $column);
                 $result = $this->guessEditorView($column, $isConfiguredInlineEdit, $result);
             }

@@ -24,6 +24,66 @@ oro_rest_api_get_deprecated:
     options:
         group: rest_api_deprecated
 
+oro_rest_api_delete_deprecated:
+    path: /api/{entity}/{id}.{_format}
+    methods: [DELETE]
+    requirements:
+        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:delete
+        _format: json
+        _action: delete
+    options:
+        group: rest_api_deprecated
+
+oro_rest_api_cdelete_deprecated:
+    path: /api/{entity}.{_format}
+    methods: [DELETE]
+    requirements:
+        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:cdelete
+        _format: json
+        _action: delete_list
+    options:
+        group: rest_api_deprecated
+
+oro_rest_api_post_deprecated:
+    path: /api/{entity}.{_format}
+    methods: [POST]
+    requirements:
+        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:post
+        _format: json
+        _action: create
+    options:
+        group: rest_api_deprecated
+
+oro_rest_api_patch_deprecated:
+    path: /api/{entity}/{id}.{_format}
+    methods: [PATCH]
+    requirements:
+        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:patch
+        _format: json
+        _action: update
+    options:
+        group: rest_api_deprecated
+
+oro_rest_api_get_subresource_deprecated:
+    path: /api/{entity}/{id}/{association}.{_format}
+    methods: [GET]
+    requirements:
+        entity: (?:(?!(soap|rest)(/|$))[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApiSubresource:get
+        _format: json
+        _action: get_subresource
+    options:
+        group: rest_api_deprecated
+
 # returns a list of entities of the given type
 oro_rest_api_cget:
     path: /api/{entity}

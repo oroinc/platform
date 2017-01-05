@@ -2,12 +2,13 @@
 namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Component\MessageQueue\Job\Schema as UniqueJobSchema;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInterface
 {
@@ -18,7 +19,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
@@ -74,12 +75,11 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $table->addColumn('started_at', 'datetime', ['notnull' => false]);
         $table->addColumn('stopped_at', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
-
         $table->addColumn('data', 'json_array', [
             'notnull' => false,
             'comment' => '(DC2Type:json_array)',
         ]);
-
+        $table->addColumn('job_progress', 'percent', ['notnull' => false, 'precision' => 0]);
         $table->addForeignKeyConstraint(
             $table,
             ['root_job_id'],
