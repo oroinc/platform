@@ -36,13 +36,9 @@
     {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
 
     {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
-    {% if isMobileVersion() %}
-        {% set enableToggleFilters = false %}
-    {% elseif renderParams.enableToggleFilters is defined %}
-        {% set enableToggleFilters = renderParams.enableToggleFilters %}
-    {% else %}
-        {% set enableToggleFilters = false %}
-    {% endif %}
+
+    {% set enableToggleFilters = false %}
+
     {% set options  = {
         el: '#' ~ gridId,
         gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
