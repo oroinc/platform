@@ -103,7 +103,6 @@ services:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
         calls:
-            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.applications']]
             - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
             - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
 

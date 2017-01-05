@@ -126,7 +126,7 @@ abstract class AbstractButtonProviderExtension implements
      */
     protected function getActiveWorkflows()
     {
-        return $this->workflowRegistry->getActiveWorkflows();
+        return $this->workflowRegistry->getActiveWorkflowsByApplication($this->getApplication());
     }
 
     /**
