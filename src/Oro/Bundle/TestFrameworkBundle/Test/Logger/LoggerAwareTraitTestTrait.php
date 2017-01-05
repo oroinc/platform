@@ -6,11 +6,11 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Use it for testing classes that use LoggerAwareTrait and/or implement LoggerAwareInterface
+ * Use this test trait for testing classes that use LoggerAwareTrait
  * Please, start by calling $this->setUpLoggerMock() method in the setUp() method of your testCase class.
  * Then use assertions of this trait in the appropriate test methods.
  */
-trait LoggerAwareInterfaceTestTrait
+trait LoggerAwareTraitTestTrait
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
@@ -29,6 +29,10 @@ trait LoggerAwareInterfaceTestTrait
             'LoggerAwareObject instance is null. May you have forgotten
              to call $this->setUpLoggerMock() in $this->setUp() method?'
         );
+
+        $loggerAwareObjectReflection = new \ReflectionClass(get_class($this->loggerAwareObject));
+
+        $this->assertTrue($loggerAwareObjectReflection->hasProperty('logger'));
 
         $loggerPropertyReflection = new \ReflectionProperty(
             get_class($this->loggerAwareObject),
