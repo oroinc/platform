@@ -16,18 +16,18 @@ class ColumnConfigListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $doctrineHelper;
+    protected $entityClassResolver;
 
     /** @var ColumnConfigListener  */
     protected $columnListener;
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->columnListener = new ColumnConfigListener($this->doctrineHelper);
+        $this->columnListener = new ColumnConfigListener($this->entityClassResolver);
     }
 
     /**
@@ -38,7 +38,10 @@ class ColumnConfigListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildBeforeEvent(array $inputConfig, array $expectedConfig)
     {
-        $this->setUpEntityManagerMock(self::ENTITY);
+        $this->entityClassResolver->expects(self::once())
+            ->method('getEntityClass')
+            ->with(self::ENTITY)
+            ->willReturn(self::ENTITY);
         $event = $this->createBuildBeforeEvent($inputConfig);
         $this->columnListener->onBuildBefore($event);
         $config = $event->getConfig()->toArray();
@@ -304,31 +307,5 @@ class ColumnConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($datagridConfiguration);
 
         return $event;
-    }
-
-    /**
-     * @param string $entity
-     */
-    protected function setUpEntityManagerMock($entity)
-    {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata->expects($this->any())->method('getName')->willReturn($entity);
-
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityManager
-            ->expects($this->any())
-            ->method('getClassMetadata')
-            ->with($entity)
-            ->willReturn($metadata);
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityManager')
-            ->with($entity)
-            ->willReturn($entityManager);
     }
 }

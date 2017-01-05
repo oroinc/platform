@@ -264,7 +264,6 @@ class JobProcessor
 
     /**
      * @param $job
-     * @return void
      */
     protected function sendRecalculateJobProgressMessage($job)
     {

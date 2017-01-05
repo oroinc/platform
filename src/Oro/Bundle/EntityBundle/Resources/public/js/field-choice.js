@@ -208,11 +208,11 @@ define(function(require) {
 
             try {
                 chain = this.util.pathToEntityChain(path, true);
+                entityName = chain[chain.length - 1].entity.name;
             } catch (e) {
                 return results;
             }
 
-            entityName = chain[chain.length - 1].entity.name;
             entityData = entityData[entityName];
             entityFields = this.options.dataFilter.call(this, entityName, entityData.fields);
 

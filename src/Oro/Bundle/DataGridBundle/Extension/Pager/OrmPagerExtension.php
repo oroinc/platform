@@ -19,7 +19,7 @@ class OrmPagerExtension extends AbstractPagerExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->getDatasourceType() === OrmDatasource::TYPE
+            $config->isOrmDatasource()
             && !$this->getOr(PagerInterface::DISABLED_PARAM, false)
             && !$config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
     }
@@ -29,7 +29,7 @@ class OrmPagerExtension extends AbstractPagerExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        /** @var $datasource OrmDatasource */
+        /** @var OrmDatasource $datasource */
         if ($datasource->getCountQb()) {
             $this->pager->setCountQb($datasource->getCountQb(), $datasource->getCountQueryHints());
         }

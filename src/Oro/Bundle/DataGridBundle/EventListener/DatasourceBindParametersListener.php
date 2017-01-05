@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
@@ -13,8 +14,6 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
  */
 class DatasourceBindParametersListener
 {
-    const DATASOURCE_BIND_PARAMETERS_PATH = '[source][bind_parameters]';
-
     /**
      * Binds datagrid parameters to datasource query on event.
      *
@@ -23,14 +22,14 @@ class DatasourceBindParametersListener
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();
-        $datasource = $datagrid->getDatasource();
 
+        $datasource = $datagrid->getDatasource();
         if (!$datasource instanceof ParameterBinderAwareInterface) {
             return;
         }
 
-        $parameters = $datagrid->getConfig()->offsetGetByPath(self::DATASOURCE_BIND_PARAMETERS_PATH, []);
-
+        $parameters = $datagrid->getConfig()
+            ->offsetGetByPath(DatagridConfiguration::DATASOURCE_BIND_PARAMETERS_PATH, []);
         if (!$parameters || !is_array($parameters)) {
             return;
         }

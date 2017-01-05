@@ -1134,6 +1134,7 @@ services:
         class: %oro_email.listener.prepare_result_item_listener.class%
         arguments:
             - '@router'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: prepareEmailItemDataEvent }
 

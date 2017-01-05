@@ -379,7 +379,7 @@ oro:
             message:
                 success: Email sync completed.
                 error: Email sync failed.
-                processing: Email sync started, please wait, grid will updated on done...
+                processing: Email sync has started. Please wait, the grid will be updated after it is complete...
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

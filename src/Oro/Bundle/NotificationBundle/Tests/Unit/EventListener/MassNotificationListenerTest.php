@@ -39,8 +39,6 @@ class MassNotificationListenerTest extends \PHPUnit_Framework_TestCase
     public function testLogMassNotification()
     {
         $spoolItem = $this->createMock('Oro\Bundle\NotificationBundle\Entity\SpoolItem');
-        $message = $this->createMock('Swift_Mime_Message');
-        $email = ['test@test.com' => 'test name'];
         $date = new \DateTime('now');
         $message = $this->createMock('Swift_Mime_Message');
         $message->expects($this->once())->method('getTo')->will($this->returnValue(['to@test.com' => 'test']));
@@ -64,7 +62,7 @@ class MassNotificationListenerTest extends \PHPUnit_Framework_TestCase
                 $this->assertEquals($logEntity->getSender(), 'test <from@test.com>');
                 $this->assertEquals($logEntity->getSubject(), 'test subject');
                 $this->assertEquals($logEntity->getBody(), 'test body');
-                $this->assertEquals($logEntity->getScheduledAt(), $date);
+                $this->assertGreaterThanOrEqual($logEntity->getScheduledAt(), $date);
                 $this->assertEquals($logEntity->getStatus(), MassNotification::STATUS_SUCCESS);
 
                 return true;

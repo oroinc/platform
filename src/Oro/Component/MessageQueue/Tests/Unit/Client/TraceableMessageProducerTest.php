@@ -74,7 +74,6 @@ class TraceableMessageProducerTest extends \PHPUnit_Framework_TestCase
         $messageProducer = new TraceableMessageProducer($internalMessageProducer);
 
         $this->expectException(\Exception::class);
-
         try {
             $messageProducer->send('aFooTopic', 'aFooBody');
         } finally {

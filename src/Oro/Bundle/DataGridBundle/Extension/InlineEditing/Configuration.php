@@ -20,7 +20,6 @@ class Configuration implements ConfigurationInterface
     const BASE_CONFIG_KEY               = 'inline_editing';
     const CONFIG_ACL_KEY                = 'acl_resource';
     const CONFIG_ENTITY_KEY             = 'entity_name';
-    const CONFIG_EXTENDED_ENTITY_KEY    = 'extended_entity_name';
     const AUTOCOMPLETE_API_ACCESSOR_KEY = 'autocomplete_api_accessor';
     const SAVE_API_ACCESSOR_KEY         = 'save_api_accessor';
     const CLASS_KEY                     = 'class';
@@ -69,8 +68,7 @@ class Configuration implements ConfigurationInterface
                     }
                 )
                 ->thenInvalid(
-                    '"' . self::CONFIG_ENTITY_KEY . '" or "'
-                    . self::CONFIG_EXTENDED_ENTITY_KEY . '" parameter must be not empty.'
+                    '"entity_name" or "extended_entity_name" parameter must be not empty.'
                 )
             ->end()
             ->children()
