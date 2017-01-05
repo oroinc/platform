@@ -113,10 +113,10 @@ system_configuration:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.host.label
                 constraints:
-                    - NotBlank: ~
                     - Length:
                         min: 3
                         max: 255
+                required: true
 
         oro_email.smtp_settings_port:
             data_type: number
@@ -125,10 +125,10 @@ system_configuration:
                 attr: {data-class: smtp_settings}
                 label: oro.email.system_configuration.smtp_settings.port.label
                 constraints:
-                    - NotBlank: ~
                     - Range:
                         min: 0
                         max: 65535
+                required: true
 
         oro_email.smtp_settings_encryption:
             data_type: string
@@ -143,6 +143,7 @@ system_configuration:
                 constraints:
                     - Choice:
                         choices: [~, ssl, tls]
+                required: true
 
         oro_email.smtp_settings_username:
             data_type: string

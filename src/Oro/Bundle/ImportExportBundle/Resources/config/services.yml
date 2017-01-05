@@ -49,3 +49,14 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: percent, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: integer, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }
+
+    oro_importexport.async.import_export_job_summary_result_service:
+        class: Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService
+        arguments:
+            - '@router'
+            - '@oro_config.global'
+            - '@oro_email.email_renderer'
+            - '@doctrine'
+
+    oro_importexport.writer.writer_chain:
+        class: Oro\Bundle\ImportExportBundle\Writer\WriterChain

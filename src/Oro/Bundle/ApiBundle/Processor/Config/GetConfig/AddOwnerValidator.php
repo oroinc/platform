@@ -59,15 +59,14 @@ class AddOwnerValidator implements ProcessorInterface
             return;
         }
 
-        $this->addValidators($context->getResult(), $entityClass, $context->getTargetAction());
+        $this->addValidators($context->getResult(), $entityClass);
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
-     * @param string                 $targetAction
      */
-    protected function addValidators(EntityDefinitionConfig $definition, $entityClass, $targetAction)
+    protected function addValidators(EntityDefinitionConfig $definition, $entityClass)
     {
         $fieldName = $this->ownershipMetadataProvider->getMetadata($entityClass)->getOwnerFieldName();
         if (!$fieldName) {
@@ -76,17 +75,6 @@ class AddOwnerValidator implements ProcessorInterface
         $field = $definition->findField($fieldName, true);
         if (null === $field) {
             return;
-        }
-
-        // add NotNull validation
-        if (ApiActions::CREATE === $targetAction) {
-            $field->addFormConstraint(new NotNull());
-        }
-
-        // add NotBlank constraint
-        $property = $field->getPropertyPath($fieldName);
-        if (!$this->validationHelper->hasValidationConstraintForProperty($entityClass, $property, NotBlank::class)) {
-            $field->addFormConstraint(new NotBlank());
         }
 
         // add owner validator

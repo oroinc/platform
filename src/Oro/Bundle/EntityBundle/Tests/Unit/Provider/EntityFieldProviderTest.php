@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
@@ -530,7 +531,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         'name' => 'Acme\Entity\Test22::uni_rel1',
                         'type' => 'ref-one',
-                        'label' => 'UniRel1 (Test22 Plural Label)',
+                        'label' => 'UniRel1 (Test22 Label)',
                         'relation_type' => 'ref-one',
                         'related_entity_name' => 'Acme\Entity\Test22',
                     ]
@@ -758,6 +759,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             if (isset($entityData['unidirectional_relations'])) {
                 foreach ($entityData['unidirectional_relations'] as $relName => $relData) {
                     $fieldTypes[] = [$relName, $relData['type']];
+                    $relData['type'] = $relData['type'] !== 'ref-one' ?:ClassMetadataInfo::MANY_TO_ONE;
                     $relData['fieldName'] = $relName;
                     $relData['isOwningSide'] = true;
                     $relData['inversedBy'] = null;

@@ -359,7 +359,12 @@ define([
         ignore: ':hidden:not([type=hidden])',
         onfocusout: function(element, event) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
-                this.element(element);
+                if ($(element).hasClass('select2-focusser')) {
+                    var realField = $(element).closest('.select2-container').parent().find('.select2[type=hidden]')[0];
+                    this.element(realField ? realField : element);
+                } else {
+                    this.element(element);
+                }
             }
         },
         onkeyup: function(element, event) {

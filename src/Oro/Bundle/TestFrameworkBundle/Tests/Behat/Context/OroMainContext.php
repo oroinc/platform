@@ -260,7 +260,7 @@ class OroMainContext extends MinkContext implements
      *            | Country         | Ukraine             |
      *            | Street          | Myronosytska 57     |
      *            | City            | Kharkiv             |
-     *            | Zip/postal code | 61000               |
+     *            | Zip/Postal Code | 61000               |
      *            | State           | Kharkivs'ka Oblast' |
      *
      * @Given /^(?:|I )add new (?P<fieldSetLabel>[^"]+) with:$/

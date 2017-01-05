@@ -22,7 +22,7 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $gridConfigurationHelper;
+    protected $entityClassResolver;
 
     /**
      * @var RestrictionManager
@@ -40,15 +40,15 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->gridConfigurationHelper = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper')
+        $this->entityClassResolver = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->manager = new RestrictionManager(
             $this->workflowRegistry,
             $this->userAgentProvider,
-            $this->gridConfigurationHelper
+            $this->entityClassResolver
         );
     }
 
@@ -56,17 +56,32 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $config = DatagridConfiguration::create([
             'source' => [
-                'type' => 'orm',
+                'type'  => 'orm',
+                'query' => [
+                    'from' => [
+                        ['table' => 'Test:Entity', 'alias' => 'rootAlias']
+                    ]
+                ]
             ]
         ]);
 
-        $userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')->disableOriginalConstructor()
-                    ->getMock();
-        $userAgent->expects($this->once())->method('isDesktop')->will($this->returnValue(true));
-        $this->userAgentProvider->expects($this->once())->method('getUserAgent')->will($this->returnValue($userAgent));
+        $userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $userAgent->expects($this->once())
+            ->method('isDesktop')
+            ->will($this->returnValue(true));
+        $this->userAgentProvider->expects($this->once())
+            ->method('getUserAgent')
+            ->will($this->returnValue($userAgent));
 
-        $this->gridConfigurationHelper->expects($this->once())->method('getEntity')->will($this->returnValue('entity'));
-        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByEntityClass')->with('entity')
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with('Test:Entity')
+            ->will($this->returnValue('Test\Entity'));
+        $this->workflowRegistry->expects($this->once())
+            ->method('getActiveWorkflowsByEntityClass')
+            ->with('Test\Entity')
             ->will($this->returnValue(new ArrayCollection()));
 
         $this->assertTrue($this->manager->boardViewEnabled($config));
@@ -76,14 +91,24 @@ class RestrictionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $config = DatagridConfiguration::create([
             'source' => [
-                'type' => 'orm',
+                'type'  => 'orm',
+                'query' => [
+                    'from' => [
+                        ['table' => 'Test:Entity', 'alias' => 'rootAlias']
+                    ]
+                ]
             ]
         ]);
 
-        $userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')->disableOriginalConstructor()
-                    ->getMock();
-        $userAgent->expects($this->once())->method('isDesktop')->will($this->returnValue(false));
-        $this->userAgentProvider->expects($this->once())->method('getUserAgent')->will($this->returnValue($userAgent));
+        $userAgent = $this->getMockBuilder('Oro\Bundle\UIBundle\Provider\UserAgent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $userAgent->expects($this->once())
+            ->method('isDesktop')
+            ->will($this->returnValue(false));
+        $this->userAgentProvider->expects($this->once())
+            ->method('getUserAgent')
+            ->will($this->returnValue($userAgent));
 
         $this->assertFalse($this->manager->boardViewEnabled($config));
     }

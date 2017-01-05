@@ -54,6 +54,8 @@ oro:
                 object:             Binary (Object)
 
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
+                currency:           Currency
+                money_value:        Money Value
             field_name.label:       Field name
             name.label:             Name
             key.label:              Key

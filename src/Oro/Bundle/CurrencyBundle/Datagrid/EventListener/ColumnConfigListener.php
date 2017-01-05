@@ -3,12 +3,11 @@
 namespace Oro\Bundle\CurrencyBundle\Datagrid\EventListener;
 
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\EventListener\AbstractDatagridListener;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser as Guesser;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class ColumnConfigListener extends AbstractDatagridListener
+class ColumnConfigListener
 {
     /** @var array  */
     protected $multiCurrencyConfigValueFormats = [
@@ -16,6 +15,17 @@ class ColumnConfigListener extends AbstractDatagridListener
         'value_field' => '%sValue',
         'currency_field' => '%sCurrency'
     ];
+
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    /**
+     * @param EntityClassResolver $entityClassResolver
+     */
+    public function __construct(EntityClassResolver $entityClassResolver)
+    {
+        $this->entityClassResolver = $entityClassResolver;
+    }
 
     /**
      * @param BuildBefore $event
@@ -25,14 +35,17 @@ class ColumnConfigListener extends AbstractDatagridListener
         $config = $event->getConfig();
 
         // datasource type other than ORM is not supported yet
-        if ($config->getDatasourceType() !== OrmDatasource::TYPE) {
+        if (!$config->isOrmDatasource()) {
             return;
         }
 
         // get root entity
-        list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
-
-        if (!$rootEntity || !$rootEntityAlias) {
+        $rootEntity = $config->getOrmQuery()->getRootEntity($this->entityClassResolver);
+        if (!$rootEntity) {
+            return;
+        }
+        $rootEntityAlias = $config->getOrmQuery()->getRootAlias();
+        if (!$rootEntityAlias) {
             return;
         }
 
