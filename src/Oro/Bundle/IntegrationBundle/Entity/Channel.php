@@ -403,10 +403,14 @@ class Channel
 
     /**
      * @param Organization $organization
+     *
+     * @return $this
      */
     public function setOrganization($organization)
     {
         $this->organization = $organization;
+
+        return $this;
     }
 
     /**
@@ -419,10 +423,14 @@ class Channel
 
     /**
      * @param boolean $enabled
+     *
+     * @return $this
      */
     public function setEnabled($enabled)
     {
         $this->enabled = $enabled;
+
+        return $this;
     }
 
     /**
