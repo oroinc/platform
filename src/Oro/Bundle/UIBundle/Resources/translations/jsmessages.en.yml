@@ -10,7 +10,7 @@
 "Loading...": "Loading..."
 "Saving...": "Saving..."
 "Deleting...": "Deleting..."
-"An unexpected error occurred. Please contact the system administrator.": "An unexpected error occurred. Please contact the system administrator."
+"An unexpected error has occurred. Please contact the system administrator.": "An unexpected error has occurred. Please contact the system administrator."
 Now: Now
 Prev: Prev
 Next: Next
@@ -55,7 +55,7 @@ oro:
         delete_confirm_cascade: Are you sure you want to delete this {{ entity_label }} with other entities related to it?
         widget_loading_failed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
-        unexpected_error: An unexpected error occurred. Please contact the system administrator.
+        unexpected_error: An unexpected error has occurred. Please contact the system administrator.
         item_add_error: Item adding failed.
         item_delete_error: Item deleting failed.
         leave_page_with_unsaved_data_confirm: 'You have unsaved changes, are you sure you want to leave this page?'
