@@ -41,6 +41,10 @@ define(function(require) {
          * @protected
          */
         _initializeView: function(options, View) {
+            if (this.disposed) {
+                this._resolveDeferredInit();
+                return;
+            }
             this.view = new View(options);
 
             // pass all component events to view

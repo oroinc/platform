@@ -40,7 +40,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testThrowIfTopicNameEmptyOnOnAddRoute()
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
-
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The topic name must not be empty');
         $router->addRoute('', 'aProcessorName', 'aQueueName');
@@ -49,7 +48,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testThrowIfProcessorNameEmptyOnOnAddRoute()
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
-
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The processor name must not be empty');
         $router->addRoute('aTopicName', '', 'aQueueName');
@@ -90,11 +88,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testShouldThrowExceptionIfTopicNameParameterIsNotSet()
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
-
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'Got message without required parameter: "oro.message_queue.client.topic_name"'
-        );
+        $this->expectExceptionMessage('Got message without required parameter: "oro.message_queue.client.topic_name"');
         $result = $router->route(new NullMessage());
 
         iterator_to_array($result);
@@ -103,7 +98,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testThrowIfQueueNameEmptyOnOnAddRoute()
     {
         $router = new Router($this->createDriverStub(), $this->createDestinationMetaRegistry());
-
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The queue name must not be empty');
         $router->addRoute('aTopicName', 'aProcessorName', '');

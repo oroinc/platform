@@ -46,7 +46,6 @@
                             'aCss':  'no-hash',
                             'iCss':  'fa-eye-slash',
                             'label': 'oro.navigation.menuupdate.hide'|trans,
-
                             'title': 'oro.navigation.menuupdate.hide'|trans,
                             'dataId': entity.id,
                             'dataMethod': 'PUT',
@@ -152,10 +151,29 @@
         'dataBlocks': dataBlocks,
     } %}
 
+    {% set componentOptions = {
+    container: 'menuitem-container',
+    sidebar: 'menuitem-tree',
+    sidebarAlias: 'menuitem-sidebar',
+    widgetAlias: 'menuitem-data-widget',
+    widgetContainer: '.menuitem-data'
+    } %}
+
     <div class="left-panel-container">
         <div class="placeholder">
             <div class="scrollable-container overflow-y clearfix">
-                <div class="left-panel clearfix">
+                <div class="left-panel clearfix"
+                     data-page-component-module="oroproduct/js/app/components/grid-sidebar-component"
+                     data-page-component-options="{{ componentOptions|json_encode }}"
+                >
+                    <div class="left-panel-header">
+                        <div class="left-panel-control left-panel-control-maximize">
+                            <i class="fa-forward control-maximize"></i>
+                        </div>
+                        <div class="left-panel-control left-panel-control-minimize">
+                            <i class="fa-backward control-minimize"></i>
+                        </div>
+                    </div>
                     {% set treeOptions = {
                         'data' : tree,
                         'nodeId': entity.key,

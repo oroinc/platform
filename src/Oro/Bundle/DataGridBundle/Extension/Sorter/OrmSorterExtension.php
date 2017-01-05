@@ -13,7 +13,9 @@ class OrmSorterExtension extends AbstractSorterExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return parent::isApplicable($config) && $config->getDatasourceType() === OrmDatasource::TYPE;
+        return
+            $config->isOrmDatasource()
+            && parent::isApplicable($config);
     }
 
     /**
@@ -21,7 +23,7 @@ class OrmSorterExtension extends AbstractSorterExtension
      */
     protected function addSorterToDatasource(array $sorter, $direction, DatasourceInterface $datasource)
     {
-        /* @var $datasource OrmDatasource */
+        /* @var OrmDatasource $datasource */
         $datasource->getQueryBuilder()->addOrderBy($sorter['data_name'], $direction);
     }
 }

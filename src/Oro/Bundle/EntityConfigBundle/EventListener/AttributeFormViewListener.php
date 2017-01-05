@@ -54,7 +54,7 @@ class AttributeFormViewListener
                 $attributeView = $formView->offsetGet($fieldId);
 
                 if (!$attributeView->isRendered()) {
-                    $html = $event->getEnvironment()->render('OroEntityExtendBundle:Attribute:row.html.twig', [
+                    $html = $event->getEnvironment()->render('OroEntityConfigBundle:Attribute:row.html.twig', [
                         'child' => $attributeView
                     ]);
 
@@ -136,7 +136,7 @@ class AttributeFormViewListener
                     continue;
                 }
 
-                $html = $event->getEnvironment()->render('OroEntityExtendBundle:Attribute:attributeView.html.twig', [
+                $html = $event->getEnvironment()->render('OroEntityConfigBundle:Attribute:attributeView.html.twig', [
                     'entity' => $this->entity,
                     'field' => $attribute
                 ]);
