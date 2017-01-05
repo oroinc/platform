@@ -108,6 +108,9 @@ class MenuUpdateManager
             $entity->setDefaultTitle(MenuUpdateTreeHandler::MENU_ITEM_DIVIDER_LABEL);
             $entity->setUri('#');
         }
+        if (isset($options['scope'])) {
+            $entity->setScope($options['scope']);
+        }
 
         $item = $this->findMenuItem($entity->getMenu(), $entity->getKey(), $context);
         if ($item) {
@@ -121,13 +124,17 @@ class MenuUpdateManager
     }
 
     /**
-     * @param $menuName
-     * @param $key
-     * @param $scope
+     * @param string $menuName
+     * @param string $key
+     * @param Scope  $scope
      * @return null|MenuUpdateInterface
      */
-    public function findMenuUpdate($menuName, $key, $scope)
+    protected function findMenuUpdate($menuName, $key, Scope $scope)
     {
+        if (null === $scope->getId()) {
+            return null;
+        }
+
         return $this->getRepository()->findOneBy(
             [
                 'menu' => $menuName,
@@ -142,16 +149,15 @@ class MenuUpdateManager
      *
      * @param string $menuName
      * @param string $key
-     * @param Scope $scope
+     * @param Scope  $scope
      * @return null|MenuUpdateInterface
      *
      */
-    protected function findOrCreateMenuUpdate($menuName, $key, Scope $scope)
+    public function findOrCreateMenuUpdate($menuName, $key, Scope $scope)
     {
         $update = $this->findMenuUpdate($menuName, $key, $scope);
-
         if (null === $update) {
-            $update = $this->createMenuUpdate($scope, ['key' => $key, 'menu' => $menuName]);
+            $update = $this->createMenuUpdate($scope, ['key' => $key, 'menu' => $menuName, 'scope' => $scope]);
         }
 
         return $update;

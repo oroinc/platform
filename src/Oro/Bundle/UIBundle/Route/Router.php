@@ -340,7 +340,7 @@ class Router
      */
     protected function parseRouteParam($parameterValue, $context)
     {
-        if (strpos($parameterValue, '$') === 0) {
+        if (is_string($parameterValue) && strpos($parameterValue, '$') === 0) {
             return $this->propertyAccessor->getValue($context, substr($parameterValue, 1));
         }
 

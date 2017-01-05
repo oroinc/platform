@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
+use Oro\Bundle\CustomerBundle\Entity\Account;
+use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -87,5 +89,15 @@ class UserMenuController extends AbstractMenuController
         if (!$this->get('oro_security.security_facade')->isGranted('oro_user_user_update')) {
             throw $this->createAccessDeniedException();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function prepareMenuTreeContext(array &$context)
+    {
+        /** @var Account $customer */
+        $customer = $context[ScopeUserCriteriaProvider::SCOPE_KEY];
+        $context[ScopeOrganizationCriteriaProvider::SCOPE_KEY] = $customer->getOrganization();
     }
 }
