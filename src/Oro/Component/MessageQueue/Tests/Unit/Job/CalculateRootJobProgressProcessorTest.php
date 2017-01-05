@@ -150,7 +150,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageMock()
     {
-        return $this->getMock(MessageInterface::class, [], [], '', false);
+        return $this->createMock(MessageInterface::class);
     }
 
     /**
@@ -158,7 +158,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobStorageMock()
     {
-        return $this->getMock(JobStorage::class, [], [], '', false);
+        return $this->createMock(JobStorage::class);
     }
 
     /**
@@ -166,7 +166,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createRootJobProgressCalculatorMock()
     {
-        return $this->getMock(RootJobProgressCalculator::class, [], [], '', false);
+        return $this->createMock(RootJobProgressCalculator::class);
     }
 
     /**
@@ -174,7 +174,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducerMock()
     {
-        return $this->getMock(MessageProducerInterface::class);
+        return $this->createMock(MessageProducerInterface::class);
     }
 
     /**
@@ -182,7 +182,7 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 
     /**
@@ -190,6 +190,6 @@ class CalculateRootJobProgressProcessorTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 }
