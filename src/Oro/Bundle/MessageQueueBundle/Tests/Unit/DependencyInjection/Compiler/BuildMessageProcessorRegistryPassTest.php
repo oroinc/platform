@@ -134,7 +134,6 @@ class BuildMessageProcessorRegistryPassTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Topic subscriber configuration is invalid. "[12345]"');
-
         $container = new ContainerBuilder();
 
         $processor = new Definition(InvalidTopicSubscriber::class);
