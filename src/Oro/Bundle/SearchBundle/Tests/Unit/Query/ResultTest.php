@@ -11,33 +11,21 @@ use Oro\Bundle\SearchBundle\Query\Query;
 class ResultTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Oro\Bundle\SearchBundle\Query\Result
+     * @var Result
      */
     private $result;
 
+    /**
+     * @var Result
+     */
+    private $result1;
+
     protected function setUp()
     {
-        if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
-            $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
-        }
-
-        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
-
-        $this->om->expects($this->any())
-            ->method('getRepository')
-            ->with($this->equalTo('OroTestBundle:test'))
-            ->will($this->returnValue($this->repository));
-
-        $this->product = new Product();
-        $this->product->setName('test product');
-
-        $this->repository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue($this->product));
+        $product = new Product();
+        $product->setName('test product');
 
         $items[] = new Item(
-            $this->om,
             'OroTestBundle:test',
             1,
             'test title',
@@ -55,7 +43,6 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             )
         );
         $items[] = new Item(
-            $this->om,
             'OroTestBundle:test',
             2,
             'test title 2',
@@ -73,7 +60,6 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             )
         );
         $items[] = new Item(
-            $this->om,
             'OroTestBundle:test',
             3,
             'test title 3',

@@ -149,7 +149,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         if ('prod' != $input->getOption('env')) {
             $output->writeln(
                 '<info>To run application in <comment>prod</comment> mode, ' .
-                'please run <comment>cache:clear</comment> command with <comment>--env prod</comment> parameter</info>'
+                'please run <comment>cache:clear</comment> command with <comment>--env=prod</comment> parameter</info>'
             );
         }
         if ('prod' == $input->getOption('env')) {

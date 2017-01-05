@@ -121,7 +121,7 @@ services:
     oro_currency.datagrid.listener.column_config:
         class: Oro\Bundle\CurrencyBundle\Datagrid\EventListener\ColumnConfigListener
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore, priority: 255 }
 

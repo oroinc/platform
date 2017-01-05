@@ -55,7 +55,6 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $messageProcessorMock = $this->createMessageProcessorMock();
 
         $consumer = new QueueConsumer($this->createConnectionStub(), null, 0);
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The queue name must be not empty.');
         $consumer->bind('', $messageProcessorMock);
@@ -68,7 +67,6 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new QueueConsumer($this->createConnectionStub(), null, 0);
 
         $consumer->bind('theQueueName', $messageProcessorMock);
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The queue was already bound.');
         $consumer->bind('theQueueName', $messageProcessorMock);
@@ -202,7 +200,6 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
 
         $queueConsumer = new QueueConsumer($connectionStub, new BreakCycleExtension(1), 0);
         $queueConsumer->bind('aQueueName', $messageProcessorMock);
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Status is not supported');
         $queueConsumer->consume();
@@ -268,7 +265,6 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Status is not supported: invalidStatus');
-
         $messageMock = $this->createMessageMock();
         $messageConsumerStub = $this->createMessageConsumerStub($messageMock);
 
@@ -764,7 +760,6 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Process failed');
-
         $expectedException = new \Exception('Process failed');
         $expectedMessage = $this->createMessageMock();
         $messageConsumerStub = $this->createMessageConsumerStub($expectedMessage);

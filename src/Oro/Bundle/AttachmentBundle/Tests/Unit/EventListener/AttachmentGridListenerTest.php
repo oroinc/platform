@@ -32,7 +32,7 @@ class AttachmentGridListenerTest extends \PHPUnit_Framework_TestCase
         $event = new BuildBefore($datagrid, $gridConfig);
         $this->listener->onBuildBefore($event);
 
-        $leftJoins = $gridConfig->offsetGetByPath(AttachmentGridListener::GRID_LEFT_JOIN_PATH);
+        $leftJoins = $gridConfig->offsetGetByPath('[source][query][join][left]');
         $this->assertEquals(
             [
                 [

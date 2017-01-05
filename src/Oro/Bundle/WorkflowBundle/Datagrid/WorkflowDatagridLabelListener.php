@@ -7,7 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-
+use Oro\Bundle\QueryDesignerBundle\Grid\QueryDesignerQueryConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
@@ -86,21 +86,19 @@ class WorkflowDatagridLabelListener
      */
     private function getWorkflowLabelColumns(DatagridConfiguration $configuration)
     {
-        $columnAliases = $configuration->offsetGetByPath('[source][query_config][column_aliases]');
         $columns = [
             WorkflowStep::class => [],
             WorkflowDefinition::class => [],
         ];
-        if (count($columnAliases)) {
-            foreach ($columnAliases as $key => $alias) {
-                if (false !== strpos($key, WorkflowStep::class . '::label')) {
-                    $columns[WorkflowStep::class][] = $alias;
-                    continue;
-                }
-                if (false !== strpos($key, WorkflowDefinition::class . '::label')) {
-                    $columns[WorkflowDefinition::class][] = $alias;
-                    continue;
-                }
+        $columnAliases = $configuration->offsetGetByPath(QueryDesignerQueryConfiguration::COLUMN_ALIASES, []);
+        foreach ($columnAliases as $key => $alias) {
+            if (false !== strpos($key, WorkflowStep::class . '::label')) {
+                $columns[WorkflowStep::class][] = $alias;
+                continue;
+            }
+            if (false !== strpos($key, WorkflowDefinition::class . '::label')) {
+                $columns[WorkflowDefinition::class][] = $alias;
+                continue;
             }
         }
 
@@ -175,7 +173,7 @@ class WorkflowDatagridLabelListener
      */
     private function getTableAliasForColumnName($columnName, DatagridConfiguration $configuration)
     {
-        $selects = $configuration->offsetGetByPath('[source][query][select]');
+        $selects = $configuration->getOrmQuery()->getSelect();
         foreach ($selects as $select) {
             $matches = [];
             if (preg_match('/^(.*)\.[a-zA-Z0-9_]+\sas\s' . $columnName . '$/', $select, $matches)) {
@@ -197,11 +195,11 @@ class WorkflowDatagridLabelListener
      */
     private function getRootEntityClass(DatagridConfiguration $configuration)
     {
-        $from = $configuration->offsetGetByPath('[source][query][from][0]');
-        if ($from && isset($from['table'])) {
-            return $from['table'];
+        $rootEntity = $configuration->getOrmQuery()->getRootEntity();
+        if (!$rootEntity) {
+            throw new InvalidArgumentException('Unable to find root entity class');
         }
 
-        throw new InvalidArgumentException('Unable to find root entity class');
+        return $rootEntity;
     }
 }

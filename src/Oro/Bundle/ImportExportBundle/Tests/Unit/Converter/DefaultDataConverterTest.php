@@ -6,6 +6,17 @@ use Oro\Bundle\ImportExportBundle\Converter\DefaultDataConverter;
 
 class DefaultDataConverterTest extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @var DefaultDataConverter
+     */
+    protected $dataConverter;
+
+    protected function setUp()
+    {
+        $this->dataConverter = new DefaultDataConverter();
+    }
+
     /**
      * @param array $importedRecord
      * @param array $exportedRecord
@@ -13,9 +24,8 @@ class DefaultDataConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testConvertImportExport(array $importedRecord, array $exportedRecord)
     {
-        $dataConverter = new DefaultDataConverter();
-        $this->assertEquals($exportedRecord, $dataConverter->convertToExportFormat($importedRecord));
-        $this->assertEquals($importedRecord, $dataConverter->convertToImportFormat($exportedRecord));
+        $this->assertEquals($exportedRecord, $this->dataConverter->convertToExportFormat($importedRecord));
+        $this->assertEquals($importedRecord, $this->dataConverter->convertToImportFormat($exportedRecord));
     }
 
     /**
@@ -73,6 +83,30 @@ class DefaultDataConverterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testConvertToExportFormatTypeCasting()
+    {
+        $testData = [
+            'intAttribute' => 123,
+            'floatAttribute' => 123.12345,
+            'boolAttribute' => true,
+            'intZeroAttribute' => 0,
+            'floatZeroAttribute' => 0.0,
+            'boolZeroAttribute' => false,
+            'stringZeroAttribute' => '0',
+        ];
+        $expectedResult = [
+            'intAttribute' => '123',
+            'floatAttribute' => '123.12345',
+            'boolAttribute' => '1',
+            'intZeroAttribute' => '0',
+            'floatZeroAttribute' => '0',
+            'boolZeroAttribute' => '0',
+            'stringZeroAttribute' => '0',
+        ];
+
+        $this->assertEquals($expectedResult, $this->dataConverter->convertToExportFormat($testData));
+    }
+
     /**
      * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
      * @expectedExceptionMessage Delimiter ":" is not allowed in keys
@@ -83,8 +117,7 @@ class DefaultDataConverterTest extends \PHPUnit_Framework_TestCase
             'owner:firstName' => 'John'
         );
 
-        $dataConverter = new DefaultDataConverter();
-        $dataConverter->convertToExportFormat($invalidImportedRecord);
+        $this->dataConverter->convertToExportFormat($invalidImportedRecord);
     }
 
     /**
@@ -98,7 +131,6 @@ class DefaultDataConverterTest extends \PHPUnit_Framework_TestCase
             'owner:firstName' => 'John',
         );
 
-        $dataConverter = new DefaultDataConverter();
-        $dataConverter->convertToImportFormat($invalidExportedRecord);
+        $this->dataConverter->convertToImportFormat($invalidExportedRecord);
     }
 }
