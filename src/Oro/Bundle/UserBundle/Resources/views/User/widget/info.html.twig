@@ -71,9 +71,11 @@
         </div>
 
         <div class="responsive-block">
-            {{ _self.renderApiBlock(entity, userApi, viewProfile) }}
+            {% if viewProfile or resource_granted('MANAGE_API_KEY', entity) %}
+                {{ _self.renderApiBlock(entity, userApi, viewProfile) }}
 
-            {% placeholder view_user_api_block_after with {entity: entity, viewProfile: viewProfile} %}
+                {% placeholder view_user_api_block_after with {entity: entity, viewProfile: viewProfile} %}
+            {% endif %}
         </div>
     </div>
 
