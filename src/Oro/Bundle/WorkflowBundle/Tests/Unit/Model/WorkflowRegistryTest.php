@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
@@ -354,6 +355,17 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($unitOfWork));
     }
 
+    protected function setUpEntityManagerMockAllKnown()
+    {
+        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $unitOfWork->expects($this->any())->method('isInIdentityMap')->with()->willReturn(true);
+
+        $this->entityManager->expects($this->any())->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
+    }
+
     /**
      * @param string $workflowName
      *
@@ -369,20 +381,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             $workflowDefinition->setRelatedEntity($relatedEntity);
         }
 
-        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $workflow->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($workflowDefinition);
-
-        $workflow->expects($this->any())
-            ->method('getName')
-            ->willReturn($workflowDefinition->getName());
-
-        return $workflow;
+        return $this->createWorkflowFromDefinition($workflowDefinition);
     }
 
     /**
@@ -400,5 +399,97 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $this->prepareAssemblerMock();
 
         $this->registry->getWorkflow($workflowName);
+    }
+
+    private function createWorkflowFromDefinition(WorkflowDefinition $definition)
+    {
+        /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
+        $workflow = $this->getMockBuilder(Workflow::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
+
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn($definition->getName());
+
+        return $workflow;
+    }
+
+    /**
+     * @param WorkflowDefinition[] $workflowDefinitions
+     * @return Workflow[]|\PHPUnit_Framework_MockObject_MockObject[]
+     */
+    private function createWorkflowsFromDefinitions(array $workflowDefinitions)
+    {
+        return array_map([$this, 'createWorkflowFromDefinition'], $workflowDefinitions);
+    }
+
+    /**
+     * @dataProvider getActiveByApplicationData
+     * @param string $application
+     * @param array|WorkflowDefinition[] $activeDefinitions
+     * @param array|Workflow[]|\PHPUnit_Framework_MockObject_MockObject[] $expectedWorkflows
+     */
+    public function testGetActiveWorkflowsByApplication(
+        $application,
+        array $activeDefinitions,
+        array $expectedWorkflows
+    ) {
+        $this->entityRepository->expects($this->once())
+            ->method('findActive')
+            ->willReturn($activeDefinitions);
+
+        $this->setUpEntityManagerMockAllKnown();
+
+        foreach ($expectedWorkflows as $at => $workflow) {
+            $this->assembler->expects($this->at($at))
+                ->method('assemble')
+                ->with($workflow->getDefinition())
+                ->willReturn($workflow);
+        }
+
+        $this->assertEquals(
+            $expectedWorkflows,
+            $this->registry->getActiveWorkflowsByApplication($application)->getValues()
+        );
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getActiveByApplicationData()
+    {
+        $wd1 = (new WorkflowDefinition())->setName('wd1')
+            ->setApplications([
+                'app1',
+                CurrentApplicationProviderInterface::DEFAULT_APPLICATION
+            ]);
+        $wd2 = (new WorkflowDefinition())->setName('wd2')->setApplications(['app1']);
+        $wd3 = (new WorkflowDefinition())->setName('wd3');
+        $wd4 = (new WorkflowDefinition())->setName('wd4')->setApplications(['app2']);
+
+        $activeDefinitions = [$wd1, $wd2, $wd3, $wd4];
+
+        yield 'not default' => [
+            'app1',
+            $activeDefinitions,
+            $this->createWorkflowsFromDefinitions([$wd1, $wd2])
+        ];
+
+        yield 'default' => [
+            CurrentApplicationProviderInterface::DEFAULT_APPLICATION,
+            $activeDefinitions,
+            $this->createWorkflowsFromDefinitions([$wd1, $wd3])
+        ];
+
+        yield 'custom' => [
+            'app2',
+            $activeDefinitions,
+            $this->createWorkflowsFromDefinitions([$wd4])
+        ];
     }
 }
