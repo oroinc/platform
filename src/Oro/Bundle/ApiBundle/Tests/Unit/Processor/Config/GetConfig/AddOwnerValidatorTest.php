@@ -88,10 +88,6 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
             ['constraints' => [new Owner()]],
             $configObject->getFormOptions()
         );
-        $this->assertEquals(
-            ['constraints' => [new NotNull(), new NotBlank()]],
-            $configObject->getField('owner')->getFormOptions()
-        );
     }
 
     public function testProcess()
@@ -122,10 +118,6 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
             ['constraints' => [new Owner()]],
             $configObject->getFormOptions()
         );
-        $this->assertEquals(
-            ['constraints' => [new NotBlank()]],
-            $configObject->getField('owner')->getFormOptions()
-        );
     }
 
     public function testProcessForRenamedOwnerField()
@@ -154,10 +146,6 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->assertEquals(
             ['constraints' => [new Owner()]],
             $configObject->getFormOptions()
-        );
-        $this->assertEquals(
-            ['constraints' => [new NotBlank()]],
-            $configObject->getField('owner1')->getFormOptions()
         );
     }
 
@@ -205,14 +193,6 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($ownershipMetadata);
         $this->validationHelper->expects($this->once())
-            ->method('hasValidationConstraintForProperty')
-            ->with(
-                self::TEST_CLASS_NAME,
-                'owner',
-                'Symfony\Component\Validator\Constraints\NotBlank'
-            )
-            ->willReturn(true);
-        $this->validationHelper->expects($this->once())
             ->method('hasValidationConstraintForClass')
             ->with(
                 self::TEST_CLASS_NAME,
@@ -246,14 +226,6 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
             ->method('getMetadata')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($ownershipMetadata);
-        $this->validationHelper->expects($this->once())
-            ->method('hasValidationConstraintForProperty')
-            ->with(
-                self::TEST_CLASS_NAME,
-                'owner',
-                'Symfony\Component\Validator\Constraints\NotBlank'
-            )
-            ->willReturn(true);
         $this->validationHelper->expects($this->once())
             ->method('hasValidationConstraintForClass')
             ->with(

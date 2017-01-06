@@ -151,8 +151,26 @@
         'dataBlocks': dataBlocks,
     } %}
 
-    <div class="menuitem-container tree-component-container">
+    {% set componentOptions = {
+        container: 'menuitem-container',
+        sidebar: 'menuitem-tree',
+        sidebarAlias: 'menuitem-sidebar',
+        widgetAlias: 'menuitem-data-widget',
+        widgetContainer: '.menuitem-data'
+    } %}
+
+    <div class="menuitem-container tree-component-container"
+         data-page-component-module="oroproduct/js/app/components/grid-sidebar-component"
+         data-page-component-options="{{ componentOptions|json_encode }}">
         <div class="menuitem menuitem-tree tree-component">
+            <div class="left-panel-header">
+                <div class="left-panel-control left-panel-control-maximize">
+                    <i class="fa-forward control-maximize"></i>
+                </div>
+                <div class="left-panel-control left-panel-control-minimize">
+                    <i class="fa-backward control-minimize"></i>
+                </div>
+            </div>
             {% set treeOptions = {
                 'data' : tree,
                 'nodeId': entity.key,
