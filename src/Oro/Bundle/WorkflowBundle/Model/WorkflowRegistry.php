@@ -129,7 +129,8 @@ class WorkflowRegistry
      * Get Active Workflows by active groups
      *
      * @param array $groupNames
-     * @return Workflow[]|Collection
+     * @return Workflow[]|Collection Named collection of active Workflow instances
+     *                               with structure: ['workflowName' => Workflow $workflowInstance]
      */
     public function getActiveWorkflowsByActiveGroups(array $groupNames)
     {
@@ -149,7 +150,8 @@ class WorkflowRegistry
 
     /**
      * @param string $application
-     * @return Workflow[]|Collection
+     * @return Workflow[]|Collection Named collection of active Workflow instances
+     *                               with structure: ['workflowName' => Workflow $workflowInstance]
      */
     public function getActiveWorkflowsByApplication($application)
     {
@@ -167,7 +169,7 @@ class WorkflowRegistry
      * Returns named collection of active Workflow instances with structure:
      *      ['workflowName' => Workflow $workflowInstance]
      *
-     * @return Workflow[]|ArrayCollection
+     * @return Workflow[]|Collection
      */
     public function getActiveWorkflows()
     {
@@ -177,7 +179,7 @@ class WorkflowRegistry
     /**
      * @param WorkflowDefinition[] $definitions
      *
-     * @return ArrayCollection
+     * @return Collection
      */
     private function getAssembledWorkflows(array $definitions)
     {
