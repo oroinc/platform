@@ -711,6 +711,7 @@ tag if it works with extend classes
 - Method `get*TargetEntities` is generated as deprecated for both `many-to-many` and `many-to-one` associations.
 - Changed signature of auto-generated `get*Targets` method of `many-to-many` association. The parameter `$targetClass` is optional now. If this parameter is not specified this method returns all target entities without filtering them by type.
 - Removed constant `EXTEND_ENTITY_CONFIG_PATH` from `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Method `addManyToOneRelationTargetSide` of `Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder` was marked as deprecated because it is not used anywhere.
 
 
 ####ApiBundle:

@@ -198,33 +198,26 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         );
         $selfIdColumn = $this->getSinglePrimaryKeyColumn($entityClassName);
         $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
+        $selfJoinTableColumnNamePrefix = null;
+        $targetJoinTableColumnNamePrefix = null;
+        if ($entityClassName === $targetEntity) {
+            // fix the collision of names if owning side entity equals to inverse side entity
+            $selfJoinTableColumnNamePrefix = 'src_';
+            $targetJoinTableColumnNamePrefix = 'dest_';
+        }
+        $selfJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName(
+            $entityClassName,
+            '_' . $selfIdColumn,
+            $selfJoinTableColumnNamePrefix
+        );
+        $targetJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName(
+            $targetEntity,
+            '_' . $targetIdColumn,
+            $targetJoinTableColumnNamePrefix
+        );
         $builder->setJoinTable($joinTableName);
-
-        if ($selfIdColumn !== 'id') {
-            $builder->addJoinColumn(
-                $this->nameGenerator->generateManyToManyJoinTableColumnName(
-                    $entityClassName,
-                    '_' . $selfIdColumn
-                ),
-                $selfIdColumn,
-                false,
-                false,
-                'CASCADE'
-            );
-        }
-
-        if ($targetIdColumn !== 'id') {
-            $builder->addInverseJoinColumn(
-                $this->nameGenerator->generateManyToManyJoinTableColumnName(
-                    $relation['target_entity'],
-                    '_' . $targetIdColumn
-                ),
-                $targetIdColumn,
-                false,
-                false,
-                'CASCADE'
-            );
-        }
+        $builder->addJoinColumn($selfJoinTableColumnName, $selfIdColumn, false, false, 'CASCADE');
+        $builder->addInverseJoinColumn($targetJoinTableColumnName, $targetIdColumn, false, false, 'CASCADE');
         foreach ($cascade as $cascadeType) {
             $builder->{'cascade' . ucfirst($cascadeType)}();
         }
