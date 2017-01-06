@@ -276,4 +276,20 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage The identifier id is missing for a query of Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group
+     */
+    // @codingStandardsIgnoreEnd
+    public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity()
+    {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+
+        $value = ['class' => Group::class, 'id' => ['primary' => 1]];
+
+        $transformer->reverseTransform($value);
+    }
 }
