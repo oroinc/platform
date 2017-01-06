@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\ORMException;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -101,7 +103,7 @@ class EntityToIdTransformer implements DataTransformerInterface
                     )
                 );
             }
-            $entity = $manager->getRepository($entityClass)->find($entityId);
+            $entity = $this->findEntity($manager, $entityClass, $entityId);
         }
         if (null === $entity) {
             throw new TransformationFailedException(
@@ -114,6 +116,22 @@ class EntityToIdTransformer implements DataTransformerInterface
         }
 
         return $entity;
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @param string        $entityClass
+     * @param mixed         $entityId
+     *
+     * @return object
+     */
+    protected function findEntity(ObjectManager $manager, $entityClass, $entityId)
+    {
+        try {
+            return $manager->getRepository($entityClass)->find($entityId);
+        } catch (ORMException $e) {
+            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
