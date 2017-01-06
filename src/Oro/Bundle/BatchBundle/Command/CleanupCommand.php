@@ -8,13 +8,13 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command to clean up old batch job records
@@ -29,6 +29,23 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     public function getDefaultDefinition()
     {
         return '0 1 * * *';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        $intervalString = $this->getContainer()->getParameter('oro_batch.cleanup_interval');
+        $date->sub(\DateInterval::createFromDateString($intervalString));
+        $qb = $this->getObsoleteJobInstancesQueryBuilder($date);
+
+        $count = $qb->select('COUNT(ji.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return ($count > 0);
     }
 
     /**

@@ -12,7 +12,7 @@ class TranslationKeyRepository extends EntityRepository
     public function getCount()
     {
         $qb = $this->createQueryBuilder('k')
-            ->select('count(k.id)');
+            ->select('COUNT(k.id)');
 
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
