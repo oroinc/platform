@@ -331,8 +331,9 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             'type' => 'string'
         ];
 
-        /** @var MetadataObject|\PHPUnit_Framework_MockObject_MockObject $metadata */
-        $metadata = $this->createMock(MetadataObject::class);
+        $metadata = $this->getMockBuilder(MetadataObject::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $metadata->expects($this->exactly(2))
             ->method('toArray')
             ->willReturn([
@@ -368,7 +369,6 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getCurrentRequest')
             ->willReturn($request);
 
-        /** @var DatagridInterface|\PHPUnit_Framework_MockObject_MockObject $grid */
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->any())->method('getName')->willReturn($gridName);
 

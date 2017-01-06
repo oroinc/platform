@@ -28,7 +28,8 @@ define(function(require) {
             menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar: false,
-            browser_spellcheck: true
+            browser_spellcheck: true,
+            paste_data_images: true //to avoid of a paste plugin restriction
         },
 
         events: {

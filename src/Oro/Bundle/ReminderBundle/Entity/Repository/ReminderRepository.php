@@ -18,14 +18,35 @@ class ReminderRepository extends EntityRepository
      */
     public function findRemindersToSend()
     {
+        return $this->createRemindersToSendQuery()
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @return int
+     */
+    public function countRemindersToSend()
+    {
+        return $this->createRemindersToSendQuery()
+            ->select('COUNT(reminder.id)')
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    protected function createRemindersToSendQuery()
+    {
         return $this->createQueryBuilder('reminder')
             ->where('reminder.state = :state')
             ->andWhere('reminder.startAt <= :now')
             ->andWhere('reminder.expireAt >= :now')
             ->setParameter('now', new \DateTime())
             ->setParameter('state', Reminder::STATE_NOT_SENT)
-            ->getQuery()
-            ->execute();
+        ;
     }
 
     /**

@@ -70,7 +70,7 @@ class TranslationRepository extends EntityRepository
     public function getCountByLanguage(Language $language)
     {
         $qb = $this->createQueryBuilder('t')
-            ->select('count(t.id)')
+            ->select('COUNT(t.id)')
             ->where('t.language = :language')
             ->setParameter('language', $language);
 

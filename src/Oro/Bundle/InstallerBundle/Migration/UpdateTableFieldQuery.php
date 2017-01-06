@@ -40,7 +40,7 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
      * @param string $column
      * @param string $from
      * @param string $to
-     * @param string $to
+     * @param string $columnId
      */
     public function __construct($table, $column, $from, $to, $columnId = 'id')
     {

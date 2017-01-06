@@ -152,47 +152,55 @@
     } %}
 
     {% set componentOptions = {
-        container: 'menuitem-container',
-        sidebar: 'menuitem-tree',
-        sidebarAlias: 'menuitem-sidebar',
-        widgetAlias: 'menuitem-data-widget',
-        widgetContainer: '.menuitem-data'
+    container: 'menuitem-container',
+    sidebar: 'menuitem-tree',
+    sidebarAlias: 'menuitem-sidebar',
+    widgetAlias: 'menuitem-data-widget',
+    widgetContainer: '.menuitem-data'
     } %}
 
-    <div class="menuitem-container tree-component-container"
+    <div class="left-panel-container"
          data-page-component-module="oroproduct/js/app/components/grid-sidebar-component"
          data-page-component-options="{{ componentOptions|json_encode }}">
-        <div class="menuitem menuitem-tree tree-component">
-            <div class="left-panel-header">
-                <div class="left-panel-control left-panel-control-maximize">
-                    <i class="fa-forward control-maximize"></i>
+        <div class="placeholder">
+            <div class="scrollable-container overflow-y clearfix">
+                <div class="left-panel clearfix">
+                    <div class="left-panel-header">
+                        <div class="left-panel-control left-panel-control-maximize">
+                            <i class="fa-forward control-maximize"></i>
+                        </div>
+                        <div class="left-panel-control left-panel-control-minimize">
+                            <i class="fa-backward control-minimize"></i>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        {% set treeOptions = {
+                            'data' : tree,
+                            'nodeId': entity.key,
+                            'menu' : entity.menu,
+                            'scopeId' : scope.id,
+                            'updateAllowed' : true,
+                            'onRootSelectRoute' : menuViewRoute,
+                            'onSelectRoute' : menuUpdateRoute,
+                            'onMoveRoute' : 'oro_navigation_menuupdate_move'
+                        } %}
+                        {{ UI.renderJsTree(
+                        {
+                            'module': 'oronavigation/js/app/components/tree-manage-component',
+                            'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                            'treeOptions': treeOptions
+                        },
+                        ['expand', 'collapse']
+                        ) }}
+                    </div>
                 </div>
-                <div class="left-panel-control left-panel-control-minimize">
-                    <i class="fa-backward control-minimize"></i>
+                <div class="content ">
+                    <div class="system-content-wrapper">
+                        {{ parent() }}
+                    </div>
+
                 </div>
             </div>
-            {% set treeOptions = {
-                'data' : tree,
-                'nodeId': entity.key,
-                'menu' : entity.menu,
-                'scopeId' : scope.id,
-                'updateAllowed' : true,
-                'onRootSelectRoute' : menuViewRoute,
-                'onSelectRoute' : menuUpdateRoute,
-                'onMoveRoute' : 'oro_navigation_menuupdate_move'
-            } %}
-
-            {{ UI.renderJsTree(
-                {
-                    'module': 'oronavigation/js/app/components/tree-manage-component',
-                    'label': 'oro.navigation.menu.menu_list_default.label'|trans,
-                    'treeOptions': treeOptions
-                },
-                ['expand', 'collapse']
-            ) }}
         </div>
-    </div>
-    <div class="menuitem-data">
-        {{ parent() }}
     </div>
 {% endblock content_data %}

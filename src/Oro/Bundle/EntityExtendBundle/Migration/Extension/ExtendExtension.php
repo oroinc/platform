@@ -377,11 +377,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $targetTableName  = $this->getTableName($targetTable);
         $targetTable      = $this->getTable($targetTable, $schema);
-        $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $targetColumnName = $this->nameGenerator->generateOneToManyRelationColumnName(
             $selfClassName,
             $associationName,
-            '_' . $selfPrimaryKeyColumnName
+            '_' . $this->getPrimaryKeyColumnName($selfTable)
         );
 
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
@@ -454,12 +453,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->checkColumnsExist($selfTable, [$titleColumnName]);
         $this->checkColumnsExist($targetTable, [$existingTargetColumnName]);
 
-        $relationKey = ExtendHelper::buildRelationKey(
+        $selfRelationKey = ExtendHelper::buildRelationKey(
             $selfClassName,
             $associationName,
             RelationType::ONE_TO_MANY,
             $targetClassName
         );
+        $targetRelationKey = ExtendHelper::toggleRelationKey($selfRelationKey);
 
         $targetFieldId = new FieldConfigId(
             'extend',
@@ -468,13 +468,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
             RelationType::MANY_TO_ONE
         );
 
-        $selfTableOptions['extend']['relation.' . $relationKey . '.target_field_id'] = $targetFieldId;
+        $selfTableOptions['extend']['relation.' . $selfRelationKey . '.target_field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
         );
 
-        $targetTableOptions['extend']['relation.' . $relationKey . '.field_id'] = $targetFieldId;
+        $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions
@@ -482,7 +482,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name'   => $selfTableName,
-            'relation_key' => $relationKey,
+            'relation_key' => $targetRelationKey,
             'column'       => $titleColumnName,
         ];
         $options[ExtendOptionsManager::TYPE_OPTION]   = RelationType::MANY_TO_ONE;
@@ -546,13 +546,22 @@ class ExtendExtension implements NameGeneratorAwareInterface
             $targetClassName
         );
         $joinTable                 = $schema->createTable($joinTableName);
+        $selfJoinTableColumnNamePrefix = null;
+        $targetJoinTableColumnNamePrefix = null;
+        if ($selfClassName === $targetClassName) {
+            // fix the collision of names if owning side entity equals to inverse side entity
+            $selfJoinTableColumnNamePrefix = 'src_';
+            $targetJoinTableColumnNamePrefix = 'dest_';
+        }
         $selfJoinTableColumnName   = $this->nameGenerator->generateManyToManyJoinTableColumnName(
             $selfClassName,
-            '_' . $selfIdColumn
+            '_' . $selfIdColumn,
+            $selfJoinTableColumnNamePrefix
         );
         $targetJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName(
             $targetClassName,
-            '_' . $targetIdColumn
+            '_' . $targetIdColumn,
+            $targetJoinTableColumnNamePrefix
         );
         $this->addRelation(
             $joinTable,
@@ -623,12 +632,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->checkColumnsExist($selfTable, $detailedColumnNames);
         $this->checkColumnsExist($selfTable, $gridColumnNames);
 
-        $relationKey = ExtendHelper::buildRelationKey(
+        $selfRelationKey = ExtendHelper::buildRelationKey(
             $selfClassName,
             $associationName,
             RelationType::MANY_TO_MANY,
             $targetClassName
         );
+        $targetRelationKey = ExtendHelper::toggleRelationKey($selfRelationKey);
 
         $targetFieldId = new FieldConfigId(
             'extend',
@@ -637,13 +647,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
             RelationType::MANY_TO_MANY
         );
 
-        $selfTableOptions['extend']['relation.' . $relationKey . '.target_field_id'] = $targetFieldId;
+        $selfTableOptions['extend']['relation.' . $selfRelationKey . '.target_field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
         );
 
-        $targetTableOptions['extend']['relation.' . $relationKey . '.field_id'] = $targetFieldId;
+        $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions
@@ -651,7 +661,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name'   => $selfTableName,
-            'relation_key' => $relationKey,
+            'relation_key' => $targetRelationKey,
             'columns'      => [
                 'title'    => $titleColumnNames,
                 'detailed' => $detailedColumnNames,
@@ -773,12 +783,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->checkColumnsExist($selfTable, $detailedColumnNames);
         $this->checkColumnsExist($selfTable, $gridColumnNames);
 
-        $relationKey = ExtendHelper::buildRelationKey(
+        $selfRelationKey = ExtendHelper::buildRelationKey(
             $selfClassName,
             $associationName,
             RelationType::MANY_TO_ONE,
             $targetClassName
         );
+        $targetRelationKey = ExtendHelper::toggleRelationKey($selfRelationKey);
 
         $targetFieldId = new FieldConfigId(
             'extend',
@@ -787,13 +798,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
             RelationType::ONE_TO_MANY
         );
 
-        $selfTableOptions['extend']['relation.' . $relationKey . '.target_field_id'] = $targetFieldId;
+        $selfTableOptions['extend']['relation.' . $selfRelationKey . '.target_field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
         );
 
-        $targetTableOptions['extend']['relation.' . $relationKey . '.field_id'] = $targetFieldId;
+        $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions
@@ -801,7 +812,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name'   => $selfTableName,
-            'relation_key' => $relationKey,
+            'relation_key' => $targetRelationKey,
             'columns'      => [
                 'title'    => $titleColumnNames,
                 'detailed' => $detailedColumnNames,
