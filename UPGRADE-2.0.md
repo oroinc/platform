@@ -13,6 +13,8 @@ UPGRADE FROM 1.10 to 2.0
   ```shell
   $ sudo -u www-data php app/console oro:platform:upgrade20 --env=prod --force
   ```
+  
+  Upgrade from version less then 1.10 is not supported.
 
 - Changed minimum required php version to 5.6
 - PhpUnit 5.7 support
