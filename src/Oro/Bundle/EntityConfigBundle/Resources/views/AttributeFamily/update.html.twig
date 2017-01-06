@@ -2,7 +2,7 @@
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
 
 {% if entity.id %}
-    {% oro_title_set({params : {'%familyName%': entity.defaultLabel}}) %}
+    {% oro_title_set({params : {'%familyName%': entity.defaultLabel.string }}) %}
     {% set formAction = path('oro_attribute_family_update', {id: entity.id })  %}
 {% else %}
     {% set formAction = path('oro_attribute_family_create', {alias: entityAlias})  %}
