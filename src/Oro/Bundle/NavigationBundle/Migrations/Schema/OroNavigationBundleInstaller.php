@@ -82,6 +82,7 @@ class OroNavigationBundleInstaller implements Installation
         $table->addColumn('title', 'text', []);
         $table->addColumn('position', 'smallint', []);
         $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_323B0258A76ED395', []);
