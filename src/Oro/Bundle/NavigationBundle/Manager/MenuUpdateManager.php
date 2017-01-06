@@ -129,7 +129,7 @@ class MenuUpdateManager
      * @param Scope  $scope
      * @return null|MenuUpdateInterface
      */
-    protected function findMenuUpdate($menuName, $key, Scope $scope)
+    public function findMenuUpdate($menuName, $key, Scope $scope)
     {
         if (null === $scope->getId()) {
             return null;

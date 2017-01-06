@@ -56,7 +56,12 @@ abstract class AbstractMenuController extends Controller
     /**
      * @throws AccessDeniedException
      */
-    abstract protected function checkAcl();
+    protected function checkAcl()
+    {
+        if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
+            throw $this->createAccessDeniedException();
+        }
+    }
 
     /**
      * @param array $context

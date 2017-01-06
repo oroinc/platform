@@ -16,9 +16,10 @@ use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 // todo check acl
-class AjaxMenuController extends Controller
+class AbstractAjaxMenuController extends Controller
 {
     /**
      * @Route("/menu/reset/{menuName}", name="oro_navigation_menuupdate_reset")
@@ -31,6 +32,7 @@ class AjaxMenuController extends Controller
      */
     public function resetAction($menuName, Request $request)
     {
+        $this->checkAcl();
         $context = $this->getContextFromRequest($request);
         $scope = $this->get('oro_scope.scope_manager')->find($context);
         if (null === $scope) {
@@ -62,6 +64,7 @@ class AjaxMenuController extends Controller
      */
     public function createAction(Request $request, $menuName, $parentKey)
     {
+        $this->checkAcl();
         $scope = $this->findOrCreateScope($request, $menuName);
         $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
             $scope,
@@ -98,6 +101,7 @@ class AjaxMenuController extends Controller
      */
     public function deleteAction($menuName, $key, Request $request)
     {
+        $this->checkAcl();
         $context = $this->getContextFromRequest($request);
 
         $scope = $this->get('oro_scope.scope_manager')->find($context);
@@ -140,6 +144,7 @@ class AjaxMenuController extends Controller
      */
     public function showAction($menuName, $key, Request $request)
     {
+        $this->checkAcl();
         $scope = $this->findOrCreateScope($request, $menuName);
         $this->getMenuUpdateManager()->showMenuItem($menuName, $key, $scope);
 
@@ -158,6 +163,7 @@ class AjaxMenuController extends Controller
      */
     public function hideAction($menuName, $key, Request $request)
     {
+        $this->checkAcl();
         $scope = $this->findOrCreateScope($request, $menuName);
         $this->getMenuUpdateManager()->hideMenuItem($menuName, $key, $scope);
 
@@ -175,6 +181,7 @@ class AjaxMenuController extends Controller
      */
     public function moveAction(Request $request, $menuName)
     {
+        $this->checkAcl();
         $manager = $this->getMenuUpdateManager();
 
         $key = $request->get('key');
@@ -185,9 +192,13 @@ class AjaxMenuController extends Controller
         $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
         $scope = $this->findOrCreateScope($request, $menuName);
-        $updates = $manager->moveMenuItem($menuName, $key,
-            $scope, $parentKey,
-            $position);
+        $updates = $manager->moveMenuItem(
+            $menuName,
+            $key,
+            $scope,
+            $parentKey,
+            $position
+        );
         foreach ($updates as $update) {
             $errors = $this->get('validator')->validate($update);
             if (count($errors)) {
@@ -209,7 +220,6 @@ class AjaxMenuController extends Controller
      */
     protected function getMenuUpdateManager()
     {
-        // todo select right manager here
         return $this->get('oro_navigation.manager.menu_update');
     }
 
@@ -230,7 +240,7 @@ class AjaxMenuController extends Controller
     /**
      * @param Request $request
      * @param string  $menuName
-     * @return \Extend\Entity\EX_OroScopeBundle_Scope|Scope
+     * @return Scope
      */
     protected function findOrCreateScope(Request $request, $menuName)
     {
@@ -239,5 +249,15 @@ class AjaxMenuController extends Controller
         $scopeType = $menu->getExtra('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE);
 
         return $this->get('oro_scope.scope_manager')->findOrCreate($scopeType, $context);
+    }
+
+    /**
+     * @throws AccessDeniedException
+     */
+    protected function checkAcl()
+    {
+        if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
+            throw $this->createAccessDeniedException();
+        }
     }
 }
