@@ -4,6 +4,7 @@ OroApiBundle Documentation
  - [Configure Stateless Security Firewalls](./security.md)
  - [Configuration Reference](./configuration.md)
    - [**exclude** option](./configuration.md#exclude-option)
+   - [**entity_aliases** configuration section](./configuration.md#entity_aliases-configuration-section)
    - [**entities** configuration section](./configuration.md#entities-configuration-section)
    - [**fields** configuration section](./configuration.md#fields-configuration-section)
    - [**filters** configuration section](./configuration.md#filters-configuration-section)
