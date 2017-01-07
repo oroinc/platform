@@ -57,7 +57,7 @@ class RelationCalculator implements RelationCalculatorInterface
         $relationIdentifier = reset($relationIdentifier);
 
         $queryBuilder = $entityManager->createQueryBuilder()
-            ->select('count(relation.' . $relationIdentifier . ') as maxCount')
+            ->select('COUNT(relation.' . $relationIdentifier . ') as maxCount')
             ->from($entityName, 'entity')
             ->join('entity.' . $fieldName, 'relation')
             ->groupBy('entity.' . $entityIdentifier)

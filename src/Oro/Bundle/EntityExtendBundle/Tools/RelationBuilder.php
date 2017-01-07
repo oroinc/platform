@@ -166,6 +166,7 @@ class RelationBuilder
      * @param string $sourceEntityName
      * @param string $relationName
      * @param string $relationKey
+     * @deprecated since 2.0. This method is not used anywhere and will be removed
      */
     public function addManyToOneRelationTargetSide(
         $targetEntityName,

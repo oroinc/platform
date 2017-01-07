@@ -122,8 +122,13 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
                     ]
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't2.name'],
+                    'c2' => ['data_name' => 't2.iso2Code']
+                ]
             ]
-
         ];
 
         $this->assertEquals($expected, $result);
@@ -256,8 +261,13 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
                     ]
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't2.name'],
+                    'c2' => ['data_name' => 't3.name']
+                ]
             ]
-
         ];
 
         $this->assertEquals($expected, $result);

@@ -86,6 +86,12 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
                     'c2' => ['data_name' => 'c2', 'type' => 'string', 'translatable' => false]
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 't2.column2']
+                ]
             ]
         ];
 
@@ -255,6 +261,15 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                     'c4' => ['data_name' => 'c4', 'type' => 'string', 'translatable' => false],
                     'c5' => ['data_name' => 'c5', 'type' => 'string', 'translatable' => false],
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 't2.column2'],
+                    'c3' => ['data_name' => 't3.column2'],
+                    'c4' => ['data_name' => 't4.column2'],
+                    'c5' => ['data_name' => 't6.column1'],
+                ]
             ]
         ];
 
@@ -353,7 +368,8 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                 'columns' => [
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false]
                 ]
-            ]
+            ],
+            'fields_acl' => ['columns' => ['c1' => ['data_name' => 't1.column1']]]
         ];
 
         $this->assertEquals($expected, $result);
