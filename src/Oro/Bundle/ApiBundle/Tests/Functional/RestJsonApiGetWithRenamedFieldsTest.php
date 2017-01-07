@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 /**
  * @dbIsolation
  */
-class GetRestJsonApiWithRenamedFieldsTest extends RestJsonApiTestCase
+class RestJsonApiGetWithRenamedFieldsTest extends RestJsonApiTestCase
 {
     const PRODUCT_ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestProduct';
 
