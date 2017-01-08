@@ -7,7 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 /**
  * @dbIsolation
  */
-class GetRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
+class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
 {
     /**
      * FQCN of the entity being used for testing.

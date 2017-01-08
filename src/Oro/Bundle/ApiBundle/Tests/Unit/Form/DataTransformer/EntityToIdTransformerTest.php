@@ -280,7 +280,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage The identifier id is missing for a query of Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group
+     * @expectedExceptionMessage An "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" entity with "array(primary = 1)" identifier cannot be loaded.
      */
     // @codingStandardsIgnoreEnd
     public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity()

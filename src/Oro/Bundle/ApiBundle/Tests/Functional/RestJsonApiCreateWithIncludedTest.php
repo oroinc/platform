@@ -95,7 +95,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -170,7 +170,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -214,7 +214,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         self::assertEquals(
             [
@@ -307,7 +307,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -384,7 +384,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         $result = self::jsonToArray($response->getContent());
 

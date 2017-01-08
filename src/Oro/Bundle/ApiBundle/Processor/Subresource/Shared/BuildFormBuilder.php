@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 
 /**
@@ -57,41 +57,22 @@ class BuildFormBuilder implements ProcessorInterface
             null,
             'form',
             $context->getParentEntity(),
-            [
-                'data_class'           => $context->getParentClassName(),
-                'validation_groups'    => ['Default', 'api'],
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
-            ]
+            array_merge(
+                FormUtil::getFormDefaultOptions(),
+                ['data_class' => $context->getParentClassName()]
+            )
         );
 
         $associationName = $context->getAssociationName();
         $associationConfig = $context->getParentConfig()->getField($associationName);
+        $association = $context->getParentMetadata()->getAssociation($associationName);
 
         $formBuilder->add(
             $associationName,
             $associationConfig->getFormType(),
-            $this->getFormFieldOptions($associationConfig)
+            FormUtil::getFormFieldOptions($association, $associationConfig)
         );
 
         return $formBuilder;
-    }
-
-    /**
-     * @param EntityDefinitionFieldConfig $fieldConfig
-     *
-     * @return array
-     */
-    protected function getFormFieldOptions(EntityDefinitionFieldConfig $fieldConfig)
-    {
-        $options = $fieldConfig->getFormOptions();
-        if (null === $options) {
-            $options = [];
-        }
-        $propertyPath = $fieldConfig->getPropertyPath();
-        if ($propertyPath) {
-            $options['property_path'] = $propertyPath;
-        }
-
-        return $options;
     }
 }

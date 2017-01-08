@@ -248,6 +248,7 @@ services:
         lazy: true
         calls:
             - [ addEntityAliasProvider, [ '@oro_api.entity_alias_provider' ] ]
+            - [ addEntityClassProvider, [ '@oro_api.entity_alias_provider' ] ]
 
     oro_api.entity_alias_provider:
         class: Oro\Bundle\ApiBundle\Provider\EntityAliasProvider
@@ -271,6 +272,14 @@ services:
             - [] # exclude rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
         tags:
             - { name: oro_entity.exclusion_provider.api, priority: 60 }
+
+    oro_api.entity_exclusion_provider.by_alias:
+        class: Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider
+        public: false
+        arguments:
+            - '@oro_api.entity_alias_resolver'
+        tags:
+            - { name: oro_entity.exclusion_provider.api, priority: 40 }
 
     oro_api.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
