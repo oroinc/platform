@@ -83,7 +83,7 @@ class ScopeAccountCriteriaProvider extends AbstractScopeCriteriaProvider
             return [];
         }
         $loggedUser = $token->getUser();
-        if (null !== $loggedUser && $loggedUser instanceof AccountUser) {
+        if (null !== $loggedUser && $loggedUser instanceof CustomerUser) {
             return [self::ACCOUNT => $loggedUser->getAccount()];
         }
 
