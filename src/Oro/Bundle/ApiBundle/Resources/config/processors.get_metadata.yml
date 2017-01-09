@@ -15,6 +15,7 @@ services:
             - '@oro_api.load_metadata.factory.object'
             - '@oro_api.load_metadata.factory.entity'
             - '@oro_api.load_metadata.nested_object.factory.entity'
+            - '@oro_api.load_metadata.nested_association.factory.entity'
 
     oro_api.load_metadata.loader.object:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader
@@ -22,6 +23,7 @@ services:
         arguments:
             - '@oro_api.load_metadata.factory.object'
             - '@oro_api.load_metadata.nested_object.factory.object'
+            - '@oro_api.load_metadata.nested_association.factory.object'
 
     oro_api.load_metadata.loader.association:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\AssociationMetadataLoader
@@ -45,6 +47,27 @@ services:
 
     oro_api.load_metadata.nested_object.helper:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper
+        public: false
+        arguments:
+            - '@oro_api.load_metadata.helper'
+            - '@oro_api.load_metadata.factory.object'
+
+    oro_api.load_metadata.nested_association.factory.entity:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityNestedAssociationMetadataFactory
+        public: false
+        arguments:
+            - '@oro_api.load_metadata.nested_association.helper'
+            - '@oro_api.load_metadata.factory.entity'
+
+    oro_api.load_metadata.nested_association.factory.object:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedAssociationMetadataFactory
+        public: false
+        arguments:
+            - '@oro_api.load_metadata.nested_association.helper'
+            - '@oro_api.load_metadata.factory.object'
+
+    oro_api.load_metadata.nested_association.helper:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataHelper
         public: false
         arguments:
             - '@oro_api.load_metadata.helper'

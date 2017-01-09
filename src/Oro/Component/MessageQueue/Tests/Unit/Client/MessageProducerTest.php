@@ -398,8 +398,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $producer = new MessageProducer($driver);
-
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'The message\'s body must be either null, scalar or array. Got: stdClass'
         );
@@ -418,7 +417,6 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $producer = new MessageProducer($driver);
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
@@ -438,7 +436,6 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $producer = new MessageProducer($driver);
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
             'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'

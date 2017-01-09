@@ -68,7 +68,6 @@ class MessageCollectorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(get_class($exception));
         $this->expectExceptionMessage($exception->getMessage());
-
         $this->messageCollector->send('test topic', 'test message');
     }
 

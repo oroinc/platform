@@ -5,7 +5,6 @@ namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Async\Topics;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
-use Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures\LoadScheduleData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -20,10 +19,6 @@ class CronCommandTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-
-        $this->loadFixtures([
-            LoadScheduleData::class
-        ]);
     }
 
     public function testShouldRunAndScheduleIfCommandDue()
@@ -33,7 +28,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
         $this->assertNotEmpty($result);
 
-        $this->assertContains('Scheduling run for command oro:test', $result);
+        $this->assertContains('Scheduling run for command ', $result);
         $this->assertContains('All commands scheduled', $result);
     }
 
@@ -44,7 +39,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
 
         $this->assertNotEmpty($result);
-        $this->assertContains('Skipping command oro:test', $result);
+        $this->assertContains('Skipping not due command', $result);
         $this->assertContains('All commands scheduled', $result);
     }
 

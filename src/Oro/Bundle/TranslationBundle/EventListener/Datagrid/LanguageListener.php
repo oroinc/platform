@@ -6,7 +6,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -31,21 +30,16 @@ class LanguageListener
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
-
     /**
      * @param LanguageHelper $languageHelper
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         LanguageHelper $languageHelper,
-        DoctrineHelper $doctrineHelper,
-        GridConfigurationHelper $gridConfigurationHelper
+        DoctrineHelper $doctrineHelper
     ) {
         $this->languageHelper = $languageHelper;
         $this->doctrineHelper = $doctrineHelper;
-        $this->gridConfigurationHelper = $gridConfigurationHelper;
     }
 
     /**
@@ -122,18 +116,14 @@ class LanguageListener
      */
     public function updateSourceConfig(DatagridConfiguration $config)
     {
-        $source = $config->offsetGetByPath('[source]', []);
-
-        $languageAlias = $this->gridConfigurationHelper->getEntityRootAlias($config);
-
-        $source['query']['select'][] = sprintf('COUNT(translation) %s', self::STATS_COUNT);
-        $source['query']['join']['left'][] = [
-            'join' => Translation::class,
-            'alias' => 'translation',
-            'conditionType' => 'WITH',
-            'condition' =>  sprintf('translation.language = %s', $languageAlias),
-        ];
-
-        $config->offsetSetByPath('[source]', $source);
+        $query = $config->getOrmQuery();
+        $query
+            ->addSelect(sprintf('COUNT(translation) %s', self::STATS_COUNT))
+            ->addLeftJoin(
+                Translation::class,
+                'translation',
+                'WITH',
+                sprintf('translation.language = %s', $query->getRootAlias())
+            );
     }
 }

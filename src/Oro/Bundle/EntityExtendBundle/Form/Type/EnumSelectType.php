@@ -13,6 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class EnumSelectType extends AbstractEnumType
 {
+    const NAME = 'oro_enum_select';
+
     /**
      * {@inheritdoc}
      */
@@ -85,7 +87,7 @@ class EnumSelectType extends AbstractEnumType
      */
     public function getBlockPrefix()
     {
-        return 'oro_enum_select';
+        return self::NAME;
     }
 
     /**

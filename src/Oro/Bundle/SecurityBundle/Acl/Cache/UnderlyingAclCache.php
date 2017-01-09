@@ -172,7 +172,15 @@ class UnderlyingAclCache
      */
     protected function getBatchNumber(ObjectIdentityInterface $oid)
     {
-        return (int)floor($oid->getIdentifier() / $this->batchSize) + 1;
+        $identifier = $oid->getIdentifier();
+        /**
+         * We can't correctly calculate batch number in case when "id" is not an integer,
+         * so we put this entities to the single batch
+         */
+        if (!is_int($identifier)) {
+            return 1;
+        }
+        return (int)floor($identifier / $this->batchSize) + 1;
     }
 
     /**

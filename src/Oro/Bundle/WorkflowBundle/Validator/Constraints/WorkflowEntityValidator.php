@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
@@ -65,10 +66,8 @@ class WorkflowEntityValidator extends ConstraintValidator
 
         // Skip changes for workflow transition form
         $root = $this->context->getRoot();
-        if ($root instanceof Form) {
-            if (WorkflowTransitionType::NAME === $root->getName()) {
-                return;
-            }
+        if ($root instanceof Form && WorkflowTransitionType::NAME === $root->getName()) {
+            return;
         }
 
         $class = $this->doctrineHelper->getEntityClass($value);
@@ -84,16 +83,7 @@ class WorkflowEntityValidator extends ConstraintValidator
         if ($this->doctrineHelper->isNewEntity($value)) {
             $this->validateNewEntity($value, $constraint, $restrictions);
         } else {
-            $permissions = $this->permissionRegistry->getEntityPermissions($value);
-            if ($permissions['UPDATE'] === false || $restrictions) {
-                if ($permissions['UPDATE'] === false) {
-                    if ($this->getEntityChangeSet($value)) {
-                        $this->context->addViolation($constraint->updateEntityMessage);
-                    }
-                } else {
-                    $this->validateUpdatedFields($value, $constraint, $restrictions);
-                }
-            }
+            $this->validateExistingEntity($value, $constraint, $restrictions);
         }
     }
 
@@ -107,12 +97,29 @@ class WorkflowEntityValidator extends ConstraintValidator
         foreach ($restrictions as $restriction) {
             $fieldValue = $this->propertyAccessor->getValue($object, $restriction['field']);
             if ($restriction['mode'] === 'full') {
-                if ($fieldValue !== null) {
+                if ($fieldValue instanceof EmptyItem && $fieldValue->isEmpty()) {
+                    continue;
+                } elseif ($fieldValue !== null) {
                     $this->addFieldViolation($restriction['field'], $constraint->createFieldMessage);
                 }
             } else {
                 $this->validateAllowedValues($object, $constraint->createFieldMessage, $restriction);
             }
+        }
+    }
+
+    /**
+     * @param object         $object
+     * @param WorkflowEntity $constraint
+     * @param array          $restrictions
+     */
+    protected function validateExistingEntity($object, WorkflowEntity $constraint, array $restrictions)
+    {
+        $permissions = $this->permissionRegistry->getEntityPermissions($object);
+        if ($permissions['UPDATE'] === false && $this->getEntityChangeSet($object)) {
+            $this->context->addViolation($constraint->updateEntityMessage);
+        } else {
+            $this->validateUpdatedFields($object, $constraint, $restrictions);
         }
     }
 

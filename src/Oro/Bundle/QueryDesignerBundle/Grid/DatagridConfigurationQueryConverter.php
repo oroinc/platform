@@ -4,10 +4,13 @@ namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
 use Doctrine\ORM\Query;
 
+use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
+
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
@@ -101,16 +104,8 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $this->innerJoins      = null;
         $this->leftJoins       = null;
 
-        $this->config->offsetSetByPath('[source][type]', 'orm');
-        $this->config->offsetSetByPath(
-            '[source][hints]',
-            [
-                [
-                    'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                    'value' => 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
-                ]
-            ]
-        );
+        $this->config->setDatasourceType(OrmDatasource::TYPE);
+        $this->config->getOrmQuery()->addHint(Query::HINT_CUSTOM_OUTPUT_WALKER, TranslationWalker::class);
     }
 
     /**
@@ -118,7 +113,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     protected function saveTableAliases($tableAliases)
     {
-        $this->config->offsetSetByPath('[source][query_config][table_aliases]', $tableAliases);
+        $this->config->offsetSetByPath(QueryDesignerQueryConfiguration::TABLE_ALIASES, $tableAliases);
     }
 
     /**
@@ -126,7 +121,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     protected function saveColumnAliases($columnAliases)
     {
-        $this->config->offsetSetByPath('[source][query_config][column_aliases]', $columnAliases);
+        $this->config->offsetSetByPath(QueryDesignerQueryConfiguration::COLUMN_ALIASES, $columnAliases);
     }
 
     /**
@@ -135,7 +130,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     protected function addSelectStatement()
     {
         parent::addSelectStatement();
-        $this->config->offsetSetByPath('[source][query][select]', $this->selectColumns);
+        $this->config->getOrmQuery()->setSelect($this->selectColumns);
     }
 
     /**
@@ -194,6 +189,11 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         }
         $this->datagridGuesser->applyColumnGuesses($entityClassName, $fieldName, $fieldType, $columnOptions);
         $this->datagridGuesser->setColumnOptions($this->config, $columnAlias, $columnOptions);
+
+        $this->config->offsetSetByPath(
+            sprintf('[fields_acl][columns][%s][data_name]', $columnAlias),
+            $columnExpr
+        );
     }
 
     /**
@@ -202,7 +202,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     protected function addFromStatements()
     {
         parent::addFromStatements();
-        $this->config->offsetSetByPath('[source][query][from]', $this->from);
+        $this->config->getOrmQuery()->setFrom($this->from);
     }
 
     /**
@@ -223,10 +223,10 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     {
         parent::addJoinStatements();
         if (!empty($this->innerJoins)) {
-            $this->config->offsetSetByPath('[source][query][join][inner]', $this->innerJoins);
+            $this->config->getOrmQuery()->setInnerJoins($this->innerJoins);
         }
         if (!empty($this->leftJoins)) {
-            $this->config->offsetSetByPath('[source][query][join][left]', $this->leftJoins);
+            $this->config->getOrmQuery()->setLeftJoins($this->leftJoins);
         }
     }
 
@@ -260,7 +260,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     {
         parent::addWhereStatement();
         if (!empty($this->filters)) {
-            $this->config->offsetSetByPath('[source][query_config][filters]', $this->filters);
+            $this->config->offsetSetByPath(QueryDesignerQueryConfiguration::FILTERS, $this->filters);
         }
     }
 
@@ -271,7 +271,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     {
         parent::addGroupByStatement();
         if (!empty($this->groupingColumns)) {
-            $this->config->offsetSetByPath('[source][query][groupBy]', implode(', ', $this->groupingColumns));
+            $this->config->getOrmQuery()->setGroupBy(implode(', ', $this->groupingColumns));
         }
     }
 

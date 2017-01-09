@@ -72,7 +72,8 @@ define(function(require) {
                 'core': {
                     'multiple': false,
                     'data': nodeList,
-                    'check_callback': true
+                    'check_callback': true,
+                    'force_text': true
                 },
                 'state': {
                     'key': options.key,
@@ -80,6 +81,7 @@ define(function(require) {
                 },
                 'plugins': ['state', 'wholerow']
             };
+
             config = this.customizeTreeConfig(options, config);
 
             this.nodeId = options.nodeId;
@@ -119,8 +121,8 @@ define(function(require) {
                     this.jsTreeInstance.close_all(selectedNode);
                 }, this));
             }
-
         },
+
         /**
          * Customize jstree config to add plugins, callbacks etc.
          *

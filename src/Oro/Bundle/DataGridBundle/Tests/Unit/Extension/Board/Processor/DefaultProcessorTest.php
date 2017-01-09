@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Board\Processor;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension;
 use Oro\Bundle\DataGridBundle\Extension\Board\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Board\Processor\DefaultProcessor;
 
@@ -19,7 +18,7 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $gridConfigurationHelper;
+    protected $entityClassResolver;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -37,8 +36,8 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->gridConfigurationHelper = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper')
+        $this->entityClassResolver = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -49,7 +48,7 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor = new DefaultProcessor(
             $this->em,
-            $this->gridConfigurationHelper,
+            $this->entityClassResolver,
             $this->choiceHelper
         );
     }
@@ -61,39 +60,64 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetBoardOptions()
     {
-        $config = DatagridConfiguration::create([]);
-        $this->gridConfigurationHelper->expects($this->once())->method('getEntity')->with($config)->will(
-            $this->returnValue('entity_name')
-        );
+        $config = DatagridConfiguration::create([
+            'source' => [
+                'type'  => 'orm',
+                'query' => [
+                    'from' => [
+                        ['table' => 'Test:Entity', 'alias' => 'rootAlias']
+                    ]
+                ]
+            ]
+        ]);
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with('Test:Entity')
+            ->will($this->returnValue('Test\Entity'));
         $entityMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityMetaData->expects($this->once())->method('hasAssociation')->with('group_field')
+        $entityMetaData->expects($this->once())
+            ->method('hasAssociation')
+            ->with('group_field')
             ->will($this->returnValue(true));
-        $entityMetaData->expects($this->once())->method('getAssociationMapping')->with('group_field')
+        $entityMetaData->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with('group_field')
             ->will($this->returnValue(['type' => ClassMetadata::MANY_TO_ONE]));
-        $entityMetaData->expects($this->once())->method('getAssociationTargetClass')->with('group_field')
+        $entityMetaData->expects($this->once())
+            ->method('getAssociationTargetClass')
+            ->with('group_field')
             ->will($this->returnValue('target_entity'));
-        $this->em->expects($this->at(0))->method('getClassMetadata')->with('entity_name')
+        $this->em->expects($this->at(0))
+            ->method('getClassMetadata')
+            ->with('Test\Entity')
             ->will($this->returnValue($entityMetaData));
 
         $targetMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $targetMetaData->expects($this->once())->method('getSingleIdentifierFieldName')
+        $targetMetaData->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
 
-        $this->em->expects($this->at(1))->method('getClassMetadata')->with('target_entity')
+        $this->em->expects($this->at(1))
+            ->method('getClassMetadata')
+            ->with('target_entity')
             ->will($this->returnValue($targetMetaData));
 
-        $this->choiceHelper->expects($this->once())->method('guessLabelField')->with($targetMetaData, 'group_field')
+        $this->choiceHelper->expects($this->once())
+            ->method('guessLabelField')
+            ->with($targetMetaData, 'group_field')
             ->will($this->returnValue('label'));
         $choices = [
             'identification_alignment' => 'Identification Alignment',
             'in_progress' => 'In Progress',
             'lost' => 'Lost'
         ];
-        $this->choiceHelper->expects($this->once())->method('getChoices')->with('target_entity', 'id', 'label')
+        $this->choiceHelper->expects($this->once())
+            ->method('getChoices')
+            ->with('target_entity', 'id', 'label')
             ->will($this->returnValue($choices));
 
         $boardConfig = [
@@ -113,7 +137,8 @@ class DefaultProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $config = DatagridConfiguration::create([]);
         $dataSource = $this->createMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
-        $dataSource->expects($this->never())->method($this->anything());
+        $dataSource->expects($this->never())
+            ->method($this->anything());
         $this->processor->processDatasource($dataSource, [], $config);
     }
 }

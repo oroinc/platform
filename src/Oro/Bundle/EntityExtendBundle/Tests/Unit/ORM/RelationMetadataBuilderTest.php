@@ -813,14 +813,20 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                         [
                             'name'                 => 'testclass_id',
                             'referencedColumnName' => 'id',
-                            'onDelete'             => 'CASCADE'
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
                         ]
                     ],
                     'inverseJoinColumns' => [
                         [
                             'name'                 => 'testclass2_id',
                             'referencedColumnName' => 'id',
-                            'onDelete'             => 'CASCADE'
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
                         ]
                     ]
                 ],
@@ -921,14 +927,20 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                         [
                             'name'                 => 'testclass_id',
                             'referencedColumnName' => 'id',
-                            'onDelete'             => 'CASCADE'
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
                         ]
                     ],
                     'inverseJoinColumns' => [
                         [
                             'name'                 => 'testclass2_id',
                             'referencedColumnName' => 'id',
-                            'onDelete'             => 'CASCADE'
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
                         ]
                     ]
                 ],
@@ -1028,14 +1040,20 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                         [
                             'name'                 => 'testclass_id',
                             'referencedColumnName' => 'id',
-                            'onDelete'             => 'CASCADE'
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
                         ]
                     ],
                     'inverseJoinColumns' => [
                         [
                             'name'                 => 'testclass2_id',
                             'referencedColumnName' => 'id',
-                            'onDelete'             => 'CASCADE'
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
                         ]
                     ]
                 ],
@@ -1163,6 +1181,118 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 'isCascadeMerge'   => false,
                 'isCascadeDetach'  => false,
                 'orphanRemoval'    => false
+            ],
+            $result
+        );
+
+        $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
+        $this->assertFalse(
+            $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testBuildManyToManyWhenOwningSiteAndInverseSideEntitiesAreEqual()
+    {
+        $entityClass = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+
+        $fieldName   = 'srcField';
+        $fieldType   = RelationType::MANY_TO_MANY;
+        $fieldId     = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldConfig = new Config($fieldId, ['without_default' => true]);
+
+        $targetFieldName   = 'targetField';
+        $targetFieldType   = RelationType::MANY_TO_MANY;
+        $targetFieldId     = new FieldConfigId('extend', $entityClass, $targetFieldName, $targetFieldType);
+
+        $this->configManager->expects($this->once())
+            ->method('getFieldConfig')
+            ->with('extend', $entityClass, $fieldName)
+            ->willReturn($fieldConfig);
+
+        $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
+        $relationKey     = ExtendHelper::buildRelationKey(
+            $entityClass,
+            $fieldName,
+            RelationType::MANY_TO_ONE,
+            $entityClass
+        );
+        $extendConfig    = $this->getEntityConfig(
+            $entityClass,
+            [
+                'relation' => [
+                    $relationKey => [
+                        'field_id'        => $fieldId,
+                        'owner'           => true,
+                        'target_entity'   => $entityClass,
+                        'target_field_id' => $targetFieldId
+                    ]
+                ],
+                'schema'   => [
+                    'relation' => [
+                        $fieldName => []
+                    ]
+                ]
+            ]
+        );
+
+        $this->builder->build($metadataBuilder, $extendConfig);
+
+        $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
+        $this->assertEquals(
+            [
+                'sourceEntity'               => $entityClass,
+                'targetEntity'               => $entityClass,
+                'fieldName'                  => $fieldName,
+                'type'                       => ClassMetadataInfo::MANY_TO_MANY,
+                'isOwningSide'               => true,
+                'mappedBy'                   => null,
+                'inversedBy'                 => $targetFieldName,
+                'cascade'                    => [],
+                'joinTable'                  => [
+                    'name'               => $this->nameGenerator->generateManyToManyJoinTableName(
+                        $entityClass,
+                        $fieldName,
+                        $entityClass
+                    ),
+                    'joinColumns'        => [
+                        [
+                            'name'                 => 'src_testclass_id',
+                            'referencedColumnName' => 'id',
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
+                        ]
+                    ],
+                    'inverseJoinColumns' => [
+                        [
+                            'name'                 => 'dest_testclass_id',
+                            'referencedColumnName' => 'id',
+                            'onDelete'             => 'CASCADE',
+                            'nullable'             => false,
+                            'unique'               => false,
+                            'columnDefinition'     => null
+                        ]
+                    ]
+                ],
+                'joinTableColumns'           => ['src_testclass_id', 'dest_testclass_id'],
+                'relationToSourceKeyColumns' => [
+                    'src_testclass_id' => 'id'
+                ],
+                'relationToTargetKeyColumns' => [
+                    'dest_testclass_id' => 'id'
+                ],
+                'fetch'                      => ClassMetadataInfo::FETCH_LAZY,
+                'isOnDeleteCascade'          => true,
+                'isCascadeRemove'            => false,
+                'isCascadePersist'           => false,
+                'isCascadeRefresh'           => false,
+                'isCascadeMerge'             => false,
+                'isCascadeDetach'            => false,
+                'orphanRemoval'              => false
             ],
             $result
         );

@@ -47,13 +47,22 @@ class CronCommand extends ContainerAwareCommand
             }
             $cronExpression = $this->getCronHelper()->createCron($schedule->getDefinition());
             if ($cronExpression->isDue()) {
-                $output->writeln(
-                    'Scheduling run for command '.$schedule->getCommand(),
-                    OutputInterface::VERBOSITY_DEBUG
-                );
-                $this->getCommandRunner()->run($schedule->getCommand(), $schedule->getArguments());
+                /** @var CronCommandInterface $command */
+                $command = $this->getApplication()->get($schedule->getCommand());
+                if ($command->isActive()) {
+                    $output->writeln(
+                        'Scheduling run for command ' . $schedule->getCommand(),
+                        OutputInterface::VERBOSITY_DEBUG
+                    );
+                    $this->getCommandRunner()->run($schedule->getCommand(), $schedule->getArguments());
+                } else {
+                    $output->writeln(
+                        'Skipping not enabled command '.$schedule->getCommand(),
+                        OutputInterface::VERBOSITY_DEBUG
+                    );
+                }
             } else {
-                $output->writeln('Skipping command '.$schedule->getCommand(), OutputInterface::VERBOSITY_DEBUG);
+                $output->writeln('Skipping not due command '.$schedule->getCommand(), OutputInterface::VERBOSITY_DEBUG);
             }
         }
 

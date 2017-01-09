@@ -67,7 +67,7 @@
 
     {# Transaltions temporary disabled due to BAP-5355 #}
     {{ ui.link({
-        'path': 'javascript:void(0);',
+        'path': transition.displayType == 'dialog' ? 'javascript:void(0);' : transitionData['transition-url'],
         'id': 'transition-%s-%s'|format(workflow.name, transition.name),
         'iCss': iCss,
         'title': label,

@@ -96,7 +96,6 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
         $session = $this->createSessionStub($transportMessage, $producer);
 
         $driver = new DbalDriver($session, $config);
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Expire is not supported by the transport');
         $driver->send($queue, $message);

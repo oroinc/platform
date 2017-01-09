@@ -244,6 +244,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
             }
 
             if ($entity) {
+                if (!$this->securityFacade->isGranted('DELETE', $entity)) {
+                    continue;
+                }
                 $deletedIds[] = $identifierValue;
                 $this->processDelete($entity, $manager);
                 $iteration++;

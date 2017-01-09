@@ -285,7 +285,7 @@ abstract class ApiTestCase extends WebTestCase
                 && $response->getStatusCode() >= 400
                 && (
                     $response->headers->contains('Content-Type', 'application/json')
-                    || $response->headers->contains('Content-Type', 'application/vnd.api+json')
+                    || $response->headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE)
                 )
             ) {
                 $e = new \PHPUnit_Framework_ExpectationFailedException(

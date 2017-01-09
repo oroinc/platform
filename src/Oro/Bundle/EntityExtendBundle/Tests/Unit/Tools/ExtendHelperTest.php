@@ -82,12 +82,86 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreNotEqual()
+    {
+        $this->assertEquals(
+            'manyToOne|Test\Entity|Test\TargetEntity|testField',
+            ExtendHelper::toggleRelationKey('manyToOne|Test\Entity|Test\TargetEntity|testField')
+        );
+    }
+
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreNotEqualAndGivenKeyHasInverseSuffix()
+    {
+        $this->assertEquals(
+            'manyToOne|Test\Entity|Test\TargetEntity|testField|inverse',
+            ExtendHelper::toggleRelationKey('manyToOne|Test\Entity|Test\TargetEntity|testField|inverse')
+        );
+    }
+
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualAndGivenKeyIsOwningSideKey()
+    {
+        $this->assertEquals(
+            'manyToOne|Test\Entity|Test\Entity|testField|inverse',
+            ExtendHelper::toggleRelationKey('manyToOne|Test\Entity|Test\Entity|testField')
+        );
+    }
+
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualAndGivenKeyIsInverseSideKey()
+    {
+        $this->assertEquals(
+            'manyToOne|Test\Entity|Test\Entity|testField',
+            ExtendHelper::toggleRelationKey('manyToOne|Test\Entity|Test\Entity|testField|inverse')
+        );
+    }
+
+    public function testToggleRelationKeyWhenOwningAndTargetEntitiesAreEqualButKeyIsNotSupported()
+    {
+        $this->assertEquals(
+            'manyToOne|Test\Entity|Test\Entity|testField|other',
+            ExtendHelper::toggleRelationKey('manyToOne|Test\Entity|Test\Entity|testField|other')
+        );
+    }
+
+    public function testToggleRelationKeyWhenGivenKeyIsInvalid()
+    {
+        $this->assertEquals(
+            'someInvalidValue',
+            ExtendHelper::toggleRelationKey('someInvalidValue')
+        );
+    }
+
     public function testGetRelationType()
     {
         $this->assertEquals(
             'manyToOne',
             ExtendHelper::getRelationType('manyToOne|Test\Entity|Test\TargetEntity|testField')
         );
+    }
+
+    public function testGetRelationTypeForInverseRelationKey()
+    {
+        $this->assertEquals(
+            'manyToOne',
+            ExtendHelper::getRelationType('manyToOne|Test\Entity|Test\Entity|testField|inverse')
+        );
+    }
+
+    /**
+     * @dataProvider invalidRelationKeysForGetRelationType
+     */
+    public function testGetRelationTypeForInvalidRelationKey($relationKey)
+    {
+        $this->assertNull(ExtendHelper::getRelationType($relationKey));
+    }
+
+    public function invalidRelationKeysForGetRelationType()
+    {
+        return [
+            [null],
+            ['manyToOne'],
+            ['manyToOne|Test\Entity|Test\Entity'],
+            ['manyToOne|Test\Entity|Test\Entity|testField|inverse|other'],
+        ];
     }
 
     /**

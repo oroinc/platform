@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class NotPhpKeyword extends Constraint
 {
-    public $message = "This value should not be the reserved PHP word.";
+    public $message = 'This value should not be the reserved PHP word.';
 }

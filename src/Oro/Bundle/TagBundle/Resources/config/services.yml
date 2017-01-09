@@ -135,7 +135,7 @@ services:
         class: Oro\Bundle\TagBundle\Grid\TagsExtension
         arguments:
             - '@oro_tag.tag.manager'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
             - '@oro_security.security_facade'
@@ -146,7 +146,7 @@ services:
         class: Oro\Bundle\TagBundle\Grid\TagsReportExtension
         arguments:
             - '@oro_tag.tag.manager'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
         tags:
@@ -183,7 +183,6 @@ services:
         class: Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension
         arguments:
             - '@oro_search.formatter.result_formatter'
-            - '@doctrine.orm.entity_manager'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         tags:
@@ -266,4 +265,3 @@ services:
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: taxonomy, acl_resource: oro_taxonomy_view }
- 
