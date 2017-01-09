@@ -18,8 +18,9 @@ use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 /**
  * Loads configuration from "Resources/config/oro/api.yml".
@@ -30,18 +31,18 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     protected $configBag;
 
     /**
-     * @param ConfigExtensionRegistry          $configExtensionRegistry
-     * @param ConfigLoaderFactory              $configLoaderFactory
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param ConfigBag                        $configBag
+     * @param ConfigExtensionRegistry   $configExtensionRegistry
+     * @param ConfigLoaderFactory       $configLoaderFactory
+     * @param ResourceHierarchyProvider $resourceHierarchyProvider
+     * @param ConfigBag                 $configBag
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        EntityHierarchyProviderInterface $entityHierarchyProvider,
+        ResourceHierarchyProvider $resourceHierarchyProvider,
         ConfigBag $configBag
     ) {
-        parent::__construct($configExtensionRegistry, $configLoaderFactory, $entityHierarchyProvider);
+        parent::__construct($configExtensionRegistry, $configLoaderFactory, $resourceHierarchyProvider);
         $this->configBag = $configBag;
     }
 
@@ -61,7 +62,11 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
             }
             $association = $context->getAssociationName();
             if ($association) {
-                $parentConfig = $this->loadConfig($context->getParentClassName(), $context->getVersion());
+                $parentConfig = $this->loadConfig(
+                    $context->getParentClassName(),
+                    $context->getVersion(),
+                    $context->getRequestType()
+                );
                 if (!empty($parentConfig[ConfigUtil::SUBRESOURCES][$association])) {
                     $subresourceConfig = $parentConfig[ConfigUtil::SUBRESOURCES][$association];
                     if (!empty($subresourceConfig[ConfigUtil::ACTIONS][$action])) {
@@ -200,7 +205,7 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     /**
      * {@inheritdoc}
      */
-    protected function getConfig($entityClass, $version)
+    protected function getConfig($entityClass, $version, RequestType $requestType)
     {
         return $this->configBag->getConfig($entityClass, $version);
     }

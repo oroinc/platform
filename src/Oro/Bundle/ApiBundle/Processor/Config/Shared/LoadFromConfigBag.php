@@ -11,8 +11,9 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 /**
  * Base processor to load raw configuration.
@@ -25,8 +26,8 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
-    /** @var EntityHierarchyProviderInterface */
-    protected $entityHierarchyProvider;
+    /** @var ResourceHierarchyProvider */
+    protected $resourceHierarchyProvider;
 
     /** @var NodeInterface */
     private $configurationTree;
@@ -35,18 +36,18 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     private $configCache = [];
 
     /**
-     * @param ConfigExtensionRegistry          $configExtensionRegistry
-     * @param ConfigLoaderFactory              $configLoaderFactory
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param ConfigExtensionRegistry   $configExtensionRegistry
+     * @param ConfigLoaderFactory       $configLoaderFactory
+     * @param ResourceHierarchyProvider $resourceHierarchyProvider
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        EntityHierarchyProviderInterface $entityHierarchyProvider
+        ResourceHierarchyProvider $resourceHierarchyProvider
     ) {
         $this->configExtensionRegistry = $configExtensionRegistry;
-        $this->configLoaderFactory     = $configLoaderFactory;
-        $this->entityHierarchyProvider = $entityHierarchyProvider;
+        $this->configLoaderFactory = $configLoaderFactory;
+        $this->resourceHierarchyProvider = $resourceHierarchyProvider;
     }
 
     /**
@@ -63,7 +64,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
 
         $this->saveConfig(
             $context,
-            $this->loadConfig($context->getClassName(), $context->getVersion())
+            $this->loadConfig($context->getClassName(), $context->getVersion(), $context->getRequestType())
         );
     }
 
@@ -100,43 +101,46 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
-     * @param string $version
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
      *
-     * @return array
+     * @return array|mixed
      */
-    protected function loadConfig($entityClass, $version)
+    protected function loadConfig($entityClass, $version, RequestType $requestType)
     {
-        $cacheKey = $entityClass . '|' . $version;
+        $cacheKey = (string)$requestType . '|' . $version . '|' . $entityClass;
         if (isset($this->configCache[$cacheKey])) {
             return $this->configCache[$cacheKey];
         }
 
-        $config = $this->buildConfig($entityClass, $version);
+        $config = $this->buildConfig($entityClass, $version, $requestType);
         $this->configCache[$cacheKey] = $config;
 
         return $config;
     }
+
     /**
-     * @param string $entityClass
-     * @param string $version
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
      *
      * @return array
      */
-    protected function buildConfig($entityClass, $version)
+    protected function buildConfig($entityClass, $version, RequestType $requestType)
     {
-        $config = $this->getConfig($entityClass, $version);
+        $config = $this->getConfig($entityClass, $version, $requestType);
         $isInherit = true;
-        if (null !== $config) {
-            $isInherit = $this->getInheritAndThenRemoveIt($config);
-        } else {
+        if (null === $config) {
             $config = [];
+        } else {
+            $isInherit = $this->getInheritAndThenRemoveIt($config);
         }
         if ($isInherit) {
             $configs = [$config];
-            $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
+            $parentClasses = $this->resourceHierarchyProvider->getParentClassNames($entityClass);
             foreach ($parentClasses as $parentClass) {
-                $config = $this->getConfig($parentClass, $version);
+                $config = $this->getConfig($parentClass, $version, $requestType);
                 if (!empty($config)) {
                     $isInherit = $this->getInheritAndThenRemoveIt($config);
                     $configs[] = $config;
@@ -192,7 +196,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     protected function getAllConfigSectionNames()
     {
         $sectionNameMap = [];
-        $extensions     = $this->configExtensionRegistry->getExtensions();
+        $extensions = $this->configExtensionRegistry->getExtensions();
         foreach ($extensions as $extension) {
             $sections = $extension->getEntityConfigurationSections();
             foreach ($sections as $name => $configuration) {
@@ -231,12 +235,13 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
-     * @param string $version
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
      *
      * @return array|null
      */
-    abstract protected function getConfig($entityClass, $version);
+    abstract protected function getConfig($entityClass, $version, RequestType $requestType);
 
     /**
      * @return NodeInterface

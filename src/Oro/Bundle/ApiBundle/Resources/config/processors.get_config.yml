@@ -22,7 +22,7 @@ services:
         arguments:
             - '@oro_api.config_extension_registry'
             - '@oro_api.config_loader_factory'
-            - '@oro_entity.entity_hierarchy_provider.all'
+            - '@oro_api.resource_hierarchy_provider'
             - '@oro_api.config_bag'
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: 20 }
@@ -112,7 +112,7 @@ services:
         arguments:
             - '@oro_api.config_extension_registry'
             - '@oro_api.config_loader_factory'
-            - '@oro_entity.entity_hierarchy_provider.all'
+            - '@oro_api.resource_hierarchy_provider'
             - '@oro_api.config_bag'
         tags:
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: 20 }

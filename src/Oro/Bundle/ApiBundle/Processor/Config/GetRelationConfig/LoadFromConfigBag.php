@@ -11,7 +11,8 @@ use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\RelationDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
  * Loads configuration from "Resources/config/oro/api.yml".
@@ -22,25 +23,25 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     protected $configBag;
 
     /**
-     * @param ConfigExtensionRegistry          $configExtensionRegistry
-     * @param ConfigLoaderFactory              $configLoaderFactory
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param ConfigBag                        $configBag
+     * @param ConfigExtensionRegistry   $configExtensionRegistry
+     * @param ConfigLoaderFactory       $configLoaderFactory
+     * @param ResourceHierarchyProvider $resourceHierarchyProvider
+     * @param ConfigBag                 $configBag
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        EntityHierarchyProviderInterface $entityHierarchyProvider,
+        ResourceHierarchyProvider $resourceHierarchyProvider,
         ConfigBag $configBag
     ) {
-        parent::__construct($configExtensionRegistry, $configLoaderFactory, $entityHierarchyProvider);
+        parent::__construct($configExtensionRegistry, $configLoaderFactory, $resourceHierarchyProvider);
         $this->configBag = $configBag;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getConfig($entityClass, $version)
+    protected function getConfig($entityClass, $version, RequestType $requestType)
     {
         return $this->configBag->getRelationConfig($entityClass, $version);
     }

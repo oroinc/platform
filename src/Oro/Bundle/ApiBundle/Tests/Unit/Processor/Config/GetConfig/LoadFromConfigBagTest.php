@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -15,7 +17,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityHierarchyProvider;
+    protected $resourceHierarchyProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configBag;
@@ -27,17 +29,17 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityHierarchyProvider = $this
-            ->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
-        $this->configBag = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigBag')
+        $this->resourceHierarchyProvider = $this->getMockBuilder(ResourceHierarchyProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configBag = $this->getMockBuilder(ConfigBag::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->processor = new LoadFromConfigBag(
             $this->configExtensionRegistry,
             new ConfigLoaderFactory($this->configExtensionRegistry),
-            $this->entityHierarchyProvider,
+            $this->resourceHierarchyProvider,
             $this->configBag
         );
     }
@@ -69,8 +71,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->once())
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->once())
+            ->method('getParentClassNames')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(['Test\ParentClass']);
 
@@ -90,8 +92,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->once())
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->once())
+            ->method('getParentClassNames')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(['Test\ParentClass']);
 
@@ -107,8 +109,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
             ->willReturn(['inherit' => false]);
 
-        $this->entityHierarchyProvider->expects($this->never())
-            ->method('getHierarchyForClassName');
+        $this->resourceHierarchyProvider->expects($this->never())
+            ->method('getParentClassNames');
 
         $this->processor->process($this->context);
 
@@ -153,8 +155,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
             ->willReturn($config);
 
-        $this->entityHierarchyProvider->expects($this->once())
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->once())
+            ->method('getParentClassNames')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn([]);
 
@@ -242,8 +244,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
             ->willReturn($config);
 
-        $this->entityHierarchyProvider->expects($this->once())
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->once())
+            ->method('getParentClassNames')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn([]);
 
@@ -350,8 +352,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->with(self::TEST_CLASS_NAME, $this->context->getVersion())
             ->willReturn($config);
 
-        $this->entityHierarchyProvider->expects($this->once())
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->once())
+            ->method('getParentClassNames')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn([]);
 
@@ -459,8 +461,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->exactly(2))
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->exactly(2))
+            ->method('getParentClassNames')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, []],
@@ -576,8 +578,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->exactly(2))
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->exactly(2))
+            ->method('getParentClassNames')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, []],
@@ -663,8 +665,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->exactly(2))
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->exactly(2))
+            ->method('getParentClassNames')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, []],
@@ -738,8 +740,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->exactly(2))
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->exactly(2))
+            ->method('getParentClassNames')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, []],
@@ -772,8 +774,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
 
     public function testProcessMergeSubresourceFiltersWhenTargetEntityDoesNotHaveOwnFilters()
     {
-        $config = [
-        ];
+        $config = [];
         $parentConfig = [
             'subresources' => [
                 'testSubresource' => [
@@ -797,8 +798,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->exactly(2))
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->exactly(2))
+            ->method('getParentClassNames')
             ->willReturnMap(
                 [
                     [self::TEST_CLASS_NAME, []],
@@ -929,8 +930,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->once())
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->once())
+            ->method('getParentClassNames')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(['Test\ParentClass1', 'Test\ParentClass2', 'Test\ParentClass3', 'Test\ParentClass4']);
 
@@ -1007,8 +1008,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
                 ]
             );
 
-        $this->entityHierarchyProvider->expects($this->once())
-            ->method('getHierarchyForClassName')
+        $this->resourceHierarchyProvider->expects($this->once())
+            ->method('getParentClassNames')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn(['Test\ParentClass1']);
 
