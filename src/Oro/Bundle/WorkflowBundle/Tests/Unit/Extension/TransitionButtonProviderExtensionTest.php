@@ -175,14 +175,16 @@ class TransitionButtonProviderExtensionTest extends AbstractTransitionButtonProv
      */
     public function isAvailableDataProvider()
     {
-        $createTransitionButton = function ($isAvailable, $isExistWorkflowItem = true) {
+        $createTransitionButton = function ($isAvailable, $isExistWorkflowItem = true, $isHidden = false) {
             $transition = $this->createMock(Transition::class);
             $transition->expects($this->any())
                 ->method('isStart')->willReturn(false);
+            $transition->expects($this->any())
+                ->method('isHidden')->willReturn($isHidden);
 
             $workflow = $this->getMockBuilder(Workflow::class)
                 ->disableOriginalConstructor()->getMock();
-            $workflow->expects($this->any())->method('isTransitionAllowed')
+            $workflow->expects($this->any())->method('isTransitionAvailable')
                 ->willReturn($isAvailable);
 
             if (true === $isExistWorkflowItem) {
@@ -200,22 +202,26 @@ class TransitionButtonProviderExtensionTest extends AbstractTransitionButtonProv
         };
 
         return [
-            [
+            'workflow item not exist' => [
                 'expected' => false,
                 'button' => $createTransitionButton(true, false),
             ],
-            [
+            'transition is not available and not exist workflow item' => [
                 'expected' => false,
                 'button' => $createTransitionButton(false, false),
             ],
-            [
+            'transition is not available and exist workflow item' => [
                 'expected' => false,
                 'button' => $createTransitionButton(false),
             ],
-            [
+            'transition is hidden' => [
+                'expected' => false,
+                'button' => $createTransitionButton(true, true, true),
+            ],
+            'transition is enable' => [
                 'expected' => true,
                 'button' => $createTransitionButton(true),
-            ]
+            ],
         ];
     }
 

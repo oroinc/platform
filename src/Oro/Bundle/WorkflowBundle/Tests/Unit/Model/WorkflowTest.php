@@ -650,10 +650,14 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testIsTransitionAvailable()
     {
-        /** @var WorkflowItem|\PHPUnit_Framework_MockObject_MockObject $workflowItem */
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflowStep = new WorkflowStep();
+        $workflowStep->setName('test_step');
+
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $workflowItem->expects($this->any())
+            ->method('getCurrentStep')
+            ->will($this->returnValue($workflowStep));
+
         $errors = new ArrayCollection();
         $transitionName = 'test_transition';
         $transition = $this->getTransitionMock($transitionName);
@@ -669,7 +673,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->with($transition)
             ->will($this->returnValue($transition));
 
+        $step = $this->getStepMock('test_step');
+        $step->expects($this->any())->method('isAllowedTransition')->willReturn(true);
         $workflow = $this->createWorkflow(null, null, null, $transitionManager);
+        $workflow->getStepManager()->setSteps([$step]);
 
         $this->assertTrue($workflow->isTransitionAvailable($workflowItem, $transition, $errors));
     }
@@ -689,6 +696,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('isAvailable')
             ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem'), $errors)
             ->will($this->returnValue(true));
+        $transition->expects($this->once())->method('isStart')->willReturn(true);
+
         $transitionManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\TransitionManager')
             ->disableOriginalConstructor()
             ->getMock();
