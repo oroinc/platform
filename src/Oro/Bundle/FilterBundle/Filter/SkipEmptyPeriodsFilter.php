@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\SkipEmptyPeriodsFilterType;
 
 class SkipEmptyPeriodsFilter extends ChoiceFilter
@@ -20,7 +21,26 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        //TODO: Apply skip-empty-periods filter.
-        return true;
+
+        if (is_array($data) && $data['value']) {
+            return false;
+        }
+
+        /** @var OrmFilterDatasourceAdapter $ds */
+        $qb = $ds->getQueryBuilder();
+        $qb->resetDQLPart('where');
+    }
+
+    /**
+     * @param mixed $data
+     * @return mixed
+     */
+    protected function parseData($data)
+    {
+        if (is_array($data) && !$data['value']) {
+            $data['value'] = SkipEmptyPeriodsFilterType::TYPE_NO;
+        }
+
+        return $data;
     }
 }

@@ -7,10 +7,14 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
+use Oro\Bundle\OrderBundle\Entity\Order;
+use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 
 class DateGroupingFilter extends ChoiceFilter
 {
     const COLUMN_NAME_SUFFIX = 'DateGroupingFilter';
+    const SUB_QUERY_1 = '%s(calendarDate.date) NOT IN (SELECT %s(cd1.date) FROM %s as cd1  INNER JOIN %s as oo1 WHERE (CAST(cd1.date AS date) = CAST(oo1.createdAt AS date)) GROUP BY cd1.date)';
+    const SUB_QUERY_2 = '%s(calendarDate.date) IN (SELECT %s(cd2.date) FROM %s as cd2  INNER JOIN %s as oo2 WHERE (CAST(cd2.date AS date) = CAST(oo2.createdAt AS date)) GROUP BY cd2.date)';
 
     /** @var array */
     protected $groupingNames = [];
@@ -62,6 +66,7 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
                 );
+                $this->addWhereClause($qb, DateGroupingFilterType::TYPE_MONTH);
                 break;
             case DateGroupingFilterType::TYPE_QUARTER:
                 $this->addFilter(DateGroupingFilterType::TYPE_QUARTER, $qb);
@@ -73,6 +78,7 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
                 );
+                $this->addWhereClause($qb, DateGroupingFilterType::TYPE_QUARTER);
                 break;
             default:
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
@@ -82,6 +88,7 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
                 );
+                $this->addWhereClause($qb, DateGroupingFilterType::TYPE_YEAR);
         }
 
         return true;
@@ -120,5 +127,32 @@ class DateGroupingFilter extends ChoiceFilter
     private function generateDataName($dataName)
     {
         return str_replace('.', '', $dataName);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param $filterType
+     */
+    protected function addWhereClause(QueryBuilder $qb, $filterType)
+    {
+        $qb->andWhere(
+            sprintf(
+                '(' . self::SUB_QUERY_1 . ')',
+                $filterType,
+                $filterType,
+                CalendarDate::class,
+                Order::class
+            )
+        );
+
+        $qb->orWhere(
+            sprintf(
+                '(' . self::SUB_QUERY_2 . ' AND product.id is not null)',
+                $filterType,
+                $filterType,
+                CalendarDate::class,
+                Order::class
+            )
+        );
     }
 }
