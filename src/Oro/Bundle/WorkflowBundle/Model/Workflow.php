@@ -428,8 +428,10 @@ class Workflow
     public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
         $transition = $this->transitionManager->extractTransition($transition);
+        //exclude if current step doesn't allowed this transition
+        $transitionIsValid = $this->checkTransitionValid($transition, $workflowItem, false);
 
-        return $transition->isAvailable($workflowItem, $errors);
+        return $transitionIsValid && $transition->isAvailable($workflowItem, $errors);
     }
 
     /**

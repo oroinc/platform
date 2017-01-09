@@ -45,7 +45,8 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
         $transition = $button->getTransition();
         $workflow = $button->getWorkflow();
         try {
-            $isAvailable = $workflow->isTransitionAllowed($workflowItem, $transition, $errors);
+            $isAvailable = !$transition->isHidden() &&
+                $workflow->isTransitionAvailable($workflowItem, $transition, $errors);
         } catch (\Exception $e) {
             $isAvailable = false;
             if (null !== $errors) {
@@ -61,15 +62,26 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
      */
     protected function getTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
     {
+        $transitions = $this->findByDatagrids($workflow, $searchContext);
+
+        return array_filter($transitions, function (Transition $transition) {
+            return !$transition->isStart();
+        });
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param ButtonSearchContext $searchContext
+     *
+     * @return array
+     */
+    private function findByDatagrids(Workflow $workflow, ButtonSearchContext $searchContext)
+    {
         if ($searchContext->getDatagrid() &&
             in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids(), true) &&
             $workflow->getDefinition()->getRelatedEntity() === $searchContext->getEntityClass()
         ) {
-            $transitions = $workflow->getTransitionManager()->getTransitions()->toArray();
-
-            return array_filter($transitions, function (Transition $transition) {
-                return !$transition->isStart();
-            });
+            return $workflow->getTransitionManager()->getTransitions()->toArray();
         }
 
         return [];
