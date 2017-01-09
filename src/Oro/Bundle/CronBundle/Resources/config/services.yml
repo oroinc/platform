@@ -67,3 +67,11 @@ services:
         class: Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener
         tags:
             - {name: doctrine.event_listener, event: onSchemaColumnDefinition, method: onSchemaColumnDefinition}
+
+    oro_cron.repository.schedule:
+        class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
+        factory: ['@doctrine', getRepository]
+        arguments:
+            - 'Oro\Bundle\CronBundle\Entity\Schedule'
+        calls:
+            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
