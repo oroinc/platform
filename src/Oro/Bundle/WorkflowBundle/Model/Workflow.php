@@ -295,6 +295,10 @@ class Workflow
      */
     protected function findWorkflowItem($entityClass, $entityId)
     {
+        if (is_array($entityId)) {
+            $entityId = reset($entityId);
+        }
+
         if (null === $entityId) {
             return null;
         }
