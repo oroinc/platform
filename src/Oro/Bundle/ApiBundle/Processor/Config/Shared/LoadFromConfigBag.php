@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\NodeInterface;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -29,8 +27,8 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     /** @var ResourceHierarchyProvider */
     protected $resourceHierarchyProvider;
 
-    /** @var NodeInterface */
-    private $configurationTree;
+    /** @var MergeEntityConfigHelper */
+    private $mergeEntityConfigHelper;
 
     /** @var array */
     private $configCache = [];
@@ -39,15 +37,18 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      * @param ConfigExtensionRegistry   $configExtensionRegistry
      * @param ConfigLoaderFactory       $configLoaderFactory
      * @param ResourceHierarchyProvider $resourceHierarchyProvider
+     * @param MergeEntityConfigHelper   $mergeEntityConfigHelper
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        ResourceHierarchyProvider $resourceHierarchyProvider
+        ResourceHierarchyProvider $resourceHierarchyProvider,
+        MergeEntityConfigHelper $mergeEntityConfigHelper
     ) {
         $this->configExtensionRegistry = $configExtensionRegistry;
         $this->configLoaderFactory = $configLoaderFactory;
         $this->resourceHierarchyProvider = $resourceHierarchyProvider;
+        $this->mergeEntityConfigHelper = $mergeEntityConfigHelper;
     }
 
     /**
@@ -217,21 +218,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      */
     protected function mergeConfigs(array $config, array $parentConfig)
     {
-        $processor = new Processor();
-
-        return $processor->process($this->getConfigurationTree(), [$parentConfig, $config]);
-    }
-
-    /**
-     * @return NodeInterface
-     */
-    protected function getConfigurationTree()
-    {
-        if (null === $this->configurationTree) {
-            $this->configurationTree = $this->createConfigurationTree();
-        }
-
-        return $this->configurationTree;
+        return $this->mergeEntityConfigHelper->mergeConfigs($config, $parentConfig);
     }
 
     /**
@@ -242,9 +229,4 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      * @return array|null
      */
     abstract protected function getConfig($entityClass, $version, RequestType $requestType);
-
-    /**
-     * @return NodeInterface
-     */
-    abstract protected function createConfigurationTree();
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetRelationConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\LoadFromConfigBag;
+use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\MergeConfig\MergeRelationConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
@@ -35,7 +36,8 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             $this->configExtensionRegistry,
             new ConfigLoaderFactory($this->configExtensionRegistry),
             $this->resourceHierarchyProvider,
-            $this->configBag
+            $this->configBag,
+            new MergeRelationConfigHelper($this->configExtensionRegistry)
         );
     }
 

@@ -6,6 +6,10 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\LoadFromConfigBag;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeFilterConfigHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
@@ -36,11 +40,16 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $mergeActionConfigHelper = new MergeActionConfigHelper();
+
         $this->processor = new LoadFromConfigBag(
             $this->configExtensionRegistry,
             new ConfigLoaderFactory($this->configExtensionRegistry),
             $this->resourceHierarchyProvider,
-            $this->configBag
+            $this->configBag,
+            new MergeEntityConfigHelper($this->configExtensionRegistry),
+            $mergeActionConfigHelper,
+            new MergeSubresourceConfigHelper($mergeActionConfigHelper, new MergeFilterConfigHelper())
         );
     }
 

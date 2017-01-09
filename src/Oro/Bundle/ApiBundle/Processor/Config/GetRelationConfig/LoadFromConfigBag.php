@@ -2,13 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
-use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
-use Oro\Bundle\ApiBundle\Config\Definition\RelationDefinitionConfiguration;
+use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\MergeConfig\MergeRelationConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
@@ -20,21 +16,28 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class LoadFromConfigBag extends BaseLoadFromConfigBag
 {
     /** @var ConfigBag */
-    protected $configBag;
+    private $configBag;
 
     /**
      * @param ConfigExtensionRegistry   $configExtensionRegistry
      * @param ConfigLoaderFactory       $configLoaderFactory
      * @param ResourceHierarchyProvider $resourceHierarchyProvider
      * @param ConfigBag                 $configBag
+     * @param MergeRelationConfigHelper $mergeRelationConfigHelper
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
         ResourceHierarchyProvider $resourceHierarchyProvider,
-        ConfigBag $configBag
+        ConfigBag $configBag,
+        MergeRelationConfigHelper $mergeRelationConfigHelper
     ) {
-        parent::__construct($configExtensionRegistry, $configLoaderFactory, $resourceHierarchyProvider);
+        parent::__construct(
+            $configExtensionRegistry,
+            $configLoaderFactory,
+            $resourceHierarchyProvider,
+            $mergeRelationConfigHelper
+        );
         $this->configBag = $configBag;
     }
 
@@ -44,22 +47,5 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     protected function getConfig($entityClass, $version, RequestType $requestType)
     {
         return $this->configBag->getRelationConfig($entityClass, $version);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createConfigurationTree()
-    {
-        $configTreeBuilder = new TreeBuilder();
-        $configuration     = new EntityConfiguration(
-            ApiConfiguration::RELATIONS_SECTION,
-            new RelationDefinitionConfiguration(),
-            $this->configExtensionRegistry->getConfigurationSettings(),
-            $this->configExtensionRegistry->getMaxNestingLevel()
-        );
-        $configuration->configure($configTreeBuilder->root('related_entity')->children());
-
-        return $configTreeBuilder->buildTree();
     }
 }
