@@ -11,8 +11,11 @@ use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension;
+use Oro\Bundle\WorkflowBundle\Model\Step;
+use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -175,52 +178,30 @@ class TransitionButtonProviderExtensionTest extends AbstractTransitionButtonProv
      */
     public function isAvailableDataProvider()
     {
-        $createTransitionButton = function ($isAvailable, $isExistWorkflowItem = true, $isHidden = false) {
-            $transition = $this->createMock(Transition::class);
-            $transition->expects($this->any())
-                ->method('isStart')->willReturn(false);
-            $transition->expects($this->any())
-                ->method('isHidden')->willReturn($isHidden);
-
-            $workflow = $this->getMockBuilder(Workflow::class)
-                ->disableOriginalConstructor()->getMock();
-            $workflow->expects($this->any())->method('isTransitionAvailable')
-                ->willReturn($isAvailable);
-
-            if (true === $isExistWorkflowItem) {
-                $workflow->expects($this->once())
-                    ->method('getWorkflowItemByEntityId')
-                    ->willReturn($this->createMock(WorkflowItem::class));
-            }
-
-            $button = $this->getMockBuilder(TransitionButton::class)
-                ->disableOriginalConstructor()->getMock();
-            $button->expects($this->any())->method('getWorkflow')->willReturn($workflow);
-            $button->expects($this->any())->method('getTransition')->willReturn($transition);
-
-            return $button;
-        };
-
         return [
             'workflow item not exist' => [
                 'expected' => false,
-                'button' => $createTransitionButton(true, false),
+                'button' => $this->createTransitionButton(true, false),
             ],
             'transition is not available and not exist workflow item' => [
                 'expected' => false,
-                'button' => $createTransitionButton(false, false),
+                'button' => $this->createTransitionButton(false, false),
             ],
             'transition is not available and exist workflow item' => [
                 'expected' => false,
-                'button' => $createTransitionButton(false),
+                'button' => $this->createTransitionButton(false),
             ],
             'transition is hidden' => [
                 'expected' => false,
-                'button' => $createTransitionButton(true, true, true),
+                'button' => $this->createTransitionButton(true, true, true),
+            ],
+            'transition forbidden by allowed_transitions' => [
+                'expected' => false,
+                'button' => $this->createTransitionButton(true, true, false, false),
             ],
             'transition is enable' => [
                 'expected' => true,
-                'button' => $createTransitionButton(true),
+                'button' => $this->createTransitionButton(true),
             ],
         ];
     }
@@ -246,5 +227,61 @@ class TransitionButtonProviderExtensionTest extends AbstractTransitionButtonProv
         $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
 
         return $workflow;
+    }
+
+
+    /**
+     * @param $isAvailable
+     * @param bool $isExistWorkflowItem
+     * @param bool $isHidden
+     * @param bool $isAllowedTransition
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|TransitionButton
+     */
+    protected function createTransitionButton(
+        $isAvailable,
+        $isExistWorkflowItem = true,
+        $isHidden = false,
+        $isAllowedTransition = true
+    ) {
+        $transition = $this->createMock(Transition::class);
+        $transition->expects($this->any())
+            ->method('isStart')->willReturn(false);
+        $transition->expects($this->any())
+            ->method('isHidden')->willReturn($isHidden);
+
+        $step = $this->createMock(Step::class);
+        $step->expects($this->any())->method('isAllowedTransition')
+            ->willReturn($isAllowedTransition);
+        $stepManager = $this->createMock(StepManager::class);
+        $stepManager->expects($this->any())->method('getStep')
+            ->willReturn($step);
+
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->any())->method('isTransitionAvailable')
+            ->willReturn($isAvailable);
+        $workflow->expects($this->any())->method('getStepManager')
+            ->willReturn($stepManager);
+
+
+
+        if (true === $isExistWorkflowItem) {
+            $workflowItem = $this->createMock(WorkflowItem::class);
+            $workflowItem->expects($this->any())->method('getCurrentStep')
+                ->willReturn(
+                    (new WorkflowStep())->setName('test_step')
+                );
+
+            $workflow->expects($this->once())
+                ->method('getWorkflowItemByEntityId')
+                ->willReturn($workflowItem);
+        }
+
+        $button = $this->getMockBuilder(TransitionButton::class)
+            ->disableOriginalConstructor()->getMock();
+        $button->expects($this->any())->method('getWorkflow')->willReturn($workflow);
+        $button->expects($this->any())->method('getTransition')->willReturn($transition);
+
+        return $button;
     }
 }

@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -46,7 +47,9 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
         $workflow = $button->getWorkflow();
         try {
             $isAvailable = !$transition->isHidden() &&
-                $workflow->isTransitionAvailable($workflowItem, $transition, $errors);
+                $workflow->isTransitionAvailable($workflowItem, $transition, $errors) &&
+                $this->validateTransitionStep($workflow, $transition, $workflowItem);
+
         } catch (\Exception $e) {
             $isAvailable = false;
             if (null !== $errors) {
@@ -75,7 +78,7 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
      *
      * @return array
      */
-    private function findByDatagrids(Workflow $workflow, ButtonSearchContext $searchContext)
+    protected function findByDatagrids(Workflow $workflow, ButtonSearchContext $searchContext)
     {
         if ($searchContext->getDatagrid() &&
             in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids(), true) &&
@@ -104,5 +107,26 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
     protected function getApplication()
     {
         return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param Transition $transition
+     * @param WorkflowItem $workflowItem
+     *
+     * @return bool
+     */
+    protected function validateTransitionStep(Workflow $workflow, Transition $transition, WorkflowItem $workflowItem)
+    {
+        $currentStep = null;
+        if ($workflowItem->getCurrentStep() && $currentStepName = $workflowItem->getCurrentStep()->getName()) {
+            $currentStep = $workflow->getStepManager()->getStep($currentStepName);
+        }
+
+        if ($currentStep && $currentStep->isAllowedTransition($transition->getName())) {
+            return true;
+        }
+
+        return false;
     }
 }
