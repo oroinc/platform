@@ -29,7 +29,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The child node "transport" at path "oro_message_queue" must be configured.');
-
         $configuration = new Configuration([]);
 
         $processor = new Processor();

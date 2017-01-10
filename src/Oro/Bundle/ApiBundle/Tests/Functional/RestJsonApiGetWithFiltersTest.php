@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @dbIsolation
  */
-class GetRestJsonApiWithFiltersTest extends RestJsonApiTestCase
+class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
 {
     /**
      * {@inheritdoc}

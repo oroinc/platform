@@ -4,15 +4,15 @@ namespace Oro\Bundle\ReminderBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
+
+use Oro\Bundle\ReminderBundle\Model\ReminderSender;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-
-use Oro\Bundle\ReminderBundle\Model\ReminderSender;
-use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
 /**
  * Command to send all reminders
@@ -25,6 +25,16 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
     public function getDefaultDefinition()
     {
         return '*/1 * * * *';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        $count = $this->getReminderRepository()->countRemindersToSend();
+
+        return ($count > 0);
     }
 
     /**

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 
-class GetSubresourcesRestJsonApiTest extends RestJsonApiTestCase
+class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
 {
     /**
      * @param string         $entityClass

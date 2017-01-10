@@ -37,7 +37,6 @@ class AttributeFamilyControllerTest extends AbstractConfigControllerTest
 
     public function testUpdate()
     {
-        $this->markTestSkipped('Fix history.html.twig issue - #BB-6719');
         $this->loadFixtures([LoadAttributeFamilyData::class]);
 
         $attributeFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);

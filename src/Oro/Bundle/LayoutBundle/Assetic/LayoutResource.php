@@ -136,7 +136,38 @@ class LayoutResource implements ResourceInterface
             $assets = ArrayUtil::arrayMergeRecursiveDistinct($this->collectThemeAssets($parentTheme), $assets);
         }
 
+        $this->overrideInputs($assets);
+
         return $assets;
+    }
+
+    /**
+     * @param array $assets
+     */
+    protected function overrideInputs(array &$assets)
+    {
+        foreach ($assets as &$asset) {
+            if (!isset($asset['inputs'])) {
+                continue;
+            }
+
+            $keysToRemove = [];
+            foreach ($asset['inputs'] as $origKey => &$value) {
+                $key = $value;
+                if (array_key_exists($key, $asset['inputs'])) {
+                    $keysToRemove[] = $key;
+                    $value = $asset['inputs'][$key];
+                }
+
+                if (!$value) {
+                    $keysToRemove[] = $origKey;
+                }
+            }
+
+            foreach ($keysToRemove as $key) {
+                unset($asset['inputs'][$key]);
+            }
+        }
     }
 
     /**

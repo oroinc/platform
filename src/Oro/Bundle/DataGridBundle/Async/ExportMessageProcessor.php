@@ -253,6 +253,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             'toEmail' => $user->getEmail(),
             'subject' => $subject,
             'body' => $body,
+            'contentType' => 'text/html',
         ]);
     }
 

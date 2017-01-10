@@ -21,11 +21,9 @@ class TopicMetaRegistryTest extends \PHPUnit_Framework_TestCase
     public function testThrowIfThereIsNotMetaForRequestedTopicName()
     {
         $registry = new TopicMetaRegistry([]);
-
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'The topic meta not found. Requested name `aName`'
-        );
+        $this->expectExceptionMessage('The topic meta not found. Requested name `aName`');
+
         $registry->getTopicMeta('aName');
     }
 

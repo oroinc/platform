@@ -274,6 +274,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                     content = $('.scrollable-container').filter(':parents(.ui-widget)');
                     if (!tools.isMobile()) {
                         content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
+                        content.filter('.overflow-y').css('overflow-y', 'auto');
                     } else {
                         content.css('overflow', 'hidden');
                         content.last().css('overflow-y', 'auto');
@@ -402,7 +403,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                         error: function() {
                             var message;
                             message = el.data('error-message') ||
-                                __('Unexpected error occurred. Please contact system administrator.');
+                                __('An unexpected error has occurred. Please contact the system administrator.');
                             mediator.execute('hideLoading');
                             mediator.execute('showMessage', 'error', message);
                         }

@@ -28,25 +28,31 @@ class EntityMetadataLoader
     /** @var EntityNestedObjectMetadataFactory */
     protected $nestedObjectMetadataFactory;
 
+    /** @var EntityNestedAssociationMetadataFactory */
+    protected $nestedAssociationMetadataFactory;
+
     /**
-     * @param DoctrineHelper                    $doctrineHelper
-     * @param MetadataFactory                   $metadataFactory
-     * @param ObjectMetadataFactory             $objectMetadataFactory
-     * @param EntityMetadataFactory             $entityMetadataFactory
-     * @param EntityNestedObjectMetadataFactory $nestedObjectMetadataFactory
+     * @param DoctrineHelper                         $doctrineHelper
+     * @param MetadataFactory                        $metadataFactory
+     * @param ObjectMetadataFactory                  $objectMetadataFactory
+     * @param EntityMetadataFactory                  $entityMetadataFactory
+     * @param EntityNestedObjectMetadataFactory      $nestedObjectMetadataFactory
+     * @param EntityNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         MetadataFactory $metadataFactory,
         ObjectMetadataFactory $objectMetadataFactory,
         EntityMetadataFactory $entityMetadataFactory,
-        EntityNestedObjectMetadataFactory $nestedObjectMetadataFactory
+        EntityNestedObjectMetadataFactory $nestedObjectMetadataFactory,
+        EntityNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->metadataFactory = $metadataFactory;
         $this->objectMetadataFactory = $objectMetadataFactory;
         $this->entityMetadataFactory = $entityMetadataFactory;
         $this->nestedObjectMetadataFactory = $nestedObjectMetadataFactory;
+        $this->nestedAssociationMetadataFactory = $nestedAssociationMetadataFactory;
     }
 
     /**
@@ -242,6 +248,16 @@ class EntityMetadataLoader
                             $entityMetadata,
                             $classMetadata,
                             $config,
+                            $entityClass,
+                            $fieldName,
+                            $field,
+                            $withExcludedProperties,
+                            $targetAction
+                        );
+                    } elseif (DataType::isNestedAssociation($dataType)) {
+                        $this->nestedAssociationMetadataFactory->createAndAddNestedAssociationMetadata(
+                            $entityMetadata,
+                            $classMetadata,
                             $entityClass,
                             $fieldName,
                             $field,
