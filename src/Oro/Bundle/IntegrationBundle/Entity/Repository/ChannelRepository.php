@@ -181,4 +181,16 @@ class ChannelRepository extends EntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
+
+    /**
+     * @param string $type
+     *
+     * @return array|Integration[]
+     */
+    public function findByType($type)
+    {
+        return $this->findBy([
+            'type' => $type
+        ]);
+    }
 }
