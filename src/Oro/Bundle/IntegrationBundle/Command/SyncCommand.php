@@ -27,6 +27,25 @@ class SyncCommand extends Command implements CronCommandInterface, ContainerAwar
     }
 
     /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        /** @var ChannelRepository $integrationRepository */
+        $integrationRepository = $this->getEntityManager()->getRepository(Integration::class);
+        $qb = $integrationRepository
+            ->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.transport is NOT NULL')
+            ->andWhere('c.enabled = :isEnabled')
+            ->setParameter('isEnabled', true);
+
+        $count = $qb->getQuery()->getSingleScalarResult();
+
+        return ($count > 0);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function configure()

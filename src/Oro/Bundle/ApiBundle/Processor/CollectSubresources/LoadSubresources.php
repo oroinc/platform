@@ -166,6 +166,10 @@ abstract class LoadSubresources implements ProcessorInterface
     protected function isAccessibleAssociation(AssociationMetadata $association, array $accessibleResources)
     {
         $targetClassNames = $association->getAcceptableTargetClassNames();
+        if (empty($targetClassNames)) {
+            return true;
+        }
+
         foreach ($targetClassNames as $className) {
             if (isset($accessibleResources[$className])) {
                 return true;

@@ -20,7 +20,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
     public function testCreateRootJobShouldThrowIfOwnerIdIsEmpty()
     {
         $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('OwnerId must not be empty');
 
@@ -102,7 +101,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Job name must not be empty');
-
         $processor->findOrCreateChildJob(null, new Job());
     }
 
@@ -203,7 +201,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t start root jobs. id: "12345"');
-
         $processor->startChildJob($rootJob);
     }
 
@@ -274,7 +271,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t success root jobs. id: "12345"');
-
         $processor->successChildJob($rootJob);
     }
 
@@ -299,7 +295,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionMessage(
             'Can success only running jobs. id: "12345", status: "oro.message_queue_job.status.cancelled"'
         );
-
         $processor->successChildJob($job);
     }
 
@@ -345,7 +340,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t fail root jobs. id: "12345"');
-
         $processor->failChildJob($rootJob);
     }
 
@@ -416,7 +410,6 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Can\'t cancel root jobs. id: "12345"');
-
         $processor->cancelChildJob($rootJob);
     }
 

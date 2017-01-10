@@ -40,10 +40,10 @@ class SentMessageConstraint extends \PHPUnit_Framework_Constraint
         if (array_key_exists('message', $this->message)) {
             $constraint = new \PHPUnit_Framework_Constraint_IsEqual($this->message);
             foreach ($other as $message) {
-                if ($this->isSubJobMessage && is_array($message['message']) && empty($message['message']['jobId'])) {
-                    return false;
-                }
                 if ($this->isSubJobMessage && is_array($message['message'])) {
+                    if (empty($message['message']['jobId'])) {
+                        return false;
+                    }
                     unset($message['message']['jobId']);
                 }
                 if ($constraint->evaluate($message, '', true)) {

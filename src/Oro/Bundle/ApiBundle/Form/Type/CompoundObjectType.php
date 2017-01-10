@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Type;
 
+use Oro\Bundle\ApiBundle\Form\EventListener\CompoundObjectListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 
-class CompoundEntityType extends AbstractType
+class CompoundObjectType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -29,7 +30,7 @@ class CompoundEntityType extends AbstractType
             $builder->add(
                 $name,
                 $fieldConfig->getFormType(),
-                $this->getFormFieldOptions($fieldConfig, $name, $field->getPropertyPath())
+                FormUtil::getFormFieldOptions($field, $fieldConfig)
             );
         }
         $associations = $metadata->getAssociations();
@@ -39,10 +40,13 @@ class CompoundEntityType extends AbstractType
                 $builder->add(
                     $name,
                     $fieldConfig->getFormType(),
-                    $this->getFormFieldOptions($fieldConfig, $name, $association->getPropertyPath())
+                    FormUtil::getFormFieldOptions($association, $fieldConfig)
                 );
             }
         }
+
+        $builder
+            ->addEventSubscriber(new CompoundObjectListener());
     }
 
     /**
@@ -69,31 +73,6 @@ class CompoundEntityType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'oro_api_compound_entity';
-    }
-
-    /**
-     * @param EntityDefinitionFieldConfig $fieldConfig
-     * @param string                      $fieldName
-     * @param string|null                 $propertyPath
-     *
-     * @return array
-     */
-    protected function getFormFieldOptions(
-        EntityDefinitionFieldConfig $fieldConfig,
-        $fieldName,
-        $propertyPath
-    ) {
-        $options = $fieldConfig->getFormOptions();
-        if (null === $options) {
-            $options = [];
-        }
-        if (!$propertyPath) {
-            $options['mapped'] = false;
-        } elseif ($propertyPath !== $fieldName) {
-            $options['property_path'] = $propertyPath;
-        }
-
-        return $options;
+        return 'oro_api_compound_object';
     }
 }

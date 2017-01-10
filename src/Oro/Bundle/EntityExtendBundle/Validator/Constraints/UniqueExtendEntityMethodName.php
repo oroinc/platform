@@ -7,9 +7,10 @@ use Symfony\Component\Validator\Constraint;
 class UniqueExtendEntityMethodName extends Constraint
 {
     /** @var string */
-    public $message = <<<EOF
-The "{{ value }}" word is reserved for system purposes. Please use another name.
-EOF;
+    public $message = 'The \'{{ value }}\' word is reserved for system purposes.';
+
+    /** @var string */
+    public $unexpectedNameMessage = 'The field name must be \'{{ field }}\'.';
 
     /**
      * {@inheritdoc}

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Helper;
 
+use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Criteria;
 
@@ -57,8 +58,10 @@ class ActivityListAclCriteriaHelper
         /** @var ActivityListProviderInterface $provider */
         foreach ($providers as $provider) {
             $criteria = $this->getCriteriaByProvider($provider, $mapFields);
-            if ($criteria->getWhereExpression()) {
-                $aclCriteria->orWhere(Criteria::expr()->orX($criteria->getWhereExpression()));
+            $whereExpression = $criteria->getWhereExpression();
+            // ignore Value expression
+            if ($whereExpression && !$whereExpression instanceof Value) {
+                $aclCriteria->orWhere(Criteria::expr()->orX($whereExpression));
             }
         }
         $this->addDefaultCriteria($aclCriteria);

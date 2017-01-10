@@ -219,6 +219,15 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
                     ]
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 't4.email'],
+                    'c3' => ['data_name' => 't2.column2'],
+                    'c4' => ['data_name' => 't3.phone'],
+                    'c5' => ['data_name' => 'COALESCE(t1.regionText, t5.name)']
+                ]
             ]
         ];
 
@@ -356,6 +365,12 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                 'columns' => [
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
                     'c2' => ['data_name' => 't1.vc1', 'type' => 'enum', 'translatable' => false],
+                ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 't2.name']
                 ]
             ]
         ];
