@@ -1,20 +1,18 @@
 Attributes Configuration
-=====================
-Attributes - is logic which gives a possibility to assign dynamic fields to an entity. Each attribute in its essence is
-config field which holds some value. Attributes have own CRUD and field types which is similar to extend fields.
-All attributes are divided into certain families and groups. So it is possible apply manipulations such as assigning,
-removing, etc., between these sets. 
+========================
 
+Attributes allow you dynamically create additional entity fields. An attribute is a configuration field with assigned value. Every attribute has a dedicated CRUD and field types, similarly to the extend fields. For easier management, attributes may be grouped and nested into attribute families.
 
-Enabling attributes for an entity
----------------
-By applying several modifications for extendable and configurable entity it is possible to activate attributes functionality. 
-Lets assume we have some entity 'Product', to activate attributes for it is required: 
+Enabling Attributes for an Entity
+---------------------------------
 
-1. Add @Config annotation to Product class with 'attributes' scope and add key 'has_attributes' set to true.
-2. Add field **attributeFamily** with many to one relation on **Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily**,
-    make field configurable and activate import (if entity can be imported), add migration for field.
-3. Implement **AttributeFamilyAwareInterface** and accessors for **attributeFamily** field
+You can enable attributes for any extendable and configurable entity by doing the following: 
+
+1. Add @Config annotation to the class with 'attributes' scope and add key 'has_attributes' set to true.
+2. Add **attributeFamily** field with many to one relation on **Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily**. Make field configurable, activate import if necessary, and add migration.
+3. Implement **AttributeFamilyAwareInterface** and accessors for **attributeFamily** field.
+
+The following example illustrates enabling attributes for the *Product* entity:
 
 ``` php
 <?php
@@ -71,15 +69,13 @@ class Product extends ExtendProduct implements AttributeFamilyAwareInterface
 }
 ```
 
-Don't forget to clear cache and update configs after changes.
+**Note:** Remember to clear cache and update configuration after these changes.
 
-Creating an attribute
---------------------
-After configuring entity with attribute's scope, routes for creating and manipulating attributes became available -
-'oro_attribute_index', 'oro_attribute_family_index', etc. Each route accepts one required parameter - 'alias'. Alias of 
-your entity class should be passed to tell controller's action with which entity to work. If no existing alias 
-passed or entity has not 'attributes' configured it will not be possible to access actions. You can add routes to navigation
-to simplify access (product as an example):
+Creating an Attribute
+---------------------
+
+After enabling attributes for an entity, you can use routes - *oro_attribute_index*, *oro_attribute_family_index*, etc - to create and manipulate the attributes. Alias of your entity class should be passed in the route parameters to help controller's action identify the necessary entity. The action is not accessible when the alias is missing or invalid, and when no 'attributes' are configured for the provided entity. 
+You can add routes to the navigation tree to simplify access, like in the following example:
 
 ```yml
     product_attributes_index:
@@ -89,33 +85,20 @@ to simplify access (product as an example):
             alias: 'product'
         extras:
             routes: ['oro_attribute_*']
-````
+```
 
-And add this item to needed place in navigation tree.
+The 'oro_attribute_create' route is responsible for creating new attribute. Attribute creation is split into two steps. On the first step, user provides the attribute code that is used as unique slug representation and attribute type (string, bigint, select, etc) that defines the data that should be captured on the following step. On the second step, user provides a label that is used to display attribute on the website (e.g. OroCommerce Web Store) and any other information that should be captured about the attribute. Oro aplication may store the attribute as *serialized field* or as a *table column*. The type of storage is selected based on the attribute type (simple types vs Select and Multi-Select) as well as setting of the *Filterable* and *Sortable* options. The product attribute storage type is set to *table column* for the attribute with Select of Multi-Select data type, and also for attribute of any type with Filterable or Sortable option enabled. This data type requires reindex that is launched by the user when they click  
+*Update schema* in the All Product Attributes page. This triggers the field to be physically create in the table.
 
-'oro_attribute_create' route is responsible for creating new attribute. To create it you have to pass two steps. On first
-fill two required fields - attribute code (some unique slug representation) and type (string, bigint, select, etc). On 
-second step 'label' field is only required. Depending on attribute type and options 'Filterable', 'Sortable' different
-storage type may be applied to it before attribute saved. If one of the listed options will be set to true or not simple attribute 
-type chosen (select, multiselect) 'table column' storage type will be predefined. To finally apply changes need to click on
-'Update schema' button (it will physically crete field in table). While the rest of the circumstances 'serialized field'
-storage type will be predefined for the attribute. There are two kinds of attributes custom (added via ui) and system 
-(added via migration)
+**Note**: Attributes created by user are labeled as custom, while attributes created during migrations are labeled as system. For system attributes deleting is disabled.
 
 Attribute Families and Groups
----------------------
-Point to understand, entity has no direct relation on attributes but **AttributeFamily** can be assigned to it. You can 
-create new family for entity using route 'oro_attribute_family_create' with corresponding alias. In its turn **AttributeFamily**
-holds collection of **AttributeGroup**. It is needed to create family at first, it can be done accessing route -
-'oro_attribute_family_create'. 'Code' and 'Labels' fields are required, also at least on attribute group should be assigned.
-Attribute groups can be created directly on family create/edit page by simply adding new group to collection. Each group
-collection element has required field 'Label' and select with attributes previously created for entity (certain class).
-You can assign any attribute for any group or move if it is already assigned, also it is possible to remove attribute
-from group but not system (it can be moved only).
+-----------------------------
+
+Entity has no direct relation to the attribute. Attributes are bound to the entity using the *AttributeFamily*. You can 
+create a new attribute family for entity using the *oro_attribute_family_create* route with the corresponding alias. The *AttributeFamily* contains a collection of *AttributeGroups*. *AttributeFamily* requires *Code* and *Labels* values to be provided and must contain at least on attribute group. Attribute groups can be created directly on family create/edit page by simply adding new group to collection. Each group (a collection element) has required field 'Label' and a select control that allows picking one or manu attributes that were previously created for the entity (in a certain class). Attributes may be added to the group, moved from one group to another, and deleted from the group (except the system attributes that are moved to the default group upon deletion).
 
 Attribute ACL
-------------------------
-Main idea of attributes is to add separate logic to manipulate extend entity fields which marked as attributes despite
-access to Entity management can be denied for some roles.
-
- 
+-------------
+Attributes porvide supplementary logics that helps extend entity fields marked as attributes despite the 
+limited access to the entity management.
