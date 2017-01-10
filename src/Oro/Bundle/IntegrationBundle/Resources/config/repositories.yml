@@ -1,0 +1,6 @@
+services:
+    oro_integration.repository.channel:
+        class: 'Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - 'Oro\Bundle\IntegrationBundle\Entity\Channel'
