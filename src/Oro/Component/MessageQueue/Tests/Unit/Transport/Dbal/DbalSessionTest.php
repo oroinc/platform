@@ -84,8 +84,8 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowIfDestinationIsInvalidInstanceType()
     {
-        $this->setExpectedException(
-            InvalidDestinationException::class,
+        $this->expectException(InvalidDestinationException::class);
+        $this->expectExceptionMessage(
             'The destination must be an instance of '.
             'Oro\Component\MessageQueue\Transport\Dbal\DbalDestination but it is '.
             'Oro\Component\MessageQueue\Transport\Null\NullQueue.'
@@ -108,14 +108,6 @@ class DbalSessionTest extends \PHPUnit_Framework_TestCase
      */
     private function createConnectionMock()
     {
-        return $this->getMock(DbalConnection::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DbalSchema
-     */
-    private function createDbalSchemaMock()
-    {
-        return $this->getMock(DbalSchema::class, [], [], '', false);
+        return $this->createMock(DbalConnection::class);
     }
 }

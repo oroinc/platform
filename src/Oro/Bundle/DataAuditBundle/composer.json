@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/UserBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "stof/doctrine-extensions-bundle": "dev-master",
         "friendsofsymfony/rest-bundle": "1.5.0-RC2",
@@ -21,7 +21,6 @@
         "psr-0": { "Oro\\Bundle\\DataAuditBundle": "" }
     },
     "target-dir": "Oro/Bundle/DataAuditBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

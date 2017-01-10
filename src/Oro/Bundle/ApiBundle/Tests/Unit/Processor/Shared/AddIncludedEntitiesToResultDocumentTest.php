@@ -43,7 +43,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
 
     public function testProcessForSuccessResponse()
     {
-        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $includedEntities = new IncludedEntityCollection();
 
         $normalizedData = ['normalizedKey' => 'normalizedValue'];
@@ -66,7 +66,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
 
     public function testProcessForFailureResponse()
     {
-        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $includedEntities = new IncludedEntityCollection();
 
         $normalizedData = ['normalizedKey' => 'normalizedValue'];

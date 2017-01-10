@@ -221,7 +221,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->context->getResponseDocumentBuilder());
 
-        $documentBuilder = $this->getMock(DocumentBuilderInterface::class);
+        $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
 
@@ -681,7 +681,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testFilters()
     {
-        $testFilter = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $testFilter = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
 
         $this->assertNotNull($this->context->getFilters());
 
@@ -698,7 +698,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testFilterValues()
     {
-        $accessor = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
+        $accessor = $this->createMock('Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface');
         $this->context->setFilterValues($accessor);
 
         $this->assertSame($accessor, $this->context->getFilterValues());
@@ -1055,6 +1055,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setSoftErrorsHandling(false);
         $this->assertFalse($this->context->isSoftErrorsHandling());
         $this->assertFalse($this->context->has(Context::SOFT_ERRORS_HANDLING));
+    }
+
+    public function testProcessed()
+    {
+        $this->assertFalse($this->context->isProcessed('test'));
+
+        $this->context->setProcessed('test');
+        $this->context->setProcessed('another');
+        $this->assertTrue($this->context->isProcessed('test'));
+        $this->assertTrue($this->context->isProcessed('another'));
+
+        $this->context->clearProcessed('test');
+        $this->assertFalse($this->context->isProcessed('test'));
+        $this->assertTrue($this->context->isProcessed('another'));
     }
 
     /**

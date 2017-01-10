@@ -30,7 +30,13 @@ class UpgradeCommand extends AbstractCommand
                 InputOption::VALUE_NONE,
                 'Skip UI related commands during update'
             )
-            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it');
+            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
+            ->addOption(
+                'skip-translations',
+                null,
+                InputOption::VALUE_NONE,
+                'Determines whether translation data need to be loaded or not'
+            );
 
         parent::configure();
     }
@@ -45,6 +51,12 @@ class UpgradeCommand extends AbstractCommand
         if ($force) {
             $commandExecutor = $this->getCommandExecutor($input, $output);
             $commandExecutor->runCommand('oro:platform:upgrade20:db-configs', ['--force' => true]);
+
+            $commandExecutor->runCommand(
+                'cache:warmup',
+                ['--no-optional-warmers' => true, '--process-isolation' => true]
+            );
+
             $updateParams = ['--process-isolation' => true];
             foreach ($input->getOptions() as $key => $value) {
                 if ($value) {

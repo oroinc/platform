@@ -44,7 +44,7 @@ class TagTest extends \PHPUnit_Framework_TestCase
 
     public function testAuthorAndUpdaterStoring()
     {
-        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
 
         $this->tag->setOwner($user);
         $this->assertEquals($user, $this->tag->getOwner());

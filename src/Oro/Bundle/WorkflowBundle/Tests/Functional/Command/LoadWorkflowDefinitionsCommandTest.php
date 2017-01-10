@@ -133,7 +133,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         );
 
         $expectedMessages = [
-            'Invalid configuration for path "workflows.first_workflow.transitions.second_transition.triggers.0.cron"',
+            'InvalidConfigurationException',
+            'Invalid configuration for path "workflows.first_workflow',
             'invalid cron expression is not a valid',
             'CRON expression'
         ];
@@ -158,6 +159,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     protected function assertCommandExecuted(array $messages)
     {
         $result = $this->runCommand(self::NAME, ['--no-ansi']);
+
+        $result = str_replace(["\r\n", "\t", "\n", '  '], "", $result);
 
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {

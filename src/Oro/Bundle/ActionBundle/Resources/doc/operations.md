@@ -22,7 +22,6 @@ described Preconditions are met. The *operation* will be performed by clicking o
 Preconditions and Conditions are met. Also, after clicking on a button, a modal dialog will be shown with some fields
 only if the operation has a config for form dialog.
 
-
 How it works?
 -------------
 
@@ -65,7 +64,7 @@ operations:
         acl_resource: acme_demo_myentity_view                       # (optional) ACL resource name that will be checked while checking that operation execution is allowed
 
         button_options:                                             # (optional) display options for operation button
-            icon: icon-time                                         # (optional) class of button icon
+            icon: fa-clock-o                                         # (optional) class of button icon
             class: btn                                              # (optional) class of button
             group: aсme.demo.operation.demogroup.label              # (optional) group operation to drop-down on the label
             template: customTemplate.html.twig                      # (optional) custom button template

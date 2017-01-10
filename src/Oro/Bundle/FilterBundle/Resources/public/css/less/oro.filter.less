@@ -14,7 +14,7 @@
         padding-left: 36px;
     }
 }
-.filter-item .reset-filter:hover [class^='icon-']:before {
+.filter-item .reset-filter:hover [class^="fa-"]:before {
     color: #666;
 }
 .filter-item .reset-filter {
@@ -31,7 +31,7 @@
     display: inline-block;
 }
 
-.filter-box .btn-group [class^='icon-'] {
+.filter-box .btn-group [class^="fa-"] {
   padding-top:2px;
   vertical-align:middle;
 }
@@ -124,7 +124,7 @@
 
 .filters-state {
   color: #aaa;
-  font-size: 14px;
+  font-size: 13px;
   padding: 0 20px;
   line-height: 31px;
   min-width: 160px;
@@ -132,6 +132,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  .fa-filter {
+    margin-right: 8px;
+    vertical-align: text-bottom;
+    &:before {
+      color: #aaa;
+      font-size: 13px;
+    }
+  }
   .page-title-center & {
     text-align: center;
     padding-left: 50px;
@@ -263,7 +271,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 }
 .filter-criteria .dropdown-menu a:hover {
     background:#3875d7;
-    color:#444;
+    color:#fff;
     outline: none !important;
 }
 .filter-criteria .nav-tabs-oro a:hover,

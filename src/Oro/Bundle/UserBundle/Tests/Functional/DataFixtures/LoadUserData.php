@@ -10,6 +10,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
+    const SIMPLE_USER = 'simple_user';
+    const SIMPLE_USER_2 = 'simple_user2';
     /**
      * @var ContainerInterface
      */
@@ -32,7 +34,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
 
         $user = $userManager->createUser();
-        $user->setUsername('simple_user')
+        $user->setUsername(self::SIMPLE_USER)
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setFirstName('Elley')
@@ -44,16 +46,18 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $userManager->updateUser($user);
 
         $user2 = $userManager->createUser();
-        $user2->setUsername('simple_user2')
+        $user2->setUsername(self::SIMPLE_USER_2)
             ->setPlainPassword('simple_password2')
-            ->setFirstName('Elley')
-            ->setLastName('Towards')
+            ->setFirstName('Merry')
+            ->setLastName('Backwards')
             ->setEmail('simple_user2@example.com')
             ->setOrganization($organization)
             ->addOrganization($organization)
             ->setEnabled(true);
 
-        $this->setReference($user->getUsername(), $user);
-        $this->setReference($user2->getUsername(), $user2);
+        $userManager->updateUser($user2);
+
+        $this->setReference(self::SIMPLE_USER, $user);
+        $this->setReference(self::SIMPLE_USER_2, $user2);
     }
 }

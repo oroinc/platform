@@ -1,20 +1,9 @@
+// @theme: blank;
+
 .line-clamp {
+    overflow: hidden;
+
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-
-    &-polyfill {
-        position: relative;
-        display: inline-block;
-
-        &:after {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-
-            background-color: inherit;
-
-            content: '\002026'; // symbol: '...'
-        }
-    }
 }

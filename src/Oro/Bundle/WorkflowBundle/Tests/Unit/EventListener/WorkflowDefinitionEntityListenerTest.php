@@ -74,8 +74,8 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getActiveWorkflowsByActiveGroups')
             ->willReturn(new ArrayCollection([$workflowMock]));
 
-        $this->setExpectedException(
-            WorkflowActivationException::class,
+        $this->expectException(WorkflowActivationException::class);
+        $this->expectExceptionMessage(
             'Workflow `workflow1` cannot be activated as it conflicts with' .
             ' workflow `conflict_workflow` by exclusive_active_group `group1`.'
         );
@@ -99,8 +99,8 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ])
         );
 
-        $this->setExpectedException(
-            WorkflowActivationException::class,
+        $this->expectException(WorkflowActivationException::class);
+        $this->expectExceptionMessage(
             'Workflow `workflow1` cannot be activated as it conflicts with' .
             ' workflow `conflict_workflow1` by exclusive_active_group `group1`,' .
             ' workflow `conflict_workflow2` by exclusive_active_group `group2`.'
@@ -124,8 +124,8 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getActiveWorkflowsByActiveGroups')->with(['group1'])
             ->willReturn(new ArrayCollection([$workflow, $conflictingWorkflow]));
 
-        $this->setExpectedException(
-            WorkflowActivationException::class,
+        $this->expectException(WorkflowActivationException::class);
+        $this->expectExceptionMessage(
             'Workflow `workflow1` cannot be activated as it conflicts with' .
             ' workflow `conflict_workflow` by exclusive_active_group `group1`.'
         );

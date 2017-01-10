@@ -1,5 +1,8 @@
 oro:
     email:
+        smtp_connection:
+            success: Connection established successfully
+            error:   Could not establish connection
         menu:
             mark_unread:
                 success.message: Message has been marked as unread
@@ -28,8 +31,8 @@ oro:
         send_email: Send email
         menu.shortcut_compose_email.label: Compose email
         action:
-            success_mark_read: "Email has been market as read"
-            success_mark_unread: "Email has been market as unread"
+            success_mark_read: "Email has been marked as read"
+            success_mark_unread: "Email has been marked as unread"
             error: Error has occurred
         error:
             get_email_last: "Getting last emails failed"

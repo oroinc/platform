@@ -43,6 +43,45 @@ config:
                 - 'jquery'
         'json':
             exports: 'JSON'
+        'bootstrap-affix':
+            deps:
+                - 'jquery'
+        'bootstrap-alert':
+            deps:
+                - 'jquery'
+        'bootstrap-button':
+            deps:
+                - 'jquery'
+        'bootstrap-carousel':
+            deps:
+                - 'jquery'
+        'bootstrap-collapse':
+            deps:
+                - 'jquery'
+        'bootstrap-dropdown':
+            deps:
+                - 'jquery'
+        'bootstrap-modal':
+            deps:
+                - 'jquery'
+        'bootstrap-popover':
+            deps:
+                - 'jquery'
+        'bootstrap-scrollspy':
+            deps:
+                - 'jquery'
+        'bootstrap-tab':
+            deps:
+                - 'jquery'
+        'bootstrap-tooltip':
+            deps:
+                - 'jquery'
+        'bootstrap-transition':
+            deps:
+                - 'jquery'
+        'bootstrap-typeahead':
+            deps:
+                - 'jquery'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
@@ -151,6 +190,8 @@ config:
         'oroui/js/app/modules/views-module': 'bundles/oroui/js/app/modules/views-module.js'
         'oroui/js/app/modules/widgets-module': 'bundles/oroui/js/app/modules/widgets-module.js'
         'oroui/js/app/modules/input-widgets': 'bundles/oroui/js/app/modules/input-widgets.js'
+        'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
+        'oroui/js/app/modules/ajax-error-module': 'bundles/oroui/js/app/modules/ajax-error-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -168,6 +209,7 @@ config:
         'oroui/js/app/views/zoomable-area-view': 'bundles/oroui/js/app/views/zoomable-area-view.js'
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
 
+        'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/standart-confirmation': 'bundles/oroui/js/standart-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
@@ -184,6 +226,7 @@ config:
         'oroui/js/app/components/jquery-widget-component': 'bundles/oroui/js/app/components/jquery-widget-component.js'
         'oroui/js/app/components/tabs-component': 'bundles/oroui/js/app/components/tabs-component.js'
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
+        'oroui/js/app/components/viewport-component': 'bundles/oroui/js/app/components/viewport-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/app/components/basic-tree-component': 'bundles/oroui/js/app/components/basic-tree-component.js'
         'oroui/js/app/components/basic-tree-manage-component': 'bundles/oroui/js/app/components/basic-tree-manage-component.js'
@@ -220,12 +263,20 @@ config:
         'autolinker': 'bundles/bowerassets/Autolinker.js/dist/Autolinker.js'
 
         'oroui/js/extend/polyfill': 'oroui/js/extend/polyfill'
+
+        'oroui/js/app/views/jstree/action-manager-view': 'bundles/oroui/js/app/views/jstree/action-manager-view.js'
+        'oroui/js/app/views/jstree/abstract-action-view': 'bundles/oroui/js/app/views/jstree/abstract-action-view.js'
+        'oroui/js/app/views/jstree/expand-action-view': 'bundles/oroui/js/app/views/jstree/expand-action-view.js'
+        'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
+        'oroui/js/app/views/jstree/subcategories-action-view': 'bundles/oroui/js/app/views/jstree/subcategories-action-view.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module
         - oroui/js/app/modules/views-module
         - oroui/js/app/modules/widgets-module
+        - oroui/js/app/modules/ajax-error-module
         - oroui/js/app/modules/input-widgets
+        - oroui/js/app/modules/viewport-module
 
 build:
     paths:

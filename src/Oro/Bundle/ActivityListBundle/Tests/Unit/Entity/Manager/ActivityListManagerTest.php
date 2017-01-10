@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Mapping\ClassMetadata;
-
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
-use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivityList;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowDataHelper;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,6 +48,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
+    /** @var WorkflowDataHelper */
+    protected $workflowHelper;
+
     public function setUp()
     {
         $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -79,6 +79,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->workflowHelper = $this->getMockBuilder(WorkflowDataHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->activityListManager = new ActivityListManager(
             $this->securityFacade,
@@ -90,7 +93,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->aclHelper,
             $this->inheritanceHelper,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->workflowHelper
         );
     }
 
@@ -175,6 +179,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'commentable'          => '',
                 'targetEntityData'     => [],
                 'is_head'              => false,
+                'workflowsData'        => null
             ],
             $this->activityListManager->getItem(105)
         );

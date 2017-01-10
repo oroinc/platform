@@ -2,7 +2,7 @@
 
 .page-content {
     width: $page-content-width;
-
+    
     @include clearfix();
 
     &--has-sidebar {
@@ -12,7 +12,15 @@
     }
 }
 
-@include breakpoint('tablet-small') {
+@include breakpoint('desktop') {
+    .page-content {
+        &--has-sidebar {
+            width: calc(#{$page-content-width} - #{$page-sidebar-width});
+        }
+    }
+}
+
+@include breakpoint('tablet') {
     .page-content {
         &--has-sidebar {
             padding: $page-content-with-sidebar-tables-s-inner-offset;

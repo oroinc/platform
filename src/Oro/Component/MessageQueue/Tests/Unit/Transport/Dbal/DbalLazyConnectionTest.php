@@ -144,7 +144,7 @@ class DbalLazyConnectionTest extends \PHPUnit_Framework_TestCase
      */
     private function createManagerRegistryMock()
     {
-        return $this->getMock(ManagerRegistry::class);
+        return $this->createMock(ManagerRegistry::class);
     }
 
     /**
@@ -167,9 +167,9 @@ class DbalLazyConnectionTest extends \PHPUnit_Framework_TestCase
      */
     private function createDBALConnectionMock()
     {
-        $schemaManager = $this->getMock(AbstractSchemaManager::class, [], [], '', false);
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
 
-        $dbalConnection = $this->getMock(Connection::class, [], [], '', false);
+        $dbalConnection = $this->createMock(Connection::class);
         $dbalConnection
             ->expects($this->any())
             ->method('getSchemaManager')

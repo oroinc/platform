@@ -7,7 +7,6 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -106,7 +105,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->tree));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface $container */
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->any())
             ->method('get')
             ->will(
@@ -146,7 +145,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->permissionManager = $this->getPermissionManagerMock();
 
-        $this->groupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $this->groupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
         $this->groupProvider->expects($this->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
@@ -156,11 +155,10 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $this->tree,
             new ObjectIdAccessor($this->doctrineHelper),
             $this->decisionMaker,
+            $entityOwnerAccessor,
             $this->permissionManager,
             $this->groupProvider
         );
-
-        $this->extension->setEntityOwnerAccessor($entityOwnerAccessor);
     }
 
     private function buildTestTree()
@@ -393,6 +391,22 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetPermissionsByMask()
+    {
+        $this->assertEquals(
+            ['VIEW', 'CREATE', 'EDIT'],
+            $this->extension->getPermissions(1)
+        );
+    }
+
+    public function testGetPermissionsAreSetInMask()
+    {
+        $this->assertEquals(
+            ['VIEW'],
+            $this->extension->getPermissions(1, true)
+        );
+    }
+
     /**
      * @param array $inputData
      * @param array $expectedData
@@ -456,6 +470,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $entityClassResolver,
             $this->securityMetadataProvider,
             $this->metadataProvider,
+            new EntityOwnerAccessor($this->metadataProvider),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,
@@ -1176,6 +1191,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             $entityClassResolverMock,
             $entityMetadataProvider,
             $this->metadataProvider,
+            new EntityOwnerAccessor($this->metadataProvider),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,

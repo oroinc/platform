@@ -27,6 +27,10 @@ define(['underscore', 'asap'], function(_, asap) {
             return text.replace(/^\s*/, '').replace(/\s*$/, '');
         },
 
+        capitalize: function(text) {
+            return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+        },
+
         /**
          * Compares two arrays if they have the same set of elements
          *

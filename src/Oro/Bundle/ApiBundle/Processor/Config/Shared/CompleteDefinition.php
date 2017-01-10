@@ -37,7 +37,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  * Updates configuration of fields if other fields a linked to them using "property_path".
  * Sets "exclusion_policy = all" for the entity. It means that the configuration
  * of all fields and associations was completed.
- * Completes configuration of fields that represent nested objects.
+ * Completes configuration of fields that represent nested objects and nested associations.
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -96,7 +96,7 @@ class CompleteDefinition implements ProcessorInterface
             } else {
                 $version = $context->getVersion();
                 $requestType = $context->getRequestType();
-                $this->completeExtendedAssociations($definition, $metadata->name, $version, $requestType);
+                $this->completeCustomAssociations($definition, $metadata->name, $version, $requestType);
                 $this->completeFields($definition, $metadata, $existingFields);
                 $this->completeAssociations($definition, $metadata, $existingFields, $version, $requestType);
                 $this->completeDependentAssociations($definition, $metadata, $version, $requestType);
@@ -182,7 +182,9 @@ class CompleteDefinition implements ProcessorInterface
         $idFieldNames = $metadata->getIdentifierFieldNames();
         // remove all not identifier fields
         foreach ($existingFields as $propertyPath => $fieldName) {
-            if (!in_array($propertyPath, $idFieldNames, true) && !ConfigUtil::isMetadataProperty($propertyPath)) {
+            if (!in_array($propertyPath, $idFieldNames, true)
+                && !$definition->getField($fieldName)->isMetaProperty()
+            ) {
                 $definition->removeField($fieldName);
             }
         }
@@ -200,7 +202,7 @@ class CompleteDefinition implements ProcessorInterface
      * @param string                 $version
      * @param RequestType            $requestType
      */
-    protected function completeExtendedAssociations(
+    protected function completeCustomAssociations(
         EntityDefinitionConfig $definition,
         $entityClass,
         $version,
@@ -212,6 +214,8 @@ class CompleteDefinition implements ProcessorInterface
                 $dataType = $field->getDataType();
                 if (DataType::isNestedObject($dataType)) {
                     $this->completeNestedObject($fieldName, $field);
+                } elseif (DataType::isNestedAssociation($dataType)) {
+                    $this->completeNestedAssociation($field, $version, $requestType);
                 } elseif (DataType::isExtendedAssociation($dataType)) {
                     if ($field->getTargetType()) {
                         throw new \RuntimeException(
@@ -261,7 +265,7 @@ class CompleteDefinition implements ProcessorInterface
             in_array($associationType, RelationType::$toManyRelations, true)
             || RelationType::MULTIPLE_MANY_TO_ONE === $associationType;
 
-        return $isCollection ? 'to-many' : 'to-one';
+        return $this->getAssociationTargetType($isCollection);
     }
 
     /**
@@ -373,14 +377,19 @@ class CompleteDefinition implements ProcessorInterface
                 $field->setExcluded();
             }
             $this->completeAssociation($field, $mapping['targetEntity'], $version, $requestType);
+            if ($field->getTargetClass()) {
+                $field->setTargetType(
+                    $this->getAssociationTargetType(!($mapping['type'] & ClassMetadata::TO_ONE))
+                );
+            }
         }
     }
 
     /**
      * @param EntityDefinitionFieldConfig $field
-     * @param string                 $targetClass
-     * @param string                 $version
-     * @param RequestType            $requestType
+     * @param string                      $targetClass
+     * @param string                      $version
+     * @param RequestType                 $requestType
      */
     protected function completeAssociation(
         EntityDefinitionFieldConfig $field,
@@ -411,7 +420,14 @@ class CompleteDefinition implements ProcessorInterface
                 $targetEntity->setExcludeAll();
                 $targetFields = $targetDefinition->getFields();
                 foreach ($targetFields as $targetFieldName => $targetField) {
-                    $targetEntity->addField($targetFieldName, $targetField);
+                    if ($targetEntity->hasField($targetFieldName)) {
+                        $existingField = $targetEntity->getField($targetFieldName);
+                        if ($targetField->isMetaProperty()) {
+                            $existingField->setMetaProperty(true);
+                        }
+                    } else {
+                        $targetEntity->addField($targetFieldName, $targetField);
+                    }
                 }
                 $field->setCollapsed();
             }
@@ -456,6 +472,13 @@ class CompleteDefinition implements ProcessorInterface
                             $version,
                             $requestType
                         );
+                        if ($targetField->getTargetClass()) {
+                            $targetField->setTargetType(
+                                $this->getAssociationTargetType(
+                                    $targetMetadata->isCollectionValuedAssociation($targetFieldName)
+                                )
+                            );
+                        }
                     }
                 }
                 if (!$isAssociation) {
@@ -470,6 +493,16 @@ class CompleteDefinition implements ProcessorInterface
     }
 
     /**
+     * @param bool $isCollection
+     *
+     * @return string
+     */
+    protected function getAssociationTargetType($isCollection)
+    {
+        return $isCollection ? 'to-many' : 'to-one';
+    }
+
+    /**
      * @param EntityDefinitionConfig $definition
      */
     protected function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition)
@@ -477,7 +510,9 @@ class CompleteDefinition implements ProcessorInterface
         $idFieldNames = $definition->getIdentifierFieldNames();
         $fieldNames = array_keys($definition->getFields());
         foreach ($fieldNames as $fieldName) {
-            if (!in_array($fieldName, $idFieldNames, true) && !ConfigUtil::isMetadataProperty($fieldName)) {
+            if (!in_array($fieldName, $idFieldNames, true)
+                && !$definition->getField($fieldName)->isMetaProperty()
+            ) {
                 $definition->removeField($fieldName);
             }
         }
@@ -495,14 +530,16 @@ class CompleteDefinition implements ProcessorInterface
     ) {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (DataType::isNestedObject($field->getDataType())) {
+            $dataType = $field->getDataType();
+            if (DataType::isNestedObject($dataType)) {
                 $this->completeNestedObject($fieldName, $field);
+            } elseif (DataType::isNestedAssociation($dataType)) {
+                $this->completeNestedAssociation($field, $version, $requestType);
             } else {
                 $targetClass = $field->getTargetClass();
-                if (!$targetClass) {
-                    continue;
+                if ($targetClass) {
+                    $this->completeAssociation($field, $targetClass, $version, $requestType);
                 }
-                $this->completeAssociation($field, $targetClass, $version, $requestType);
             }
         }
     }
@@ -518,11 +555,40 @@ class CompleteDefinition implements ProcessorInterface
         $target = $field->getOrCreateTargetEntity();
         $target->setExcludeAll();
 
+        $this->completeDependsOn($field);
+
+        $formOptions = $field->getFormOptions();
+        if (null === $formOptions || !array_key_exists('property_path', $formOptions)) {
+            $formOptions['property_path'] = $fieldName;
+            $field->setFormOptions($formOptions);
+        }
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param string                      $version
+     * @param RequestType                 $requestType
+     */
+    protected function completeNestedAssociation(
+        EntityDefinitionFieldConfig $field,
+        $version,
+        RequestType $requestType
+    ) {
+        $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $this->completeAssociation($field, EntityIdentifier::class, $version, $requestType);
+        $this->completeDependsOn($field);
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     */
+    protected function completeDependsOn(EntityDefinitionFieldConfig $field)
+    {
         $dependsOn = $field->getDependsOn();
         if (null === $dependsOn) {
             $dependsOn = [];
         }
-        $targetFields = $target->getFields();
+        $targetFields = $field->getTargetEntity()->getFields();
         foreach ($targetFields as $targetFieldName => $targetField) {
             $targetPropertyPath = $targetField->getPropertyPath($targetFieldName);
             if (!in_array($targetPropertyPath, $dependsOn, true)) {
@@ -530,11 +596,5 @@ class CompleteDefinition implements ProcessorInterface
             }
         }
         $field->setDependsOn($dependsOn);
-
-        $formOptions = $field->getFormOptions();
-        if (null === $formOptions || !array_key_exists('property_path', $formOptions)) {
-            $formOptions['property_path'] = $fieldName;
-            $field->setFormOptions($formOptions);
-        }
     }
 }

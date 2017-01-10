@@ -9,8 +9,8 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorWithInvalidGuesser()
     {
-        $this->setExpectedException(
-            '\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException',
+        $this->expectException('\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException');
+        $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
             . ', "stdClass" given'
         );
@@ -19,8 +19,8 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorWithInvalidGuesserScalar()
     {
-        $this->setExpectedException(
-            '\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException',
+        $this->expectException('\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException');
+        $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
             . ', "string" given'
         );
@@ -29,8 +29,8 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorWithInvalidGuesserNull()
     {
-        $this->setExpectedException(
-            '\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException',
+        $this->expectException('\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException');
+        $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
             . ', "NULL" given'
         );
@@ -39,9 +39,9 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorWithChainGuessers()
     {
-        $guesser1 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser2 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser3 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser1 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser2 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser3 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
 
         $chainGuesser = new ColumnOptionsGuesserChain(
             [
@@ -81,9 +81,9 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit_Framework_TestCase
         $guess1 = new ColumnGuess([], ColumnGuess::LOW_CONFIDENCE);
         $guess2 = new ColumnGuess([], ColumnGuess::HIGH_CONFIDENCE);
 
-        $guesser1 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser2 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
-        $guesser3 = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser1 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser2 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
+        $guesser3 = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface');
 
         $guesser1->expects($this->once())
             ->method($guessMethodName)

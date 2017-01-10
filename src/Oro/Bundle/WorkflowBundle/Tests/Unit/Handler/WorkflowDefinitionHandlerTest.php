@@ -53,10 +53,10 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityRepository);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $managerRegistry */
-        $managerRegistry = $this->getMock(ManagerRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
-        $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $managerRegistry->expects($this->any())
             ->method('getManagerForClass')

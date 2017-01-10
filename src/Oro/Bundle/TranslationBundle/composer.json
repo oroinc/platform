@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/TranslationBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "ext-zip" : "*",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "doctrine/data-fixtures": "@dev",
@@ -20,7 +20,6 @@
         "psr-0": { "Oro\\Bundle\\TranslationBundle": "" }
     },
     "target-dir": "Oro/Bundle/TranslationBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

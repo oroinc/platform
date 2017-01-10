@@ -35,11 +35,11 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
 
-        $registry = $this->getMock(ManagerRegistry::class);
+        $registry = $this->createMock(ManagerRegistry::class);
 
-        $translator = $this->getMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $kernel = $this->getMock(KernelInterface::class);
+        $kernel = $this->createMock(KernelInterface::class);
 
         return [
             new PreloadedExtension(
@@ -73,14 +73,14 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                         'default' => self::TEST_DESCRIPTION
                     ]
                 ],
-                'icon'=> 'icon-anchor',
+                'icon'=> 'fa-anchor',
             ]
         );
 
         $expected = new MenuUpdate();
         $expectedTitle = (new LocalizedFallbackValue)->setString(self::TEST_TITLE);
         $expected->addTitle($expectedTitle);
-        $expected->setIcon('icon-anchor');
+        $expected->setIcon('fa-anchor');
 
         $expectedDescription = (new LocalizedFallbackValue)->setText(self::TEST_DESCRIPTION);
         $expected->addDescription($expectedDescription);
@@ -168,7 +168,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     public function testAclResourceIdShouldExist()
     {
         $menuUpdate = new MenuUpdate();
-        $menuItem = $this->getMock(ItemInterface::class);
+        $menuItem = $this->createMock(ItemInterface::class);
         $menuItem->expects($this->any())
             ->method('getExtra')
             ->with('acl_resource_id')
@@ -191,7 +191,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     protected function getConstraintValidatorFactory()
     {
         /* @var $factory \PHPUnit_Framework_MockObject_MockObject|ConstraintValidatorFactoryInterface */
-        $factory = $this->getMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
+        $factory = $this->createMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
         $factory->expects($this->any())
             ->method('getInstance')
             ->willReturnCallback(

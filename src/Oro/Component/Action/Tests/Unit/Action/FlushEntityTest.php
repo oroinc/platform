@@ -58,7 +58,8 @@ class FlushEntityTest extends \PHPUnit_Framework_TestCase
         $this->assertEntityManagerCalled($entity, $flushException);
 
         if ($flushException) {
-            $this->setExpectedException('\Exception', 'Flush exception');
+            $this->expectException('\Exception');
+            $this->expectExceptionMessage('Flush exception');
         }
 
         $this->action->initialize($options);
@@ -104,7 +105,7 @@ class FlushEntityTest extends \PHPUnit_Framework_TestCase
     protected function assertEntityManagerCalled($entity, $throwException = false)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager $entityManager */
-        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $entityManager = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $entityManager->expects($this->once())->method('beginTransaction');
 
         if ($throwException) {

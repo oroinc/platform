@@ -14,6 +14,7 @@ workflows:
                 scope2: value2
             -
                 scope1: value3
+        datagrids: ['datagrid1', 'datagrid2']
         defaults:
             active: true
         exclusive_active_groups:
@@ -21,6 +22,8 @@ workflows:
         exclusive_record_groups:
             - 'record_group1'
         steps_display_ordered: true
+        disable_operations:
+            operation1: [entity1, entity2]
         steps:
             first_step:
                 order: 1
@@ -45,6 +48,13 @@ workflows:
                 display_type: page
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
+                init_entities:
+                    - entity1
+                init_routes:
+                    - route1
+                init_datagrids:
+                    - datagrid1
+                init_context_attribute: test_init_context
                 form_options:
                     attribute_fields:
                         first_attribute:

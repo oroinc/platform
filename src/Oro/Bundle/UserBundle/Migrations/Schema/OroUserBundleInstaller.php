@@ -4,12 +4,15 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareTrait;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
@@ -30,6 +33,9 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddAuthStatusColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_24\AddImpersonationIpColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle20;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -38,28 +44,23 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_22\AddImpersonationTable;
 class OroUserBundleInstaller implements
     Installation,
     AttachmentExtensionAwareInterface,
+    ExtendExtensionAwareInterface,
     ActivityExtensionAwareInterface
 {
-    /** @var AttachmentExtension */
-    protected $attachmentExtension;
+    use AttachmentExtensionAwareTrait;
 
     /** @var ActivityExtension */
     protected $activityExtension;
+
+    /** @var ExtendExtension */
+    protected $extendExtension;
 
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_23';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
-    {
-        $this->attachmentExtension = $attachmentExtension;
+        return 'v2_0';
     }
 
     /**
@@ -68,6 +69,14 @@ class OroUserBundleInstaller implements
     public function setActivityExtension(ActivityExtension $activityExtension)
     {
         $this->activityExtension = $activityExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
     }
 
     /**
@@ -132,6 +141,11 @@ class OroUserBundleInstaller implements
         DropEmailUserColumn::updateOroEmailUserTable($schema);
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
+        AddImpersonationIpColumn::addColumn($schema);
+        AddAuthStatusColumn::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
+        OroUserBundle20::addEmailUserIndexes($schema);
+
+        $this->addRelationsToScope($schema);
     }
 
     /**
@@ -204,7 +218,6 @@ class OroUserBundleInstaller implements
         $table->addColumn('password_requested', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('last_login', 'datetime', ['notnull' => false, 'precision' => 0]);
         $table->addColumn('login_count', 'integer', ['default' => '0', 'precision' => 0, 'unsigned' => true]);
-        $table->addColumn('login_disabled', 'boolean', ['default' => false]);
         $table->addColumn('createdAt', 'datetime', ['precision' => 0]);
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
@@ -522,5 +535,30 @@ class OroUserBundleInstaller implements
         $table = $schema->getTable('oro_access_group');
         $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addRelationsToScope(Schema $schema)
+    {
+        if ($schema->hasTable('oro_scope')) {
+            $this->extendExtension->addManyToOneRelation(
+                $schema,
+                'oro_scope',
+                'user',
+                'oro_user',
+                'id',
+                [
+                    'extend' => [
+                        'owner' => ExtendScope::OWNER_CUSTOM,
+                        'cascade' => ['all'],
+                        'on_delete' => 'CASCADE',
+                        'nullable' => true
+                    ]
+                ],
+                RelationType::MANY_TO_ONE
+            );
+        }
     }
 }

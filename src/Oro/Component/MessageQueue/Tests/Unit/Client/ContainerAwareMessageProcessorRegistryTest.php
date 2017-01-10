@@ -14,18 +14,16 @@ class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_Test
 
     public function testShouldThrowExceptionIfProcessorIsNotSet()
     {
-        $this->setExpectedException(
-            \LogicException::class,
-            'MessageProcessor was not found. processorName: "processor-name"'
-        );
-
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('MessageProcessor was not found. processorName: "processor-name"');
         $registry = new ContainerAwareMessageProcessorRegistry();
         $registry->get('processor-name');
     }
 
     public function testShouldThrowExceptionIfContainerIsNotSet()
     {
-        $this->setExpectedException(\LogicException::class, 'Container was not set');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Container was not set');
 
         $registry = new ContainerAwareMessageProcessorRegistry();
         $registry->set('processor-name', 'processor-id');
@@ -35,8 +33,8 @@ class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_Test
 
     public function testShouldThrowExceptionIfInstanceOfMessageProcessorIsInvalid()
     {
-        $this->setExpectedException(\LogicException::class, 'Container was not set');
-
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Container was not set');
         $processor = new \stdClass();
 
         $container = new Container();
@@ -50,7 +48,8 @@ class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_Test
 
     public function testShouldReturnInstanceOfMessageProcessor()
     {
-        $this->setExpectedException(\LogicException::class, 'Container was not set');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Container was not set');
 
         $processor = $this->createMessageProcessorMock();
 
@@ -68,6 +67,6 @@ class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_Test
      */
     protected function createMessageProcessorMock()
     {
-        return $this->getMock(MessageProcessorInterface::class);
+        return $this->createMock(MessageProcessorInterface::class);
     }
 }

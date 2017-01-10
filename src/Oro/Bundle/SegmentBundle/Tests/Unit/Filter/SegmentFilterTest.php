@@ -71,7 +71,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
 
         $registry = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry', [], '', false);
@@ -92,7 +92,7 @@ class SegmentFilterTest extends OrmTestCase
                         []
                     ),
                     new CsrfExtension(
-                        $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                        $this->createMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
                     )
                 ]
             )
@@ -117,7 +117,7 @@ class SegmentFilterTest extends OrmTestCase
             ->getMockBuilder('Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder')
             ->disableOriginalConstructor()->getMock();
 
-        $this->entityNameProvider = $this->getMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
+        $this->entityNameProvider = $this->createMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
         $this->entityNameProvider
             ->expects($this->any())
             ->method('getEntityName')
@@ -301,7 +301,7 @@ class SegmentFilterTest extends OrmTestCase
 
     public function testApplyInvalidData()
     {
-        $dsMock = $this->getMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
+        $dsMock = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
         $result = $this->filter->apply($dsMock, [null]);
 
         $this->assertFalse($result);
@@ -339,8 +339,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $expectedResult = [
             'SELECT t1.name FROM OroSegmentBundle:CmsUser t1',
-            'WHERE EXISTS(SELECT ts1.id FROM OroSegmentBundle:CmsUser ts1' .
-            ' WHERE ts1.name LIKE :param1 AND ts1.id = t1.id)'
+            'WHERE t1.id IN(SELECT ts1.id FROM OroSegmentBundle:CmsUser ts1 WHERE ts1.name LIKE :param1)'
         ];
         $expectedResult = implode(' ', $expectedResult);
 
@@ -383,8 +382,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $expectedResult = [
             'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
-            'EXISTS(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 ' .
-            'WHERE ts1.segmentId = :segment AND ts1.integerEntityId = t1.id)'
+            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :segment)'
         ];
         $expectedResult = implode(' ', $expectedResult);
 

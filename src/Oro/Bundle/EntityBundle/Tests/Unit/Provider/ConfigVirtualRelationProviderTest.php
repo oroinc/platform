@@ -13,7 +13,8 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $entityHierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
+        $entityHierarchyProvider = $this
+            ->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
 
         $hierarchy = ['TestEntity' => ['AbstractEntity']];
         $entityHierarchyProvider
@@ -110,7 +111,8 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     {
         if (is_array($expected)) {
             list($exception, $message) = $expected;
-            $this->setExpectedException($exception, $message);
+            $this->expectException($exception);
+            $this->expectExceptionMessage($message);
         }
 
         $this->assertEquals(

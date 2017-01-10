@@ -6,7 +6,7 @@ operations:
         routes:
             - oro_translation_language_index
         button_options:
-            icon: icon-plus
+            icon: fa-plus
         frontend_options:
             options:
                 width: 375
@@ -23,6 +23,8 @@ operations:
                     form_type: oro_translation_add_language
                     options:
                         required: true
+                        constraints:
+                            - NotBlank: ~
         actions:
             - '@create_entity':
                 class: Oro\Bundle\TranslationBundle\Entity\Language
@@ -43,7 +45,7 @@ operations:
             - oro-translation-language-grid
         order: 10
         button_options:
-            icon: icon-remove
+            icon: fa-close
         preactions:
             - '@call_service_method':
                 service: oro_translation.helper.language
@@ -74,7 +76,7 @@ operations:
             - oro-translation-language-grid
         order: 10
         button_options:
-            icon: icon-ok
+            icon: fa-check
         preconditions:
             '@equal': [$enabled, false]
         actions:
@@ -101,7 +103,7 @@ operations:
                 importProcessor: 'oro_translation_translation'
                 importJob: 'language_translations_import_from_csv'
         button_options:
-            icon: upload-alt
+            icon: upload
             data:
                 options:
                     refreshPageOnSuccess: $.isDefaultLanguage
@@ -142,7 +144,7 @@ operations:
                 exportProcessor: 'oro_translation_translation'
                 exportJob: 'language_translations_export_to_csv'
         button_options:
-            icon: download-alt
+            icon: download
             data:
                 options:
                     filePrefix: $.filePrefix
@@ -243,7 +245,7 @@ operations:
         datagrids:
             - oro-translation-language-grid
         button_options:
-            icon: icon-cloud-download
+            icon: fa-cloud-download
         frontend_options:
             title: oro.translation.action.install.title
             options:
@@ -265,7 +267,7 @@ operations:
             - oro-translation-language-grid
         label: oro.translation.action.update
         button_options:
-            icon: icon-cloud-download
+            icon: fa-cloud-download
         frontend_options:
             title: oro.translation.action.update.title
             options:
@@ -287,7 +289,7 @@ operations:
         routes:
             - oro_translation_translation_index
         button_options:
-            icon: icon-refresh
+            icon: fa-refresh
             class: btn-danger icons-holder-text
         acl_resource: oro_translation_language_translate
         actions:
@@ -300,6 +302,31 @@ operations:
             - '@flash_message':
                 message: oro.translation.translation.message.rebuild_cache
                 type: 'success'
+
+    oro_translation_translation_remove:
+        label: oro.translation.action.remove_translation
+        acl_resource: [TRANSLATE, $language]
+        applications: [default]
+        datagrids:
+            - oro-translation-translations-grid
+        button_options:
+            icon: fa-trash-o
+        preconditions:
+            '@not_blank': $id
+        actions:
+            - '@call_service_method':
+                service: oro_translation.manager.translation
+                method: saveTranslation
+                method_parameters:
+                    - $translationKey.key
+                    - null
+                    - $language.code
+                    - $translationKey.domain
+                    - $scope
+            - '@call_service_method':
+                service: oro_translation.manager.translation
+                method: flush
+            - '@refresh_grid': oro-translation-translations-grid
 
 action_groups:
     oro_translation_language_set_enabled:

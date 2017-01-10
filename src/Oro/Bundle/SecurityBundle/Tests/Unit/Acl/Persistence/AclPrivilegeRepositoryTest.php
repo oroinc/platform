@@ -36,12 +36,9 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $aceProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $translator;
-
     protected function setUp()
     {
-        $this->extension = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
+        $this->extension = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
         $this->extension->expects($this->any())
             ->method('getObjectIdentity')
             ->will(
@@ -90,11 +87,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getAceProvider')
             ->will($this->returnValue($this->aceProvider));
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $this->repository = new AclPrivilegeRepository($this->manager, $this->translator);
+        $this->repository = new AclPrivilegeRepository($this->manager);
     }
 
     public function testGetPermissionNames()
@@ -140,7 +133,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $thisLink = $this;
 
-        $sid = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
         $sid->expects($this->any())->method('equals')->will($this->returnValue(true));
 
         $extensionKey = 'test';
@@ -148,13 +141,13 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             'Acme\Class1',
             'Acme\Class2',
         );
-        $class1 = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo');
+        $class1 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo');
         $class1->expects($this->once())->method('getClassName')->will($this->returnValue($classes[0]));
         $class1->expects($this->once())->method('getGroup')->will($this->returnValue('SomeGroup'));
         $class1->expects($this->once())->method('getLabel')->will($this->returnValue('Class 1'));
         $class1->expects($this->once())->method('getDescription')->will($this->returnValue('Desc 1'));
         $class1->expects($this->once())->method('getCategory')->will($this->returnValue('Category 1'));
-        $class2 = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo');
+        $class2 = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo');
         $class2->expects($this->once())->method('getClassName')->will($this->returnValue($classes[1]));
         $class2->expects($this->once())->method('getGroup')->will($this->returnValue('SomeGroup'));
         $class2->expects($this->once())->method('getLabel')->will($this->returnValue('Class 2'));
@@ -162,10 +155,10 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
         $class2->expects($this->once())->method('getCategory')->will($this->returnValue('Category 2'));
 
         $rootOid = new ObjectIdentity($extensionKey, ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
-        $rootAcl = $this->getMock('Symfony\Component\Security\Acl\Model\AclInterface');
+        $rootAcl = $this->createMock('Symfony\Component\Security\Acl\Model\AclInterface');
 
         $oid1 = new ObjectIdentity($extensionKey, $classes[0]);
-        $oid1Acl = $this->getMock('Symfony\Component\Security\Acl\Model\AclInterface');
+        $oid1Acl = $this->createMock('Symfony\Component\Security\Acl\Model\AclInterface');
         $oid2 = new ObjectIdentity($extensionKey, $classes[1]);
 
         $oidsWithRoot = array($rootOid, $oid2, $oid1);
@@ -295,10 +288,6 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-
-        $this->translator->expects($this->exactly(2))
-            ->method('trans')
-            ->will($this->returnArgument(0));
 
         $result = $this->repository->getPrivileges($sid);
 
@@ -544,7 +533,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $sid = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
         $this->initSavePrivileges($extensionKey, $rootOid);
 
         $this->setExpectationsForGetAces(array());
@@ -594,7 +583,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $sid = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
         $this->initSavePrivileges($extensionKey, $rootOid);
 
         $this->setExpectationsForGetAces(array());
@@ -654,7 +643,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $sid = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
         $this->initSavePrivileges($extensionKey, $rootOid);
 
         $this->setExpectationsForGetAces(
@@ -715,7 +704,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function getAce($mask, $sid = null)
     {
-        $ace = $this->getMock('Symfony\Component\Security\Acl\Model\EntryInterface');
+        $ace = $this->createMock('Symfony\Component\Security\Acl\Model\EntryInterface');
         $ace->expects($this->any())->method('isGranting')->will($this->returnValue(true));
         $ace->expects($this->any())->method('getMask')->will($this->returnValue($mask));
         if ($sid !== null) {

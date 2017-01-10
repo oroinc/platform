@@ -91,6 +91,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
 
+        $this->processInitContext($workflow, $workflowDefinition);
+
         $this->setSteps($workflowDefinition, $workflow);
         $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
 
@@ -175,18 +177,46 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     }
 
     /**
+     * Collect init context of all start transitions
+     *
+     * @param Workflow $workflow
+     * @param WorkflowDefinition $definition
+     */
+    protected function processInitContext(Workflow $workflow, WorkflowDefinition $definition)
+    {
+        $initData = [];
+        foreach ($workflow->getTransitionManager()->getStartTransitions() as $startTransition) {
+            foreach ($startTransition->getInitEntities() as $entity) {
+                $initData[WorkflowConfiguration::NODE_INIT_ENTITIES][$entity][] = $startTransition->getName();
+            }
+            foreach ($startTransition->getInitRoutes() as $route) {
+                $initData[WorkflowConfiguration::NODE_INIT_ROUTES][$route][] = $startTransition->getName();
+            }
+            foreach ($startTransition->getInitDatagrids() as $datagrid) {
+                $initData[WorkflowConfiguration::NODE_INIT_DATAGRIDS][$datagrid][] = $startTransition->getName();
+            }
+        }
+        $definition->setConfiguration(array_merge($definition->getConfiguration(), $initData));
+    }
+
+    /**
      * @param array $configuration
      * @return array
      */
     protected function filterConfiguration(array $configuration)
     {
         $configurationKeys = [
-            WorkflowConfiguration::NODE_STEPS,
             WorkflowDefinition::CONFIG_SCOPES,
+            WorkflowDefinition::CONFIG_DATAGRIDS,
+            WorkflowConfiguration::NODE_DISABLE_OPERATIONS,
+            WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,
             WorkflowConfiguration::NODE_TRANSITIONS,
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
-            WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS
+            WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
+            WorkflowConfiguration::NODE_INIT_ENTITIES,
+            WorkflowConfiguration::NODE_INIT_ROUTES,
+            WorkflowConfiguration::NODE_INIT_DATAGRIDS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));

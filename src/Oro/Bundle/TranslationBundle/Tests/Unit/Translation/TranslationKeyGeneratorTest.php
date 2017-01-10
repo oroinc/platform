@@ -17,7 +17,7 @@ class TranslationKeyGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $this->generator = new TranslationKeyGenerator();
 
-        $this->keySource = $this->getMock(TranslationKeySourceInterface::class);
+        $this->keySource = $this->createMock(TranslationKeySourceInterface::class);
     }
 
     /**

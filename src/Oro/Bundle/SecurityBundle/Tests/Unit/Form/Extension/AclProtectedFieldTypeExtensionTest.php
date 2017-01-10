@@ -5,7 +5,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
@@ -36,6 +35,9 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     /** @var TestLogger */
     protected $logger;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
     /** @var AclProtectedFieldTypeExtension */
     protected $extension;
 
@@ -56,12 +58,17 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             ->getMock();
         $this->logger = new TestLogger();
 
+        $this->eventDispatcher = $this->getMockForAbstractClass(
+            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
+        );
+
         $this->extension = new AclProtectedFieldTypeExtension(
             $this->securityFacade,
             $this->entityClassResolver,
             $this->doctrineHelper,
             $this->configProvider,
-            $this->logger
+            $this->logger,
+            $this->eventDispatcher
         );
     }
 
@@ -112,6 +119,10 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         );
         $this->entityClassResolver->expects($this->once())
             ->method('isEntity')
+            ->with('Acme\Demo\TestEntity')
+            ->willReturn(true);
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
             ->with('Acme\Demo\TestEntity')
             ->willReturn(true);
         $this->configProvider->expects($this->once())
@@ -226,7 +237,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $form->add('street');
         $form->add('country');
 
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $builder = new FormBuilder('postoffice', null, $dispatcher, $this->factory);
         $builder->setPropertyPath(new PropertyPath('zip'));
         $builder->setAttribute('error_mapping', array());
@@ -328,6 +339,10 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
         $this->entityClassResolver->expects($this->any())
             ->method('isEntity')
+            ->with($className)
+            ->willReturn(true);
+        $this->configProvider->expects($this->any())
+            ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
         $this->configProvider->expects($this->any())

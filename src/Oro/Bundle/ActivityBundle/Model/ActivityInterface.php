@@ -17,13 +17,13 @@ interface ActivityInterface
     public function supportActivityTarget($targetClass);
 
     /**
-     * Gets entities of the given type associated with this activity entity
+     * Gets entities associated with this activity entity
      *
-     * @param string $targetClass The class name of the target entity
+     * @param string|null $targetClass The class name of the target entity
      *
      * @return object[]
      */
-    public function getActivityTargets($targetClass);
+    public function getActivityTargets($targetClass = null);
 
     /**
      * Checks is the given entity is associated with this activity entity
@@ -51,12 +51,4 @@ interface ActivityInterface
      * @return self This object
      */
     public function removeActivityTarget($target);
-
-    /**
-     * Gets full target entities list associated with activity
-     * Please use this method carefully because of the performance reasons
-     *
-     * @return object[]
-     */
-    public function getActivityTargetEntities();
 }

@@ -40,7 +40,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
 
         $user = $this->getUser();
 
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
 
         $user->expects($this->any())
             ->method('getOrganization')
@@ -160,6 +160,8 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
      */
     public function setDataProvider()
     {
+        $accessTokenExpiresAt = new \DateTime();
+
         return [
             'should have only accountType field' => [
                 [
@@ -188,7 +190,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                         'imapHost' => '',
                         'imapPort' => '',
                         'imapEncryption' => '',
-                        'accessTokenExpiresAt' => new \DateTime(),
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'accessToken' => 'token',
                         'googleAuthCode' => 'googleAuthCode'
                     ],
@@ -197,7 +199,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                     'accountType' => 'gmail',
                     'userEmailOrigin' => $this->getUserEmailOrigin([
                         'user' => 'test',
-                        'accessTokenExpiresAt' => new \DateTime(),
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'googleAuthCode' => 'googleAuthCode',
                         'accessToken' => 'token',
                     ])
@@ -206,7 +208,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                     'accountType' => 'gmail',
                     'userEmailOrigin' => $this->getUserEmailOrigin([
                         'user' => 'test',
-                        'accessTokenExpiresAt' => new \DateTime(),
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'googleAuthCode' => 'googleAuthCode',
                         'accessToken' => 'token'
                     ])
@@ -220,7 +222,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                         'imapHost' => '',
                         'imapPort' => '',
                         'imapEncryption' => '',
-                        'accessTokenExpiresAt' => new \DateTime(),
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'accessToken' => '',
                         'googleAuthCode' => 'googleAuthCode',
                         'password' => '111'
@@ -260,7 +262,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         if (isset($data['refreshToken'])) {
             $userEmailOrigin->setRefreshToken($data['refreshToken']);
         }
-        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $userEmailOrigin->setOrganization($organization);
 
         $userEmailOrigin->setOwner($this->getUser());

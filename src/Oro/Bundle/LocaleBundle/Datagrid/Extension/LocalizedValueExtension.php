@@ -15,6 +15,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait;
@@ -28,6 +29,9 @@ class LocalizedValueExtension extends AbstractExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
     /** @var LocalizationHelper */
     protected $localizationHelper;
 
@@ -35,12 +39,17 @@ class LocalizedValueExtension extends AbstractExtension
     protected $propertyAccessor;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param LocalizationHelper $localizationHelper
+     * @param DoctrineHelper      $doctrineHelper
+     * @param EntityClassResolver $entityClassResolver
+     * @param LocalizationHelper  $localizationHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, LocalizationHelper $localizationHelper)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EntityClassResolver $entityClassResolver,
+        LocalizationHelper $localizationHelper
+    ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityClassResolver = $entityClassResolver;
         $this->localizationHelper = $localizationHelper;
 
         $this->propertyAccessor = new PropertyAccessor();
@@ -61,7 +70,9 @@ class LocalizedValueExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return count($this->getProperties($config)) > 0 && $config->getDatasourceType() === OrmDatasource::TYPE;
+        return
+            $config->isOrmDatasource()
+            && count($this->getProperties($config)) > 0;
     }
 
     /**
@@ -90,7 +101,7 @@ class LocalizedValueExtension extends AbstractExtension
             return;
         }
 
-        list(, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
+        $rootEntityAlias = $config->getOrmQuery()->getRootAlias();
         if (!$rootEntityAlias) {
             return;
         }
@@ -133,8 +144,12 @@ class LocalizedValueExtension extends AbstractExtension
             return;
         }
 
-        list($rootEntity, $rootEntityAlias) = $this->getRootEntityNameAndAlias($config);
-        if (!$rootEntity || !$rootEntityAlias) {
+        $rootEntity = $config->getOrmQuery()->getRootEntity($this->entityClassResolver);
+        if (!$rootEntity) {
+            return;
+        }
+        $rootEntityAlias = $config->getOrmQuery()->getRootAlias();
+        if (!$rootEntityAlias) {
             return;
         }
 
@@ -197,35 +212,5 @@ class LocalizedValueExtension extends AbstractExtension
         }
 
         return $properties;
-    }
-
-    /**
-     * @param DatagridConfiguration $config
-     * @return array
-     */
-    protected function getRootEntityNameAndAlias(DatagridConfiguration $config)
-    {
-        $rootEntity = null;
-        $rootEntityAlias = null;
-
-        $from = $config->offsetGetByPath('[source][query][from]');
-        if ($from) {
-            $firstFrom = current($from);
-            if (!empty($firstFrom['table']) && !empty($firstFrom['alias'])) {
-                $rootEntity = $this->getEntityClassName($firstFrom['table']);
-                $rootEntityAlias = $firstFrom['alias'];
-            }
-        }
-
-        return [$rootEntity, $rootEntityAlias];
-    }
-
-    /**
-     * @param string $entity
-     * @return string
-     */
-    protected function getEntityClassName($entity)
-    {
-        return $this->doctrineHelper->getEntityMetadata($entity)->getName();
     }
 }

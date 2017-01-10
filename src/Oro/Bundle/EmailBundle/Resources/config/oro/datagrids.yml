@@ -48,7 +48,7 @@ datagrids:
                 type:         dialog
                 acl_resource: oro_email_autoresponserule_update
                 label:        oro.grid.action.update
-                icon:         edit
+                icon:         pencil-square-o
                 link:         update_link
                 rowAction:    true
                 widgetOptions:
@@ -66,7 +66,7 @@ datagrids:
                 type:         delete
                 acl_resource: oro_email_autoresponserule_delete
                 label:        oro.grid.action.delete
-                icon:         trash
+                icon:         trash-o
                 link:         delete_link
         options:
             toolbarOptions:
@@ -130,6 +130,9 @@ datagrids:
                         -
                             join: e.emailBody
                             alias: eb
+                        -
+                            join: e.recipients
+                            alias: r
 # The next join is performed in EmailGridListener, when any of grid filters are applied: folder, folders, mailbox.
 #                        -
 #                            join: eu.folders
@@ -144,10 +147,9 @@ datagrids:
                                 JOIN act_f.origin act_o
                                 WHERE act_o.isActive = true AND eu.id = act_eu.id
                             )
-
         columns:
             contacts:
-                data_name: email.contacts
+                data_name: ~
                 type: twig
                 label: oro.email.contact.label
                 frontend_type: html
@@ -274,13 +276,13 @@ datagrids:
                 type: navigate
                 label: oro.grid.action.view
                 link: view_thread_link
-                icon: eye-open
+                icon: eye
                 rowAction: true
             mark_as_read:
                 type: ajax
                 label: oro.email.datagrid.emails.action.mark_as_read
                 link:  toggle_seen_link
-                icon: check
+                icon: check-square-o
                 defaultMessages:
                     success: oro.email.action.success_mark_read
                     error: oro.email.action.error
@@ -299,7 +301,7 @@ datagrids:
                 entity_name: %oro_email.email_user.entity.class%
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_read
-                icon: check
+                icon: check-square-o
             emailmarkunread:
                 type: emailmarkunread
                 entity_name: %oro_email.email_user.entity.class%
@@ -380,7 +382,7 @@ datagrids:
                 type: dialog
                 label: oro.email.datagrid.emails.action.view
                 link: view_thread_link
-                icon: eye-open
+                icon: eye
                 rowAction: true
                 widgetOptions:
                     options:
@@ -575,20 +577,20 @@ datagrids:
                 type:         navigate
                 label:        oro.grid.action.update
                 link:         update_link
-                icon:         edit
+                icon:         pencil-square-o
                 acl_resource: oro_email_emailtemplate_update
                 rowAction:    true
             clone:
                 type:         navigate
                 label:        oro.grid.action.clone
                 link:         clone_link
-                icon:         copy
+                icon:         files-o
                 acl_resource: oro_email_emailtemplate_create
             delete:
                 type:         delete
                 label:        oro.grid.action.delete
                 acl_resource: oro_email_emailtemplate_delete
-                icon:         trash
+                icon:         trash-o
                 link:         delete_link
         options:
             entity_pagination: true
@@ -651,12 +653,12 @@ datagrids:
                 type:         navigate
                 label:        oro.grid.action.update
                 link:         update_link
-                icon:         edit
+                icon:         pencil-square-o
                 rowAction:    true
             delete:
                 type:         delete
                 label:        oro.grid.action.delete
-                icon:         trash
+                icon:         trash-o
                 link:         delete_link
 
     email-for-context-grid:

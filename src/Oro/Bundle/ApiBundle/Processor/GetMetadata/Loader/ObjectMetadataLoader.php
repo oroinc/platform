@@ -15,16 +15,22 @@ class ObjectMetadataLoader
     /** @var ObjectNestedObjectMetadataFactory */
     protected $nestedObjectMetadataFactory;
 
+    /** @var ObjectNestedAssociationMetadataFactory */
+    protected $nestedAssociationMetadataFactory;
+
     /**
-     * @param ObjectMetadataFactory             $objectMetadataFactory
-     * @param ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory
+     * @param ObjectMetadataFactory                  $objectMetadataFactory
+     * @param ObjectNestedObjectMetadataFactory      $nestedObjectMetadataFactory
+     * @param ObjectNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
      */
     public function __construct(
         ObjectMetadataFactory $objectMetadataFactory,
-        ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory
+        ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory,
+        ObjectNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
     ) {
         $this->objectMetadataFactory = $objectMetadataFactory;
         $this->nestedObjectMetadataFactory = $nestedObjectMetadataFactory;
+        $this->nestedAssociationMetadataFactory = $nestedAssociationMetadataFactory;
     }
 
     /**
@@ -47,13 +53,24 @@ class ObjectMetadataLoader
             if (!$withExcludedProperties && $field->isExcluded()) {
                 continue;
             }
-            $targetClass = $field->getTargetClass();
-            if ($targetClass) {
-                $this->objectMetadataFactory->createAndAddAssociationMetadata(
+            $dataType = $field->getDataType();
+            if (DataType::isNestedObject($dataType)) {
+                $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
+                    $entityMetadata,
+                    $config,
+                    $entityClass,
+                    $fieldName,
+                    $field,
+                    $withExcludedProperties,
+                    $targetAction
+                );
+            } elseif (DataType::isNestedAssociation($dataType)) {
+                $this->nestedAssociationMetadataFactory->createAndAddNestedAssociationMetadata(
                     $entityMetadata,
                     $entityClass,
                     $fieldName,
                     $field,
+                    $withExcludedProperties,
                     $targetAction
                 );
             } elseif ($field->isMetaProperty()) {
@@ -67,14 +84,12 @@ class ObjectMetadataLoader
                 if (ConfigUtil::CLASS_NAME === $fieldName) {
                     $entityMetadata->setInheritedType(true);
                 }
-            } elseif (DataType::isNestedObject($field->getDataType())) {
-                $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
+            } elseif ($field->getTargetClass()) {
+                $this->objectMetadataFactory->createAndAddAssociationMetadata(
                     $entityMetadata,
-                    $config,
                     $entityClass,
                     $fieldName,
                     $field,
-                    $withExcludedProperties,
                     $targetAction
                 );
             } else {

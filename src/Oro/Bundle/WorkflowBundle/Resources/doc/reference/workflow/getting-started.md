@@ -6,10 +6,13 @@ Table of Contents
  - [What is Workflow?](#what-is-workflow)
  - [Main Entities](#main-entities)
  - [How it works?](#how-it-works)
+ - [Workflow Related Entity](#workflow-related-entity)
  - [Workflow Fields](#workflow-fields)
  - [Activation State](#activation-state)
  - [Mutually Exclusive Workflows](#mutually-exclusive-workflows)
  - [Filtering by Scopes](#filtering-by-scopes)
+ - [Initial Transitions](#initial-transitions)
+ - [Disabling Operations](#disabling-operations)
  - [Configuration](#configuration)
  - [Console commands](#console-commands)
 
@@ -61,7 +64,7 @@ associated workflow.
 
 * **TransitionTriggerEvent** - allows to perform transition when needed entity trigger needed Doctrine Event. 
 
-* **TransitionTriggerCron** - allows to perform transition by cron definition. 
+* **TransitionTriggerCron** - allows to perform transition by cron definition.
 
 How it works?
 -------------
@@ -88,6 +91,13 @@ To be able to attach an entity to specific workflow (e.g. make entity workflow r
 - Entity can not have composite fields as its primary keys.
 - Entity primary key can be integer or string (for doctrine types it is: BIGINT, DECIMAL, INTEGER, SMALLINT, STRING). In other words - all types that can be casted by SQL CAST to text representation.
 - Entity should be configurable see [Annotation](./#annotation) section.
+
+Workflow Related Entity
+-----------------------
+
+The main entity for workflow that used as a central point of all business processes described in concrete workflow configuration.
+The entity class is declared through `entity` node as FQCN of workflow configuration.
+All **OTHER** entities in context of this documentation called *not related entities* or *not directly related*.
 
 Activation State
 ----------------
@@ -171,8 +181,8 @@ Filtering by Scopes
 If the scope configuration is provided for the workflow, the Oro application will use only the workflows, selected by filtering all available workflows using the scopes defined for `worflow_definition` scope type. 
 
 Example of scope configuration in :
-```
-        scope:
+```YAML
+        scopes:
             -
                 scopeField1: 2
             -
@@ -182,7 +192,34 @@ Example of scope configuration in :
 ```
 **Note**: The scopeField1, scopeField2, and scopeField3 are scope criteria that are delivered by scope providers. Scope provider should be registered in Oro application for the `workflow_definition` scope type.  
 
-For more information about scopes see  ../../../../../ScopeBundle/Resources/doc/scope.md.
+For more information about scopes see [ScopeBundle documentation](../../../../../ScopeBundle/Resources/doc/scope.md).
+
+Initial Transitions
+-------------------
+To provide an ability to start some workflow from *not related entity* we have special functionality that called **initial transitions**.
+It is a special type of transition configuration that allows us to use transition as an initiative (as it comes from the name) for new workflow instance (workflow item) creation.
+The main difference from *start transitions* is that *init transition* can be invoked from almost any part of an application within indirect relation to main workflow entity or without it (if we able to fill all necessary data of main entity).
+Distinctive configuration features of *init transitions* are special nodes `init_entities`, `init_routes`, `init_datagrids` in transition configuration together with `is_start: true`.
+For more details see [configuration reference](./configuration-reference.md#transitions-configuration) section.
+
+Disabling Operations
+--------------------
+
+Some of workflows can be used to expand already existent configuration and replace old (primitive) behavior.
+So that usually some simple custom behavior on Oro based applications were managed through [Operations](../../../../../ActionBundle/Resources/doc/operations.md).
+And when you have created more advanced way to manage business logic trough specific workflow configuration you might need to disable those operations.
+It can be done trough `disable_operations` configuration node:
+
+```YAML
+        disable_operations:
+            operation_one:      #disable operation for custom entities (match by context)
+                - EntityClass1
+                - EntityClass2
+                - EntityClass3
+            operation_two: ~    #disable operation for any occurrences 
+
+```
+
 
 Configuration
 -------------
@@ -190,7 +227,7 @@ Configuration
 All Workflow entities are described in configuration. Look at example of simple Workflow configuration that performs
 some action with User entity.
 
-```
+```YAML
 workflows:
     example_user_flow:                            # name of the workflow
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
@@ -251,7 +288,7 @@ workflows:
                                 required: true              # define this field as required
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
-            add_email:                                      # transition from step "add_email" to "add_email" (self-transition)
+            add_email:                                      # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions
                 form_options:                               # options which will be passed to form type of transition
@@ -262,7 +299,7 @@ workflows:
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
                                     - Email: ~              # field must contain valid email
-            schedule_transition:                                            # transition from step "add_email" to "add_email" (self-transition)
+            schedule_transition:                                            # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                                          # next step after transition performing
                 transition_definition: schedule_transition_definition       # link to definition of conditions and post actions
                 triggers:                                                   # transition triggers
@@ -281,26 +318,25 @@ workflows:
             set_name_definition: []                               # definitions for transition "set_name", no extra conditions or actions here
             add_email_definition:                                 # definition for transition "add_email"
                 actions:                                          # list of action which will be performed after transition
-                    - @create_entity:                             # create email entity
+                    - '@create_entity':                           # create email entity
                         class: Oro\Bundle\UserBundle\Entity\Email # entity class
                         attribute: $email_entity                  # entity attribute that should store this entity
                         data:                                     # data for creating entity
                             email: $email_string                  # entered email
                             user: $user                           # current user
-                    - @call_method:                               # call specific method from entity class
+                    - '@call_method':                             # call specific method from entity class
                         object: $user                             # object that should call method
                         method: addEmail                          # method that should be called
                         method_parameters:                        # parameters that will be passed to the called method
                             [$email_entity]                       # add email from temporary attribute
-                    - @unset_value:                               # unset temporary properties
+                    - '@unset_value':                             # unset temporary properties
                             [$email_string, $email_entity]        # clear email string and entity
             schedule_transition_definition:                       # definitions for transition "schedule_transition", no extra conditions or actions here
                 actions:                                          # list of action which will be performed after transition
                     - '@assign_value': [$user.status, 'processed']# change user's status
-
 ```
 
-This configuration describes Workflow that includes two steps - "set_name" and "add_email".
+This configuration describes Workflow that includes two transitions - "set_name" and "add_email".
 
 On step "started" user can update full name (first, middle and last name) using transition "set_name".
 Then on step "processed" user can add additional emails using transition "add_email".

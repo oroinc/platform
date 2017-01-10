@@ -20,6 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResol
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Component\Testing\DbIsolationExtension;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * Abstract class for functional and integration tests
@@ -95,14 +96,6 @@ abstract class WebTestCase extends BaseWebTestCase
             $this->rollbackTransaction();
             self::$loadedFixtures = [];
         }
-
-        $refClass = new \ReflectionClass($this);
-        foreach ($refClass->getProperties() as $prop) {
-            if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
-                $prop->setAccessible(true);
-                $prop->setValue($this, null);
-            }
-        }
     }
 
     public static function setUpBeforeClass()
@@ -170,6 +163,19 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $this->client = self::$clientInstance;
+    }
+
+    /**
+     * @param string $login
+     */
+    protected function loginUser($login)
+    {
+        if ('' !== $login) {
+            self::$clientInstance->setServerParameters(static::generateBasicAuthHeader($login, $login));
+        } else {
+            self::$clientInstance->setServerParameters([]);
+            $this->client->getCookieJar()->clear();
+        }
     }
 
     /**
@@ -403,22 +409,22 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @param string $referenceUID
+     * @param string $name
      *
      * @return object|mixed
      */
-    protected function getReference($referenceUID)
+    protected function getReference($name)
     {
-        return $this->getReferenceRepository()->getReference($referenceUID);
+        return $this->getReferenceRepository()->getReference($name);
     }
 
     /**
-     * @param string $referenceUID
+     * @param string $name
      * @return bool
      */
-    protected function hasReference($referenceUID)
+    protected function hasReference($name)
     {
-        return $this->getReferenceRepository()->hasReference($referenceUID);
+        return $this->getReferenceRepository()->hasReference($name);
     }
 
     /**
@@ -675,26 +681,28 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Checks json response status code and return content as array
      *
-     * @param Response $response
-     * @param int      $statusCode
+     * @param Response   $response
+     * @param int        $statusCode
+     * @param string|int $message
      *
      * @return array
      */
-    public static function getJsonResponseContent(Response $response, $statusCode)
+    public static function getJsonResponseContent(Response $response, $statusCode, $message = null)
     {
-        self::assertJsonResponseStatusCodeEquals($response, $statusCode);
+        self::assertJsonResponseStatusCodeEquals($response, $statusCode, $message);
         return self::jsonToArray($response->getContent());
     }
 
     /**
      * Assert response is json and has status code
      *
-     * @param Response $response
-     * @param int      $statusCode
+     * @param Response    $response
+     * @param int         $statusCode
+     * @param string|null $message
      */
-    public static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode)
+    public static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
-        self::assertResponseStatusCodeEquals($response, $statusCode);
+        self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertEmpty(
             $response->getContent(),
             sprintf('HTTP response with code %d must have empty body', $statusCode)
@@ -704,37 +712,40 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert response is json and has status code
      *
-     * @param Response $response
-     * @param int      $statusCode
+     * @param Response    $response
+     * @param int         $statusCode
+     * @param string|null $message
      */
-    public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode)
+    public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
-        self::assertResponseStatusCodeEquals($response, $statusCode);
-        self::assertResponseContentTypeEquals($response, 'application/json');
+        self::assertResponseStatusCodeEquals($response, $statusCode, $message);
+        self::assertResponseContentTypeEquals($response, 'application/json', $message);
     }
 
     /**
      * Assert response is html and has status code
      *
-     * @param Response $response
-     * @param int      $statusCode
+     * @param Response    $response
+     * @param int         $statusCode
+     * @param string|null $message
      */
-    public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode)
+    public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
-        self::assertResponseStatusCodeEquals($response, $statusCode);
-        self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8');
+        self::assertResponseStatusCodeEquals($response, $statusCode, $message);
+        self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8', $message);
     }
 
     /**
      * Assert response status code equals
      *
-     * @param Response $response
-     * @param int      $statusCode
+     * @param Response    $response
+     * @param int         $statusCode
+     * @param string|null $message
      */
-    public static function assertResponseStatusCodeEquals(Response $response, $statusCode)
+    public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
     {
         try {
-            \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode());
+            \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             if ($statusCode < 400
                 && $response->getStatusCode() >= 400
@@ -768,15 +779,17 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * Assert response content type equals
      *
-     * @param Response $response
-     * @param string   $contentType
+     * @param Response    $response
+     * @param string      $contentType
+     * @param string|null $message
      */
-    public static function assertResponseContentTypeEquals(Response $response, $contentType)
+    public static function assertResponseContentTypeEquals(Response $response, $contentType, $message = null)
     {
-        \PHPUnit_Framework_TestCase::assertTrue(
-            $response->headers->contains('Content-Type', $contentType),
-            $response->headers
-        );
+        $message = $message ? $message . PHP_EOL : '';
+        $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
+        $message .= PHP_EOL . $response->headers;
+
+        \PHPUnit_Framework_TestCase::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
     }
 
     /**
@@ -788,12 +801,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
     {
-        $actualIntersect = [];
-        foreach (array_keys($expected) as $expectedKey) {
-            if (array_key_exists($expectedKey, $actual)) {
-                $actualIntersect[$expectedKey] = $actual[$expectedKey];
-            }
-        }
+        $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
         \PHPUnit_Framework_TestCase::assertEquals(
             $expected,
             $actualIntersect,
@@ -802,10 +810,76 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Get intersect of $target array with values of keys in $source array.
+     * If key is an array in both places then the value of this key will be returned as intersection as well.
+     * Not associative arrays will be returned completely
+     *
+     * @param array $source
+     * @param array $target
+     * @return array
+     */
+    public static function getRecursiveArrayIntersect(array $target, array $source)
+    {
+        $result = [];
+
+        $isSourceAssociative = ArrayUtil::isAssoc($source);
+        $isTargetAssociative = ArrayUtil::isAssoc($target);
+        if (!$isSourceAssociative || !$isTargetAssociative) {
+            foreach ($target as $key => $value) {
+                if (array_key_exists($key, $source) && is_array($value) && is_array($source[$key])) {
+                    $result[$key] = self::getRecursiveArrayIntersect($value, $source[$key]);
+                } else {
+                    $result[$key] = $value;
+                }
+            }
+        } else {
+            foreach (array_keys($source) as $key) {
+                if (array_key_exists($key, $target)) {
+                    if (is_array($target[$key]) && is_array($source[$key])) {
+                        $result[$key] = self::getRecursiveArrayIntersect($target[$key], $source[$key]);
+                    } else {
+                        $result[$key] = $target[$key];
+                    }
+                }
+            }
+        }
+
+
+        return $result;
+    }
+
+    /**
+     * Sorts array by key recursively. This method is used to output failures of array response comparison in
+     * a more comprehensive way.
+     *
+     * @param array $array
+     */
+    protected static function sortArrayByKeyRecursively(array &$array)
+    {
+        ksort($array);
+
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                self::sortArrayByKeyRecursively($value);
+            }
+        }
+    }
+
+    /**
      * {@inheritdoc}
+     *
+     * @return Client
      */
     protected function getClient()
     {
         return $this->client;
+    }
+
+    /**
+     * @return Client
+     */
+    protected function getSoapClient()
+    {
+        return $this->soapClient;
     }
 }

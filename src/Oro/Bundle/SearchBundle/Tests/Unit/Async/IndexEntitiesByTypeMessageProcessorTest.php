@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
+use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -14,12 +15,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    use MessageQueueExtension;
+
     public function testCouldBeConstructedWithRequiredAttributes()
     {
         new IndexEntitiesByTypeMessageProcessor(
             $this->createDoctrineMock(),
             $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
+            $this->createMock(MessageProducerInterface::class),
             $this->createLoggerMock()
         );
     }
@@ -58,16 +61,19 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
             }))
         ;
 
-        $producer = $this->createMessageProducerMock();
-
         $message = new NullMessage();
         $message->setBody(JSON::encode([
             'entityClass' => 'entity-name',
             'jobId' => 12345,
         ]));
 
-        $processor = new IndexEntitiesByTypeMessageProcessor($doctrine, $jobRunner, $producer, $logger);
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $processor = new IndexEntitiesByTypeMessageProcessor(
+            $doctrine,
+            $jobRunner,
+            self::getMessageProducer(),
+            $logger
+        );
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -77,15 +83,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface
-     */
-    protected function createMessageProducerMock()
-    {
-        return $this->getMock(MessageProducerInterface::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -93,7 +91,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createDoctrineMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -101,6 +99,6 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

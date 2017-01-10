@@ -1,4 +1,6 @@
 parameters:
+    twig.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
+    fos_rest.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
     security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
     oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 
@@ -124,7 +126,6 @@ services:
         class: %oro_security.acl.privilege_repository.class%
         arguments:
             - '@oro_security.acl.manager'
-            - '@translator'
 
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%
@@ -161,12 +162,11 @@ services:
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_security.entity_security_metadata_provider'
             - '@oro_security.owner.metadata_provider.chain'
+            - '@oro_security.owner.entity_owner_accessor'
             - '@oro_security.owner.ownership_decision_maker.chain'
             - '@oro_security.acl.permission_manager'
             - '@oro_security.acl.group_provider.chain'
             - '@oro_security.acl.extension.field'
-        calls:
-            - [setEntityOwnerAccessor, ['@oro_security.owner.entity_owner_accessor']]
         tags:
             - { name: oro_security.acl.extension, priority: 20 }
 
@@ -207,6 +207,7 @@ services:
         class: %oro_security.acl.permission_granting_strategy.class%
         calls:
              - [setAuditLogger, ["@?security.acl.audit_logger"]]
+             - [setSecurityMetadataProvider, ["@oro_security.entity_security_metadata_provider"]]
 
     oro_security.acl.permission_map:
         public: false
@@ -304,7 +305,9 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@oro_entity_config.provider.extend'
             - '@doctrine'
+            - '@translator'
             - '@oro_security.entity_security_metadata_provider.cache'
+            - '@event_dispatcher'
 
     oro_security.entity_security_metadata_provider.cache:
         public: false
@@ -317,6 +320,7 @@ services:
         class: %oro_security.action_metadata_provider.class%
         arguments:
             - '@oro_security.acl.annotation_provider'
+            - '@translator'
             - '@oro_security.action_metadata_provider.cache'
 
     oro_security.action_metadata_provider.cache:
@@ -328,7 +332,8 @@ services:
     oro_security.acl.annotation_provider:
         class: %oro_security.acl.annotation_provider.class%
         arguments:
-          - '@oro_security.acl.annotation_provider.cache'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_security.acl.annotation_provider.cache'
 
     oro_security.acl.annotation_provider.cache:
         public: false
@@ -348,6 +353,7 @@ services:
         class: Oro\Bundle\SecurityBundle\Annotation\AclListener
         arguments:
             - '@oro_security.acl.annotation_provider'
+            - '@oro_security.action_metadata_provider'
             - '@oro_security.acl.annotation.metadata.dumper'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
@@ -359,6 +365,14 @@ services:
             - %kernel.cache_dir%
             - %kernel.debug%
             - 'oro_acl_annotation'
+
+    oro_security.acl.config.metadata.dumper:
+        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
+        public: false
+        arguments:
+            - %kernel.cache_dir%
+            - %kernel.debug%
+            - 'oro_acl_config'
 
     oro_security.acl.config_loader:
         public: false
@@ -590,7 +604,7 @@ services:
         arguments:
             - '@service_container'
         tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 7 }
 
     oro_security.listener.api_listener:
           class: %oro_security.listener.api_listener.class%
@@ -704,11 +718,10 @@ services:
         class: Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension
         arguments:
             - '@oro_security.acl.object_id_accessor'
-            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.ownership_decision_maker.chain'
             - '@oro_security.owner.entity_owner_accessor'
-            - '@oro_entity_config.provider.security'
+            - '@oro_entity_config.config_manager'
             - '@oro_security.entity_security_metadata_provider'
 
     oro_security.serializer.acl_filter:

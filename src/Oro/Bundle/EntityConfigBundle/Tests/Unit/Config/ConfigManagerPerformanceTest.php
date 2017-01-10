@@ -432,7 +432,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $securityTokenStorage = $this
-            ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $securityTokenStorage->expects($this->any())
             ->method('getToken')
             ->willReturn(null);

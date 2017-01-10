@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
@@ -13,6 +15,9 @@ class ActionMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $annotationProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
 
     /** @var ActionMetadataProvider */
     protected $provider;
@@ -33,7 +38,18 @@ class ActionMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->provider = new ActionMetadataProvider($this->annotationProvider, $this->cache);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($value) {
+                return 'translated: ' . $value;
+            });
+
+        $this->provider = new ActionMetadataProvider(
+            $this->annotationProvider,
+            $this->translator,
+            $this->cache
+        );
     }
 
     public function testIsKnownAction()
@@ -69,7 +85,13 @@ class ActionMetadataProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $action = new ActionMetadata('test', 'TestGroup', 'TestLabel', 'TestDescription', 'TestCategory');
+        $action = new ActionMetadata(
+            'test',
+            'TestGroup',
+            'translated: TestLabel',
+            'translated: TestDescription',
+            'TestCategory'
+        );
 
         $this->cache->expects($this->at(0))
             ->method('fetch')
@@ -94,7 +116,7 @@ class ActionMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($action, $actions[0]);
 
         // call with cache
-        $provider = new ActionMetadataProvider($this->annotationProvider, $this->cache);
+        $provider = new ActionMetadataProvider($this->annotationProvider, $this->translator, $this->cache);
         $actions = $provider->getActions();
         $this->assertCount(1, $actions);
         $this->assertEquals($action, $actions[0]);

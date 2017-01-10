@@ -10,7 +10,7 @@ class OroTagExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = new OroTagExtension();
         $configs = array();
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
 
         $extension->load($configs, $container);
     }

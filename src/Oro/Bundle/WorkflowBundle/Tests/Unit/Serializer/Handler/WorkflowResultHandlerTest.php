@@ -65,8 +65,8 @@ class WorkflowResultHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function workflowResultToJsonDataProvider()
     {
-        $object = $this->getMock('PlainObject');
-        $entity = $this->getMock('Entity');
+        $object = $this->createMock(\stdClass::class);
+        $entity = $this->createMock(\stdClass::class);
         return array(
             'plain' => array(
                 new WorkflowResult(

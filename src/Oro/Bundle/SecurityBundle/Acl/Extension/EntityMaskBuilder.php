@@ -20,8 +20,8 @@ final class EntityMaskBuilder extends MaskBuilder
      */
     const MAX_PERMISSIONS_IN_MASK = 3;
 
-    const SERVICE_BITS            = -32768;
-    const REMOVE_SERVICE_BITS     = 32767;
+    const SERVICE_BITS        = -32768; // 0xFFFF8000
+    const REMOVE_SERVICE_BITS = 32767;  // 0x00007FFF
 
     /** @var int */
     protected $identity;

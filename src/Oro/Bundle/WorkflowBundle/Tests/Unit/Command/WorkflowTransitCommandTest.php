@@ -59,7 +59,7 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
             ->with(self::CLASS_NAME)
             ->willReturn($em);
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
 
         $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
             ->disableOriginalConstructor()
@@ -137,7 +137,8 @@ class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($expectedException) {
-            $this->setExpectedException(get_class($expectedException), $expectedException->getMessage());
+            $this->expectException(get_class($expectedException));
+            $this->expectExceptionMessage($expectedException->getMessage());
         }
 
         $this->command->execute($this->input, $this->output);

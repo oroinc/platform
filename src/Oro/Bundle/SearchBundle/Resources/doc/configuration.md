@@ -257,7 +257,7 @@ that builds a simple user datagrid, using search index data only:
                  type:          navigate
                  label:         oro.grid.action.view
                  link:          view_link
-                 icon:          eye-open
+                 icon:          eye
                  acl_resource:  oro_user_user_view
                  rowAction:     true
              update:

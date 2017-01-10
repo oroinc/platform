@@ -3,11 +3,14 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
+use Oro\Bundle\UserBundle\Entity\Impersonation;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -18,12 +21,6 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorInterface;
-
-use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
-use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
 
 class ImpersonationAuthenticator implements GuardAuthenticatorInterface
 {
@@ -45,6 +42,7 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      * @param EntityManager $em
      * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
      * @param EventDispatcherInterface $eventDispatcher
+     * @param UrlGeneratorInterface $router
      */
     public function __construct(
         EntityManager $em,
@@ -92,11 +90,13 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         $impersonation = $this->getImpersonation($this->getCredentials($request));
+        $token->setAttribute('IMPERSONATION', $impersonation->getId());
 
         $event = new ImpersonationSuccessEvent($impersonation);
         $this->eventDispatcher->dispatch(ImpersonationSuccessEvent::EVENT_NAME, $event);
 
         $impersonation->setLoginAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $impersonation->setIpAddress($request->getClientIp());
         $this->em->flush();
     }
 
@@ -115,7 +115,11 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        return false;
+        if ($authException) {
+            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $authException);
+        }
+
+        return new RedirectResponse($this->router->generate('oro_user_security_login'));
     }
 
     /**
@@ -150,7 +154,7 @@ class ImpersonationAuthenticator implements GuardAuthenticatorInterface
      */
     protected function getImpersonation($token)
     {
-        return $impersonation = $this->em
+        return $this->em
             ->getRepository('OroUserBundle:Impersonation')
             ->findOneBy(['token' => $token]);
     }

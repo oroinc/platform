@@ -623,11 +623,28 @@ DQL
         $this->assertNull(QueryUtils::findJoinByAlias($qb, 'w'));
     }
 
+    public function testIsToOne()
+    {
+        $qb = $this->em->createQueryBuilder()
+            ->select('p')
+            ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+            ->join('p.bestItem', 'i')
+            ->join('i.owner', 'o')
+            ->join('i.persons', 'persons')
+            ->join('persons.bestItem', 'bi');
+
+        $this->assertTrue(QueryUtils::isToOne($qb, 'i'));
+        $this->assertTrue(QueryUtils::isToOne($qb, 'o'));
+        $this->assertFalse(QueryUtils::isToOne($qb, 'bi'));
+        $this->assertFalse(QueryUtils::isToOne($qb, 'persons'));
+        $this->assertFalse(QueryUtils::isToOne($qb, 'nonExistingAlias'));
+    }
+
     /**
      * @return QueryBuilder
      */
     protected function getQueryBuilder()
     {
-        return new QueryBuilder($this->getMock('Doctrine\ORM\EntityManagerInterface'));
+        return new QueryBuilder($this->createMock('Doctrine\ORM\EntityManagerInterface'));
     }
 }

@@ -3,6 +3,7 @@
 {% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
 {% set importLabel = importLabel|default('oro.importexport.import.label'|trans) %}
+{% set importValidationLabel = importValidationLabel|default('oro.importexport.import.validation_label'|trans) %}
 
 {% set hasExportProcessor = exportProcessor is defined and exportProcessor is not empty %}
 {% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
@@ -53,7 +54,7 @@
     {% if exportAllowed %}
         <div class="btn-group">
             <a type="button" class="btn export-btn icons-holder-text no-hash" href="#">
-                <i class="icon-upload-alt hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
+                <i class="fa-upload hide-text">{{ 'oro.importexport.export.label'|trans }}</i>{{ 'oro.importexport.export.label'|trans }}
             </a>
         </div>
     {% endif %}
@@ -62,11 +63,14 @@
         <div class="btn-group">
             {% set buttonsHtml %}
                 <a type="button" class="btn import-btn icons-holder-text no-hash" href="#">
-                    <i class="icon-download-alt hide-text">{{ importLabel }}</i>{{ importLabel }}
+                    <i class="fa-download hide-text">{{ importLabel }}</i>{{ importLabel }}
+                </a>
+                <a type="button" class="btn import-validation-btn icons-holder-text no-hash" href="#">
+                    <i class="icon-download-alt hide-text">{{ importValidationLabel }}</i>{{ importValidationLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}
                     <a type="button" class="btn template-btn icons-holder-text no-hash" href="#">
-                        <i class="icon-file-alt hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
+                        <i class="fa-file-o hide-text"></i>{{ 'oro.importexport.import.tempate'|trans }}
                     </a>
                 {% endif %}
             {% endset %}

@@ -23,7 +23,7 @@ class DatabaseExceptionHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->databaseExceptionHelper = new DatabaseExceptionHelper($this->registry);
     }
 

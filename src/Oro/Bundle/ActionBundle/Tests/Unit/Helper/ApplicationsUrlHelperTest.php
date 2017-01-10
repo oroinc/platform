@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $mockApplicationsHelper;
+    /** @var RouteProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $routerProvider;
 
     /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $mockRouter;
@@ -20,20 +20,20 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->mockApplicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
+        $this->routerProvider = $this->getMockBuilder(RouteProviderInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->mockRouter = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $this->mockRouter = $this->createMock('Symfony\Component\Routing\RouterInterface');
 
-        $this->instance = new ApplicationsUrlHelper($this->mockApplicationsHelper, $this->mockRouter);
+        $this->instance = new ApplicationsUrlHelper($this->routerProvider, $this->mockRouter);
     }
 
     public function testGetExecutionUrl()
     {
         $parameters = ['param1' => 'val1'];
 
-        $this->mockApplicationsHelper->expects($this->once())
+        $this->routerProvider->expects($this->once())
             ->method('getExecutionRoute')
             ->willReturn('extension_route');
 
@@ -48,9 +48,9 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetDialogUrl()
     {
         $parameters = ['param1' => 'val1'];
-        
-        $this->mockApplicationsHelper->expects($this->once())
-            ->method('getDialogRoute')
+
+        $this->routerProvider->expects($this->once())
+            ->method('getFormDialogRoute')
             ->willReturn('dialog_route');
 
         $this->mockRouter->expects($this->once())
@@ -59,5 +59,21 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn('ok_dialog');
 
         $this->assertEquals('ok_dialog', $this->instance->getDialogUrl($parameters));
+    }
+
+    public function testGetPageUrl()
+    {
+        $parameters = ['param1' => 'val1'];
+
+        $this->routerProvider->expects($this->once())
+            ->method('getFormPAgeRoute')
+            ->willReturn('page_route');
+
+        $this->mockRouter->expects($this->once())
+            ->method('generate')
+            ->with('page_route', $parameters)
+            ->willReturn('ok_dialog');
+
+        $this->assertEquals('ok_dialog', $this->instance->getPageUrl($parameters));
     }
 }

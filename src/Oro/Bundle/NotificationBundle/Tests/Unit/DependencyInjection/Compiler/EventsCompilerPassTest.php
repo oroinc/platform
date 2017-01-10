@@ -11,8 +11,8 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testCompile()
     {
-        $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $dispatcher = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $dispatcher = $this->createMock('Symfony\Component\DependencyInjection\Definition');
 
         $container->expects($this->once())
             ->method('hasDefinition')
@@ -62,7 +62,7 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testCompileManagerNotDefined()
     {
-        $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
 
         $container->expects($this->once())
             ->method('hasDefinition')

@@ -8,7 +8,7 @@ Scenario: Add note to user entity
   And I go to System/Entities/Entity Management
   And filter Name as is equal to "User"
   And click Edit User in grid
-  And select "Yes" from "Enable notes"
+  And I check "Notes"
   When I save and close form
   And click update schema
   Then I should see "Schema updated" flash message

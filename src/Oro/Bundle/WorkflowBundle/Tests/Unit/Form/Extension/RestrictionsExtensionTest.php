@@ -101,7 +101,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['disable_workflow_restrictions' => false]);

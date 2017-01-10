@@ -52,7 +52,7 @@ parameters:
     oro_entity.form.entity_field.handler.base_handler.class: Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler
     oro_entity.form.entity_field.handler.processor.handler_processor.class:  Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor
 
-    # halpers
+    # helpers
     oro_entity.helper.dictionary.class:                      Oro\Bundle\EntityBundle\Helper\DictionaryHelper
 
 services:
@@ -226,14 +226,6 @@ services:
         arguments:
             - '@oro_entity.entity_field_provider'
             - '@oro_entity.entity_provider'
-
-    oro_entity.exclusion_provider.by_alias:
-        class: Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider
-        public: false
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro_entity.exclusion_provider.api, priority: 40 }
 
     oro_entity.twig.extension.entity:
         class: %oro_entity.twig.extension.entity.class%

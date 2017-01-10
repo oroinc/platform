@@ -69,7 +69,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
             ->will(
@@ -169,18 +169,18 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMetadataWithoutCache()
     {
-        $config = new Config(new EntityConfigId('ownership', 'SomeClass'));
+        $config = new Config(new EntityConfigId('ownership', \stdClass::class));
         $config->set('owner_type', 'USER');
         $config->set('owner_field_name', 'test_field');
         $config->set('owner_column_name', 'test_column');
 
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
-            ->with($this->equalTo('SomeClass'))
+            ->with($this->equalTo(\stdClass::class))
             ->will($this->returnValue(true));
         $this->configProvider->expects($this->once())
             ->method('getConfig')
-            ->with($this->equalTo('SomeClass'))
+            ->with($this->equalTo(\stdClass::class))
             ->will($this->returnValue($config));
 
         $this->entityClassResolver = null;
@@ -188,24 +188,24 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             new OwnershipMetadata('USER', 'test_field', 'test_column'),
-            $this->provider->getMetadata('SomeClass')
+            $this->provider->getMetadata(\stdClass::class)
         );
     }
 
     public function testGetMetadataSetsOrganizationFieldName()
     {
-        $config = new Config(new EntityConfigId('ownership', 'SomeClass'));
+        $config = new Config(new EntityConfigId('ownership', \stdClass::class));
         $config->set('owner_type', 'ORGANIZATION');
         $config->set('owner_field_name', 'test_field');
         $config->set('owner_column_name', 'test_column');
 
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
-            ->with($this->equalTo('SomeClass'))
+            ->with($this->equalTo(\stdClass::class))
             ->will($this->returnValue(true));
         $this->configProvider->expects($this->once())
             ->method('getConfig')
-            ->with($this->equalTo('SomeClass'))
+            ->with($this->equalTo(\stdClass::class))
             ->will($this->returnValue($config));
 
         $this->entityClassResolver = null;
@@ -213,7 +213,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             new OwnershipMetadata('ORGANIZATION', 'test_field', 'test_column', 'test_field', 'test_column'),
-            $this->provider->getMetadata('SomeClass')
+            $this->provider->getMetadata(\stdClass::class)
         );
     }
 
@@ -291,15 +291,6 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method getSystemLevelClass() unsupported.
-     */
-    public function testGetSystemLevelClass()
-    {
-        $this->assertFalse($this->provider->getSystemLevelClass());
-    }
-
-    /**
      * @dataProvider owningEntityNamesDataProvider
      *
      * @expectedException \InvalidArgumentException
@@ -362,7 +353,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetMaxAccessLevel($accessLevel, $object, $expectedResult)
     {
         if ($object && $accessLevel === AccessLevel::SYSTEM_LEVEL) {
-            $config = new Config(new EntityConfigId('ownership', 'SomeClass'));
+            $config = new Config(new EntityConfigId('ownership', \stdClass::class));
             $config
                 ->set('owner_type', 'USER')
                 ->set('owner_field_name', 'test_field')
@@ -370,11 +361,11 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
             $this->configProvider->expects($this->once())
                 ->method('hasConfig')
-                ->with('SomeClass')
+                ->with(\stdClass::class)
                 ->willReturn(true);
             $this->configProvider->expects($this->once())
                 ->method('getConfig')
-                ->with('SomeClass')
+                ->with(\stdClass::class)
                 ->willReturn($config);
         }
 
@@ -392,7 +383,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'accessLevel' => AccessLevel::GLOBAL_LEVEL,
-                'object' => 'SomeClass',
+                'object' => \stdClass::class,
                 'expectedResult' => AccessLevel::GLOBAL_LEVEL
             ],
             [
@@ -402,7 +393,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'accessLevel' => AccessLevel::DEEP_LEVEL,
-                'object' => 'SomeClass',
+                'object' => \stdClass::class,
                 'expectedResult' => AccessLevel::DEEP_LEVEL
             ],
             [
@@ -412,7 +403,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'accessLevel' => AccessLevel::LOCAL_LEVEL,
-                'object' => 'SomeClass',
+                'object' => \stdClass::class,
                 'expectedResult' => AccessLevel::LOCAL_LEVEL
             ],
             [
@@ -422,7 +413,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'accessLevel' => AccessLevel::BASIC_LEVEL,
-                'object' => 'SomeClass',
+                'object' => \stdClass::class,
                 'expectedResult' => AccessLevel::BASIC_LEVEL
             ],
             [
@@ -432,7 +423,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'accessLevel' => AccessLevel::SYSTEM_LEVEL,
-                'object' => 'SomeClass',
+                'object' => \stdClass::class,
                 'expectedResult' => AccessLevel::GLOBAL_LEVEL
             ],
             [

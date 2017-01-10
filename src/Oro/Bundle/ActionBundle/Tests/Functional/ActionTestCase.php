@@ -4,8 +4,14 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ActionTestCase extends WebTestCase
@@ -24,6 +30,37 @@ abstract class ActionTestCase extends WebTestCase
     protected function getOperationDialogRoute()
     {
         return 'oro_action_widget_form';
+    }
+
+    /**
+     * @param string $buttonName
+     * @param mixed $entityId
+     * @param string $entityClass
+     * @param array $data
+     */
+    protected function assertActionButton($buttonName, $entityId, $entityClass, array $data = [])
+    {
+        $request = array_merge([
+            ContextHelper::ENTITY_CLASS_PARAM => $entityClass,
+            ContextHelper::ENTITY_ID_PARAM => $entityId,
+        ], $data);
+
+        /* @var $requestStack RequestStack */
+        $requestStack = $this->getContainer()->get('request_stack');
+        $requestStack->push(new Request($request));
+
+        /* @var $provider ButtonProvider */
+        $provider = $this->getContainer()->get('oro_action.provider.button');
+
+        /* @var $contextProvider ButtonSearchContextProvider */
+        $contextProvider = $this->getContainer()->get('oro_action.provider.button_search_context');
+        $context = $contextProvider->getButtonSearchContext();
+
+        $buttons = array_map(function (ButtonInterface $button) {
+            return $button->getName();
+        }, $provider->findAvailable($context));
+
+        $this->assertContains($buttonName, $buttons);
     }
 
     /**

@@ -17,8 +17,8 @@ class DelegateMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfProcessorNameIsNotSet()
     {
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'Got message without required parameter: "oro.message_queue.client.processor_name"'
         );
 
@@ -61,7 +61,7 @@ class DelegateMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProcessorRegistryMock()
     {
-        return $this->getMock(MessageProcessorRegistryInterface::class);
+        return $this->createMock(MessageProcessorRegistryInterface::class);
     }
 
     /**
@@ -69,7 +69,7 @@ class DelegateMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createTransportSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->createMock(SessionInterface::class);
     }
 
     /**
@@ -77,6 +77,6 @@ class DelegateMessageProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function createMessageProcessorMock()
     {
-        return $this->getMock(MessageProcessorInterface::class);
+        return $this->createMock(MessageProcessorInterface::class);
     }
 }

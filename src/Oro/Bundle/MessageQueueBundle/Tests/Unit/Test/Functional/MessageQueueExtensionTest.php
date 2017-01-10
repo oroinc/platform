@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Tests\Unit;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Functional;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -39,7 +39,7 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
     {
         if (null === self::$container) {
             self::$container = new Container();
-            self::$messageCollector = new MessageCollector($this->getMock(MessageProducerInterface::class));
+            self::$messageCollector = new MessageCollector($this->createMock(MessageProducerInterface::class));
             self::$container->set('oro_message_queue.test.message_collector', self::$messageCollector);
         }
     }
@@ -63,6 +63,21 @@ class MessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $message = 'test message';
 
         self::$messageCollector->send($topic, $message);
+
+        self::assertEquals(
+            [
+                ['topic' => $topic, 'message' => $message]
+            ],
+            self::getSentMessages()
+        );
+    }
+
+    public function testShouldAllowSendMessageViaMessageProducerAlias()
+    {
+        $topic = 'test topic';
+        $message = 'test message';
+
+        self::getMessageProducer()->send($topic, $message);
 
         self::assertEquals(
             [

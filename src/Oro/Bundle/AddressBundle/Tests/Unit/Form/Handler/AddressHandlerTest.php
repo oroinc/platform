@@ -33,9 +33,9 @@ class AddressHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $this->request = $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $this->request = $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $this->address = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Address')
             ->disableOriginalConstructor()
             ->getMock();

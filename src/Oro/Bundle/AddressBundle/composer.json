@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/AddressBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "doctrine/orm": ">=2.2.3,<2.5-dev",
         "doctrine/doctrine-bundle": "1.1.*",
@@ -15,12 +15,10 @@
         "nelmio/api-doc-bundle": "dev-master",
         "oro/form-bundle": "dev-master",
         "oro/translation-bundle": "dev-master",
-        "besimple/soap-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\AddressBundle": "" }
     },
-    "target-dir": "Oro/Bundle/AddressBundle",
-    "minimum-stability": "dev"
+    "target-dir": "Oro/Bundle/AddressBundle"
 }

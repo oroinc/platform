@@ -6,7 +6,7 @@
     "homepage": "https://github.com/laboro/WorkflowBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.2.*",
@@ -27,7 +27,6 @@
     "autoload": {
         "psr-0": { "Oro\\Bundle\\ReminderBundle": "" }
     },
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

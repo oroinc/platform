@@ -34,13 +34,25 @@ final class DataType
     }
 
     /**
+     * Checks whether the field represents a nested association.
+     *
+     * @param string $dataType
+     *
+     * @return bool
+     */
+    public static function isNestedAssociation($dataType)
+    {
+        return 'nestedAssociation' === $dataType;
+    }
+
+    /**
      * Checks whether an association should be represented as a field.
      * For JSON.API it means that it should be in "attributes" section instead of "relationships" section.
      * Usually, to increase readability, "array" data-type is used for "to-many" associations
      * and "object" or "scalar" data-type is used for "to-one" associations.
      * The "object" is usually used if a value of such field contains several properties.
      * The "scalar" is usually used if a value of such field contains a scalar value.
-     * Also "nested" data-type, that is used to group several fields in one object, is classified
+     * Also "nestedObject" data-type, that is used to group several fields in one object, is classified
      * as an association that should be represented as a field because the behaviour
      * of the nested object is the same.
      *

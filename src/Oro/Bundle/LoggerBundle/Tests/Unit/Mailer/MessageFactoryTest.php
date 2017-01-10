@@ -36,7 +36,7 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->exactly(2))
             ->method('get')
             ->willReturnMap(
@@ -68,7 +68,7 @@ class MessageFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('createMessage')
             ->willReturn($message);
 
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->once())
             ->method('get')
             ->with('swiftmailer.mailer.default')

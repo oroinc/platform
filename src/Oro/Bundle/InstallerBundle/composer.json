@@ -6,23 +6,20 @@
     "homepage": "https://github.com/laboro/InstallerBundle",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9",
+        "php": ">=5.6",
         "symfony/framework-bundle": "2.8.*",
         "sylius/flow-bundle": "dev-master",
         "oro/config": "dev-master",
         "oro/cache-bundle": "dev-master",
         "components/jquery": "2.1.*",
-        "bower-asset/jquery-ajax-queue": "0.0.1"
-    },
-    "require-dev": {
-        "symfony/form": "~2.3",
-        "symfony/validator": "~2.3"
+        "bower-asset/jquery-ajax-queue": "0.0.1",
+        "symfony/form": "2.8.*",
+        "symfony/validator": "2.8.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\InstallerBundle": "" }
     },
     "target-dir": "Oro/Bundle/InstallerBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

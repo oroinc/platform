@@ -21,7 +21,7 @@ class ScheduleManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $this->manager = new ScheduleManager($this->registry, self::CLASS_NAME);
     }
@@ -99,7 +99,8 @@ class ScheduleManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateScheduleException($command, $definition, array $schedules, $exception, $message)
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
 
         if ($schedules) {
             $this->assertRepositoryCalled($command, $definition, $schedules);
@@ -148,14 +149,14 @@ class ScheduleManagerTest extends \PHPUnit_Framework_TestCase
     protected function assertRepositoryCalled($command, $definition, array $schedules = [])
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectRepository $repository */
-        $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository->expects($this->once())
             ->method('findBy')
             ->with(['command' => $command, 'definition' => $definition])
             ->willReturn($schedules);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager $em */
-        $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
         $em->expects($this->once())
             ->method('getRepository')
             ->with(self::CLASS_NAME)

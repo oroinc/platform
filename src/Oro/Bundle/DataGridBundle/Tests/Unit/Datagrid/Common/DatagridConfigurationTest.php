@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Common;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 
 class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,6 +14,62 @@ class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->configuration = DatagridConfiguration::create([]);
+    }
+
+    public function testGetOrmQueryForUndefinedDatasourceType()
+    {
+        self::assertInstanceOf(OrmQueryConfiguration::class, $this->configuration->getOrmQuery());
+    }
+
+    public function testGetOrmQueryForOrmDatasourceType()
+    {
+        $this->configuration->setDatasourceType(OrmDatasource::TYPE);
+        self::assertInstanceOf(OrmQueryConfiguration::class, $this->configuration->getOrmQuery());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\DataGridBundle\Exception\LogicException
+     * @expectedExceptionMessage The expected data grid source type is "orm". Actual source type is "another".
+     */
+    public function testGetOrmQueryForNotOrmDatasourceType()
+    {
+        $this->configuration->setDatasourceType('another');
+        $this->configuration->getOrmQuery();
+    }
+
+    public function testIsOrmDatasource()
+    {
+        // the datasource type is not set
+        self::assertFalse($this->configuration->isOrmDatasource());
+        // ORM datasource
+        $this->configuration->setDatasourceType(OrmDatasource::TYPE);
+        self::assertTrue($this->configuration->isOrmDatasource());
+        // not ORM datasource
+        $this->configuration->setDatasourceType('another');
+        self::assertFalse($this->configuration->isOrmDatasource());
+    }
+
+    public function testDatasourceType()
+    {
+        // test initial value
+        self::assertNull($this->configuration->getDatasourceType());
+        // test setter
+        self::assertSame($this->configuration, $this->configuration->setDatasourceType('test'));
+        // test previously set value
+        self::assertEquals('test', $this->configuration->getDatasourceType());
+    }
+
+    public function testExtendedEntityClassName()
+    {
+        // test initial value
+        self::assertNull($this->configuration->getExtendedEntityClassName());
+        // test setter
+        self::assertSame($this->configuration, $this->configuration->setExtendedEntityClassName('test'));
+        // test previously set value
+        self::assertEquals('test', $this->configuration->getExtendedEntityClassName());
+        // test remove value
+        self::assertSame($this->configuration, $this->configuration->setExtendedEntityClassName(null));
+        self::assertNull($this->configuration->getExtendedEntityClassName());
     }
 
     /**
@@ -166,22 +224,16 @@ class DatagridConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptions()
     {
-        $this->setExpectedException(
-            'BadMethodCallException',
-            'DatagridConfiguration::addColumn: name should not be empty'
-        );
+        $this->expectException('BadMethodCallException');
+        $this->expectExceptionMessage('DatagridConfiguration::addColumn: name should not be empty');
         $this->configuration->addColumn(null, []);
 
-        $this->setExpectedException(
-            'BadMethodCallException',
-            'DatagridConfiguration::updateLabel: name should not be empty'
-        );
+        $this->expectException('BadMethodCallException');
+        $this->expectExceptionMessage('DatagridConfiguration::updateLabel: name should not be empty');
         $this->configuration->updateLabel(null, []);
 
-        $this->setExpectedException(
-            'BadMethodCallException',
-            'DatagridConfiguration::addSelect: select should not be empty'
-        );
+        $this->expectException('BadMethodCallException');
+        $this->expectExceptionMessage('DatagridConfiguration::addSelect: select should not be empty');
         $this->configuration->addSelect(null);
     }
 
