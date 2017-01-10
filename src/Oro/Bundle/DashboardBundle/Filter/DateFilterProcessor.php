@@ -6,7 +6,9 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateFilterProcessor
 {
@@ -20,10 +22,11 @@ class DateFilterProcessor
      * @param DateRangeFilter    $filter
      * @param DateFilterModifier $modifier
      */
-    public function __construct(DateRangeFilter $filter, DateFilterModifier $modifier)
+    public function __construct(DateRangeFilter $filter, DateFilterModifier $modifier, LocaleSettings $localeSettings)
     {
         $this->dateFilter = $filter;
         $this->modifier   = $modifier;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -53,5 +56,43 @@ class DateFilterProcessor
         unset($dateData['start'], $dateData['end']);
 
         return $this->modifier->modify($dateData, ['start', 'end'], false);
+    }
+
+    /**
+     * @param mixed $date
+     *
+     * @return \DateTime
+     */
+    public function prepareDate($date)
+    {
+        return $date instanceof \DateTime
+            ? $date
+            : new \DateTime($date, new \DateTimeZone($this->localeSettings->getTimeZone()));
+    }
+    /**
+     * @param QueryBuilder $qb
+     * @param $dateRange
+     * @param $fieldAlias
+     */
+    public function applyDateRangeFilterToQuery(QueryBuilder $qb, $dateRange, $fieldAlias)
+    {
+        $dateRange = $this->getModifiedDateData($dateRange);
+        switch ($dateRange['type']) {
+            case AbstractDateFilterType::TYPE_MORE_THAN:
+                $start = $this->prepareDate($dateRange['value']['start']);
+                $qb->andWhere(sprintf('%s >= :start', $fieldAlias))->setParameter('start', $start);
+                break;
+            case AbstractDateFilterType::TYPE_LESS_THAN:
+                $end = $this->prepareDate($dateRange['value']['end']);
+                $qb->andWhere(sprintf('%s <= :end', $fieldAlias))->setParameter('end', $end);
+                break;
+            case AbstractDateFilterType::TYPE_ALL_TIME:
+                return;
+            default:
+                $start = $this->prepareDate($dateRange['value']['start']);
+                $end = $this->prepareDate($dateRange['value']['end']);
+                $qb->andWhere(sprintf('%s >= :start', $fieldAlias))->setParameter('start', $start);
+                $qb->andWhere(sprintf('%s <= :end', $fieldAlias))->setParameter('end', $end);
+        }
     }
 }
