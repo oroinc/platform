@@ -157,7 +157,7 @@ class IndexListener implements OptionalListenerInterface
         // collect owners of all changed collections if owner class has mapping to collection field
         return array_reduce(
             $collectionUpdates,
-            function(array $entities, PersistentCollection $collection) {
+            function (array $entities, PersistentCollection $collection) {
                 $owner        = $collection->getOwner();
                 $className     = ClassUtils::getClass($owner);
                 $changedFields = $this->getIntersectChangedIndexedFields(
