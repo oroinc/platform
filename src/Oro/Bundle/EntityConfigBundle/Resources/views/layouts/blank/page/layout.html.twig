@@ -17,7 +17,7 @@
         'data-page-component-options': {'id': group}|json_encode
     }) %}
 
-    <div {{ block('block_attributes') }} style="display: none;">
+    <div {{ block('block_attributes') }} style="display: none;" class="tab-content">
         {{ block_widget(block) }}
     </div>
 {% endblock %}
