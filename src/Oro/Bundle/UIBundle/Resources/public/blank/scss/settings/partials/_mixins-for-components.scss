@@ -17,7 +17,6 @@
 // @param $state {CSS pseudo-element}
 
 @mixin fa-icon($icon: null, $state: before) {
-
     @if ($icon) {
         &:#{$state} {
             content: '#{$icon}';
