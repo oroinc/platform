@@ -49,7 +49,6 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
             $isAvailable = !$transition->isHidden() &&
                 $workflow->isTransitionAvailable($workflowItem, $transition, $errors) &&
                 $this->validateTransitionStep($workflow, $transition, $workflowItem);
-
         } catch (\Exception $e) {
             $isAvailable = false;
             if (null !== $errors) {
