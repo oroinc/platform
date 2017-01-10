@@ -172,15 +172,9 @@
 {% endblock %}
 
 {% block __oro_datagrid_server_render__datagrid_cell_widget %}
-    {% set attr = attr|merge({
-        class: attr.class|default('') ~ " string-cell grid-cell grid-body-cell grid-body-cell-" ~ column_name
-    }) %}
-
-    <div{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
             {{ block_widget(child) }}
         {%- endfor %}
-    </div>
 {% endblock %}
 
 {%- block __oro_datagrid_server_render__datagrid_cell_value_widget -%}
