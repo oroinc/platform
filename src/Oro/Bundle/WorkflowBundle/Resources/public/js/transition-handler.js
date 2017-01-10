@@ -3,7 +3,7 @@ define([
     'underscore',
     'oroui/js/modal',
     'oroworkflow/js/transition-executor',
-    'oroworkflow/js/transition-event-handlers',
+    'oroworkflow/js/transition-event-handlers'
 ], function($, _, Modal, performTransition, TransitionEventHandlers) {
     'use strict';
 
@@ -75,10 +75,15 @@ define([
 
         var showConfirmationModal = function() {
             var message = element.data('message');
-            var confirm = new Modal({
+            var modalOptions = {
                 title: element.data('transition-label'),
                 content: message
-            });
+            };
+            if (element.data('transition-confirmation-options')) {
+                modalOptions = $.extend({}, modalOptions, element.data('transition-confirmation-options'));
+                modalOptions.template = _.template(element.data('transition-confirmation-options').template);
+            }
+            var confirm = new Modal(modalOptions);
 
             confirm.on('ok', function() {
                 performTransition(element, null, pageRefresh);
