@@ -14,7 +14,6 @@ class CalendarDateManager
     protected $doctrineHelper;
 
     /**
-     * CalendarDateManager constructor.
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(DoctrineHelper $doctrineHelper)
@@ -22,6 +21,9 @@ class CalendarDateManager
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    /**
+     * @param bool $append
+     */
     public function handleCalendarDates($append = false)
     {
         $period = $this->getDatesFromInterval($append);
@@ -36,15 +38,11 @@ class CalendarDateManager
         $manager->flush();
     }
 
-    public function getLastDate()
-    {
-        /** @var CalendarDateRepository $dateRepo */
-        $dateRepo = $this->doctrineHelper->getEntityRepository(CalendarDate::class);
-
-        return $dateRepo->getDate();
-    }
-
-    public function getDatesFromInterval($append = false)
+    /**
+     * @param bool $append
+     * @return \DatePeriod
+     */
+    protected function getDatesFromInterval($append = false)
     {
         $startDate = new \DateTime();
         $startDate->setDate($startDate->format('Y'), 1, 1);
@@ -62,5 +60,16 @@ class CalendarDateManager
         );
 
         return $period;
+    }
+
+    /**
+     * @return CalendarDate
+     */
+    protected function getLastDate()
+    {
+        /** @var CalendarDateRepository $dateRepository */
+        $dateRepository = $this->doctrineHelper->getEntityRepository(CalendarDate::class);
+
+        return $dateRepository->getDate();
     }
 }

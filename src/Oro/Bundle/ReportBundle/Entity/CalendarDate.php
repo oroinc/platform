@@ -9,9 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository")
  * @ORM\Table("oro_calendar_date")
- * @Config(
- *     mode="hidden",
- * )
+ * @Config(mode="hidden")
  */
 class CalendarDate
 {

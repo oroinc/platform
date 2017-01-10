@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\AbstractProperty;
 class LocalizedValueProperty extends AbstractProperty
 {
     const NAME = 'localized_value';
-    const JOIN_TYPE = 'join_type';
+    const ALLOW_EMPTY = 'allow_empty';
 
     /**
      * {@inheritdoc}

@@ -3,16 +3,14 @@
 namespace Oro\Bundle\ReportBundle\Migrations\Schema\v2_1;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroReportBundle implements Migration
 {
-
     /**
      * {@inheritdoc}
-     *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function up(Schema $schema, QueryBag $queries)
     {

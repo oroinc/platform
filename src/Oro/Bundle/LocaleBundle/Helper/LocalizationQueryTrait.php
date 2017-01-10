@@ -20,12 +20,16 @@ trait LocalizationQueryTrait
         $join,
         $joinAlias,
         $fieldAlias,
-        $joinType = Join::INNER_JOIN)
-    {
-        $queryBuilder
-            ->addSelect(sprintf('%s.string as %s', $joinAlias, $fieldAlias))
-            ->{$joinType.'Join'}($join, $joinAlias, Join::WITH, sprintf('%s.localization IS NULL', $joinAlias));
+        $joinType = Join::INNER_JOIN
+    ) {
+        if ($joinType == Join::INNER_JOIN) {
+            return $queryBuilder
+                ->addSelect(sprintf('%s.string as %s', $joinAlias, $fieldAlias))
+                ->innerJoin($join, $joinAlias, Join::WITH, sprintf('%s.localization IS NULL', $joinAlias));
+        }
 
-        return $queryBuilder;
+        return $queryBuilder
+            ->addSelect(sprintf('%s.string as %s', $joinAlias, $fieldAlias))
+            ->leftJoin($join, $joinAlias, Join::WITH, sprintf('%s.localization IS NULL', $joinAlias));
     }
 }

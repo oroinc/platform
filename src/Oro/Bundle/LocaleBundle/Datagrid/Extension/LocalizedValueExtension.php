@@ -102,10 +102,9 @@ class LocalizedValueExtension extends AbstractExtension
 
         foreach ($properties as $name => $definition) {
             $propertyPath = $definition[LocalizedValueProperty::DATA_NAME_KEY];
-            $joinType =
-                array_key_exists(LocalizedValueProperty::JOIN_TYPE, $definition) ?
-                    $definition[LocalizedValueProperty::JOIN_TYPE] :
-                    Join::INNER_JOIN;
+
+            $shouldAllowEmpty = array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
+            $joinType = $shouldAllowEmpty ? Join::LEFT_JOIN : Join::INNER_JOIN;
 
             if (false === strpos($propertyPath, '.')) {
                 $propertyPath = sprintf('%s.%s', $rootEntityAlias, $propertyPath);

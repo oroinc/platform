@@ -29,6 +29,8 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
         /** @var OrmFilterDatasourceAdapter $ds */
         $qb = $ds->getQueryBuilder();
         $qb->resetDQLPart('where');
+
+        return true;
     }
 
     /**
