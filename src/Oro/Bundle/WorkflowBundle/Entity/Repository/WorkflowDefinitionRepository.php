@@ -32,6 +32,7 @@ class WorkflowDefinitionRepository extends EntityRepository
     public function getScopedByNames(array $names, ScopeCriteria $scopeCriteria)
     {
         $qb = $this->createQueryBuilder('wd');
+        $qb->select('wd');
         $qb->join('wd.scopes', 'scopes', Join::WITH)
             ->andWhere($qb->expr()->in('wd.name', ':names'))
             ->setParameter('names', $names);
