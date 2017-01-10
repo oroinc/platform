@@ -47,6 +47,14 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     }
 
     /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->isFeatureEnabled('email');
+    }
+
+    /**
      * {@internaldoc}
      */
     protected function configure()

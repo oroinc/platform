@@ -7,7 +7,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -24,9 +23,6 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
-
-    /** @var GridConfigurationHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $gridConfigurationHelper;
 
     /** @var TranslationKeyRepository|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationKeyRepository;
@@ -47,18 +43,13 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->gridConfigurationHelper = $this->getMockBuilder(GridConfigurationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->translationKeyRepository = $this->getMockBuilder(TranslationKeyRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->listener = new LanguageListener(
             $this->languageHelper,
-            $this->doctrineHelper,
-            $this->gridConfigurationHelper
+            $this->doctrineHelper
         );
     }
 
@@ -71,19 +62,24 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             $this->listener,
             $this->languageHelper,
             $this->doctrineHelper,
-            $this->gridConfigurationHelper,
             $this->translationKeyRepository
         );
     }
 
     public function testOnBuildBefore()
     {
-        $event = new BuildBefore($this->createMock(DatagridInterface::class), DatagridConfiguration::create([]));
-
-        $this->gridConfigurationHelper->expects($this->once())
-            ->method('getEntityRootAlias')
-            ->with($event->getConfig())
-            ->willReturn('rootAlias');
+        $event = new BuildBefore(
+            $this->createMock(DatagridInterface::class),
+            DatagridConfiguration::create([
+                'source' => [
+                    'query' => [
+                        'from'    => [
+                            ['table' => 'Test\Entity', 'alias' => 'rootAlias']
+                        ]
+                    ]
+                ]
+            ])
+        );
 
         $this->listener->onBuildBefore($event);
 
@@ -101,6 +97,13 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
         $event = new BuildBefore(
             $this->createMock(DatagridInterface::class),
             DatagridConfiguration::create([
+                'source' => [
+                    'query' => [
+                        'from'    => [
+                            ['table' => 'Test\Entity', 'alias' => 'rootAlias']
+                        ]
+                    ]
+                ],
                 'columns' => [
                     LanguageListener::COLUMN_STATUS => [
                         'label' => 'custom_label1',
@@ -111,11 +114,6 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
                 ],
             ])
         );
-
-        $this->gridConfigurationHelper->expects($this->once())
-            ->method('getEntityRootAlias')
-            ->with($event->getConfig())
-            ->willReturn('rootAlias');
 
         $this->listener->onBuildBefore($event);
 
@@ -242,6 +240,9 @@ class LanguageListenerTest extends \PHPUnit_Framework_TestCase
             'query' => [
                 'select' => [
                     sprintf('COUNT(translation) %s', LanguageListener::STATS_COUNT),
+                ],
+                'from'    => [
+                    ['table' => 'Test\Entity', 'alias' => $rootAlias]
                 ],
                 'join' => [
                     'left' => [

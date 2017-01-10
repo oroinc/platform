@@ -4,8 +4,6 @@ namespace Oro\Bundle\TagBundle\Grid\Extension;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
@@ -25,9 +23,6 @@ class TagSearchResultsExtension extends AbstractExtension
     /** @var ResultFormatter */
     protected $resultFormatter;
 
-    /** @var EntityManager */
-    protected $em;
-
     /** @var ObjectMapper */
     protected $mapper;
 
@@ -36,18 +31,15 @@ class TagSearchResultsExtension extends AbstractExtension
 
     /**
      * @param ResultFormatter          $formatter
-     * @param EntityManager            $em
      * @param ObjectMapper             $mapper
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         ResultFormatter $formatter,
-        EntityManager $em,
         ObjectMapper $mapper,
         EventDispatcherInterface $dispatcher
     ) {
         $this->resultFormatter = $formatter;
-        $this->em              = $em;
         $this->mapper          = $mapper;
         $this->dispatcher      = $dispatcher;
     }
@@ -79,7 +71,6 @@ class TagSearchResultsExtension extends AbstractExtension
                     : [];
 
                 return new ResultItem(
-                    $this->em,
                     $entityClass,
                     $entityId,
                     null,

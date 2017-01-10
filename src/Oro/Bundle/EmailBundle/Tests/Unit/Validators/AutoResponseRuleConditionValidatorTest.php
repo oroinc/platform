@@ -97,7 +97,7 @@ class AutoResponseRuleConditionValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getValidator()
     {
-        $validator = new AutoResponseRuleConditionValidator($this->emailAddressHelper);
+        $validator = new AutoResponseRuleConditionValidator();
         $validator->initialize($this->context);
 
         return $validator;

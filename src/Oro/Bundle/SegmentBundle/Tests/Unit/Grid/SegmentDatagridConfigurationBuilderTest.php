@@ -112,6 +112,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 'acl_resource' => 'oro_segment_view',
             ],
             'options' => ['export' => true],
+            'fields_acl' => ['columns' => ['c1' => ['data_name' => 't1.userName']]]
         ];
 
         if (!empty($route)) {

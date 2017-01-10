@@ -1,5 +1,8 @@
-define(['jquery', 'oroform/js/optional-validation-handler'], function($, defaultOptionalValidationHandler) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var defaultOptionalValidationHandler = require('oroform/js/optional-validation-handler');
 
     return {
         /**

@@ -47,6 +47,7 @@ oro:
             labels.label: Label
             attribute_relations.label: Attributes
             code.label: Code
+            is_visible.label: Visible
 
         block_titles:
             general.label:       General Information
@@ -97,6 +98,7 @@ oro:
                     sortable: Sortable
                     filterable: Filterable
                     enabled: Enabled
+                    visible: Visible
 
         field_config:
             field_name.label: Name

@@ -88,4 +88,12 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
 
         $this->assertEquals($expectedMap, $map);
     }
+
+    public function testRemoveByFieldId()
+    {
+        $regularAttributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
+        $this->assertCount(1, $this->repository->findBy(['entityConfigFieldId' => $regularAttributeId]));
+        $this->assertEquals(1, $this->repository->removeByFieldId($regularAttributeId));
+        $this->assertEmpty($this->repository->findBy(['entityConfigFieldId' => $regularAttributeId]));
+    }
 }

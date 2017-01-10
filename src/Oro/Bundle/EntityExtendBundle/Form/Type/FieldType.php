@@ -12,9 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class FieldType extends AbstractType
 {
@@ -83,15 +84,11 @@ class FieldType extends AbstractType
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
                 'choice_attr' => function ($choiceKey) {
-                    $relationTypeParts = explode('||', $choiceKey);
+                    $parts = explode('||', $choiceKey);
 
-                    if (count($relationTypeParts) !== 2 || count(explode('|', $relationTypeParts[0])) !== 4) {
-                        return [];
-                    }
-
-                    return [
-                        'data-fieldname' => $relationTypeParts[1]
-                    ];
+                    return count($parts) === 2 && ExtendHelper::getRelationType($parts[0])
+                        ? ['data-fieldname' => $parts[1]]
+                        : [];
                 },
                 'empty_value' => '',
                 'block'       => 'general',

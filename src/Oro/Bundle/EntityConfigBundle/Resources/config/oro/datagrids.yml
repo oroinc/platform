@@ -260,6 +260,7 @@ datagrids:
                 select:
                     - attributeFamily.id
                     - attributeFamily.code
+                    - attributeFamily.entityClass
                 from:
                     - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily', alias: attributeFamily }
                 where:
@@ -313,7 +314,6 @@ datagrids:
                 label:         oro.grid.action.view
                 link:          view_link
                 icon:          eye
-                acl_resource:  oro_attribute_family_view
                 rowAction:     true
             update:
                 acl_resource:  oro_attribute_family_update
@@ -321,7 +321,6 @@ datagrids:
                 label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
-                acl_resource:  oro_attribute_family_update
                 rowAction:     true
             delete:
                 acl_resoure:   oro_attribute_family_delete
@@ -329,8 +328,8 @@ datagrids:
                 label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
-                acl_resource:  oro_attribute_family_delete
                 rowAction:     true
+        action_configuration: ['@oro_entity_config.datagrid.attribute_family_actions_configuration', 'configureActionsVisibility']
     attribute-groups-grid:
         source:
             type: orm
@@ -338,6 +337,7 @@ datagrids:
                 select:
                     - attributeGroup.id
                     - attributeFamily.code
+                    - attributeGroup.isVisible
                 from:
                     - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup', alias: attributeGroup }
                 join:
@@ -353,6 +353,9 @@ datagrids:
                 label: oro.entity_config.attribute_group.labels.label
             code:
                 label: oro.entity_config.attribute_group.code.label
+            isVisible:
+                label: oro.entity_config.attribute_group.is_visible.label
+                frontend_type: boolean
             attributes:
                 label: oro.entity_config.attribute_group.attribute_relations.label
                 renderable: true

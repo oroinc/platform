@@ -267,6 +267,7 @@ services:
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.manager.attribute_family_manager'
         tags:
             - { name: security.voter }
 
@@ -308,6 +309,18 @@ services:
         arguments:
             - "@oro_entity_config.twig.extension.dynamic_fields_attribute_decorator.inner"
             - "@oro_entity_config.config.attributes_config_helper"
+
+    oro_entity_config.datagrid.attribute_family_actions_configuration:
+        class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
+        arguments:
+            - '@oro_security.security_facade'
+            - '@doctrine.orm.entity_manager'
+
+    oro_entity_config.manager.attribute_family_manager:
+        class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager'
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
 
     oro_entity_config.entity_listener.attribute_group:
         class: Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener

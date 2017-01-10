@@ -12,7 +12,7 @@ class Decimal extends Constraint
     /**
      * @var string
      */
-    public $message = "This value should be decimal with valid precision ({{ precision }}) and scale ({{ scale }}).";
+    public $message = 'This value should be decimal with valid precision ({{ precision }}) and scale ({{ scale }}).';
 
     /**
      * For more info look here: \Doctrine\DBAL\Platforms\AbstractPlatform::getDecimalTypeDeclarationSQL

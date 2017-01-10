@@ -15,16 +15,22 @@ class ObjectMetadataLoader
     /** @var ObjectNestedObjectMetadataFactory */
     protected $nestedObjectMetadataFactory;
 
+    /** @var ObjectNestedAssociationMetadataFactory */
+    protected $nestedAssociationMetadataFactory;
+
     /**
-     * @param ObjectMetadataFactory             $objectMetadataFactory
-     * @param ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory
+     * @param ObjectMetadataFactory                  $objectMetadataFactory
+     * @param ObjectNestedObjectMetadataFactory      $nestedObjectMetadataFactory
+     * @param ObjectNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
      */
     public function __construct(
         ObjectMetadataFactory $objectMetadataFactory,
-        ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory
+        ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory,
+        ObjectNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
     ) {
         $this->objectMetadataFactory = $objectMetadataFactory;
         $this->nestedObjectMetadataFactory = $nestedObjectMetadataFactory;
+        $this->nestedAssociationMetadataFactory = $nestedAssociationMetadataFactory;
     }
 
     /**
@@ -52,6 +58,15 @@ class ObjectMetadataLoader
                 $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
                     $entityMetadata,
                     $config,
+                    $entityClass,
+                    $fieldName,
+                    $field,
+                    $withExcludedProperties,
+                    $targetAction
+                );
+            } elseif (DataType::isNestedAssociation($dataType)) {
+                $this->nestedAssociationMetadataFactory->createAndAddNestedAssociationMetadata(
+                    $entityMetadata,
                     $entityClass,
                     $fieldName,
                     $field,
