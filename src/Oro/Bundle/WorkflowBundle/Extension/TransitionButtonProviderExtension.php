@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -45,7 +46,10 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
         $transition = $button->getTransition();
         $workflow = $button->getWorkflow();
         try {
-            $isAvailable = $workflow->isTransitionAllowed($workflowItem, $transition, $errors);
+            $isAvailable = !$transition->isHidden() &&
+                $workflow->isTransitionAvailable($workflowItem, $transition, $errors) &&
+                $this->validateTransitionStep($workflow, $transition, $workflowItem);
+
         } catch (\Exception $e) {
             $isAvailable = false;
             if (null !== $errors) {
@@ -61,15 +65,26 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
      */
     protected function getTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
     {
+        $transitions = $this->findByDatagrids($workflow, $searchContext);
+
+        return array_filter($transitions, function (Transition $transition) {
+            return !$transition->isStart();
+        });
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param ButtonSearchContext $searchContext
+     *
+     * @return array
+     */
+    protected function findByDatagrids(Workflow $workflow, ButtonSearchContext $searchContext)
+    {
         if ($searchContext->getDatagrid() &&
             in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids(), true) &&
             $workflow->getDefinition()->getRelatedEntity() === $searchContext->getEntityClass()
         ) {
-            $transitions = $workflow->getTransitionManager()->getTransitions()->toArray();
-
-            return array_filter($transitions, function (Transition $transition) {
-                return !$transition->isStart();
-            });
+            return $workflow->getTransitionManager()->getTransitions()->toArray();
         }
 
         return [];
@@ -92,5 +107,26 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
     protected function getApplication()
     {
         return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param Transition $transition
+     * @param WorkflowItem $workflowItem
+     *
+     * @return bool
+     */
+    protected function validateTransitionStep(Workflow $workflow, Transition $transition, WorkflowItem $workflowItem)
+    {
+        $currentStep = null;
+        if ($workflowItem->getCurrentStep() && $currentStepName = $workflowItem->getCurrentStep()->getName()) {
+            $currentStep = $workflow->getStepManager()->getStep($currentStepName);
+        }
+
+        if ($currentStep && $currentStep->isAllowedTransition($transition->getName())) {
+            return true;
+        }
+
+        return false;
     }
 }
