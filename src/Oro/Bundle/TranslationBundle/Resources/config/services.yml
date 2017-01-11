@@ -157,12 +157,21 @@ services:
             - { name: oro_service_link,  service: oro_distribution.package_manager }
 
     oro_translation.packages_provider:
-        class: %oro_translation.packages_provider.class%
+        class: '%oro_translation.packages_provider.class%'
         arguments:
             - '@oro_translation.distribution.package_manager.link'
-            - %kernel.bundles%
-            - %kernel.root_dir%
-            - %oro_distribution.composer_cache_home%
+            - '%kernel.bundles%'
+            - '%kernel.root_dir%'
+            - '%oro_distribution.composer_cache_home%'
+            - ['@oro_translation.packages_provider.translation']
+
+    oro_translation.packages_provider.translation:
+        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider'
+
+    oro_translation.extension.transtation_packages_provider:
+        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension'
+        tags:
+            - {name: oro_translation.extension.packages_provider}
 
     oro_translation.query_hint.translatable:
         public: false

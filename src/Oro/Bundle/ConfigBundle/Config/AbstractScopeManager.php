@@ -19,9 +19,6 @@ abstract class AbstractScopeManager
     protected $cache;
 
     /** @var array */
-    protected $storedSettings = [];
-
-    /** @var array */
     protected $changedSettings = [];
 
     /**
@@ -46,19 +43,15 @@ abstract class AbstractScopeManager
     public function getSettingValue($name, $full = false, $scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        $this->ensureStoredSettingsLoaded($entityId);
-        list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+        $setting = $this->getCachedSetting($entityId, $name);
 
         $result = null;
-        if (isset($this->storedSettings[$entityId][$section][$key])) {
-            $setting = $this->storedSettings[$entityId][$section][$key];
-            if (isset($setting['value'])) {
-                if ($full) {
-                    $result          = $setting;
-                    $result['scope'] = $this->getScopedEntityName();
-                } else {
-                    $result = $setting['value'];
-                }
+        if (null !== $setting && isset($setting['value'])) {
+            if ($full) {
+                $result          = $setting;
+                $result['scope'] = $this->getScopedEntityName();
+            } else {
+                $result = $setting['value'];
             }
         }
 
@@ -76,27 +69,55 @@ abstract class AbstractScopeManager
     public function getInfo($name, $scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        $this->ensureStoredSettingsLoaded($entityId);
-        list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+        $setting = $this->getCachedSetting($entityId, $name);
 
         $createdAt   = null;
         $updatedAt   = null;
         $isNullValue = true;
 
-        if (!empty($this->storedSettings[$entityId][$section][$key])) {
-            $setting = $this->storedSettings[$entityId][$section][$key];
-            if (isset($setting['value'])) {
-                $isNullValue = false;
-                if (array_key_exists('createdAt', $setting)) {
-                    $createdAt = $setting['createdAt'];
-                }
-                if (array_key_exists('updatedAt', $setting)) {
-                    $updatedAt = $setting['updatedAt'];
-                }
+        if (null !== $setting) {
+            $isNullValue = false;
+            if (array_key_exists('createdAt', $setting)) {
+                $createdAt = $setting['createdAt'];
+            }
+            if (array_key_exists('updatedAt', $setting)) {
+                $updatedAt = $setting['updatedAt'];
             }
         }
 
         return [$createdAt, $updatedAt, $isNullValue];
+    }
+
+    /**
+     * @param int|null $entityId
+     * @param string $name
+     * @return array|null
+     */
+    protected function getCachedSetting($entityId, $name)
+    {
+        $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
+        list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+
+        if (!$this->cache->contains($cacheKey)) {
+            $settings = $this->loadStoredSettings($entityId);
+            $this->cache->save($cacheKey, $settings);
+        }
+
+        $settings = $this->cache->fetch($cacheKey);
+        $keySetting = null;
+
+        if (!empty($settings[$section][$key])) {
+            $keySetting = $settings[$section][$key];
+        }
+
+        if (isset($this->changedSettings[$entityId][$name]['value'])) {
+            if (null === $keySetting) {
+                $keySetting = [];
+            }
+            $keySetting = array_merge($keySetting, $this->changedSettings[$entityId][$name]);
+        }
+
+        return $keySetting;
     }
 
     /**
@@ -109,23 +130,6 @@ abstract class AbstractScopeManager
     public function set($name, $value, $scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        $this->ensureStoredSettingsLoaded($entityId);
-        list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
-
-        if (isset($this->storedSettings[$entityId][$section][$key])) {
-            $this->storedSettings[$entityId][$section][$key] = array_merge(
-                $this->storedSettings[$entityId][$section][$key],
-                [
-                    'value'                  => $value,
-                    'use_parent_scope_value' => false
-                ]
-            );
-        } else {
-            $this->storedSettings[$entityId][$section][$key] = [
-                'value'                  => $value,
-                'use_parent_scope_value' => false
-            ];
-        }
 
         $this->changedSettings[$entityId][$name] = [
             'value'                  => $value,
@@ -142,10 +146,7 @@ abstract class AbstractScopeManager
     public function reset($name, $scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        $this->ensureStoredSettingsLoaded($entityId);
-        list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
-        unset($this->storedSettings[$entityId][$section][$key]);
         $this->cache->delete($this->getCacheKey($this->getScopedEntityName(), $entityId));
 
         $this->changedSettings[$entityId][$name] = [
@@ -203,7 +204,6 @@ abstract class AbstractScopeManager
             $config = new Config();
             $config->setScopedEntity($entity)->setRecordId($entityId);
         }
-        $this->storedSettings[$entityId] = $this->convertToSettings($config);
 
         list ($updated, $removed) = $this->calculateChangeSet($settings, $entityId);
         foreach ($removed as $name) {
@@ -224,9 +224,12 @@ abstract class AbstractScopeManager
         $em->persist($config);
         $em->flush();
 
-        $settings = $this->convertToSettings($config);
+        foreach ($settings as $name => $value) {
+            unset($this->changedSettings[$entityId][$name]);
+        }
+
+        $settings = SettingsConverter::convertToSettings($config);
         $this->cache->save($this->getCacheKey($entity, $entityId), $settings);
-        $this->storedSettings[$entityId] = $settings;
 
         $em->detach($config);
 
@@ -273,7 +276,10 @@ abstract class AbstractScopeManager
     public function reload($scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        unset($this->storedSettings[$entityId]);
+        $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
+
+        $settings = $this->loadStoredSettings($entityId);
+        $this->cache->save($cacheKey, $settings);
     }
 
     /**
@@ -347,29 +353,11 @@ abstract class AbstractScopeManager
     }
 
     /**
-     * Makes sure that settings are loaded from a database
-     *
-     * @param int $entityId
-     */
-    protected function ensureStoredSettingsLoaded($entityId)
-    {
-        if (!isset($this->storedSettings[$entityId])) {
-            $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
-            $settings = $this->cache->fetch($cacheKey);
-            if (!$this->cache->contains($cacheKey)) {
-                $settings = $this->loadStoredSettings($entityId);
-                $this->cache->save($cacheKey, $settings);
-            }
-            $this->storedSettings[$entityId] = $settings;
-        }
-    }
-
-    /**
      * Loads settings from a database
      *
      * @param int $entityId
      *
-     * @return Config
+     * @return array
      */
     protected function loadStoredSettings($entityId)
     {
@@ -381,27 +369,7 @@ abstract class AbstractScopeManager
             return [];
         }
 
-        return $this->convertToSettings($config);
-    }
-
-    /**
-     * @param Config $config
-     *
-     * @return array
-     */
-    protected function convertToSettings(Config $config)
-    {
-        $settings = [];
-        foreach ($config->getValues() as $value) {
-            $settings[$value->getSection()][$value->getName()] = [
-                'value'                  => $value->getValue(),
-                'use_parent_scope_value' => false,
-                'createdAt'              => $value->getCreatedAt(),
-                'updatedAt'              => $value->getUpdatedAt()
-            ];
-        }
-
-        return $settings;
+        return SettingsConverter::convertToSettings($config);
     }
 
     /**

@@ -10,7 +10,7 @@
 {% endif %}
 
 {% block navButtons %}
-    {% if entity.id and resource_granted('oro_attribute_family_delete', entity) %}
+    {% if entity.id and resource_granted('oro_attribute_family_delete', entity) and resource_granted('delete', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_attribute_family_delete', {'id': entity.id}),
             'dataRedirect': path('oro_attribute_family_index', {alias: entityAlias}),
