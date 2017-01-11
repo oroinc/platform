@@ -70,7 +70,6 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
     public function getLocaleFallbacks()
     {
         $key = static::CACHE_KEY;
-        $this->cacheProvider->deleteAll();
         if ($this->cacheProvider->contains($key)) {
             return $this->cacheProvider->fetch($key);
         }
