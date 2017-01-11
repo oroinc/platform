@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -25,9 +27,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 class WorkflowStepColumnListener
 {
     use WorkflowQueryTrait;
-
     const WORKFLOW_STEP_COLUMN = 'workflowStepLabel';
-
     const WORKFLOW_FILTER = 'workflowStepLabelByWorkflow';
     const WORKFLOW_STEP_FILTER = 'workflowStepLabelByWorkflowStep';
 
@@ -43,32 +43,34 @@ class WorkflowStepColumnListener
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $workflowStepColumns = [self::WORKFLOW_STEP_COLUMN];
 
-    /**
-     * @var ArrayCollection[] key(Entity Class) => value(ArrayCollection of Workflow instances)
-     */
+    /** @var ArrayCollection[] key(Entity Class) => value(ArrayCollection of Workflow instances) */
     protected $workflows = [];
 
+    /** @var CurrentApplicationProviderInterface */
+    private $currentApplicationProvider;
+
     /**
-     * @param DoctrineHelper      $doctrineHelper
+     * @param DoctrineHelper $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
-     * @param ConfigProvider      $configProvider
-     * @param WorkflowRegistry    $workflowRegistry
+     * @param ConfigProvider $configProvider
+     * @param WorkflowRegistry $workflowRegistry
+     * @param CurrentApplicationProviderInterface $currentApplicationProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $configProvider,
-        WorkflowRegistry $workflowRegistry
+        WorkflowRegistry $workflowRegistry,
+        CurrentApplicationProviderInterface $currentApplicationProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityClassResolver = $entityClassResolver;
         $this->configProvider = $configProvider;
         $this->workflowRegistry = $workflowRegistry;
+        $this->currentApplicationProvider = $currentApplicationProvider;
     }
 
     /**
@@ -86,6 +88,10 @@ class WorkflowStepColumnListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
+        if (!$this->isDefaultApplication()) {
+            return;
+        }
+
         $config = $event->getConfig();
 
         // datasource type other than ORM is not supported yet
@@ -127,6 +133,10 @@ class WorkflowStepColumnListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
+        if (!$this->isDefaultApplication()) {
+            return;
+        }
+
         $datagrid = $event->getDatagrid();
 
         $config = $datagrid->getConfig();
@@ -145,6 +155,10 @@ class WorkflowStepColumnListener
      */
     public function onResultAfter(OrmResultAfter $event)
     {
+        if (!$this->isDefaultApplication()) {
+            return;
+        }
+
         $config = $event->getDatagrid()->getConfig();
 
         if (!$this->isApplicable($config)) {
@@ -368,5 +382,14 @@ class WorkflowStepColumnListener
     protected function isEntityHaveMoreThanOneWorkflow($className)
     {
         return $this->getWorkflows($className)->count() > 1;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDefaultApplication()
+    {
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION
+            === $this->currentApplicationProvider->getCurrentApplication();
     }
 }
