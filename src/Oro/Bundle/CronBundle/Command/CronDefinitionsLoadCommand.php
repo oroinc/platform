@@ -32,12 +32,8 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
 
         $applicationCommands = $this->getApplication()->all('oro:cron');
         $em = $this->getEntityManager('OroCronBundle:Schedule');
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
         foreach ($applicationCommands as $name => $command) {
-            if (!$featureChecker->isResourceEnabled($name, 'cron_jobs')) {
-                continue;
-            }
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
             if ($this->checkCommand($output, $command)) {
                 $schedule = $this->createSchedule($output, $command, $name);

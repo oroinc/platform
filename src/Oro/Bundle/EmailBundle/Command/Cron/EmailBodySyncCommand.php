@@ -15,6 +15,11 @@ use Symfony\Component\Filesystem\LockHandler;
 class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
+     * Command name
+     */
+    const COMMAND_MAME = 'oro:cron:email-body-sync';
+
+    /**
      * Number of emails in batch
      */
     const BATCH_SIZE = 25;
@@ -32,11 +37,14 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
         return '*/30 * * * *';
     }
 
+    /**
+     * @return bool
+     */
     public function isActive()
     {
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
-        return $featureChecker->isFeatureEnabled('email');
+        return $featureChecker->isResourceEnabled(self::COMMAND_MAME, 'cron_jobs');
     }
 
     /**
@@ -45,7 +53,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     protected function configure()
     {
         $this
-            ->setName('oro:cron:email-body-sync')
+            ->setName(self::COMMAND_MAME)
             ->setDescription('Synchronize email body')
             ->addOption(
                 'max-exec-time',
@@ -68,13 +76,6 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
-        if (!$featureChecker->isFeatureEnabled('email')) {
-            $output->writeln('The email feature is disabled. The command will not run.');
-
-            return 0;
-        }
-
         $lock = new LockHandler('oro:cron:email-body-sync');
         if (!$lock->lock()) {
             $output->writeln('The command is already running in another process.');
