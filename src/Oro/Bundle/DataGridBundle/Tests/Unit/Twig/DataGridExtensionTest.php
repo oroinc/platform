@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Twig;
 
+use Doctrine\DBAL\Driver\AbstractDriverException;
+use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Exception\SyntaxErrorException;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
@@ -267,6 +271,38 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($gridDataArray));
 
         $this->assertSame($gridDataArray, $this->twigExtension->getGridData($grid));
+    }
+
+    public function testGetGridDataException()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $gridData = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\ResultsObject')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $grid->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($gridData));
+
+        $errorArray = [
+            'error' => 'Page not found'
+        ];
+
+        $driverException = $this->getMockBuilder(AbstractDriverException::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $gridData->expects($this->once())
+            ->method('toArray')
+            ->willThrowException(
+                new SyntaxErrorException(
+                    'Page not found',
+                    $driverException
+                )
+            );
+
+        $this->assertSame($errorArray, $this->twigExtension->getGridData($grid));
     }
 
     /**

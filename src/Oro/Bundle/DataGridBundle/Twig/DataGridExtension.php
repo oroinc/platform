@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Twig;
 
+use Doctrine\DBAL\Exception\SyntaxErrorException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -133,7 +134,11 @@ class DataGridExtension extends \Twig_Extension
      */
     public function getGridData(DatagridInterface $grid)
     {
-        return $grid->getData()->toArray();
+        try {
+            return $grid->getData()->toArray();
+        } catch (SyntaxErrorException $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
 
     /**
