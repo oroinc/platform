@@ -70,6 +70,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
     public function getLocaleFallbacks()
     {
         $key = static::CACHE_KEY;
+        $this->cacheProvider->deleteAll();
         if ($this->cacheProvider->contains($key)) {
             return $this->cacheProvider->fetch($key);
         }
@@ -77,7 +78,9 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
             return array_merge($result, $this->localizationToArray($localization));
         }, []);
         /** All localizations always should have only one parent that equals to default language */
-        $fallbacks = [Configuration::DEFAULT_LOCALE => $fallbacks];
+        if (!isset($fallbacks[Configuration::DEFAULT_LOCALE])) {
+            $fallbacks = [Configuration::DEFAULT_LOCALE => $fallbacks];
+        }
 
         $this->cacheProvider->save($key, $fallbacks);
         return $fallbacks;
