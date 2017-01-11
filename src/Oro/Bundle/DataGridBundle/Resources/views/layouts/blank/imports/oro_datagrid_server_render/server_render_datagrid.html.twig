@@ -19,27 +19,35 @@
 
     {% set datagridData = oro_datagrid_data(datagrid) %}
 
-    {% set datagridData = datagridData|merge({
+    {% if datagridData.error is defined %}
+        {% set attr = attr|merge({class: attr.class|default('') ~ " text-center"}) %}
+        <div {{ block('block_attributes') }}>
+            <h1>Page not found</h1>
+            <p>{{ 'oro_frontend.exception.code.404'|trans }}</p>
+            <p><a href="#" onclick="window.history.back(); return false;">{{ 'oro_frontend.exception.back'|trans }}</a></p>
+        </div>
+    {% else %}
+        {% set datagridData = datagridData|merge({
         backendGrid: true
-    }) %}
+        }) %}
 
-    {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
+        {% set datagridMetaData = oro_datagrid_metadata(datagrid) %}
 
-    {% set datagridMetaData = datagridMetaData|merge({
+        {% set datagridMetaData = datagridMetaData|merge({
         GridView: 'productServerRenderGrid',
         PageableCollection: 'productPageableCollection'
-    })%}
+        })%}
 
-    {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}
+        {% set toolbarOptions = datagridMetaData.options.toolbarOptions %}
 
-    {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
-    {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
+        {% do block[id ~ '_toolbar']|merge_context({'datagrid': datagrid}) %}
+        {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
 
-    {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
+        {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
 
-    {% set enableToggleFilters = false %}
+        {% set enableToggleFilters = false %}
 
-    {% set options  = {
+        {% set options  = {
         el: '#' ~ gridId,
         gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
         builders: datagridMetaData.requireJSModules,
@@ -54,66 +62,68 @@
         themeOptions: themeOptions|default({}),
         toolbarOptions: renderParams.toolbarOptions|default({}),
         gridMainContainer: '.oro-datagrid'
-    } %}
+        } %}
 
-    <div id="{{ gridId }}"
-         data-page-component-module="oroproduct/js/app/datagrid/backend-datagrid-component"
-         data-page-component-name="{{ options.gridName }}"
-         data-page-component-options="{{ options|json_encode }}"
-         data-layout="separate"
-            {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
-    >
-        <div class="oro-datagrid">
-            {% if toolbarOptions.placement.top %}
-                <div class="toolbar" data-grid-toolbar="top">
-                    {{ block_widget(block[id ~ '_toolbar']) }}
-                </div>
-            {% endif %}
+        <div id="{{ gridId }}"
+             data-page-component-module="oroproduct/js/app/datagrid/backend-datagrid-component"
+             data-page-component-name="{{ options.gridName }}"
+             data-page-component-options="{{ options|json_encode }}"
+             data-layout="separate"
+                {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
+        >
+            <div class="oro-datagrid">
+                {% if toolbarOptions.placement.top %}
+                    <div class="toolbar" data-grid-toolbar="top">
+                        {{ block_widget(block[id ~ '_toolbar']) }}
+                    </div>
+                {% endif %}
 
-            <div class="other-scroll-container">
-                <div class="other-scroll"></div>
+                <div class="other-scroll-container">
+                    <div class="other-scroll"></div>
 
-                <div class="container-fluid grid-scrollable-container">
-                    <div class="grid-container">
-                        <div class="grid table-hover table table-bordered table-condensed">
-                            {% if themeOptions.headerHide is not defined or themeOptions.headerHide == false %}
-                                <div class="grid-header">
-                                    {{ block_widget(block[id ~ '_header_row']) }}
-                                </div>
-                            {% endif %}
+                    <div class="container-fluid grid-scrollable-container">
+                        <div class="grid-container">
+                            <div class="grid table-hover table table-bordered table-condensed">
+                                {% if themeOptions.headerHide is not defined or themeOptions.headerHide == false %}
+                                    <div class="grid-header">
+                                        {{ block_widget(block[id ~ '_header_row']) }}
+                                    </div>
+                                {% endif %}
 
-                            <div class="{{ themeOptions.bodyClassName }}">
-                                {% for datagrid_row in datagridData.data %}
-                                    {% set child = block[id ~'_row'] %}
+                                <div class="{{ themeOptions.bodyClassName }}">
+                                    {% for datagrid_row in datagridData.data %}
+                                        {% set child = block[id ~'_row'] %}
 
-                                    {% set childAttr = layout_attr_defaults(child.vars.attr, {
+                                        {% set childAttr = layout_attr_defaults(child.vars.attr, {
                                         'class': themeOptions.rowClassName
-                                    }) %}
-                                    {% set childAttr = layout_attr_defaults(childAttr, themeOptions.rowAttributes) %}
+                                        }) %}
+                                        {% set childAttr = layout_attr_defaults(childAttr, themeOptions.rowAttributes) %}
 
-                                    {% do child|merge_context({
+                                        {% do child|merge_context({
                                         'datagrid_row': datagrid_row,
                                         'themeOptions': themeOptions
-                                    }) %}
-                                    {{ block_widget(child, {'attr': childAttr}) }}
-                                {% endfor %}
-                            </div>
+                                        }) %}
+                                        {{ block_widget(child, {'attr': childAttr}) }}
+                                    {% endfor %}
+                                </div>
 
-                            <div class="grid-footer"></div>
+                                <div class="grid-footer"></div>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="no-data"></div>
                 </div>
 
-                <div class="no-data"></div>
+                {% if toolbarOptions.placement.bottom %}
+                    <div class="toolbar dropup-area" data-grid-toolbar="bottom">
+                        {{ block_widget(block[id ~ '_toolbar']) }}
+                    </div>
+                {% endif %}
             </div>
-
-            {% if toolbarOptions.placement.bottom %}
-                <div class="toolbar dropup-area" data-grid-toolbar="bottom">
-                    {{ block_widget(block[id ~ '_toolbar']) }}
-                </div>
-            {% endif %}
         </div>
-    </div>
+    {% endif %}
+
 {% endblock %}
 
 {% block __oro_datagrid_server_render__datagrid_header_row_widget %}
