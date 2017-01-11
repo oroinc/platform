@@ -45,11 +45,13 @@ abstract class AbstractDatagridTestCase extends WebTestCase
         );
         $result = $this->getJsonResponseContent($response, 200);
 
-        foreach ($result['data'] as $row) {
-            foreach ($requestData['assert'] as $fieldName => $value) {
-                $this->assertEquals($value, $row[$fieldName]);
+        if (!empty($requestData['assert'])) {
+            foreach ($result['data'] as $row) {
+                foreach ($requestData['assert'] as $fieldName => $value) {
+                    $this->assertEquals($value, $row[$fieldName]);
+                }
+                break;
             }
-            break;
         }
 
         $this->assertCount((int) $requestData['expectedResultCount'], $result['data']);

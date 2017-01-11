@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
@@ -18,15 +19,17 @@ class DateFilterProcessor
     /** @var DateFilterModifier */
     protected $modifier;
 
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
     /**
      * @param DateRangeFilter    $filter
      * @param DateFilterModifier $modifier
      */
-    public function __construct(DateRangeFilter $filter, DateFilterModifier $modifier, LocaleSettings $localeSettings)
+    public function __construct(DateRangeFilter $filter, DateFilterModifier $modifier)
     {
         $this->dateFilter = $filter;
         $this->modifier   = $modifier;
-        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -59,12 +62,27 @@ class DateFilterProcessor
     }
 
     /**
+     * Initialize locale settings to be used in the class methods
+     *
+     * @param LocaleSettings $localeSettings
+     */
+    public function setLocaleSettings(LocaleSettings $localeSettings)
+    {
+        $this->localeSettings = $localeSettings;
+    }
+
+    /**
      * @param mixed $date
      *
+     * @throws \Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException in case localeSettings is not set
      * @return \DateTime
      */
-    public function prepareDate($date)
+    protected function prepareDate($date)
     {
+        if (!$this->localeSettings) {
+            throw new InvalidArgumentException('Processor should be initialized with LocaleSettings');
+        }
+
         return $date instanceof \DateTime
             ? $date
             : new \DateTime($date, new \DateTimeZone($this->localeSettings->getTimeZone()));

@@ -300,7 +300,8 @@ services:
         arguments:
             - '@oro_dashboard.filter.date_range'
             - '@oro_filter.utils.date_filter_modifier'
-            - '@oro_locale.settings'
+        calls:
+            - ['setLocaleSettings', ['@oro_locale.settings']]
 
     # Twig extension
     oro_dashboard.twig.extension:
