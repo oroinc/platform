@@ -122,7 +122,7 @@ class TranslationStrategyProvider
                 $path = $this->findPathToLocale($subTree, $searchedLocale);
                 if ($path) {
                     array_unshift($path, $locale);
-                    return $path;
+                    return array_unique($path);
                 }
             }
         }
