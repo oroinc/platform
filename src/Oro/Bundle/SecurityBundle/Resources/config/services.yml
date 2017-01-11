@@ -207,6 +207,7 @@ services:
         class: %oro_security.acl.permission_granting_strategy.class%
         calls:
              - [setAuditLogger, ["@?security.acl.audit_logger"]]
+             - [setSecurityMetadataProvider, ["@oro_security.entity_security_metadata_provider"]]
 
     oro_security.acl.permission_map:
         public: false
@@ -306,6 +307,7 @@ services:
             - '@doctrine'
             - '@translator'
             - '@oro_security.entity_security_metadata_provider.cache'
+            - '@event_dispatcher'
 
     oro_security.entity_security_metadata_provider.cache:
         public: false

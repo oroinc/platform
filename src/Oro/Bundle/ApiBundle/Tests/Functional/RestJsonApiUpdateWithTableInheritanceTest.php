@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 /**
  * @dbIsolation
  */
-class UpdateRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
+class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
 {
     /**
      * FQCN of the entity being used for testing.
@@ -32,7 +32,7 @@ class UpdateRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department created by API', $result['data']['attributes']['title']);
         self::assertEquals([], $result['data']['relationships']['staff']['data']);
@@ -66,7 +66,7 @@ class UpdateRestJsonApiWithTableInheritanceTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department updated by API', $result['data']['attributes']['title']);
         self::assertEquals([], $result['data']['relationships']['staff']['data']);
