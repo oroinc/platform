@@ -287,29 +287,31 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     }
 
     /**
-     * Remove all empty arrays and arrays with only null values
+     * Remove all empty sub-arrays and sub-arrays with only null values
      *
-     * @param array $data
+     * @param array   $data
+     * @param integer $deep
+     *
      * @return array|null
      */
-    protected function filterEmptyArrays(array $data)
+    protected function filterEmptyArrays(array $data, $deep = 0)
     {
         $hasValue = false;
 
         foreach ($data as $key => $value) {
             if (is_array($value)) {
-                $value = $this->filterEmptyArrays($value);
+                $value      = $this->filterEmptyArrays($value, $deep + 1);
                 $data[$key] = $value;
             }
 
-            if (array() === $value) {
+            if ([] === $value && 0 !== $deep) {
                 unset($data[$key]);
             } elseif (null !== $value) {
                 $hasValue = true;
             }
         }
 
-        return $hasValue ? $data : array();
+        return $hasValue ? $data : [];
     }
 
     /**
