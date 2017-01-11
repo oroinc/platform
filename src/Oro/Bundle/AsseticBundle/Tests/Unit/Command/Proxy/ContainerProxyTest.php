@@ -19,7 +19,7 @@ class ContainerProxyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->target = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->target = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->proxy = new ContainerProxy($this->target);
     }
 
@@ -89,7 +89,7 @@ class ContainerProxyTest extends \PHPUnit_Framework_TestCase
             ['setParameter', ['name', 'test'], null],
             ['enterScope', ['name'], null],
             ['leaveScope', ['name'], null],
-            ['addScope', [$this->getMock('Symfony\Component\DependencyInjection\ScopeInterface')], null],
+            ['addScope', [$this->createMock('Symfony\Component\DependencyInjection\ScopeInterface')], null],
             ['hasScope', ['name'], true],
             ['isScopeActive', ['name'], true],
         ];

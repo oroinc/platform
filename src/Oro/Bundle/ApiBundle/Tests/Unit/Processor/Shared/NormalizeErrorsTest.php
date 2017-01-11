@@ -19,7 +19,7 @@ class NormalizeErrorsTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->processor = new NormalizeErrors($this->translator);
     }

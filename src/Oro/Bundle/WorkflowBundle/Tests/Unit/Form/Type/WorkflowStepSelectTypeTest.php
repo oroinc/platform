@@ -38,7 +38,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator->expects($this->any())->method('trans')->willReturnCallback(
             function ($label) {
                 return 'transtaled_' . $label;
@@ -160,7 +160,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->type->finishView(
             $view,
-            $this->getMock('Symfony\Component\Form\Test\FormInterface'),
+            $this->createMock('Symfony\Component\Form\Test\FormInterface'),
             ['workflow_name' => 'test']
         );
 
@@ -186,7 +186,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->type->finishView(
             $view,
-            $this->getMock('Symfony\Component\Form\Test\FormInterface'),
+            $this->createMock('Symfony\Component\Form\Test\FormInterface'),
             ['workflow_entity_class' => '\stdClass']
         );
 
@@ -202,7 +202,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     {
         $this->type->finishView(
             new FormView(),
-            $this->getMock('Symfony\Component\Form\Test\FormInterface'),
+            $this->createMock('Symfony\Component\Form\Test\FormInterface'),
             []
         );
     }

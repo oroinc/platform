@@ -45,6 +45,7 @@ class EmailSyncCommandTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->serviceFactory = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapServicesFactory')
+            ->setMethods(['createImapServices', 'getDefaultImapStorage'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->imapServices = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapServices')

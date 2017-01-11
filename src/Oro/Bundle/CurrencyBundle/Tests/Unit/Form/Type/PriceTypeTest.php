@@ -22,7 +22,7 @@ class PriceTypeTest extends FormIntegrationTestCase
      */
     protected function setUp()
     {
-        $this->formType = PriceTypeGenerator::createPriceType();
+        $this->formType = PriceTypeGenerator::createPriceType($this);
 
         parent::setUp();
     }

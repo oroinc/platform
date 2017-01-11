@@ -29,7 +29,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 
     protected function setUp()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
 
         $this->formFactory = Forms::createFormFactoryBuilder()
@@ -43,7 +43,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                     []
                 ),
                 new CsrfExtension(
-                    $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
+                    $this->createMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface')
                 )
                 ]
             )
@@ -195,7 +195,8 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 )
             );
 
-        $entityHierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
+        $entityHierarchyProvider = $this
+            ->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
         $entityHierarchyProvider
             ->expects($this->any())
             ->method('getHierarchy')

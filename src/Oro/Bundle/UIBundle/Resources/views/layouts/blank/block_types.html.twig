@@ -1,0 +1,13 @@
+{% block layout_subtree_update_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        '~data-page-component-options': {
+            view: 'oroui/js/app/views/layout-subtree-view',
+            blockId : block.vars.id,
+            reloadEvents: reloadEvents
+        },
+    }) %}
+    <div {{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}

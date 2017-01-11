@@ -37,7 +37,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
         $this->formManager = $this->getMockBuilder(EmbeddedFormManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->sessionIdProvider = $this->getMock(SessionIdProviderInterface::class);
+        $this->sessionIdProvider = $this->createMock(SessionIdProviderInterface::class);
 
         $this->embedFormLayoutManager = new EmbedFormLayoutManager(
             $this->layoutManager,
@@ -57,7 +57,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->with($formEntity->getFormType())
             ->willReturn(null);
 
-        $layoutBuilder = $this->getMock(LayoutBuilderInterface::class);
+        $layoutBuilder = $this->createMock(LayoutBuilderInterface::class);
         $this->layoutManager->expects(self::once())
             ->method('getLayoutBuilder')
             ->willReturn($layoutBuilder);
@@ -96,7 +96,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
     {
         $formEntity = new EmbeddedForm();
         $formEntity->setFormType('testForm');
-        $form = $this->getMock(FormInterface::class);
+        $form = $this->createMock(FormInterface::class);
 
         $this->formManager->expects(self::once())
             ->method('getCustomFormLayoutByFormType')
@@ -107,7 +107,7 @@ class EmbedFormLayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getSessionId')
             ->willReturn('test_session_id');
 
-        $layoutBuilder = $this->getMock(LayoutBuilderInterface::class);
+        $layoutBuilder = $this->createMock(LayoutBuilderInterface::class);
         $this->layoutManager->expects(self::once())
             ->method('getLayoutBuilder')
             ->willReturn($layoutBuilder);

@@ -87,16 +87,12 @@ class EntityRelationGridListener
         $assignedExpr = 'CASE WHEN ' . $whenExpr . ' THEN true ELSE false END';
 
         // build a query skeleton
-        $query = [
-            'select' => [
-                sprintf('o.%s AS id', $targetIdField),
-                $assignedExpr . ' as assigned'
-            ],
-            'from'   => [
-                ['table' => $targetEntityName, 'alias' => 'o']
-            ]
-        ];
-        $config->offsetSetByPath('[source][query]', $query);
+        $config->getOrmQuery()
+            ->resetSelect()
+            ->resetFrom()
+            ->addSelect(sprintf('o.%s AS id', $targetIdField))
+            ->addSelect($assignedExpr . ' as assigned')
+            ->addFrom($targetEntityName, 'o');
 
         // enable AdditionalFieldsExtension to add all other fields
         $config->offsetSetByPath('[options][entity_name]', $targetEntityName);

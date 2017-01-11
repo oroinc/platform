@@ -16,12 +16,12 @@
     {% set threadViewOptions = {
         view: 'oroemail/js/app/views/email-thread-view',
         actionPanelSelector: '.email-thread-action-panel',
-        name: 'email-thread'
     } %}
     {% set threadViewOptions = threadViewOptions|merge({isBaseView: not renderContexts}) %}
     <div class="thread-view"
          data-page-component-module="oroui/js/app/components/view-component"
          data-page-component-options="{{ threadViewOptions|json_encode }}"
+         data-page-component-name="email-thread"
          data-layout="separate">
         {% for email in thread|reverse %}
             {% if shortEmailThread is defined and shortEmailThread and loop.index > 2 and loop.index < (loop.length - 1) %}

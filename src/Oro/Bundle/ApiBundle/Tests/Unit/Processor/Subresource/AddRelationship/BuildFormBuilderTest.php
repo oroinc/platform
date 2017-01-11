@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\AddRelationship;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 
@@ -24,8 +26,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->propertyAccessor = $this->getMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
+        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->propertyAccessor = $this->createMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
 
         $this->processor = new BuildFormBuilder($this->formFactory, $this->propertyAccessor);
 
@@ -36,10 +38,13 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     public function testAppendRelationshipMapperShouldBeSetForFormBuilder()
     {
         $parentEntity = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
+
+        $parentMetadata = new EntityMetadata();
+        $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects($this->once())
             ->method('createNamedBuilder')
@@ -50,6 +55,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->with($this->isInstanceOf('Oro\Bundle\ApiBundle\Form\DataMapper\AppendRelationshipMapper'));
 
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
         $this->assertSame($formBuilder, $this->context->getFormBuilder());

@@ -25,7 +25,8 @@ define([
         if (validator instanceof $.validator) {
             return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
                 var $el = $(el);
-                // is it current element or first in a group of elements
+
+                // is it current element or the first in a group of elements or the first visible one
                 return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
             });
         } else {
@@ -220,7 +221,7 @@ define([
         var validator = this;
 
         $(this.currentForm).on('content:changed', function(event) {
-            validationHandler.initialize($(event.target));
+            validationHandler.initializeOptionalValidationGroupHandlers($(event.target));
         }).on('disabled', function(e) {
             validator.hideElementErrors(e.target);
         });
@@ -358,7 +359,12 @@ define([
         ignore: ':hidden:not([type=hidden])',
         onfocusout: function(element, event) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
-                this.element(element);
+                if ($(element).hasClass('select2-focusser')) {
+                    var realField = $(element).closest('.select2-container').parent().find('.select2[type=hidden]')[0];
+                    this.element(realField ? realField : element);
+                } else {
+                    this.element(element);
+                }
             }
         },
         onkeyup: function(element, event) {

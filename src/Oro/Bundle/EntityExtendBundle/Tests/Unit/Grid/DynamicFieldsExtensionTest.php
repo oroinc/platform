@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension;
@@ -35,18 +36,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 )
             )
         );
-        $this->assertTrue(
-            $this->getExtension()->isApplicable(
-                DatagridConfiguration::create(
-                    [
-                        'extended_entity_name' => 'entity',
-                        'source' => [
-                            'type' => 'orm',
-                        ],
-                    ]
-                )
-            )
-        );
         $this->assertFalse(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
@@ -56,6 +45,56 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 )
             )
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function isExtendDataProvider()
+    {
+        return [
+            'is applicable' => [
+                'isExtend' => true
+            ],
+            'not applicable' => [
+                'isExtend' => false
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider isExtendDataProvider
+     * @param $isExtend
+     */
+    public function testIsApplicableIfEntityIsExtendable($isExtend)
+    {
+        $datagridConfig = DatagridConfiguration::create([
+            'extended_entity_name' => self::ENTITY_NAME,
+            'source' => [
+                'type' => 'orm',
+            ],
+        ]);
+
+        $config = $this->createMock(ConfigInterface::class);
+        $config
+            ->expects($this->once())
+            ->method('is')
+            ->with('is_extend')
+            ->willReturn($isExtend);
+
+        $this->extendConfigProvider
+            ->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($config);
+
+        $this->extendConfigProvider
+            ->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn(true);
+
+        $this->assertEquals($isExtend, $this->getExtension()->isApplicable($datagridConfig));
     }
 
     public function testGetPriority()

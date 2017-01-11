@@ -1,0 +1,4 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set attributes = record.getValue('attributes') %}
+
+{{ UI.renderList(attributes) }}

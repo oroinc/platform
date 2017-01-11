@@ -350,7 +350,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'code'     => 'id2',
                     'category' => null,
-                    'groups'   => null,
+                    'groups'   => [],
                 ]
             ],
             $result

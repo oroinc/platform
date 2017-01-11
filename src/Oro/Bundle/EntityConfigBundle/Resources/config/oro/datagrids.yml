@@ -61,16 +61,13 @@ datagrids:
                     type: datetime
                     data_name: ce.updated
 
-    # Entity field datagrid
-    entityfields-grid:
+    base-entityfields-grid:
         options:
             mode: client
             entityHint: fields
             toolbarOptions:
                 pageSize:
                     default_per_page: 50
-        # TODO: check oro_entityconfig_view acl (403) right now
-        acl_resource: oro_entityconfig_manage
         source:
             type: orm
             query:
@@ -91,7 +88,6 @@ datagrids:
                     and:
                         - ce.id = :entity_id
                         - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_HIDDEN'
-
         columns:
             fieldName:
                 label: oro.entity_config.field_config.field_name.label
@@ -102,12 +98,6 @@ datagrids:
                 type: twig
                 template: OroEntityConfigBundle:Config:fieldType.html.twig
 
-        properties:
-            update_link:
-                type: url
-                route: oro_entityconfig_field_update
-                params:
-                    - id
         actions:
             # @TODO check why those actions dont have ACL
             update:
@@ -125,6 +115,59 @@ datagrids:
             default:
                 fieldName: ASC
         filters: ~
+
+    # Entity field datagrid
+    entityfields-grid:
+        extends: base-entityfields-grid
+        # TODO: check oro_entityconfig_view acl (403) right now
+        acl_resource: oro_entityconfig_manage
+        properties:
+            update_link:
+                type: url
+                route: oro_entityconfig_field_update
+                params:
+                    - id
+
+    # Attribute fields datagrid
+    attributes-grid:
+        extends: base-entityfields-grid
+        acl_resource: oro_attributes_manage
+        source:
+            type: orm
+            query:
+                where:
+                    and:
+                        - cfv_attribute_is_attribute.value = '1'
+        properties:
+            update_link:
+                type: url
+                route: oro_attribute_update
+                params:
+                    - id
+        columns:
+            attributeFamilies:
+                label: oro.entity_config.attribute_family.entity_plural_label
+                frontend_type: html
+                type: twig
+                template: OroEntityConfigBundle:Datagrid:Column/attributeFamilies.html.twig
+                order: 99
+        actions:
+            update:
+                acl_resource: oro_attribute_update
+                type: navigate
+                label: oro.grid.action.update
+                icon: pencil-square-o
+                link: update_link
+                rowAction: true
+        filters:
+            columns:
+                type:
+                    type:      choice
+                    data_name: cf.type
+                    options:
+                        field_options:
+                            choices: "@oro_entity_extend.type.field->getTranslatedTypeChoices"
+                            multiple: true
 
     # Audit entity log grid
     entity-audit-grid:
@@ -209,3 +252,115 @@ datagrids:
                 context:
                     is_entity: false
                     field_name: ~ # set from buildBefore in event listener
+    attribute-family-grid:
+        acl_resource: oro_attribute_family_manage
+        source:
+            type:         orm
+            query:
+                select:
+                    - attributeFamily.id
+                    - attributeFamily.code
+                    - attributeFamily.entityClass
+                from:
+                    - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily', alias: attributeFamily }
+                where:
+                    and:
+                        - attributeFamily.entityClass = :entity_class
+            bind_parameters:
+                - entity_class
+        columns:
+            code:
+                label: oro.entity_config.attribute_family.code.label
+            familyLabel:
+                label: oro.entity_config.attribute_family.labels.label
+        properties:
+            id: ~
+            familyLabel:
+                type: localized_value
+                data_name: labels
+            view_link:
+                type:  url
+                route: oro_attribute_family_view
+                params:
+                    - id
+            update_link:
+                type:  url
+                route: oro_attribute_family_update
+                params:
+                    - id
+            delete_link:
+                type:  url
+                route: oro_attribute_family_delete
+                params:
+                    - id
+        sorters:
+            columns:
+                code:
+                    data_name: attributeFamily.code
+                familyLabel:
+                    data_name: familyLabel
+        filters:
+            columns:
+                code:
+                    type:      string
+                    data_name: attributeFamily.code
+                familyLabel:
+                    type:      string
+                    data_name: familyLabel
+        actions:
+            view:
+                acl_resource:  oro_attribute_family_view
+                type:          navigate
+                label:         oro.grid.action.view
+                link:          view_link
+                icon:          eye
+                rowAction:     true
+            update:
+                acl_resource:  oro_attribute_family_update
+                type:          navigate
+                label:         oro.grid.action.update
+                link:          update_link
+                icon:          edit
+                rowAction:     true
+            delete:
+                acl_resoure:   oro_attribute_family_delete
+                type:          ajaxdelete
+                label:         oro.grid.action.delete
+                link:          delete_link
+                icon:          trash
+                rowAction:     true
+        action_configuration: ['@oro_entity_config.datagrid.attribute_family_actions_configuration', 'configureActionsVisibility']
+    attribute-groups-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - attributeGroup.id
+                from:
+                    - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup', alias: attributeGroup }
+                join:
+                    inner:
+                        - { join: attributeGroup.attributeFamily, alias: attributeFamily }
+                where:
+                    and:
+                        - attributeFamily.id = :family_id
+            bind_parameters:
+                - family_id
+        columns:
+            groupLabel:
+                label: oro.entity_config.attribute_group.labels.label
+            attributes:
+                label: oro.entity_config.attribute_group.attribute_relations.label
+                renderable: true
+                type: twig
+                template: 'OroEntityConfigBundle:Datagrid:Property/attributes.html.twig'
+                frontend_type: html
+        properties:
+            id: ~
+            groupLabel:
+                type: localized_value
+                data_name: labels
+        sorters:
+            columns:
+                groupLabel:
+                    data_name: groupLabel

@@ -123,11 +123,12 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
 
         $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->setMethods(
-                ['getFromEmailAddress',
+                [
+                    'getFromEmailAddress',
                     'hasOwner',
                     'getOwner',
                     'getOrganization',
-                    'getActivityTargetEntities'
+                    'getActivityTargets'
                 ]
             )
             ->disableOriginalConstructor()
@@ -142,7 +143,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getOrganization')
             ->willReturn($organization);
         $emailMock->expects($this->exactly(1))
-            ->method('getActivityTargetEntities')
+            ->method('getActivityTargets')
             ->willReturn([]);
 
         $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
@@ -180,7 +181,8 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $this->emailActivityListProvider->setFeatureChecker($this->featureChecker);
         $this->emailActivityListProvider->addFeature('email');
 
-        $mock = $this->getMockForTrait(FeatureCheckerHolderTrait::class);
+        $mock = $this->getMockBuilder(FeatureCheckerHolderTrait::class)->setMethods(['isFeaturesEnabled'])
+            ->getMockForTrait();
 
         $mock->expects($this->any())
             ->method('isFeaturesEnabled')

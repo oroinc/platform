@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
@@ -23,6 +24,9 @@ class ConfigNormalizer
         $toRemove = [];
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
+            if (DataType::isExtendedAssociation($field->getDataType())) {
+                $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+            }
             $propertyPath = $field->getPropertyPath();
             if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
                 $toRemove[] = $fieldName;

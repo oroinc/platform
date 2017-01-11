@@ -1,0 +1,12 @@
+entity_config:
+    multicurrency:
+        field:
+            items:
+                target:
+                    options:
+                        required_properties:
+                            -
+                                config_id:
+                                    scope: extend
+                                code: is_serialized
+                                value: false

@@ -10,20 +10,23 @@ define(['jquery'], function($) {
          * @param  {jQuery}  $group Optional validation elements group
          */
         initialize: function($group) {
-            var self = this;
-
             var labels = this.getGroupElements($group, $group.find('label[data-required]'));
             labels.addClass('required');
 
             var labelAsterisk = labels.find('em');
-            labelAsterisk.hide().html('*');
-            if (self.hasNotEmptyDescendantGroup($group) ||
-                self.hasNotEmptyInput($group) ||
-                self.hasNotEmptySelect($group)) {
-                labelAsterisk.show();
+            labelAsterisk.html('*');
 
+            if (this.isGroupEmpty($group)) {
+                labelAsterisk.hide();
+            } else {
+                labelAsterisk.show();
                 $group.data('group-validation-required', true);
             }
+        },
+
+        isGroupEmpty: function($group) {
+            return !(this.hasNotEmptyDescendantGroup($group) || this.hasNotEmptyInput($group) ||
+                this.hasNotEmptySelect($group));
         },
 
         /**
@@ -111,7 +114,7 @@ define(['jquery'], function($) {
          * @param {string|undefined} value  Changed Element value
          */
         handleGroupRequire: function($group, value) {
-            if (this.isValueEmpty(value)) {
+            if (this.isValueEmpty(value) && this.isGroupEmpty($group)) {
                 $group.find('label[data-required] em').hide();
                 this.clearValidationErrorsAndDisableValidation($group);
                 $group.data('group-validation-required', false);

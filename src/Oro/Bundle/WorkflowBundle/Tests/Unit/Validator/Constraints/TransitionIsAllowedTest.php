@@ -9,7 +9,7 @@ class TransitionIsAllowedTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $workflowItem = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
+        $workflowItem = $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
         $transitionName = 'test_transition';
 
         $constraint = new TransitionIsAllowed($workflowItem, $transitionName);

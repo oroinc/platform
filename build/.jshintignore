@@ -1,0 +1,5 @@
+../../**/node_modules/**
+../../**/public/lib/**
+../../**/Karma/lib/**
+../../**/commerce/**
+../../**/*.min.js

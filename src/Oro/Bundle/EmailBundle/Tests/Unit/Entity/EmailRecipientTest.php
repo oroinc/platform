@@ -30,7 +30,7 @@ class EmailRecipientTest extends \PHPUnit_Framework_TestCase
 
     public function testEmailAddressGetterAndSetter()
     {
-        $emailAddress = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $emailAddress = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
 
         $entity = new EmailRecipient();
         $entity->setEmailAddress($emailAddress);
@@ -40,7 +40,7 @@ class EmailRecipientTest extends \PHPUnit_Framework_TestCase
 
     public function testEmailGetterAndSetter()
     {
-        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
 
         $entity = new EmailRecipient();
         $entity->setEmail($email);

@@ -645,6 +645,6 @@ DQL
      */
     protected function getQueryBuilder()
     {
-        return new QueryBuilder($this->getMock('Doctrine\ORM\EntityManagerInterface'));
+        return new QueryBuilder($this->createMock('Doctrine\ORM\EntityManagerInterface'));
     }
 }

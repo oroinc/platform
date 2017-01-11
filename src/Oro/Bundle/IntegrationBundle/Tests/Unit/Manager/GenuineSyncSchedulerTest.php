@@ -15,7 +15,7 @@ class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testCouldBeConstructedWithRegistryAsFirstArgument()
     {
-        new GenuineSyncScheduler($this->getMock(MessageProducerInterface::class));
+        new GenuineSyncScheduler($this->createMock(MessageProducerInterface::class));
     }
 
     public function testShouldSendSyncIntegrationMessageWithIntegrationIdOnly()

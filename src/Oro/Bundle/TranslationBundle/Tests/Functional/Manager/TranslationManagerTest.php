@@ -62,7 +62,28 @@ class TranslationManagerTest extends WebTestCase
         $locale = LoadLanguages::LANGUAGE1;
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
-        $this->assertNull($this->manager->saveTranslation($key, '', $locale, $domain, Translation::SCOPE_UI));
+        $this->assertNotNull($this->manager->saveTranslation($key, '', $locale, $domain, Translation::SCOPE_UI));
+        $this->manager->flush();
+
+        $this->assertNotNull($this->repository->findTranslation($key, $locale, $domain));
+    }
+
+    public function testCreateWithNullValue()
+    {
+        $key = uniqid('TEST_KEY_', true);
+        $locale = LoadLanguages::LANGUAGE1;
+        $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
+
+        $this->assertNotNull($this->manager->saveTranslation(
+            $key,
+            uniqid('TEST_VALUE_', true),
+            $locale,
+            $domain,
+            Translation::SCOPE_UI
+        ));
+        $this->manager->flush();
+
+        $this->assertNull($this->manager->saveTranslation($key, null, $locale, $domain, Translation::SCOPE_UI));
         $this->manager->flush();
 
         $this->assertNull($this->repository->findTranslation($key, $locale, $domain));

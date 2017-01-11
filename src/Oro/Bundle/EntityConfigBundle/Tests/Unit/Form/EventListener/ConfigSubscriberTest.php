@@ -227,7 +227,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $form  = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $event = $this->getFormEvent($data, $model, $form);
         $this->configManager->expects($this->once())
             ->method('getProviders')
@@ -577,14 +577,14 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFormEvent($data, $model, $form = null)
     {
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formConfig->expects($this->once())
             ->method('getOption')
             ->with('config_model')
             ->will($this->returnValue($model));
 
         if (null === $form) {
-            $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+            $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         }
         $form->expects($this->once())
             ->method('getConfig')

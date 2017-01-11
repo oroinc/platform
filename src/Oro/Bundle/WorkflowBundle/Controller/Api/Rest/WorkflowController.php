@@ -172,7 +172,8 @@ class WorkflowController extends FOSRestController
         return $this->handleView(
             $this->view(
                 array(
-                    'workflowItem' => $workflowItem
+                    'workflowItem' => $workflowItem,
+                    'redirectUrl' => $workflowItem->getResult()->redirectUrl,
                 ),
                 Codes::HTTP_OK
             )

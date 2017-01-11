@@ -3,10 +3,13 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -18,14 +21,14 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
     protected $entityClassResolver;
 
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
-    protected $manager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
+    protected $registry;
 
     /** @var DeleteMassActionExtension */
     protected $extension;
+
+    /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $contextHelper;
 
     protected function setUp()
     {
@@ -35,14 +38,14 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->gridConfigurationHelper = new GridConfigurationHelper($this->entityClassResolver);
-
-        $this->manager = $this->getMockBuilder(OperationManager::class)->disableOriginalConstructor()->getMock();
+        $this->registry = $this->getMockBuilder(OperationRegistry::class)->disableOriginalConstructor()->getMock();
+        $this->contextHelper = $this->getMockBuilder(ContextHelper::class)->disableOriginalConstructor()->getMock();
 
         $this->extension = new DeleteMassActionExtension(
             $this->doctrineHelper,
-            $this->gridConfigurationHelper,
-            $this->manager
+            $this->entityClassResolver,
+            $this->registry,
+            $this->contextHelper
         );
     }
 
@@ -51,9 +54,8 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
         unset(
             $this->extension,
             $this->doctrineHelper,
-            $this->gridConfigurationHelper,
             $this->entityClassResolver,
-            $this->manager
+            $this->registry
         );
     }
 
@@ -69,21 +71,31 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider isApplicableDataProvider
      *
-     * @param bool $hasOperation
+     * @param ActionData $actionData
+     * @param Operation $operation
+     * @param bool $expected
      */
-    public function testIsApplicable($hasOperation)
+    public function testIsApplicable(ActionData $actionData, Operation $operation = null, $expected = false)
     {
-        $this->manager->expects($this->once())
-            ->method('hasOperation')
-            ->with(
-                DeleteMassActionExtension::OPERATION_NAME,
-                [
-                    'entityClass' => 'TestEntity',
-                    'datagrid' => 'test-grid',
-                    'group' => ['test_group']
-                ]
-            )
-            ->willReturn($hasOperation);
+        $this->registry->expects($this->once())
+            ->method('findByName')
+            ->with(DeleteMassActionExtension::OPERATION_NAME)
+            ->willReturn($operation);
+
+        $context = [
+            'entityClass' => 'TestEntity',
+            'datagrid' => 'test-grid',
+            'group' => ['test_group']
+        ];
+
+        if ($operation) {
+            $this->contextHelper->expects($this->once())
+                ->method('getActionData')
+                ->with($context)
+                ->willReturn($actionData);
+        } else {
+            $this->contextHelper->expects($this->never())->method('getActionData');
+        }
 
         $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
@@ -97,7 +109,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->setGroups(['test_group']);
 
-        $this->assertEquals($hasOperation, $this->extension->isApplicable($this->getDatagridConfiguration()));
+        $this->assertEquals($expected, $this->extension->isApplicable($this->getDatagridConfiguration()));
     }
 
     /**
@@ -105,9 +117,38 @@ class DeleteMassActionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function isApplicableDataProvider()
     {
+        $actionData = new ActionData([
+            'entityClass' => 'TestEntity',
+            'datagrid' => 'test-grid',
+            'group' => ['test_group']
+        ]);
+
+        $operationAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operationAvailable->expects($this->once())
+            ->method('isAvailable')->with($actionData)->willReturn(true);
+        $operationAvailable->expects($this->once())
+            ->method('getDefinition')->willReturn(new OperationDefinition());
+
+        $operationNotAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operationNotAvailable->expects($this->once())
+            ->method('isAvailable')->with($actionData)->willReturn(false);
+        $operationNotAvailable->expects($this->once())
+            ->method('getDefinition')->willReturn(new OperationDefinition());
+
         return [
-            ['hasOperation' => true],
-            ['hasOperation' => false]
+            [
+                'actionData' => $actionData,
+                'operation' => null
+            ],
+            [
+                'actionData' => $actionData,
+                'operation' => $operationAvailable,
+                'expected' => true,
+            ],
+            [
+                'actionData' => $actionData,
+                'operation' => $operationNotAvailable
+            ]
         ];
     }
 

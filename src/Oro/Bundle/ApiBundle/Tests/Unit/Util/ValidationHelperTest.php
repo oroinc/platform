@@ -17,7 +17,7 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->metadataFactory = $this
-            ->getMock('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface');
+            ->createMock('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface');
 
         $this->validationHelper = new ValidationHelper($this->metadataFactory);
     }
@@ -39,7 +39,7 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetValidationMetadataForClassWhenMetadataExists()
     {
         $className = 'Test\Class';
-        $classMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
 
         $this->metadataFactory->expects($this->once())
             ->method('hasMetadataFor')
@@ -78,8 +78,8 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Class';
         $propertyName = 'test';
-        $classMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
-        $propertyMetadata = $this->getMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
+        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $propertyMetadata = $this->createMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
 
         $this->metadataFactory->expects($this->once())
             ->method('hasMetadataFor')
@@ -103,7 +103,7 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Class';
         $group = 'Test';
-        $classMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
 
         $this->metadataFactory->expects($this->once())
             ->method('hasMetadataFor')
@@ -131,7 +131,7 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
     {
         $className = 'Test\Class';
         $group = 'Test';
-        $classMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
 
         $this->metadataFactory->expects($this->once())
             ->method('hasMetadataFor')
@@ -160,8 +160,8 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Test\Class';
         $propertyName = 'test';
         $group = 'Test';
-        $classMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
-        $propertyMetadata = $this->getMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
+        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $propertyMetadata = $this->createMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
 
         $this->metadataFactory->expects($this->once())
             ->method('hasMetadataFor')
@@ -195,8 +195,8 @@ class ValidationHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Test\Class';
         $propertyName = 'test';
         $group = 'Test';
-        $classMetadata = $this->getMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
-        $propertyMetadata = $this->getMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
+        $classMetadata = $this->createMock('Symfony\Component\Validator\Mapping\ClassMetadataInterface');
+        $propertyMetadata = $this->createMock('Symfony\Component\Validator\Mapping\PropertyMetadataInterface');
 
         $this->metadataFactory->expects($this->once())
             ->method('hasMetadataFor')

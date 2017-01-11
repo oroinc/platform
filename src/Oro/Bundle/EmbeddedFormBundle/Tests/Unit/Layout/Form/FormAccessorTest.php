@@ -16,7 +16,7 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->form->expects($this->once())
             ->method('getName')
             ->will($this->returnValue(self::FORM_NAME));
@@ -55,8 +55,8 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formView   = new FormView();
 
         $formView->vars['multipart'] = false;
@@ -87,7 +87,7 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formView   = new FormView();
 
         $formView->vars['multipart'] = true;

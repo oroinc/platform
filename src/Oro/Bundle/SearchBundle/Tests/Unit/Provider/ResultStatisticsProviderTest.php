@@ -162,7 +162,7 @@ class ResultStatisticsProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConfigEntity($label, $icon)
     {
-        $configEntity = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $configEntity = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $configEntity->expects($this->exactly(2))
             ->method('has')
             ->will($this->returnValue(true));

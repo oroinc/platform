@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
-use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\CurrencyBundle\Entity\MultiCurrencyHolderInterface;
-use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MultiCurrencyTransformer;
 use Symfony\Component\Validator\Constraints\NotBlank;
+
+use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 
 class MultiCurrencyType extends PriceType
 {
@@ -63,16 +61,6 @@ class MultiCurrencyType extends PriceType
                 ]
             );
 
-        $builder->addViewTransformer(new MultiCurrencyTransformer());
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $multiCurrencyHolder = $event->getForm()->getParent()->getData();
-                if ($multiCurrencyHolder instanceof MultiCurrencyHolderInterface) {
-                    $multiCurrencyHolder->updateMultiCurrencyFields();
-                }
-            }
-        );
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {

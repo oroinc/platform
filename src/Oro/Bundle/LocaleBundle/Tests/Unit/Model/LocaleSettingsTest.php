@@ -28,7 +28,7 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calendarFactory = $this->getMock('Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface');
+        $this->calendarFactory = $this->createMock('Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface');
         $this->localeSettings = new LocaleSettings($this->configManager, $this->calendarFactory);
     }
 
@@ -338,7 +338,7 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
             ->with('oro_locale.language')
             ->will($this->returnValue($expectedLanguage));
 
-        $calendar = $this->getMock('Oro\Bundle\LocaleBundle\Model\Calendar');
+        $calendar = $this->createMock('Oro\Bundle\LocaleBundle\Model\Calendar');
 
         $this->calendarFactory->expects($this->once())->method('getCalendar')
             ->with($expectedLocale, $expectedLanguage)
@@ -354,7 +354,7 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->never())->method($this->anything());
 
-        $calendar = $this->getMock('Oro\Bundle\LocaleBundle\Model\Calendar');
+        $calendar = $this->createMock('Oro\Bundle\LocaleBundle\Model\Calendar');
 
         $this->calendarFactory->expects($this->once())->method('getCalendar')
             ->with($locale, $language)

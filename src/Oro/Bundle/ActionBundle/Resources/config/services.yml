@@ -6,14 +6,10 @@ parameters:
     oro_action.helper.applications_url.class: Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
-    oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
-    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
-    oro_action.layout.data_provider.actions_data_provider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsProvider
 
 services:
     oro_action.handler.delete:
@@ -56,10 +52,7 @@ services:
     oro_action.helper.options:
         class: %oro_action.helper.options.class%
         arguments:
-            - '@oro_action.helper.context'
-            - '@oro_action.options_assembler'
-            - '@oro_action.expression.context_accessor'
-            - '@oro_action.helper.applications_url'
+            - '@router'
             - '@translator'
 
     oro_action.helper.applications_url:
@@ -81,13 +74,6 @@ services:
         arguments:
             - '@oro_action.configuration.provider.action_groups'
             - '@oro_action.assembler.action_group'
-
-    oro_action.operation_manager:
-        class: %oro_action.operation_manager.class%
-        arguments:
-            - '@oro_action.operation_registry'
-            - '@oro_action.action_group_registry'
-            - '@oro_action.helper.context'
 
     oro_action.attribute_guesser:
         class: %oro_action.attribute_guesser.class%
@@ -130,12 +116,13 @@ services:
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
 
-    oro_action.form_manager:
-        class: %oro_action.form_manager.class%
+    oro_action.form.handler.operation_button:
+        class: Oro\Bundle\ActionBundle\Handler\OperationFormHandler
         arguments:
             - '@form.factory'
-            - '@oro_action.operation_manager'
             - '@oro_action.helper.context'
+            - '@oro_action.operation_registry'
+            - '@translator'
 
     oro_action.api_manager:
         class: %oro_action.api_manager.class%
@@ -144,14 +131,15 @@ services:
             - ''
             - '@doctrine.orm.entity_manager'
 
-    oro_action.datagrid.event_listener.operation:
-        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\OperationListener'
+    oro_action.datagrid.event_listener.button:
+        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener'
         arguments:
-            - '@oro_action.operation_manager'
+            - '@oro_action.provider.button'
             - '@oro_action.helper.context'
             - '@oro_action.datagrid.mass_action_provider.registry'
             - '@oro_action.helper.options'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@translator'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
@@ -161,33 +149,24 @@ services:
         class: Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_datagrid.grid_configuration.helper'
-            - '@oro_action.operation_manager'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_action.operation_registry'
+            - '@oro_action.helper.context'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
             - { name: oro_datagrid.extension }
 
-    oro_action.datagrid.action.action_widget_action:
-        class: %oro_action.datagrid.action.action_widget_action.class%
+    oro_action.datagrid.action.button_widget_action:
+        class: Oro\Bundle\ActionBundle\Datagrid\Action\ButtonWidgetAction
         arguments:
             - '@translator'
         scope: prototype
         tags:
-            - { name: oro_datagrid.extension.action.type, type: action-widget }
+            - { name: oro_datagrid.extension.action.type, type: button-widget }
 
     oro_action.datagrid.mass_action_provider.registry:
         class: %oro_action.datagrid.mass_action_provider.registry.class%
-
-    oro_action.layout.data_provider.actions_data_provider:
-        class: %oro_action.layout.data_provider.actions_data_provider.class%
-        arguments:
-            - '@oro_action.operation_manager'
-            - '@oro_action.helper.context'
-            - '@oro_action.helper.restrict'
-            - '@translator'
-        tags:
-            - { name: layout.data_provider, alias: actions }
 
     oro_action.layout.data_provider.button_provider:
         class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\LayoutButtonProvider'
@@ -196,15 +175,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_action.provider.button_search_context'
         tags:
-            - { name: layout.data_provider, alias: button_provider }
-
-    oro_action.layout.data_provider.action_buttons:
-        class: 'Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider'
-        arguments:
-            - '@oro_action.provider.route'
-            - '@oro_entity.doctrine_helper'
-        tags:
-            - { name: layout.data_provider, alias: action_buttons }
+            - { name: layout.data_provider, alias: buttons }
 
     oro_action.condition.route_exists:
         class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
@@ -228,11 +199,13 @@ services:
     oro_action.provider.button:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonProvider'
 
-    oro_ui.provider.button.extension.operation:
+    oro_action.provider.button.extension.operation:
         class: 'Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension'
         arguments:
             - '@oro_action.operation_registry'
             - '@oro_action.helper.context'
             - '@oro_action.provider.route'
+            - '@oro_action.options_assembler'
+            - '@oro_action.expression.context_accessor'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }

@@ -1,0 +1,2 @@
+imports:
+    - { resource: 'sub/child1.yml' }

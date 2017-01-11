@@ -37,7 +37,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
 
         $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
 
-        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->type = new WorkflowSelectType($this->registry, $this->translator);
     }
@@ -136,7 +136,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->with($label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
             ->willReturn($translatedLabel);
 
-        $this->type->finishView($view, $this->getMock(FormInterface::class), []);
+        $this->type->finishView($view, $this->createMock(FormInterface::class), []);
 
         $this->assertEquals([new ChoiceView([], 'test', $translatedLabel)], $view->vars['choices']);
     }

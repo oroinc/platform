@@ -154,11 +154,9 @@ oro_entity:
 "entity_aliases" configuration section
 --------------------------------------
 
-The `entity_aliases` section allows to override existing system-wide entity aliases.
+The `entity_aliases` section allows to override existing system-wide entity aliases or add aliases for models intended to be used only in Data API.
 
-It can be helpful when you need to provide entity aliases for Data API but it is not possible to make them system-wide. For example because the backwards compatibility promise.
-
-Please note that you can override existing entity aliases via `Resources/config/oro/api.yml`, but it is not possible to introduce aliases for new entities here.
+It can be helpful when you need to provide entity aliases for Data API but it is not possible to make them system-wide. For example because the backwards compatibility promise or because your models were created for using only in Data API.
 
 Please see [documentation](../../../EntityBundle/Resources/doc/entity_aliases.md) for more details about entity aliases.
 
@@ -185,6 +183,7 @@ The `entities` section describes a configuration of entities.
 * **order_by** *array* The property can be used to configure default ordering of the result. The item key is the name of a field. The value can be `ASC` or `DESC`. By default the result is ordered by identifier field.
 * **disable_inclusion** *boolean* The flag indicates whether an inclusion of related entities is disabled. In JSON.API an [**include** request parameter](http://jsonapi.org/format/#fetching-includes) can be used to customize which related entities should be returned. By default `false`.
 * **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
+* **disable_meta_properties** *boolean* The flag indicates whether a requesting of additional meta properties is disabled. By default `false`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **identifier_field_names** *string[]* The names of identifier fields of the entity. Usually it should be set in a configuration file in case if Data API resource is based on not ORM entity. For ORM entities a value of this option is retrieved from an entity metadata.
 * **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
@@ -388,6 +387,7 @@ The `actions` configuration section allows to specify action-specific options. T
 * **disable_sorting** *boolean* The flag indicates whether a sorting is disabled. By default `false`.
 * **disable_inclusion** *boolean* The flag indicates whether an inclusion of related entities is disabled. In JSON.API an [**include** request parameter](http://jsonapi.org/format/#fetching-includes) can be used to customize which related entities should be returned. By default `false`.
 * **disable_fieldset** *boolean* The flag indicates whether a requesting of a restricted set of fields is disabled. In JSON.API an [**fields** request parameter](http://jsonapi.org/format/#fetching-sparse-fieldsets) can be used to customize which fields should be returned. By default `false`.
+* **disable_meta_properties** *boolean* The flag indicates whether a requesting of additional meta properties is disabled. By default `false`.
 * **form_type** *string* The form type that should be used for the entity.
 * **form_options** *array* The form options that should be used for the entity.
 * **status_codes** *array* <a id="action-status_codes-configuration-section" />The possible response status codes for the action.
@@ -547,7 +547,7 @@ api:
         Oro\Bundle\EmailBundle\Entity\Email:
             subresources:
                 suggestions:
-                    target_class: Oro\Bundle\ApiBundle\Model\EntityDescriptor
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
                     target_type: collection
                     actions:
                         get_subresource:

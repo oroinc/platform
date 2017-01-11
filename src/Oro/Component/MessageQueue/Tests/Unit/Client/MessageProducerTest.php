@@ -398,9 +398,8 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $producer = new MessageProducer($driver);
-
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'The message\'s body must be either null, scalar or array. Got: stdClass'
         );
         $producer->send('topic', new \stdClass());
@@ -418,9 +417,8 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $producer = new MessageProducer($driver);
-
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
         $producer->send($queue, ['foo' => new \stdClass]);
@@ -438,9 +436,8 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $producer = new MessageProducer($driver);
-
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'The message\'s body must be an array of scalars. Found not scalar in the array: stdClass'
         );
         $producer->send($queue, ['foo' => ['bar' => new \stdClass]]);
@@ -451,7 +448,7 @@ class MessageProducerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createDriverStub($config = null, $queue = null)
     {
-        $driverMock = $this->getMock(DriverInterface::class, [], [], '', false);
+        $driverMock = $this->createMock(DriverInterface::class);
         $driverMock
             ->expects($this->any())
             ->method('getConfig')

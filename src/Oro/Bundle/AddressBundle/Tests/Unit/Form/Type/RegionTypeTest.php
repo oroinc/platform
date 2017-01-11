@@ -26,7 +26,7 @@ class RegionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
@@ -45,7 +45,7 @@ class RegionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        $builderMock = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builderMock = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
         $options = array(RegionType::COUNTRY_OPTION_KEY => 'test');
 
         $builderMock->expects($this->once())
@@ -60,7 +60,7 @@ class RegionTypeTest extends \PHPUnit_Framework_TestCase
     {
         $optionKey = 'countryFieldName';
 
-        $formConfigMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfigMock = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formConfigMock->expects($this->once())
             ->method('getAttribute')
             ->with($this->equalTo(RegionType::COUNTRY_OPTION_KEY))

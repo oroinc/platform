@@ -19,8 +19,8 @@ class DynamicTranslationKeySourceTest extends \PHPUnit_Framework_TestCase
 
     public function testNonConfiguredCalls()
     {
-        $this->setExpectedException(
-            \LogicException::class,
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
             'Can\'t build source without template. Please configure source by ->configure($template) method.'
         );
 
@@ -30,7 +30,7 @@ class DynamicTranslationKeySourceTest extends \PHPUnit_Framework_TestCase
     public function testMergedConfiguredData()
     {
         $dynamicSource = new DynamicTranslationKeySource(['a' => 1, 'c' => 42]);
-        $template = $this->getMock(TranslationKeyTemplateInterface::class);
+        $template = $this->createMock(TranslationKeyTemplateInterface::class);
         $template->expects($this->once())->method('getRequiredKeys')->willReturn([]);
         $dynamicSource->configure($template, ['b' => 2, 'a' => 3]);
 
@@ -46,19 +46,19 @@ class DynamicTranslationKeySourceTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorDataValidationFailure()
     {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Expected not empty value for key "some_key" in data, null given for template '
         );
 
-        $templateMock = $this->getMock(TranslationKeyTemplateInterface::class);
+        $templateMock = $this->createMock(TranslationKeyTemplateInterface::class);
         $templateMock->expects($this->once())->method('getRequiredKeys')->willReturn(['some_key']);
         $this->dynamicSource->configure($templateMock, ['some_other_key' => 'someValue']);
     }
 
     public function testGetTemplate()
     {
-        $template = $this->getMock(TranslationKeyTemplateInterface::class);
+        $template = $this->createMock(TranslationKeyTemplateInterface::class);
         $template->expects($this->once())->method('getRequiredKeys')->willReturn([]);
         $template->expects($this->once())->method('getTemplate')->willReturn('template string');
         $this->dynamicSource->configure($template);

@@ -24,7 +24,7 @@ class AttachmentGridListenerTest extends \PHPUnit_Framework_TestCase
         $gridConfig = new TestGridConfiguration();
 
         $parameters = new ParameterBag(['entityField' => 'testField']);
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $datagrid->expects($this->once())
             ->method('getParameters')
             ->will($this->returnValue($parameters));
@@ -32,7 +32,7 @@ class AttachmentGridListenerTest extends \PHPUnit_Framework_TestCase
         $event = new BuildBefore($datagrid, $gridConfig);
         $this->listener->onBuildBefore($event);
 
-        $leftJoins = $gridConfig->offsetGetByPath(AttachmentGridListener::GRID_LEFT_JOIN_PATH);
+        $leftJoins = $gridConfig->offsetGetByPath('[source][query][join][left]');
         $this->assertEquals(
             [
                 [
@@ -52,7 +52,7 @@ class AttachmentGridListenerTest extends \PHPUnit_Framework_TestCase
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $datagrid->expects($this->once())
             ->method('getDatasource')
             ->will($this->returnValue($datasource));

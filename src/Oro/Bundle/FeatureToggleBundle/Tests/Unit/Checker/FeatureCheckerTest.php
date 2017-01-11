@@ -32,7 +32,7 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
 
         $checker = new FeatureChecker($configManager);
 
-        $voter = $this->getMock(VoterInterface::class);
+        $voter = $this->createMock(VoterInterface::class);
         $checker->setVoters([$voter]);
 
         $this->assertAttributeCount(1, 'voters', $checker);
@@ -204,7 +204,7 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getVoter($vote)
     {
-        $voter = $this->getMock(VoterInterface::class);
+        $voter = $this->createMock(VoterInterface::class);
         $voter->expects($this->any())
             ->method('vote')
             ->will($this->returnValue($vote));
@@ -232,7 +232,7 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
             ]);
 
         $checker = new FeatureChecker($configManager);
-        $voter = $this->getMock(VoterInterface::class);
+        $voter = $this->createMock(VoterInterface::class);
         $voter->expects($this->any())
             ->method('vote')
             ->willReturnMap(
@@ -272,7 +272,7 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['feature1']);
 
         $checker = new FeatureChecker($configManager);
-        $voter = $this->getMock(VoterInterface::class);
+        $voter = $this->createMock(VoterInterface::class);
         $voter->expects($this->any())
             ->method('vote')
             ->willReturnMap(

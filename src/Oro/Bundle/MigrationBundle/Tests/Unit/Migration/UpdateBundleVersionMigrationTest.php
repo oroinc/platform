@@ -99,7 +99,7 @@ class UpdateBundleVersionMigrationTest extends \PHPUnit_Framework_TestCase
     protected function getMigration($bundleName, $version, $state = true)
     {
         $migration = new MigrationState(
-            $this->getMock('Oro\Bundle\MigrationBundle\Migration\Migration'),
+            $this->createMock('Oro\Bundle\MigrationBundle\Migration\Migration'),
             $bundleName,
             $version
         );

@@ -25,7 +25,7 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
             new Filesystem(),
             __DIR__
         );
-        $this->layoutResource->setLogger($this->getMock(LoggerInterface::class));
+        $this->layoutResource->setLogger($this->createMock(LoggerInterface::class));
     }
 
     protected function tearDown()
@@ -144,5 +144,67 @@ class LayoutResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('layout_with_two_asset_first', $formulae);
         $this->assertArrayHasKey('layout_with_two_asset_second', $formulae);
         $this->assertEquals($formulae, $this->layoutResource->getContent());
+    }
+
+    public function testOverwritingStylesInChildTheme()
+    {
+        $themes = [
+            'parent_theme' => [
+                'config' => [
+                    'assets' => [
+                        'styles' => [
+                            'inputs' => [
+                                'parent-style1.css',
+                                'parent-style2.css',
+                                'parent-style4.css',
+                                'parent-style3.css'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'child_theme' => [
+                'parent' => 'parent_theme',
+                'config' => [
+                    'assets' => [
+                        'styles' => [
+                            'inputs' => [
+                                'child-style1.css',
+                                'parent-style2.css' => 'child-style2.css',
+                                'parent-style4.css' => null,
+                                'child-style3.css'
+                            ],
+                            'output' => 'output.css',
+                            'filters' => ['filters'],
+                        ]
+                    ]
+                ]
+            ],
+        ];
+
+        $this->themeManager = new ThemeManager(new ThemeFactory(), $themes);
+        $this->layoutResource = new LayoutResource($this->themeManager, new Filesystem(), __DIR__);
+
+        $expectedContentAfterMergingThemes =  [
+            'layout_child_theme_styles' => [
+                [
+                    'parent-style1.css',
+                    'child-style2.css',
+                    'parent-style3.css',
+                    'child-style1.css',
+                    'child-style3.css',
+                ],
+                [
+                    'filters'
+                ],
+                [
+                    'output' => 'output.css',
+                    'name' => 'layout_child_theme_styles'
+                ]
+            ]
+        ];
+
+        $content = $this->layoutResource->getContent();
+        $this->assertEquals($expectedContentAfterMergingThemes, $content);
     }
 }

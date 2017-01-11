@@ -193,4 +193,52 @@ class User implements UserInterface
     {
         return (string)$this->name;
     }
+
+    /**
+     * Getter for extended manyToMany association
+     *
+     * @return array
+     */
+    public function getTargets()
+    {
+        $targets = [];
+        if ($this->products->count()) {
+            $targets = array_merge($targets, $this->products->toArray());
+        }
+        if ($this->groups->count()) {
+            $targets = array_merge($targets, $this->groups->toArray());
+        }
+
+        return $targets;
+    }
+
+    /**
+     * Adder for extended manyToMany association
+     *
+     * @param $target
+     */
+    public function addTarget($target)
+    {
+        if ($target instanceof Product && !$this->products->contains($target)) {
+            $this->products->add($target);
+        }
+        if ($target instanceof Group && !$this->groups->contains($target)) {
+            $this->groups->add($target);
+        }
+    }
+
+    /**
+     * Remover for extended manyToMany association
+     *
+     * @param $target
+     */
+    public function removeTarget($target)
+    {
+        if ($target instanceof Product && $this->products->contains($target)) {
+            $this->products->removeElement($target);
+        }
+        if ($target instanceof Group && $this->groups->contains($target)) {
+            $this->groups->removeElement($target);
+        }
+    }
 }

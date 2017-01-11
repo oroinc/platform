@@ -67,9 +67,9 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetRequestedRemindersReturnCorrectData()
     {
-        $reminder  = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $reminder1 = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $reminder2 = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder  = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder1 = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder2 = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
 
         $expectedReminder      = new \stdClass();
         $expectedReminder->id  = 42;
@@ -82,8 +82,8 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
         $reminders = array($reminder, $reminder1, $reminder2);
         $token     = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
             ->getMockForAbstractClass();
-        $user      = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock(
-        );
+        $user      = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()
+            ->getMock();
         $token->expects($this->once())->method('getUser')->will($this->returnValue($user));
         $repository = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository')
             ->disableOriginalConstructor()

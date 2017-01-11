@@ -21,7 +21,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->baseMailer = $this->getMailerMock();
-        $this->container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $this->emailOrigin =
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
@@ -39,7 +39,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     {
         $message          = new \Swift_Message();
         $failedRecipients = [];
-        $transport        = $this->getMock('\Swift_Transport');
+        $transport        = $this->createMock('\Swift_Transport');
 
         $this->baseMailer->expects($this->once())
             ->method('getTransport')
@@ -73,7 +73,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport        = $this->getMockBuilder('\Swift_Transport_SpoolTransport')
             ->disableOriginalConstructor()
             ->getMock();
-        $realTransport    = $this->getMock('\Swift_Transport');
+        $realTransport    = $this->createMock('\Swift_Transport');
 
         $this->baseMailer->expects($this->once())
             ->method('getTransport')
@@ -122,7 +122,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     {
         $message          = new \Swift_Message();
         $failedRecipients = [];
-        $transport        = $this->getMock('\Swift_Transport');
+        $transport        = $this->createMock('\Swift_Transport');
 
         $this->baseMailer->expects($this->once())
             ->method('getTransport')
@@ -151,7 +151,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateSmtpTransport()
     {
-        $transportMock = $this->getMock('\Swift_Transport');
+        $transportMock = $this->createMock('\Swift_Transport');
         $smtpTransportMock = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
             ->disableOriginalConstructor()
             ->getMock();
@@ -178,12 +178,10 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($dispatcher);
 
         $mailer = new DirectMailer($this->baseMailer, $this->container);
-        $mailer->prepareSmtpTransport($this->emailOrigin);
+        $mailer->prepareEmailOriginSmtpTransport($this->emailOrigin);
         $smtpTransport = $mailer->getTransport();
 
         $this->assertInstanceOf('\Swift_Transport_EsmtpTransport', $smtpTransport);
-
-        $mailer->prepareSmtpTransport($this->emailOrigin);
     }
 
     /**
@@ -191,14 +189,14 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRegisterPlugin()
     {
-        $transport = $this->getMock('\Swift_Transport');
+        $transport = $this->createMock('\Swift_Transport');
 
         $this->baseMailer->expects($this->once())
             ->method('getTransport')
             ->will($this->returnValue($transport));
 
         $mailer = new DirectMailer($this->baseMailer, $this->container);
-        $plugin = $this->getMock('\Swift_Events_EventListener');
+        $plugin = $this->createMock('\Swift_Events_EventListener');
         $mailer->registerPlugin($plugin);
     }
 

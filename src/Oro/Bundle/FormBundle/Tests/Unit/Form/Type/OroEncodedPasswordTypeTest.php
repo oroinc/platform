@@ -19,7 +19,7 @@ class OroEncodedPasswordTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->encryptor = $this->getMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
+        $this->encryptor = $this->createMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
         $this->formType = new OroEncodedPasswordType($this->encryptor);
     }
 

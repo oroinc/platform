@@ -68,6 +68,10 @@ class ObjectMetadataFactory
         $metaPropertyMetadata->setDataType(
             $this->metadataHelper->assertDataType($field->getDataType(), $entityClass, $fieldName)
         );
+        $resultName = $field->getMetaPropertyResultName();
+        if ($resultName) {
+            $metaPropertyMetadata->setResultName($resultName);
+        }
 
         return $metaPropertyMetadata;
     }

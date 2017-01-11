@@ -16,7 +16,6 @@ use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Bundle\LayoutBundle\EventListener\LayoutListener;
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
-use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -32,26 +31,18 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutHelper;
 
-    /** @var LayoutContextHolder|\PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutContextHolder;
-
     protected function setUp()
     {
-        $this->layoutManager = $this->getMockBuilder('Oro\Component\Layout\LayoutManager')
+        $this->layoutManager = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\LayoutManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->layoutHelper = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Request\LayoutHelper')
             ->disableOriginalConstructor()->getMock();
 
-        $this->layoutContextHolder = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->listener = new LayoutListener(
             $this->layoutHelper,
-            $this->layoutManager,
-            $this->layoutContextHolder
+            $this->layoutManager
         );
     }
 
@@ -66,7 +57,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAddOptionsFromLayoutAnnotationToContext()
     {
-        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\LayoutBuilderInterface');
 
         $builder->expects($this->once())
             ->method('setBlockTheme')
@@ -103,7 +94,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAddBlockThemeFromLayoutAnnotation()
     {
-        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\LayoutBuilderInterface');
 
         $builder->expects($this->once())
             ->method('setBlockTheme')
@@ -126,7 +117,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldAddOneBlockThemeFromLayoutAnnotationBlockThemesAttr()
     {
-        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\LayoutBuilderInterface');
 
         $builder->expects($this->once())
             ->method('setBlockTheme')
@@ -154,7 +145,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             'block2' => 'Test block 2',
         ];
 
-        $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+        $builder = $this->createMock('Oro\Component\Layout\LayoutBuilderInterface');
         $this->setupLayoutExpectations($builder, null, $blocks);
 
         $layoutAnnotation = new LayoutAnnotation([]);
@@ -324,14 +315,14 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
         array $renderBlocks = []
     ) {
         if (null === $builder) {
-            $builder = $this->getMock('Oro\Component\Layout\LayoutBuilderInterface');
+            $builder = $this->createMock('Oro\Component\Layout\LayoutBuilderInterface');
         }
         $callCount = $renderBlocks ? count($renderBlocks) : 1;
-        $this->layoutManager->expects($this->exactly($callCount))
+        $this->layoutManager->expects($this->any())
             ->method('getLayoutBuilder')
             ->willReturn($builder);
 
-        $builder->expects($this->exactly($callCount))
+        $this->layoutManager->expects($this->exactly($callCount))
             ->method('getLayout')
             ->willReturnCallback(
                 function (ContextInterface $context, $blockId) use ($assertContextCallback, $renderBlocks) {
@@ -370,7 +361,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($renderContent);
         $layout->expects($this->any())
             ->method('getView')
-            ->will($this->returnValue($this->getMock('Oro\Component\Layout\BlockView')));
+            ->will($this->returnValue($this->createMock('Oro\Component\Layout\BlockView')));
 
         return $layout;
     }
@@ -393,7 +384,7 @@ class LayoutListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($annotation);
 
         /** @var HttpKernelInterface|\PHPUnit_Framework_MockObject_MockObject $kernel */
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
 
         return new GetResponseForControllerResultEvent(
             $kernel,

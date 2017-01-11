@@ -14,6 +14,7 @@ workflows:
                 scope2: value2
             -
                 scope1: value3
+        datagrids: ['datagrid1', 'datagrid2']
         defaults:
             active: true
         exclusive_active_groups:
@@ -51,6 +52,8 @@ workflows:
                     - entity1
                 init_routes:
                     - route1
+                init_datagrids:
+                    - datagrid1
                 init_context_attribute: test_init_context
                 form_options:
                     attribute_fields:

@@ -22,7 +22,7 @@ class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessDoesntExecuteWhenMailersNotFound()
     {
-        $containerBuilder = $this->getMock(ContainerBuilder::class, [], [], '', false);
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
         $containerBuilder->expects($this->any())
             ->method('hasParameter')
             ->with('swiftmailer.mailers')
@@ -42,13 +42,13 @@ class SwiftMailerHandlerPassTest extends \PHPUnit_Framework_TestCase
         ];
         $containerBuilder->setParameter('swiftmailer.mailers', $mailers);
 
-        $fooDefinition = $this->getMock(Definition::class);
+        $fooDefinition = $this->createMock(Definition::class);
         $fooDefinition->expects($this->once())
             ->method('addMethodCall')
             ->with('registerPlugin', [$decorator]);
         $containerBuilder->setDefinition('foo.mailer', $fooDefinition);
 
-        $barDefinition = $this->getMock(Definition::class);
+        $barDefinition = $this->createMock(Definition::class);
         $barDefinition->expects($this->once())
             ->method('addMethodCall')
             ->with('registerPlugin', [$decorator]);

@@ -44,11 +44,11 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $this->entity->setDescription($testData);
         $this->assertEquals($testData, $this->entity->getDescription());
 
-        $testData = $this->getMock('Oro\Bundle\SegmentBundle\Entity\SegmentType', [], ['testTypeName']);
+        $testData = $this->createMock('Oro\Bundle\SegmentBundle\Entity\SegmentType', [], ['testTypeName']);
         $this->entity->setType($testData);
         $this->assertSame($testData, $this->entity->getType());
 
-        $testData = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit');
+        $testData = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit');
         $this->entity->setOwner($testData);
         $this->assertSame($testData, $this->entity->getOwner());
 
@@ -68,7 +68,7 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $this->entity->setLastRun($testData);
         $this->assertSame($testData, $this->entity->getLastRun());
 
-        $testData = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $testData = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $this->entity->setOrganization($testData);
         $this->assertSame($testData, $this->entity->getOrganization());
     }

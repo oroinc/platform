@@ -3,8 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
@@ -21,7 +24,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         $this->processor = new BuildFormBuilder($this->formFactory);
 
@@ -31,7 +34,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWhenFormBuilderAlreadyExists()
     {
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $this->context->setFormBuilder($formBuilder);
         $this->processor->process($this->context);
@@ -40,7 +43,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWhenFormAlreadyExists()
     {
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
@@ -51,10 +54,13 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     public function testProcessWithDefaultOptions()
     {
         $parentEntity = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
+
+        $parentMetadata = new EntityMetadata();
+        $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects($this->once())
             ->method('createNamedBuilder')
@@ -79,6 +85,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             );
 
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
         $this->assertSame($formBuilder, $this->context->getFormBuilder());
@@ -87,13 +94,17 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     public function testProcessWithCustomOptions()
     {
         $parentEntity = new \stdClass();
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
 
         $parentConfig = new EntityDefinitionConfig();
         $associationConfig = $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
         $associationConfig->setPropertyPath('realAssociationName');
         $associationConfig->setFormType('customType');
         $associationConfig->setFormOptions(['trim' => false]);
+
+        $parentMetadata = new EntityMetadata();
+        $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME))
+            ->setPropertyPath('realAssociationName');
 
         $this->formFactory->expects($this->once())
             ->method('createNamedBuilder')
@@ -118,6 +129,48 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             );
 
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setParentEntity($parentEntity);
+        $this->processor->process($this->context);
+        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessWhenAssociationShouldNotBeMapped()
+    {
+        $parentEntity = new \stdClass();
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
+
+        $parentMetadata = new EntityMetadata();
+        $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME))
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                'form',
+                $parentEntity,
+                [
+                    'data_class'           => self::TEST_PARENT_CLASS_NAME,
+                    'validation_groups'    => ['Default', 'api'],
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects($this->once())
+            ->method('add')
+            ->with(
+                self::TEST_ASSOCIATION_NAME,
+                null,
+                ['mapped' => false]
+            );
+
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
         $this->assertSame($formBuilder, $this->context->getFormBuilder());

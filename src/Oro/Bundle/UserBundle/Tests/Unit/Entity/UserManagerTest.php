@@ -51,9 +51,9 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 
-        $this->ef = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->ef = $this->createMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
+        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->will($this->returnValue($this->om));
@@ -143,7 +143,7 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
             ->setEmail($email)
             ->setPlainPassword($password);
 
-        $encoder = $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
+        $encoder = $this->createMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
         $encoder->expects($this->once())
             ->method('encodePassword')
             ->with($user->getPlainPassword(), $user->getSalt())

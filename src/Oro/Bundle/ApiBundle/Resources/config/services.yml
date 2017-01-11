@@ -42,6 +42,7 @@ services:
         arguments:
             - '@oro_api.criteria_normalizer'
             - '@oro_api.criteria_placeholders_resolver'
+            - '@oro_api.query.expression_visitor_factory'
 
     oro_api.criteria_normalizer:
         class: Oro\Bundle\ApiBundle\Util\CriteriaNormalizer
@@ -72,7 +73,7 @@ services:
             - '@oro_api.doctrine_helper'
 
     oro_api.entity_accessor:
-        class: Oro\Component\EntitySerializer\EntityDataAccessor
+        class: Oro\Bundle\ApiBundle\Util\EntityDataAccessor
         public: false
 
     oro_api.entity_metadata_factory:
@@ -95,9 +96,14 @@ services:
             - '@oro_api.entity_accessor'
             - '@oro_api.entity_serializer.data_transformer'
             - '@oro_api.object_normalizer.config_normalizer'
+            - '@oro_api.object_normalizer.data_normalizer'
 
     oro_api.object_normalizer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer
+        public: false
+
+    oro_api.object_normalizer.data_normalizer:
+        class: Oro\Bundle\ApiBundle\Normalizer\DataNormalizer
         public: false
 
     oro_api.object_normalizer_registry:
@@ -141,6 +147,10 @@ services:
             - '@oro_api.collect_subresources.processor'
             - '@oro_api.resources_provider'
             - '@oro_api.resources_cache'
+
+    oro_api.resource_hierarchy_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider
+        public: false
 
     oro_api.resources_cache:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
@@ -242,6 +252,7 @@ services:
         lazy: true
         calls:
             - [ addEntityAliasProvider, [ '@oro_api.entity_alias_provider' ] ]
+            - [ addEntityClassProvider, [ '@oro_api.entity_alias_provider' ] ]
 
     oro_api.entity_alias_provider:
         class: Oro\Bundle\ApiBundle\Provider\EntityAliasProvider
@@ -265,6 +276,14 @@ services:
             - [] # exclude rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
         tags:
             - { name: oro_entity.exclusion_provider.api, priority: 60 }
+
+    oro_api.entity_exclusion_provider.by_alias:
+        class: Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider
+        public: false
+        arguments:
+            - '@oro_api.entity_alias_resolver'
+        tags:
+            - { name: oro_entity.exclusion_provider.api, priority: 40 }
 
     oro_api.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
@@ -399,8 +418,24 @@ services:
             - '@oro_api.rest.doc_view_detector'
             - '@oro_api.action_processor_bag'
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.doc_handler.identifier'
+            - '@oro_api.rest.doc_handler.filters'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    oro_api.rest.doc_handler.identifier:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocIdentifierHandler
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.value_normalizer'
+
+    oro_api.rest.doc_handler.filters:
+        class: Oro\Bundle\ApiBundle\ApiDoc\RestDocFiltersHandler
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.value_normalizer'
 
     oro_api.rest.doc_view_detector:
         class: Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector
@@ -426,7 +461,7 @@ services:
         public: false
         arguments:
             - '@oro_entity.entity_class_name_provider'
-            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.config_manager'
             - '@oro_api.doctrine_helper'
             - '@translator'
 
@@ -463,6 +498,17 @@ services:
         tags:
             - { name: oro.api.constraint_text_extractor, priority: -10 }
 
+    oro_api.entity_title_provider:
+        class: Oro\Bundle\ApiBundle\Provider\EntityTitleProvider
+        public: false
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity.entity_name_resolver'
+
+    oro_api.expanded_association_extractor:
+        class: Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor
+        public: false
+
     oro_api.api_doc.metadata_parser:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadataParser
         arguments:
@@ -474,3 +520,73 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
         arguments:
             - '@file_locator'
+
+    oro_api.query.expression_visitor_factory:
+        class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory
+        public: false
+        argumets:
+            - [] # The composite expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
+            - [] # The comparison expressions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\QueryExpressionCompilerPass
+
+    oro_api.query.composite_expression.and:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression
+        public: false
+        tags:
+          - { name: oro.api.query.composite_expression, type: 'AND' }
+
+    oro_api.query.composite_expression.or:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\OrCompositeExpression
+        public: false
+        tags:
+          - { name: oro.api.query.composite_expression, type: 'OR' }
+
+    oro_api.query.composite_expression.not:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotCompositeExpression
+        public: false
+        tags:
+          - { name: oro.api.query.composite_expression, type: 'NOT' }
+
+    oro_api.query.comparison_expression:
+       class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpression
+       public: false
+       tags:
+         - { name: oro.api.query.comparison_expression, operator: '>' }
+         - { name: oro.api.query.comparison_expression, operator: '>=' }
+         - { name: oro.api.query.comparison_expression, operator: '<' }
+         - { name: oro.api.query.comparison_expression, operator: '<=' }
+
+    oro_api.query.comparison_expression.member_of:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\MemberOfComparisonExpression
+        public: false
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: 'MEMBER OF' }
+
+    oro_api.query.comparison_expression.in:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\InComparisonExpression
+        public: false
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: 'IN' }
+
+    oro_api.query.comparison_expression.nin:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NinComparisonExpression
+        public: false
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: 'NIN' }
+
+    oro_api.query.comparison_expression.eq:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpression
+        public: false
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: '=' }
+
+    oro_api.query.comparison_expression.neq:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqComparisonExpression
+        public: false
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: '<>' }
+
+    oro_api.query.comparison_expression.contains:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ContainsComparisonExpression
+        public: false
+        tags:
+          - { name: oro.api.query.comparison_expression, operator: 'CONTAINS' }

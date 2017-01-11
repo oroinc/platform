@@ -3,16 +3,34 @@
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for fieldName, item in dynamicFields %}
-            {{ ui.renderHtmlProperty(
-                item.label|trans,
-                _self.formatDynamicFieldValue(
-                    entity,
-                    entity_class,
-                    fieldName,
-                    item
-                )
-            ) }}
+            {% if feature_resource_enabled(fieldName, 'field_configs') %}
+                {{ ui.renderHtmlProperty(
+                    item.label|trans,
+                    _self.formatDynamicFieldValue(
+                        entity,
+                        entity_class,
+                        fieldName,
+                        item
+                    )
+                ) }}
+            {% endif %}
         {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{% macro renderDynamicField(entity, field) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% set dynamicField = oro_get_dynamic_field(entity, field) %}
+    {% if dynamicField %}
+        {{ ui.renderHtmlProperty(
+            dynamicField.label|trans,
+            _self.formatDynamicFieldValue(
+                field.entity,
+                field.entity.className,
+                field.fieldName,
+                dynamicField
+            )
+        ) }}
     {% endif %}
 {% endmacro %}
 
@@ -48,7 +66,7 @@
         {% endset %}
     {% elseif type == 'html' %}
         {{ value|default('N/A'|trans)|raw }}
-    {% elseif type == 'boolean' %}
+    {% elseif type == 'boolean' and value is not null %}
         {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}
         {% set value = value ? value | oro_format_currency : null %}
@@ -90,4 +108,32 @@
     {% else %}
         {{ value.title|escape }}
     {% endif %}
+{% endmacro %}
+
+{% macro displayLayoutActions(actions) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% for button in actions %}
+        {% set componentData = {} %}
+        {% if  button.page_component_module is defined %}
+            {% set componentData = {'page-component-module' : button.page_component_module} %}
+
+            {% if  button.page_component_options is defined %}
+                {% set componentData = componentData|merge({
+                    'page-component-options' : button.page_component_options|json_encode
+                })
+                %}
+            {% endif %}
+
+        {% endif %}
+        {{ UI.button({
+            'path'   : button.void is defined ? 'javascript:void(0);' : path(button.route, button.args|default({})),
+            'data'   : {
+                'url' : button.void is defined ? path(button.route, button.args|default({})) : null,
+            }|merge(componentData),
+            'iCss'   : button.iCss|default(''),
+            'aCss'   : button.aCss|default(''),
+            'title'  : button.title|default(button.name)|trans,
+            'label'  : button.name|trans
+        }) }}
+    {% endfor %}
 {% endmacro %}

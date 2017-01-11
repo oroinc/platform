@@ -21,7 +21,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $entityConfig = new EntityConfig(
-            $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
+            $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
             ['max_element_count' => self::MAX_ENTITIES_COUNT]
         );
         $entityConfigProvider->expects($this->any())
@@ -29,7 +29,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
             ->with('SomeEntityClass')
             ->willReturn($entityConfig);
 
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         $this->target = new MergeMassAction($entityConfigProvider, $translator);
     }

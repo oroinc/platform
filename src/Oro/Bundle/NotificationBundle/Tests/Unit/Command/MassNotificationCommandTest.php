@@ -33,7 +33,7 @@ class MassNotificationCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         $this->sender = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Model\MassNotificationSender')
             ->disableOriginalConstructor()
@@ -42,8 +42,8 @@ class MassNotificationCommandTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->any())->method('get')->with('oro_notification.mass_notification_sender')
             ->will($this->returnValue($this->sender));
 
-        $this->in  = $this->getMock('Symfony\Component\Console\Input\InputInterface');
-        $this->out = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $this->in  = $this->createMock('Symfony\Component\Console\Input\InputInterface');
+        $this->out = $this->createMock('Symfony\Component\Console\Output\OutputInterface');
 
         $this->command = new MassNotificationCommand();
         $this->command->setContainer($this->container);

@@ -27,7 +27,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
 
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
     }
 
     /**
@@ -206,12 +206,12 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
      */
     protected function addRegistryExpectations(array $values, array $localizations)
     {
-        $valueRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $valueRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $valueRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValueMap($this->convertArrayToMap($values)));
 
-        $localizationRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $localizationRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $localizationRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValueMap($this->convertArrayToMap($localizations)));

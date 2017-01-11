@@ -13,7 +13,7 @@ class OroFeatureToggleBundleTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
 
         $bundle = new OroFeatureToggleBundle($kernel);
         $bundle->build($container);
@@ -29,7 +29,7 @@ class OroFeatureToggleBundleTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
 
         $bundle = new OroFeatureToggleBundle($kernel);
         $bundle->build($container);

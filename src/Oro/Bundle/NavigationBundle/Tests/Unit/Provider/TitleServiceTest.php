@@ -287,7 +287,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($this->repository));
 
-        $entityMock = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Title');
+        $entityMock = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Title');
 
         $entityMock->expects($this->once())
             ->method('getRoute')
@@ -323,7 +323,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->userConfigManager->expects($this->at(2))->method('get')
             ->with('oro_navigation.title_delimiter')->will($this->returnValue('/'));
 
-        $entityMock = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Title');
+        $entityMock = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Title');
 
         $entityMock->expects($this->exactly(2))
             ->method('getRoute')

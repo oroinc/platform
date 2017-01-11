@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Migration;
 
+use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -40,7 +41,7 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
      * @param string $column
      * @param string $from
      * @param string $to
-     * @param string $to
+     * @param string $columnId
      */
     public function __construct($table, $column, $from, $to, $columnId = 'id')
     {
@@ -83,11 +84,15 @@ class UpdateTableFieldQuery extends ParametrizedMigrationQuery
         $columnId = $this->columnId;
 
         $preparedFrom = str_replace('\\', '\\\\', $from);
+        if ($this->connection->getDatabasePlatform()->getName() === DatabasePlatformInterface::DATABASE_MYSQL) {
+            $preparedFrom = str_replace('\\', '\\\\', $preparedFrom);
+        }
+
         $rows = $this->connection
-            ->fetchAll("SELECT $columnId, $column FROM $table WHERE $column LIKE '%$preparedFrom%'");
+            ->fetchAll("SELECT $columnId, $column as field FROM $table WHERE $column LIKE '%$preparedFrom%'");
         foreach ($rows as $row) {
             $id = $row[$columnId];
-            $originalValue = $row[$column];
+            $originalValue = $row['field'];
             $alteredValue = $this->replaceStringValue($originalValue, $from, $to);
             if ($alteredValue !== $originalValue) {
                 $this->connection

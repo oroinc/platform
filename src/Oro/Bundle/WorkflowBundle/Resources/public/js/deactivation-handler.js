@@ -1,5 +1,5 @@
-define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/messenger', 'oroui/js/error'],
-function($, __, Modal, Messenger, Error) {
+define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/messenger'],
+function($, __, Modal, Messenger) {
     'use strict';
 
     /**
@@ -28,7 +28,6 @@ function($, __, Modal, Messenger, Error) {
                     el.trigger('deactivation_success', [response]);
                 },
                 error: function(xhr, textStatus, error) {
-                    Error.handle({}, xhr, {enforce: true});
                     el.trigger('deactivation_error', [xhr, textStatus, error]);
                 }
             });

@@ -46,7 +46,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getAbstractExtension()
     {
-        $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $expr = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
         $expr->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('test'));

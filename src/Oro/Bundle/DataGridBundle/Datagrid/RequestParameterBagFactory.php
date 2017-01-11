@@ -28,20 +28,32 @@ class RequestParameterBagFactory
 
     /**
      * @param string $gridParameterName
-     * @return ParameterBag
+     *
+     * @return array
      */
-    public function createParameters($gridParameterName = self::DEFAULT_ROOT_PARAM)
+    public function fetchParameters($gridParameterName = self::DEFAULT_ROOT_PARAM)
     {
         $parameters = $this->request->get($gridParameterName, []);
 
         if (!is_array($parameters)) {
-            $parameters = array();
+            $parameters = [];
         }
 
         $minifiedParameters = $this->getMinifiedParameters($gridParameterName);
         if ($minifiedParameters) {
             $parameters[ParameterBag::MINIFIED_PARAMETERS] = $minifiedParameters;
         }
+
+        return $parameters;
+    }
+
+    /**
+     * @param string $gridParameterName
+     * @return ParameterBag
+     */
+    public function createParameters($gridParameterName = self::DEFAULT_ROOT_PARAM)
+    {
+        $parameters = $this->fetchParameters($gridParameterName);
 
         return new $this->parametersClass($parameters);
     }

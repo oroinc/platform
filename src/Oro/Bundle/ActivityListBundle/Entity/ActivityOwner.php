@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Entity;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Criteria;
 
@@ -30,7 +28,6 @@ class ActivityOwner
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int", nillable=true)
      */
     protected $id;
 
@@ -55,7 +52,6 @@ class ActivityOwner
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     * @Soap\ComplexType("Oro\Bundle\UserBundle\Entity\User")
      */
     protected $user;
 

@@ -79,7 +79,7 @@ class DestinationsCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createDestinationMetaRegistryStub($destinations = [])
     {
-        $registryMock = $this->getMock(DestinationMetaRegistry::class, [], [], '', false);
+        $registryMock = $this->createMock(DestinationMetaRegistry::class);
         $registryMock
             ->expects($this->any())
             ->method('getDestinationsMeta')
