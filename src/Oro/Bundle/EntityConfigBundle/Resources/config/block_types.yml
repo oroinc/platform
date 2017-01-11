@@ -11,6 +11,7 @@ services:
                         entity: {required: true}
                         property_path: {required: true}
                         value: {default: '=data["property_accessor"].getValue(entity, property_path)'}
+                        visible: {default: '=data["attribute_config_provider"].getConfig(entity, property_path).is("visible")'}
         tags:
              - { name: layout.block_type, alias: attribute_text }
 

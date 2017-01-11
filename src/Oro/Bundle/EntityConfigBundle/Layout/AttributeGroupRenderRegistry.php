@@ -44,16 +44,17 @@ class AttributeGroupRenderRegistry
     public function getNotRenderedGroups(AttributeFamily $attributeFamily)
     {
         $familyCode = $attributeFamily->getCode();
+        $renderedGroupCodes = [];
         if (isset($this->renderedGroupsByFamily[$familyCode])) {
             $renderedGroupCodes = array_keys($this->renderedGroupsByFamily[$familyCode]);
-
-            return $attributeFamily->getAttributeGroups()->filter(
-                function (AttributeGroup $attributeGroup) use ($renderedGroupCodes) {
-                    return !in_array($attributeGroup->getCode(), $renderedGroupCodes);
-                }
-            );
         }
 
-        return $attributeFamily->getAttributeGroups();
+        return $attributeFamily->getAttributeGroups()->filter(
+            function (AttributeGroup $attributeGroup) use ($renderedGroupCodes) {
+                $rendered = in_array($attributeGroup->getCode(), $renderedGroupCodes);
+
+                return !$rendered && $attributeGroup->getIsVisible();
+            }
+        );
     }
 }

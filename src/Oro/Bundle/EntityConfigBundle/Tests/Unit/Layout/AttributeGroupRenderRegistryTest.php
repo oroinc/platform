@@ -44,9 +44,15 @@ class AttributeGroupRenderRegistryTest extends \PHPUnit_Framework_TestCase
         $groupCode = 'group_2_code';
         $attributeGroup2->setCode($groupCode);
 
+        $attributeGroup3 = new AttributeGroup();
+        $groupCode = 'group_3_code';
+        $attributeGroup3->setCode($groupCode);
+        $attributeGroup3->setIsVisible(false);
+
         $attributeFamily
             ->addAttributeGroup($attributeGroup1)
-            ->addAttributeGroup($attributeGroup2);
+            ->addAttributeGroup($attributeGroup2)
+            ->addAttributeGroup($attributeGroup3);
 
         $this->assertCount(2, $this->attributeGroupRenderRegistry->getNotRenderedGroups($attributeFamily));
 

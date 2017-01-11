@@ -62,6 +62,7 @@ class AttributeGroupType extends AbstractContainerType
         );
         /** @var AttributeGroup $attributeGroup */
         $attributeGroup = $attributeGroups->first();
+        $options['visible'] = $attributeGroup->getIsVisible();
 
         if ($excludeFromRest) {
             $this->groupRenderRegistry->setRendered($attributeFamily, $attributeGroup);
@@ -71,11 +72,11 @@ class AttributeGroupType extends AbstractContainerType
         $attributeGroupBlockId = $builder->getId();
         $attributes = $this->attributeManager->getAttributesByGroup($attributeGroup);
         foreach ($attributes as $attribute) {
-            $field_name = $attribute->getFieldName();
+            $fieldName = $attribute->getFieldName();
             $blockType = $this->blockTypeMapper->getBlockType($attribute);
 
             $layoutManipulator->add(
-                $this->getAttributeBlockName($field_name, $blockType, $attributeGroupBlockId),
+                $this->getAttributeBlockName($fieldName, $blockType, $attributeGroupBlockId),
                 $attributeGroupBlockId,
                 $blockType,
                 [
