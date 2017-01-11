@@ -315,6 +315,39 @@ class CalculateRootJobStatusServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Job::STATUS_FAILED, $rootJob->getStatus());
     }
 
+
+    public function testShouldSetStatusFailedRedeliveredIfThereIsAnyOneIsFailedRedelivered()
+    {
+        $rootJob = new Job();
+
+        $childJob1 = new Job();
+        $childJob1->setRootJob($rootJob);
+        $childJob1->setStatus(Job::STATUS_SUCCESS);
+
+        $childJob2 = new Job();
+        $childJob2->setRootJob($rootJob);
+        $childJob2->setStatus(Job::STATUS_FAILED_REDELIVERED);
+
+        $childJob3 = new Job();
+        $childJob3->setRootJob($rootJob);
+        $childJob3->setStatus(Job::STATUS_SUCCESS);
+
+        $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
+
+        $storage = $this->createJobStorageMock();
+        $storage
+            ->expects($this->once())
+            ->method('saveJob')
+            ->will($this->returnCallback(function (Job $job, $callback) {
+                $callback($job);
+            }))
+        ;
+
+        $case = new CalculateRootJobStatusService($storage);
+        $case->calculate($rootJob);
+
+        $this->assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
+    }
     public function testShouldSetStatusSuccessIfAllAreSuccess()
     {
         $rootJob = new Job();
