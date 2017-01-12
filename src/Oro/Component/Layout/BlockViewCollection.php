@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-class ArrayCollection implements \ArrayAccess
+class BlockViewCollection implements \ArrayAccess
 {
     /**
      * @var array

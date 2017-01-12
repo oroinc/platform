@@ -5,9 +5,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 use Composer\Package\Package;
 
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
+use Oro\Bundle\TranslationBundle\Provider\PackageProviderInterface;
 use Oro\Bundle\TranslationBundle\Provider\PackagesProvider;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtensionInterface;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class PackagesProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,22 +38,18 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $packages
      * @param array $bundles
-     * @param array $extensions
+     * @param array $providers
      * @param array $expectedResult
      */
     public function testGetInstalledPackages(
         array $packages = [],
         array $bundles = [],
-        array $extensions = [],
+        array $providers = [],
         array $expectedResult = []
     ) {
-        $provider = new PackagesProvider($this->pml, $bundles, 'rootDir', 'rootDir/cache/composer');
+        $provider = new PackagesProvider($this->pml, $bundles, 'rootDir', 'rootDir/cache/composer', $providers);
         $this->pm->expects($this->once())->method('getInstalled')
             ->will($this->returnValue($packages));
-
-        foreach ($extensions as $extension) {
-            $provider->addExtension($extension);
-        }
 
         $this->assertEquals($expectedResult, $provider->getInstalledPackages());
     }
@@ -63,9 +59,9 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function installedPackagesProvider()
     {
-        $extension1 = $this->getProviderExtension();
-        $extension2 = $this->getProviderExtension(['package1', 'package2']);
-        $extension3 = $this->getProviderExtension(['package3', 'package1']);
+        $provider1 = $this->getPackagesProvider();
+        $provider2 = $this->getPackagesProvider(['package1', 'package2']);
+        $provider3 = $this->getPackagesProvider(['package3', 'package1']);
 
         return [
             'empty result by default' => [],
@@ -76,16 +72,16 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
                 [],
                 ['Oro']
             ],
-            'packages from provider extensions' => [
+            'packages from other providers' => [
                 [],
                 [],
-                [$extension1, $extension2, $extension3],
+                [$provider1, $provider2, $provider3],
                 ['package1', 'package2', 'package3']
             ],
             'packages merged from both source' => [
                 [new Package('testName', '1', '1')],
                 ['Oro\Bundle\TranslationBundle\OroTranslationBundle'],
-                [$extension1, $extension2, $extension3],
+                [$provider1, $provider2, $provider3],
                 ['testname', 'Oro', 'package1', 'package2', 'package3']
             ]
         ];
@@ -93,13 +89,14 @@ class PackagesProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array|string[] $names
-     * @return TranslationPackagesProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return PackageProviderInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getProviderExtension(array $names = [])
+    protected function getPackagesProvider(array $names = [])
     {
-        $extension = $this->createMock(TranslationPackagesProviderExtensionInterface::class);
-        $extension->expects($this->any())->method('getPackageNames')->willReturn($names);
+        $otherProvider = $this->createMock(PackageProviderInterface::class);
+        $otherProvider->expects($this->any())->method('getInstalledPackages')
+            ->willReturn($names);
 
-        return $extension;
+        return $otherProvider;
     }
 }

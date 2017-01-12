@@ -90,7 +90,7 @@ class UnderlyingAclCache
      */
     public function isUnderlying(ObjectIdentityInterface $oid)
     {
-        if (!is_int($oid->getIdentifier())) {
+        if (!$this->isDigitIdentifier($oid)) {
             return false;
         }
 
@@ -135,7 +135,7 @@ class UnderlyingAclCache
      */
     public function evictFromCache(ObjectIdentityInterface $oid)
     {
-        if (!is_int($oid->getIdentifier())) {
+        if (!$this->isDigitIdentifier($oid)) {
             $this->cache->delete($this->getUnderlyingDataKeyByIdentity($oid));
         } else {
             $batchNumber = $this->getBatchNumber($oid);
@@ -177,7 +177,7 @@ class UnderlyingAclCache
          * We can't correctly calculate batch number in case when "id" is not an integer,
          * so we put this entities to the single batch
          */
-        if (!is_int($identifier)) {
+        if (!$this->isDigitIdentifier($oid)) {
             return 1;
         }
         return (int)floor($identifier / $this->batchSize) + 1;
@@ -205,5 +205,17 @@ class UnderlyingAclCache
     protected function getUnderlyingDataKeyByIdentity(ObjectIdentityInterface $oid)
     {
         return $oid->getType() . '_' . $oid->getIdentifier();
+    }
+
+    /**
+     * Check if OID identifier contains only digits
+     *
+     * @param  ObjectIdentityInterface $oid
+     *
+     * @return boolean
+     */
+    protected function isDigitIdentifier(ObjectIdentityInterface $oid)
+    {
+        return is_int($oid->getIdentifier()) || ctype_digit($oid->getIdentifier());
     }
 }
