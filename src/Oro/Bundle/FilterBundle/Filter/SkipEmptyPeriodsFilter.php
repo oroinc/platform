@@ -8,6 +8,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\SkipEmptyPeriodsFilterType;
 
 class SkipEmptyPeriodsFilter extends ChoiceFilter
 {
+    /** @var array */
+    protected $config = [];
+
     /**
      * {@inheritdoc}
      */
@@ -21,13 +24,17 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        if (is_array($data) && $data['value']) {
-            return false;
-        }
+        $data = $this->parseData($data);
+        $this->resolveConfiguration();
 
         /** @var OrmFilterDatasourceAdapter $ds */
         $qb = $ds->getQueryBuilder();
-        $qb->resetDQLPart('where');
+
+        if (boolval($data['value'])) {
+            $qb->andWhere(
+                sprintf('%s IS NOT NULL', $this->config['not_nullable_field'])
+            );
+        }
 
         return true;
     }
@@ -38,10 +45,18 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
      */
     protected function parseData($data)
     {
-        if (is_array($data) && !$data['value']) {
-            $data['value'] = SkipEmptyPeriodsFilterType::TYPE_NO;
+        if (is_array($data) && is_null($data['value'])) {
+            $data['value'] = true;
         }
 
         return $data;
+    }
+
+    /**
+     * Resolve options from configuration or constants.
+     */
+    private function resolveConfiguration()
+    {
+        $this->config['not_nullable_field'] = $this->get('not_nullable_field');
     }
 }

@@ -148,6 +148,11 @@ class DateGroupingFilter extends ChoiceFilter
      */
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
+        $whereClauseParameters = $qb->getParameters();
+        $extraWhereClauses = $qb->getDQLPart('where') ?
+            $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts()) :
+            '';
+
         $firstSubQueryBuilder = $this->generateSubQuery(
             $filterType,
             $this->config['first_calendar_table_for_grouping'],
@@ -156,8 +161,11 @@ class DateGroupingFilter extends ChoiceFilter
             $this->config['joined_column'],
             $this->config['target_column'],
             $this->config['calendar_entity'],
-            $this->config['target_entity']
+            $this->config['target_entity'],
+            $extraWhereClauses,
+            $whereClauseParameters
         );
+
         $secondSubQueryBuilder = $this->generateSubQuery(
             $filterType,
             $this->config['second_calendar_table_for_grouping'],
@@ -166,33 +174,49 @@ class DateGroupingFilter extends ChoiceFilter
             $this->config['joined_column'],
             $this->config['target_column'],
             $this->config['calendar_entity'],
-            $this->config['target_entity']
+            $this->config['target_entity'],
+            $extraWhereClauses,
+            $whereClauseParameters
         );
 
         $qb->andWhere(
-            $qb->expr()->notIn(
-                sprintf('%s(%s.%s)', $filterType, $this->config['calendar_table'], $this->config['calendar_column']),
-                $firstSubQueryBuilder->getDQL()
+            $qb->expr()->orX(
+                $qb->expr()->notIn(
+                    sprintf(
+                        '%s(%s.%s)',
+                        $filterType,
+                        $this->config['calendar_table'],
+                        $this->config['calendar_column']
+                    ),
+                    $firstSubQueryBuilder->getDQL()
+                ),
+                $qb->expr()->andX(
+                    $qb->expr()->in(
+                        sprintf(
+                            '%s(%s.%s)',
+                            $filterType,
+                            $this->config['calendar_table'],
+                            $this->config['calendar_column']
+                        ),
+                        $secondSubQueryBuilder->getDQL()
+                    ),
+                    $qb->expr()->isNotNull($this->config['not_nullable_field'])
+                )
             )
         );
-        $qb->orWhere($qb->expr()->andX(
-            $qb->expr()->in(
-                sprintf('%s(%s.%s)', $filterType, $this->config['calendar_table'], $this->config['calendar_column']),
-                $secondSubQueryBuilder->getDQL()
-            ),
-            $qb->expr()->isNotNull($this->config['not_nullable_field'])
-        ));
     }
 
     /**
-     * @param string $filterType
-     * @param string $calendarTableForGrouping
-     * @param string $calendarColumnForGrouping
-     * @param string $joinedTable
-     * @param string $joinedColumn
-     * @param string $targetColumn
-     * @param string $calendarEntity
-     * @param string $targetEntity
+     * @param $filterType
+     * @param $calendarTableForGrouping
+     * @param $calendarColumnForGrouping
+     * @param $joinedTable
+     * @param $joinedColumn
+     * @param $targetColumn
+     * @param $calendarEntity
+     * @param $targetEntity
+     * @param $extraWhereClauses
+     * @param $extraWhereParameters
      * @return QueryBuilder
      */
     private function generateSubQuery(
@@ -203,9 +227,16 @@ class DateGroupingFilter extends ChoiceFilter
         $joinedColumn,
         $targetColumn,
         $calendarEntity,
-        $targetEntity
-    ) {
+        $targetEntity,
+        $extraWhereClauses,
+        $extraWhereParameters
+    )
+    {
         $subQueryBuilder = $this->entityManager->createQueryBuilder();
+        $extraWhereClauses = str_replace(
+            $this->config['data_name'],
+            sprintf('%s.%s', $calendarTableForGrouping, $calendarColumnForGrouping),
+            $extraWhereClauses);
 
         return $subQueryBuilder
             ->select(
@@ -220,15 +251,17 @@ class DateGroupingFilter extends ChoiceFilter
             ->innerJoin($targetEntity, $joinedTable)
             ->where(
                 sprintf(
-                    '(CAST(%s.%s as %s) = CAST(%s.%s as %s))',
+                    '(CAST(%s.%s as %s) = CAST(%s.%s as %s) %s)',
                     $calendarTableForGrouping,
                     $calendarColumnForGrouping,
                     $targetColumn,
                     $joinedTable,
                     $joinedColumn,
-                    $targetColumn
+                    $targetColumn,
+                    $extraWhereClauses
                 )
             )
+            ->setParameters($extraWhereParameters)
             ->groupBy(sprintf('%s.%s', $calendarTableForGrouping, $calendarColumnForGrouping));
     }
 
@@ -237,6 +270,7 @@ class DateGroupingFilter extends ChoiceFilter
      */
     private function resolveConfiguration()
     {
+        $this->config['data_name'] = $this->get(FilterUtility::DATA_NAME_KEY);
         $this->config['calendar_table'] = $this->getOr('calendar_table', self::CALENDAR_TABLE);
         $this->config['calendar_column'] = $this->getOr('calendar_column', self::CALENDAR_COLUMN);
         $this->config['first_calendar_table_for_grouping'] = $this
@@ -261,5 +295,21 @@ class DateGroupingFilter extends ChoiceFilter
     private function generateDataName($dataName)
     {
         return str_replace('.', '', $dataName);
+    }
+
+    /**
+     * @param $whereClauseParts
+     * @return string
+     */
+    public function getExtraWhereClauses($whereClauseParts)
+    {
+        $extraWhereClauses = '';
+        foreach ($whereClauseParts as $whereClausePart) {
+            if (strpos($whereClausePart, $this->config['data_name']) !== false) {
+                $extraWhereClauses = sprintf('%s AND ( %s )', $extraWhereClauses, $whereClausePart);
+            }
+        }
+
+        return $extraWhereClauses;
     }
 }

@@ -44,9 +44,6 @@ class SkipEmptyPeriodsFilterType extends AbstractChoiceType
                 'field_type'       => 'choice',
                 'field_options'    => ['choices' => $this->getGroupChoices()],
                 'default_value'    => self::TYPE_YES,
-                'null_value'       => null,
-                'class'            => null,
-                'populate_default' => true,
             )
         );
     }
@@ -54,7 +51,8 @@ class SkipEmptyPeriodsFilterType extends AbstractChoiceType
     protected function getGroupChoices()
     {
         return [
-            self::TYPE_NO,
+            true => ucfirst(self::TYPE_YES),
+            false => ucfirst(self::TYPE_NO),
         ];
     }
 }
