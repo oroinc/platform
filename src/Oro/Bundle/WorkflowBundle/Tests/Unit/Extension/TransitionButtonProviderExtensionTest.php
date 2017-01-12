@@ -110,8 +110,7 @@ class TransitionButtonProviderExtensionTest extends AbstractTransitionButtonProv
             $workflow = $this->getWorkflow($transitionManager);
 
             $this->workflowRegistry->expects($this->once())
-                ->method('getActiveWorkflowsByApplication')
-                ->with($this->getApplication())
+                ->method('getActiveWorkflows')
                 ->willReturn(new ArrayCollection([$workflow]));
 
             $buttonContext = (new ButtonContext())

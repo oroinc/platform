@@ -24,6 +24,10 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_workflow.started_workflows.bag:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag'
+        public: false
+
     oro_workflow.manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
         arguments:
@@ -31,6 +35,22 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.changes.event.dispatcher'
             - '@oro_workflow.entity_connector'
+            - '@oro_workflow.started_workflows.bag'
+        calls:
+            - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
+
+    oro_workflow.manager.system:
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
+        public: false
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.changes.event.dispatcher'
+            - '@oro_workflow.entity_connector'
+            - '@oro_workflow.started_workflows.bag'
         calls:
             - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
             - [setLogger, ['@logger']]
@@ -99,6 +119,17 @@ services:
 
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
+        arguments:
+            - '@doctrine'
+            - '@oro_workflow.workflow_assembler'
+        calls:
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
+            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.applications']]
+
+    oro_workflow.registry.system:
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
+        public: false
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
