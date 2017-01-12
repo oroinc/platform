@@ -77,9 +77,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface
             return array_merge($result, $this->localizationToArray($localization));
         }, []);
         /** All localizations always should have only one parent that equals to default language */
-        if (!isset($fallbacks[Configuration::DEFAULT_LOCALE])) {
-            $fallbacks = [Configuration::DEFAULT_LOCALE => $fallbacks];
-        }
+        $fallbacks = [Configuration::DEFAULT_LOCALE => $fallbacks];
 
         $this->cacheProvider->save($key, $fallbacks);
         return $fallbacks;
