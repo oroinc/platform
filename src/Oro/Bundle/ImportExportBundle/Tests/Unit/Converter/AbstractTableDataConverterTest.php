@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ */
 class AbstractTableDataConverterTest extends \PHPUnit_Framework_TestCase
 {
     /**
