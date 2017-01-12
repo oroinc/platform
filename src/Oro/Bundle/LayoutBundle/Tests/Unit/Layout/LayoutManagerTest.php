@@ -36,10 +36,10 @@ class LayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayoutFactory')
             ->willReturn($factory);
 
-        $this->manager = new LayoutManager($factoryBuilder, $this->contextHolder, 'default_theme');
+        $this->manager = new LayoutManager($factoryBuilder, $this->contextHolder);
     }
 
-    public function testGetLayoutWithDefaultTheme()
+    public function testGetLayout()
     {
         $context = new LayoutContext();
         $layout = $this->createMock(Layout::class);
@@ -58,31 +58,6 @@ class LayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->with($context);
 
         $this->manager->getLayout($context, 'root_id');
-
-        $this->assertEquals('default_theme', $context->get('theme'));
-    }
-
-    public function testGetLayoutWithCustomTheme()
-    {
-        $context = new LayoutContext(['theme' => 'custom_theme']);
-        $layout = $this->createMock(Layout::class);
-
-        $this->builder->expects($this->once())
-            ->method('getLayout')
-            ->with($context, 'root_id')
-            ->willReturn($layout);
-
-        $this->builder->expects($this->once())
-            ->method('add')
-            ->with('root', null, 'root');
-
-        $this->contextHolder->expects($this->once())
-            ->method('setContext')
-            ->with($context);
-
-        $this->manager->getLayout($context, 'root_id');
-
-        $this->assertEquals('custom_theme', $context->get('theme'));
     }
 
     public function testRender()

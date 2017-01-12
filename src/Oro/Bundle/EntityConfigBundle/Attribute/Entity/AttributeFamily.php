@@ -32,6 +32,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
  *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"="",
+ *              "category"="catalog"
+ *          }
  *      }
  * )
  */
