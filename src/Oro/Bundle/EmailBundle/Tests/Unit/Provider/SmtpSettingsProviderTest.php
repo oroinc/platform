@@ -7,7 +7,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigValueBag;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider;
@@ -71,8 +70,7 @@ class SmtpSettingsProviderTest extends \PHPUnit_Framework_TestCase
         $this->manager = new ConfigManager(
             'global',
             $bag,
-            $dispatcher,
-            new ConfigValueBag()
+            $dispatcher
         );
 
         $this->globalScopeManager = $this->getMockBuilder(GlobalScopeManager::class)
