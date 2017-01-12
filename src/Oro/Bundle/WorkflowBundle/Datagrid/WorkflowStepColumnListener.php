@@ -88,6 +88,8 @@ class WorkflowStepColumnListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
+        //Applications other than "default" is not supported
+        //@fixme in BB-6995
         if (!$this->isDefaultApplication()) {
             return;
         }
@@ -146,6 +148,8 @@ class WorkflowStepColumnListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
+        //Applications other than "default" is not supported
+        //@fixme in BB-6995
         if (!$this->isDefaultApplication()) {
             return;
         }
@@ -168,6 +172,8 @@ class WorkflowStepColumnListener
      */
     public function onResultAfter(OrmResultAfter $event)
     {
+        //Applications other than "default" is not supported
+        //@fixme in BB-6995
         if (!$this->isDefaultApplication()) {
             return;
         }
