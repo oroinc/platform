@@ -14,7 +14,7 @@
         {% set metadata = oro_datagrid_metadata(datagrid) %}
         {% set data = oro_datagrid_data(datagrid) %}
 
-        {% set totalRecords = data.options.totalRecords %}
+        {% set totalRecords = data.options.totalRecords is defined ? data.options.totalRecords : 0 %}
         {% set pageSize = metadata.state.pageSize %}
         {% set currentPage = metadata.state.currentPage %}
         {% set totalPages = pageSize == 0 ? 1 : (totalRecords / pageSize)|round %}

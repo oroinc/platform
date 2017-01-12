@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Twig;
 
-use Doctrine\DBAL\Exception\SyntaxErrorException;
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -35,6 +36,9 @@ class DataGridExtension extends \Twig_Extension
     /** @var RequestStack */
     protected $requestStack;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param ManagerInterface $manager
      * @param NameStrategyInterface $nameStrategy
@@ -42,6 +46,7 @@ class DataGridExtension extends \Twig_Extension
      * @param SecurityFacade $securityFacade
      * @param DatagridRouteHelper $datagridRouteHelper
      * @param RequestStack $requestStack
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ManagerInterface $manager,
@@ -49,7 +54,8 @@ class DataGridExtension extends \Twig_Extension
         RouterInterface $router,
         SecurityFacade $securityFacade,
         DatagridRouteHelper $datagridRouteHelper,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        LoggerInterface $logger = null
     ) {
         $this->manager = $manager;
         $this->nameStrategy = $nameStrategy;
@@ -57,6 +63,7 @@ class DataGridExtension extends \Twig_Extension
         $this->securityFacade = $securityFacade;
         $this->datagridRouteHelper = $datagridRouteHelper;
         $this->requestStack = $requestStack;
+        $this->logger = $logger;
     }
 
     /**
@@ -136,8 +143,14 @@ class DataGridExtension extends \Twig_Extension
     {
         try {
             return $grid->getData()->toArray();
-        } catch (SyntaxErrorException $e) {
-            return ['error' => $e->getMessage()];
+        } catch (\Exception $e) {
+            $this->logger->error('Getting grid data failed.', ['exception' => $e]);
+
+            return [
+                "data" => [],
+                "metadata" => [],
+                "options" => []
+            ];
         }
     }
 

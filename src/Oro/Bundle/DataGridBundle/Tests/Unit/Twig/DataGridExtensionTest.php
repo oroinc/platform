@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Twig;
 
-use Doctrine\DBAL\Driver\AbstractDriverException;
-use Doctrine\DBAL\Driver\DriverException;
-use Doctrine\DBAL\Exception\SyntaxErrorException;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
@@ -45,6 +41,9 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
     protected $requestStack;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    private $logger;
+
     protected function setUp()
     {
         $this->manager = $this->createMock(ManagerInterface::class);
@@ -58,13 +57,18 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->requestStack = $this->createMock(RequestStack::class);
 
+        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->twigExtension = new DataGridExtension(
             $this->manager,
             $this->nameStrategy,
             $this->router,
             $this->securityFacade,
             $this->datagridRouteHelper,
-            $this->requestStack
+            $this->requestStack,
+            $this->logger
         );
     }
 
@@ -285,22 +289,24 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($gridData));
 
-        $errorArray = [
-            'error' => 'Page not found'
-        ];
+        $exception = new \Exception('Page not found');
 
-        $driverException = $this->getMockBuilder(AbstractDriverException::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with(
+                'Getting grid data failed.',
+                ['exception' => $exception]
+            );
+
+        $errorArray = [
+            "data" => [],
+            "metadata" => [],
+            "options" => []
+        ];
 
         $gridData->expects($this->once())
             ->method('toArray')
-            ->willThrowException(
-                new SyntaxErrorException(
-                    'Page not found',
-                    $driverException
-                )
-            );
+            ->willThrowException($exception);
 
         $this->assertSame($errorArray, $this->twigExtension->getGridData($grid));
     }
