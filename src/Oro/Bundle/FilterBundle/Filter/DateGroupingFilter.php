@@ -2,22 +2,42 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
-use Oro\Bundle\OrderBundle\Entity\Order;
-use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 
 class DateGroupingFilter extends ChoiceFilter
 {
     const COLUMN_NAME_SUFFIX = 'DateGroupingFilter';
-    const SUB_QUERY_1 = '%s(calendarDate.date) NOT IN (SELECT %s(cd1.date) FROM %s as cd1  INNER JOIN %s as oo1 WHERE (CAST(cd1.date AS date) = CAST(oo1.createdAt AS date)) GROUP BY cd1.date)';
-    const SUB_QUERY_2 = '%s(calendarDate.date) IN (SELECT %s(cd2.date) FROM %s as cd2  INNER JOIN %s as oo2 WHERE (CAST(cd2.date AS date) = CAST(oo2.createdAt AS date)) GROUP BY cd2.date)';
+    const CALENDAR_TABLE = 'calendarDate';
+    const CALENDAR_COLUMN = 'date';
+    const FIRST_CALENDAR_TABLE_FOR_GROUPING = 'cd1';
+    const SECOND_CALENDAR_TABLE_FOR_GROUPING = 'cd2';
+    const CALENDAR_COLUMN_FOR_GROUPING = 'date';
+    const FIRST_JOINED_TABLE = 'oo1';
+    const SECOND_JOINED_TABLE = 'oo2';
+    const JOINED_COLUMN = 'createdAt';
+    const TARGET_COLUMN = 'date';
+    const NOT_NULLABLE_FIELD = 'product.id';
+    const CALENDAR_ENTITY = 'Oro\Bundle\ReportBundle\Entity\CalendarDate';
+    const TARGET_ENTITY = 'Oro\Bundle\OrderBundle\Entity\Order';
 
     /** @var array */
     protected $groupingNames = [];
+
+    /** @var EntityManager */
+    protected $entityManager;
+
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function setEntityManager(EntityManager $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
 
     /**
      * {@inheritdoc}
@@ -121,38 +141,119 @@ class DateGroupingFilter extends ChoiceFilter
     }
 
     /**
+     * @param QueryBuilder $qb
+     * @param $filterType
+     */
+    protected function addWhereClause(QueryBuilder $qb, $filterType)
+    {
+        /** Resolve options from configuration or constants */
+        $calendarTable = $this->getOr('calendar_table', self::CALENDAR_TABLE);
+        $calendarColumn = $this->getOr('calendar_column', self::CALENDAR_COLUMN);
+        $firstCalendarTableForGrouping = $this
+            ->getOr('first_calendar_table_for_grouping', self::FIRST_CALENDAR_TABLE_FOR_GROUPING);
+        $secondCalendarTableForGrouping = $this
+            ->getOr('second_calendar_table_for_grouping', self::SECOND_CALENDAR_TABLE_FOR_GROUPING);
+        $calendarColumnForGrouping = $this->getOr('calendar_column_for_grouping', self::CALENDAR_COLUMN_FOR_GROUPING);
+        $firstJoinedTable = $this->getOr('first_joined_table', self::FIRST_JOINED_TABLE);
+        $secondJoinedTable = $this->getOr('second_joined_table', self::SECOND_JOINED_TABLE);
+        $joinedColumn = $this->getOr('joined_column', self::JOINED_COLUMN);
+        $targetColumn = $this->getOr('target_column', self::TARGET_COLUMN);
+        $notNullableField = $this->getOr('not_nullable_field', self::NOT_NULLABLE_FIELD);
+        $calendarEntity = $this->getOr('calendar_entity', self::CALENDAR_ENTITY);
+        $targetEntity = $this->getOr('target_entity', self::TARGET_ENTITY);
+
+        $firstSubQueryBuilder = $this->generateSubQuery(
+            $filterType,
+            $firstCalendarTableForGrouping,
+            $calendarColumnForGrouping,
+            $firstJoinedTable,
+            $joinedColumn,
+            $targetColumn,
+            $calendarEntity,
+            $targetEntity
+        );
+        $secondSubQueryBuilder = $this->generateSubQuery(
+            $filterType,
+            $secondCalendarTableForGrouping,
+            $calendarColumnForGrouping,
+            $secondJoinedTable,
+            $joinedColumn,
+            $targetColumn,
+            $calendarEntity,
+            $targetEntity
+        );
+
+        $qb->andWhere(
+            $qb->expr()->notIn(
+                sprintf('%s(%s.%s)', $filterType, $calendarTable, $calendarColumn),
+                $firstSubQueryBuilder->getDQL()
+            )
+        );
+        $qb->orWhere(
+            $qb->expr()->andX(
+                $qb->expr()->in(
+                    sprintf('%s(%s.%s)', $filterType, $calendarTable, $calendarColumn),
+                    $secondSubQueryBuilder->getDQL()
+                ),
+                $qb->expr()->isNotNull($notNullableField)
+            )
+        );
+    }
+
+    /**
+     * @param string $filterType
+     * @param string $calendarTableForGrouping
+     * @param string $calendarColumnForGrouping
+     * @param string $joinedTable
+     * @param string $joinedColumn
+     * @param string $targetColumn
+     * @param string $calendarEntity
+     * @param string $targetEntity
+     * @return QueryBuilder
+     */
+    private function generateSubQuery(
+        $filterType,
+        $calendarTableForGrouping,
+        $calendarColumnForGrouping,
+        $joinedTable,
+        $joinedColumn,
+        $targetColumn,
+        $calendarEntity,
+        $targetEntity
+    ) {
+        $subQueryBuilder = $this->entityManager->createQueryBuilder();
+
+        return $subQueryBuilder
+            ->select(
+                sprintf(
+                    '%s(%s.%s)',
+                    $filterType,
+                    $calendarTableForGrouping,
+                    $calendarColumnForGrouping
+                )
+            )
+            ->from($calendarEntity, $calendarTableForGrouping)
+            ->innerJoin($targetEntity, $joinedTable)
+            ->where(
+                sprintf(
+                    '(CAST(%s.%s as %s) = CAST(%s.%s as %s))',
+                    $calendarTableForGrouping,
+                    $calendarColumnForGrouping,
+                    $targetColumn,
+                    $joinedTable,
+                    $joinedColumn,
+                    $targetColumn
+                )
+            )
+            ->groupBy(sprintf('%s.%s', $calendarTableForGrouping, $calendarColumnForGrouping));
+    }
+
+    /**
      * @param string $dataName
      * @return mixed
      */
     private function generateDataName($dataName)
     {
         return str_replace('.', '', $dataName);
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param $filterType
-     */
-    protected function addWhereClause(QueryBuilder $qb, $filterType)
-    {
-        $qb->andWhere(
-            sprintf(
-                '(' . self::SUB_QUERY_1 . ')',
-                $filterType,
-                $filterType,
-                CalendarDate::class,
-                Order::class
-            )
-        );
-
-        $qb->orWhere(
-            sprintf(
-                '(' . self::SUB_QUERY_2 . ' AND product.id is not null)',
-                $filterType,
-                $filterType,
-                CalendarDate::class,
-                Order::class
-            )
-        );
     }
 }
