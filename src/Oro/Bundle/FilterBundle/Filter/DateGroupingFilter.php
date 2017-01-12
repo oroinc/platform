@@ -21,15 +21,15 @@ class DateGroupingFilter extends ChoiceFilter
     const SECOND_JOINED_TABLE = 'oo2';
     const JOINED_COLUMN = 'createdAt';
     const TARGET_COLUMN = 'date';
-    const NOT_NULLABLE_FIELD = 'product.id';
-    const CALENDAR_ENTITY = 'Oro\Bundle\ReportBundle\Entity\CalendarDate';
-    const TARGET_ENTITY = 'Oro\Bundle\OrderBundle\Entity\Order';
 
     /** @var array */
     protected $groupingNames = [];
 
     /** @var EntityManager */
     protected $entityManager;
+
+    /** @var array */
+    protected $config = [];
 
     /**
      * @param EntityManager $entityManager
@@ -56,6 +56,8 @@ class DateGroupingFilter extends ChoiceFilter
         if (!$data) {
             return false;
         }
+
+        $this->resolveConfiguration();
 
         /** @var OrmFilterDatasourceAdapter $ds */
         $qb = $ds->getQueryBuilder();
@@ -146,58 +148,40 @@ class DateGroupingFilter extends ChoiceFilter
      */
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
-        /** Resolve options from configuration or constants */
-        $calendarTable = $this->getOr('calendar_table', self::CALENDAR_TABLE);
-        $calendarColumn = $this->getOr('calendar_column', self::CALENDAR_COLUMN);
-        $firstCalendarTableForGrouping = $this
-            ->getOr('first_calendar_table_for_grouping', self::FIRST_CALENDAR_TABLE_FOR_GROUPING);
-        $secondCalendarTableForGrouping = $this
-            ->getOr('second_calendar_table_for_grouping', self::SECOND_CALENDAR_TABLE_FOR_GROUPING);
-        $calendarColumnForGrouping = $this->getOr('calendar_column_for_grouping', self::CALENDAR_COLUMN_FOR_GROUPING);
-        $firstJoinedTable = $this->getOr('first_joined_table', self::FIRST_JOINED_TABLE);
-        $secondJoinedTable = $this->getOr('second_joined_table', self::SECOND_JOINED_TABLE);
-        $joinedColumn = $this->getOr('joined_column', self::JOINED_COLUMN);
-        $targetColumn = $this->getOr('target_column', self::TARGET_COLUMN);
-        $notNullableField = $this->getOr('not_nullable_field', self::NOT_NULLABLE_FIELD);
-        $calendarEntity = $this->getOr('calendar_entity', self::CALENDAR_ENTITY);
-        $targetEntity = $this->getOr('target_entity', self::TARGET_ENTITY);
-
         $firstSubQueryBuilder = $this->generateSubQuery(
             $filterType,
-            $firstCalendarTableForGrouping,
-            $calendarColumnForGrouping,
-            $firstJoinedTable,
-            $joinedColumn,
-            $targetColumn,
-            $calendarEntity,
-            $targetEntity
+            $this->config['first_calendar_table_for_grouping'],
+            $this->config['calendar_column_for_grouping'],
+            $this->config['first_joined_table'],
+            $this->config['joined_column'],
+            $this->config['target_column'],
+            $this->config['calendar_entity'],
+            $this->config['target_entity']
         );
         $secondSubQueryBuilder = $this->generateSubQuery(
             $filterType,
-            $secondCalendarTableForGrouping,
-            $calendarColumnForGrouping,
-            $secondJoinedTable,
-            $joinedColumn,
-            $targetColumn,
-            $calendarEntity,
-            $targetEntity
+            $this->config['secondCalendarTableForGrouping'],
+            $this->config['calendarColumnForGrouping'],
+            $this->config['secondJoinedTable'],
+            $this->config['joinedColumn'],
+            $this->config['targetColumn'],
+            $this->config['calendarEntity'],
+            $this->config['targetEntity']
         );
 
         $qb->andWhere(
             $qb->expr()->notIn(
-                sprintf('%s(%s.%s)', $filterType, $calendarTable, $calendarColumn),
+                sprintf('%s(%s.%s)', $filterType, $this->config['calendar_table'], $this->config['calendar_column']),
                 $firstSubQueryBuilder->getDQL()
             )
         );
-        $qb->orWhere(
-            $qb->expr()->andX(
-                $qb->expr()->in(
-                    sprintf('%s(%s.%s)', $filterType, $calendarTable, $calendarColumn),
-                    $secondSubQueryBuilder->getDQL()
-                ),
-                $qb->expr()->isNotNull($notNullableField)
-            )
-        );
+        $qb->orWhere($qb->expr()->andX(
+            $qb->expr()->in(
+                sprintf('%s(%s.%s)', $filterType, $this->config['calendar_table'], $this->config['calendar_column']),
+                $secondSubQueryBuilder->getDQL()
+            ),
+            $qb->expr()->isNotNull($this->config['not_nullable_field'])
+        ));
     }
 
     /**
@@ -246,6 +230,28 @@ class DateGroupingFilter extends ChoiceFilter
                 )
             )
             ->groupBy(sprintf('%s.%s', $calendarTableForGrouping, $calendarColumnForGrouping));
+    }
+
+    /**
+     * Resolve options from configuration or constants.
+     */
+    private function resolveConfiguration()
+    {
+        $this->config['calendar_table'] = $this->getOr('calendar_table', self::CALENDAR_TABLE);
+        $this->config['calendar_column'] = $this->getOr('calendar_column', self::CALENDAR_COLUMN);
+        $this->config['first_calendar_table_for_grouping'] = $this
+            ->getOr('first_calendar_table_for_grouping', self::FIRST_CALENDAR_TABLE_FOR_GROUPING);
+        $this->config['second_calendar_table_for_grouping'] = $this
+            ->getOr('second_calendar_table_for_grouping', self::SECOND_CALENDAR_TABLE_FOR_GROUPING);
+        $this->config['calendar_column_for_grouping'] = $this
+            ->getOr('calendar_column_for_grouping', self::CALENDAR_COLUMN_FOR_GROUPING);
+        $this->config['first_joined_table'] = $this->getOr('first_joined_table', self::FIRST_JOINED_TABLE);
+        $this->config['second_joined_table'] = $this->getOr('second_joined_table', self::SECOND_JOINED_TABLE);
+        $this->config['joined_column'] = $this->getOr('joined_column', self::JOINED_COLUMN);
+        $this->config['target_column'] = $this->getOr('target_column', self::TARGET_COLUMN);
+        $this->config['not_nullable_field'] = $this->get('not_nullable_field');
+        $this->config['calendar_entity'] = $this->get('calendar_entity');
+        $this->config['target_entity'] = $this->get('target_entity');
     }
 
     /**
