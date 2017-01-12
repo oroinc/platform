@@ -149,23 +149,6 @@ class WorkflowRegistry
     }
 
     /**
-     * @param string $application
-     * @return Workflow[]|Collection Named collection of active Workflow instances
-     *                               with structure: ['workflowName' => Workflow $workflowInstance]
-     */
-    public function getActiveWorkflowsByApplication($application)
-    {
-        $definitions = array_filter(
-            $this->getEntityRepository()->findActive(),
-            function (WorkflowDefinition $definition) use ($application) {
-                return in_array($application, $definition->getApplications(), true);
-            }
-        );
-
-        return $this->getAssembledWorkflows($definitions);
-    }
-
-    /**
      * Returns named collection of active Workflow instances with structure:
      *      ['workflowName' => Workflow $workflowInstance]
      *
