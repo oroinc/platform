@@ -950,4 +950,56 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
 
         return $obj;
     }
+
+    /**
+     * @dataProvider filterEmptyArraysDataProvider
+     *
+     * @param array $expected
+     * @param array $data
+     */
+    public function testFilterEmptyArrays(array $expected, array $data)
+    {
+        $this->assertEquals($expected, ArrayUtil::filterEmptyArrays($data));
+    }
+
+    /**
+     * @return array
+     */
+    public function filterEmptyArraysDataProvider()
+    {
+        return [
+            'One-level array data' => [
+                'expected' => [
+                    'One Level Array' => [
+                        'rowOne' => 'some value',
+                        'rowTwo' => 'some value',
+                    ],
+                    'Empty Array'     => [],
+                    'Empty SubArrays' => [
+                        'rowOne'  => 'some value',
+                        'rowTree' => [
+                            'subrowTwo'  => 'some value',
+                            'subrowTree' => null,
+                        ],
+                    ],
+                ],
+                'data'     => [
+                    'One Level Array' => [
+                        'rowOne' => 'some value',
+                        'rowTwo' => 'some value',
+                    ],
+                    'Empty Array'     => [],
+                    'Empty SubArrays' => [
+                        'rowOne'  => 'some value',
+                        'rowTwo'  => [],
+                        'rowTree' => [
+                            'subrowOne'  => [],
+                            'subrowTwo'  => 'some value',
+                            'subrowTree' => null,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

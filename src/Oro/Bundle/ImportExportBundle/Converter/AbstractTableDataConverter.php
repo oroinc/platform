@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\FormatConversionEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -61,21 +62,22 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
 
         $plainDataWithFrontendHeader = $this->removeEmptyColumns($importedRecord, $skipNullValues);
 
-        $frontendHeader = array_keys($plainDataWithFrontendHeader);
-        $frontendToBackendHeader = $this->convertHeaderToBackend($frontendHeader);
-        $plainDataWithBackendHeader = $this->replaceKeys(
+        $frontendHeader               = array_keys($plainDataWithFrontendHeader);
+        $frontendToBackendHeader      = $this->convertHeaderToBackend($frontendHeader);
+        $plainDataWithBackendHeader   = $this->replaceKeys(
             $frontendToBackendHeader,
             $plainDataWithFrontendHeader
         );
         $complexDataWithBackendHeader = parent::convertToImportFormat($plainDataWithBackendHeader, $skipNullValues);
-        $filteredComplexDataWithBackendHeader = $this->filterEmptyArrays($complexDataWithBackendHeader);
+
+        $filteredComplexDataWithBackendHeader = ArrayUtil::filterEmptyArrays($complexDataWithBackendHeader);
 
         return $this->dispatchFormatConversionEvent(
             Events::AFTER_IMPORT_FORMAT_CONVERSION,
             $importedRecord,
             $filteredComplexDataWithBackendHeader
         )
-        ->getResult();
+            ->getResult();
     }
 
     /**
@@ -284,34 +286,6 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         }
 
         return $resultData;
-    }
-
-    /**
-     * Remove all empty sub-arrays and sub-arrays with only null values
-     *
-     * @param array   $data
-     * @param integer $deep
-     *
-     * @return array|null
-     */
-    protected function filterEmptyArrays(array $data, $deep = 0)
-    {
-        $hasValue = false;
-
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $value      = $this->filterEmptyArrays($value, $deep + 1);
-                $data[$key] = $value;
-            }
-
-            if ([] === $value && 0 !== $deep) {
-                unset($data[$key]);
-            } elseif (null !== $value) {
-                $hasValue = true;
-            }
-        }
-
-        return $hasValue ? $data : [];
     }
 
     /**

@@ -432,4 +432,32 @@ class ArrayUtil
 
         return $propertyAccessor->getValue($array, $propertyPath);
     }
+
+    /**
+     * Remove all empty sub-arrays and sub-arrays with only null values
+     *
+     * @param array   $data
+     * @param integer $deep
+     *
+     * @return array|null
+     */
+    public static function filterEmptyArrays(array $data, $deep = 0)
+    {
+        $hasValue = false;
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value      = self::filterEmptyArrays($value, $deep + 1);
+                $data[$key] = $value;
+            }
+
+            if ([] === $value && 0 !== $deep) {
+                unset($data[$key]);
+            } elseif (null !== $value) {
+                $hasValue = true;
+            }
+        }
+
+        return $hasValue ? $data : [];
+    }
 }
