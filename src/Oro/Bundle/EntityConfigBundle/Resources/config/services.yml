@@ -352,14 +352,6 @@ services:
             - [addBlockType, ['multiEnum', 'attribute_multiselect']]
             - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localized_fallback']]
 
-    oro_entity_config.layout.data_provider.attribute_group_rest:
-        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeGroupRestProvider'
-        arguments:
-            - '@oro_entity_config.attribute_group_rendrer_registry'
-            - '@oro_locale.helper.localization'
-        tags:
-            - { name: layout.data_provider, alias: attribute_group_rest }
-
     oro_entity_config.layout.data_provider.attribute_config_provider:
         class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeConfigProvider'
         arguments:

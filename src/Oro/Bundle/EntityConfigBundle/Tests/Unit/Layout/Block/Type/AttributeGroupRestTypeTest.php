@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\BlockType;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\ExpressionLanguage\Expression;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
@@ -10,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupRestType;
 use Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeGroupType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
@@ -17,8 +20,15 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 {
-    /** @var AttributeGroupRenderRegistry */
+    /**
+     * @var AttributeGroupRenderRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
     protected $attributeGroupRenderRegistry;
+
+    /**
+     * @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $localizationHelper;
 
     /**
      * {@inheritdoc}
@@ -28,7 +38,11 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
 
         $this->attributeGroupRenderRegistry = new AttributeGroupRenderRegistry;
-        $restBlockType = new AttributeGroupRestType($this->attributeGroupRenderRegistry);
+        $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $restBlockType = new AttributeGroupRestType($this->attributeGroupRenderRegistry, $this->localizationHelper);
 
         $groupBlockTypeStub = new ConfigurableType();
         $groupBlockTypeStub->setName(AttributeGroupType::NAME);
@@ -38,6 +52,7 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
                 'group' => ['required' => true],
                 'attribute_family' => ['required' => true],
                 'exclude_from_rest' => ['default' => false],
+                'attribute_options' => ['default' => []],
             ]
         );
         $layoutFactoryBuilder
@@ -63,6 +78,11 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
 
         $this->attributeGroupRenderRegistry->setRendered($attributeFamily, $attributeGroup1);
 
+        $this->localizationHelper->expects($this->exactly(2))
+            ->method('getLocalizedValue')
+            ->with(new ArrayCollection([]))
+            ->willReturnOnConsecutiveCalls('label1', 'label2');
+
         $view = $this->getBlockView(
             AttributeGroupRestType::NAME,
             [
@@ -81,6 +101,17 @@ class AttributeGroupRestTypeTest extends BaseBlockTypeTestCase
         $this->assertEquals($entityValue, $thirdAttributeGroup->vars['entity']);
         $this->assertEquals($attributeFamily, $thirdAttributeGroup->vars['attribute_family']);
         $this->assertEquals('third_group', $thirdAttributeGroup->vars['group']);
+
+        $this->assertEquals([
+            [
+                'id' => 'second_group',
+                'label' => 'label1'
+            ],
+            [
+                'id' => 'third_group',
+                'label' => 'label2'
+            ]
+        ], $view->vars['tabsOptions']);
     }
 
     public function testGetBlockViewNothingToRender()

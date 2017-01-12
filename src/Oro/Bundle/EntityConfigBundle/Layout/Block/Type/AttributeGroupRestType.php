@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Layout\Block\Type;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
@@ -18,15 +19,23 @@ class AttributeGroupRestType extends AbstractContainerType
 {
     const NAME = 'attribute_group_rest';
 
+    /** @var LocalizationHelper */
+    protected $localizationHelper;
+
     /** @var AttributeGroupRenderRegistry */
     protected $attributeGroupRenderRegistry;
 
     /**
      * @param AttributeGroupRenderRegistry $attributeGroupRenderRegistry
+     * @param LocalizationHelper           $localizationHelper
      */
-    public function __construct(AttributeGroupRenderRegistry $attributeGroupRenderRegistry)
+    public function __construct(
+        AttributeGroupRenderRegistry $attributeGroupRenderRegistry,
+        LocalizationHelper $localizationHelper
+    )
     {
         $this->attributeGroupRenderRegistry = $attributeGroupRenderRegistry;
+        $this->localizationHelper = $localizationHelper;
     }
 
     /**
@@ -55,7 +64,12 @@ class AttributeGroupRestType extends AbstractContainerType
                     'group' => $group->getCode(),
                     'exclude_from_rest' => $options['exclude_from_rest'],
                     'additional_block_prefixes' => [
-                        'attribute_group_rest_child'
+                        'attribute_group_rest_attribute_group'
+                    ],
+                    'attribute_options' => [
+                        'additional_block_prefixes' => [
+                            'attribute_group_rest_attribute'
+                        ],
                     ]
                 ]
             );
@@ -68,6 +82,29 @@ class AttributeGroupRestType extends AbstractContainerType
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['options']);
+
+        $view->vars['tabsOptions'] = $this->getTabsOptions($options['attribute_family']);
+    }
+
+    /**
+     * @param AttributeFamily $attributeFamily
+     *
+     * @return array
+     */
+    private function getTabsOptions(AttributeFamily $attributeFamily)
+    {
+        $groups = $this->attributeGroupRenderRegistry->getNotRenderedGroups($attributeFamily);
+        $tabListOptions = array_map(
+            function (AttributeGroup $group) {
+                return [
+                    'id' => $group->getCode(),
+                    'label' => (string)$this->localizationHelper->getLocalizedValue($group->getLabels())
+                ];
+            },
+            $groups->toArray()
+        );
+
+        return array_values($tabListOptions);
     }
 
     /**
