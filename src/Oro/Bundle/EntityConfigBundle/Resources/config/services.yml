@@ -309,7 +309,8 @@ services:
     oro_entity_config.datagrid.attribute_family_actions_configuration:
         class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
         arguments:
-            - '@oro_entity_config.manager.attribute_family_manager'
+            - '@oro_security.security_facade'
+            - '@doctrine.orm.entity_manager'
 
     oro_entity_config.manager.attribute_family_manager:
         class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager'

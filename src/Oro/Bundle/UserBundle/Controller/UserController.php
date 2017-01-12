@@ -31,7 +31,9 @@ class UserController extends Controller
      */
     public function viewAction(User $user)
     {
-        return $this->view($user);
+        $securityFacade = $this->get('oro_security.security_facade');
+
+        return $this->view($user, $securityFacade->getLoggedUserId() === $user->getId());
     }
 
     /**

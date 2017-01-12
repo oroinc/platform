@@ -9,19 +9,3 @@ services:
         public: false
         calls:
             - [ setNamespace, [ 'oro_locale_tree_fallback_strategy' ] ]
-
-    oro_locale.localization.localization_provider.cache.warmer:
-        public: false
-        class: 'Oro\Bundle\LocaleBundle\Cache\LocalizationCacheWarmer'
-        arguments:
-            - '@oro_locale.manager.localization'
-        tags:
-            - { name: kernel.cache_warmer, priority: 5 }
-
-    oro_locale.localization.localization_provider.cache.clearer:
-        public: false
-        class: 'Oro\Bundle\LocaleBundle\Cache\LocalizationCacheCleaner'
-        arguments:
-            - '@oro_locale.manager.localization'
-        tags:
-            - { name: kernel.cache_clearer }

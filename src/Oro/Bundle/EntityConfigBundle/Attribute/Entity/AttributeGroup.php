@@ -87,6 +87,12 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     private $attributeRelations;
 
     /**
+     * @var bool
+     * @ORM\Column(name="is_visible", type="boolean", nullable=false, options={"default"=true})
+     */
+    private $isVisible = true;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct()
@@ -220,5 +226,24 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
         if (!$this->code) {
             $this->code = uniqid('group_code', false); //Todo: should be removed in #BB-6143 for real code generating
         }
+    }
+
+    /**
+     * @param bool $isVisible
+     * @return $this
+     */
+    public function setIsVisible($isVisible)
+    {
+        $this->isVisible = $isVisible;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsVisible()
+    {
+        return $this->isVisible;
     }
 }

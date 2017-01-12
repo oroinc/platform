@@ -13,7 +13,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class TargetType extends AbstractType
 {
@@ -129,10 +128,8 @@ class TargetType extends AbstractType
         $choices = [];
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
-            if ($className !== $entityClassName) {
-                $entityConfig        = $this->configManager->getProvider('entity')->getConfig($className);
-                $choices[$className] = $entityConfig->get('label');
-            }
+            $entityConfig = $this->configManager->getProvider('entity')->getConfig($className);
+            $choices[$className] = $entityConfig->get('label');
         }
 
         return $choices;

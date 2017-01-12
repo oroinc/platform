@@ -110,7 +110,7 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
             }
         }
 
-        return false;
+        return null;
     }
 
     /**

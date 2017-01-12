@@ -23,6 +23,7 @@ class OroIntegrationExtensionTest extends ExtensionTestCase
 
         $expectedDefinitions = [
             'oro_integration.datagrid.action_configuration',
+            'oro_integration.repository.channel',
         ];
 
         $this->assertDefinitionsLoaded($expectedDefinitions);

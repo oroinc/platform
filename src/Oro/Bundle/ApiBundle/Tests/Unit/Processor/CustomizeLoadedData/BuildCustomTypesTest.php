@@ -119,6 +119,38 @@ class BuildCustomTypesTest extends \PHPUnit_Framework_TestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessNestedAssociation()
+    {
+        $data = [
+            'targetEntityClass' => 'Test\TargetEntity',
+            'targetEntityId'    => 123,
+        ];
+        $config = new EntityDefinitionConfig();
+        $config->addField('targetEntityClass')->setExcluded();
+        $config->addField('targetEntityId')->setExcluded();
+        $nestedAssociationFieldConfig = $config->addField('nestedAssociationField');
+        $nestedAssociationFieldConfig->setDataType('nestedAssociation');
+        $nestedAssociationFieldTargetConfig = $nestedAssociationFieldConfig->getOrCreateTargetEntity();
+        $nestedAssociationFieldTargetConfig->addField(ConfigUtil::CLASS_NAME)->setPropertyPath('targetEntityClass');
+        $nestedAssociationFieldTargetConfig->getField(ConfigUtil::CLASS_NAME)->setMetaProperty(true);
+        $nestedAssociationFieldTargetConfig->addField('id')->setPropertyPath('targetEntityId');
+
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        $this->assertEquals(
+            [
+                'targetEntityClass'      => 'Test\TargetEntity',
+                'targetEntityId'         => 123,
+                'nestedAssociationField' => [
+                    ConfigUtil::CLASS_NAME => 'Test\TargetEntity',
+                    'id'                   => 123
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testProcessForExcludedExtendedAssociation()
     {
         $data = [

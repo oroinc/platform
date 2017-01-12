@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
+use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedAssociationMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory;
 
 class ObjectMetadataLoaderTest extends LoaderTestCase
@@ -15,6 +16,9 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $nestedObjectMetadataFactory;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $nestedAssociationMetadataFactory;
 
     /** @var ObjectMetadataLoader */
     protected $objectMetadataLoader;
@@ -27,10 +31,14 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $this->nestedObjectMetadataFactory = $this->getMockBuilder(ObjectNestedObjectMetadataFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $this->nestedAssociationMetadataFactory = $this->getMockBuilder(ObjectNestedAssociationMetadataFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->objectMetadataLoader = new ObjectMetadataLoader(
             $this->objectMetadataFactory,
-            $this->nestedObjectMetadataFactory
+            $this->nestedObjectMetadataFactory,
+            $this->nestedAssociationMetadataFactory
         );
     }
 
@@ -266,6 +274,43 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
             ->with(
                 self::identicalTo($entityMetadata),
                 self::identicalTo($config),
+                $entityClass,
+                $fieldName,
+                self::identicalTo($field),
+                $withExcludedProperties,
+                $targetAction
+            );
+
+        $result = $this->objectMetadataLoader->loadObjectMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+    }
+
+    public function testForNestedAssociation()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $entityMetadata = new EntityMetadata();
+
+        $fieldName = 'testField';
+        $field = $config->addField($fieldName);
+        $field->setDataType('nestedAssociation');
+
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createObjectMetadata')
+            ->with($entityClass, self::identicalTo($config))
+            ->willReturn($entityMetadata);
+        $this->nestedAssociationMetadataFactory->expects(self::once())
+            ->method('createAndAddNestedAssociationMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
                 $entityClass,
                 $fieldName,
                 self::identicalTo($field),
