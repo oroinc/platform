@@ -199,6 +199,7 @@ define(function(require) {
                 '[data-bound-input-widget], [data-page-component-module], [data-bound-component]' +
                 ')'
             ).filter(function() {
+                //add data-skip-input-widgets to any container to disable widgets inside this container(for example when container is hidden)
                 return $(this).closest('[data-skip-input-widgets]').length === 0;
             });
             this.create(foundElements);
