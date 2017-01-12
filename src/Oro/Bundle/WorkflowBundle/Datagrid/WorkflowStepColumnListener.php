@@ -91,19 +91,14 @@ class WorkflowStepColumnListener
         if (!$this->isDefaultApplication()) {
             return;
         }
-
         $config = $event->getConfig();
 
-        // datasource type other than ORM is not supported yet
-        if (!$config->isOrmDatasource()) {
-            return;
-        }
+        $rootEntity = $this->getRootEntity($config);
 
-        // get root entity
-        $rootEntity = $config->getOrmQuery()->getRootEntity($this->entityClassResolver);
         if (!$rootEntity) {
             return;
         }
+
         $rootEntityAlias = $config->getOrmQuery()->getRootAlias();
         if (!$rootEntityAlias) {
             return;
@@ -126,6 +121,24 @@ class WorkflowStepColumnListener
         if ($isShowWorkflowStep && !$workflowStepColumns) {
             $this->addWorkflowStep($config, $rootEntity, $rootEntityAlias);
         }
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     *
+     * @return null|string
+     */
+    private function getRootEntity(DatagridConfiguration $config)
+    {
+        // datasource type other than ORM is not supported yet
+        if (!$config->isOrmDatasource()) {
+            return null;
+        }
+
+        // get root entity
+        $rootEntity = $config->getOrmQuery()->getRootEntity($this->entityClassResolver);
+
+        return $rootEntity ?: null;
     }
 
     /**
@@ -198,6 +211,7 @@ class WorkflowStepColumnListener
 
     /**
      * @param string $entity
+     *
      * @return bool
      */
     protected function isShowWorkflowStep($entity)
@@ -310,6 +324,7 @@ class WorkflowStepColumnListener
      * Check whether grid contains workflow step column
      *
      * @param DatagridConfiguration $config
+     *
      * @return bool
      */
     protected function isApplicable(DatagridConfiguration $config)
@@ -364,6 +379,7 @@ class WorkflowStepColumnListener
 
     /**
      * @param string $className
+     *
      * @return ArrayCollection
      */
     protected function getWorkflows($className)
@@ -377,6 +393,7 @@ class WorkflowStepColumnListener
 
     /**
      * @param string $className
+     *
      * @return bool
      */
     protected function isEntityHaveMoreThanOneWorkflow($className)
@@ -390,6 +407,6 @@ class WorkflowStepColumnListener
     protected function isDefaultApplication()
     {
         return CurrentApplicationProviderInterface::DEFAULT_APPLICATION
-            === $this->currentApplicationProvider->getCurrentApplication();
+        === $this->currentApplicationProvider->getCurrentApplication();
     }
 }
