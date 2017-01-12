@@ -154,7 +154,7 @@ define(function(require) {
                 callback(data);
             } else {
                 var item = data.pop();
-                if (!_.isUndefined(item.children) && _.isArray(item.children)) {
+                if (!_.isUndefined(item) && !_.isUndefined(item.children) && _.isArray(item.children)) {
                     callback(item.children.pop());
                 } else {
                     callback(item);
