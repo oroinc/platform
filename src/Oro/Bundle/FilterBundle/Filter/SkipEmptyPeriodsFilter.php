@@ -21,7 +21,6 @@ class SkipEmptyPeriodsFilter extends ChoiceFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-
         if (is_array($data) && $data['value']) {
             return false;
         }
