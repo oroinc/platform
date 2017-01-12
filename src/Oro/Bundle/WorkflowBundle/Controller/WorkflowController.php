@@ -63,11 +63,11 @@ class WorkflowController extends Controller
                 'transition' => $transition,
                 'workflow' => $workflow,
                 'transitionUrl' => $this->generateUrl(
-                    'oro_api_workflow_start',
+                    $this->getRouteProvider()->getExecutionRoute(),
                     $routeParams
                 ),
                 'transitionFormUrl' => $this->generateUrl(
-                    'oro_workflow_widget_start_transition_form',
+                    $this->getRouteProvider()->getFormDialogRoute(),
                     $routeParams
                 )
             ]
@@ -112,5 +112,13 @@ class WorkflowController extends Controller
                 )
             ]
         );
+    }
+
+    /**
+     * @return RouteProviderInterface
+     */
+    protected function getRouteProvider()
+    {
+        return $this->container->get('oro_workflow.provider.start_transition_route');
     }
 }

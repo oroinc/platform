@@ -22,7 +22,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
      */
     public function getMigrationVersion()
     {
-        return 'v1_12';
+        return 'v1_13';
     }
 
     /**
@@ -270,6 +270,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $table->addColumn('attribute_family_id', 'integer', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('is_visible', 'boolean', ['default' => '1']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['attribute_family_id']);
     }

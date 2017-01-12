@@ -159,17 +159,20 @@ class LocalizationCollectionType extends AbstractType
 
         foreach ($this->getLocalizations() as $localization) {
             $localizationId = $localization->getId();
-            if (!array_key_exists($localizationId, $data)) {
-                if ($localization->getParentLocalization()) {
-                    $data[$localizationId] = new FallbackType(FallbackType::PARENT_LOCALIZATION);
-                } else {
-                    $data[$localizationId] = new FallbackType(FallbackType::SYSTEM);
-                }
-                if ($form->hasOption('default_callback')) {
-                    /** @var \Closure $defaultCallback */
-                    $defaultCallback = $form->getOption('default_callback');
-                    $data[$localizationId] = $defaultCallback($data[$localizationId]);
-                }
+            if (array_key_exists($localizationId, $data) && $data[$localizationId] !== null) {
+                continue;
+            }
+
+            if ($localization->getParentLocalization()) {
+                $data[$localizationId] = new FallbackType(FallbackType::PARENT_LOCALIZATION);
+            } else {
+                $data[$localizationId] = new FallbackType(FallbackType::SYSTEM);
+            }
+
+            if ($form->hasOption('default_callback')) {
+                /** @var \Closure $defaultCallback */
+                $defaultCallback = $form->getOption('default_callback');
+                $data[$localizationId] = $defaultCallback($data[$localizationId]);
             }
         }
 

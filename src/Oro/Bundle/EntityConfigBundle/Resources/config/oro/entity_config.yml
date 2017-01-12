@@ -104,3 +104,20 @@ entity_config:
                             block: other
                             subblock: frontend
                             label: oro.entity_config.entity_config.attribute.field.items.enabled
+                visible:
+                    options:
+                        value_type: boolean
+                        default_value: true
+                        indexed: true
+                    grid:
+                        type: boolean
+                        label: oro.entity_config.entity_config.attribute.field.items.visible
+                        renderable: true
+                    form:
+                        type: choice
+                        options:
+                            choices: ['No', 'Yes']
+                            empty_value: false
+                            block: other
+                            subblock: frontend
+                            label: oro.entity_config.entity_config.attribute.field.items.visible
