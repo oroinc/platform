@@ -5,13 +5,13 @@ We have:
 
  - 2 organizations: **Main Organization** and the **Second Organization**;
  - Main Organization contains one **BU A**;
- - Senond Organization contains one **BU B**;
- - BU B contains one subordinate **BU C**;
- - user **John** was created in the Main Organization and BU A;
- - user **Mary** was created in the Main Organization and BU A;
- - user **Mike** was created in the Second Organization and BU C;
- - user **Robert** was created in the Second Organization and BU B;
- - user **Mark** was created in the Second Organization and BU B;
+ - Second Organization contains one **BU B**;
+ - **BU B** contains one subordinate **BU C**;
+ - user **John** was created in the Main Organization and **BU A**;
+ - user **Mary** was created in the Main Organization and **BU A**;
+ - user **Mike** was created in the Second Organization and **BU C**;
+ - user **Robert** was created in the Second Organization and **BU B**;
+ - user **Mark** was created in the Second Organization and **BU B**;
  
 Users was assigned:
 
