@@ -36,13 +36,9 @@
     {% do block[id ~ '_header_row']|merge_context({'datagrid': datagrid}) %}
 
     {% set enableFilters = renderParams.enableFilters is defined ? renderParams.enableFilters : true %}
-    {% if isMobileVersion() %}
-        {% set enableToggleFilters = false %}
-    {% elseif renderParams.enableToggleFilters is defined %}
-        {% set enableToggleFilters = renderParams.enableToggleFilters %}
-    {% else %}
-        {% set enableToggleFilters = true %}
-    {% endif %}
+
+    {% set enableToggleFilters = false %}
+
     {% set options  = {
         el: '#' ~ gridId,
         gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
@@ -176,15 +172,9 @@
 {% endblock %}
 
 {% block __oro_datagrid_server_render__datagrid_cell_widget %}
-    {% set attr = attr|merge({
-        class: attr.class|default('') ~ " string-cell grid-cell grid-body-cell grid-body-cell-" ~ column_name
-    }) %}
-
-    <div{{ block('block_attributes') }}>
         {% for child in block if child.vars.visible -%}
             {{ block_widget(child) }}
         {%- endfor %}
-    </div>
 {% endblock %}
 
 {%- block __oro_datagrid_server_render__datagrid_cell_value_widget -%}

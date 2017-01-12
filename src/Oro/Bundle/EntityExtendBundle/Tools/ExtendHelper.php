@@ -84,6 +84,9 @@ class ExtendHelper
     }
 
     /**
+     * Returns a relation key used for extended relations.
+     * The result string is "relationType|entityClassName|targetEntityClassName|fieldName".
+     *
      * @param string $entityClassName
      * @param string $fieldName
      * @param string $relationType
@@ -97,13 +100,49 @@ class ExtendHelper
     }
 
     /**
+     * Returns a relation key for inverse side relation if the given relation key represents owning side relation,
+     * and vice versa.
+     * A valid relation key is
+     * either "relationType|entityClassName|targetEntityClassName|fieldName"
+     * or "relationType|entityClassName|targetEntityClassName|fieldName|inverse".
+     *
      * @param string $relationKey
      *
-     * @return string
+     * @return string|null
+     */
+    public static function toggleRelationKey($relationKey)
+    {
+        $parts = explode('|', $relationKey);
+        // toggle the relation key only if owning side entity equals to inverse side entity
+        $numberOfParts = count($parts);
+        if ($numberOfParts >= 4 && $parts[1] === $parts[2]) {
+            if (4 === $numberOfParts) {
+                $relationKey .= '|inverse';
+            } elseif (5 === $numberOfParts && 'inverse' === $parts[4]) {
+                $relationKey = substr($relationKey, 0, -8);
+            }
+        }
+
+        return $relationKey;
+    }
+
+    /**
+     * Extracts an extended relation type from its relation key.
+     * A valid relation key is
+     * either "relationType|entityClassName|targetEntityClassName|fieldName"
+     * or "relationType|entityClassName|targetEntityClassName|fieldName|inverse".
+     *
+     * @param string $relationKey
+     *
+     * @return string|null
      */
     public static function getRelationType($relationKey)
     {
         $parts = explode('|', $relationKey);
+        $numberOfParts = count($parts);
+        if ($numberOfParts < 4 || $numberOfParts > 5) {
+            return null;
+        }
 
         return reset($parts);
     }

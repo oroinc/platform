@@ -18,10 +18,7 @@ class LimitConsumedMessagesExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldThrowExceptionIfMessageLimitIsNotInt()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Expected message limit is int but got: "double"'
-        );
-
+        $this->expectExceptionMessage('Expected message limit is int but got: "double"');
         new LimitConsumedMessagesExtension(0.0);
     }
 

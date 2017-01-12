@@ -227,14 +227,6 @@ services:
             - '@oro_entity.entity_field_provider'
             - '@oro_entity.entity_provider'
 
-    oro_entity.exclusion_provider.by_alias:
-        class: Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider
-        public: false
-        arguments:
-            - '@oro_entity.entity_alias_resolver'
-        tags:
-            - { name: oro_entity.exclusion_provider.api, priority: 40 }
-
     oro_entity.twig.extension.entity:
         class: %oro_entity.twig.extension.entity.class%
         arguments:

@@ -106,7 +106,7 @@ define([
 
         _onError: function(jqXHR) {
             var err = jqXHR.responseJSON;
-            var msg = __('Sorry, unexpected error was occurred');
+            var msg = __('Sorry, an unexpected error has occurred.');
             if (tools.debug) {
                 if (err.message) {
                     msg += ': ' + err.message;

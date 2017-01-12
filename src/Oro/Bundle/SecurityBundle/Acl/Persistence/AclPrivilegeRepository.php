@@ -267,6 +267,10 @@ class AclPrivilegeRepository
 
         /** @var FieldSecurityMetadata $fieldInfo */
         foreach ($classInfo->getFields() as $fieldInfo) {
+            if ($fieldInfo->isHidden()) {
+                continue;
+            }
+
             $privilege = new AclPrivilege();
             $privilege->setIdentity(
                 new AclPrivilegeIdentity(

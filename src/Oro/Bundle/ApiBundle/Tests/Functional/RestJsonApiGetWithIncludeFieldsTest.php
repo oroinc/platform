@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-class GetRestJsonApiWithIncludeFieldsTest extends RestJsonApiTestCase
+class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
 {
     /**
      * FQCN of the entity being used for testing.

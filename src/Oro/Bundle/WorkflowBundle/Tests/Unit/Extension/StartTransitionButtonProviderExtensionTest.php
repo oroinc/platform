@@ -81,8 +81,7 @@ class StartTransitionButtonProviderExtensionTest extends AbstractTransitionButto
             );
 
             $this->workflowRegistry->expects($this->once())
-                ->method('getActiveWorkflowsByApplication')
-                ->with($this->getApplication())
+                ->method('getActiveWorkflows')
                 ->willReturn(new ArrayCollection([$workflow]));
 
             $buttonContext = (new ButtonContext())
@@ -165,8 +164,7 @@ class StartTransitionButtonProviderExtensionTest extends AbstractTransitionButto
         );
 
         $this->workflowRegistry->expects($this->once())
-            ->method('getActiveWorkflowsByApplication')
-            ->with($this->getApplication())
+            ->method('getActiveWorkflows')
             ->willReturn(new ArrayCollection([$workflow1, $workflow2, $workflow3]));
 
         $buttonContext = new ButtonContext();

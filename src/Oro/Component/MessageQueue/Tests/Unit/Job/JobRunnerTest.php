@@ -236,7 +236,6 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Job was not found. id: "job-id"');
-
         $jobRunner->runDelayed('job-id', function () {
         });
     }
