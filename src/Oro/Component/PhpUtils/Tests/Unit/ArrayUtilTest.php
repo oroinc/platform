@@ -4,6 +4,9 @@ namespace Oro\Component\PhpUtils\Tests\Unit;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class ArrayUtilTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateOrderedComparator()
