@@ -10,8 +10,8 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
-* @SuppressWarnings(PHPMD.TooManyMethods)
-*/
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterface
 {
     use AttachmentExtensionAwareTrait;
@@ -37,6 +37,8 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
         $this->addOroAttributeGroupForeignKeys($schema);
         $this->addAttributeFamilyImageAssociation($schema);
         $this->addOrganizationForeignKey($schema);
+        $table = $schema->getTable('oro_attribute_group');
+        $table->addColumn('code', 'string', ['length' => 255, 'notnull' => false]);
     }
 
     /**
@@ -85,7 +87,6 @@ class OroEntityConfigBundle implements Migration, AttachmentExtensionAwareInterf
     {
         $table = $schema->createTable('oro_attribute_group');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('code', 'string', ['length' => 255]);
         $table->addColumn('attribute_family_id', 'integer', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
