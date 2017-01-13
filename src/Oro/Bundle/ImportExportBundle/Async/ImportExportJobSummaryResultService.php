@@ -109,7 +109,7 @@ class ImportExportJobSummaryResultService
                 continue;
             }
             foreach ($childrenJobData['errors'] as $errorMessage) {
-                $errorLog .= sprintf("error in part #%s: %s\n\r", ++$key, $errorMessage);
+                $errorLog .= sprintf("error in part #%s: %s\n\r", $key, $errorMessage);
             }
         }
         return $errorLog;

@@ -180,14 +180,51 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
         // import entity fields
         if ($existingEntity) {
+            $this->handlerOfEntity($entity, $existingEntity, $itemData);
             if ($isFullData) {
                 $this->importExistingEntity($entity, $existingEntity, $itemData);
             }
 
             $entity = $existingEntity;
+        } else {
+            $this->handlerOfEntity($entity, null, $itemData);
         }
 
         return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @param array|null $itemData
+     */
+    protected function handlerOfEntity($entity, $existingEntity = null, $itemData = null)
+    {
+        $entityName       = ClassUtils::getClass($entity);
+        $identifierName   = $this->databaseHelper->getIdentifierFieldName($entityName);
+        $excludedFields[] = $identifierName;
+        $fields           = $this->fieldHelper->getFields($entityName, true);
+        $action = $existingEntity ? 'EDIT' : 'CREATE';
+
+        foreach ($fields as $key => $field) {
+            $fieldName = $field['name'];
+            $importedValue = $this->fieldHelper->getObjectValue($entity, $fieldName);
+            if (!$this->strategyHelper->isGranted($action, $entity, $fieldName) && $importedValue) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $fieldName,
+                        '%entity_name%' => $entityName,
+                    ]
+                );
+                $this->context->addError($error);
+                if ($existingEntity) {
+                    $existingValue = $this->fieldHelper->getObjectValue($existingEntity, $fieldName);
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, $existingValue);
+                } else {
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, null);
+                }
+            }
+        }
     }
 
     /**
@@ -209,19 +246,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
-            if ($this->isFieldExcluded($entityName, $fieldName, $itemData)) {
+            if ($isExcludedField = $this->isFieldExcluded($entityName, $fieldName, $itemData)) {
                 $excludedFields[] = $fieldName;
                 unset($fields[$key]);
-            }
-            if (!$this->strategyHelper->isGranted('EDIT', $entity, $fieldName)) {
-                $error = $this->translator->trans(
-                    'oro.importexport.import.errors.access_denied_property_entity',
-                    [
-                        '%property_name%' => $fieldName,
-                        '%entity_name%' => $entityName,
-                    ]
-                );
-                $this->context->addError($error);
             }
         }
 
