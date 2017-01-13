@@ -28,9 +28,7 @@ class AttributeTextTypeTest extends BlockTypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
         $attributeTextType = new AttributeTextType($this->attributeManager);
-
 
         $layoutFactoryBuilder
             ->addType($attributeTextType);
