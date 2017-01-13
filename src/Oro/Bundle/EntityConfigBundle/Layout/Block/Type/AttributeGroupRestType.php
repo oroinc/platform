@@ -32,8 +32,7 @@ class AttributeGroupRestType extends AbstractContainerType
     public function __construct(
         AttributeGroupRenderRegistry $attributeGroupRenderRegistry,
         LocalizationHelper $localizationHelper
-    )
-    {
+    ) {
         $this->attributeGroupRenderRegistry = $attributeGroupRenderRegistry;
         $this->localizationHelper = $localizationHelper;
     }
@@ -124,13 +123,17 @@ class AttributeGroupRestType extends AbstractContainerType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired([
-            'attribute_family',
-            'entity',
-        ])->setDefaults([
-            'options' => [],
-            'exclude_from_rest' => false,
-        ]);
+        $resolver->setRequired(
+            [
+                'attribute_family',
+                'entity',
+            ]
+        )->setDefaults(
+            [
+                'options' => [],
+                'exclude_from_rest' => false,
+            ]
+        );
     }
 
     /**

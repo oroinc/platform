@@ -21,8 +21,7 @@ define(function(require) {
         },
 
         onGroupChange: function(model) {
-            if (model.id == this.id) {
-                console.log(this.el);
+            if (model.id === this.id) {
                 this.el.toggle();
             }
         }
