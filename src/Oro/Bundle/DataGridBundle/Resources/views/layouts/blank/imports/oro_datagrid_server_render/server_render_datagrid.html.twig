@@ -63,7 +63,9 @@
          data-layout="separate"
             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
     >
-        <div class="oro-datagrid">
+        <div class="oro-datagrid"
+             data-skip-input-widgets
+        >
             {% if toolbarOptions.placement.top %}
                 <div class="toolbar" data-grid-toolbar="top">
                     {{ block_widget(block[id ~ '_toolbar']) }}
