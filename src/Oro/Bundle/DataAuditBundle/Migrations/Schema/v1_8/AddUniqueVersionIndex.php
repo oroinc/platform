@@ -29,13 +29,15 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $ids = $this->getDuplicates();
-        $queries->addPreQuery(
-            new ParametrizedSqlMigrationQuery(
-                'DELETE FROM oro_audit WHERE id IN (:ids)',
-                ['ids' => $ids],
-                ['ids' => Connection::PARAM_STR_ARRAY]
-            )
-        );
+        if ($ids) {
+            $queries->addPreQuery(
+                new ParametrizedSqlMigrationQuery(
+                    'DELETE FROM oro_audit WHERE id IN (:ids)',
+                    ['ids' => $ids],
+                    ['ids' => Connection::PARAM_STR_ARRAY]
+                )
+            );
+        }
 
         $auditTable = $schema->getTable('oro_audit');
         $auditTable->addUniqueIndex(['object_id', 'object_class', 'version'], 'idx_oro_audit_version');
