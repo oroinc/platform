@@ -102,12 +102,9 @@ class StringFilter extends AbstractFilter
                     $fieldName = $ds->expr()->trim($fieldName);
                 }
 
-                return $ds->expr()->andX(
-                    $ds->expr()->orX(
-                        $ds->expr()->isNull($fieldName),
-                        $ds->expr()->eq($fieldName, $emptyString)
-                    ),
-                    $ds->expr()->eq(true, true)
+                return $ds->expr()->orX(
+                    $ds->expr()->isNull($fieldName),
+                    $ds->expr()->eq($fieldName, $emptyString)
                 );
             case FilterUtility::TYPE_NOT_EMPTY:
                 $emptyString = $ds->expr()->literal('');
