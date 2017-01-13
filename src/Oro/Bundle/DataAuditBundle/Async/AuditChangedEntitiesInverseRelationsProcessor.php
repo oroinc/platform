@@ -235,9 +235,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             foreach ($new['deleted'] as $deletedEntityData) {
                 $entityId = $deletedEntityData['entity_id'];
 
-                $change = $this->getCollectionChangeSetFromMap(
-                    $map, $entityClass, $entityId, $fieldName
-                );
+                $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
 
                 $change[1]['deleted'][] = [
                     'entity_class' => $sourceEntityClass,
