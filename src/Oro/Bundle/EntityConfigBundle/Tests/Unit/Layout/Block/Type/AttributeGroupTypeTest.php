@@ -105,7 +105,10 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
             [
                 'group' => 'group_code',
                 'entity' => $entityValue,
-                'attribute_family' => $attributeFamily
+                'attribute_family' => $attributeFamily,
+                'attribute_options' => [
+                    'vars' => ['foo' => 'bar']
+                ]
             ]
         );
         $this->assertCount(2, $view->children);
@@ -115,12 +118,14 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertEquals($entityValue, $firstAttributeView->vars['entity']);
         $this->assertEquals('first_attribute', $firstAttributeView->vars['property_path']);
         $this->assertEquals('first_attribute_label', $firstAttributeView->vars['label']);
+        $this->assertEquals('bar', $firstAttributeView->vars['foo']);
 
         $secondAttributeView = $view->children['attribute_group_id_attribute_type_second_attribute'];
         $this->assertEquals('attribute_type', $secondAttributeView->vars['block_type']);
         $this->assertEquals($entityValue, $secondAttributeView->vars['entity']);
         $this->assertEquals('second_attribute', $secondAttributeView->vars['property_path']);
         $this->assertEquals('second_attribute_label', $secondAttributeView->vars['label']);
+        $this->assertEquals('bar', $secondAttributeView->vars['foo']);
 
         $this->assertTrue($this->attributeGroupRenderRegistry->isRendered($attributeFamily, $attributeGroup));
     }

@@ -79,11 +79,14 @@ class AttributeGroupType extends AbstractContainerType
                 $this->getAttributeBlockName($fieldName, $blockType, $attributeGroupBlockId),
                 $attributeGroupBlockId,
                 $blockType,
-                [
-                    'entity' => $entityValue,
-                    'property_path' => $attribute->getFieldName(),
-                    'label' => $this->attributeManager->getAttributeLabel($attribute)
-                ]
+                array_merge(
+                    [
+                        'entity' => $entityValue,
+                        'property_path' => $attribute->getFieldName(),
+                        'label' => $this->attributeManager->getAttributeLabel($attribute)
+                    ],
+                    $options->get('attribute_options')->toArray()
+                )
             );
         }
     }
@@ -120,7 +123,12 @@ class AttributeGroupType extends AbstractContainerType
                 'attribute_family'
             ]
         );
-        $resolver->setDefault('exclude_from_rest', true);
+        $resolver->setDefaults(
+            [
+                'exclude_from_rest' => true,
+                'attribute_options' => []
+            ]
+        );
     }
 
     /**
