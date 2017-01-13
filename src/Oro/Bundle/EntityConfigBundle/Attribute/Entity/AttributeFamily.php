@@ -352,7 +352,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
      */
     public function toString()
     {
-        return 'code:' . $this->getCode();
+        return 'code:'.$this->getCode();
     }
 
     /**
@@ -366,7 +366,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
         $groups = $this->getAttributeGroups();
 
         foreach ($groups as $group) {
-            $item = ['group' => $group->getId(), 'attributes' => [], 'visible'=> $group->getIsVisible()];
+            $item = ['group' => $group->getId(), 'attributes' => [], 'visible' => $group->getIsVisible()];
 
             /** @var AttributeGroupRelation $attributeRelation */
             foreach ($group->getAttributeRelations() as $attributeRelation) {
