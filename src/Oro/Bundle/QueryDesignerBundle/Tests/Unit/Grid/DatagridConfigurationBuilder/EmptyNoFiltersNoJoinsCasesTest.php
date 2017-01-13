@@ -89,6 +89,11 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
                 'columns' => [
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false]
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1']
+                ]
             ]
         ];
 
@@ -152,6 +157,11 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
             'filters' => [
                 'columns' => [
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false]
+                ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1']
                 ]
             ]
         ];

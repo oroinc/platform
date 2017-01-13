@@ -2,21 +2,27 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Datagrid;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
-use Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AttributeFamilyActionsConfiguration
 {
-    /** @var AttributeFamilyVoter */
-    private $familyManager;
+    /** @var SecurityFacade */
+    private $securityFacade;
+
+    /** @var EntityManager */
+    private $entityManager;
 
     /**
-     * @param AttributeFamilyManager $familyManager
+     * @param SecurityFacade $securityFacade
+     * @param EntityManager $entityManager
      */
-    public function __construct(AttributeFamilyManager $familyManager)
+    public function __construct(SecurityFacade $securityFacade, EntityManager $entityManager)
     {
-        $this->familyManager = $familyManager;
+        $this->securityFacade = $securityFacade;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -25,12 +31,12 @@ class AttributeFamilyActionsConfiguration
      */
     public function configureActionsVisibility(ResultRecordInterface $record)
     {
-        $id = $record->getValue('id');
+        $attributeFamily = $this->entityManager->getReference(AttributeFamily::class, $record->getValue('id'));
 
         return [
             'view' => true,
             'edit' => true,
-            'delete' => $this->familyManager->isAttributeFamilyDeletable($id)
+            'delete' => $this->securityFacade->isGranted('delete', $attributeFamily)
         ];
     }
 }

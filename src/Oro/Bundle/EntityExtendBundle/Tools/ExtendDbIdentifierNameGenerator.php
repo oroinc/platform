@@ -212,16 +212,21 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     /**
      * Builds the name of a column in a join table for a many-to-many relation
      *
-     * @param string $entityClassName
-     * @param string $suffix
+     * @param string      $entityClassName
+     * @param string      $suffix
+     * @param string|null $prefix
      *
      * @return string
      *
      */
-    public function generateManyToManyJoinTableColumnName($entityClassName, $suffix = self::RELATION_COLUMN_SUFFIX)
-    {
+    public function generateManyToManyJoinTableColumnName(
+        $entityClassName,
+        $suffix = self::RELATION_COLUMN_SUFFIX,
+        $prefix = null
+    ) {
         return sprintf(
-            '%s%s',
+            '%s%s%s',
+            $prefix,
             strtolower(ExtendHelper::getShortClassName($entityClassName)),
             $suffix
         );

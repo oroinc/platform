@@ -107,6 +107,19 @@ class DefaultOperationRequestHelperTest extends \PHPUnit_Framework_TestCase
                 'executionRoute' => 'test_route',
                 'expected' => 'test_original_route',
             ],
+            'exists route name with datagrid widget route' => [
+                'masterRequest' => new Request(
+                    [
+                        '_route' => DefaultOperationRequestHelper::DATAGRID_WIDGET_ROUTE,
+                        'gridName' => 'test-grid',
+                        'test-grid' => [
+                            'originalRoute' => 'test_original_route',
+                        ],
+                    ]
+                ),
+                'executionRoute' => 'test_route',
+                'expected' => 'test_original_route',
+            ],
         ];
     }
 

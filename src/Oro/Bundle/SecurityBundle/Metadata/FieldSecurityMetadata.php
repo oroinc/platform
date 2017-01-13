@@ -17,21 +17,41 @@ class FieldSecurityMetadata implements \Serializable
     protected $permissions;
 
     /**
+     * Field name. If set, the permission check will be performed by it.
+     *
+     * @var $string
+     */
+    protected $alias;
+
+    /**
+     * Determinate if field should be shown or not on permissions list.
+     *
+     * @var bool
+     */
+    protected $isHidden;
+
+    /**
      * @param string      $fieldName
      * @param string      $label
      * @param array       $permissions
      * @param string|null $description
+     * @param string      $alias
+     * @param bool        $isHidden
      */
     public function __construct(
         $fieldName = '',
         $label = '',
         $permissions = [],
-        $description = null
+        $description = null,
+        $alias = null,
+        $isHidden = false
     ) {
         $this->fieldName = $fieldName;
         $this->label = $label;
         $this->description = $description;
         $this->permissions = $permissions;
+        $this->alias    = $alias;
+        $this->isHidden = $isHidden;
     }
 
     /**
@@ -75,6 +95,22 @@ class FieldSecurityMetadata implements \Serializable
     }
 
     /**
+     * @return string
+     */
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->isHidden;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -84,7 +120,9 @@ class FieldSecurityMetadata implements \Serializable
                 $this->fieldName,
                 $this->label,
                 $this->permissions,
-                $this->description
+                $this->description,
+                $this->alias,
+                $this->isHidden
             ]
         );
     }
@@ -98,8 +136,10 @@ class FieldSecurityMetadata implements \Serializable
             $this->fieldName,
             $this->label,
             $this->permissions,
-            $this->description
-            ) = unserialize($serialized);
+            $this->description,
+            $this->alias,
+            $this->isHidden
+        ) = unserialize($serialized);
     }
 
     /**
@@ -117,6 +157,8 @@ class FieldSecurityMetadata implements \Serializable
         $result->label = $data['label'];
         $result->permissions = $data['permissions'];
         $result->description = $data['description'];
+        $result->alias = $data['alias'];
+        $result->isHidden = $data['isHidden'];
 
         return $result;
     }

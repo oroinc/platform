@@ -105,13 +105,18 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->with(Provider::ACL_SECURITY_TYPE)
             ->will($this->returnValue(array(\stdClass::class => new EntitySecurityMetadata())));
 
+        $eventDispatcher = $this->getMockForAbstractClass(
+            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
+        );
+
         $provider = new Provider(
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->doctrine,
             $this->createMock(TranslatorInterface::class),
-            $this->cache
+            $this->cache,
+            $eventDispatcher
         );
 
         $this->assertTrue($provider->isProtectedEntity(\stdClass::class));
@@ -164,13 +169,18 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
                 return 'translated: ' . $value;
             });
 
+        $eventDispatcher = $this->getMockForAbstractClass(
+            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
+        );
+
         $provider = new Provider(
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->doctrine,
             $translator,
-            $this->cache
+            $this->cache,
+            $eventDispatcher
         );
 
         // call without cache
@@ -192,7 +202,8 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             $this->extendConfigProvider,
             $this->doctrine,
             $this->createMock(TranslatorInterface::class),
-            $this->cache
+            $this->cache,
+            $eventDispatcher
         );
         $result = $provider->getEntities();
         $this->assertCount(1, $result);
@@ -208,13 +219,18 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->cache->expects($this->once())
             ->method('deleteAll');
 
+        $eventDispatcher = $this->getMockForAbstractClass(
+            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
+        );
+
         $provider = new Provider(
             $this->securityConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->doctrine,
             $this->createMock(TranslatorInterface::class),
-            $this->cache
+            $this->cache,
+            $eventDispatcher
         );
 
         $provider->clearCache('SomeType');

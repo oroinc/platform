@@ -338,6 +338,15 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
         },
 
         /**
+         * @param {string} value
+         * @returns {string}
+         */
+        formatDayDateTime: function(value) {
+            return this.getMomentForBackendDateTime(value).tz(this.timezone)
+                .format(this.getDayFormat());
+        },
+
+        /**
          * Get Date object based on formatted backend date time string
          *
          * @param {string} value

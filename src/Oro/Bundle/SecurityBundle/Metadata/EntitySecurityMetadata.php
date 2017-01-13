@@ -6,39 +6,25 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 
 class EntitySecurityMetadata implements AclClassInfo, \Serializable
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $securityType;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $className;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $group;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $label;
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     protected $permissions;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $description;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $category;
 
     /** @var array|FieldSecurityMetadata[] */
@@ -142,14 +128,6 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     public function getCategory()
     {
         return $this->category;
-    }
-
-    /**
-     * @param string $category
-     */
-    public function setCategory($category)
-    {
-        $this->category = $category;
     }
 
     /**

@@ -4,9 +4,8 @@ namespace Oro\Bundle\EmailBundle\Async;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -14,6 +13,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
 
 class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -71,10 +71,7 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
             return self::REJECT;
         }
 
-        $data['seen']
-            ? $this->emailFlagManager->setSeen($emailUser)
-            : $this->emailFlagManager->setUnseen($emailUser)
-        ;
+        $this->emailFlagManager->changeStatusSeen($emailUser, $data['seen']);
 
         $emailUser->decrementUnsyncedFlagCount();
 

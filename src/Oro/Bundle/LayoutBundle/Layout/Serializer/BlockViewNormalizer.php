@@ -7,7 +7,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-use Oro\Component\Layout\ArrayCollection;
+use Oro\Component\Layout\BlockViewCollection;
 use Oro\Component\Layout\BlockView;
 
 use Oro\Bundle\LayoutBundle\Exception\UnexpectedBlockViewVarTypeException;
@@ -126,7 +126,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
 
         if (!$recursiveCall) {
-            $this->setBlocksRecursive($view, new ArrayCollection($this->currentDenormalizedViews));
+            $this->setBlocksRecursive($view, new BlockViewCollection($this->currentDenormalizedViews));
         }
 
         return $view;
@@ -134,9 +134,9 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
 
     /**
      * @param BlockView $view
-     * @param ArrayCollection $blocks
+     * @param BlockViewCollection $blocks
      */
-    private function setBlocksRecursive($view, ArrayCollection $blocks)
+    private function setBlocksRecursive($view, BlockViewCollection $blocks)
     {
         $view->blocks = $blocks;
         $view->vars['block'] = $view;

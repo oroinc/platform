@@ -2,10 +2,20 @@ UPGRADE FROM 1.10 to 2.0
 ========================
 
 ####General
-- **Upgrade to 2.0 is available only from 1.10 version**. For this update
-  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted.
-  Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
+- **Upgrade to 2.0 is available only from 1.10 version**.
+
+  To correctly upgrade to version 2.0 follow the steps in the guide [How to Upgrade to a New Version](https://www.orocrm.com/documentation/index/current/cookbook/how-to-upgrade-to-new-version).
+  At **Step 7** instead of running
+  ```shell
+  $ sudo -u www-data php app/console oro:platform:update --env=prod --force
+  ```
+  you will run **only once** the upgrade command introduced to help upgrading from 1.10 to 2.0
+  ```shell
+  $ sudo -u www-data php app/console oro:platform:upgrade20 --env=prod --force
+  ```
+  
   Upgrade from version less then 1.10 is not supported.
+
 - Changed minimum required php version to 5.6
 - PhpUnit 5.7 support
 - LiipImagineBundle was updated to 1.5.* version.
@@ -701,6 +711,7 @@ tag if it works with extend classes
 - Method `get*TargetEntities` is generated as deprecated for both `many-to-many` and `many-to-one` associations.
 - Changed signature of auto-generated `get*Targets` method of `many-to-many` association. The parameter `$targetClass` is optional now. If this parameter is not specified this method returns all target entities without filtering them by type.
 - Removed constant `EXTEND_ENTITY_CONFIG_PATH` from `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Method `addManyToOneRelationTargetSide` of `Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder` was marked as deprecated because it is not used anywhere.
 
 
 ####ApiBundle:

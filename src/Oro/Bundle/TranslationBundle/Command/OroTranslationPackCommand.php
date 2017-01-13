@@ -94,6 +94,12 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         InputOption::VALUE_NONE,
                         'Download all language packs from project at translation service'
                     ),
+                    new InputOption(
+                        'show',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Show all enabled project namespaces for dump/load translations packages.'
+                    ),
                 )
             )
             ->setHelp(
@@ -104,6 +110,7 @@ specified vendor namespace(project) and creates language pack that's placed at
 
     <info>php %command.full_name% --dump OroCRM</info>
     <info>php %command.full_name% --upload OroCRM</info>
+    <info>php %command.full_name% --show project</info>
 EOF
             );
     }
@@ -114,6 +121,11 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
+        if ($input->getOption('show') === true) {
+            $this->showEnabledProject($output);
+            return 0;
+        }
 
         // check presence of action
         $modeOption = false;
@@ -275,6 +287,7 @@ EOF
             $container->get('translation.extractor'),
             $container->get('translation.loader'),
             new Filesystem(),
+            $container->get('oro_translation.packages_provider.translation'),
             $container->get('kernel')->getBundles()
         );
         $dumper->setLogger(new OutputLogger($output));
@@ -307,5 +320,22 @@ EOF
         }
 
         return $path;
+    }
+
+    /**
+     * Show enabled project namespaces.
+     *
+     * @param OutputInterface $output
+     *
+     * @return string
+     */
+    private function showEnabledProject(OutputInterface $output)
+    {
+        $provider = $this->getContainer()->get('oro_translation.packages_provider.translation');
+        $output->writeln('Enabled project namespaces for dump/load translations packages:');
+
+        foreach ($provider->getInstalledPackages() as $packageName) {
+            $output->writeln(sprintf('> <info>%s</info>', $packageName));
+        }
     }
 }
