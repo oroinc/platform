@@ -282,7 +282,7 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function isSupported($entity)
     {
-        return $this->getEntityIndexedFields(ClassUtils::getClass($entity));
+        return !empty($this->getEntityIndexedFields(ClassUtils::getClass($entity)));
     }
 
     /**
