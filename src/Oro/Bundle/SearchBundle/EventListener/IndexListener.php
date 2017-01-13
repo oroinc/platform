@@ -122,6 +122,7 @@ class IndexListener implements OptionalListenerInterface
         $updates = $unitOfWork->getScheduledEntityUpdates();
         $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
         $this->savedEntities = array_merge(
+            $this->savedEntities,
             $this->getEntitiesWithUpdatedIndexedFields($unitOfWork),
             $this->getAssociatedEntitiesToReindex($entityManager, $inserts),
             $this->getAssociatedEntitiesToReindex($entityManager, $updates),
