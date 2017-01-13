@@ -180,14 +180,14 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
         // import entity fields
         if ($existingEntity) {
-            $this->handlerOfEntity($entity, $existingEntity, $itemData);
+            $this->checkEntityAcl($entity, $existingEntity, $itemData);
             if ($isFullData) {
                 $this->importExistingEntity($entity, $existingEntity, $itemData);
             }
 
             $entity = $existingEntity;
         } else {
-            $this->handlerOfEntity($entity, null, $itemData);
+            $this->checkEntityAcl($entity, null, $itemData);
         }
 
         return $entity;
@@ -197,7 +197,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param object $entity
      * @param array|null $itemData
      */
-    protected function handlerOfEntity($entity, $existingEntity = null, $itemData = null)
+    protected function checkEntityAcl($entity, $existingEntity = null, $itemData = null)
     {
         $entityName       = ClassUtils::getClass($entity);
         $identifierName   = $this->databaseHelper->getIdentifierFieldName($entityName);
@@ -246,7 +246,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
         foreach ($fields as $key => $field) {
             $fieldName = $field['name'];
-            if ($isExcludedField = $this->isFieldExcluded($entityName, $fieldName, $itemData)) {
+            if ($this->isFieldExcluded($entityName, $fieldName, $itemData)) {
                 $excludedFields[] = $fieldName;
                 unset($fields[$key]);
             }
