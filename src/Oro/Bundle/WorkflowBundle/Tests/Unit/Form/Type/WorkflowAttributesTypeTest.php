@@ -466,8 +466,4 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
         $this->factory->create($this->type, null, $options);
     }
-
-    protected function setFormTypeGuesser(array $guessedData)
-    {
-    }
 }
