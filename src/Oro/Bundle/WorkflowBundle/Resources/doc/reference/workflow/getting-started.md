@@ -240,6 +240,7 @@ workflows:
         exclusive_record_groups:
             - unique_run                          # only one started workflow for the `entity` from specified groups can exist at time
         priority: 100                             # has priority of 100
+        applications: [ commerce ]                # web application availability level 
         scopes:
             -                                     # definition of configuration for one scope
                 scopeField1: 42                   # context for scope will have field `scopeField1` and entity with id `42`
