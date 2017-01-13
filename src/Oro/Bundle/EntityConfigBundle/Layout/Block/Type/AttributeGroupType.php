@@ -29,6 +29,9 @@ class AttributeGroupType extends AbstractContainerType
     /** @var AttributeManager */
     protected $attributeManager;
 
+    /** @var array */
+    protected $notRenderableAttributeTypes = [];
+
     /**
      * @param AttributeGroupRenderRegistry      $groupRenderRegistry
      * @param AttributeManager                  $attributeManager
@@ -42,6 +45,14 @@ class AttributeGroupType extends AbstractContainerType
         $this->groupRenderRegistry = $groupRenderRegistry;
         $this->attributeManager = $attributeManager;
         $this->blockTypeMapper = $blockTypeMapper;
+    }
+
+    /**
+     * @param array $notRenderableAttributeTypes
+     */
+    public function setNotRenderableAttributeTypes(array $notRenderableAttributeTypes)
+    {
+        $this->notRenderableAttributeTypes = $notRenderableAttributeTypes;
     }
 
     /**
@@ -72,18 +83,24 @@ class AttributeGroupType extends AbstractContainerType
         $attributeGroupBlockId = $builder->getId();
         $attributes = $this->attributeManager->getAttributesByGroup($attributeGroup);
         foreach ($attributes as $attribute) {
+            if (in_array($attribute->getType(), $this->notRenderableAttributeTypes, true)) {
+                continue;
+            }
+
             $fieldName = $attribute->getFieldName();
             $blockType = $this->blockTypeMapper->getBlockType($attribute);
-
             $layoutManipulator->add(
                 $this->getAttributeBlockName($fieldName, $blockType, $attributeGroupBlockId),
                 $attributeGroupBlockId,
                 $blockType,
-                [
-                    'entity' => $entityValue,
-                    'property_path' => $attribute->getFieldName(),
-                    'label' => $this->attributeManager->getAttributeLabel($attribute)
-                ]
+                array_merge(
+                    [
+                        'entity' => $entityValue,
+                        'fieldName' => $attribute->getFieldName(),
+                        'className' => $attribute->getEntity()->getClassName()
+                    ],
+                    $options->get('attribute_options')->toArray()
+                )
             );
         }
     }
@@ -120,7 +137,12 @@ class AttributeGroupType extends AbstractContainerType
                 'attribute_family'
             ]
         );
-        $resolver->setDefault('exclude_from_rest', true);
+        $resolver->setDefaults(
+            [
+                'exclude_from_rest' => true,
+                'attribute_options' => []
+            ]
+        );
     }
 
     /**

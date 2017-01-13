@@ -366,7 +366,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
         $groups = $this->getAttributeGroups();
 
         foreach ($groups as $group) {
-            $item = ['group' => $group->getId(), 'attributes' => []];
+            $item = ['group' => $group->getId(), 'attributes' => [], 'visible'=> $group->getIsVisible()];
 
             /** @var AttributeGroupRelation $attributeRelation */
             foreach ($group->getAttributeRelations() as $attributeRelation) {

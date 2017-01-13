@@ -1,20 +1,21 @@
-{% block attribute_group_rest_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+{% block attribute_group_rest_widget -%}
+    {% import 'OroUIBundle::macros.html.twig' as UI -%}
+    {% if tabsOptions is not empty %}
+        <div {{ block('block_attributes') }}>
+            <div {{ UI.renderPageComponentAttributes({
+                module: 'oroentityconfig/js/attribute-group-tabs-component',
+                options: {data: tabsOptions}
+            }) }}></div>
 
-    <div {{ block('block_attributes') }}>
-        <div {{ UI.renderPageComponentAttributes({
-            module: 'oroentityconfig/js/attribute-group-tabs-component',
-            options: options.tabsOptions
-        }) }}></div>
+            {{ block_widget(block) }}
+        </div>
+    {% endif %}
+{%- endblock %}
 
-        {{ block_widget(block) }}
-    </div>
-{% endblock %}
-
-{% block attribute_group_rest_child_widget %}
+{% block attribute_group_rest_attribute_group_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        'data-page-component-module': 'oroentityconfig/js/attribute-group-tab-content-component',
-        'data-page-component-options': {'id': group}|json_encode
+    'data-page-component-module': 'oroentityconfig/js/attribute-group-tab-content-component',
+    'data-page-component-options': {'id': group}|json_encode
     }) %}
 
     <div {{ block('block_attributes') }} style="display: none;" class="tab-content">
@@ -26,10 +27,57 @@
     {{ block_widget(block) }}
 {% endblock %}
 
+{% block attribute_label_widget %}
+    <label>{{ label }}:</label>
+{% endblock %}
+
 {% block attribute_text_widget %}
-    {{ value }}
+    {{ value|nl2br }}
+{% endblock %}
+
+{% block attribute_boolean_widget %}
+    {{ value ? 'Yes'|trans : 'No'|trans }}
+{% endblock %}
+
+{% block attribute_currency_widget %}
+    {{ value ? value | oro_format_currency : null }}
+{% endblock %}
+
+{% block attribute_percent_widget %}
+    {{ value ? value | oro_format_percent : null }}
+{% endblock %}
+
+{% block attribute_date_widget %}
+    {{ value ? value | oro_format_date : null }}
+{% endblock %}
+
+{% block attribute_datetime_widget %}
+    {{ value ? value | oro_format_datetime : null }}
+{% endblock %}
+
+{% block attribute_multiselect_widget %}
+    {% for item in value %}
+        {{ item }}
+        {% if not loop.last %}
+            ,&nbsp;
+        {% endif %}
+    {% else %}
+        {{ 'N/A'|trans }}
+    {% endfor %}
+{% endblock %}
+
+{% block attribute_image_widget %}
+    <img src="{{ resized_image_url(value, width, height) }}" alt="{{ label }}" width="{{ width }}" height="{{ height }}">
+{% endblock %}
+
+{% block attribute_file_widget %}
+    {{ oro_file_view(entity, fieldName, value) }}
 {% endblock %}
 
 {% block attribute_localized_fallback_widget %}
     {{ translated_value|raw }}
+{% endblock %}
+
+{% block attribute_group_rest_attribute_widget %}
+    <p>{{ block('attribute_label_widget') }} {{ block_widget(block) }}</p>
 {% endblock %}

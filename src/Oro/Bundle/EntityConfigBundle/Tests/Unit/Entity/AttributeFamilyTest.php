@@ -62,11 +62,13 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
         $result[1] = [
             [
                 'group' => 1,
-                'attributes' => []
+                'attributes' => [],
+                'visible'=> true
             ],
             [
                 'group' => 2,
-                'attributes' => []
+                'attributes' => [],
+                'visible'=> true
             ],
         ];
 

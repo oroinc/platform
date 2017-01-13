@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\DataProvider;
 
-use Oro\Bundle\EntityConfigBundle\Layout\DataProvider\AttributeConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider as DataProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
-class AttributeConfigProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetConfig()
     {
@@ -17,7 +17,7 @@ class AttributeConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->with('entityClass', 'fooFieldName')
             ->willReturn($config);
 
-        $provider = new AttributeConfigProvider($configProvider);
+        $provider = new DataProvider($configProvider);
 
         $this->assertEquals($config, $provider->getConfig('entityClass', 'fooFieldName'));
     }
