@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
-use Oro\Bundle\ApiBundle\Config\SorterFieldConfig;
+use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 
-class SorterFieldConfigTest extends \PHPUnit_Framework_TestCase
+class StatusCodeConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function testCustomAttribute()
     {
         $attrName = 'test';
 
-        $config = new SorterFieldConfig();
+        $config = new StatusCodeConfig();
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
         $this->assertSame([], $config->keys());
@@ -36,7 +36,7 @@ class SorterFieldConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testClone()
     {
-        $config = new SorterFieldConfig();
+        $config = new StatusCodeConfig();
         $this->assertEmpty($config->toArray());
 
         $config->set('test', 'value');
@@ -52,7 +52,7 @@ class SorterFieldConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testExcluded()
     {
-        $config = new SorterFieldConfig();
+        $config = new StatusCodeConfig();
         $this->assertFalse($config->hasExcluded());
         $this->assertFalse($config->isExcluded());
 
@@ -67,29 +67,26 @@ class SorterFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
-    public function testPropertyPath()
+    public function testDescription()
     {
-        $config = new SorterFieldConfig();
-        $this->assertFalse($config->hasPropertyPath());
-        $this->assertNull($config->getPropertyPath());
-        $this->assertEquals('default', $config->getPropertyPath('default'));
+        $config = new StatusCodeConfig();
+        $this->assertFalse($config->hasDescription());
+        $this->assertNull($config->getDescription());
 
-        $config->setPropertyPath('path');
-        $this->assertTrue($config->hasPropertyPath());
-        $this->assertEquals('path', $config->getPropertyPath());
-        $this->assertEquals('path', $config->getPropertyPath('default'));
-        $this->assertEquals(['property_path' => 'path'], $config->toArray());
+        $config->setDescription('text');
+        $this->assertTrue($config->hasDescription());
+        $this->assertEquals('text', $config->getDescription());
+        $this->assertEquals(['description' => 'text'], $config->toArray());
 
-        $config->setPropertyPath(null);
-        $this->assertFalse($config->hasPropertyPath());
-        $this->assertNull($config->getPropertyPath());
+        $config->setDescription(null);
+        $this->assertFalse($config->hasDescription());
+        $this->assertNull($config->getDescription());
         $this->assertEquals([], $config->toArray());
 
-        $config->setPropertyPath('path');
-        $config->setPropertyPath('');
-        $this->assertFalse($config->hasPropertyPath());
-        $this->assertNull($config->getPropertyPath());
-        $this->assertEquals('default', $config->getPropertyPath('default'));
+        $config->setDescription('text');
+        $config->setDescription('');
+        $this->assertFalse($config->hasDescription());
+        $this->assertNull($config->getDescription());
         $this->assertEquals([], $config->toArray());
     }
 }
