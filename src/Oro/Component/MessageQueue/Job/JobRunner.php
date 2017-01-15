@@ -29,23 +29,36 @@ class JobRunner
      * @param \Closure $runCallback
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function runUnique($ownerId, $name, \Closure $runCallback)
     {
-        $rootJob = $this->jobProcessor->findOrCreateRootJob($ownerId, $name, true);
-        if (! $rootJob) {
+        if (! ($rootJob = $this->jobProcessor->findOrCreateRootJob($ownerId, $name, true))) {
             return;
         }
 
         $childJob = $this->jobProcessor->findOrCreateChildJob($name, $rootJob);
 
-        if (! $childJob->getStartedAt()) {
+        if ($rootJob->isInterrupted()) {
+            $this->jobProcessor->cancelAllActiveChildJobs($rootJob);
+
+            return;
+        }
+
+        if (! $childJob->getStartedAt() || $childJob->getStatus() === Job::STATUS_FAILED_REDELIVERED) {
             $this->jobProcessor->startChildJob($childJob);
         }
 
         $jobRunner = new JobRunner($this->jobProcessor, $rootJob);
 
-        $result = call_user_func($runCallback, $jobRunner, $childJob);
+        try {
+            $result = call_user_func($runCallback, $jobRunner, $childJob);
+        } catch (\Exception $e) {
+            $this->jobProcessor->failAndRedeliveryChildJob($childJob);
+
+            throw $e;
+        }
 
         if (! $childJob->getStoppedAt()) {
             $result
@@ -77,6 +90,8 @@ class JobRunner
      * @param \Closure $runCallback
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function runDelayed($jobId, \Closure $runCallback)
     {
@@ -96,9 +111,15 @@ class JobRunner
         if (! $job->getStartedAt()) {
             $this->jobProcessor->startChildJob($job);
         }
-
         $jobRunner = new JobRunner($this->jobProcessor, $job->getRootJob());
-        $result = call_user_func($runCallback, $jobRunner, $job);
+
+        try {
+            $result = call_user_func($runCallback, $jobRunner, $job);
+        } catch (\Exception $e) {
+            $this->jobProcessor->failAndRedeliveryChildJob($job);
+
+            throw $e;
+        }
 
         if (! $job->getStoppedAt()) {
             $result

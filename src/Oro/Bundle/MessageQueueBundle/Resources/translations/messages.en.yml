@@ -38,3 +38,4 @@ oro:
             running: Running
             success: Success
             failed: Failed
+            failed_redelivered: Failed Redelivered

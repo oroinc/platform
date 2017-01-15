@@ -7,14 +7,14 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AddTransactionIdColumn implements Migration, OrderedMigrationInterface
+class SetTransactionIdNotNullable implements Migration, OrderedMigrationInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getOrder()
     {
-        return 1;
+        return 2;
     }
 
     /**
@@ -23,8 +23,6 @@ class AddTransactionIdColumn implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $auditTable = $schema->getTable('oro_audit');
-        $auditTable->addColumn('transaction_id', 'string', ['notnull' => false, 'length' => 255]);
-
-        $queries->addPostQuery("UPDATE oro_audit SET transaction_id = ''");
+        $auditTable->changeColumn('transaction_id', ['notnull' => true]);
     }
 }
