@@ -44,12 +44,14 @@ class CalendarDateManager
      */
     protected function getDatesFromInterval($append = false)
     {
-        $startDate = new \DateTime();
-        $startDate->setDate($startDate->format('Y'), 1, 1);
-        $startDate->setTime(0, 0, 0);
-
         if ($append) {
-            $startDate = $this->getLastDate()->getDate();
+            $startDate = $this->getLastDate();
+        }
+
+        if (empty($startDate)) {
+            $startDate = new \DateTime();
+            $startDate->setDate($startDate->format('Y'), 1, 1);
+            $startDate->setTime(0, 0, 0);
         }
 
         $period = new \DatePeriod(
@@ -63,13 +65,18 @@ class CalendarDateManager
     }
 
     /**
-     * @return CalendarDate
+     * @return \DateTime|null
      */
     protected function getLastDate()
     {
         /** @var CalendarDateRepository $dateRepository */
         $dateRepository = $this->doctrineHelper->getEntityRepository(CalendarDate::class);
 
-        return $dateRepository->getDate();
+        $calendarDate = $dateRepository->getDate();
+        if ($calendarDate) {
+            return $calendarDate->getDate();
+        }
+
+        return null;
     }
 }

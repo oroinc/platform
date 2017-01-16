@@ -10,7 +10,7 @@ class CalendarDateRepository extends EntityRepository
 {
     /**
      * @param \DateTime|null $date
-     * @return CalendarDate
+     * @return CalendarDate|null
      */
     public function getDate(\DateTime $date = null)
     {
@@ -19,6 +19,6 @@ class CalendarDateRepository extends EntityRepository
             $qb->andWhere('d.date LIKE :date')->setParameter('date', $date->format('Y-m-d') . "%");
         }
 
-        return $qb->getQuery()->getSingleResult();
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }

@@ -46,13 +46,6 @@ class CalendarDateCommand extends ContainerAwareCommand implements CronCommandIn
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $logger = new OutputLogger($output);
-        if ($this->getContainer()->get('oro_cron.schedule_manager')->getRunningJobsCount(self::COMMAND_NAME) > 1) {
-            $logger->warning('Parsing job already running. Terminating current job.');
-
-            return self::STATUS_SUCCESS;
-        }
-
         /** @var CalendarDateManager $calendarDateManager */
         $calendarDateManager = $this->getContainer()->get('oro_report.calendar_date_manager');
 

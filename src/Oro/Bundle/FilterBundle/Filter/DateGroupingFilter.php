@@ -230,13 +230,13 @@ class DateGroupingFilter extends ChoiceFilter
         $targetEntity,
         $extraWhereClauses,
         $extraWhereParameters
-    )
-    {
+    ) {
         $subQueryBuilder = $this->entityManager->createQueryBuilder();
         $extraWhereClauses = str_replace(
             $this->config['data_name'],
             sprintf('%s.%s', $calendarTableForGrouping, $calendarColumnForGrouping),
-            $extraWhereClauses);
+            $extraWhereClauses
+        );
 
         return $subQueryBuilder
             ->select(
