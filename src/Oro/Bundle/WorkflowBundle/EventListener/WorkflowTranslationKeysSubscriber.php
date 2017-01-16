@@ -44,6 +44,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         foreach ($newWorkflowDefinitionFields as $translationKey => $value) {
             $this->ensureTranslationKey($translationKey);
         }
+        $this->translationManager->flush();
     }
 
     /**
@@ -72,6 +73,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         foreach (array_diff($oldKeys, $newKeys) as $translationKeyForRemove) {
             $this->removeTranslationKey($translationKeyForRemove);
         }
+        $this->translationManager->flush();
     }
 
     /**
@@ -85,6 +87,7 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
         foreach ($deletedDefinition as $translationKeyForRemove) {
             $this->removeTranslationKey($translationKeyForRemove);
         }
+        $this->translationManager->flush();
     }
 
     /**
