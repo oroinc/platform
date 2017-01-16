@@ -64,7 +64,7 @@ class AttributeTextTypeTest extends BlockTypeTestCase
         $this->assertEquals('attribute_label', $view->vars['label']);
         $this->assertEquals('=data["property_accessor"].getValue(entity, fieldName)', $view->vars['value']);
         $this->assertEquals(
-            '=data["attribute_config"].getConfig(className,fieldName).is("visible")',
+            '=data["attribute_config"].getConfig(className,fieldName).is("visible") && value',
             $view->vars['visible']
         );
     }
