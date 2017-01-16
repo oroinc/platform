@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Command\Cron;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
-use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\LockHandler;
+
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
+use Oro\Component\Log\OutputLogger;
 
 class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {

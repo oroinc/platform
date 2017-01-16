@@ -1197,3 +1197,8 @@ services:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
         arguments:
             - '@oro_email.direct_mailer'
+
+    oro_email.command.email_body_sync:
+        class: 'Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand'
+        tags:
+            - { name: console.command }
