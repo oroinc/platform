@@ -118,6 +118,10 @@ define(function(require) {
                                 }).join('; ');
                                 tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
                                 self.$el.after($('<div />', {class: 'mce-fullscreen-overlay'}));
+                                var DOM = editor.target.DOM;
+                                var iframe = editor.iframeElement;
+                                var iframeTop = iframe.getBoundingClientRect().top;
+                                DOM.setStyle(iframe, 'height', window.innerHeight - iframeTop);
                             } else {
                                 self.$el.siblings('.mce-fullscreen-overlay').remove();
                             }
