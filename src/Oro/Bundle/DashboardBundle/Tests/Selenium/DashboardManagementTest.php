@@ -26,7 +26,7 @@ class DashboardsManagementTest extends Selenium2TestCase
             ->setClone('Blank Dashboard')
             ->save()
             ->assertMessage('Dashboard saved')
-            ->assertTitle("{$dashboardName} - Manage Dashboards - Dashboards");
+            ->assertTitle("{$dashboardName} - Manage dashboards - Dashboards");
 
         return $dashboardName;
     }
@@ -42,7 +42,7 @@ class DashboardsManagementTest extends Selenium2TestCase
         $login = $login->openDashboards('Oro\Bundle\DashboardBundle')
             ->filterBy('Label', $dashboardName)
             ->action(array($dashboardName), 'View')
-            ->assertTitle("{$dashboardName} - Manage Dashboards - Dashboards");
+            ->assertTitle("{$dashboardName} - Manage dashboards - Dashboards");
 
         static::assertTrue($login->isEmpty());
         $login = $login->addWidget('Quick Launchpad');

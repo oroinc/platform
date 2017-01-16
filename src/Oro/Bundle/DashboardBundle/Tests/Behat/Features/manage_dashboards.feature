@@ -5,7 +5,7 @@ Feature: Manage dashboards
 
   Scenario: Create new dashboard
     Given I login as administrator
-    And I go to Dashboards/Manage Dashboards
+    And I go to Dashboards/Manage dashboards
     And number of records should be 1
     And I press "Create Dashboard"
     And I fill form with:
@@ -16,7 +16,7 @@ Feature: Manage dashboards
     And page has "My own custom dashboard" header
 
   Scenario: Menage dashboards
-    Given I go to Dashboards/Manage Dashboards
+    Given I go to Dashboards/Manage dashboards
     And number of records should be 2
     When I go to Dashboards/Dashboard
     Then page has "Dashboard" header
