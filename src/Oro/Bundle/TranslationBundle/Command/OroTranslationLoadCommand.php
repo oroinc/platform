@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -59,9 +64,22 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
 
         $translator = $this->getTranslator();
-        $translator->rebuildCache();
-
+///        $translator->rebuildCache();
+        $start = time();
+        /** @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine')->getManagerForClass(TranslationKey::class);
+        $repo = $em->getRepository(TranslationKey::class);
+        $connection = $em->getConnection();
+        $translationKeysData = $repo->createQueryBuilder('tk')
+            ->select('tk.id, tk.domain', 'tk.key')
+            ->getQuery()
+            ->getArrayResult();
+        $translationKeys = [];
+        foreach ($translationKeysData as $item) {
+            $translationKeys[$item['domain']][$item['key']] = $item['id'];
+        }
         foreach ($locales as $locale) {
+            $language = $em->getRepository(Language::class)->findOneBy(['code' => $locale]);
             $domains = $translator->getCatalogue($locale)->all();
 
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($domains)));
@@ -70,11 +88,36 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
 
                 foreach ($messages as $key => $value) {
-                    $translationManager->saveTranslation($key, $value, $locale, $domain);
+                    if (!isset($translationKeys[$domain][$key])) {
+                        $connection->insert('oro_translation_key', [
+                            'domain' => $domain,
+                            'key' => $key,
+                        ]);
+                        $translationKeys[$domain][$key] =$connection->lastInsertId(
+                            $connection->getDatabasePlatform() instanceof PostgreSqlPlatform
+                                ? 'oro_translation_key_id_seq'
+                                : null
+                        );
+                    }
+                    if (!$connection->update('oro_translation',
+                        ['value' => $value],
+                        [
+                            'translation_key_id' => $translationKeys[$domain][$key],
+                            'language_id' => $language->getId()
+                        ]
+                    )) {
+                        $connection->insert(
+                            'oro_translation',
+                            [
+                                'translation_key_id' => $translationKeys[$domain][$key],
+                                'language_id' => $language->getId(),
+                                'value' => $value,
+                                'scope' => Translation::SCOPE_SYSTEM,
+                            ]
+                        );
+                    }
+                    //$translationManager->saveTranslation($key, $value, $locale, $domain);
                 }
-
-                $translationManager->flush(true);
-                $translationManager->clear();
 
                 $output->writeln(sprintf('processed %d records.', count($messages)));
             }
@@ -87,9 +130,10 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         // restore DB loader
         $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
 
-        $translator->rebuildCache();
+        //$translator->rebuildCache();
 
         $output->writeln(sprintf('<info>Done.</info>'));
+        echo time() - $start;
     }
 
     /**
