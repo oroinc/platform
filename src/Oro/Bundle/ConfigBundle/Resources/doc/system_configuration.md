@@ -26,7 +26,7 @@ system_configuration:
     groups:
         platform: #unique name
             title: 'Platform'             # title is required
-            icon:  icon-hdd
+            icon:  fa-hdd-o
             priority: 30                  # sort order
             description: some description # add description on the next line after group header
             tooltip: some tooltip         # add tooltip on the same line after group header
@@ -105,10 +105,10 @@ system_configuration:
     groups:
         # string syntax
         some_group:
-            configurator: Acme\Bundle\DemoBundle\SettingsFormHandler::handle
+            handler: Acme\Bundle\DemoBundle\SettingsFormHandler::handle
         # array syntax
         some_group:
-            configurator:
+            handler:
                 - Acme\Bundle\DemoBundle\SettingsFormHandler::handle
                 - '@acme.settings_form_handler::handle'
 ```

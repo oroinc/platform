@@ -124,7 +124,7 @@ class EntityConfigListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function createConfig(array $arrayOptions)
     {
-        $result = $this->getMock('Oro\\Bundle\\EntityConfigBundle\\Config\\ConfigInterface');
+        $result = $this->createMock('Oro\\Bundle\\EntityConfigBundle\\Config\\ConfigInterface');
         $result->expects($this->once())
             ->method('all')
             ->will($this->returnValue($arrayOptions));

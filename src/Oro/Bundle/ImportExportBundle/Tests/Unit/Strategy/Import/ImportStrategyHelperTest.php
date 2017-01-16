@@ -66,12 +66,18 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->securityFacade = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->helper = new ImportStrategyHelper(
             $this->managerRegistry,
             $this->validator,
             $this->translator,
             $this->fieldHelper,
-            $this->configurableDataConverter
+            $this->configurableDataConverter,
+            $this->securityFacade
         );
 
         $this->helper->setConfigProvider($this->extendConfigProvider);

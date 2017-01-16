@@ -3,28 +3,29 @@ namespace Oro\Bundle\CurrencyBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\FormBundle\Entity\EmptyItem;
 
-class MultiCurrency
+class MultiCurrency implements EmptyItem
 {
     use CurrencyAwareTrait;
 
     protected $value;
-    protected $rate;
+    protected $baseCurrencyValue = null;
 
     /**
-     * @param string $value
-     * @param string $currency
-     * @param float $rate | null
+     * @param string      $value
+     * @param string      $currency
+     * @param string|null $baseCurrencyValue
+     *
      * @return MultiCurrency
      */
-    public static function create($value, $currency, $rate = null)
+    public static function create($value, $currency, $baseCurrencyValue = null)
     {
-        /* @var $multiCurrency self */
+        /* @var $multiCurrency MultiCurrency */
         $multiCurrency = new static();
         $multiCurrency->setValue($value)
             ->setCurrency($currency)
-            ->setRate($rate);
+            ->setBaseCurrencyValue($baseCurrencyValue);
 
         return $multiCurrency;
     }
@@ -39,6 +40,7 @@ class MultiCurrency
 
     /**
      * @param string $value
+     *
      * @return $this
      */
     public function setValue($value)
@@ -49,21 +51,30 @@ class MultiCurrency
     }
 
     /**
-     * @return float
+     * @return string|null
      */
-    public function getRate()
+    public function getBaseCurrencyValue()
     {
-        return $this->rate;
+        return $this->baseCurrencyValue;
     }
 
     /**
-     * @param float $rate
+     * @param $baseCurrencyValue
+     *
      * @return $this
      */
-    public function setRate($rate)
+    public function setBaseCurrencyValue($baseCurrencyValue)
     {
-        $this->rate = $rate;
+        $this->baseCurrencyValue = $baseCurrencyValue;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return $this->value === null;
     }
 }

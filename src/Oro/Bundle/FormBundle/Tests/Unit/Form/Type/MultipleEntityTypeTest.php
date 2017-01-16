@@ -43,7 +43,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
         $this->em->expects($this->any())->method('getClassMetadata')
             ->willReturnMap([['\stdClass', $metadata]]);
 
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->registry->expects($this->any())->method('getManagerForClass')
             ->willReturnMap([['\stdClass', $this->em]]);
 

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Component\PhpUtils\PhpIniUtil;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 
 class PlatformUpdateCommand extends AbstractCommand
 {
@@ -45,12 +45,14 @@ class PlatformUpdateCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->checkSuggestedMemory($output);
+
         $force = $input->getOption('force');
 
         if ($force) {
-            $assetsOptions = array(
-                '--exclude' => array('OroInstallerBundle')
-            );
+            $assetsOptions = [
+                '--exclude' => ['OroInstallerBundle']
+            ];
             if ($input->hasOption('symlink') && $input->getOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
             }
@@ -60,19 +62,28 @@ class PlatformUpdateCommand extends AbstractCommand
             $commandExecutor
                 ->runCommand(
                     'oro:migration:load',
-                    array(
+                    [
                         '--process-isolation' => true,
                         '--force'             => true,
                         '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
-                    )
+                    ]
                 )
-                ->runCommand(LoadPermissionConfigurationCommand::NAME, array('--process-isolation' => true))
-                ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
-                ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
-                ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
-                ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-                ->runCommand('router:cache:clear', array('--process-isolation' => true))
-                ->runCommand('oro:message-queue:create-queues', array('--process-isolation' => true))
+                ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
+                ->runCommand(
+                    'oro:workflow:definitions:load',
+                    ['--process-isolation' => true]
+                )
+                ->runCommand(
+                    'oro:cron:definitions:load',
+                    [
+                        '--process-isolation' => true
+                    ]
+                )
+                ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
+                ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
+                ->runCommand('oro:navigation:init', ['--process-isolation' => true])
+                ->runCommand('router:cache:clear', ['--process-isolation' => true])
+                ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
             ;
 
             if (!$input->getOption('skip-translations')) {
@@ -84,12 +95,12 @@ class PlatformUpdateCommand extends AbstractCommand
                 $commandExecutor
                     ->runCommand('oro:assets:install', $assetsOptions)
                     ->runCommand('assetic:dump')
-                    ->runCommand('fos:js-routing:dump', array('--process-isolation' => true))
-                    ->runCommand('oro:localization:dump', array('--process-isolation' => true))
-                    ->runCommand('oro:translation:dump', array('--process-isolation' => true))
+                    ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
+                    ->runCommand('oro:localization:dump', ['--process-isolation' => true])
+                    ->runCommand('oro:translation:dump', ['--process-isolation' => true])
                     ->runCommand(
                         'oro:requirejs:build',
-                        array('--ignore-errors' => true, '--process-isolation' => true)
+                        ['--ignore-errors' => true, '--process-isolation' => true]
                     );
             }
         } else {
@@ -100,6 +111,18 @@ class PlatformUpdateCommand extends AbstractCommand
             $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));
+        }
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    protected function checkSuggestedMemory(OutputInterface $output)
+    {
+        $minimalSuggestedMemory = 1 * pow(1024, 3);
+        $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
+        if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
+            $output->writeln('<comment>We recommend at least 1Gb to be available for PHP CLI</comment>');
         }
     }
 }

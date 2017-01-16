@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Tools;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
-use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 
+/**
+ * @deprecated since 2.0. Use config->getOrmQuery()->getRootEntity() and config->getOrmQuery()->getRootAlias() instead
+ */
 class GridConfigurationHelper
 {
     /** @var EntityClassResolver */
@@ -25,6 +25,7 @@ class GridConfigurationHelper
      * @param DatagridConfiguration $config
      *
      * @return string|null
+     * @deprecated since 2.0. Use config->getOrmQuery()->getRootEntity(entityClassResolver, true) instead
      */
     public function getEntity(DatagridConfiguration $config)
     {
@@ -33,26 +34,17 @@ class GridConfigurationHelper
             return $entityClassName;
         }
 
-        $from = $config->offsetGetByPath('[source][query][from]');
-        if (!$from) {
-            return null;
-        }
-
-        return $this->entityClassResolver->getEntityClass($from[0]['table']);
+        return $config->getOrmQuery()->getRootEntity($this->entityClassResolver);
     }
 
     /**
      * @param DatagridConfiguration $config
      *
      * @return null
+     * @deprecated since 2.0. Use config->getOrmQuery()->getRootAlias() instead
      */
     public function getEntityRootAlias(DatagridConfiguration $config)
     {
-        $from = $config->offsetGetByPath('[source][query][from]');
-        if ($from) {
-            return $from[0]['alias'];
-        }
-
-        return null;
+        return $config->getOrmQuery()->getRootAlias();
     }
 }

@@ -43,7 +43,7 @@ class EntityRelationGridListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnBuildAfter(array $parameters, $expectedBindParamsCall)
     {
-        $grid       = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $grid       = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()->getMock();
 

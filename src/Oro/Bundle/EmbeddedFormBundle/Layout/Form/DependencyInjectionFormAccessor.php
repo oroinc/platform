@@ -59,7 +59,7 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
      */
     public function toString()
     {
-        return $this->hash;
+        return 'form_service_id:' . $this->formServiceId;
     }
 
     /**
@@ -70,5 +70,13 @@ class DependencyInjectionFormAccessor extends AbstractFormAccessor implements Co
         if (!$this->getForm()->isSubmitted()) {
             $this->getForm()->setData($formData);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
+        return $this->hash;
     }
 }

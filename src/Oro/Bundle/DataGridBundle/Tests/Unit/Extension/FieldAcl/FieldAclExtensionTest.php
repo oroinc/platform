@@ -38,7 +38,7 @@ class FieldAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->authorizationChecker = $this
-            ->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
+            ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
 
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

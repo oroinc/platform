@@ -198,7 +198,7 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->arrayNode('inputs')
                         ->info('Input assets list')
-                        ->prototype('scalar')->end()
+                        ->prototype('variable')->end()
                     ->end()
                     ->arrayNode('filters')
                         ->info('Filters to manipulate input assets')

@@ -201,6 +201,7 @@ define([
          * @protected
          */
         _showCriteria: function() {
+            this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).css('visibility', 'visible');
             this._alignCriteria();
             this._focusCriteria();

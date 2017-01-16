@@ -22,7 +22,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  *      routeView="oro_workflow_definition_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-exchange"
+ *              "icon"="fa-exchange"
  *          },
  *          "security"={
  *              "type"="ACL",
@@ -53,6 +53,7 @@ class WorkflowDefinition implements DomainObjectInterface
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
     const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
     const CONFIG_SCOPES = 'scopes';
+    const CONFIG_DATAGRIDS = 'datagrids';
 
     /**
      * @var string
@@ -902,5 +903,15 @@ class WorkflowDefinition implements DomainObjectInterface
         $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD] = $groups;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDatagrids()
+    {
+        return array_key_exists(self::CONFIG_DATAGRIDS, $this->configuration)
+            ? (array)$this->configuration[self::CONFIG_DATAGRIDS]
+            : [];
     }
 }

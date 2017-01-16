@@ -14,7 +14,7 @@ class JsonExpressionEncoderTest extends \PHPUnit_Framework_TestCase
     public function testEncodeExpr()
     {
         $parsedExpression = new ParsedExpression('true', new ConstantNode(true));
-        $expressionManipulator = $this->getMock(ExpressionManipulator::class);
+        $expressionManipulator = $this->createMock(ExpressionManipulator::class);
         $expressionManipulator->expects($this->once())
             ->method('toArray')
             ->with($parsedExpression)

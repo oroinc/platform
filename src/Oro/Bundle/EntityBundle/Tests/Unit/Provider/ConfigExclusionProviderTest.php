@@ -13,7 +13,7 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $hierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
+        $hierarchyProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
         $hierarchyProvider->expects($this->any())
             ->method('getHierarchyForClassName')
             ->will(

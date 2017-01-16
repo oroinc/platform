@@ -27,7 +27,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
 
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
     }
 
     /**
@@ -51,6 +51,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
         $firstStringValue = $this->createLocalizedFallbackValue(2, 1, null, 'first');
         $secondStringValue = $this->createLocalizedFallbackValue(3, 2, null, 'second');
         $thirdStringValue = $this->createLocalizedFallbackValue(4, 3, FallbackType::SYSTEM);
+        $emptyIdValue = $this->createLocalizedFallbackValue(null, 4, FallbackType::SYSTEM);
 
         $emptyTextValue = $this->createLocalizedFallbackValue(5, null, null, null, 'empty');
         $firstTextValue = $this->createLocalizedFallbackValue(6, 1, null, null, 'first');
@@ -78,6 +79,19 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
                         1 => 2,
                         2 => 3,
                         3 => 4,
+                    ],
+                ],
+            ],
+            'empty id' => [
+                'field' => 'string',
+                'source' => [$emptyStringValue, $emptyIdValue],
+                'expected' => [
+                    LocalizedFallbackValueCollectionType::FIELD_VALUES => [
+                        null => 'empty',
+                        4 => new FallbackType(FallbackType::SYSTEM),
+                    ],
+                    LocalizedFallbackValueCollectionType::FIELD_IDS => [
+                        0 => 1,
                     ],
                 ],
             ],
@@ -206,12 +220,12 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit_Framework
      */
     protected function addRegistryExpectations(array $values, array $localizations)
     {
-        $valueRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $valueRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $valueRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValueMap($this->convertArrayToMap($values)));
 
-        $localizationRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $localizationRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
         $localizationRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValueMap($this->convertArrayToMap($localizations)));

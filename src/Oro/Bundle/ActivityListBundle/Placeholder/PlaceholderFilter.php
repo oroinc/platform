@@ -87,6 +87,25 @@ class PlaceholderFilter
     }
 
     /**
+     * @param BeforeGroupingChainWidgetEvent $event
+     */
+    public function isAllowedButton(BeforeGroupingChainWidgetEvent $event)
+    {
+        $entity   = $event->getEntity();
+        $pageType = $event->getPageType();
+
+        if ($pageType === null
+            || !is_object($entity)
+            || !$this->configManager->hasConfig($this->doctrineHelper->getEntityClass($entity))
+            || !$this->isAllowedOnPage($this->doctrineHelper->getEntityClass($entity), $pageType)
+            || $this->doctrineHelper->isNewEntity($entity)
+        ) {
+            // Clear allowed widgets
+            $event->setWidgets([]);
+        }
+    }
+
+    /**
      * Checks whether the activity list has at least one accessible activity type
      *
      * @param string $entityClass
@@ -132,23 +151,5 @@ class PlaceholderFilter
         $repo = $this->doctrine->getRepository('OroActivityListBundle:ActivityList');
 
         return 0 === $repo->getRecordsCountForTargetClassAndId($targetEntityClass, $targetEntityId);
-    }
-
-    /**
-     * @param BeforeGroupingChainWidgetEvent $event
-     */
-    public function isAllowedButton(BeforeGroupingChainWidgetEvent $event)
-    {
-        $entity   = $event->getEntity();
-        $pageType = $event->getPageType();
-
-        if ($pageType === null
-            || !is_object($entity)
-            || !$this->configManager->hasConfig($this->doctrineHelper->getEntityClass($entity))
-            || !$this->isAllowedOnPage($this->doctrineHelper->getEntityClass($entity), $pageType)
-        ) {
-            // Clear allowed widgets
-            $event->setWidgets([]);
-        }
     }
 }

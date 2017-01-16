@@ -137,14 +137,14 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.view
                 link:          view_link
-                icon:          eye-open
+                icon:          eye
                 acl_resource:  oro_user_user_view
                 rowAction:     true
             update:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_user_update
             config:
                 type:          navigate
@@ -156,7 +156,7 @@ datagrids:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_user_delete
 
     groups-grid:
@@ -196,14 +196,14 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_group_update
                 rowAction:     true
             delete:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_group_delete
 
         sorters:
@@ -265,19 +265,19 @@ datagrids:
                 type:          navigate
                 label:         oro.grid.action.view
                 link:          view_link
-                icon:          eye-open
+                icon:          eye
                 rowAction:     true
             update:
                 type:          navigate
                 label:         oro.grid.action.update
                 link:          update_link
-                icon:          edit
+                icon:          pencil-square-o
                 acl_resource:  oro_user_role_update
             delete:
                 type:          delete
                 label:         oro.grid.action.delete
                 link:          delete_link
-                icon:          trash
+                icon:          trash-o
                 acl_resource:  oro_user_role_delete
 
         action_configuration: "@oro_user.role.datagrid_helper->getActionConfigurationClosure"
@@ -327,6 +327,63 @@ datagrids:
             disable_default_sorting: true
 
         filters: []
+
+    role-view-users-grid:
+        extends: user-relation-grid
+        acl_resource: oro_user_role_view
+        source:
+            query:
+                join:
+                    left:
+                        - { join: u.roles, alias: r }
+                where:
+                    and:
+                      - r.id = :role_id
+            bind_parameters:
+                -
+                    name: role_id
+                    default: null
+        columns:
+            firstName:
+                label: oro.user.first_name.label
+            lastName:
+                label: oro.user.last_name.label
+            email:
+                label: oro.user.email.label
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Disabled
+                   - Enabled
+        filters:
+            columns:
+                firstName:
+                    type: string
+                    data_name: u.firstName
+                lastName:
+                    type: string
+                    data_name: u.lastName
+                email:
+                    type: string
+                    data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: boolean
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                2: Disabled
+                                1: Enabled
+        sorters:
+            multiple_sorting: true
+            default:
+                lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
     role-users-grid:
         extends: user-relation-grid
@@ -399,7 +456,6 @@ datagrids:
             default:
                 has_role: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
-
         options:
             rowSelection:
                 dataField: id

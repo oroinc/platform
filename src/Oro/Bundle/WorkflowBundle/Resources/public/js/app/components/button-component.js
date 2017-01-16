@@ -7,6 +7,7 @@ define(function(require) {
     var TransitionHandler = require('oroworkflow/js/transition-handler');
     var $ = require('jquery');
     var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
 
     var ButtonComponent = BaseComponent.extend({
 
@@ -49,6 +50,11 @@ define(function(require) {
                         e.preventDefault();
                         $(this).data('executor').call();
                     });
+                } else {
+                    this.$button.on('click', function(e) {
+                        e.preventDefault();
+                        mediator.execute('redirectTo', {url: self.$button.data('transition-url')}, {redirect: true});
+                    });
                 }
             } else {
                 this.$button.on('click', function(e) {
@@ -60,7 +66,7 @@ define(function(require) {
                         'placement': 'bottom',
                         'container': $('body'),
                         'trigger': 'hover',
-                        'title': '<i class="icon-exclamation-sign"></i>' + __('Unmet conditions'),
+                        'title': '<i class="fa-exclamation-circle"></i>' + __('Unmet conditions'),
                         'content': this.$button.data('transition-condition-messages')
                     });
                 }

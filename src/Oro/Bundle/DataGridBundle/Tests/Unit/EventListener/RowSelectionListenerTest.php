@@ -33,7 +33,7 @@ class RowSelectionListenerTest extends \PHPUnit_Framework_TestCase
         $this->event = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Event\\BuildAfter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->datagrid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $this->datagrid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $this->datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
@@ -173,7 +173,7 @@ class RowSelectionListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getDatagrid')
             ->will($this->returnValue($this->datagrid));
 
-        $datasource = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datasource\\DatasourceInterface');
+        $datasource = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datasource\\DatasourceInterface');
 
         $this->datagrid->expects($this->once())
             ->method('getDatasource')

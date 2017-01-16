@@ -40,7 +40,8 @@ class SetNewAuditVersionServiceTest extends WebTestCase
         $newAudit->setObjectId(123);
         $newAudit->setObjectClass('anObjectClass');
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'The audit must be already stored');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The audit must be already stored');
 
         $service->setVersion($newAudit);
     }
@@ -62,7 +63,8 @@ class SetNewAuditVersionServiceTest extends WebTestCase
         $this->getEntityManager()->persist($newAudit);
         $this->getEntityManager()->flush();
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'Audit version already set.');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Audit version already set.');
         $service->setVersion($newAudit);
     }
 

@@ -22,7 +22,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
         new IndexEntitiesByTypeMessageProcessor(
             $this->createDoctrineMock(),
             $this->createJobRunnerMock(),
-            $this->getMock(MessageProducerInterface::class),
+            $this->createMock(MessageProducerInterface::class),
             $this->createLoggerMock()
         );
     }
@@ -73,7 +73,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
             self::getMessageProducer(),
             $logger
         );
-        $result = $processor->process($message, $this->getMock(SessionInterface::class));
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -83,7 +83,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     private function createJobRunnerMock()
     {
-        return $this->getMock(JobRunner::class, [], [], '', false);
+        return $this->createMock(JobRunner::class);
     }
 
     /**
@@ -91,7 +91,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createDoctrineMock()
     {
-        return $this->getMock(RegistryInterface::class);
+        return $this->createMock(RegistryInterface::class);
     }
 
     /**
@@ -99,6 +99,6 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit_Framework_TestCas
      */
     protected function createLoggerMock()
     {
-        return $this->getMock(LoggerInterface::class);
+        return $this->createMock(LoggerInterface::class);
     }
 }

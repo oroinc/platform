@@ -48,7 +48,7 @@ parameters:
     oro_navigation.breadcrumbs_manager.class:                  Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
     oro_navigation.chain_breadcrumbs_manager.class:            Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
 
-    oro_navigation.area:                                       default
+    oro_navigation.menu_update.scope_type:                     menu_default_visibility
 
 services:
     oro_menu.cache:
@@ -314,6 +314,15 @@ services:
         tags:
             - { name: form.type, alias: pagestate }
 
+    oro_navigation.form.type.route_select:
+        class: Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType
+        arguments:
+            - '@router.default'
+            - '@doctrine'
+            - '@translator'
+        tags:
+            - { name: form.type, alias: oro_route_choice }
+
     oro_navigation.form.handler.pagestate:
         class:                        %oro_navigation.form.handler.pagestate.class%
         scope:                        request
@@ -324,7 +333,7 @@ services:
         arguments:
             - '@security.context'
             - '@templating'
-            - %kernel.debug%
+            - '%kernel.debug%'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
 
@@ -350,29 +359,21 @@ services:
         calls:
           - [ setDefaultManager, [ '@oro_navigation.breadcrumb_manager' ]]
 
-    oro_navigation.menu_update.builder:
+    oro_navigation.menu_update.builder.abstract:
         class: Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder
+        abstract: true
         arguments:
             - '@oro_locale.helper.localization'
+            - '@oro_scope.scope_manager'
+            - '@doctrine'
+
+    oro_navigation.menu_update.builder.menu_default_visibility:
+        parent: oro_navigation.menu_update.builder.abstract
+        calls:
+          - [setClassName, ['%oro_navigation.entity.menu_update.class%']]
+          - [setScopeType, ['%oro_navigation.menu_update.scope_type%']]
         tags:
             - { name: oro_menu.builder, priority: 100 }
-
-    oro_navigation.ownership_provider.global:
-        class: Oro\Bundle\NavigationBundle\Menu\Provider\GlobalOwnershipProvider
-        arguments:
-            - '@doctrine'
-            - '%oro_navigation.entity.menu_update.class%'
-        tags:
-            - { name: oro_navigation.ownership_provider, area: default, priority: 100 }
-
-    oro_navigation.ownership_provider.user:
-        class: Oro\Bundle\NavigationBundle\Menu\Provider\UserOwnershipProvider
-        arguments:
-            - '@doctrine'
-            - '%oro_navigation.entity.menu_update.class%'
-            - '@security.token_storage'
-        tags:
-            - { name: oro_navigation.ownership_provider, area: default, priority: 200 }
 
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
@@ -383,19 +384,16 @@ services:
         arguments:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
-            - '%oro_navigation.area%'
+            - '%oro_navigation.menu_update.scope_type%'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }
 
-    oro_navigation.manager.menu_update_abstract:
+    oro_navigation.manager.menu_update:
         class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
         arguments:
             - "@doctrine"
             - "@oro_menu.builder_chain"
             - "@oro_navigation.menu_helper.menu_update"
-
-    oro_navigation.manager.menu_update_default:
-        parent: oro_navigation.manager.menu_update_abstract
         calls:
             - [ setEntityClass, [ '%oro_navigation.entity.menu_update.class%' ]]
 
@@ -443,6 +441,27 @@ services:
             - '@translator'
             - '@oro_locale.helper.localization'
 
+    oro_navigation.event_listener.menu_update_cache_flusher:
+        class: Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher
+        arguments:
+            - '@oro_navigation.repository.menu_update'
+            - '@oro_navigation.menu_update.cache'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.menu_update_scope_change, method: onMenuUpdateScopeChange }
+
+    oro_navigation.repository.menu_update:
+        class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_navigation.entity.menu_update.class%'
+        calls:
+            - [ setQueryResultCache, [ '@oro_navigation.menu_update.cache' ] ]
+
+    oro_navigation.menu_update.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_menu_updates' ] ]
+
     oro_navigation.data_provider.title:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider
         scope: request
@@ -452,3 +471,7 @@ services:
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
+    oro_navigation.scope_criteria_provider.user:
+        parent: oro_user.scope_criteria_provider.user
+        tags:
+            - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}

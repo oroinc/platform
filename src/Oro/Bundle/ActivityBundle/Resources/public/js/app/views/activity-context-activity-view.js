@@ -75,6 +75,8 @@ define([
 
         render: function() {
             this.$el.toggle(this.collection.length > 0);
+
+            this.trigger('render');
         },
 
         initEvents: function() {
@@ -94,7 +96,7 @@ define([
                 var $view = $(view);
                 self.$containerContextTargets.append($view);
 
-                $view.find('i.icon-remove').click(function() {
+                $view.find('i.fa-close').click(function() {
                     $view.fadeOut();
                     model.destroy({
                         success: function(model, response) {

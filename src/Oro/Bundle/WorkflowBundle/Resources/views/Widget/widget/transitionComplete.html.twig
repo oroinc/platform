@@ -9,21 +9,27 @@
             widgetManager,
             TransitionEventHandlers
         ) {
-
             var response = {{ response|json_encode|raw }};
             var responseCode = {{ responseCode|json_encode|raw }};
             var transitionSuccess = {{ transitionSuccess|json_encode|raw }};
 
-            var element = $('<div>');
-
-            if (transitionSuccess) {
-                TransitionEventHandlers.getOnSuccess(element)(response);
-            } else {
-                TransitionEventHandlers.getOnFailure(element)({status: responseCode}, '', '');
-            }
-
             widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                widget.remove();
+                if (widget._events['transitionSuccess']) {
+                    if (transitionSuccess) {
+                        widget.trigger('transitionSuccess', response);
+
+                        return;
+                    }
+                    widget.trigger('transitionFailure', {status: responseCode});
+                } else {
+                    var element = $('<div>');
+                    if (transitionSuccess) {
+                        TransitionEventHandlers.getOnSuccess(element)(response);
+                    } else {
+                        TransitionEventHandlers.getOnFailure(element)({status: responseCode}, '', '');
+                    }
+                    widget.remove();
+                }
             });
         });
     </script>

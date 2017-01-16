@@ -24,7 +24,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')
@@ -39,7 +39,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildView($options, $expectedVars)
     {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $view = new FormView();
 
         $this->type->buildView($view, $form, $options);

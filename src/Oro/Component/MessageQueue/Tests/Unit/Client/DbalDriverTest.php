@@ -96,8 +96,8 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
         $session = $this->createSessionStub($transportMessage, $producer);
 
         $driver = new DbalDriver($session, $config);
-
-        $this->setExpectedException(\LogicException::class, 'Expire is not supported by the transport');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Expire is not supported by the transport');
         $driver->send($queue, $message);
     }
 
@@ -212,7 +212,7 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionStub($message = null, $messageProducer = null)
     {
-        $sessionMock = $this->getMock(DbalSession::class, [], [], '', false);
+        $sessionMock = $this->createMock(DbalSession::class);
         $sessionMock
             ->expects($this->any())
             ->method('createMessage')
@@ -239,7 +239,7 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function createMessageProducer()
     {
-        return $this->getMock(DbalMessageProducer::class, [], [], '', false);
+        return $this->createMock(DbalMessageProducer::class);
     }
 
     /**
@@ -247,6 +247,6 @@ class DbalDriverTest extends \PHPUnit_Framework_TestCase
      */
     private function createSessionMock()
     {
-        return $this->getMock(DbalSession::class, [], [], '', false);
+        return $this->createMock(DbalSession::class);
     }
 }

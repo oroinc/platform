@@ -12,9 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class FieldType extends AbstractType
 {
@@ -82,6 +83,13 @@ class FieldType extends AbstractType
             'genemu_jqueryselect2_choice',
             [
                 'choices'     => $this->getFieldTypeChoices($reverseRelationTypes),
+                'choice_attr' => function ($choiceKey) {
+                    $parts = explode('||', $choiceKey);
+
+                    return count($parts) === 2 && ExtendHelper::getRelationType($parts[0])
+                        ? ['data-fieldname' => $parts[1]]
+                        : [];
+                },
                 'empty_value' => '',
                 'block'       => 'general',
                 'configs'     => [
@@ -136,17 +144,8 @@ class FieldType extends AbstractType
      */
     protected function getFieldTypeChoices($reverseRelationTypes)
     {
-        $fieldTypes = $relationTypes = [];
-
-        foreach ($this->fieldTypeProvider->getSupportedFieldTypes() as $type) {
-            $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
-        }
-        foreach ($this->fieldTypeProvider->getSupportedRelationTypes() as $type) {
-            $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
-        }
-
-        uasort($fieldTypes, 'strcasecmp');
-        uasort($relationTypes, 'strcasecmp');
+        $fieldTypes = $this->getTranslatedFieldTypes();
+        $relationTypes = $this->getTranslatedRelationTypes();
 
         if (!empty($reverseRelationTypes)) {
             uasort($reverseRelationTypes, 'strcasecmp');
@@ -159,6 +158,43 @@ class FieldType extends AbstractType
         ];
 
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTranslatedFieldTypes()
+    {
+        foreach ($this->fieldTypeProvider->getSupportedFieldTypes() as $type) {
+            $fieldTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
+        }
+
+        uasort($fieldTypes, 'strcasecmp');
+
+        return $fieldTypes;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTranslatedRelationTypes()
+    {
+        $relationTypes = [];
+        foreach ($this->fieldTypeProvider->getSupportedRelationTypes() as $type) {
+            $relationTypes[$type] = $this->translator->trans(self::TYPE_LABEL_PREFIX . $type);
+        }
+
+        uasort($relationTypes, 'strcasecmp');
+
+        return $relationTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTranslatedTypeChoices()
+    {
+        return array_merge($this->getTranslatedFieldTypes(), $this->getTranslatedRelationTypes());
     }
 
     /**

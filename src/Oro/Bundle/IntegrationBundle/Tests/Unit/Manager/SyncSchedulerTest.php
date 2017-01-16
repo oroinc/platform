@@ -14,7 +14,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
     public function testCouldBeConstructedWithMessageProducerAsFirstArgument()
     {
-        new SyncScheduler($this->getMock(MessageProducerInterface::class));
+        new SyncScheduler($this->createMock(MessageProducerInterface::class));
     }
 
     public function testShouldSendReversSyncIntegrationMessage()

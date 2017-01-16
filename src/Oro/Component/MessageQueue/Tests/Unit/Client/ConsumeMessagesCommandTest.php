@@ -246,7 +246,8 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
             ))
         ;
 
-        $this->setExpectedException(\Exception::class, $expectedException->getMessage());
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage($expectedException->getMessage());
 
         $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
 
@@ -271,7 +272,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createConnectionMock()
     {
-        return $this->getMock(ConnectionInterface::class);
+        return $this->createMock(ConnectionInterface::class);
     }
 
     /**
@@ -279,7 +280,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createDelegateMessageProcessorMock()
     {
-        return $this->getMock(DelegateMessageProcessor::class, [], [], '', false);
+        return $this->createMock(DelegateMessageProcessor::class);
     }
 
     /**
@@ -287,7 +288,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createQueueConsumerMock()
     {
-        return $this->getMock(QueueConsumer::class, [], [], '', false);
+        return $this->createMock(QueueConsumer::class);
     }
 
     /**
@@ -295,6 +296,6 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createLoggerInterfaceMock()
     {
-        return $this->getMock(LoggerInterface::class, [], [], '', false);
+        return $this->createMock(LoggerInterface::class);
     }
 }

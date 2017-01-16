@@ -34,7 +34,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $entity = $this->getMock('MockEntity');
+        $entity = $this->createMock(\stdClass::class);
 
         $this->processor->setImportExportContext($this->context);
         $this->processor->process($entity);
@@ -42,17 +42,17 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWithDataConverter()
     {
-        $entity = $this->getMock('MockEntity');
+        $entity = $this->createMock(\stdClass::class);
         $serializedValue = array('serialized');
         $expectedValue = array('expected');
 
-        $serializer = $this->getMock('Symfony\Component\Serializer\SerializerInterface');
+        $serializer = $this->createMock('Symfony\Component\Serializer\SerializerInterface');
         $serializer->expects($this->once())
             ->method('serialize')
             ->with($entity, null)
             ->will($this->returnValue($serializedValue));
 
-        $dataConverter = $this->getMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
+        $dataConverter = $this->createMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
         $dataConverter->expects($this->once())
             ->method('convertToExportFormat')
             ->with($serializedValue)
@@ -67,10 +67,10 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWithoutDataConverter()
     {
-        $entity = $this->getMock('MockEntity');
+        $entity = $this->createMock(\stdClass::class);
         $expectedValue = array('expected');
 
-        $serializer = $this->getMock('Symfony\Component\Serializer\SerializerInterface');
+        $serializer = $this->createMock('Symfony\Component\Serializer\SerializerInterface');
         $serializer->expects($this->once())
             ->method('serialize')
             ->with($entity, null)
@@ -87,7 +87,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue(null));
 
-        $dataConverter = $this->getMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
+        $dataConverter = $this->createMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
@@ -103,7 +103,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue($queryBuilder));
 
-        $dataConverter = $this->getMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
+        $dataConverter = $this->createMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
@@ -119,7 +119,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue($queryBuilder));
 
-        $dataConverter = $this->getMock(
+        $dataConverter = $this->createMock(
             'Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\QueryBuilderAwareDataConverter'
         );
         $dataConverter->expects($this->once())
@@ -141,7 +141,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue(new \stdClass()));
 
-        $dataConverter = $this->getMock(
+        $dataConverter = $this->createMock(
             'Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\QueryBuilderAwareDataConverter'
         );
         $dataConverter->expects($this->never())->method($this->anything());
@@ -155,7 +155,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $entityName = 'TestEntity';
 
         $dataConverter
-            = $this->getMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter');
+            = $this->createMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter');
         $dataConverter->expects($this->once())->method('setEntityName')->with($entityName);
 
         $this->processor->setDataConverter($dataConverter);

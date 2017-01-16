@@ -54,7 +54,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_7';
     }
 
     /**
@@ -78,6 +78,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
         $this->createTestUserOwnershipTable($schema);
+        $this->createTestNestedObjectsTable($schema);
 
         /** Entity extensions generation */
         $this->extendScopeForTestActivity($schema);
@@ -101,6 +102,8 @@ class OroTestFrameworkBundleInstaller implements
                 true
             );
         }
+
+        $this->addAttributeFamilyRelationForTestActivityTarget($schema);
     }
 
     /**
@@ -550,6 +553,22 @@ class OroTestFrameworkBundleInstaller implements
     }
 
     /**
+     * Create test_nested_objects table
+     *
+     * @param Schema $schema
+     */
+    public function createTestNestedObjectsTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_nested_objects');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('related_class', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('related_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    /**
      * Add test_person foreign keys.
      *
      * @param Schema $schema
@@ -668,6 +687,24 @@ class OroTestFrameworkBundleInstaller implements
             ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    public function addAttributeFamilyRelationForTestActivityTarget(Schema $schema)
+    {
+        $table = $schema->getTable('test_activity_target');
+
+        $table->addColumn('attribute_family_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['attribute_family_id']);
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_attribute_family'),
+            ['attribute_family_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'RESTRICT']
         );
     }
 }

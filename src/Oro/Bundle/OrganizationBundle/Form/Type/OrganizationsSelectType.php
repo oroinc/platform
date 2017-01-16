@@ -16,7 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class OrganizationsSelectType extends AbstractType
 {
@@ -98,15 +97,7 @@ class OrganizationsSelectType extends AbstractType
             }
         );
 
-        $builder->add(
-            'organizations',
-            'entity',
-            [
-                'class'    => 'OroOrganizationBundle:Organization',
-                'property' => 'name',
-                'multiple' => true
-            ]
-        );
+        $this->addOrganizationsField($builder);
         $builder->add(
             'businessUnits',
             'oro_type_business_unit_select_autocomplete',
@@ -150,6 +141,24 @@ class OrganizationsSelectType extends AbstractType
         $view->vars['selected_organizations']  = [$this->securityFacade->getOrganizationId()];
         $view->vars['selected_business_units'] = $businessUnitData;
         $view->vars['accordion_enabled'] = $this->buManager->getTreeNodesCount($buTree) > 1000;
+    }
+
+    /**
+     * Adds organizations field to form
+     *
+     * @param FormBuilderInterface $builder
+     */
+    protected function addOrganizationsField(FormBuilderInterface $builder)
+    {
+        $builder->add(
+            'organizations',
+            'entity',
+            [
+                'class'    => 'OroOrganizationBundle:Organization',
+                'property' => 'name',
+                'multiple' => true
+            ]
+        );
     }
 
     /**

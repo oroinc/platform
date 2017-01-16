@@ -81,7 +81,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($entityName, $fieldName) {
-                        $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+                        $entityConfig = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
                         $entityConfig->expects($this->any())->method('has')->with($this->isType('string'))
                             ->will(
                                 $this->returnCallback(
@@ -350,7 +350,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     {
         if ($exception) {
             list($class, $message) = $exception;
-            $this->setExpectedException($class, $message);
+            $this->expectException($class, $message);
         }
 
         $this->helper->setObjectValue($object, $fieldName, $value);
@@ -370,7 +370,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     {
         if ($exception) {
             list($class, $message) = $exception;
-            $this->setExpectedException($class, $message);
+            $this->expectException($class, $message);
         }
 
         $this->assertEquals(null, $this->helper->getObjectValue($object, $fieldName));

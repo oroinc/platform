@@ -6,7 +6,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
-use Oro\Component\Layout\ArrayCollection;
+use Oro\Component\Layout\BlockViewCollection;
 use Oro\Component\Layout\BlockView;
 
 use Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer;
@@ -21,7 +21,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock(Serializer::class, [], [], '', false);
+        $this->serializer = $this->createMock(Serializer::class);
 
         $this->normalizer = new BlockViewNormalizer();
         $this->normalizer->setSerializer($this->serializer);
@@ -31,7 +31,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->normalizer->supportsNormalization((object)[]));
         $this->assertTrue($this->normalizer->supportsNormalization(
-            $this->getMock(BlockView::class)
+            $this->createMock(BlockView::class)
         ));
     }
 
@@ -197,7 +197,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
         ];
 
         foreach ($blocks as $view) {
-            $view->blocks = $view->vars['blocks'] = new ArrayCollection($blocks);
+            $view->blocks = $view->vars['blocks'] = new BlockViewCollection($blocks);
         }
 
         return [
@@ -277,7 +277,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $expectedView->blocks = $expectedView->vars['blocks'] = new ArrayCollection([
+        $expectedView->blocks = $expectedView->vars['blocks'] = new BlockViewCollection([
             'root' => $expectedView
         ]);
 
@@ -296,7 +296,7 @@ class BlockViewNormalizerTest extends \PHPUnit_Framework_TestCase
     protected function createBlockView($id, array $vars = [], array $children = [])
     {
         $view = new BlockView();
-        $view->blocks = new ArrayCollection([$id => $view]);
+        $view->blocks = new BlockViewCollection([$id => $view]);
         $view->vars = array_merge($vars, [
             'id' => $id,
             'block' => $view,

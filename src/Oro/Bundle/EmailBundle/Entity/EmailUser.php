@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -21,7 +19,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      name="oro_email_user",
  *      indexes={
  *        @ORM\Index(name="seen_idx", columns={"is_seen", "mailbox_owner_id"}),
- *        @ORM\Index(name="received_idx", columns={"received", "is_seen", "mailbox_owner_id"})
+ *        @ORM\Index(name="received_idx", columns={"received", "is_seen", "mailbox_owner_id"}),
+ *        @ORM\Index(
+ *          name="user_owner_id_mailbox_owner_id_organization_id",
+ *          columns={"user_owner_id", "mailbox_owner_id", "organization_id"}
+ *        )
  *     }
  * )
  * @ORM\HasLifecycleCallbacks
@@ -54,7 +56,6 @@ class EmailUser
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int")
      * @JMS\Type("integer")
      */
     protected $id;
@@ -104,7 +105,6 @@ class EmailUser
      * @var \DateTime
      *
      * @ORM\Column(name="received", type="datetime")
-     * @Soap\ComplexType("dateTime")
      * @JMS\Type("dateTime")
      */
     protected $receivedAt;
@@ -113,7 +113,6 @@ class EmailUser
      * @var bool
      *
      * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
-     * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
     protected $seen = false;

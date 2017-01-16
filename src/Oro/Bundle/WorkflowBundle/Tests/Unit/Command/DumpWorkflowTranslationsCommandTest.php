@@ -55,7 +55,7 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = $this->getMock(ContainerInterface::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
@@ -63,8 +63,8 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
                 ['translator.default', 1, $this->translator],
             ]));
 
-        $this->input = $this->getMock(InputInterface::class);
-        $this->output = $this->getMock(OutputInterface::class);
+        $this->input = $this->createMock(InputInterface::class);
+        $this->output = $this->createMock(OutputInterface::class);
 
         $this->command = new DumpWorkflowTranslationsCommand();
         $this->command->setContainer($this->container);

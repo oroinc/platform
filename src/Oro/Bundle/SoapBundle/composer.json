@@ -8,16 +8,12 @@
     "require": {
         "php": ">=5.6",
         "symfony/symfony": "2.8.*, !=2.8.10",
-        "besimple/soap-common": "dev-master",
-        "besimple/soap-server": "dev-master",
-        "besimple/soap-bundle": "dev-master",
         "oro/config": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\SoapBundle": "" }
     },
     "target-dir": "Oro/Bundle/SoapBundle",
-    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"

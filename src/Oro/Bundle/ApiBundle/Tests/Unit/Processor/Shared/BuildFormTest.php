@@ -18,7 +18,7 @@ class BuildFormTest extends FormProcessorTestCase
 
     public function testProcessWhenFormAlreadyExists()
     {
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $this->context->setForm($form);
         $this->processor->process($this->context);
@@ -33,8 +33,8 @@ class BuildFormTest extends FormProcessorTestCase
 
     public function testProcess()
     {
-        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
-        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $formBuilder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
+        $form = $this->createMock('Symfony\Component\Form\FormInterface');
 
         $formBuilder->expects($this->once())
             ->method('getForm')

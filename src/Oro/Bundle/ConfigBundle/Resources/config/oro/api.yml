@@ -1,6 +1,15 @@
 api:
+    entity_aliases:
+        Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
+            alias:        configuration
+            plural_alias: configuration
+        Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
+            alias:        configurationoption
+            plural_alias: configurationoptions
+
     entities:
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationSection:
+            disable_meta_properties: true
             identifier_field_names: [id]
             fields:
                 id:
@@ -28,6 +37,7 @@ api:
                 get_relationship: false
 
         Oro\Bundle\ConfigBundle\Api\Model\ConfigurationOption:
+            disable_meta_properties: true
             identifier_field_names: [key]
             fields:
                 key:

@@ -204,18 +204,18 @@ class Processor
      */
     public function processSend($message, $emailOrigin)
     {
-        if ($emailOrigin && $emailOrigin instanceof UserEmailOrigin) {
-            /* Modify transport smtp settings */
-            if ($emailOrigin->isSmtpConfigured()) {
-                $this->mailer->prepareSmtpTransport($emailOrigin);
-            }
-        }
+        $this->mailer->prepareSmtpTransport($emailOrigin);
         $messageId = $message->getId();
+
         if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
-        // To save old id, as after the message is sent, it's id is regenerated immediately.
+        /**
+         * We expect message->getId() to be id of the sent message later,
+         * but sending of the message generates new id after it's sent
+         * (https://github.com/swiftmailer/swiftmailer/issues/335)
+         */
         $message->setId($messageId);
     }
 

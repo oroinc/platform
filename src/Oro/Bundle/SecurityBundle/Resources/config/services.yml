@@ -1,4 +1,6 @@
 parameters:
+    twig.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
+    fos_rest.exception_listener.class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
     security.exception_listener.class:                         Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener
     oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 
@@ -205,6 +207,7 @@ services:
         class: %oro_security.acl.permission_granting_strategy.class%
         calls:
              - [setAuditLogger, ["@?security.acl.audit_logger"]]
+             - [setSecurityMetadataProvider, ["@oro_security.entity_security_metadata_provider"]]
 
     oro_security.acl.permission_map:
         public: false
@@ -304,6 +307,7 @@ services:
             - '@doctrine'
             - '@translator'
             - '@oro_security.entity_security_metadata_provider.cache'
+            - '@event_dispatcher'
 
     oro_security.entity_security_metadata_provider.cache:
         public: false
@@ -349,6 +353,7 @@ services:
         class: Oro\Bundle\SecurityBundle\Annotation\AclListener
         arguments:
             - '@oro_security.acl.annotation_provider'
+            - '@oro_security.action_metadata_provider'
             - '@oro_security.acl.annotation.metadata.dumper'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
@@ -360,6 +365,14 @@ services:
             - %kernel.cache_dir%
             - %kernel.debug%
             - 'oro_acl_annotation'
+
+    oro_security.acl.config.metadata.dumper:
+        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
+        public: false
+        arguments:
+            - %kernel.cache_dir%
+            - %kernel.debug%
+            - 'oro_acl_config'
 
     oro_security.acl.config_loader:
         public: false

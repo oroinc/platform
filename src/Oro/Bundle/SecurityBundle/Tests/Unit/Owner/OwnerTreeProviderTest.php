@@ -72,7 +72,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('getManagerForClass')
             ->will($this->returnValue($this->em));
 
-        $this->cache = $this->getMockForAbstractClass('Doctrine\Common\Cache\CacheProvider');
+        $this->cache = $this->createMock('Doctrine\Common\Cache\CacheProvider');
         $this->cache->expects($this->any())->method('fetch')->will($this->returnValue(false));
         $this->cache->expects($this->any())->method('save');
 
@@ -80,7 +80,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
             ->will(
@@ -151,33 +151,13 @@ class OwnerTreeProviderTest extends OrmTestCase
      * @param string                                   $sql
      * @param array                                    $result
      */
-    protected function setQueryExpectationAt(
-        \PHPUnit_Framework_MockObject_MockObject $conn,
-        $expectsAt,
-        $sql,
-        $result
-    ) {
-        $stmt = $this->createFetchStatementMock($result);
-        $conn
-            ->expects($this->at($expectsAt))
-            ->method('query')
-            ->with($sql)
-            ->will($this->returnValue($stmt));
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $conn
-     * @param int                                      $expectsAt
-     * @param string                                   $sql
-     * @param array                                    $result
-     */
     protected function setFetchAllQueryExpectationAt(
         \PHPUnit_Framework_MockObject_MockObject $conn,
         $expectsAt,
         $sql,
         $result
     ) {
-        $stmt = $this->getMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
+        $stmt = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
         $stmt->expects($this->once())
             ->method('fetchAll')
             ->willReturn($result);

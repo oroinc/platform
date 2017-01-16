@@ -4,17 +4,18 @@ namespace Oro\Bundle\EmailBundle\Async;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Bridge\Doctrine\RegistryInterface;
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
+
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -26,17 +27,24 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
     private $doctrine;
 
     /**
+     * @var JobRunner
+     */
+    private $jobRunner;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
 
     /**
      * @param RegistryInterface $doctrine
+     * @param JobRunner $jobRunner
      * @param LoggerInterface $logger
      */
-    public function __construct(RegistryInterface $doctrine, LoggerInterface $logger)
+    public function __construct(RegistryInterface $doctrine, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;
+        $this->jobRunner = $jobRunner;
         $this->logger = $logger;
     }
 
@@ -47,7 +55,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
     {
         $body = JSON::decode($message->getBody());
 
-        if (! isset($body['ids']) || ! is_array($body['ids'])) {
+        if (! isset($body['jobId'], $body['ids']) || ! is_array($body['ids'])) {
             $this->logger->critical(
                 sprintf('[PurgeEmailAttachmentsByIdsMessageProcessor] Got invalid message: "%s"', $message->getBody()),
                 ['message' => $message]
@@ -56,19 +64,23 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
             return self::REJECT;
         }
 
-        $em = $this->getEntityManager();
-        $emailAttachments = $this->getEmailAttachments($body['ids']);
+        $result = $this->jobRunner->runDelayed($body['jobId'], function () use ($body) {
+            $em = $this->getEntityManager();
+            $emailAttachments = $this->getEmailAttachments($body['ids']);
 
-        foreach ($emailAttachments as $attachment) {
-            if (isset($body['size']) && ($attachment->getSize() < $body['size'])) {
-                continue;
+            foreach ($emailAttachments as $attachment) {
+                if (isset($body['size']) && ($attachment->getSize() < $body['size'])) {
+                    continue;
+                }
+
+                $em->remove($attachment);
             }
+            $em->flush();
 
-            $em->remove($attachment);
-        }
-        $em->flush();
+            return true;
+        });
 
-        return self::ACK;
+        return $result ? self::ACK : self::REJECT;
     }
 
     /**

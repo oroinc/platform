@@ -112,6 +112,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 'acl_resource' => 'oro_segment_view',
             ],
             'options' => ['export' => true],
+            'fields_acl' => ['columns' => ['c1' => ['data_name' => 't1.userName']]]
         ];
 
         if (!empty($route)) {
@@ -131,7 +132,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                             'type'         => 'navigate',
                             'acl_resource' => 'VIEW;entity:AcmeBundle:UserEntity',
                             'label'        => 'oro.report.datagrid.row.action.view',
-                            'icon'         => 'eye-open',
+                            'icon'         => 'eye',
                             'link'         => 'view_link',
                             'rowAction'    => true,
                         ],

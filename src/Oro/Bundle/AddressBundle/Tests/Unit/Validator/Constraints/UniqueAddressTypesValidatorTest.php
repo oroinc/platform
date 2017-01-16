@@ -13,7 +13,7 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateExceptionWhenInvalidArgumentType()
     {
-        $constraint = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraint = $this->createMock('Symfony\Component\Validator\Constraint');
         $validator = new UniqueAddressTypesValidator();
         $validator->validate(false, $constraint);
     }
@@ -26,7 +26,7 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
     //@codingStandardsIgnoreEnd
     public function testValidateExceptionWhenInvalidArgumentElementType()
     {
-        $constraint = $this->getMock('Symfony\Component\Validator\Constraint');
+        $constraint = $this->createMock('Symfony\Component\Validator\Constraint');
         $validator = new UniqueAddressTypesValidator();
         $validator->validate(array(1), $constraint);
     }
@@ -43,7 +43,7 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->never())
             ->method('addViolation');
 
-        $constraint = $this->getMock('Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes');
+        $constraint = $this->createMock('Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes');
         $validator = new UniqueAddressTypesValidator();
         $validator->initialize($context);
 
@@ -97,7 +97,7 @@ class UniqueAddressTypesValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation')
             ->with('Several addresses have the same type {{ types }}.', array('{{ types }}' => $types));
 
-        $constraint = $this->getMock('Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes');
+        $constraint = $this->createMock('Oro\Bundle\AddressBundle\Validator\Constraints\UniqueAddressTypes');
         $validator = new UniqueAddressTypesValidator();
         $validator->initialize($context);
 

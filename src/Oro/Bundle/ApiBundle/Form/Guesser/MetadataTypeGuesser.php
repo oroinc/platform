@@ -112,22 +112,24 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             } elseif ($metadata->hasAssociation($property)) {
                 $association = $metadata->getAssociation($property);
                 if (DataType::isAssociationAsField($association->getDataType())) {
-                    $config = $this->getConfigForClass($class);
-                    if (null !== $config) {
-                        $fieldConfig = $config->getField($property);
-                        if (null !== $fieldConfig) {
-                            if (DataType::isNestedObject($fieldConfig->getDataType())) {
-                                return $this->getTypeGuessForNestedObjectAssociation($association, $fieldConfig);
-                            }
-                            if (!$association->isCollapsed()) {
-                                return $this->getTypeGuessForArrayAssociation($association, $fieldConfig);
-                            }
+                    $fieldConfig = $this->getFieldConfig($class, $property);
+                    if (null !== $fieldConfig) {
+                        if (DataType::isNestedObject($fieldConfig->getDataType())) {
+                            return $this->getTypeGuessForNestedObjectAssociation($association, $fieldConfig);
+                        }
+                        if (!$association->isCollapsed()) {
+                            return $this->getTypeGuessForArrayAssociation($association, $fieldConfig);
                         }
                     }
                     if ($association->isCollapsed()) {
                         return $this->getTypeGuessForCollapsedArrayAssociation($association);
                     } else {
                         return null;
+                    }
+                } else {
+                    $fieldConfig = $this->getFieldConfig($class, $property);
+                    if (null !== $fieldConfig && DataType::isNestedAssociation($fieldConfig->getDataType())) {
+                        return $this->getTypeGuessForNestedAssociation($association, $fieldConfig);
                     }
                 }
 
@@ -183,6 +185,21 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     {
         return null !== $this->configAccessor
             ? $this->configAccessor->getConfig($class)
+            : null;
+    }
+
+    /**
+     * @param string $class
+     * @param string $property
+     *
+     * @return EntityDefinitionFieldConfig|null
+     */
+    protected function getFieldConfig($class, $property)
+    {
+        $config = $this->getConfigForClass($class);
+
+        return null !== $config
+            ? $config->getField($property)
             : null;
     }
 
@@ -259,7 +276,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
             $formType,
             [
                 'entry_data_class' => $targetMetadata->getClassName(),
-                'entry_type'       => 'oro_api_compound_entity',
+                'entry_type'       => 'oro_api_compound_object',
                 'entry_options'    => [
                     'metadata' => $targetMetadata,
                     'config'   => $config->getTargetEntity()
@@ -280,7 +297,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         EntityDefinitionFieldConfig $config
     ) {
         return $this->createTypeGuess(
-            'oro_api_compound_entity',
+            'oro_api_compound_object',
             array_merge(
                 $config->getFormOptions(),
                 [
@@ -325,6 +342,23 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
                 'entry_data_class'    => $targetMetadata->getClassName(),
                 'entry_data_property' => $targetFieldName,
             ],
+            TypeGuess::HIGH_CONFIDENCE
+        );
+    }
+
+    /**
+     * @param AssociationMetadata         $metadata
+     * @param EntityDefinitionFieldConfig $config
+     *
+     * @return TypeGuess|null
+     */
+    protected function getTypeGuessForNestedAssociation(
+        AssociationMetadata $metadata,
+        EntityDefinitionFieldConfig $config
+    ) {
+        return $this->createTypeGuess(
+            'oro_api_nested_association',
+            ['metadata' => $metadata, 'config' => $config],
             TypeGuess::HIGH_CONFIDENCE
         );
     }

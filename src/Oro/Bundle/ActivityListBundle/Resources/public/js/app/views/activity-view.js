@@ -5,10 +5,12 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var CommentComponent = require('orocomment/js/app/components/comment-component');
+    var transitionHandler = require('oroworkflow/js/transition-handler');
 
     ActivityView = BaseView.extend({
         options: {
@@ -22,7 +24,8 @@ define(function(require) {
                 deleteItem: null
             },
             infoBlock: '> .accordion-group > .accordion-body .message .info',
-            commentsBlock: '> .accordion-group > .accordion-body .message .comment',
+            // commentsBlock is placed in next container after infoBlock
+            commentsBlock: '> .accordion-group > .accordion-body .message > .info + * > .comment',
             commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },
@@ -30,6 +33,7 @@ define(function(require) {
             'class': 'list-item'
         },
         events: {
+            'click .transition-item': 'onTransition',
             'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
             'click .accordion-toggle': 'onToggle',
@@ -96,7 +100,7 @@ define(function(require) {
             this.$('.dropdown-menu.activity-item').on('mouseleave', function() {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
-            if (this.$('.dropdown-menu.activity-item .launcher-item').children().length === 0) {
+            if (this.$('.dropdown-menu.activity-item li').children().length === 0) {
                 this.$('.dropdown-menu.activity-item').hide();
                 this.$('.dropdown-toggle.activity-item').text('');
             }
@@ -104,8 +108,22 @@ define(function(require) {
             return this;
         },
 
-        onEdit: function() {
-            this.model.collection.trigger('toEdit', this.model);
+        onTransition: function(e) {
+            e.preventDefault();
+            var $el = $(e.target);
+            var activityModel = this.model;
+
+            $el.one('transitions_success', function() {
+                // manually update the model in case the workflow transition does not change any of it's attributes
+                activityModel.set('updatedAt', new Date());
+                mediator.trigger('widget_success:activity_list:item:update');
+            });
+
+            transitionHandler.call($el, false);
+        },
+
+        onEdit: function(e) {
+            this.model.collection.trigger('toEdit', this.model, this.$(e.currentTarget).data('actionExtraOptions'));
         },
 
         onDelete: function() {
@@ -147,8 +165,9 @@ define(function(require) {
         },
 
         _onContentChange: function() {
-            this.disposePageComponents();
-            this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+            this.$(this.options.infoBlock)
+                .trigger('content:remove') // to dispose only components related to infoBlock
+                .html(this.model.get('contentHTML'));
             this.initLayout().done(_.bind(function() {
                 // if the activity has an EmailTreadView -- handle comment count change in own way
                 var emailTreadView = this.getEmailThreadView();
@@ -171,12 +190,18 @@ define(function(require) {
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
         },
 
-        _onContentLoadingStatusChange: function() {
-            if (this.model.get('isContentLoading')) {
+        _onContentLoadingStatusChange: function(model) {
+            if (!this.subview('loading')) {
                 this.subview('loading', new LoadingMaskView({
                     container: this.$el
                 }));
+            }
+            if (this.model.get('isContentLoading')) {
                 this.subview('loading').show();
+            } else if (!model.hasChanged('contentHTML')) {
+                // in case contentHTML was not changed after load action -- hide loading mask now,
+                // otherwise it'll be hidden on initLayout done
+                this.subview('loading').hide();
             }
         },
 

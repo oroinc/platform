@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -12,16 +13,25 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtension extends AbstractFieldsExtension
 {
-    const EXTEND_ENTITY_CONFIG_PATH = 'extended_entity_name';
-
     /**
      * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return
-            parent::isApplicable($config)
-            && $config->offsetGetOr(self::EXTEND_ENTITY_CONFIG_PATH, false) !== false;
+        if (!parent::isApplicable($config) || !$config->getExtendedEntityClassName()) {
+            return false;
+        }
+
+        $entityClassName = $this->entityClassResolver->getEntityClass($this->getEntityName($config));
+        /** @var ConfigProvider $extendProvider */
+        $extendProvider = $this->configManager->getProvider('extend');
+        if (!$extendProvider->hasConfig($entityClassName)) {
+            return false;
+        }
+
+        $extendConfig = $extendProvider->getConfig($entityClassName);
+
+        return $extendConfig->is('is_extend');
     }
 
     /**
@@ -37,7 +47,7 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
      */
     protected function getEntityName(DatagridConfiguration $config)
     {
-        return $config->offsetGetOr(self::EXTEND_ENTITY_CONFIG_PATH);
+        return $config->getExtendedEntityClassName();
     }
 
     /**

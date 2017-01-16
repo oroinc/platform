@@ -28,25 +28,31 @@ class EntityMetadataLoader
     /** @var EntityNestedObjectMetadataFactory */
     protected $nestedObjectMetadataFactory;
 
+    /** @var EntityNestedAssociationMetadataFactory */
+    protected $nestedAssociationMetadataFactory;
+
     /**
-     * @param DoctrineHelper                    $doctrineHelper
-     * @param MetadataFactory                   $metadataFactory
-     * @param ObjectMetadataFactory             $objectMetadataFactory
-     * @param EntityMetadataFactory             $entityMetadataFactory
-     * @param EntityNestedObjectMetadataFactory $nestedObjectMetadataFactory
+     * @param DoctrineHelper                         $doctrineHelper
+     * @param MetadataFactory                        $metadataFactory
+     * @param ObjectMetadataFactory                  $objectMetadataFactory
+     * @param EntityMetadataFactory                  $entityMetadataFactory
+     * @param EntityNestedObjectMetadataFactory      $nestedObjectMetadataFactory
+     * @param EntityNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         MetadataFactory $metadataFactory,
         ObjectMetadataFactory $objectMetadataFactory,
         EntityMetadataFactory $entityMetadataFactory,
-        EntityNestedObjectMetadataFactory $nestedObjectMetadataFactory
+        EntityNestedObjectMetadataFactory $nestedObjectMetadataFactory,
+        EntityNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->metadataFactory = $metadataFactory;
         $this->objectMetadataFactory = $objectMetadataFactory;
         $this->entityMetadataFactory = $entityMetadataFactory;
         $this->nestedObjectMetadataFactory = $nestedObjectMetadataFactory;
+        $this->nestedAssociationMetadataFactory = $nestedAssociationMetadataFactory;
     }
 
     /**
@@ -237,16 +243,7 @@ class EntityMetadataLoader
                     && !$entityMetadata->hasField($fieldName)
                     && !$entityMetadata->hasAssociation($fieldName)
                 ) {
-                    $targetClass = $field->getTargetClass();
-                    if ($targetClass) {
-                        $this->objectMetadataFactory->createAndAddAssociationMetadata(
-                            $entityMetadata,
-                            $entityClass,
-                            $fieldName,
-                            $field,
-                            $targetAction
-                        );
-                    } elseif (DataType::isNestedObject($dataType)) {
+                    if (DataType::isNestedObject($dataType)) {
                         $this->nestedObjectMetadataFactory->createAndAddNestedObjectMetadata(
                             $entityMetadata,
                             $classMetadata,
@@ -255,6 +252,24 @@ class EntityMetadataLoader
                             $fieldName,
                             $field,
                             $withExcludedProperties,
+                            $targetAction
+                        );
+                    } elseif (DataType::isNestedAssociation($dataType)) {
+                        $this->nestedAssociationMetadataFactory->createAndAddNestedAssociationMetadata(
+                            $entityMetadata,
+                            $classMetadata,
+                            $entityClass,
+                            $fieldName,
+                            $field,
+                            $withExcludedProperties,
+                            $targetAction
+                        );
+                    } elseif ($field->getTargetClass()) {
+                        $this->objectMetadataFactory->createAndAddAssociationMetadata(
+                            $entityMetadata,
+                            $entityClass,
+                            $fieldName,
+                            $field,
                             $targetAction
                         );
                     } else {

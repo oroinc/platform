@@ -46,17 +46,17 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->objectManager = $this->getMock(ObjectManager::class);
+        $this->objectManager = $this->createMock(ObjectManager::class);
 
-        $this->registry = $this->getMock(ManagerRegistry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
 
-        $this->logger = $this->getMock(LoggerInterface::class);
-        $this->handler = $this->getMock(TransitionTriggerHandlerInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->handler = $this->createMock(TransitionTriggerHandlerInterface::class);
 
         $this->processor = new TransitionTriggerProcessor($this->registry, $this->logger, $this->handler);
 
-        $this->session = $this->getMock(SessionInterface::class);
+        $this->session = $this->createMock(SessionInterface::class);
     }
 
     protected function tearDown()
@@ -184,7 +184,7 @@ class TransitionTriggerProcessorTest extends \PHPUnit_Framework_TestCase
             ];
         }
 
-        $message = $this->getMock(MessageInterface::class);
+        $message = $this->createMock(MessageInterface::class);
         $message->expects($this->any())->method('getBody')->willReturn(json_encode($data));
 
         return $message;

@@ -14,7 +14,8 @@ class JSONTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowIfMalformedJson()
     {
-        $this->setExpectedException(\InvalidArgumentException::class, 'The malformed json given. ');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The malformed json given. ');
         $this->assertSame(['foo' => 'fooVal'], JSON::decode('{]'));
     }
 
@@ -39,11 +40,8 @@ class JSONTest extends \PHPUnit_Framework_TestCase
      */
     public function testShouldThrowExceptionIfInputIsNotString($value)
     {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            'Accept only string argument but got:'
-        );
-
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Accept only string argument but got:');
         $this->assertSame(0, JSON::decode($value));
     }
 
@@ -92,10 +90,8 @@ class JSONTest extends \PHPUnit_Framework_TestCase
 
     public function testThrowIfValueIsResource()
     {
-        $this->setExpectedException(
-            \InvalidArgumentException::class,
-            'Could not encode value into json. Error 8 and message Type is not supported'
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not encode value into json. Error 8 and message Type is not supported');
 
         $resource = fopen('php://memory', 'r');
         fclose($resource);

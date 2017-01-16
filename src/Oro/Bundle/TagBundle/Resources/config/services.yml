@@ -1,9 +1,11 @@
 parameters:
     oro_tag.tag.entity.class: Oro\Bundle\TagBundle\Entity\Tag
+    oro_tag.taxonomy.entity.class: Oro\Bundle\TagBundle\Entity\Taxonomy
     oro_tag.tagging.entity.class: Oro\Bundle\TagBundle\Entity\Tagging
     oro_tag.tag_listener.class: Oro\Bundle\TagBundle\EventListener\TagListener
 
     oro_tag.tag.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_tag.taxonomy.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_tag.tag.manager.class:  Oro\Bundle\TagBundle\Entity\TagManager
 
     oro_tag.provider.search_provider.class: Oro\Bundle\TagBundle\Provider\SearchProvider
@@ -59,6 +61,13 @@ services:
             - %oro_tag.tag.entity.class%
             - '@doctrine.orm.entity_manager'
 
+    oro_tag.taxonomy.manager.api:
+        class: %oro_tag.taxonomy.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - '%oro_tag.taxonomy.entity.class%'
+            - '@doctrine.orm.entity_manager'
+ 
     # Twig extension
     oro_tag.twig.tag.extension:
         class: %oro_tag.twig.tag.extension.class%
@@ -126,7 +135,7 @@ services:
         class: Oro\Bundle\TagBundle\Grid\TagsExtension
         arguments:
             - '@oro_tag.tag.manager'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
             - '@oro_security.security_facade'
@@ -137,7 +146,7 @@ services:
         class: Oro\Bundle\TagBundle\Grid\TagsReportExtension
         arguments:
             - '@oro_tag.tag.manager'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
         tags:
@@ -162,11 +171,18 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@oro_entity.entity_alias_resolver'
 
+    oro_tag.taxonomy.provider.statistic:
+        class: Oro\Bundle\TagBundle\Provider\TaxonomyStatisticProvider
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@oro_tag.security_provider'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity.entity_alias_resolver'
+
     oro_tag.extension.tag_search_results:
         class: Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension
         arguments:
             - '@oro_search.formatter.result_formatter'
-            - '@doctrine.orm.entity_manager'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         tags:
@@ -241,3 +257,11 @@ services:
         arguments:
             - '@oro_tag.tag.manager'
             - '@oro_tag.helper.taggable_helper'
+
+    oro_tag.form.autocomplete.taxonomy.search_handler:
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - '%oro_tag.taxonomy.entity.class%'
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: taxonomy, acl_resource: oro_taxonomy_view }

@@ -16,7 +16,7 @@ class FormTypeTest extends BlockTypeTestCase
 {
     public function testSetDefaultOptions()
     {
-        $form = $this->getMock(FormView::class);
+        $form = $this->createMock(FormView::class);
 
         $this->assertEquals(
             [
@@ -32,7 +32,7 @@ class FormTypeTest extends BlockTypeTestCase
 
     public function testBuildBlock()
     {
-        $form = $this->getMock(FormView::class);
+        $form = $this->createMock(FormView::class);
 
         $builder = $this->getBlockBuilder(FormType::NAME, [
             'form' => $form,

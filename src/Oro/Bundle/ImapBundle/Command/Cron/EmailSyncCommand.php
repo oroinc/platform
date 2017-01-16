@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
+use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
+use Oro\Component\Log\OutputLogger;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Component\Log\OutputLogger;
-
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\CronBundle\Command\CronCommandConcurrentJobsInterface;
-use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
-use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
-
-class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface, CronCommandConcurrentJobsInterface
+class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
      * The maximum number of email origins which can be synchronized
@@ -47,6 +44,14 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     public function getDefaultDefinition()
     {
         return '*/1 * * * *';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->isFeatureEnabled('email');
     }
 
     /**

@@ -26,6 +26,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
@@ -47,6 +48,19 @@ use Oro\Component\MessageQueue\Client\MessageProducer;
  */
 class EmailController extends Controller
 {
+    /**
+     * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection")
+     */
+    public function checkSmtpConnectionAction(Request $request)
+    {
+        $smtpSettings = SmtpSettingsFactory::createFromRequest($request);
+        $smtpSettingsChecker = $this->get('oro_email.mailer.checker.smtp_settings');
+
+        return new JsonResponse(
+            $smtpSettingsChecker->checkConnection($smtpSettings)
+        );
+    }
+
     /**
      * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
      * @AclAncestor("oro_config_system")
@@ -177,10 +191,16 @@ class EmailController extends Controller
      */
     public function threadWidgetAction(Email $entity)
     {
-        $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
-            $this->get('doctrine')->getManager(),
-            $entity
-        );
+        $emails = [];
+        if ($this->getRequest()->get('showSingleEmail', false)) {
+            $emails[] = $entity;
+        } else {
+            $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
+                $this->get('doctrine')->getManager(),
+                $entity
+            );
+        }
+
         $emails = array_filter($emails, function ($email) {
             return $this->get('security.context')->isGranted('VIEW', $email);
         });

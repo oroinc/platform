@@ -1,4 +1,4 @@
-{% macro renderTransitionButton(workflow, transition, workflowItem, transitionData) %}
+{% macro renderTransitionButton(workflow, transition, workflowItem, transitionData, onlyLink, noIcon, noIconText, aClass) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
 
     {% if transition.displayType == 'dialog' and (transitionData['dialog-url'] is not defined or not transitionData['dialog-url']) and transition.hasForm() %}
@@ -42,8 +42,8 @@
     {% endif %}
 
     {% set data = transitionData|merge({
-        'page-component-module': 'oroworkflow/js/app/components/button-component',
-        'page-component-options': {'displayType': transition.displayType}|json_encode,
+        'page-component-module': transitionData['page-component-module']|default('oroworkflow/js/app/components/button-component'),
+        'page-component-options': transitionData['page-component-options']|default({})|merge({'displayType': transition.displayType})|json_encode,
     }) %}
 
     {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
@@ -52,22 +52,29 @@
         }) %}
     {% endif %}
 
+    {% set label = transition.label|trans({},'workflows') %}
+
     {% set class %}
-        btn icons-holder-text workflow-transition-buttons
+        {{ aClass }}
+        icons-holder-text
+        {% if not onlyLink|default(false) %}btn workflow-transition-buttons{% endif %}
         {% if transition.displayType == 'dialog' %}no-hash{% endif %}
         {% if not transitionData.enabled %}disabled{% endif %}
-        {% if transition.frontendOptions is defined and transition.frontendOptions.class is defined %}{{ transition.frontendOptions.class }}{% endif %}
+        {{ transition.frontendOptions.class|default('') }}
     {% endset %}
+
+    {% set iCss = noIcon|default(false) ? false : transition.frontendOptions.icon|default('') %}
 
     {# Transaltions temporary disabled due to BAP-5355 #}
     {{ ui.link({
-        'path': transitionData['transition-url'],
+        'path': 'javascript:void(0);',
         'id': 'transition-%s-%s'|format(workflow.name, transition.name),
-        'iCss': transition.frontendOptions is defined and transition.frontendOptions.icon is defined ? transition.frontendOptions.icon : '',
-        'title': transition.label|trans({},'workflows'),
+        'iCss': iCss,
+        'title': label,
         'class': class,
         'data': data,
-        'label':  transition.label|trans({},'workflows')
+        'label': label,
+        'noIconText': noIconText|default(false),
     }) }}
 {% endmacro %}
 
@@ -78,7 +85,7 @@
        title="{{ data.title }}"
        class="btn icons-holder-text btn-primary"
        id="{{ resetButtonId }}">
-            <i class="icon-repeat"></i>
+            <i class="fa-repeat"></i>
             {{ data.title }}
     </a>
 

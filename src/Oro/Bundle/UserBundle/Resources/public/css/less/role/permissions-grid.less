@@ -98,8 +98,9 @@
     float: left;
     &.dropdown-toggle {
       cursor: pointer;
-      &:hover:after {
+      &:hover:after, &.active:after {
         position: absolute;
+        right: -15px;
         display: inline-block;
         width: 0;
         height: 0;
@@ -168,4 +169,3 @@
     margin: 0;
   }
 }
-

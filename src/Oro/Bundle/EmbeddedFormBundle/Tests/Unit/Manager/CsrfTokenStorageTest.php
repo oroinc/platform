@@ -23,8 +23,8 @@ class CsrfTokenStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tokenCache = $this->getMock(Cache::class);
-        $this->sessionIdProvider = $this->getMock(SessionIdProviderInterface::class);
+        $this->tokenCache = $this->createMock(Cache::class);
+        $this->sessionIdProvider = $this->createMock(SessionIdProviderInterface::class);
 
         $this->sessionIdProvider->expects(self::any())
             ->method('getSessionId')

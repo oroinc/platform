@@ -158,4 +158,39 @@ class ChannelRepository extends EntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    /**
+     * @param  $type
+     *
+     * @return int
+     */
+    public function countActiveIntegrations($type = null)
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.enabled = :enabled')
+            ->setParameter('enabled', true)
+        ;
+
+        if ($type) {
+            $qb
+                ->andWhere('c.type = :type')
+                ->setParameter('type', $type)
+            ;
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return array|Integration[]
+     */
+    public function findByType($type)
+    {
+        return $this->findBy([
+            'type' => $type
+        ]);
+    }
 }

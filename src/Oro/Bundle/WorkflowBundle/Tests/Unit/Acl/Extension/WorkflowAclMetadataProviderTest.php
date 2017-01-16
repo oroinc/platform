@@ -32,8 +32,8 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMock(ManagerRegistry::class);
-        $this->translator = $this->getMock(TranslatorInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -562,7 +562,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit_Framework_TestCase
             '',
             [
                 new FieldSecurityMetadata(
-                    'start_transition|step1|next_step',
+                    'start_transition||next_step',
                     'translated: start transition [domain: workflows] '
                     . "(translated: step 1 [domain: workflows] \u{2192} translated: next step [domain: workflows])"
                 )

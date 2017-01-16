@@ -18,7 +18,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->serviceIds = ['test' => 'expression_service'];
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->extension = new DependencyInjectionExtension(
             $this->container,
             $this->serviceIds
@@ -33,7 +33,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExpression()
     {
-        $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $expr = $this->createMock('Oro\Component\ConfigExpression\ExpressionInterface');
 
         $this->container->expects($this->once())
             ->method('get')

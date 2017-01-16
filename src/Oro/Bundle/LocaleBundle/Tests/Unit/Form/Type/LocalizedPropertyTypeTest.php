@@ -21,7 +21,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
 
     protected function setUp()
     {
-        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         parent::setUp();
 
@@ -37,7 +37,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         $localizationCollection->setDataClass(self::LOCALIZATION_CLASS);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface $translator */
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
 
         return [
             new PreloadedExtension(
@@ -113,7 +113,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
                     LocalizedPropertyType::FIELD_DEFAULT => 5,
                     LocalizedPropertyType::FIELD_LOCALIZATIONS => [
                         1 => 10,
-                        2 => null,
+                        2 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                         3 => new FallbackType(FallbackType::PARENT_LOCALIZATION),
                     ]
                 ],

@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\ContextItemInterface;
+use Oro\Component\Layout\Tests\Unit\Stubs\ContextItemStub;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
@@ -24,14 +24,14 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextHolder = $this->getMock(LayoutContextHolder::class);
+        $this->contextHolder = $this->createMock(LayoutContextHolder::class);
 
         $configs = [
             'oro_layout.debug_developer_toolbar' => true
         ];
 
         /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
-        $configManager = $this->getMock(ConfigManager::class, [], [], '', false);
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('get')
             ->will($this->returnCallback(function ($code) use ($configs) {
@@ -50,10 +50,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $contextItemInterface = $this->getMock(ContextItemInterface::class);
-        $contextItemInterface->expects($this->once())
-            ->method('toString')
-            ->will($this->returnValue('ContextItemInterface'));
+        $contextItemInterface =  new ContextItemStub();
         $contextItems = [
             'string' => 'string',
             'array' => ['array'],
@@ -63,7 +60,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             $context->set($name, $item);
         }
         $contextItems['array'] = json_encode($contextItems['array']);
-        $contextItems['ContextItemInterface'] = 'ContextItemInterface';
+        $contextItems['ContextItemInterface'] = '(object) ContextItemStub::id:1';
 
         $contextData = [
             'string' => 'string',
@@ -115,7 +112,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             $blockView->vars = $options[$blockView->vars['id']];
 
             /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
-            $block = $this->getMock(BlockInterface::class);
+            $block = $this->createMock(BlockInterface::class);
             $block->expects($this->any())
                 ->method('getId')
                 ->will($this->returnValue($blockView->vars['id']));
@@ -149,7 +146,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         foreach ($options as $id => $blockOptions) {
             /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
-            $block = $this->getMock(BlockInterface::class);
+            $block = $this->createMock(BlockInterface::class);
             $block->expects($this->any())
                 ->method('getId')
                 ->will($this->returnValue($id));
@@ -161,7 +158,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             $blockView->vars = $options[$blockView->vars['id']];
 
             /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
-            $block = $this->getMock(BlockInterface::class);
+            $block = $this->createMock(BlockInterface::class);
             $block->expects($this->any())
                 ->method('getId')
                 ->will($this->returnValue($blockView->vars['id']));
@@ -255,7 +252,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockRequest()
     {
-        return $this->getMock(Request::class);
+        return $this->createMock(Request::class);
     }
 
     /**
@@ -263,6 +260,6 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockResponse()
     {
-        return $this->getMock(Response::class);
+        return $this->createMock(Response::class);
     }
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 
 class UpdateSchemaCommand extends ContainerAwareCommand
 {
@@ -34,6 +33,12 @@ class UpdateSchemaCommand extends ContainerAwareCommand
                         null,
                         InputOption::VALUE_NONE,
                         'Dumps the generated SQL statements to the screen (does not execute them).'
+                    ),
+                    new InputOption(
+                        'attributes-only',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Executes update schema only for entities which has attributes.'
                     )
                 ]
             );
@@ -56,16 +61,16 @@ class UpdateSchemaCommand extends ContainerAwareCommand
 
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        /** @var ConfigManager $configManager */
-        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
 
-        $metadata = array_filter(
-            $em->getMetadataFactory()->getAllMetadata(),
-            function ($doctrineMetadata) use ($configManager) {
-                /** @var ClassMetadataInfo $doctrineMetadata */
-                return $this->isExtendEntity($doctrineMetadata->getReflectionClass()->getName(), $configManager);
-            }
-        );
+        /** @var ExtendEntityConfigProvider $attributeProvider */
+        $extendEntityConfigProvider = $this->getContainer()
+            ->get('oro_entity_config.provider.extend_entity_config_provider');
+
+        $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs($input->getOption('attributes-only'));
+        $metadata = [];
+        foreach ($extendConfigs as $extendConfig) {
+            $metadata[] = $em->getClassMetadata($extendConfig->getId()->getClassName());
+        }
 
         $schemaTool = new SaveSchemaTool($em);
         $sqls       = $schemaTool->getUpdateSchemaSql($metadata, true);
@@ -91,25 +96,5 @@ class UpdateSchemaCommand extends ContainerAwareCommand
             $enumSynchronizer = $this->getContainer()->get('oro_entity_extend.enum_synchronizer');
             $enumSynchronizer->sync();
         }
-    }
-
-    /**
-     * @param string        $className
-     * @param ConfigManager $configManager
-     *
-     * @return bool
-     */
-    protected function isExtendEntity($className, ConfigManager $configManager)
-    {
-        $result = false;
-
-        // check if an entity is marked as extended (both extended and custom entities are marked as extended)
-        if ($configManager->hasConfig($className)) {
-            $extendProvider = $configManager->getProvider('extend');
-
-            $result = $extendProvider->getConfig($className)->is('is_extend');
-        }
-
-        return $result;
     }
 }

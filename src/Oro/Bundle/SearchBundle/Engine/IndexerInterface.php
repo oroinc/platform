@@ -49,7 +49,7 @@ interface IndexerInterface
      * @param string|string[] $class
      * @param array           $context
      *
-     * @return int Number of reindexed entities
+     * @return int Number of reindexed entities or null if information not available
      * @throws \LogicException
      */
     public function reindex($class = null, array $context = []);

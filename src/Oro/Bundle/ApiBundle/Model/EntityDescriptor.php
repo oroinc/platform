@@ -6,12 +6,10 @@ namespace Oro\Bundle\ApiBundle\Model;
  * This class can be used if you need a Data API sub-resource that should return
  * a list of objects contain a reference to different types of entities
  * and its human-readable representation.
+ * @deprecated since 2.0. Use Oro\Bundle\ApiBundle\Model\EntityIdentifier instead
  */
 class EntityDescriptor extends EntityIdentifier
 {
-    /** @var string */
-    protected $class;
-
     /** @var string */
     protected $title;
 
@@ -22,29 +20,8 @@ class EntityDescriptor extends EntityIdentifier
      */
     public function __construct($id = null, $class = null, $title = null)
     {
-        parent::__construct($id);
-        $this->class = $class;
+        parent::__construct($id, $class);
         $this->title = $title;
-    }
-
-    /**
-     * Gets the FQCN of the entity.
-     *
-     * @return mixed
-     */
-    public function getClass()
-    {
-        return $this->class;
-    }
-
-    /**
-     * Sets the FQCN of the entity.
-     *
-     * @param string $class
-     */
-    public function setClass($class)
-    {
-        $this->class = $class;
     }
 
     /**

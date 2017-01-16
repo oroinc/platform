@@ -17,12 +17,12 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
     }
 
     public function testGetForm()
     {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->once())->method('getName')->willReturn('form_name');
 
         $this->container->expects($this->once())
@@ -38,10 +38,10 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
     public function testToString()
     {
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
-        $this->assertEquals(self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
-    public function testToStringWithAllParams()
+    public function testGetHash()
     {
         $formAccessor = new DependencyInjectionFormAccessor(
             $this->container,
@@ -52,7 +52,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             self::FORM_SERVICE_ID . ';action_route:test_route;method:post;enctype:multipart/form-data',
-            $formAccessor->toString()
+            $formAccessor->getHash()
         );
     }
 
@@ -63,8 +63,8 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formView   = new FormView();
 
         $formView->vars['multipart'] = false;
@@ -89,7 +89,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertNull($formAccessor->getEnctype());
-        $this->assertEquals(self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
     public function testParamsInitializerForMultipartForm()
@@ -99,8 +99,8 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $form       = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formView   = new FormView();
 
         $formView->vars['multipart'] = true;
@@ -125,7 +125,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertEquals('multipart/form-data', $formAccessor->getEnctype());
-        $this->assertEquals(self::FORM_SERVICE_ID, $formAccessor->toString());
+        $this->assertEquals('form_service_id:'.self::FORM_SERVICE_ID, $formAccessor->toString());
     }
 
     public function testGetView()
@@ -140,7 +140,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $field2View                     = new FormView($field1View);
         $field1View->children['field2'] = $field2View;
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
@@ -171,7 +171,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
     {
         $data = ['test'];
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->once())->method('setData')->with($data);
         $form->expects($this->once())->method('getData')->willReturn($data);
 
@@ -188,11 +188,11 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSetters()
     {
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
         $formView = new FormView();
         $formView->vars['multipart'] = true;
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
         $form->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($formConfig));

@@ -24,14 +24,18 @@ oro:
             identity.tooltip: "If set to \"Only when not empty\", the field may be omitted in the identity when it has no value."
             order.label:    "Column Position"
 
+
         import:
             error:          "Errors occurred during file import."
+            download_error_log: "Error log"
             errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."
-            label:          Import
+            label:          "Import file"
+            validation_label: "Validate Data File"
             success:        "File was successfully imported."
             alert:          "%added% %entities% were added, %updated% %entities% were updated"
             entity:         Import %entityName%
+            entity_validation:         Import %entityName% Validation
             tempate:        Download Data Template
             file:           File
             strategy:       Strategy
@@ -39,6 +43,8 @@ oro:
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
             errors:
                 not_found_entity: Not found entity "%entity_name%"
+                access_denied_entity: Access denied to entity "%entity_name%"
+                access_denied_property_entity: Access denied to property %property_name% of entity "%entity_name%"
 
         message:
             entities.label: "entities"

@@ -8,9 +8,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType;
 
 class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroTimeIntervalType
-     */
+    /** @var OroTimeIntervalType */
     protected $type;
 
     protected function setUp()
@@ -34,13 +32,13 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
     {
         $expectedOptions = array(
             'widget'         => 'single_text',
+            'with_minutes'   => true,
             'with_seconds'   => true,
             'model_timezone' => 'UTC',
             'view_timezone'  => 'UTC',
         );
 
         $form = $this->factory->create($this->type);
-        $form->submit(new \DateTime());
 
         $options = $form->getConfig()->getOptions();
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -52,7 +50,6 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
     public function testBuildView()
     {
         $form = $this->factory->create($this->type);
-        $form->submit(new \DateTime());
         $view = $form->createView();
 
         $this->assertEquals('text', $view->vars['type']);

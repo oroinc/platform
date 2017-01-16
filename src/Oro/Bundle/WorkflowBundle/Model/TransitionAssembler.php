@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
@@ -29,19 +29,19 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected $conditionFactory;
 
     /**
-     * @var ActionFactory
+     * @var ActionFactoryInterface
      */
     protected $actionFactory;
 
     /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
-     * @param ActionFactory $actionFactory
+     * @param ActionFactoryInterface $actionFactory
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
-        ActionFactory $actionFactory
+        ActionFactoryInterface $actionFactory
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
@@ -135,6 +135,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setDialogTemplate($this->getOption($options, 'dialog_template'))
             ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
             ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+            ->setInitDatagrids($this->getOption($options, WorkflowConfiguration::NODE_INIT_DATAGRIDS, []))
             ->setInitContextAttribute($this->getOption($options, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE));
 
         if (!empty($definition['preactions'])) {
@@ -181,7 +182,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $aclResource = $this->getOption($options, 'acl_resource');
 
         if ($aclResource) {
-            $aclPreConditionDefinition = ['parameters' => [$aclResource]];
+            $aclPreConditionDefinition = ['parameters' => $aclResource];
             $aclMessage = $this->getOption($options, 'acl_message');
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;

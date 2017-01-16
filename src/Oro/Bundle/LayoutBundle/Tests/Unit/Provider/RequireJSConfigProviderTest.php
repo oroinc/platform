@@ -48,8 +48,8 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->engineInterface = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $this->cache = $this->getMock('Doctrine\Common\Cache\CacheProvider');
+        $this->engineInterface = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $this->cache = $this->createMock('Doctrine\Common\Cache\CacheProvider');
 
         $this->config = [
             'build_path' => './build/path',
@@ -77,7 +77,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             $this->webRoot
         );
 
-        $this->themeManager = $this->getMock(
+        $this->themeManager = $this->createMock(
             'Oro\Component\Layout\Extension\Theme\Model\ThemeManager',
             [],
             [],
@@ -110,7 +110,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
         $config->setConfigFilePath($path . RequireJSConfigProvider::REQUIREJS_CONFIG_FILE);
 
         /** @var Theme|\PHPUnit_Framework_MockObject_MockObject $theme */
-        $theme = $this->getMock('Oro\Component\Layout\Extension\Theme\Model\Theme', [], [], '', false);
+        $theme = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
         $theme->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('default'));
@@ -144,7 +144,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['default' => $config]));
 
         /** @var LayoutContext|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->getMock(LayoutContext::class);
+        $context = $this->createMock(LayoutContext::class);
         $context->expects($this->once())
             ->method('get')
             ->with('theme')
@@ -192,7 +192,7 @@ class RequireJSConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['default' => []]));
 
         /** @var LayoutContext|\PHPUnit_Framework_MockObject_MockObject $context */
-        $context = $this->getMock(LayoutContext::class);
+        $context = $this->createMock(LayoutContext::class);
         $context->expects($this->once())
             ->method('get')
             ->with('theme')

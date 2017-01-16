@@ -12,7 +12,10 @@ Table of Contents
  - [Change delete handler for entity](#change-delete-handler-for-entity)
  - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure nested object](#configure-nested-object)
+ - [Configure nested association](#configure-nested-association)
  - [Turn on Extended Many-To-One Associations](#turn-on-extended-many-to-one-associations)
+ - [Turn on Extended Many-To-Many Associations](#turn-on-extended-many-to-many-associations)
+ - [Turn on Extended Multiple Many-To-One Associations](#turn-on-extended-multiple-many-to-one-associations)
 
 
 Turn on API for entity
@@ -222,6 +225,46 @@ Here is an example how the nested objects looks in JSON.API:
 }
 ```
 
+Configure nested association
+----------------------------
+
+Sometimes a relationship with a group of entities is implemented as two fields, "entityClass" and "entityId", rather than [many-to-one extended association](../../../EntityExtendBundle/Resources/doc/associations.md). But in Data API these fields should be represented as a regular relationship. To achieve this a special data type named `nestedAssociation` was implemented. For example lets suppose that an entity has two fields `sourceEntityClass` and `sourceEntityId` and you need to expose them in API as `source` relationship. This can be achieved by the following configuration:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\OrderBundle\Entity\Order:
+            fields:
+                source:
+                    data_type: nestedAssociation
+                    fields:
+                        __class__:
+                            property_path: sourceEntityClass
+                        id:
+                            property_path: sourceEntityId
+                sourceEntityClass:
+                    exclude: true
+                sourceEntityId:
+                    exclude: true
+```
+
+Here is an example how the nested association looks in JSON.API:
+
+```json
+{
+  "data": {
+    "type": "orders",
+    "id": "1",
+    "relationships": {
+      "source": {
+        "type": "contacts",
+        "id": 123
+      }
+    }
+  }
+}
+```
+
 Turn on Extended Many-To-One Associations
 -----------------------------------------
 
@@ -241,3 +284,78 @@ api:
 ```
 
 After applying configuration like above, the `target` relationship will be available in scope of [get_list](./actions.md#get_list-action), [get](./actions.md#get-action), [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. Also the `target` relationship will be available as subresource and it will be possible to perform [get_subresource](./actions.md#get_subresource-action), [get_relationship](./actions.md#get_relationship-action) and [update_relationship](./actions.md#update_relationship-action) actions.
+
+The `data_type` parameter has format: `association:relationType:associationKind`, where
+
+ - `relationType` part should have 'manyToOne' value for extended Many-To-One association;
+ - `associationKind` - optional part. The association kind.
+
+Turn on Extended Many-To-Many Associations
+------------------------------------------
+
+For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
+
+Depending on current entity configuration, each association resource (e.g. call) can be assigned to several resources (e.g. user, account, contact) that supports such associations.
+
+By default, there is no possibility to retrieve targets of such associations. But this behaviour can be enabled via configuration in `Resources/config/oro/api.yml`, for instance:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\CallBundle\Entity\Call:
+            fields:
+                activityTargets:
+                    data_type: association:manyToMany:activity
+```
+
+After applying configuration like above, the `activityTargets` relationship will be available in scope of 
+[get_list](./actions.md#get_list-action), 
+[get](./actions.md#get-action), 
+[create](./actions.md#create-action) and 
+[update](./actions.md#update-action) actions. 
+Also the `activityTargets` relationship will be available as subresource and it will be possible to perform 
+[get_subresource](./actions.md#get_subresource-action), 
+[get_relationship](./actions.md#get_relationship-action), 
+[add_relationship](./actions.md#add_relationship-action),
+[update_relationship](./actions.md#update_relationship-action) and.
+[delete_relationship](./actions.md#delete_relationship-action) actions.
+
+The `data_type` parameter has format: `association:relationType:associationKind`, where
+
+ - `relationType` part should have 'manyToMany' value for extended Many-To-Many association;
+ - `associationKind` - optional part. The association kind.
+
+Turn on Extended Multiple Many-To-One Associations
+--------------------------------------------------
+
+For detail what are extended associations, please refer to [Associations](../../../EntityExtendBundle/Resources/doc/associations.md) topic.
+
+Depending on current entity configuration, each association resource (e.g. call) can be assigned to several resources (e.g. user, account, contact) that supports such associations, but in case of multiple many-to-one association a resource can be associated with only one other resource of each type. E.g. a call can be associated only with one user, one account, etc.
+
+By default, there is no possibility to retrieve targets of such associations. But this behaviour can be enabled via configuration in `Resources/config/oro/api.yml`, for instance:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\CallBundle\Entity\Call:
+            fields:
+                targets:
+                    data_type: association:multipleManyToOne
+```
+
+After applying configuration like above, the `targets` relationship will be available in scope of 
+[get_list](./actions.md#get_list-action), 
+[get](./actions.md#get-action), 
+[create](./actions.md#create-action) and 
+[update](./actions.md#update-action) actions. 
+Also the `targets` relationship will be available as subresource and it will be possible to perform 
+[get_subresource](./actions.md#get_subresource-action), 
+[get_relationship](./actions.md#get_relationship-action), 
+[add_relationship](./actions.md#add_relationship-action),
+[update_relationship](./actions.md#update_relationship-action) and.
+[delete_relationship](./actions.md#delete_relationship-action) actions.
+
+The `data_type` parameter has format: `association:relationType:associationKind`, where
+
+ - `relationType` part should have 'multipleManyToOne' value for extended Multiple Many-To-One association;
+ - `associationKind` - optional part. The association kind.

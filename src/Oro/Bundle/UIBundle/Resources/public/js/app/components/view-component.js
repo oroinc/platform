@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var ViewComponent;
+    var $ = require('jquery');
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var tools = require('oroui/js/tools');
@@ -16,14 +17,25 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
+            var subPromises = _.values(options._subPromises);
             var viewOptions = _.extend(
-                _.omit(options, ['_sourceElement', 'view']),
+                _.omit(options, '_sourceElement', '_subPromises', 'view'),
                 {el: options._sourceElement}
             );
-            this._deferredInit();
+            var initializeView = _.bind(this._initializeView, this, viewOptions);
+
             // mark element
             options._sourceElement.attr('data-bound-view', options.view);
-            tools.loadModules(options.view, _.partial(_.bind(this._initializeView, this), viewOptions));
+
+            this._deferredInit();
+            if (subPromises.length) {
+                // ensure that all nested components are already initialized
+                $.when.apply($, subPromises).then(function() {
+                    tools.loadModules(options.view, initializeView);
+                });
+            } else {
+                tools.loadModules(options.view, initializeView);
+            }
         },
 
         /**
@@ -33,6 +45,10 @@ define(function(require) {
          * @protected
          */
         _initializeView: function(options, View) {
+            if (this.disposed) {
+                this._resolveDeferredInit();
+                return;
+            }
             this.view = new View(options);
 
             // pass all component events to view

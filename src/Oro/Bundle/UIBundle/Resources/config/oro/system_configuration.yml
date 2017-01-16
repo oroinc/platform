@@ -1,7 +1,7 @@
 system_configuration:
     groups:
         application_settings:
-            icon:        icon-desktop
+            icon:        fa-desktop
             title:       oro.ui.system_configuration.groups.application_settings.title
             page_reload: true
 
@@ -14,9 +14,12 @@ system_configuration:
     fields:
         oro_ui.application_url:
             data_type: string
-            type: text
+            type: 'Symfony\Component\Form\Extension\Core\Type\UrlType'
             options:
+                default_protocol: 'http'
                 label: oro.ui.system_configuration.fields.application_url.label
+                constraints:
+                    - Url: ~
         oro_ui.navbar_position:
             data_type: string
             type: choice

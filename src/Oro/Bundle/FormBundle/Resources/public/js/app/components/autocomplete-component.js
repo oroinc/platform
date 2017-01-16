@@ -54,13 +54,26 @@ define(function(require) {
                 config: {
                     source: _.bind(this.source, this),
                     matcher: _.bind(this.matcher, this),
+                    updater: _.bind(this.updater, this),
                     sorter: _.bind(this.sorter, this),
-                    show: this.show
+                    show: this.show,
+                    hide: this.hide
                 }
             };
+
             this.options = $.extend(true, thisOptions, this.options, options || {});
             this.$el = options._sourceElement;
+
             this.$el.attr('autocomplete', 'off');
+
+            var dropClasses = this.$el.data('dropdown-classes');
+            if (dropClasses) {
+                this.options.config = _.assign(this.options.config, {
+                    holder: '<div class="' + dropClasses.holder + '"></div>',
+                    menu: '<ul class="' + dropClasses.menu + '"></ul>',
+                    item: '<li class="' + dropClasses.item + '"><a class="' + dropClasses.link + '" href="#"></a></li>'
+                });
+            }
 
             if (this.options.route_name) {
                 this.url = routing.generate(
@@ -132,6 +145,14 @@ define(function(require) {
         },
 
         /**
+         * @param {String} item
+         * @returns {String}
+         */
+        updater: function(item) {
+            return item;
+        },
+
+        /**
          * @param {Array} items
          * @returns {Array}
          */
@@ -140,7 +161,30 @@ define(function(require) {
         },
 
         show: function() {
-            this.constructor.prototype.show.apply(this);
+            var pos = $.extend({}, this.$element.position(), {
+                height: this.$element[0].offsetHeight
+            });
+
+            if (this.$holder.length) {
+                this.$holder
+                    .insertAfter(this.$element)
+                    .css({
+                        top: pos.top + pos.height,
+                        left: pos.left
+                    })
+                    .append(this.$menu)
+                    .show();
+            } else {
+                this.$menu
+                    .insertAfter(this.$element)
+                    .css({
+                        top: pos.top + pos.height,
+                        left: pos.left
+                    })
+                    .show();
+            }
+
+            this.shown = true;
 
             var $window = $(window);
             var viewportBottom = $window.scrollTop() + $window.height();
@@ -153,6 +197,20 @@ define(function(require) {
                 var aboveTop = this.$menu.css('top').replace('px', '') - resultsHeight - elementHeight;
                 this.$menu.css('top', aboveTop + 'px');
             }
+
+            return this;
+        },
+
+        hide: function() {
+            if (this.$holder.length) {
+                this.$holder.hide();
+            } else {
+                this.$menu.hide();
+            }
+
+            this.shown = false;
+
+            return this;
         },
 
         /**

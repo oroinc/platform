@@ -24,7 +24,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
 
     public function setUp()
     {
-        $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
+        $this->userChecker = $this->createMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $this->provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');
         $this->provider->setTokenFactory(new OrganizationRememberMeTokenFactory());
     }
@@ -41,7 +41,7 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
         $token = new OrganizationRememberMeToken($user, 'another', 'testKey', $organization);
         $this->assertFalse($this->provider->supports($token));
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AbstractToken');
+        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\AbstractToken');
         $this->assertFalse($this->provider->supports($token));
     }
 

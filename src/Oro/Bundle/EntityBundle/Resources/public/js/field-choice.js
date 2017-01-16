@@ -106,6 +106,10 @@ define(function(require) {
             instance = this.element.data('select2');
         },
 
+        _destroy: function() {
+            this.element.data('select2').destroy();
+        },
+
         _setOption: function(key, value) {
             if ($.isPlainObject(value)) {
                 $.extend(this.options[key], value);
@@ -204,11 +208,11 @@ define(function(require) {
 
             try {
                 chain = this.util.pathToEntityChain(path, true);
+                entityName = chain[chain.length - 1].entity.name;
             } catch (e) {
                 return results;
             }
 
-            entityName = chain[chain.length - 1].entity.name;
             entityData = entityData[entityName];
             entityFields = this.options.dataFilter.call(this, entityName, entityData.fields);
 

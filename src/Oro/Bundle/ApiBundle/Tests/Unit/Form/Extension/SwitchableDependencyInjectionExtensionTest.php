@@ -20,9 +20,9 @@ class SwitchableDependencyInjectionExtensionTest extends \PHPUnit_Framework_Test
 
     protected function setUp()
     {
-        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->extension1 = $this->getMock('Symfony\Component\Form\FormExtensionInterface');
-        $this->extension2 = $this->getMock('Symfony\Component\Form\FormExtensionInterface');
+        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->extension1 = $this->createMock('Symfony\Component\Form\FormExtensionInterface');
+        $this->extension2 = $this->createMock('Symfony\Component\Form\FormExtensionInterface');
 
         $this->switchableExtension = new SwitchableDependencyInjectionExtension($this->container);
         $this->switchableExtension->addExtension('extension1', 'extension1_service');
@@ -72,7 +72,7 @@ class SwitchableDependencyInjectionExtensionTest extends \PHPUnit_Framework_Test
 
     public function testGetType()
     {
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        $type = $this->createMock('Symfony\Component\Form\FormTypeInterface');
 
         $this->container->expects($this->once())
             ->method('get')
@@ -103,7 +103,7 @@ class SwitchableDependencyInjectionExtensionTest extends \PHPUnit_Framework_Test
     public function testGetTypeExtensions()
     {
         $typeExtensions = [
-            $this->getMock('Symfony\Component\Form\FormTypeExtensionInterface')
+            $this->createMock('Symfony\Component\Form\FormTypeExtensionInterface')
         ];
 
         $this->container->expects($this->once())
@@ -120,7 +120,7 @@ class SwitchableDependencyInjectionExtensionTest extends \PHPUnit_Framework_Test
 
     public function testGetTypeGuesser()
     {
-        $typeGuesser = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
+        $typeGuesser = $this->createMock('Symfony\Component\Form\FormTypeGuesserInterface');
 
         $this->container->expects($this->once())
             ->method('get')

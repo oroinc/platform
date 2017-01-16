@@ -23,7 +23,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $router                = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router                = $this->createMock('Symfony\Component\Routing\RouterInterface');
         $entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();

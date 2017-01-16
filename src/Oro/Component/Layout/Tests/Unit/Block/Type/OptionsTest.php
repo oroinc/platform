@@ -20,7 +20,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('test', $this->options->get('value'));
 
-        $this->setExpectedException('OutOfBoundsException');
+        $this->expectException('OutOfBoundsException');
         $this->assertFalse($this->options->get('nameNotExist'));
     }
 

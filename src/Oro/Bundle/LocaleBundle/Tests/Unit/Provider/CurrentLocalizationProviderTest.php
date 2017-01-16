@@ -28,9 +28,9 @@ class CurrentLocalizationProviderTest extends \PHPUnit_Framework_TestCase
     {
         $localization = new Localization();
 
-        $extension1 = $this->getMock(CurrentLocalizationExtensionInterface::class);
-        $extension2 = $this->getMock(CurrentLocalizationExtensionInterface::class);
-        $extension3 = $this->getMock(CurrentLocalizationExtensionInterface::class);
+        $extension1 = $this->createMock(CurrentLocalizationExtensionInterface::class);
+        $extension2 = $this->createMock(CurrentLocalizationExtensionInterface::class);
+        $extension3 = $this->createMock(CurrentLocalizationExtensionInterface::class);
 
         $extension1->expects($this->once())->method('getCurrentLocalization')->willReturn(null);
         $extension2->expects($this->once())->method('getCurrentLocalization')->willReturn($localization);
