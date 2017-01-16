@@ -19,5 +19,6 @@ class OroEntityConfigBundle implements Migration
     {
         $table = $schema->getTable('oro_attribute_group');
         $table->addColumn('is_visible', 'boolean', ['default' => '1']);
+        $table->changeColumn('code', ['notnull' => true]);
     }
 }

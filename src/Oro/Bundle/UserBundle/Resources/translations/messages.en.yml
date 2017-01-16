@@ -280,6 +280,8 @@ oro:
         permission:
             update_configuration:
                 label: Configure
+            manage_api_key:
+                label: Manage API Key
 
         security:
             password_changed.message: Your password was updated by an administrator. New password was sent to you by email.

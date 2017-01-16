@@ -220,3 +220,10 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer
         tags:
             - { name: layout.block_view_serializer.normalizer }
+
+    oro_layout.provider.property_accessor:
+        class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\PropertyAccessDataProvider'
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: layout.data_provider, alias: property_accessor }
