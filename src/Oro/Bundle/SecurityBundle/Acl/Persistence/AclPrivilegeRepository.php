@@ -678,7 +678,6 @@ class AclPrivilegeRepository
      * @param \SplObjectStorage     $acls
      * @param AclExtensionInterface $extension
      * @param AclInterface          $rootAcl
-     * @param null|string           $field
      */
     protected function addPermissions(
         SID $sid,

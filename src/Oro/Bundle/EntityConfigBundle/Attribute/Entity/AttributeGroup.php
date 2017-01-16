@@ -16,7 +16,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 /**
  * @ORM\Table(name="oro_attribute_group")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
- * @ORM\HasLifecycleCallbacks()
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *      mode="hidden"
  * )
@@ -64,13 +64,15 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="code", type="string", length=255, unique=false, nullable=true)
+     * @ORM\Column(name="code", type="string", length=255, unique=false)
      */
     private $code;
 
     /**
      * @var AttributeFamily
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups")
+     * @ORM\ManyToOne(
+     *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups"
+     * )
      * @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id")
      */
     private $attributeFamily;

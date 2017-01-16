@@ -151,20 +151,21 @@ class LayoutResource implements ResourceInterface
                 continue;
             }
 
-            $keysToRemove = [];
-            foreach ($asset['inputs'] as $origKey => &$value) {
-                $key = $value;
-                if (array_key_exists($key, $asset['inputs'])) {
-                    $keysToRemove[] = $key;
-                    $value = $asset['inputs'][$key];
+            foreach ($asset['inputs'] as $key => $value) {
+                if (!is_array($value)) {
+                    continue;
                 }
 
-                if (!$value) {
-                    $keysToRemove[] = $origKey;
-                }
-            }
+                foreach ($value as $form => $to) {
+                    $keyToReplace = array_search($form, $asset['inputs']);
 
-            foreach ($keysToRemove as $key) {
+                    if ($to) {
+                        $asset['inputs'][$keyToReplace] = $to;
+                    } else {
+                        unset($asset['inputs'][$keyToReplace]);
+                    }
+                }
+
                 unset($asset['inputs'][$key]);
             }
         }
