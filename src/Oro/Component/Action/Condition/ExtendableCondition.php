@@ -3,6 +3,7 @@
 namespace Oro\Component\Action\Condition;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 use Oro\Component\Action\Exception\ExtendableEventNameMissingException;
@@ -12,6 +13,8 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 class ExtendableCondition extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
+
+    const DEFAULT_MESSAGE_TYPE = 'error';
 
     const NAME = 'extendable';
 
@@ -26,11 +29,28 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     protected $subscribedEvents = [];
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
+     * @var FlashBag
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
+    protected $flashBag;
+
+    /**
+     * @var bool
+     */
+    private $showErrors;
+
+    /**
+     * @var string
+     */
+    private $messageType;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param FlashBag $flashBag
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher, FlashBag $flashBag)
     {
         $this->eventDispatcher = $eventDispatcher;
+        $this->flashBag = $flashBag;
     }
 
     /**
@@ -45,6 +65,12 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             }
 
             $this->eventDispatcher->dispatch($eventName, $event);
+        }
+
+        if ($this->showErrors && $event->hasErrors()) {
+            foreach ($event->getErrors() as $error) {
+                $this->flashBag->add($this->messageType, $error['message']);
+            }
         }
 
         return false == $event->hasErrors();
@@ -74,5 +100,9 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             );
         }
         $this->subscribedEvents = $options['events'];
+        $this->showErrors = (bool) array_key_exists('showErrors', $options) ? $options['showErrors'] : false;
+        $this->messageType = array_key_exists('messageType', $options)
+            ? $options['messageType']
+            : self::DEFAULT_MESSAGE_TYPE;
     }
 }

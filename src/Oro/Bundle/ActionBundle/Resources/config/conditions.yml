@@ -33,6 +33,7 @@ services:
         class: Oro\Component\Action\Condition\ExtendableCondition
         arguments:
             - '@event_dispatcher'
+            - '@session.flash_bag'
         tags:
             - { name: oro_action.condition, alias: extendable }
 
