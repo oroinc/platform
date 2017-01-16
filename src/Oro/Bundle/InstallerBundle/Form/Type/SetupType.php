@@ -34,7 +34,9 @@ class SetupType extends AbstractType
                 array(
                     'label'    => 'form.setup.organization_name',
                     'mapped'   => false,
-                    'required' => false,
+                    'constraints' => array(
+                        new Assert\NotBlank(),
+                    ),
                 )
             )
             ->add(
