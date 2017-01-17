@@ -16,7 +16,7 @@ class CalendarDateRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('d')->orderBy('d.date', 'DESC')->setMaxResults(1);
         if ($date) {
-            $qb->andWhere('d.date LIKE :date')->setParameter('date', $date->format('Y-m-d') . "%");
+            $qb->andWhere('d.date = :date')->setParameter('date', $date);
         }
 
         return $qb->getQuery()->getOneOrNullResult();
