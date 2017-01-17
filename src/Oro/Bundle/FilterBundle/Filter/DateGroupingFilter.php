@@ -159,9 +159,6 @@ class DateGroupingFilter extends ChoiceFilter
             $this->config['calendar_column_for_grouping'],
             $this->config['first_joined_table'],
             $this->config['joined_column'],
-            $this->config['target_column'],
-            $this->config['calendar_entity'],
-            $this->config['target_entity'],
             $extraWhereClauses,
             $whereClauseParameters
         );
@@ -172,9 +169,6 @@ class DateGroupingFilter extends ChoiceFilter
             $this->config['calendar_column_for_grouping'],
             $this->config['second_joined_table'],
             $this->config['joined_column'],
-            $this->config['target_column'],
-            $this->config['calendar_entity'],
-            $this->config['target_entity'],
             $extraWhereClauses,
             $whereClauseParameters
         );
@@ -212,9 +206,6 @@ class DateGroupingFilter extends ChoiceFilter
      * @param $calendarColumnForGrouping
      * @param $joinedTable
      * @param $joinedColumn
-     * @param $targetColumn
-     * @param $calendarEntity
-     * @param $targetEntity
      * @param $extraWhereClauses
      * @param $extraWhereParameters
      * @return QueryBuilder
@@ -225,9 +216,6 @@ class DateGroupingFilter extends ChoiceFilter
         $calendarColumnForGrouping,
         $joinedTable,
         $joinedColumn,
-        $targetColumn,
-        $calendarEntity,
-        $targetEntity,
         $extraWhereClauses,
         $extraWhereParameters
     ) {
@@ -247,17 +235,17 @@ class DateGroupingFilter extends ChoiceFilter
                     $calendarColumnForGrouping
                 )
             )
-            ->from($calendarEntity, $calendarTableForGrouping)
-            ->innerJoin($targetEntity, $joinedTable)
+            ->from($this->config['calendar_entity'], $calendarTableForGrouping)
+            ->innerJoin($this->config['target_entity'], $joinedTable)
             ->where(
                 sprintf(
                     '(CAST(%s.%s as %s) = CAST(%s.%s as %s) %s)',
                     $calendarTableForGrouping,
                     $calendarColumnForGrouping,
-                    $targetColumn,
+                    $this->config['target_column'],
                     $joinedTable,
                     $joinedColumn,
-                    $targetColumn,
+                    $this->config['target_column'],
                     $extraWhereClauses
                 )
             )
