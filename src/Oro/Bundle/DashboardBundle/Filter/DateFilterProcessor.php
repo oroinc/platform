@@ -67,7 +67,7 @@ class DateFilterProcessor
     {
         return $date instanceof \DateTime
             ? $date
-            : new \DateTime($date, $this->localeSettings->getTimeZone());
+            : new \DateTime($date, new \DateTimeZone($this->localeSettings->getTimeZone()));
     }
 
     /**

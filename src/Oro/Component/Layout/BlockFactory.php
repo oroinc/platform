@@ -189,7 +189,7 @@ class BlockFactory implements BlockFactoryInterface
             $views[$id]                = $view;
         }
 
-        $viewsCollection = new ArrayCollection($views);
+        $viewsCollection = new BlockViewCollection($views);
         foreach ($views as $view) {
             $view->blocks = $viewsCollection;
         }

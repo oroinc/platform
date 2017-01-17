@@ -40,6 +40,50 @@ In additional to a query modification methods, the [OrmQueryConfiguration](../..
 - `getRootEntity($entityClassResolver = null, $lookAtExtendedEntityClassName = false)` - Returns the FIRST root entity of the query.
 - `findRootAlias($entityClass, $entityClassResolver = null)` - Tries to find the root alias for the given entity.
 - `getJoinAlias($join, $conditionType = null, $condition = null)` - Returns an alias for the given join. If the query does not contain the specified join, its alias will be generated automatically. This might be helpful if you need to get an alias to extended association that will be joined later.
+- `convertAssociationJoinToSubquery($joinAlias, $columnAlias, $joinEntityClass)` - Converts an association based join to a subquery. This can be helpful in case of performance issues with a datagrid.
+- `convertEntityJoinToSubquery($joinAlias, $columnAlias)` - Converts an entity based join to a subquery. This can be helpful in case of performance issues with a datagrid.
+
+Example of `convertAssociationJoinToSubquery` usage in a datagrid listener:
+
+```
+public function onPreBuild(PreBuild $event)
+{
+    $config = $event->getConfig();
+    $parameters = $event->getParameters();
+
+    $sorters = $parameters->get(OrmSorterExtension::SORTERS_ROOT_PARAM, []);
+    if (empty($sorters['channelName'])) {
+        $config->getOrmQuery()->convertAssociationJoinToSubquery(
+            'g',
+            'groupName',
+            'Acme\Bundle\AppBundle\Entity\UserGroup'
+        );
+    }
+}
+```
+
+The original query:
+
+```yaml
+query:
+    select:
+        - g.name as groupName
+    from:
+        - { table: Acme\Bundle\AppBundle\Entity\User, alias: u }
+    join:
+        left:
+            - { join: u.group, alias: g }
+```
+
+The converted query:
+
+```yaml
+query:
+    select:
+        - (SELECT g.name FROM Acme\Bundle\AppBundle\Entity\UserGroup AS g WHERE g = u.group) as groupName
+    from:
+        - { table: Acme\Bundle\AppBundle\Entity\User, alias: u }
+```
 
 Please investigate this class to find out all other features.
 
