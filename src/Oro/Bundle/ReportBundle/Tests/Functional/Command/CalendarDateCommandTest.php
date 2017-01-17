@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class CalendarDateCommandTest extends WebTestCase
 {
     const DATE_FORMAT = 'Y-m-d';
+
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -20,17 +21,18 @@ class CalendarDateCommandTest extends WebTestCase
 
     public function testGenerateDates()
     {
-        $repository = $this->getContainer()->get('doctrine')->getRepository(CalendarDate::class);
-        $results = $repository->findAll();
-        $this->assertCalendarDates($results);
+        $doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
+        $repository = $doctrineHelper->getEntityRepository(CalendarDate::class);
+        $manager = $doctrineHelper->getEntityManager(CalendarDate::class);
 
-        $manager = $this->getContainer()->get('doctrine')->getManagerForClass(CalendarDate::class);
+        $results = $repository->findAll();
         foreach ($results as $result) {
             $manager->remove($result);
         }
         $manager->flush();
 
         $this->runCommand(CalendarDateCommand::COMMAND_NAME);
+        $this->assertNotEmpty($repository->findAll());
         $this->assertCalendarDates($repository->findAll());
     }
 
