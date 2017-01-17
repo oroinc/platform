@@ -34,6 +34,7 @@ services:
         arguments:
             - '@event_dispatcher'
             - '@session.flash_bag'
+            - '@translator'
         tags:
             - { name: oro_action.condition, alias: extendable }
 

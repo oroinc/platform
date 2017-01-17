@@ -4,6 +4,7 @@ namespace Oro\Component\Action\Condition;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 use Oro\Component\Action\Exception\ExtendableEventNameMissingException;
@@ -34,6 +35,11 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     protected $flashBag;
 
     /**
+     * @var FlashBag
+     */
+    protected $translator;
+
+    /**
      * @var bool
      */
     private $showErrors;
@@ -46,11 +52,16 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param FlashBag $flashBag
+     * @param TranslatorInterface $translator
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, FlashBag $flashBag)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        FlashBag $flashBag,
+        TranslatorInterface $translator
+    ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->flashBag = $flashBag;
+        $this->translator = $translator;
     }
 
     /**
@@ -69,7 +80,8 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
 
         if ($this->showErrors && $event->hasErrors()) {
             foreach ($event->getErrors() as $error) {
-                $this->flashBag->add($this->messageType, $error['message']);
+                $errorMessage = $this->translator->trans($error['message']);
+                $this->flashBag->add($this->messageType, $errorMessage);
             }
         }
 
