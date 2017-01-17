@@ -7,18 +7,6 @@ oro:
             view_entity:         View configurable entity
             update_entity_field: Update configurable entity field
             field_search:        Return varchar type field(s) in given entity
-            attribute:
-                manage: '[Attribute] Manage attributes'
-                create: '[Attribute] Create attribute'
-                update: '[Attribute] Edit attribute'
-                remove: '[Attribute] Remove attribute'
-                unremove: '[Attribute] Restore attribute'
-            attribute_family:
-                manage: '[Product Family] Manage Product Families'
-                view:   '[Product Family] View Product Family'
-                create: '[Product Family] Create Product Family'
-                update: '[Product Family] Edit Product Family'
-                delete: '[Product Family] Delete Product Family'
 
         attribute:
             entity_label: Attribute
@@ -46,6 +34,7 @@ oro:
         attribute_group:
             labels.label: Label
             attribute_relations.label: Attributes
+            code.label: Code
             is_visible.label: Visible
 
         block_titles:

@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\ContextItemInterface;
+use Oro\Component\Layout\Tests\Unit\Stubs\ContextItemStub;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
@@ -50,10 +50,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         $context = new LayoutContext();
 
-        $contextItemInterface = $this->createMock(ContextItemInterface::class);
-        $contextItemInterface->expects($this->once())
-            ->method('toString')
-            ->will($this->returnValue('ContextItemInterface'));
+        $contextItemInterface =  new ContextItemStub();
         $contextItems = [
             'string' => 'string',
             'array' => ['array'],
@@ -63,7 +60,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
             $context->set($name, $item);
         }
         $contextItems['array'] = json_encode($contextItems['array']);
-        $contextItems['ContextItemInterface'] = 'ContextItemInterface';
+        $contextItems['ContextItemInterface'] = '(object) ContextItemStub::id:1';
 
         $contextData = [
             'string' => 'string',

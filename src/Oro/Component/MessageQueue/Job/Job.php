@@ -7,6 +7,7 @@ class Job
     const STATUS_RUNNING = 'oro.message_queue_job.status.running';
     const STATUS_SUCCESS = 'oro.message_queue_job.status.success';
     const STATUS_FAILED = 'oro.message_queue_job.status.failed';
+    const STATUS_FAILED_REDELIVERED = 'oro.message_queue_job.status.failed_redelivered';
     const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
 
     /**

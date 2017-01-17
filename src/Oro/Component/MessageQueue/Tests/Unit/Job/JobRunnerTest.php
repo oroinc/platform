@@ -73,6 +73,30 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         });
     }
 
+    public function testRunUniqueShouldReturnVoidIfRootJobIsInterrupted()
+    {
+        $root = new Job();
+        $root->setInterrupted(true);
+        $child = new Job();
+
+        $jobProcessor = $this->createJobProcessorMock();
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findOrCreateRootJob')
+            ->will($this->returnValue($root))
+        ;
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findOrCreateChildJob')
+            ->will($this->returnValue($child))
+        ;
+        $jobRunner = new JobRunner($jobProcessor);
+
+        $result = $jobRunner->runUnique('owner-id', 'job-name', function () {
+        });
+        $this->assertNull($result);
+    }
+
     public function testRunUniqueShouldNotStartChildJobIfAlreadyStarted()
     {
         $root = new Job();
@@ -93,6 +117,35 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         $jobProcessor
             ->expects($this->never())
             ->method('startChildJob')
+        ;
+
+        $jobRunner = new JobRunner($jobProcessor);
+        $jobRunner->runUnique('owner-id', 'job-name', function () {
+        });
+    }
+
+    public function testRunUniqueShouldStartChildJobIfAlreadyStartedButStatusFailedRedelivered()
+    {
+        $root = new Job();
+        $child = new Job();
+        $child->setStartedAt(new \DateTime());
+        $child->setStatus(Job::STATUS_FAILED_REDELIVERED);
+
+        $jobProcessor = $this->createJobProcessorMock();
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findOrCreateRootJob')
+            ->will($this->returnValue($root))
+        ;
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findOrCreateChildJob')
+            ->will($this->returnValue($child))
+        ;
+        $jobProcessor
+            ->expects($this->once())
+            ->method('startChildJob')
+            ->will($this->returnValue($child))
         ;
 
         $jobRunner = new JobRunner($jobProcessor);
@@ -162,6 +215,39 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         });
     }
 
+    public function testRunUniqueShouldFailAndRedeliveryChildJobJobIfCallbackThrowException()
+    {
+        $root = new Job();
+        $child = new Job();
+
+        $jobProcessor = $this->createJobProcessorMock();
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findOrCreateRootJob')
+            ->will($this->returnValue($root))
+        ;
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findOrCreateChildJob')
+            ->will($this->returnValue($child))
+        ;
+        $jobProcessor
+            ->expects($this->never())
+            ->method('successChildJob')
+        ;
+        $jobProcessor
+            ->expects($this->once())
+            ->method('failAndRedeliveryChildJob')
+        ;
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        $jobRunner = new JobRunner($jobProcessor);
+        $jobRunner->runUnique('owner-id', 'job-name', function () {
+            throw new \Exception('test');
+        });
+    }
+
     public function testRunUniqueShouldNotSuccessJobIfJobIsAlreadyStopped()
     {
         $root = new Job();
@@ -220,6 +306,42 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(JobRunner::class, $expRunner);
         $this->assertSame($expJob, $child);
+    }
+
+
+    public function testRunDelayedShouldCallFailAndRedeliveryAndThrowExceptionIfCallbackThrowException()
+    {
+        $root = new Job();
+        $child = new Job();
+        $child->setRootJob($root);
+
+        $jobProcessor = $this->createJobProcessorMock();
+        $jobProcessor
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with('job-id')
+            ->will($this->returnValue($child))
+        ;
+        $jobProcessor
+            ->expects($this->never())
+            ->method('successChildJob')
+            ->with($this->identicalTo($child))
+        ;
+        $jobProcessor
+            ->expects($this->never())
+            ->method('failChildJob')
+        ;
+        $jobProcessor
+            ->expects($this->once())
+            ->method('failAndRedeliveryChildJob')
+        ;
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        $jobRunner = new JobRunner($jobProcessor);
+        $jobRunner->runDelayed('job-id', function (JobRunner $runner, Job $job) {
+            throw new \Exception('test');
+        });
     }
 
     public function testRunDelayedShouldThrowExceptionIfJobWasNotFoundById()
@@ -288,7 +410,10 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
             ->method('cancelChildJob')
             ->with($this->identicalTo($child))
         ;
-
+        $jobProcessor
+            ->expects($this->never())
+            ->method('failAndRedeliveryChildJob')
+        ;
         $jobRunner = new JobRunner($jobProcessor);
         $jobRunner->runDelayed('job-id', function (JobRunner $runner, Job $job) {
             return true;
@@ -316,6 +441,10 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
         $jobProcessor
             ->expects($this->never())
             ->method('failChildJob')
+        ;
+        $jobProcessor
+            ->expects($this->never())
+            ->method('failAndRedeliveryChildJob')
         ;
 
         $jobRunner = new JobRunner($jobProcessor);
@@ -346,7 +475,10 @@ class JobRunnerTest extends \PHPUnit_Framework_TestCase
             ->method('failChildJob')
             ->with($this->identicalTo($child))
         ;
-
+        $jobProcessor
+            ->expects($this->never())
+            ->method('failAndRedeliveryChildJob')
+        ;
         $jobRunner = new JobRunner($jobProcessor);
         $jobRunner->runDelayed('job-id', function (JobRunner $runner, Job $job) {
             return false;
