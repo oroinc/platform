@@ -27,7 +27,7 @@ class UpdateDataFixturesFixture extends AbstractFixture
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
