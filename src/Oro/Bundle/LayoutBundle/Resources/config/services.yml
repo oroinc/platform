@@ -30,7 +30,6 @@ services:
         arguments:
             - '@oro_layout.layout_factory_builder'
             - '@oro_layout.layout_context_holder'
-            - '%oro_layout.default_active_theme%'
 
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper
@@ -221,3 +220,10 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer
         tags:
             - { name: layout.block_view_serializer.normalizer }
+
+    oro_layout.provider.property_accessor:
+        class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\PropertyAccessDataProvider'
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: layout.data_provider, alias: property_accessor }

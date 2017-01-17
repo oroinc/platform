@@ -8,7 +8,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -21,25 +20,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @Route("/attribute/family")
- * @Acl(
- *      id="oro_attribute_family_manage",
- *      label="oro.entity_config.action.attribute_family.manage",
- *      type="action",
- *      group_name=""
- * )
  */
 class AttributeFamilyController extends Controller
 {
     /**
      * @Route("/create/{alias}", name="oro_attribute_family_create")
      * @Template("OroEntityConfigBundle:AttributeFamily:update.html.twig")
-     * @Acl(
-     *      id="oro_attribute_family_create",
-     *      label="oro.entity_config.action.attribute_family.create",
-     *      type="action",
-     *      group_name=""
-     * )
-     *
      * @param string $alias
      * @return array|RedirectResponse
      */
@@ -84,12 +70,6 @@ class AttributeFamilyController extends Controller
     /**
      * @Route("/update/{id}", name="oro_attribute_family_update")
      * @Template("OroEntityConfigBundle:AttributeFamily:update.html.twig")
-     * @Acl(
-     *      id="oro_attribute_family_update",
-     *      label="oro.entity_config.action.attribute_family.update",
-     *      type="action",
-     *      group_name=""
-     * )
      * @param AttributeFamily $attributeFamily
      * @return array|RedirectResponse
      */
@@ -123,7 +103,6 @@ class AttributeFamilyController extends Controller
 
     /**
      * @Route("/index/{alias}", name="oro_attribute_family_index")
-     *
      * @Template()
      * @param string $alias
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -142,12 +121,6 @@ class AttributeFamilyController extends Controller
 
     /**
      * @Route("/delete/{id}", name="oro_attribute_family_delete")
-     * @Acl(
-     *      id="oro_attribute_family_delete",
-     *      label="oro.entity_config.action.attribute_family.delete",
-     *      type="action",
-     *      group_name=""
-     * )
      * @param AttributeFamily $attributeFamily
      * @return JsonResponse
      */
@@ -171,12 +144,6 @@ class AttributeFamilyController extends Controller
     /**
      * @Route("/view/{id}", name="oro_attribute_family_view", requirements={"id"="\d+"})
      * @Template()
-     * @Acl(
-     *      id="oro_attribute_family_view",
-     *      label="oro.entity_config.action.attribute_family.view",
-     *      type="action",
-     *      group_name=""
-     * )
      * @param \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily $attributeFamily
      * @return array
      */
