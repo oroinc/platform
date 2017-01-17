@@ -95,7 +95,7 @@ class EmailOriginHelper
 
         return $origin;
     }
-    
+
     /**
      * Find existing email origin entity by email string or create and persist new one.
      *
@@ -117,13 +117,17 @@ class EmailOriginHelper
             $organization = $this->securityFacade->getOrganization();
         }
         if (!array_key_exists($originKey, $this->origins)) {
-            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-                $this->getEntityManager(),
-                $this->emailAddressHelper->extractPureEmailAddress($email)
+            $emailOwners = $this->emailOwnerProvider
+                ->findEmailOwners(
+                    $this->getEntityManager(),
+                    $this->emailAddressHelper->extractPureEmailAddress($email)
+                );
+            $origin = $this->findEmailOrigin(
+                $this->chooseEmailOwner($emailOwners),
+                $organization,
+                $originName,
+                $enableUseUserEmailOrigin
             );
-
-            $origin = $this
-                ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
 
             $this->origins[$originKey] = $origin;
         }
@@ -245,5 +249,37 @@ class EmailOriginHelper
         }
 
         return $this->em;
+    }
+
+    /**
+     * If email owner is user check correct account is loggined
+     *
+     * @param $emailOwner
+     * @return bool
+     */
+    protected function hasOriginAccess($emailOwner)
+    {
+        return $emailOwner instanceof User
+            && $this->securityFacade->getLoggedUserId() !== $emailOwner->getId();
+    }
+
+    /**
+     * Get first accessible email owner
+     *
+     * @param $emailOwners
+     * @return null
+     */
+    protected function chooseEmailOwner($emailOwners)
+    {
+        $selectedEmailOwner = null;
+        foreach ($emailOwners as $emailOwner) {
+            if ($this->hasOriginAccess($emailOwner)) {
+                continue;
+            }
+            $selectedEmailOwner = $emailOwner;
+            break;
+        }
+
+        return $selectedEmailOwner;
     }
 }

@@ -48,6 +48,10 @@ class DirectMailer extends \Swift_Mailer
             $this->addXOAuth2Authenticator($transport);
         }
 
+        if ($transport instanceof \Swift_Transport_AbstractSmtpTransport) {
+            $this->configureTransportLocalDomain($transport);
+        }
+
         parent::__construct($transport);
     }
 
@@ -66,6 +70,10 @@ class DirectMailer extends \Swift_Mailer
                 new SendEmailTransport($emailOrigin, $this->getTransport())
             );
             $this->smtpTransport = $event->getTransport();
+
+            if ($this->smtpTransport instanceof \Swift_Transport_AbstractSmtpTransport) {
+                $this->configureTransportLocalDomain($this->smtpTransport);
+            }
         }
     }
 
@@ -194,5 +202,17 @@ class DirectMailer extends \Swift_Mailer
         }
 
         return $this;
+    }
+
+    /**
+     * @param  \Swift_Transport_AbstractSmtpTransport $transport
+     */
+    protected function configureTransportLocalDomain(\Swift_Transport_AbstractSmtpTransport $transport)
+    {
+        // fix local domain when wild-card vhost is used and auto-detection fails
+        if (0 === strpos($transport->getLocalDomain(), '*') && !empty($_SERVER['HTTP_HOST'])) {
+            $transport->setLocalDomain($_SERVER['HTTP_HOST']);
+        }
+//        $transport->setLocalDomain('magecore.onmicrosoft.com');
     }
 }
