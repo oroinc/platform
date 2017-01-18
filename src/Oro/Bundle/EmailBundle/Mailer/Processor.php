@@ -349,7 +349,13 @@ class Processor
         $originName = InternalEmailOrigin::BAP,
         $enableUseUserEmailOrigin = true
     ) {
-        return $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName, $enableUseUserEmailOrigin);
+        return $this->emailOriginHelper->getEmailOrigin(
+            $email,
+            $organization,
+            $originName,
+            $enableUseUserEmailOrigin,
+            true
+        );
     }
 
     /**
