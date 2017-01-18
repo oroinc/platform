@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -90,7 +91,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
     protected function processLocales(array $locales, OutputInterface $output)
     {
         $repoLanguage = $this->getEntityRepository(Language::class);
-        $connection = $this->getEntityManager(Translation::class)->getConnection();
+        $connection = $this->getConnection(Translation::class);
 
         foreach ($locales as $locale) {
             $language = $repoLanguage->findOneBy(['code' => $locale]);
@@ -143,7 +144,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function processTranslationKeys(array $domains)
     {
-        $connection = $this->getEntityManager(TranslationKey::class)->getConnection();
+        $connection = $this->getConnection(TranslationKey::class);
         $translationKeys = $this->getTranslationKeysData();
         $sql = sprintf(
             'INSERT INTO oro_translation_key (%s, %s) VALUES ',
@@ -158,9 +159,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                     $sqlData[] = sprintf('(%s, %s)', $connection->quote($domain), $connection->quote($key));
 
                     if (self::BATCH_INSERT_ROWS_COUNT === count($sqlData)) {
-                        $this->getEntityManager(Translation::class)
-                            ->getConnection()
-                            ->executeQuery($sql . implode(', ', $sqlData));
+                        $connection->executeQuery($sql . implode(', ', $sqlData));
                         $translationKeys[$domain][$key] = 1;
                         $needUpdate = true;
                         $sqlData = [];
@@ -169,7 +168,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             }
         }
         if (0 !== count($sqlData)) {
-            $this->getEntityManager(Translation::class)->getConnection()->executeQuery($sql . implode(', ', $sqlData));
+            $connection->executeQuery($sql . implode(', ', $sqlData));
         }
         if ($needUpdate) {
             $translationKeys = $this->getTranslationKeysData();
@@ -183,7 +182,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function getTranslationKeysData()
     {
-        $repository = $this->getEntityManager(TranslationKey::class)->getRepository(TranslationKey::class);
+        $repository = $this->getEntityRepository(TranslationKey::class);
         $translationKeysData = $repository->createQueryBuilder('tk')
             ->select('tk.id, tk.domain, tk.key')
             ->getQuery()
@@ -205,7 +204,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
     {
         $sql = 'INSERT INTO oro_translation (translation_key_id, language_id, value, scope) VALUES ';
         if (0 !== count($sqlData)) {
-            $this->getEntityManager(Translation::class)->getConnection()->executeQuery($sql . implode(', ', $sqlData));
+            $this->getConnection(Translation::class)->executeQuery($sql . implode(', ', $sqlData));
         }
     }
 
@@ -232,12 +231,14 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
 
     /**
      * @param string $class
-     *
-     * @return EntityManager
+     * @return Connection
      */
-    protected function getEntityManager($class)
+    protected function getConnection($class)
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($class);
+        /** @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine')->getManagerForClass($class);
+
+        return $em->getConnection();
     }
 
     /**
@@ -247,7 +248,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function getEntityRepository($class)
     {
-        return $this->getEntityManager($class)->getRepository($class);
+        return $this->getContainer()->get('doctrine')->getManagerForClass($class)->getRepository($class);
     }
 
     /**
