@@ -4,21 +4,23 @@ namespace Oro\Bundle\TranslationBundle\Command;
 
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class OroTranslationLoadCommand extends ContainerAwareCommand
 {
+    const BATCH_INSERT_ROWS_COUNT = 50;
+
     /**
      * {@inheritdoc}
      */
@@ -32,7 +34,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                 'l',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Languages to load.'
-            );
+            )->addOption('rebuild-cache', 'rc', InputOption::VALUE_OPTIONAL, 'Rebuild translation cache');
     }
 
     /**
@@ -60,29 +62,67 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         // disable DB loader to not get translations from database
         $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
 
-        /* @var $translationManager TranslationManager */
-        $translationManager = $this->getContainer()->get('oro_translation.manager.translation');
+        if ($input->getOption('rebuild-cache')) {
+            $this->getTranslator()->rebuildCache();
+        }
 
-        $translator = $this->getTranslator();
-///        $translator->rebuildCache();
         $start = time();
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine')->getManagerForClass(TranslationKey::class);
-        $repo = $em->getRepository(TranslationKey::class);
-        $connection = $em->getConnection();
-        $translationKeysData = $repo->createQueryBuilder('tk')
-            ->select('tk.id, tk.domain', 'tk.key')
+        $this->processLocales($locales, $output);
+        $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
+
+        // restore DB loader
+        $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
+
+        if ($input->getOption('rebuild-cache')) {
+            $output->write(sprintf('<info>Rebuilding cache ... </info>'));
+            $this->getTranslator()->rebuildCache();
+        }
+
+        $output->writeln(sprintf('<info>Done.</info>'));
+        echo time() - $start;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTranslationKeysData()
+    {
+        $repository = $this->getEntityManager(TranslationKey::class)->getRepository(TranslationKey::class);
+        $translationKeysData = $repository->createQueryBuilder('tk')
+            ->select('tk.id, tk.domain, tk.key')
             ->getQuery()
             ->getArrayResult();
         $translationKeys = [];
         foreach ($translationKeysData as $item) {
             $translationKeys[$item['domain']][$item['key']] = $item['id'];
         }
+
+        return $translationKeys;
+    }
+
+    /**
+     * @param array $locales
+     * @param OutputInterface $output
+     * @return array
+     */
+    protected function processLocales(array $locales, OutputInterface $output)
+    {
+        $repoLanguage = $this->getEntityRepository(Language::class);
+        $connection = $this->getEntityManager(Translation::class)->getConnection();
+
+        $translationKeys = $this->getTranslationKeysData();
+        $seqName = $connection->getDatabasePlatform() instanceof PostgreSqlPlatform
+            ? 'oro_translation_key_id_seq'
+            : null;
+
+        $sqlData = [];
         foreach ($locales as $locale) {
-            $language = $em->getRepository(Language::class)->findOneBy(['code' => $locale]);
-            $domains = $translator->getCatalogue($locale)->all();
+            $language = $repoLanguage->findOneBy(['code' => $locale]);
+            $domains = $this->getTranslator()->getCatalogue($locale)->all();
 
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($domains)));
+
+            $translations = $this->getTranslationsData($language->getId());
 
             foreach ($domains as $domain => $messages) {
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
@@ -91,49 +131,96 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                     if (!isset($translationKeys[$domain][$key])) {
                         $connection->insert('oro_translation_key', [
                             'domain' => $domain,
-                            'key' => $key,
+                            $connection->quoteIdentifier('key') => $key,
                         ]);
-                        $translationKeys[$domain][$key] =$connection->lastInsertId(
-                            $connection->getDatabasePlatform() instanceof PostgreSqlPlatform
-                                ? 'oro_translation_key_id_seq'
-                                : null
-                        );
+                        $translationKeys[$domain][$key] = $connection->lastInsertId($seqName);
                     }
-                    if (!$connection->update('oro_translation',
-                        ['value' => $value],
-                        [
-                            'translation_key_id' => $translationKeys[$domain][$key],
-                            'language_id' => $language->getId()
-                        ]
-                    )) {
-                        $connection->insert(
-                            'oro_translation',
-                            [
-                                'translation_key_id' => $translationKeys[$domain][$key],
-                                'language_id' => $language->getId(),
-                                'value' => $value,
-                                'scope' => Translation::SCOPE_SYSTEM,
-                            ]
-                        );
-                    }
-                    //$translationManager->saveTranslation($key, $value, $locale, $domain);
-                }
 
+                    if (isset($translations[$translationKeys[$domain][$key]])) {
+                        if ($translations[$translationKeys[$domain][$key]] === Translation::SCOPE_SYSTEM) {
+                            $connection->update(
+                                'oro_translation',
+                                ['value' => $value],
+                                [
+                                    'translation_key_id' => $translationKeys[$domain][$key],
+                                    'language_id' => $language->getId()
+                                ]
+                            );
+                        }
+                    } else {
+                        $sqlData[] = sprintf(
+                            '(%d, %d, %s, %s)',
+                            $translationKeys[$domain][$key],
+                            $language->getId(),
+                            $connection->quote($value),
+                            Translation::SCOPE_SYSTEM
+                        );
+
+                        if (self::BATCH_INSERT_ROWS_COUNT === count($sqlData)) {
+                            $this->executeBatchTranslationInsert($sqlData);
+                            $sqlData = [];
+                        }
+                    }
+                }
                 $output->writeln(sprintf('processed %d records.', count($messages)));
             }
         }
 
-        $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
+        $this->executeBatchTranslationInsert($sqlData);
+    }
 
-        $output->write(sprintf('<info>Rebuilding cache ... </info>'));
+    /**
+     * @param array $sqlData
 
-        // restore DB loader
-        $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
+     * @return array
+     */
+    protected function executeBatchTranslationInsert(array $sqlData)
+    {
+        $sql = 'INSERT INTO oro_translation (translation_key_id, language_id, value, scope) VALUES ';
+        if (0 !== count($sqlData)) {
+            $this->getEntityManager(Translation::class)->getConnection()->executeQuery($sql . implode(', ', $sqlData));
+        }
+    }
 
-        //$translator->rebuildCache();
+    /**
+     * @param int $languageId
+     * @return array
+     */
+    protected function getTranslationsData($languageId)
+    {
+        $translationsData = $this->getEntityRepository(Translation::class)
+            ->createQueryBuilder('t')
+            ->select('IDENTITY(t.translationKey) as translation_key_id, t.scope')
+            ->where('t.language = :language')
+            ->setParameters(['language' => $languageId])
+            ->getQuery()
+            ->getArrayResult();
+        $translations = [];
+        foreach ($translationsData as $item) {
+            $translations[$item['translation_key_id']] = $item['scope'];
+        }
 
-        $output->writeln(sprintf('<info>Done.</info>'));
-        echo time() - $start;
+        return $translations;
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return EntityManager
+     */
+    protected function getEntityManager($class)
+    {
+        return $this->getContainer()->get('doctrine')->getManagerForClass($class);
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return EntityRepository
+     */
+    protected function getEntityRepository($class)
+    {
+        return $this->getEntityManager($class)->getRepository($class);
     }
 
     /**
