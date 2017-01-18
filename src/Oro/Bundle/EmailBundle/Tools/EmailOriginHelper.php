@@ -139,6 +139,67 @@ class EmailOriginHelper
     }
 
     /**
+     * Get first accessible email owner
+     *
+     * @param EmailOwnerInterface[] $emailOwners
+     * @param bool $secured
+     *
+     * @return null
+     */
+    protected function chooseEmailOwner($emailOwners, $secured)
+    {
+        $selectedEmailOwner = null;
+        foreach ($emailOwners as $emailOwner) {
+            if ($secured && !$this->hasOriginAccess($emailOwner)) {
+                continue;
+            }
+            $selectedEmailOwner = $emailOwner;
+            break;
+        }
+
+        return $selectedEmailOwner;
+    }
+
+    /**
+     * Check on access to email owner data by logged in user
+     *
+     * @param EmailOwnerInterface $emailOwner
+     *
+     * @return bool
+     */
+    protected function hasOriginAccess($emailOwner)
+    {
+        $access = false;
+        if ($emailOwner instanceof User
+            && $this->securityFacade->getLoggedUserId() === $emailOwner->getId()) {
+            $access = true;
+        } elseif ($emailOwner instanceof Mailbox) {
+            $ownerIds = [];
+            $authorizedUsers = $emailOwner->getAuthorizedUsers();
+            foreach ($authorizedUsers as $user) {
+                $ownerIds[] = $user->getId();
+            }
+
+            $authorizedRoles = $emailOwner->getAuthorizedRoles();
+            foreach ($authorizedRoles as $role) {
+                $users = $this->getEntityManager()->getRepository('OroUserBundle:Role')
+                    ->getUserQueryBuilder($role)
+                    ->getQuery()->getResult();
+
+                foreach ($users as $user) {
+                    $ownerIds[] = $user->getId();
+                }
+            }
+
+            if (in_array($this->securityFacade->getLoggedUserId(), $ownerIds, true)) {
+                $access = true;
+            }
+        }
+
+        return $access;
+    }
+
+    /**
      * @param mixed $origin
      *
      * @return bool
@@ -252,66 +313,5 @@ class EmailOriginHelper
         }
 
         return $this->em;
-    }
-
-    /**
-     * Check on access to email owner data by logged in user
-     *
-     * @param EmailOwnerInterface $emailOwner
-     *
-     * @return bool
-     */
-    protected function hasOriginAccess($emailOwner)
-    {
-        $access = false;
-        if ($emailOwner instanceof User
-            && $this->securityFacade->getLoggedUserId() === $emailOwner->getId()) {
-            $access = true;
-        } elseif ($emailOwner instanceof Mailbox) {
-            $ownerIds = [];
-            $authorizedUsers = $emailOwner->getAuthorizedUsers();
-            foreach ($authorizedUsers as $user) {
-                $ownerIds[] = $user->getId();
-            }
-
-            $authorizedRoles = $emailOwner->getAuthorizedRoles();
-            foreach ($authorizedRoles as $role) {
-                $users = $this->getEntityManager()->getRepository('OroUserBundle:Role')
-                    ->getUserQueryBuilder($role)
-                    ->getQuery()->getResult();
-
-                foreach ($users as $user) {
-                    $ownerIds[] = $user->getId();
-                }
-            }
-
-            if (in_array($this->securityFacade->getLoggedUserId(), $ownerIds, true)) {
-                $access = true;
-            }
-        }
-
-        return $access;
-    }
-
-    /**
-     * Get first accessible email owner
-     *
-     * @param EmailOwnerInterface[] $emailOwners
-     * @param bool $secured
-     *
-     * @return null
-     */
-    protected function chooseEmailOwner($emailOwners, $secured)
-    {
-        $selectedEmailOwner = null;
-        foreach ($emailOwners as $emailOwner) {
-            if ($secured && !$this->hasOriginAccess($emailOwner)) {
-                continue;
-            }
-            $selectedEmailOwner = $emailOwner;
-            break;
-        }
-
-        return $selectedEmailOwner;
     }
 }
