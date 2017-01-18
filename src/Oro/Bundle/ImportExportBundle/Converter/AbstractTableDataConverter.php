@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\ImportExportBundle\Utils\ArrayUtil;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\FormatConversionEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
