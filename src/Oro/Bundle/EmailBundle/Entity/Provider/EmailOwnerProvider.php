@@ -44,6 +44,7 @@ class EmailOwnerProvider
 
         return $emailOwner;
     }
+
     /**
      * Find an entity objects which is an owner of the given email address
      *
