@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_13;
+namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -15,6 +15,6 @@ class OroEntityConfigBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_attribute_group');
-        $table->addColumn('is_visible', 'boolean', ['default' => '1']);
+        $table->changeColumn('code', ['notnull' => true]);
     }
 }
