@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\File;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 class FileSystemOperator
 {
     /**
@@ -39,7 +41,9 @@ class FileSystemOperator
             $cacheDirectory = rtrim($this->cacheDirectory, DIRECTORY_SEPARATOR);
             $temporaryDirectory = $cacheDirectory . DIRECTORY_SEPARATOR . $this->temporaryDirectoryName;
             if (!file_exists($temporaryDirectory) && !is_dir($temporaryDirectory)) {
-                mkdir($temporaryDirectory);
+                $fs = new Filesystem();
+                $fs->mkdir($temporaryDirectory, 0777);
+                $fs->chmod($temporaryDirectory, 0777);
             }
 
             if (!is_readable($temporaryDirectory)) {
