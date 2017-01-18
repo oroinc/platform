@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
@@ -103,6 +104,7 @@ class EmailOriginHelper
      * @param OrganizationInterface $organization
      * @param string                $originName
      * @param boolean               $enableUseUserEmailOrigin
+     * @param boolean               $secured Check origin can be used by current user
      *
      * @return EmailOrigin
      */
@@ -110,7 +112,8 @@ class EmailOriginHelper
         $email,
         OrganizationInterface $organization = null,
         $originName = InternalEmailOrigin::BAP,
-        $enableUseUserEmailOrigin = true
+        $enableUseUserEmailOrigin = true,
+        $secured = false
     ) {
         $originKey = $originName . $email . $enableUseUserEmailOrigin;
         if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
@@ -123,7 +126,7 @@ class EmailOriginHelper
                     $this->emailAddressHelper->extractPureEmailAddress($email)
                 );
             $origin = $this->findEmailOrigin(
-                $this->chooseEmailOwner($emailOwners),
+                $this->chooseEmailOwner($emailOwners, $secured),
                 $organization,
                 $originName,
                 $enableUseUserEmailOrigin
@@ -254,7 +257,8 @@ class EmailOriginHelper
     /**
      * If email owner is user check correct account is loggined
      *
-     * @param $emailOwner
+     * @param EmailOwnerInterface $emailOwner
+     *
      * @return bool
      */
     protected function hasOriginAccess($emailOwner)
@@ -266,14 +270,16 @@ class EmailOriginHelper
     /**
      * Get first accessible email owner
      *
-     * @param $emailOwners
+     * @param EmailOwnerInterface[] $emailOwners
+     * @param bool $secured
+     *
      * @return null
      */
-    protected function chooseEmailOwner($emailOwners)
+    protected function chooseEmailOwner($emailOwners, $secured)
     {
         $selectedEmailOwner = null;
         foreach ($emailOwners as $emailOwner) {
-            if ($this->hasOriginAccess($emailOwner)) {
+            if ($secured && $this->hasOriginAccess($emailOwner)) {
                 continue;
             }
             $selectedEmailOwner = $emailOwner;
