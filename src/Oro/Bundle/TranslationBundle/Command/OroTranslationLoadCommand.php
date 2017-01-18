@@ -6,6 +6,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -90,17 +92,19 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      */
     protected function processLocales(array $locales, OutputInterface $output)
     {
-        $repoLanguage = $this->getEntityRepository(Language::class);
+        $languageRepository = $this->getEntityRepository(Language::class);
+        /** @var TranslationRepository $repoTranslation */
+        $translationRepository = $this->getEntityRepository(Translation::class);
         $connection = $this->getConnection(Translation::class);
 
         foreach ($locales as $locale) {
-            $language = $repoLanguage->findOneBy(['code' => $locale]);
+            $language = $languageRepository->findOneBy(['code' => $locale]);
             $domains = $this->getTranslator()->getCatalogue($locale)->all();
 
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($domains)));
 
             $translationKeys = $this->processTranslationKeys($domains);
-            $translations = $this->getTranslationsData($language->getId());
+            $translations = $translationRepository->getTranslationsData($language->getId());
             $sqlData = [];
             foreach ($domains as $domain => $messages) {
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
@@ -145,7 +149,10 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
     protected function processTranslationKeys(array $domains)
     {
         $connection = $this->getConnection(TranslationKey::class);
-        $translationKeys = $this->getTranslationKeysData();
+        /** @var TranslationKeyRepository $translationKeyRepository */
+        $translationKeyRepository = $this->getEntityRepository(TranslationKey::class);
+
+        $translationKeys = $translationKeyRepository->getTranslationKeysData();
         $sql = sprintf(
             'INSERT INTO oro_translation_key (%s, %s) VALUES ',
             $connection->quoteIdentifier('domain'),
@@ -171,29 +178,13 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             $connection->executeQuery($sql . implode(', ', $sqlData));
         }
         if ($needUpdate) {
-            $translationKeys = $this->getTranslationKeysData();
+            $translationKeys = $translationKeyRepository->getTranslationKeysData();
         }
 
         return $translationKeys;
     }
 
-    /**
-     * @return array
-     */
-    protected function getTranslationKeysData()
-    {
-        $repository = $this->getEntityRepository(TranslationKey::class);
-        $translationKeysData = $repository->createQueryBuilder('tk')
-            ->select('tk.id, tk.domain, tk.key')
-            ->getQuery()
-            ->getArrayResult();
-        $translationKeys = [];
-        foreach ($translationKeysData as $item) {
-            $translationKeys[$item['domain']][$item['key']] = $item['id'];
-        }
 
-        return $translationKeys;
-    }
 
     /**
      * @param array $sqlData
@@ -206,27 +197,6 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         if (0 !== count($sqlData)) {
             $this->getConnection(Translation::class)->executeQuery($sql . implode(', ', $sqlData));
         }
-    }
-
-    /**
-     * @param int $languageId
-     * @return array
-     */
-    protected function getTranslationsData($languageId)
-    {
-        $translationsData = $this->getEntityRepository(Translation::class)
-            ->createQueryBuilder('t')
-            ->select('IDENTITY(t.translationKey) as translation_key_id, t.scope')
-            ->where('t.language = :language')
-            ->setParameters(['language' => $languageId])
-            ->getQuery()
-            ->getArrayResult();
-        $translations = [];
-        foreach ($translationsData as $item) {
-            $translations[$item['translation_key_id']] = $item['scope'];
-        }
-
-        return $translations;
     }
 
     /**
