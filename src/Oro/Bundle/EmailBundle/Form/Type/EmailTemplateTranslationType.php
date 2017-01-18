@@ -53,13 +53,13 @@ class EmailTemplateTranslationType extends AbstractType
                 'subject_options'      => [],
                 'fields'               => function (Options $options) use ($isWysiwygEnabled) {
                     return [
-                        'subject' => array_merge(
+                        'subject' => array_merge_recursive(
                             [
                                 'field_type' => 'text'
                             ],
                             $options->get('subject_options')
                         ),
-                        'content' => array_merge(
+                        'content' => array_merge_recursive(
                             [
                                 'field_type'      => 'oro_email_template_rich_text',
                                 'attr'            => [
