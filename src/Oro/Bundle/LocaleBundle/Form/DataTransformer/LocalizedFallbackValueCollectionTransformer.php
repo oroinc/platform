@@ -79,7 +79,9 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
             }
 
             $result[LocalizedFallbackValueCollectionType::FIELD_VALUES][$key ?: null] = $value;
-            $result[LocalizedFallbackValueCollectionType::FIELD_IDS][$key] = $localizedFallbackValue->getId();
+            if ($localizedFallbackValue->getId()) {
+                $result[LocalizedFallbackValueCollectionType::FIELD_IDS][$key] = $localizedFallbackValue->getId();
+            }
         }
 
         return $result;

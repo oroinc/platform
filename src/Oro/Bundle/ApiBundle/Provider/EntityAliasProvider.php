@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
 
-class EntityAliasProvider implements EntityAliasProviderInterface
+class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface
 {
     /** @var array */
     protected $entityAliases;
@@ -39,5 +40,13 @@ class EntityAliasProvider implements EntityAliasProviderInterface
             $this->entityAliases[$entityClass]['alias'],
             $this->entityAliases[$entityClass]['plural_alias']
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClassNames()
+    {
+        return array_keys($this->entityAliases);
     }
 }

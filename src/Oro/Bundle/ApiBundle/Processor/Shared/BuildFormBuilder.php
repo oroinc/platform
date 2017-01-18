@@ -8,8 +8,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
@@ -80,18 +80,9 @@ class BuildFormBuilder implements ProcessorInterface
      */
     protected function getFormOptions(FormContext $context, EntityDefinitionConfig $config)
     {
-        $options = $config->getFormOptions();
-        if (null === $options) {
-            $options = [];
-        }
+        $options = array_merge(FormUtil::getFormDefaultOptions(), $config->getFormOptions() ?: []);
         if (!array_key_exists('data_class', $options)) {
             $options['data_class'] = $context->getClassName();
-        }
-        if (!array_key_exists('validation_groups', $options)) {
-            $options['validation_groups'] = ['Default', 'api'];
-        }
-        if (!array_key_exists('extra_fields_message', $options)) {
-            $options['extra_fields_message'] = 'This form should not contain extra fields: "{{ extra_fields }}"';
         }
         $options[CustomizeFormDataExtension::API_CONTEXT] = $context;
 
@@ -114,7 +105,7 @@ class BuildFormBuilder implements ProcessorInterface
             $formBuilder->add(
                 $name,
                 $fieldConfig->getFormType(),
-                $this->getFormFieldOptions($fieldConfig, $name, $field->getPropertyPath())
+                FormUtil::getFormFieldOptions($field, $fieldConfig)
             );
         }
         $associations = $metadata->getAssociations();
@@ -124,33 +115,8 @@ class BuildFormBuilder implements ProcessorInterface
             $formBuilder->add(
                 $name,
                 $fieldConfig->getFormType(),
-                $this->getFormFieldOptions($fieldConfig, $name, $association->getPropertyPath())
+                FormUtil::getFormFieldOptions($association, $fieldConfig)
             );
         }
-    }
-
-    /**
-     * @param EntityDefinitionFieldConfig $fieldConfig
-     * @param string                      $fieldName
-     * @param string|null                 $propertyPath
-     *
-     * @return array
-     */
-    protected function getFormFieldOptions(
-        EntityDefinitionFieldConfig $fieldConfig,
-        $fieldName,
-        $propertyPath
-    ) {
-        $options = $fieldConfig->getFormOptions();
-        if (null === $options) {
-            $options = [];
-        }
-        if (!$propertyPath) {
-            $options['mapped'] = false;
-        } elseif ($propertyPath !== $fieldName) {
-            $options['property_path'] = $propertyPath;
-        }
-
-        return $options;
     }
 }

@@ -8,16 +8,12 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-
 use Oro\Bundle\UserBundle\Entity\User;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
@@ -103,52 +99,35 @@ class OwnerUserGridListener
      */
     protected function applyACL(DatagridConfiguration $config, $accessLevel, User $user, Organization $organization)
     {
-        $where = $config->offsetGetByPath('[source][query][where][and]', []);
+        $query = $config->getOrmQuery();
         /** todo: refactor this check usages */
-        if ($accessLevel == AccessLevel::BASIC_LEVEL) {
-            $where = array_merge(
-                $where,
-                ['u.id = ' . $user->getId()]
-            );
-        } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
-            $leftJoins   = $config->offsetGetByPath('[source][query][join][inner]', []);
-            $leftJoins[] = ['join' => 'u.organizations', 'alias' => 'org'];
-            $config->offsetSetByPath('[source][query][join][inner]', $leftJoins);
-
-            $where = array_merge(
-                $where,
-                ['org.id in (' . $organization->getId() . ')']
-            );
-        } elseif ($accessLevel !== AccessLevel::SYSTEM_LEVEL) {
+        if (AccessLevel::BASIC_LEVEL === $accessLevel) {
+            $query->addAndWhere('u.id = ' . $user->getId());
+        } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
+            $query->addInnerJoin('u.organizations', 'org');
+            $query->addAndWhere('org.id in (' . $organization->getId() . ')');
+        } elseif (AccessLevel::SYSTEM_LEVEL !== $accessLevel) {
             $resultBuIds = [];
-            if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
+            if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
                 $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()
                 );
-            } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
+            } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
                 $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()
                 );
             }
 
-            $leftJoins   = $config->offsetGetByPath('[source][query][join][inner]', []);
-            $leftJoins[] = ['join' => 'u.businessUnits', 'alias' => 'bu'];
-            $config->offsetSetByPath('[source][query][join][inner]', $leftJoins);
+            $query->addInnerJoin('u.businessUnits', 'bu');
 
             if ($resultBuIds) {
-                $where = array_merge(
-                    $where,
-                    ['bu.id in (' . implode(', ', $resultBuIds) . ')']
-                );
+                $query->addAndWhere('bu.id in (' . implode(', ', $resultBuIds) . ')');
             } else {
                 // There are no records to show, make query to return empty result
-                $where = array_merge($where, ['1 = 0']);
+                $query->addAndWhere('1 = 0');
             }
-        }
-        if (count($where)) {
-            $config->offsetSetByPath('[source][query][where][and]', $where);
         }
     }
 

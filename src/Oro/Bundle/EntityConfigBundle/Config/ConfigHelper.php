@@ -140,14 +140,18 @@ class ConfigHelper
                 $fieldType = $fieldTypeParts[0];
                 $fieldOptions['enum']['enum_code'] = $fieldTypeParts[1];
             } else {
-                $firstPartItems = explode('|', $fieldTypeParts[0]);
-                if (count($firstPartItems) === 4) {
+                $relationType = ExtendHelper::getRelationType($fieldTypeParts[0]);
+                if ($relationType) {
                     // reverse relation
-                    $fieldType = ExtendHelper::getReverseRelationType($firstPartItems[0]);
+                    $fieldType = ExtendHelper::getReverseRelationType($relationType);
                     $relationKey = $fieldTypeParts[0];
                     $fieldOptions['extend']['relation_key'] = $relationKey;
                     $relations = $extendEntityConfig->get('relation');
                     $fieldOptions['extend']['target_entity'] = $relations[$relationKey]['target_entity'];
+                } else {
+                    throw new \InvalidArgumentException(
+                        sprintf('The field type "%s" is not supported.', $fieldType)
+                    );
                 }
             }
         }

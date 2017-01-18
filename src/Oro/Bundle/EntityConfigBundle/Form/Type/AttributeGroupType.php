@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -56,6 +57,14 @@ class AttributeGroupType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'isVisible',
+            CheckboxType::class,
+            [
+                'label' => 'oro.entity_config.attribute_group.is_visible.label'
+            ]
+        );
+
         $builder->add( //This needed for new forms which will be dynamically added
             'attributeRelations',
             AttributeMultiSelectType::NAME,
@@ -64,7 +73,7 @@ class AttributeGroupType extends AbstractType
                 'configs' => [
                     'component' => 'attribute-autocomplete',
                 ],
-                'attributeEntityClass' => $options['attributeEntityClass']
+                'attributeEntityClass' => $options['attributeEntityClass'],
             ]
         );
 

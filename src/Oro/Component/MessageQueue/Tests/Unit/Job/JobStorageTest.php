@@ -231,7 +231,6 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(DuplicateJobException::class);
         $this->expectExceptionMessage('Duplicate job. ownerId:"owner-id", name:"job-name"');
-
         $storage->saveJob($job);
     }
 
@@ -265,9 +264,7 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
         $storage = new JobStorage($doctrine, 'entity-class', 'unique_table');
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'Is not possible to create new job with lock, only update is allowed'
-        );
+        $this->expectExceptionMessage('Is not possible to create new job with lock, only update is allowed');
 
         $storage->saveJob($job, function () {
         });

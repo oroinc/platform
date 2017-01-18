@@ -71,6 +71,10 @@
         &:hover {
             color: get-color('additional', 'dark');
         }
+
+        &--active {
+            font-weight: bold;
+        }
     }
 
     &__currency,

@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
-    './empty-filter'
-], function($, _, __, EmptyFilter) {
+    './empty-filter',
+    'oroui/js/tools'
+], function($, _, __, EmptyFilter, tools) {
     'use strict';
 
     var TextFilter;
@@ -72,6 +73,10 @@ define([
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter'
+        },
+
+        listen: {
+            'layout:reposition mediator': '_onLayoutReposition'
         },
 
         /**
@@ -156,6 +161,12 @@ define([
             }
         },
 
+        _onLayoutReposition: function() {
+            if (this.popupCriteriaShowed) {
+                this._alignCriteria();
+            }
+        },
+
         /**
          * @protected
          */
@@ -217,14 +228,19 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            var $container = this._findDropdownFitContainer();
-            if ($container === null) {
+            if (tools.isMobile()) {
+                // no need to align criteria on mobile version, it is aligned over CSS
+                return;
+            }
+            var $container = this.$el.closest('.filter-box');
+            if (!$container.length) {
                 return;
             }
             var $dropdown = this.$(this.criteriaSelector);
+            $dropdown.css('margin-left', 'auto');
             var rect = $dropdown.get(0).getBoundingClientRect();
             var containerRect = $container.get(0).getBoundingClientRect();
-            var shift = rect.right - (containerRect.left + $container.prop('clientWidth'));
+            var shift = rect.right - containerRect.right;
             if (shift > 0) {
                 /**
                  * reduce shift to avoid overlaping left edge of container

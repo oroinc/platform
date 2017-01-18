@@ -7,17 +7,17 @@ layout:
     actions: []
     imports:
         -
-            id: 'account_user_role_form_actions'
+            id: 'customer_user_role_form_actions'
 ```
 or just
 ```yaml
 layout:
     actions: []
     imports:
-        - 'account_user_role_form_actions'
+        - 'customer_user_role_form_actions'
 ```
-In this example 'account_user_role_form_actions' is the name of the folder in layouts/{theme_name}/imports and the unique import identifier.
-It means, that all layout updates will be loaded from layouts/{theme_name}/imports/account_user_role_form_actions folder on import statement.
+In this example 'customer_user_role_form_actions' is the name of the folder in layouts/{theme_name}/imports and the unique import identifier.
+It means, that all layout updates will be loaded from layouts/{theme_name}/imports/customer_user_role_form_actions folder on import statement.
 As result all actions will be executed if condition (if exists) of imported layout update is true. In this case you don't need any special syntax in layout updates.
 
 To import same layout update repeatedly, provide unique ids for all layout blocks using the following special syntax:
@@ -54,7 +54,7 @@ Double underscore means namespace can be provided for this blocks. Namespace sho
 ```yaml
 imports:
     -
-        id: 'account_user_role_form_actions'
+        id: 'customer_user_role_form_actions'
         root: 'form_fields_container'
         namespace: 'form_fields'
 ```
@@ -71,10 +71,10 @@ tree:
 When you provide a block theme for imported layout update, the end identifier is not known. To state it, use special syntax for the block name in the template ```__{unique import identifier}{import block id before namespace added}_widget```
 
 ```twig
-{% block __account_user_role_form_actions__update_widget %}
+{% block __customer_user_role_form_actions__update_widget %}
 {% endblock %}
 
-{% block __account_user_role_form_actions__root_widget %}
+{% block __customer_user_role_form_actions__root_widget %}
 {% endblock %}
 ```
 

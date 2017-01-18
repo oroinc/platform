@@ -134,8 +134,13 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
                         'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
                     ]
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't2.amount'],
+                    'c2' => ['data_name' => 't3.iso2Code']
+                ]
             ]
-
         ];
 
         $this->assertEquals($expected, $result);

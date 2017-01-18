@@ -276,4 +276,20 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
 
         $this->assertEquals($entity, $transformer->reverseTransform($value));
     }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage An "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" entity with "array(primary = 1)" identifier cannot be loaded.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity()
+    {
+        $metadata = $this->getAssociationMetadata([Group::class]);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+
+        $value = ['class' => Group::class, 'id' => ['primary' => 1]];
+
+        $transformer->reverseTransform($value);
+    }
 }

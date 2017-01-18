@@ -116,6 +116,7 @@ services:
             - '@oro_security.security_facade'
             - '@oro_datagrid.helper.route'
             - '@request_stack'
+            - '@logger'
         tags:
             - { name: twig.extension }
 
@@ -299,7 +300,7 @@ services:
         class: %oro_datagrid.datagrid.board.processor.default.class%
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_datagrid.choice.helper'
         tags:
           - { name: oro_datagrid.board_processor }
@@ -309,7 +310,7 @@ services:
         arguments:
             - "@oro_workflow.registry"
             - '@oro_ui.user_agent_provider'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
 
     oro_datagrid.choice.helper:
         class: %oro_datagrid.choice.helper.class%
