@@ -213,6 +213,5 @@ class DirectMailer extends \Swift_Mailer
         if (0 === strpos($transport->getLocalDomain(), '*') && !empty($_SERVER['HTTP_HOST'])) {
             $transport->setLocalDomain($_SERVER['HTTP_HOST']);
         }
-//        $transport->setLocalDomain('magecore.onmicrosoft.com');
     }
 }
