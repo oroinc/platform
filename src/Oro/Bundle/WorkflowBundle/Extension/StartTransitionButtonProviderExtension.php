@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Extension;
 
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 
@@ -14,7 +13,7 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
-class StartTransitionButtonProviderExtension extends AbstractButtonProviderExtension
+class StartTransitionButtonProviderExtension extends AbstractStartTransitionButtonProviderExtension
 {
     /**
      * {@inheritdoc}
@@ -45,14 +44,6 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
         }
 
         return $isAvailable;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(ButtonInterface $button)
-    {
-        return $button instanceof StartTransitionButton && $button->getTransition()->isStart();
     }
 
     /**
@@ -92,28 +83,6 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getActiveWorkflows()
-    {
-        $exclusiveGroups = [];
-
-        return parent::getActiveWorkflows()->filter(
-            function (Workflow $workflow) use (&$exclusiveGroups) {
-                $currentGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
-
-                if (array_intersect($exclusiveGroups, $currentGroups)) {
-                    return false;
-                }
-
-                $exclusiveGroups = array_merge($exclusiveGroups, $currentGroups);
-
-                return true;
-            }
-        );
-    }
-
-    /**
      * @param $value
      * @param array|null $data
      *
@@ -122,16 +91,5 @@ class StartTransitionButtonProviderExtension extends AbstractButtonProviderExten
     private function getNodeInitTransitions($value, array $data = null)
     {
         return ($data && array_key_exists($value, $data)) ? $data[$value] : [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createTransitionButton(
-        Transition $transition,
-        Workflow $workflow,
-        ButtonContext $buttonContext
-    ) {
-        return new StartTransitionButton($transition, $workflow, $buttonContext);
     }
 }
