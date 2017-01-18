@@ -3,6 +3,8 @@
 namespace Oro\Component\Action\Condition;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 use Oro\Component\Action\Exception\ExtendableEventNameMissingException;
@@ -12,6 +14,8 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 class ExtendableCondition extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
+
+    const DEFAULT_MESSAGE_TYPE = 'error';
 
     const NAME = 'extendable';
 
@@ -26,11 +30,38 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     protected $subscribedEvents = [];
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
+     * @var FlashBag
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
-    {
+    protected $flashBag;
+
+    /**
+     * @var FlashBag
+     */
+    protected $translator;
+
+    /**
+     * @var bool
+     */
+    private $showErrors;
+
+    /**
+     * @var string
+     */
+    private $messageType;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param FlashBag $flashBag
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        FlashBag $flashBag,
+        TranslatorInterface $translator
+    ) {
         $this->eventDispatcher = $eventDispatcher;
+        $this->flashBag = $flashBag;
+        $this->translator = $translator;
     }
 
     /**
@@ -47,7 +78,13 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             $this->eventDispatcher->dispatch($eventName, $event);
         }
 
-        return false == $event->hasErrors();
+        if ($event->hasErrors()) {
+            $this->processErrors($event);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -74,5 +111,28 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             );
         }
         $this->subscribedEvents = $options['events'];
+        $this->showErrors = $options['showErrors'];
+        $this->messageType = array_key_exists('messageType', $options)
+            ? $options['messageType']
+            : self::DEFAULT_MESSAGE_TYPE;
+    }
+
+    /**
+     * @param ExtendableConditionEvent $event
+     */
+    protected function processErrors(ExtendableConditionEvent $event)
+    {
+        $errors = [];
+        foreach ($event->getErrors() as $error) {
+            $errors[] = $this->translator->trans($error['message']);
+        }
+
+        if ($this->contextAccessor->getValue($event->getContext(), $this->showErrors)) {
+            foreach ($errors as $error) {
+                $this->flashBag->add($this->messageType, $error);
+            }
+        } else {
+            $event->getContext()->offsetSet('errors', $errors);
+        }
     }
 }
