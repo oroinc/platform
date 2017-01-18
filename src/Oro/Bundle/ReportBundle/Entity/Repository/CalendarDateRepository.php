@@ -16,12 +16,9 @@ class CalendarDateRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('d')->orderBy('d.date', 'DESC')->setMaxResults(1);
         if ($date) {
-            $from = new \DateTime($date->format("Y-m-d") . " 00:00:01");
-            $to   = new \DateTime($date->format("Y-m-d") . " 23:59:59");
             $qb
-                ->andWhere($qb->expr()->between('d.date', ':from', ':to'))
-                ->setParameter('from', $from)
-                ->setParameter('to', $to);
+                ->where($qb->expr()->eq('CAST(d.date as date)', 'CAST(:date as date)'))
+                ->setParameter('date', $date);
         }
 
         return $qb->getQuery()->getOneOrNullResult();

@@ -44,22 +44,15 @@ class CalendarDateManager
      */
     protected function getDatesFromInterval($append = false)
     {
+        $startDate = new \DateTime();
+        $startDate->setDate($startDate->format('Y'), 1, 1);
+        $startDate->setTime(0, 0, 0);
+
         if ($append) {
-            $startDate = $this->getLastDate();
+            $startDate = $this->getLastDate() ?: $startDate;
         }
 
-        if (empty($startDate)) {
-            $startDate = new \DateTime();
-            $startDate->setDate($startDate->format('Y'), 1, 1);
-            $startDate->setTime(0, 0, 0);
-        }
-
-        $period = new \DatePeriod(
-            $startDate,
-            new \DateInterval('P1D'),
-            new \DateTime('tomorrow + 1day'),
-            \DatePeriod::EXCLUDE_START_DATE
-        );
+        $period = new \DatePeriod($startDate, new \DateInterval('P1D'), new \DateTime('tomorrow'));
 
         return $period;
     }

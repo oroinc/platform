@@ -26,10 +26,16 @@ class CalendarDateRepositoryTest extends WebTestCase
 
     public function testGetDateWithExistingArgument()
     {
-        $fistDate = $this->getFirstCalendarDate()->getDate();
+        $firstDate = $this->getFirstCalendarDate()->getDate();
+        $lastDate = $this->getLastCalendarDate()->getDate();
+
         /** @var CalendarDate $calendarDate */
-        $calendarDate = $this->getRepository()->getDate($fistDate);
-        $this->assertEquals($fistDate->format('Y-m-d'), $calendarDate->getDate()->format('Y-m-d'));
+        $calendarDate = $this->getRepository()->getDate($firstDate);
+        $this->assertEquals($firstDate->format('Y-m-d'), $calendarDate->getDate()->format('Y-m-d'));
+
+        /** @var CalendarDate $calendarDate */
+        $calendarDate = $this->getRepository()->getDate($lastDate);
+        $this->assertEquals($lastDate->format('Y-m-d'), $calendarDate->getDate()->format('Y-m-d'));
     }
 
     public function testGetDateWithNotExistingArgument()

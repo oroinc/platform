@@ -14,11 +14,11 @@ class DateGroupingFilter extends ChoiceFilter
     const COLUMN_NAME_SUFFIX = 'DateGroupingFilter';
     const CALENDAR_TABLE = 'calendarDate';
     const CALENDAR_COLUMN = 'date';
-    const FIRST_CALENDAR_TABLE_FOR_GROUPING = 'cd1';
-    const SECOND_CALENDAR_TABLE_FOR_GROUPING = 'cd2';
+    const FIRST_CALENDAR_TABLE_FOR_GROUPING = 'calendarDate1';
+    const SECOND_CALENDAR_TABLE_FOR_GROUPING = 'calendarDate2';
     const CALENDAR_COLUMN_FOR_GROUPING = 'date';
-    const FIRST_JOINED_TABLE = 'oo1';
-    const SECOND_JOINED_TABLE = 'oo2';
+    const FIRST_JOINED_TABLE = 'order1';
+    const SECOND_JOINED_TABLE = 'order2';
     const JOINED_COLUMN = 'createdAt';
     const TARGET_COLUMN = 'date';
 

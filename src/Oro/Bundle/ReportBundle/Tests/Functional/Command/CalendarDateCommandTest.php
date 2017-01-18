@@ -32,8 +32,9 @@ class CalendarDateCommandTest extends WebTestCase
         $manager->flush();
 
         $this->runCommand(CalendarDateCommand::COMMAND_NAME);
-        $this->assertNotEmpty($repository->findAll());
-        $this->assertCalendarDates($repository->findAll());
+        $results = $repository->findAll();
+        $this->assertNotEmpty($results);
+        $this->assertCalendarDates($results);
     }
 
     /**

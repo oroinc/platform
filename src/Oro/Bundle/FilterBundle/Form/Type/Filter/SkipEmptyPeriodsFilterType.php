@@ -48,6 +48,9 @@ class SkipEmptyPeriodsFilterType extends AbstractChoiceType
         );
     }
 
+    /**
+     * @return array
+     */
     protected function getGroupChoices()
     {
         return [
