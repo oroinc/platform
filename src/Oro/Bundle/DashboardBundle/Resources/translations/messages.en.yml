@@ -48,7 +48,7 @@ oro:
             dashboards_tab:
                 label: Dashboards
             dashboards_list:
-                label: Manage dashboards
+                label: Manage Dashboards
 
         label: Label
         owner: Owner
