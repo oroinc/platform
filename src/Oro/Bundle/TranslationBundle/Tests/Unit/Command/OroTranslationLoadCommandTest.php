@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -63,6 +65,11 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->translationLoader = new EmptyArrayLoader();
 
+        $entityRepository = $this->createMock(EntityRepository::class);
+
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityRepository);
+
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
@@ -71,6 +78,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 ['oro_translation.provider.language', 1, $this->languageProvider],
                 ['oro_translation.manager.translation', 1, $this->translationManager],
                 ['oro_translation.database_translation.loader', 1, $this->translationLoader],
+                ['doctrine', 1, $managerRegistry],
             ]));
 
         $this->input = $this->createMock(InputInterface::class);
@@ -102,11 +110,13 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->command->getDescription());
         $this->assertNotEmpty($this->command->getName());
         $this->assertTrue($this->command->getDefinition()->hasOption('languages'));
+        $this->assertTrue($this->command->getDefinition()->hasOption('rebuild-cache'));
     }
 
     public function testExecute()
     {
-        $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn([]);
+        $this->input->expects($this->at(0))->method('getOption')->with('languages')->willReturn([]);
+        $this->input->expects($this->at(1))->method('getOption')->with('rebuild-cache')->willReturn(1);
 
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguages')
@@ -165,7 +175,9 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteWithLanguage()
     {
-        $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn(['locale1']);
+        $this->input->expects($this->at(0))->method('getOption')->with('languages')->willReturn(['locale1']);
+        $this->input->expects($this->at(1))->method('getOption')->with('rebuild-cache')->willReturn(0);
+
 
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguages')
