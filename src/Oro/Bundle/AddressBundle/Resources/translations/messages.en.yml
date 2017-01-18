@@ -54,6 +54,8 @@ oro:
             entity_plural_label:  Countries
             entity_description:   Represent address country
             regions.label:        States
+            regions_code.label:   State codes
+            regions_name.label:   State names
             name.label:           Name
             iso3_code.label:      ISO3 code
             iso2_code.label:      ISO2 code
