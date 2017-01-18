@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -83,24 +83,6 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return array
-     */
-    protected function getTranslationKeysData()
-    {
-        $repository = $this->getEntityManager(TranslationKey::class)->getRepository(TranslationKey::class);
-        $translationKeysData = $repository->createQueryBuilder('tk')
-            ->select('tk.id, tk.domain, tk.key')
-            ->getQuery()
-            ->getArrayResult();
-        $translationKeys = [];
-        foreach ($translationKeysData as $item) {
-            $translationKeys[$item['domain']][$item['key']] = $item['id'];
-        }
-
-        return $translationKeys;
-    }
-
-    /**
      * @param array $locales
      * @param OutputInterface $output
      * @return array
@@ -110,32 +92,18 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         $repoLanguage = $this->getEntityRepository(Language::class);
         $connection = $this->getEntityManager(Translation::class)->getConnection();
 
-        $translationKeys = $this->getTranslationKeysData();
-        $seqName = $connection->getDatabasePlatform() instanceof PostgreSqlPlatform
-            ? 'oro_translation_key_id_seq'
-            : null;
-
-        $sqlData = [];
         foreach ($locales as $locale) {
             $language = $repoLanguage->findOneBy(['code' => $locale]);
             $domains = $this->getTranslator()->getCatalogue($locale)->all();
 
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($domains)));
 
+            $translationKeys = $this->processTranslationKeys($domains);
             $translations = $this->getTranslationsData($language->getId());
-
+            $sqlData = [];
             foreach ($domains as $domain => $messages) {
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
-
                 foreach ($messages as $key => $value) {
-                    if (!isset($translationKeys[$domain][$key])) {
-                        $connection->insert('oro_translation_key', [
-                            'domain' => $domain,
-                            $connection->quoteIdentifier('key') => $key,
-                        ]);
-                        $translationKeys[$domain][$key] = $connection->lastInsertId($seqName);
-                    }
-
                     if (isset($translations[$translationKeys[$domain][$key]])) {
                         if ($translations[$translationKeys[$domain][$key]] === Translation::SCOPE_SYSTEM) {
                             $connection->update(
@@ -164,9 +132,68 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                 }
                 $output->writeln(sprintf('processed %d records.', count($messages)));
             }
+            $this->executeBatchTranslationInsert($sqlData);
+        }
+    }
+
+    /**
+     * @param array $domains
+     *
+     * @return array
+     */
+    protected function processTranslationKeys(array $domains)
+    {
+        $connection = $this->getEntityManager(TranslationKey::class)->getConnection();
+        $translationKeys = $this->getTranslationKeysData();
+        $sql = sprintf(
+            'INSERT INTO oro_translation_key (%s, %s) VALUES ',
+            $connection->quoteIdentifier('domain'),
+            $connection->quoteIdentifier('key')
+        );
+        $sqlData = [];
+        $needUpdate = false;
+        foreach ($domains as $domain => $messages) {
+            foreach ($messages as $key => $value) {
+                if (!isset($translationKeys[$domain][$key])) {
+                    $sqlData[] = sprintf('(%s, %s)', $connection->quote($domain), $connection->quote($key));
+
+                    if (self::BATCH_INSERT_ROWS_COUNT === count($sqlData)) {
+                        $this->getEntityManager(Translation::class)
+                            ->getConnection()
+                            ->executeQuery($sql . implode(', ', $sqlData));
+                        $translationKeys[$domain][$key] = 1;
+                        $needUpdate = true;
+                        $sqlData = [];
+                    }
+                }
+            }
+        }
+        if (0 !== count($sqlData)) {
+            $this->getEntityManager(Translation::class)->getConnection()->executeQuery($sql . implode(', ', $sqlData));
+        }
+        if ($needUpdate) {
+            $translationKeys = $this->getTranslationKeysData();
         }
 
-        $this->executeBatchTranslationInsert($sqlData);
+        return $translationKeys;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getTranslationKeysData()
+    {
+        $repository = $this->getEntityManager(TranslationKey::class)->getRepository(TranslationKey::class);
+        $translationKeysData = $repository->createQueryBuilder('tk')
+            ->select('tk.id, tk.domain, tk.key')
+            ->getQuery()
+            ->getArrayResult();
+        $translationKeys = [];
+        foreach ($translationKeysData as $item) {
+            $translationKeys[$item['domain']][$item['key']] = $item['id'];
+        }
+
+        return $translationKeys;
     }
 
     /**
