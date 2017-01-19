@@ -6,9 +6,12 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
+use Oro\Bundle\EntityConfigBundle\Event\BeforeRemoveFieldEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -26,22 +29,28 @@ class RemoveRestoreConfigFieldHandler
     /** @var Session */
     private $session;
 
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
+
     /**
      * @param ConfigManager $configManager
      * @param FieldNameValidationHelper $validationHelper
      * @param ConfigHelper $configHelper
      * @param Session $session
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         ConfigManager $configManager,
         FieldNameValidationHelper $validationHelper,
         ConfigHelper $configHelper,
-        Session $session
+        Session $session,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->configManager = $configManager;
         $this->validationHelper = $validationHelper;
         $this->configHelper = $configHelper;
         $this->session = $session;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -51,6 +60,17 @@ class RemoveRestoreConfigFieldHandler
      */
     public function handleRemove(FieldConfigModel $field, $successMessage)
     {
+        $event = new BeforeRemoveFieldEvent($field->getEntity()->getClassName(), $field->getFieldName());
+        $this->eventDispatcher->dispatch(Events::BEFORE_REMOVE_FIELD, $event);
+
+        if ($event->hasErrors()) {
+            $validationMessage = $event->getValidationMessage();
+
+            $this->session->getFlashBag()->add('error', $validationMessage);
+
+            return new JsonResponse(['message' => $validationMessage, 'successful' => false], JsonResponse::HTTP_OK);
+        }
+
         $fields = $this->configHelper->filterEntityConfigByField(
             $field,
             'extend',
