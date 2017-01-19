@@ -20,7 +20,7 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-class OroTranslationLoadCommand extends ContainerAwareCommand
+final class OroTranslationLoadCommand extends ContainerAwareCommand
 {
     const BATCH_INSERT_ROWS_COUNT = 50;
 
@@ -69,8 +69,16 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             $this->getTranslator()->rebuildCache();
         }
 
-        $this->processLocales($locales, $output);
-        $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
+        $connection = $this->getConnection(Translation::class);
+        $connection->beginTransaction();
+        try {
+            $this->processLocales($locales, $output);
+            $connection->commit();
+            $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
+        } catch (\Exception $e) {
+            $connection->rollBack();
+            throw $e;
+        }
 
         // restore DB loader
         $this->getContainer()->set('oro_translation.database_translation.loader', $translationLoader);
@@ -88,7 +96,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      * @return array
      */
-    protected function processLocales(array $locales, OutputInterface $output)
+    private function processLocales(array $locales, OutputInterface $output)
     {
         $languageRepository = $this->getEntityRepository(Language::class);
         /** @var TranslationRepository $translationRepository */
@@ -108,16 +116,11 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
                 $output->write(sprintf('  > loading [%s] (%d) ... ', $domain, count($messages)));
                 foreach ($messages as $key => $value) {
                     if (isset($translations[$translationKeys[$domain][$key]])) {
-                        if ($translations[$translationKeys[$domain][$key]] === Translation::SCOPE_SYSTEM) {
-                            $connection->update(
-                                'oro_translation',
-                                ['value' => $value],
-                                [
-                                    'translation_key_id' => $translationKeys[$domain][$key],
-                                    'language_id' => $language->getId()
-                                ]
-                            );
-                        }
+                        $this->updateTranslation(
+                            $value,
+                            $language->getId(),
+                            $translations[$translationKeys[$domain][$key]]
+                        );
                     } else {
                         $sqlData[] = sprintf(
                             '(%d, %d, %s, %s)',
@@ -144,7 +147,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      *
      * @return array
      */
-    protected function processTranslationKeys(array $domains)
+    private function processTranslationKeys(array $domains)
     {
         $connection = $this->getConnection(TranslationKey::class);
         /** @var TranslationKeyRepository $translationKeyRepository */
@@ -162,10 +165,10 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             foreach ($messages as $key => $value) {
                 if (!isset($translationKeys[$domain][$key])) {
                     $sqlData[] = sprintf('(%s, %s)', $connection->quote($domain), $connection->quote($key));
+                    $translationKeys[$domain][$key] = 1;
 
                     if (self::BATCH_INSERT_ROWS_COUNT === count($sqlData)) {
                         $connection->executeQuery($sql . implode(', ', $sqlData));
-                        $translationKeys[$domain][$key] = 1;
                         $needUpdate = true;
                         $sqlData = [];
                     }
@@ -187,7 +190,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
 
      * @return array
      */
-    protected function executeBatchTranslationInsert(array $sqlData)
+    private function executeBatchTranslationInsert(array $sqlData)
     {
         $sql = 'INSERT INTO oro_translation (translation_key_id, language_id, value, scope) VALUES ';
         if (0 !== count($sqlData)) {
@@ -196,10 +199,32 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
     }
 
     /**
+     * @param string $value
+     * @param int $languageId
+     * @param array $translationDataItem
+     *
+     * @return array
+     */
+    private function updateTranslation($value, $languageId, array $translationDataItem)
+    {
+        if ($translationDataItem['scope'] === Translation::SCOPE_SYSTEM && $translationDataItem['value'] !== $value) {
+            $this->getConnection(Translation::class)->update(
+                'oro_translation',
+                ['value' => $value],
+                [
+                    'translation_key_id' => $translationDataItem['translation_key_id'],
+                    'language_id' => $languageId
+                ]
+            );
+        }
+    }
+
+    /**
      * @param string $class
+     *
      * @return Connection
      */
-    protected function getConnection($class)
+    private function getConnection($class)
     {
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManagerForClass($class);
@@ -212,7 +237,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
      *
      * @return EntityRepository
      */
-    protected function getEntityRepository($class)
+    private function getEntityRepository($class)
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($class)->getRepository($class);
     }
@@ -220,7 +245,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
     /**
      * @return Translator
      */
-    protected function getTranslator()
+    private function getTranslator()
     {
         return $this->getContainer()->get('translator');
     }
