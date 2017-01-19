@@ -39,9 +39,9 @@ define(['jquery', '../locale-settings', './name'
                 } else if ('street' === lowerCaseKey) {
                     value = address.street || ''+ ' ' + (address.street2 || '');
                 } else if ('street1' === lowerCaseKey) {
-                    value = address.street || '';
+                    value = address.street;
                 } else {
-                    value = address[lowerCaseKey] || '';
+                    value = address[lowerCaseKey];
                 }
                 if (value && key !== lowerCaseKey) {
                     value = value.toLocaleUpperCase();
