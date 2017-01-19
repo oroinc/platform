@@ -131,7 +131,9 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             foreach ($errors as $error) {
                 $this->flashBag->add($this->messageType, $error);
             }
-        } else {
+        }
+
+        if ($event->getContext() instanceof \ArrayAccess) {
             $event->getContext()->offsetSet('errors', $errors);
         }
     }
