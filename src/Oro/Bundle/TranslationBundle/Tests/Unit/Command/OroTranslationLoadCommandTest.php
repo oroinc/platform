@@ -7,13 +7,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 
-use Oro\Bundle\TranslationBundle\Entity\Language;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
+use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\OutputStub;
@@ -141,13 +141,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->at(2))->method('set')
             ->with('oro_translation.database_translation.loader', new EmptyArrayLoader())
             ->willReturn($this->translationManager);
-
-//        $this->translator->expects($this->at(3))->method('rebuildCache');
-
-//        $this->container->expects($this->exactly(2))->method('set')
-//            ->with('oro_translation.database_translation.loader', $loader);
-
-        //$this->translator->expects($this->at(5))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
