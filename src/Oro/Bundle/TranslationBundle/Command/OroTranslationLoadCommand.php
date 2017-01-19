@@ -105,6 +105,10 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
 
         foreach ($locales as $locale) {
             $language = $languageRepository->findOneBy(['code' => $locale]);
+            if (!$language) {
+                $output->writeln(sprintf('<info>Language "%s" not found</info>', $locale));
+                continue;
+            }
             $domains = $this->getTranslator()->getCatalogue($locale)->all();
 
             $output->writeln(sprintf('<info>Loading translations [%s] (%d) ...</info>', $locale, count($domains)));
@@ -166,10 +170,10 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
                 if (!isset($translationKeys[$domain][$key])) {
                     $sqlData[] = sprintf('(%s, %s)', $connection->quote($domain), $connection->quote($key));
                     $translationKeys[$domain][$key] = 1;
+                    $needUpdate = true;
 
                     if (self::BATCH_INSERT_ROWS_COUNT === count($sqlData)) {
                         $connection->executeQuery($sql . implode(', ', $sqlData));
-                        $needUpdate = true;
                         $sqlData = [];
                     }
                 }
