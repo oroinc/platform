@@ -1,7 +1,7 @@
 oro:
     tag:
         menu:
-            shortcut_new_tag.label: Create new tag
+            shortcut_new_tag.label: Create new Tag
             shortcut_new_tag.description: Create new tag
             tag_list.description: Tags list
             all_tags: All tags
@@ -73,7 +73,7 @@ oro:
     taxonomy:
         label: Taxonomy
         menu:
-            shortcut_new_taxonomy.label: Create new taxonomy
+            shortcut_new_taxonomy.label: Create new Taxonomy
             shortcut_new_taxonomy.description: Create new taxonomy
             taxonomy_list.description: Taxonomies list
             all_taxonomies: All taxonomies

@@ -43,6 +43,7 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this.$el.toggleClass(this.options.openClass, this.options.open);
             if (this.options.open) {
                 this.$container.show();
+                mediator.trigger('scrollable-table:reload');
             } else {
                 this.$container.hide();
             }
