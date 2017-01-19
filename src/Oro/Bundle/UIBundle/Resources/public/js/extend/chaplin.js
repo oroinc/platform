@@ -43,7 +43,7 @@ define([
         }
         this.disposePageComponents();
         this.trigger('dispose', this);
-        original.viewDispose.call(this, arguments);
+        original.viewDispose.call(this);
     };
 
     /**
@@ -53,7 +53,7 @@ define([
         _.each(this.getItemViews(), function(itemView) {
             itemView.$el.detach();
         });
-        return original.collectionViewRender.call(this, arguments);
+        return original.collectionViewRender.call(this);
     };
 
     /**
