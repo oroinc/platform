@@ -12,7 +12,7 @@ Feature: Shortcuts feature
   Scenario: Choose shortcut from search
     Given I follow "Shortcuts"
     When I type "Create" in "Enter shortcut action"
-    And click "Create new user" in shortcuts search results
+    And click "Create new User" in shortcuts search results
     Then I should be on User Create page
 
   Scenario: Compose email from shortcut

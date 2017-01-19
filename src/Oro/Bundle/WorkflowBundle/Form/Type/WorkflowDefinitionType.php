@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\OroIconType;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,9 +9,22 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
+use Oro\Bundle\FormBundle\Form\Type\OroIconType;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionChoicesGroupProvider;
+
 class WorkflowDefinitionType extends AbstractType
 {
     const NAME = 'oro_workflow_definition';
+
+    /** @var WorkflowDefinitionChoicesGroupProvider */
+    private $provider;
+
+    public function __construct(WorkflowDefinitionChoicesGroupProvider $provider)
+    {
+        $this->provider = $provider;
+    }
 
     /**
      * {@inheritdoc}
@@ -58,6 +69,28 @@ class WorkflowDefinitionType extends AbstractType
                     'mapped' => false,
                     'required' => false,
                     'tooltip' => 'oro.workflow.workflowdefinition.transition.icon.tooltip'
+                ]
+            )
+            ->add(
+                'exclusive_active_groups',
+                OroChoiceType::NAME,
+                [
+                    'choices' => $this->provider->getActiveGroupsChoices(),
+                    'label' => 'oro.workflow.workflowdefinition.exclusive_active_groups.label',
+                    'required' => false,
+                    'multiple' => true,
+                    'tooltip' => 'oro.workflow.form.exclusive_active_groups.tooltip'
+                ]
+            )
+            ->add(
+                'exclusive_record_groups',
+                OroChoiceType::NAME,
+                [
+                    'choices' => $this->provider->getRecordGroupsChoices(),
+                    'label' => 'oro.workflow.workflowdefinition.exclusive_record_groups.label',
+                    'required' => false,
+                    'multiple' => true,
+                    'tooltip' => 'oro.workflow.form.exclusive_record_groups.tooltip'
                 ]
             );
     }

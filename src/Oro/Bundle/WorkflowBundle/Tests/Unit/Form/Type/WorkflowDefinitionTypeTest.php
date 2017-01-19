@@ -4,11 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType;
+use Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionChoicesGroupProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\ApplicableEntitiesTypeStub;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -24,7 +26,8 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->formType = new WorkflowDefinitionType();
+        $choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
+        $this->formType = new WorkflowDefinitionType($choicesProvider);
     }
 
     protected function tearDown()
@@ -74,19 +77,25 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
                     'label' => ['required' => true],
                     'related_entity' => ['required' => true],
                     'steps_display_ordered' => ['required' => false],
-                    'transition_prototype_icon' => ['required' => false]
+                    'transition_prototype_icon' => ['required' => false],
+                    'exclusive_active_groups' => ['required' => false],
+                    'exclusive_record_groups' => ['required' => false],
                 ],
                 'submittedData' => [
                     'label' => 'label',
                     'related_entity' => 'stdClass',
                     'steps_display_ordered' => true,
-                    'transition_prototype_icon' => null
+                    'transition_prototype_icon' => null,
+                    'exclusive_active_groups' => [],
+                    'exclusive_record_groups' => [],
                 ],
                 'expectedData' => [
                     'label' => 'label',
                     'related_entity' => 'stdClass',
                     'steps_display_ordered' => true,
-                    'transition_prototype_icon' => null
+                    'transition_prototype_icon' => null,
+                    'exclusive_active_groups' => [],
+                    'exclusive_record_groups' => [],
                 ]
             ]
         ];
@@ -122,12 +131,19 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject|Translator $translator */
         $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
 
+        $choiceType = $this->getMockBuilder(OroChoiceType::class)
+            ->setMethods(['configureOptions', 'getParent'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
                         OroIconType::NAME => new OroIconTypeStub(),
+                        OroChoiceType::NAME => $choiceType,
                         ApplicableEntitiesType::NAME => new ApplicableEntitiesTypeStub()
                     ],
                     [
