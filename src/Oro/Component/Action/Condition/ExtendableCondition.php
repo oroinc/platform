@@ -111,7 +111,7 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             );
         }
         $this->subscribedEvents = $options['events'];
-        $this->showErrors = $options['showErrors'];
+        $this->showErrors = array_key_exists('showErrors', $options) ? $options['showErrors'] : false;
         $this->messageType = array_key_exists('messageType', $options)
             ? $options['messageType']
             : self::DEFAULT_MESSAGE_TYPE;
