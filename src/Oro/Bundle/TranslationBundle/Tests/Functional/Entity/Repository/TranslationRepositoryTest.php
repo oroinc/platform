@@ -188,12 +188,11 @@ class TranslationRepositoryTest extends WebTestCase
         );
     }
 
-
     /**
-     * @param $languageCode
-     * @param array $expectedTranslations
-     *
      * @dataProvider getTranslationsDataProvider
+     *
+     * @param string $languageCode
+     * @param array $expectedTranslations
      */
     public function testGetTranslationsData($languageCode, array $expectedTranslations)
     {
