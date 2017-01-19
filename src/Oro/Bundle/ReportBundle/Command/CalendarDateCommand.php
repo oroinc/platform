@@ -8,7 +8,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
-use Oro\Component\Log\OutputLogger;
 
 class CalendarDateCommand extends ContainerAwareCommand implements CronCommandInterface
 {
@@ -48,7 +47,6 @@ class CalendarDateCommand extends ContainerAwareCommand implements CronCommandIn
     {
         /** @var CalendarDateManager $calendarDateManager */
         $calendarDateManager = $this->getContainer()->get('oro_report.calendar_date_manager');
-
         $calendarDateManager->handleCalendarDates(true);
 
         return self::STATUS_SUCCESS;

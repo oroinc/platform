@@ -13,6 +13,9 @@ class CalendarDateCommandTest extends WebTestCase
 {
     const DATE_FORMAT = 'Y-m-d';
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -25,6 +28,7 @@ class CalendarDateCommandTest extends WebTestCase
         $repository = $doctrineHelper->getEntityRepository(CalendarDate::class);
         $manager = $doctrineHelper->getEntityManager(CalendarDate::class);
 
+        // Empty CalendarDate table.
         $results = $repository->findAll();
         foreach ($results as $result) {
             $manager->remove($result);

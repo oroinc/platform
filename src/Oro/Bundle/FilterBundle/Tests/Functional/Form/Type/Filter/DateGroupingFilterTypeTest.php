@@ -9,6 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DateGroupingFilterTypeTest extends WebTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         parent::setUp();

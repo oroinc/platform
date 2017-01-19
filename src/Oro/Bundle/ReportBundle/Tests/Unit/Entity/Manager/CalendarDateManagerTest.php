@@ -17,6 +17,9 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
     /** @var CalendarDateManager */
     protected $calendarDateManager;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
@@ -43,6 +46,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');
+
         $this->calendarDateManager->handleCalendarDates();
     }
 
@@ -81,6 +85,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');
+
         $this->calendarDateManager->handleCalendarDates(true);
     }
 
@@ -116,6 +121,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');
+
         $this->calendarDateManager->handleCalendarDates(true);
     }
 }

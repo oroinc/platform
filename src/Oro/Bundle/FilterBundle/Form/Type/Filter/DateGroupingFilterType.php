@@ -68,6 +68,9 @@ class DateGroupingFilterType extends AbstractChoiceType
         );
     }
 
+    /**
+     * @return array
+     */
     protected function getGroupChoices()
     {
         return [

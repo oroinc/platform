@@ -11,6 +11,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class CalendarDateRepositoryTest extends WebTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
