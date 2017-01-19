@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -49,7 +49,12 @@ class EnumFilterTypeTest extends TypeTestCase
             // This may be achieved with Stub. Stub namespace does not reflect Stub path.
             // So we have to load it manually
             $fileName = ExtendHelper::getShortClassName($enumValueClassName) . '.php';
-            require_once(realpath(__DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $fileName));
+            $path = str_replace(
+                '/',
+                DIRECTORY_SEPARATOR,
+                '/../../../../../../EntityExtendBundle/Tests/Unit/Form/Type/Stub/'
+            );
+            require_once(realpath(__DIR__ . $path . DIRECTORY_SEPARATOR . $fileName));
 
             $this->provider->expects($this->once())
                 ->method('getEnumChoices')

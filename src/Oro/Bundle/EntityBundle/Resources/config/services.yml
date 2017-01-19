@@ -175,7 +175,9 @@ services:
         arguments:
             - '@oro_entity_config.provider.grouping'
             - '@oro_entity_config.provider.dictionary'
+            - '@oro_entity_config.provider.entity'
             - '@doctrine'
+            - '@translator'
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
 
