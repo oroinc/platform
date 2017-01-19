@@ -10,10 +10,6 @@ layout:
             id: requirejs_scripts_after
             blockType: container
             parentId: require_js
-        - '@setOption':
-            id: app_script
-            optionName: content
-            optionValue: 'require(["oroui/js/app"]); require(["oroui/js/init-layout"]);'
         - '@removeOption':
             id: requirejs_scripts
             optionName: provider_alias
