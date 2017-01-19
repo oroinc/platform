@@ -6,8 +6,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,6 +14,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -69,7 +69,6 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
             $this->getTranslator()->rebuildCache();
         }
 
-        $start = time();
         $this->processLocales($locales, $output);
         $output->writeln(sprintf('<info>All messages successfully loaded.</info>'));
 
@@ -82,7 +81,6 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
         }
 
         $output->writeln(sprintf('<info>Done.</info>'));
-        echo time() - $start;
     }
 
     /**
@@ -93,7 +91,7 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
     protected function processLocales(array $locales, OutputInterface $output)
     {
         $languageRepository = $this->getEntityRepository(Language::class);
-        /** @var TranslationRepository $repoTranslation */
+        /** @var TranslationRepository $translationRepository */
         $translationRepository = $this->getEntityRepository(Translation::class);
         $connection = $this->getConnection(Translation::class);
 
@@ -183,8 +181,6 @@ class OroTranslationLoadCommand extends ContainerAwareCommand
 
         return $translationKeys;
     }
-
-
 
     /**
      * @param array $sqlData
