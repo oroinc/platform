@@ -33,9 +33,9 @@ define([
         },
 
         getSearchableString: function() {
-            return this.get('country') + ', ' +
-                this.get('city') + ', ' +
-                this.get('street') + ' ' + (this.get('street2') || '');
+            return this.get('country') || '' + ', ' +
+                this.get('city') || '' + ', ' +
+                this.get('street') || '' + ' ' + (this.get('street2') || '');
         }
     });
 });
