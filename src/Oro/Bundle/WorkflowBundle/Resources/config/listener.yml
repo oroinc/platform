@@ -92,6 +92,14 @@ services:
             - { name: oro_workflow.changes.listener, event: oro.workflow.after_create, method: onCreateWorkflowDefinition }
             - { name: oro_workflow.changes.listener, event: oro.workflow.after_update, method: onUpdateWorkflowDefinition }
 
+    oro_workflow.listener.workflow_definition_validate:
+        class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionValidateListener'
+        arguments:
+            - '@oro_workflow.workflow_assembler'
+        tags:
+            - { name: oro_workflow.changes.listener, event: oro.workflow.after_create, method: onCreateWorkflowDefinition }
+            - { name: oro_workflow.changes.listener, event: oro.workflow.after_update, method: onUpdateWorkflowDefinition }
+
     oro_workflow.event_listener.role_page_listener:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\RolePageListener'
         arguments:
