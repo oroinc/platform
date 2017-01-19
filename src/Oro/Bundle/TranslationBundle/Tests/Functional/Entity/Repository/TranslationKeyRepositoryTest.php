@@ -58,7 +58,6 @@ class TranslationKeyRepositoryTest extends WebTestCase
             LoadTranslations::TRANSLATION_KEY_5,
         ];
 
-
         $this->assertEquals($expectedTranslationKeys, array_keys($data[LoadTranslations::TRANSLATION_KEY_DOMAIN]));
     }
 }
