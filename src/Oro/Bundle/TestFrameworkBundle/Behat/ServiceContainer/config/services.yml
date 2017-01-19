@@ -13,7 +13,7 @@ services:
         arguments:
             - '@suite.registry'
         tags:
-            - { name: cli.controller, priority: 1100 }
+            - { name: cli.controller, priority: 700 }
 
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
