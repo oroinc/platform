@@ -30,10 +30,7 @@ class OroTranslationLoadCommandTest extends WebTestCase
 
     public function testExecuteEmptyLanguage()
     {
-        $result = $this->runCommand(
-            'oro:translation:load',
-            ['--languages=' . LoadLanguages::LANGUAGE1, '--rebuild-cache=0']
-        );
+        $result = $this->runCommand('oro:translation:load', ['--languages=' . LoadLanguages::LANGUAGE1]);
 
         $this->assertNotEmpty($result);
         $this->assertContains('All messages successfully loaded.', $result);
@@ -42,12 +39,24 @@ class OroTranslationLoadCommandTest extends WebTestCase
 
     public function testExecuteWithNotExistedLanguage()
     {
-        $result = $this->runCommand(
-            'oro:translation:load',
-            ['--languages=NotExisted', '--rebuild-cache=0']
-        );
+        $result = $this->runCommand('oro:translation:load', ['--languages=NotExisted']);
 
         $this->assertNotEmpty($result);
         $this->assertContains('Language "NotExisted" not found', $result);
+        $this->assertNotContains('Rebuilding cache', $result);
+    }
+
+    public function testExecuteWithRebuildCache()
+    {
+        $this->markTestSkipped('Skipped due takes much time to rebuild translation cache');
+
+        $result = $this->runCommand('oro:translation:load', [
+            '--languages=' . LoadLanguages::LANGUAGE1,
+            '--rebuild-cache'
+        ]);
+
+        $this->assertNotEmpty($result);
+        $this->assertContains('All messages successfully loaded.', $result);
+        $this->assertContains('Rebuilding cache', $result);
     }
 }

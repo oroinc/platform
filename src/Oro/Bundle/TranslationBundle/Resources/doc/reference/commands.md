@@ -7,7 +7,7 @@ Table of contents
 - [Overview](#overview)
 - [oro:translation:dump](#orotranslationdump)
 - [oro:translation:pack](#orotranslationpack)
-- [Examples](#examples)
+- [oro:translation:load](#orotranslationload)
 
 Overview
 ----------
@@ -80,8 +80,14 @@ app/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb -
 
 oro:translation:load
 --------------------
-Load translations data to DB.
+Command  used to load translations data to DB.
 Params are:
 
 - `languages` - the list of languages, that should be loaded.
-- `rebuild-cache` (default 0) - rebuild translation cache before and after loading.
+
+- `rebuild-cache` - rebuild translation cache before and after loading.
+
+**Load translations for English and Russian with rebuilding translation cache:**
+```bash
+app/console oro:translation:load --languages=en --languages=ru --rebuild-cache
+```
