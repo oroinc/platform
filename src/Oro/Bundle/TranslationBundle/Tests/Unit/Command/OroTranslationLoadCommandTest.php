@@ -2,12 +2,18 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
-use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
+use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\OutputStub;
@@ -63,6 +69,19 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->translationLoader = new EmptyArrayLoader();
 
+        $language = new Language();
+
+        $entityManager = $this->createMock(EntityManager::class);
+
+        $connection = $this->createMock(Connection::class);
+        $entityManager->expects($this->any())->method('getConnection')->willReturn($connection);
+
+        $entityRepository = $this->createMock(EntityRepository::class);
+        $entityRepository->expects($this->any())->method('findOneBy')->willReturn($language);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
+        $entityManager->expects($this->any())->method('getRepository')->willReturn($entityRepository);
+
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
@@ -71,6 +90,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 ['oro_translation.provider.language', 1, $this->languageProvider],
                 ['oro_translation.manager.translation', 1, $this->translationManager],
                 ['oro_translation.database_translation.loader', 1, $this->translationLoader],
+                ['doctrine', 1, $managerRegistry],
             ]));
 
         $this->input = $this->createMock(InputInterface::class);
@@ -102,45 +122,25 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->command->getDescription());
         $this->assertNotEmpty($this->command->getName());
         $this->assertTrue($this->command->getDefinition()->hasOption('languages'));
+        $this->assertTrue($this->command->getDefinition()->hasOption('rebuild-cache'));
     }
 
     public function testExecute()
     {
-        $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn([]);
+        $this->input->expects($this->exactly(3))->method('getOption')->willReturnMap(
+            [
+                ['languages', []],
+                ['rebuild-cache', 0]
+            ]
+        );
 
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguages')
             ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
 
-        $loader = new EmptyArrayLoader();
-
         $this->container->expects($this->at(2))->method('set')
             ->with('oro_translation.database_translation.loader', new EmptyArrayLoader())
             ->willReturn($this->translationManager);
-
-        $this->translator->expects($this->at(0))->method('rebuildCache');
-
-        $this->translationManager->expects($this->at(0))->method('saveTranslation')
-            ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(1))->method('flush');
-        $this->translationManager->expects($this->at(2))->method('clear');
-
-        $this->translationManager->expects($this->at(3))->method('saveTranslation')
-            ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(4))->method('flush');
-        $this->translationManager->expects($this->at(5))->method('clear');
-
-        $this->translationManager->expects($this->at(6))->method('saveTranslation')
-            ->with('key1', 'domain1-currentLocale-message1', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(7))->method('saveTranslation')
-            ->with('key2', 'domain1-currentLocale-message2', 'currentLocale', 'domain1')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(8))->method('flush');
-        $this->translationManager->expects($this->at(9))->method('clear');
-
-        $this->container->expects($this->at(5))->method('set')
-            ->with('oro_translation.database_translation.loader', $loader);
-
-        $this->translator->expects($this->at(1))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
@@ -156,34 +156,27 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 '  > loading [domain1] (2) ... ',
                 'processed 2 records.',
                 'All messages successfully loaded.',
-                'Rebuilding cache ... ',
                 'Done.',
             ],
             $this->output->messages
         );
     }
 
-    public function testExecuteWithLanguage()
+    public function testExecuteWithLanguageAndRebuildCache()
     {
-        $this->input->expects($this->once())->method('getOption')->with('languages')->willReturn(['locale1']);
+        $this->input->expects($this->any())->method('getOption')->willReturnMap(
+            [
+                ['languages', ['locale1']],
+                ['rebuild-cache', 1]
+            ]
+        );
+
 
         $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguages')
             ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
 
-        $this->translator->expects($this->at(0))->method('rebuildCache');
-
-        $this->translationManager->expects($this->at(0))->method('saveTranslation')
-            ->with('key1', 'domain1-locale1-message1', 'locale1', 'domain1');
-        $this->translationManager->expects($this->at(1))->method('flush');
-        $this->translationManager->expects($this->at(2))->method('clear');
-
-        $this->translationManager->expects($this->at(3))->method('saveTranslation')
-            ->with('key1', 'domain2-locale1-message1', 'locale1', 'domain2')->willReturn(new \stdClass());
-        $this->translationManager->expects($this->at(4))->method('flush');
-        $this->translationManager->expects($this->at(5))->method('clear');
-
-        $this->translator->expects($this->at(1))->method('rebuildCache');
+        $this->translator->expects($this->exactly(2))->method('rebuildCache');
 
         $this->command->run($this->input, $this->output);
 
