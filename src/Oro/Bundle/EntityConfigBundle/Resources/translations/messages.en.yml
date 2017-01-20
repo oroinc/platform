@@ -34,6 +34,7 @@ oro:
         attribute_group:
             labels.label: Label
             attribute_relations.label: Attributes
+            code.label: Code
             is_visible.label: Visible
 
         block_titles:

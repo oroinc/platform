@@ -26,16 +26,13 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilder = $this->getContainerBuilder($bundles);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
-        $containerBuilder->get('symfony2_extension.kernel')->getContainer()->setParameter(
-            'database_driver',
-            'pdo_mysql'
-        );
 
         $config = [
             'shared_contexts' => $this->sharedContexts,
             'application_suites' => [],
             'elements_namespace_suffix' => '\Tests\Behat\Page\Element',
-            'reference_initializer_class' => 'ReferenceRepositoryInitializer'
+            'reference_initializer_class'
+                => 'Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer'
         ];
 
         $extension = $this
@@ -174,6 +171,18 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $kernel = new KernelStub();
         $kernel->setBundleMap($this->getBundlesFromNames($bundles));
+        $kernel->getContainer()->set(
+            'oro_entity.entity_alias_resolver',
+            $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+                ->disableOriginalConstructor()
+                ->getMock()
+        );
+        $kernel->getContainer()->set(
+            'oro_security.owner.metadata_provider.chain',
+            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+                ->disableOriginalConstructor()
+                ->getMock()
+        );
 
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));

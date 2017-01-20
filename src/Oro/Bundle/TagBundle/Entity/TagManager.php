@@ -547,8 +547,8 @@ class TagManager
     protected function getOrganization()
     {
         return $this->securityFacade->getOrganization()
-                    ? $this->securityFacade->getOrganization()
-                    : $this->getOrganizationByUser();
+                ? $this->securityFacade->getOrganization()
+                : $this->getOrganizationByUser();
     }
 
     /**
