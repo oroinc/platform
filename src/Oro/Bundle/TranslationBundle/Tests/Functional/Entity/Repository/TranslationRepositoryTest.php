@@ -29,7 +29,7 @@ class TranslationRepositoryTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->loadFixtures([LoadTranslations::class]);
+        $this->loadFixtures([LoadTranslations::class, LoadLanguages::class]);
 
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Translation::class);
         $this->repository = $this->em->getRepository(Translation::class);
@@ -186,5 +186,46 @@ class TranslationRepositoryTest extends WebTestCase
             ],
             $result
         );
+    }
+
+    /**
+     * @dataProvider getTranslationsDataProvider
+     *
+     * @param string $languageCode
+     * @param array $expectedTranslations
+     */
+    public function testGetTranslationsData($languageCode, array $expectedTranslations)
+    {
+        $language = $this->getReference($languageCode);
+
+        $result = [];
+        foreach ($expectedTranslations as $translationRef) {
+            /** @var Translation $translation */
+            $translation = $this->getReference($translationRef);
+            $result[$translation->getTranslationKey()->getId()] = [
+                'translation_key_id' => $translation->getTranslationKey()->getId(),
+                'scope' => $translation->getScope(),
+                'value' => $translation->getValue(),
+            ];
+        }
+
+        $this->assertEquals($result, $this->repository->getTranslationsData($language->getId()));
+    }
+
+    /**
+     * @return array
+     */
+    public function getTranslationsDataProvider()
+    {
+        return [
+            'language2' => [
+                'languageCode' => LoadLanguages::LANGUAGE2,
+                'values' => [
+                    LoadTranslations::TRANSLATION3,
+                    LoadTranslations::TRANSLATION4,
+                    LoadTranslations::TRANSLATION5,
+                ],
+            ],
+        ];
     }
 }
