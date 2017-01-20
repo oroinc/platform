@@ -162,7 +162,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         ];
 
         yield 'empty start step' => [
-            'expectedMessages' => ['Workflow "test_workflow" does not contains neither start'],
+            'expectedMessages' => ['does not contains neither start step nor start transitions'],
             'configDirectory' => '/Tests/Functional/Command/DataFixtures/WithoutStartStep'
         ];
     }
