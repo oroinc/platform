@@ -2,19 +2,21 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Oro\Component\AmqpMessageQueue\Transport\Amqp\AmqpQueue;
+use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Wire\AMQPTable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
-class DbalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolatorInterface
+class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolatorInterface
 {
     /**
      * @var KernelInterface
@@ -38,18 +40,19 @@ class DbalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $command = sprintf(
-            './console oro:message-queue:consume --env=%s %s > /dev/null 2>&1 &',
+            './console oro:message-queue:consume --env=%s %s -vvv > /tmp/rabbit.log',
             $this->kernel->getEnvironment(),
             $this->kernel->isDebug() ? '' : '--no-debug'
         );
         $process = new Process($command, $this->kernel->getRootDir());
-        $process->run();
+        $process->start();
+        self::waitWhileProcessingMessages();
     }
 
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
-        $this->waitWhileProcessingMessages();
+        self::waitWhileProcessingMessages();
 
         $process = new Process('pkill -f oro:message-queue:consume', $this->kernel->getRootDir());
 
@@ -68,7 +71,7 @@ class DbalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        return 'dbal' === $container->getParameter('message_queue_transport');
+        return 'amqp' === $container->getParameter('message_queue_transport');
     }
 
     /**
@@ -91,7 +94,7 @@ class DbalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
      */
     public function getName()
     {
-        return 'Dbal Message Queue';
+        return 'AMQP Message Queue';
     }
 
     /**
@@ -100,18 +103,69 @@ class DbalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
     public function waitWhileProcessingMessages($timeLimit = 60)
     {
         $time = $timeLimit;
-        /** @var Connection $connection */
-        $connection = $this->kernel->getContainer()->get('doctrine')->getManager()->getConnection();
-        $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
 
-        while (0 !== $result) {
+        $queue = $this->createAmqpQueue();
+        $channel = $this->createAmqpStreamConnection()->channel();
+        $messagesNumber = $this->getQueueMessageNumber($channel, $queue);
+
+        while (0 !== $messagesNumber) {
             if ($time <= 0) {
                 throw new RuntimeException('Message Queue was not process messages during time limit');
             }
 
-            $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
+            $messagesNumber = $this->getQueueMessageNumber($channel, $queue);
+
             usleep(250000);
             $time -= 0.25;
         }
+    }
+
+    /**
+     * @return AMQPStreamConnection
+     */
+    private function createAmqpStreamConnection()
+    {
+        $appContainer = $this->kernel->getContainer();
+        $messageQueueParameters = $appContainer->getParameter('message_queue_transport_config');
+
+        return new AMQPStreamConnection(
+            $messageQueueParameters['host'],
+            $messageQueueParameters['port'],
+            $messageQueueParameters['user'],
+            $messageQueueParameters['password']
+        );
+    }
+
+    /**
+     * @return AmqpQueue
+     */
+    private function createAmqpQueue()
+    {
+        $queue = new AmqpQueue('oro.default');
+        $queue->setDurable(true);
+        $queue->setAutoDelete(false);
+        $queue->setTable(['x-max-priority' => 4]);
+
+        return $queue;
+    }
+
+    /**
+     * @param AMQPChannel $channel
+     * @param AmqpQueue $queue
+     * @return int
+     */
+    private function getQueueMessageNumber(AMQPChannel $channel, AmqpQueue $queue)
+    {
+        $result = $channel->queue_declare(
+            $queue->getQueueName(),
+            $queue->isPassive(),
+            $queue->isDurable(),
+            $queue->isExclusive(),
+            $queue->isAutoDelete(),
+            $queue->isNoWait(),
+            $queue->getTable() ? new AMQPTable($queue->getTable()) : null
+        );
+
+        return $result[1];
     }
 }

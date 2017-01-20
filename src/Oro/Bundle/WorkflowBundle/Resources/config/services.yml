@@ -411,6 +411,11 @@ services:
             - 'oro_workflow_transition_form'
             - 'oro_api_workflow_transit'
 
+    oro_workflow.provider.workflow_definition_choices_groups:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDefinitionChoicesGroupProvider'
+        arguments:
+            - '@doctrine'
+
     oro_workflow.operation_registry.filter:
         class: Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter
         arguments:
