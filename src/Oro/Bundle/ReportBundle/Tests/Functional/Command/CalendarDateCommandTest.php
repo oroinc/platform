@@ -65,7 +65,11 @@ class CalendarDateCommandTest extends WebTestCase
     private function getGeneratedDates()
     {
         $dates = [];
-        $period = new \DatePeriod(new \DateTime('first day of this year'), new \DateInterval('P1D'), new \DateTime());
+        $period = new \DatePeriod(
+            new \DateTime('first day of this year'),
+            new \DateInterval('P1D'),
+            new \DateTime('tomorrow')
+        );
         foreach ($period as $date) {
             $dates[] = $date;
         }

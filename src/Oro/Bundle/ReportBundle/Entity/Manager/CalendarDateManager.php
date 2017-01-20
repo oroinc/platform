@@ -52,7 +52,7 @@ class CalendarDateManager
             $startDate = $this->getLastDate() ?: $startDate;
         }
 
-        $period = new \DatePeriod($startDate, new \DateInterval('P1D'), new \DateTime('tomorrow'));
+        $period = new \DatePeriod($startDate, new \DateInterval('P1D'), new \DateTime('tomorrow + 1 day'));
 
         return $period;
     }

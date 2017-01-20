@@ -40,9 +40,9 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $startDate = new \DateTime('first day of this year');
-        $today = new \DateTime();
+        $endDate = new \DateTime('tomorrow + 1 day');
         $entityManager
-            ->expects($this->exactly(1 + $today->diff($startDate)->format('%a')))
+            ->expects($this->exactly(1 + $endDate->diff($startDate)->format('%a')))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');
@@ -56,7 +56,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
         $startDate->modify('+15 days');
         $calendarDate = new CalendarDate();
         $calendarDate->setDate($startDate);
-        $today = new \DateTime();
+        $endDate = new \DateTime('tomorrow + 1 day');
         $repository = $this->getMockBuilder(CalendarDateRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -81,7 +81,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $entityManager
-            ->expects($this->exactly(1 + $today->diff($startDate)->format('%a')))
+            ->expects($this->exactly(1 + $endDate->diff($startDate)->format('%a')))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');
@@ -115,9 +115,9 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $startDate = new \DateTime('first day of this year');
-        $today = new \DateTime();
+        $endDate = new \DateTime('tomorrow + 1 day');
         $entityManager
-            ->expects($this->exactly(1 + $today->diff($startDate)->format('%a')))
+            ->expects($this->exactly(1 + $endDate->diff($startDate)->format('%a')))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
         $entityManager->expects($this->once())->method('flush');
