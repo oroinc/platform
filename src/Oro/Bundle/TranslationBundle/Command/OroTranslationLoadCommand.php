@@ -21,8 +21,8 @@ use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
- * This command loading translations to database
- * It performs many queries to DB. To optimize it - using native SQL queries and batch insert
+ * This command loads translations to database
+ * It performs many queries to DB. To optimize it - was used native SQL queries and batch inserts
  */
 final class OroTranslationLoadCommand extends ContainerAwareCommand
 {
@@ -35,13 +35,14 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:translation:load')
-            ->setDescription('Load translations into DB')
+            ->setDescription('Loads translations into DB')
             ->addOption(
                 'languages',
                 'l',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Languages to load.'
-            )->addOption('rebuild-cache', 'rc', InputOption::VALUE_OPTIONAL, 'Rebuild translation cache');
+            )
+            ->addOption('rebuild-cache', null, InputOption::VALUE_NONE, 'Rebuild translation cache');
     }
 
     /**
@@ -66,7 +67,7 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
         // backup DB loader
         $translationLoader = $this->getContainer()->get('oro_translation.database_translation.loader');
 
-        // disable DB loader to not get translations from database
+        // disable DB loader to exclude existing translations from database
         $this->getContainer()->set('oro_translation.database_translation.loader', new EmptyArrayLoader());
 
         if ($input->getOption('rebuild-cache')) {
