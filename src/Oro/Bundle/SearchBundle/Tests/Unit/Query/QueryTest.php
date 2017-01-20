@@ -150,6 +150,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testString, $result);
     }
 
+    /**
+     * @dataProvider dataProviderForClearString
+     *
+     * @param string $textToClear
+     * @param string $expected
+     */
+    public function testClearString($textToClear, $expected)
+    {
+        $this->assertEquals($expected, Query::clearString($textToClear));
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForClearString()
+    {
+        return [
+            ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re: FW: Test One äöü ßü abc 3 again'],
+            ['text with ___ \' special chars \/ "', 'text with ___ special chars'],
+            ['at @ * . test', 'at @ * . test'],
+        ];
+    }
+
     public function testAddingSelect()
     {
         $query = new Query();

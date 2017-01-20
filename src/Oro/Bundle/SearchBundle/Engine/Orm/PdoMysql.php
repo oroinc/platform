@@ -67,7 +67,7 @@ class PdoMysql extends BaseDriver
     {
         $fieldValue = $searchCondition['fieldValue'];
         $condition = $searchCondition['condition'];
-        $words = $this->getWords($this->filterTextFieldValue($fieldValue), $condition);
+        $words = $this->getWords($this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue), $condition);
 
         switch ($condition) {
             case Query::OPERATOR_CONTAINS:
