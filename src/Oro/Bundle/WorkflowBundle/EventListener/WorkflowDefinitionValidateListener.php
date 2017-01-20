@@ -42,7 +42,7 @@ class WorkflowDefinitionValidateListener
     protected function tryAssemble(WorkflowDefinition $workflowDefinition)
     {
         try {
-            $this->workflowAssembler->assemble(clone $workflowDefinition, true);
+            $this->workflowAssembler->assemble($workflowDefinition, true);
         } catch (AssemblerException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
