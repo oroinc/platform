@@ -25,11 +25,11 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit_Framework_TestCase
     public function testValid()
     {
         $event = $this->getEvent();
+        $prevWorkflowDefinition = clone $event->getDefinition();
 
         $this->workflowAssembler->expects($this->any())->method('assemble')
-            ->with($this->callback(function ($workflowDefinition) use ($event) {
-                $this->assertEquals($event->getDefinition(), $workflowDefinition);
-                $this->assertNotSame($event->getDefinition(), $workflowDefinition);
+            ->with($this->callback(function ($workflowDefinition) use ($prevWorkflowDefinition) {
+                $this->assertEquals($prevWorkflowDefinition, $workflowDefinition);
                 return true;
             }));
 
