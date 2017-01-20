@@ -40,7 +40,7 @@ class OroTranslationLoadCommandTest extends WebTestCase
         $this->assertNotContains('Rebuilding cache', $result);
     }
 
-    public function testExecuteNotExistedLanguage()
+    public function testExecuteWithNotExistedLanguage()
     {
         $result = $this->runCommand(
             'oro:translation:load',

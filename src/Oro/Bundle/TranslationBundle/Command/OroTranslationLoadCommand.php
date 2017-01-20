@@ -20,6 +20,10 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * This command loading translations to database
+ * It performs many queries to DB. To optimize it - using native SQL queries and batch insert
+ */
 final class OroTranslationLoadCommand extends ContainerAwareCommand
 {
     const BATCH_INSERT_ROWS_COUNT = 50;
@@ -147,6 +151,8 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
     }
 
     /**
+     * Loads translation keys to DB if needed
+     *
      * @param array $domains
      *
      * @return array
@@ -203,6 +209,8 @@ final class OroTranslationLoadCommand extends ContainerAwareCommand
     }
 
     /**
+     * Update translation record in DB only if record is changed and scope in DB for this record is System
+     *
      * @param string $value
      * @param int $languageId
      * @param array $translationDataItem
