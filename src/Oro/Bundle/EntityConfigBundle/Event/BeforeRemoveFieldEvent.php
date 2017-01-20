@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 
-class BeforeRemoveFieldEvent extends Event
+class BeforeRemoveFieldEvent extends SymfonyEvent
 {
     /** @var string */
     protected $className;
@@ -24,8 +24,8 @@ class BeforeRemoveFieldEvent extends Event
      */
     public function __construct($className, $fieldName)
     {
-        $this->className     = $className;
-        $this->fieldName     = $fieldName;
+        $this->className = $className;
+        $this->fieldName = $fieldName;
     }
 
     /**
