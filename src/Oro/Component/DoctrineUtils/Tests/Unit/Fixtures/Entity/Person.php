@@ -18,6 +18,13 @@ class Person
     protected $id;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string")
+     */
+    protected $name;
+
+    /**
      * @var Item
      *
      * @ORM\ManyToOne(targetEntity="Item")

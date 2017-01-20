@@ -11,8 +11,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -41,6 +44,9 @@ class RelatedEmailsProvider
     /** @var EmailRecipientsHelper */
     protected $emailRecipientsHelper;
 
+    /** @var EntityFieldProvider  */
+    protected $entityFieldProvider;
+
     /**
      * @param Registry $registry
      * @param ConfigManager $configManager
@@ -63,6 +69,14 @@ class RelatedEmailsProvider
         $this->nameFormatter = $nameFormatter;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->emailRecipientsHelper = $emailRecipientsHelper;
+    }
+
+    /**
+     * @param EntityFieldProvider $entityFieldProvider
+     */
+    public function setEntityFieldProvider(EntityFieldProvider $entityFieldProvider)
+    {
+        $this->entityFieldProvider = $entityFieldProvider;
     }
 
     /**
@@ -91,16 +105,14 @@ class RelatedEmailsProvider
         $metadata = $this->getMetadata($className);
         $attributes = $this->initAttributes($className, $metadata);
 
-        foreach ($metadata->associationMappings as $name => $assoc) {
-            if (in_array(
-                'Oro\Bundle\EmailBundle\Entity\EmailInterface',
-                class_implements($assoc['targetEntity']),
-                true
-            )) {
-                $attributes[] = new EmailAttribute($name, true);
+        $relations = $this->entityFieldProvider->getRelations($className);
+
+        foreach ($relations as $relation) {
+            if (is_a($relation['related_entity_name'], EmailInterface::class, true)) {
+                $attributes[] = new EmailAttribute($relation['name'], true);
             } else {
                 if ($depth > 1) {
-                    $assocObject = $this->getPropertyAccessor()->getValue($object, $name);
+                    $assocObject = $this->getPropertyAccessor()->getValue($object, $relation['name']);
                     if (!$assocObject instanceof \Traversable && !is_array($assocObject)) {
                         if ($assocObject) {
                             $assocObject = [$assocObject];
@@ -278,7 +290,7 @@ class RelatedEmailsProvider
     protected function initAttributes($className, $metadata)
     {
         $attributes = [];
-        if (in_array('Oro\Bundle\EmailBundle\Model\EmailHolderInterface', class_implements($className), true)) {
+        if (is_a($className, EmailHolderInterface::class, true)) {
             $attributes[] = new EmailAttribute('email');
         }
         $attributes = array_merge($attributes, $this->getFieldAttributes($metadata));

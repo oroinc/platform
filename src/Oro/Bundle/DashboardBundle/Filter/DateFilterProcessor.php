@@ -4,9 +4,12 @@ namespace Oro\Bundle\DashboardBundle\Filter;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateFilterProcessor
 {
@@ -15,6 +18,9 @@ class DateFilterProcessor
 
     /** @var DateFilterModifier */
     protected $modifier;
+
+    /** @var LocaleSettings */
+    protected $localeSettings;
 
     /**
      * @param DateRangeFilter    $filter
@@ -53,5 +59,58 @@ class DateFilterProcessor
         unset($dateData['start'], $dateData['end']);
 
         return $this->modifier->modify($dateData, ['start', 'end'], false);
+    }
+
+    /**
+     * Initialize locale settings to be used in the class methods
+     *
+     * @param LocaleSettings $localeSettings
+     */
+    public function setLocaleSettings(LocaleSettings $localeSettings)
+    {
+        $this->localeSettings = $localeSettings;
+    }
+
+    /**
+     * @param mixed $date
+     *
+     * @throws \Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException in case localeSettings is not set
+     * @return \DateTime
+     */
+    protected function prepareDate($date)
+    {
+        if (!$this->localeSettings) {
+            throw new InvalidArgumentException('Processor should be initialized with LocaleSettings');
+        }
+
+        return $date instanceof \DateTime
+            ? $date
+            : new \DateTime($date, new \DateTimeZone($this->localeSettings->getTimeZone()));
+    }
+    /**
+     * @param QueryBuilder $qb
+     * @param $dateRange
+     * @param $fieldAlias
+     */
+    public function applyDateRangeFilterToQuery(QueryBuilder $qb, $dateRange, $fieldAlias)
+    {
+        $dateRange = $this->getModifiedDateData($dateRange);
+        switch ($dateRange['type']) {
+            case AbstractDateFilterType::TYPE_MORE_THAN:
+                $start = $this->prepareDate($dateRange['value']['start']);
+                $qb->andWhere(sprintf('%s >= :start', $fieldAlias))->setParameter('start', $start);
+                break;
+            case AbstractDateFilterType::TYPE_LESS_THAN:
+                $end = $this->prepareDate($dateRange['value']['end']);
+                $qb->andWhere(sprintf('%s <= :end', $fieldAlias))->setParameter('end', $end);
+                break;
+            case AbstractDateFilterType::TYPE_ALL_TIME:
+                return;
+            default:
+                $start = $this->prepareDate($dateRange['value']['start']);
+                $end = $this->prepareDate($dateRange['value']['end']);
+                $qb->andWhere(sprintf('%s >= :start', $fieldAlias))->setParameter('start', $start);
+                $qb->andWhere(sprintf('%s <= :end', $fieldAlias))->setParameter('end', $end);
+        }
     }
 }

@@ -100,7 +100,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
         $owner = new \stdClass();
 
         $this->emailOwnerProvider->expects($this->once())
-            ->method('findEmailOwner')
+            ->method('findEmailOwners')
             ->willReturn($owner);
         $entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
@@ -128,7 +128,7 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
         $owner = new \stdClass();
 
         $this->emailOwnerProvider->expects($this->exactly(2))
-            ->method('findEmailOwner')
+            ->method('findEmailOwners')
             ->willReturn($owner);
         $entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
