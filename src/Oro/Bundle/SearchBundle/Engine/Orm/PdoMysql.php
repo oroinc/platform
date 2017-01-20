@@ -3,9 +3,9 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
@@ -70,6 +70,10 @@ class PdoMysql extends BaseDriver
         $words = $this->getWords($this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue), $condition);
 
         switch ($condition) {
+            case Query::OPERATOR_LIKE:
+                $whereExpr = $this->createLikeExpr($qb, $searchCondition['fieldValue'], $index);
+                break;
+            
             case Query::OPERATOR_CONTAINS:
                 $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
                 $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
@@ -99,6 +103,25 @@ class PdoMysql extends BaseDriver
         }
 
         return '(' . $whereExpr . ')';
+    }
+
+    /**
+     * Uses whole string for like expression. Does not operate on words.
+     *
+     * @param QueryBuilder $qb
+     * @param string $fieldValue
+     * @param $index
+     *
+     * @return string
+     */
+    protected function createLikeExpr(QueryBuilder $qb, $fieldValue, $index)
+    {
+        $parameterName = 'value' . $index;
+        $parameterValue = '%' . $fieldValue . '%';
+        
+        $qb->setParameter($parameterName, $parameterValue);
+        
+        return parent::createContainsStringQuery($index, false);
     }
 
     /**
