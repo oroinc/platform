@@ -82,7 +82,7 @@ class Channel
      * @var Transport
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport",
-     *     cascade={"all"}, orphanRemoval=true
+     *     cascade={"all"}, orphanRemoval=true, inversedBy="channel"
      * )
      */
     protected $transport;
