@@ -35,12 +35,24 @@ define([
         getSearchableString: function() {
             var address = '';
 
-            if (this.get('country'))     address += this.get('country')      +  ', ';
-            if (this.get('region'))      address += this.get('region')       +  ', ';
-            if (this.get('city'))        address += this.get('city')         +  ', ';
-            if (this.get('street'))      address += this.get('street')       +  ' ';
-            if (this.get('street2'))     address += this.get('street2')      +  ' ';
-            if (this.get('postalCode'))  address += this.get('postalCode')   +  ', ';
+            if (this.get('country')) {
+                address += this.get('country') + ', ';
+            }
+            if (this.get('region')) {
+                address += this.get('region') + ', ';
+            }
+            if (this.get('city')) {
+                address += this.get('city') + ', ';
+            }
+            if (this.get('street')) {
+                address += this.get('street') + ' ';
+            }
+            if (this.get('street2')) {
+                address += this.get('street2') + ' ';
+            }
+            if (this.get('postalCode')) {
+                address += this.get('postalCode') + ', ';
+            }
 
             return address;
         }
