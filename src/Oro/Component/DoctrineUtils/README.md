@@ -31,3 +31,14 @@ The [SqlWalker](./ORM/SqlWalker.php) is an [Doctrine output walker](http://docs.
 ```php
 $query->setHint('HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS', true);
 ```
+
+PreciseOrderByWalker class
+--------------------------
+**Description:**
+The [PreciseOrderByWalker](./ORM/Walker/PreciseOrderByWalker.php) is an [Doctrine tree walker](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/cookbook/dql-custom-walkers.html) that is used to modify ORDER BY clause of a query to make sure that records will be returned in the same order independent from a state of SQL server and from values of OFFSET and LIMIT clauses. This is achieved by adding the primary key column of the first root entity to the end of ORDER BY clause.
+
+Example of usage:
+
+```php
+$query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [PreciseOrderByWalker::class]);
+```
