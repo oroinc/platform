@@ -77,3 +77,11 @@ Note: you must call dump command before using this one, otherwise system won't h
 ```bash
 app/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --upload OroCRM
 ```
+
+oro:translation:load
+--------------------
+Load translations data to DB.
+Params are:
+
+- `languages` - the list of languages, that should be loaded.
+- `rebuild-cache` (default 0) - rebuild translation cache before and after loading.
