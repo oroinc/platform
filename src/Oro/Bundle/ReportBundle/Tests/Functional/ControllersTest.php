@@ -209,6 +209,15 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 404);
     }
 
+    public function testViewFromGrid()
+    {
+        $crawler = $this->client->request('GET', $this->getUrl('oro_report_view_grid', ['gridName' => 'reports-grid']));
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains('reports-grid', $crawler->html());
+        $this->assertEquals('reports-grid', $crawler->filter('h1.oro-subtitle')->html());
+    }
+
     /**
      * Data provider for SOAP API tests
      *

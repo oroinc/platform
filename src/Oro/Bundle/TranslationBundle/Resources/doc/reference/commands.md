@@ -7,7 +7,7 @@ Table of contents
 - [Overview](#overview)
 - [oro:translation:dump](#orotranslationdump)
 - [oro:translation:pack](#orotranslationpack)
-- [Examples](#examples)
+- [oro:translation:load](#orotranslationload)
 
 Overview
 ----------
@@ -76,4 +76,18 @@ app/console oro:translation:pack --dump OroCRM
 Note: you must call dump command before using this one, otherwise system won't have anything to upload or will upload earlier generated files if there were left.
 ```bash
 app/console oro:translation:pack -i project-key -k abc1234567890c23ee33a767adb --upload OroCRM
+```
+
+oro:translation:load
+--------------------
+Command  used to load translations data to DB.
+Params are:
+
+- `languages` - the list of languages, that should be loaded.
+
+- `rebuild-cache` - rebuild translation cache before and after loading.
+
+**Load translations for English and Russian with rebuilding translation cache:**
+```bash
+app/console oro:translation:load --languages=en --languages=ru --rebuild-cache
 ```
