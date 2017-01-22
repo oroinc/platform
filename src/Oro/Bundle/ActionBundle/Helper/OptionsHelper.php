@@ -69,6 +69,7 @@ class OptionsHelper
             'showDialog' => !empty($data['showDialog']),
             'executionUrl' => $executionUrl,
             'url' => $executionUrl,
+            'jsDialogWidget' => $data['jsDialogWidget'],
         ];
 
         if ($data['hasForm']) {
@@ -141,6 +142,7 @@ class OptionsHelper
                 'routeParams' => [],
                 'frontendOptions' => [],
                 'buttonOptions' => [],
+                'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
             ],
             $data
         );
