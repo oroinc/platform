@@ -1,0 +1,4 @@
+styles:
+    inputs:
+        - 'bundles/orodatagrid/blank/scss/variables/grid-views-config.scss'
+        - 'bundles/orodatagrid/blank/scss/styles.scss'
