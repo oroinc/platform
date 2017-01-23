@@ -4,6 +4,14 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% from _self import resetButton %}
 {% block content %}
+    {% set componentOptions = {
+        container: 'left-panel-container',
+        sidebar: 'left-panel',
+        sidebarAlias: 'menuitem-sidebar',
+        widgetAlias: 'menuitem-widget',
+        widgetContainer: '.content'
+    } %}
+
     <div class="layout-content"{% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
         <div class="container-fluid page-title">
             <div class="navigation clearfix navbar-extra navbar-extra-right">
@@ -66,10 +74,20 @@
 
         <div class="layout-content scrollable-container">
             {% block content_data %}
-                <div class="left-panel-container">
+                <div class="left-panel-container"
+                     data-page-component-module="orodatagrid/js/app/components/grid-sidebar-component"
+                     data-page-component-options="{{ componentOptions|json_encode }}">
                     <div class="placeholder">
                         <div class="scrollable-container">
                             <div class="left-panel scrollable-container">
+                                <div class="left-panel-header">
+                                    <div class="left-panel-control left-panel-control-maximize">
+                                        <i class="fa-forward control-maximize"></i>
+                                    </div>
+                                    <div class="left-panel-control left-panel-control-minimize">
+                                        <i class="fa-backward control-minimize"></i>
+                                    </div>
+                                </div>
                                 <div class="menu-item">
                                     {% set treeOptions = {
                                         'data' : tree,
@@ -92,7 +110,7 @@
                                     ) }}
                                 </div>
                             </div>
-                            <div class="content">
+                            <div class="content categories-content">
                                 <div class="text-center">
                                     {{ 'oro.navigation.menuupdate.select_existing_or_create_new'|trans }}
                                 </div>

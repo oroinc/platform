@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -48,6 +49,8 @@ class AbstractAjaxMenuController extends Controller
         }
 
         $em->flush($updates);
+
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -85,6 +88,8 @@ class AbstractAjaxMenuController extends Controller
         $em = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
         $em->persist($menuUpdate);
         $em->flush();
+
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
 
         return new JsonResponse(null, Response::HTTP_CREATED);
     }
@@ -129,6 +134,8 @@ class AbstractAjaxMenuController extends Controller
 
         $entityManager->flush($menuUpdate);
 
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
@@ -148,6 +155,8 @@ class AbstractAjaxMenuController extends Controller
         $scope = $this->findOrCreateScope($request, $menuName);
         $this->getMenuUpdateManager()->showMenuItem($menuName, $key, $scope);
 
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
@@ -166,6 +175,8 @@ class AbstractAjaxMenuController extends Controller
         $this->checkAcl();
         $scope = $this->findOrCreateScope($request, $menuName);
         $this->getMenuUpdateManager()->hideMenuItem($menuName, $key, $scope);
+
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -212,6 +223,8 @@ class AbstractAjaxMenuController extends Controller
 
         $entityManager->flush();
 
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
         return new JsonResponse(['status' => true], Response::HTTP_OK);
     }
 
@@ -221,6 +234,18 @@ class AbstractAjaxMenuController extends Controller
     protected function getMenuUpdateManager()
     {
         return $this->get('oro_navigation.manager.menu_update');
+    }
+
+    /**
+     * @param string $menuName
+     * @param Scope $scope
+     */
+    protected function dispatchMenuUpdateScopeChangeEvent($menuName, Scope $scope)
+    {
+        $this->get('event_dispatcher')->dispatch(
+            MenuUpdateScopeChangeEvent::NAME,
+            new MenuUpdateScopeChangeEvent($menuName, $scope)
+        );
     }
 
     /**

@@ -8,7 +8,6 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

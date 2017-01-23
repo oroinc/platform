@@ -70,7 +70,7 @@ class TranslationRepository extends EntityRepository
     public function getCountByLanguage(Language $language)
     {
         $qb = $this->createQueryBuilder('t')
-            ->select('count(t.id)')
+            ->select('COUNT(t.id)')
             ->where('t.language = :language')
             ->setParameter('language', $language);
 
@@ -115,5 +115,25 @@ class TranslationRepository extends EntityRepository
             ->setParameter('scope', Translation::SCOPE_SYSTEM);
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @param int $languageId
+     * @return array
+     */
+    public function getTranslationsData($languageId)
+    {
+        $translationsData = $this->createQueryBuilder('t')
+            ->select('IDENTITY(t.translationKey) as translation_key_id, t.scope, t.value')
+            ->where('t.language = :language')
+            ->setParameters(['language' => $languageId])
+            ->getQuery()
+            ->getArrayResult();
+        $translations = [];
+        foreach ($translationsData as $item) {
+            $translations[$item['translation_key_id']] = $item;
+        }
+
+        return $translations;
     }
 }

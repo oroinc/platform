@@ -59,6 +59,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.async.indexer'
+            - '@property_accessor'
         calls:
             - [setEntitiesConfig, [%oro_search.entities_config%]]
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
@@ -115,7 +116,6 @@ services:
         class: %oro_search.extension.search_results.class%
         arguments:
             - '@oro_search.formatter.result_formatter'
-            - '@doctrine.orm.entity_manager'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         tags:

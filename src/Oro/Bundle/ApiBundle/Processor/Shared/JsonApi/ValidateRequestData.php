@@ -161,14 +161,16 @@ abstract class ValidateRequestData implements ProcessorInterface
 
             $relationData = $relation[JsonApiDoc::DATA];
             $relationDataPointer = $this->buildPointer($relationPointer, JsonApiDoc::DATA);
-            if (!ArrayUtil::isAssoc($relationData)) {
-                foreach ($relationData as $key => $value) {
-                    if ($this->validateResourceObject($value, $this->buildPointer($relationDataPointer, $key))) {
-                        $isValid = false;
+            if ($relationData) {
+                if (!ArrayUtil::isAssoc($relationData)) {
+                    foreach ($relationData as $key => $value) {
+                        if ($this->validateResourceObject($value, $this->buildPointer($relationDataPointer, $key))) {
+                            $isValid = false;
+                        }
                     }
+                } elseif (!$this->validateResourceObject($relationData, $relationDataPointer)) {
+                    $isValid = false;
                 }
-            } elseif (!$this->validateResourceObject($relationData, $relationDataPointer)) {
-                $isValid = false;
             }
         }
 

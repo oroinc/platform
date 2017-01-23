@@ -64,10 +64,7 @@ class InlineEditingExtension extends AbstractExtension
         $configItems   = $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, []);
 
         if (empty($configItems[Configuration::CONFIG_ENTITY_KEY])) {
-            $configItems[Configuration::CONFIG_ENTITY_KEY] = $config->offsetGetOr(
-                Configuration::CONFIG_EXTENDED_ENTITY_KEY,
-                null
-            );
+            $configItems[Configuration::CONFIG_ENTITY_KEY] = $config->getExtendedEntityClassName();
         }
 
         $configuration = new Configuration(Configuration::BASE_CONFIG_KEY);

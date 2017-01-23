@@ -80,6 +80,8 @@ services:
 
     oro_workflow.form.type.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType'
+        arguments:
+            - '@oro_workflow.provider.workflow_definition_choices_groups'
         tags:
             - { name: form.type, alias: oro_workflow_definition }
 

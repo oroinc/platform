@@ -160,7 +160,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
      */
     public function setDataProvider()
     {
-        $tokenDateTime = new \DateTime();
+        $accessTokenExpiresAt = new \DateTime();
 
         return [
             'should have only accountType field' => [
@@ -190,7 +190,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                         'imapHost' => '',
                         'imapPort' => '',
                         'imapEncryption' => '',
-                        'accessTokenExpiresAt' => $tokenDateTime,
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'accessToken' => 'token',
                         'googleAuthCode' => 'googleAuthCode'
                     ],
@@ -199,7 +199,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                     'accountType' => 'gmail',
                     'userEmailOrigin' => $this->getUserEmailOrigin([
                         'user' => 'test',
-                        'accessTokenExpiresAt' => $tokenDateTime,
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'googleAuthCode' => 'googleAuthCode',
                         'accessToken' => 'token',
                     ])
@@ -208,7 +208,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                     'accountType' => 'gmail',
                     'userEmailOrigin' => $this->getUserEmailOrigin([
                         'user' => 'test',
-                        'accessTokenExpiresAt' => $tokenDateTime,
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'googleAuthCode' => 'googleAuthCode',
                         'accessToken' => 'token'
                     ])
@@ -222,7 +222,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                         'imapHost' => '',
                         'imapPort' => '',
                         'imapEncryption' => '',
-                        'accessTokenExpiresAt' => $tokenDateTime,
+                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
                         'accessToken' => '',
                         'googleAuthCode' => 'googleAuthCode',
                         'password' => '111'

@@ -105,10 +105,10 @@ system_configuration:
     groups:
         # string syntax
         some_group:
-            configurator: Acme\Bundle\DemoBundle\SettingsFormHandler::handle
+            handler: Acme\Bundle\DemoBundle\SettingsFormHandler::handle
         # array syntax
         some_group:
-            configurator:
+            handler:
                 - Acme\Bundle\DemoBundle\SettingsFormHandler::handle
                 - '@acme.settings_form_handler::handle'
 ```

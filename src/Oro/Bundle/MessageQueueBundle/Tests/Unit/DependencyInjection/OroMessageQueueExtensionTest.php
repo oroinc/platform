@@ -45,7 +45,6 @@ class OroMessageQueueExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroMessageQueueExtension();
 
         $extension->addTransportFactory(new FooTransportFactory('foo'));
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Transport factory with such name already added. Name foo');
         $extension->addTransportFactory(new FooTransportFactory('foo'));

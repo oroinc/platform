@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 class DefaultOperationRequestHelper
 {
     const DATAGRID_ROUTE = 'oro_datagrid_index';
     const MASS_ACTION_ROUTE = 'oro_datagrid_mass_action';
+    const DATAGRID_WIDGET_ROUTE = 'oro_datagrid_widget';
 
     /** @var RequestStack */
     protected $requestStack;
@@ -37,7 +39,7 @@ class DefaultOperationRequestHelper
 
         $route = $request->get('_route');
 
-        if (in_array($route, [self::DATAGRID_ROUTE, self::MASS_ACTION_ROUTE], true)) {
+        if (in_array($route, [self::DATAGRID_ROUTE, self::MASS_ACTION_ROUTE, self::DATAGRID_WIDGET_ROUTE], true)) {
             $params = $request->query->get($request->get('gridName'));
 
             if (isset($params['originalRoute'])) {

@@ -78,7 +78,6 @@ class SearchProvider extends ResultStatisticsProvider
         foreach ($originResults as $item) {
             $entityName = $item['entityName'];
             $results[]  = new Item(
-                $this->em,
                 $entityName,
                 $item['recordId'],
                 null,

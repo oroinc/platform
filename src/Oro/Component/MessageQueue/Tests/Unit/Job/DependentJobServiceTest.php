@@ -25,7 +25,6 @@ class DependentJobServiceTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Only root jobs allowed but got child. jobId: "12345"');
-
         $service->saveDependentJob($context);
     }
 

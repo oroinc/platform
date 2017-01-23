@@ -10,6 +10,10 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var RelationEntityConfigDumperExtension */
@@ -79,9 +83,12 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         );
     }
 
-    public function testManyToOneNoChangesIfReverseRelationAlreadyCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testReverseRelationAlreadyCreatedForManyToOne($reverseElements)
     {
-        $selfRelations   = [
+        $selfRelations = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
                 'owner'           => true,
@@ -106,6 +113,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -114,15 +133,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'manyToOne',
             'Test\SourceEntity',
             'rel_mto'
-        );
-
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE,
-                'relation'  => $targetRelations,
-            ],
-            'Test\TargetEntity'
         );
         $this->addConfigNewField(
             [
@@ -136,14 +146,16 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $this->extension->preUpdate();
 
-        // assert nothing changed
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testManyToManyNoChangesIfReverseRelationAlreadyCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testReverseRelationAlreadyCreatedForManyToMany($reverseElements)
     {
-        $selfRelations   = [
+        $selfRelations = [
             'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
                 'owner'           => true,
@@ -168,6 +180,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -176,15 +200,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'manyToMany',
             'Test\SourceEntity',
             'rel_mtm'
-        );
-
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE,
-                'relation'  => $targetRelations,
-            ],
-            'Test\TargetEntity'
         );
         $this->addConfigNewField(
             [
@@ -198,14 +213,16 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $this->extension->preUpdate();
 
-        // assert nothing changed
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testOneToManyNoChangesIfReverseRelationAlreadyCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testReverseRelationAlreadyCreatedForOneToMany($reverseElements)
     {
-        $selfRelations   = [
+        $selfRelations = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
                 'owner'           => false,
@@ -230,6 +247,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -238,15 +267,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'oneToMany',
             'Test\SourceEntity',
             'rel_otm'
-        );
-
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE,
-                'relation'  => $targetRelations,
-            ],
-            'Test\TargetEntity'
         );
         $this->addConfigNewField(
             [
@@ -260,14 +280,16 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $this->extension->preUpdate();
 
-        // assert nothing changed
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testManyToOneWhenNoReverseRelation()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testNoReverseRelationForManyToOne($reverseElements)
     {
-        $selfRelations   = [
+        $selfRelations = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
                 'owner'           => true,
@@ -292,6 +314,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -302,25 +336,59 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'rel_mto'
         );
 
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE,
-                'relation'  => $targetRelations,
-            ],
-            'Test\TargetEntity'
-        );
-
         $this->extension->preUpdate();
 
-        // assert nothing changed
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testManyToManyWhenNoReverseRelation()
+    public function testNoReverseRelationForManyToOneAndSameOwningAndTarget()
     {
-        $selfRelations   = [
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => false
+            ],
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse' => [
+                'field_id'        => false,
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'rel_mto'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testNoReverseRelationForManyToMany($reverseElements)
+    {
+        $selfRelations = [
             'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
                 'owner'           => true,
@@ -345,6 +413,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -355,28 +435,62 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'rel_mtm'
         );
 
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE,
-                'relation'  => $targetRelations,
-            ],
-            'Test\TargetEntity'
-        );
-
         $this->extension->preUpdate();
 
-        // assert nothing changed
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testOneToManyWhenNoReverseRelation()
+    public function testNoReverseRelationForManyToManyAndSameOwningAndTarget()
     {
-        $selfRelations   = [
+        $selfRelations = [
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany')
+            ],
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm'
+            ],
+            'manyToMany',
+            'Test\SourceEntity',
+            'rel_mtm'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testNoReverseRelationForOneToMany($reverseElements)
+    {
+        $selfRelations = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
-                'owner'           => false,
+                'owner'           => true,
                 'target_entity'   => 'Test\TargetEntity',
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne')
             ]
@@ -384,7 +498,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $targetRelations = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
                 'field_id'        => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne'),
-                'owner'           => true,
+                'owner'           => false,
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
             ]
@@ -398,6 +512,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -408,25 +534,59 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'rel_otm'
         );
 
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE,
-                'relation'  => $targetRelations,
-            ],
-            'Test\TargetEntity'
-        );
-
         $this->extension->preUpdate();
 
-        // assert nothing changed
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testManyToOneReverseRelationToBeCreated()
+    public function testNoReverseRelationForOneToManyAndSameOwningAndTarget()
     {
-        $selfRelations   = [
+        $selfRelations = [
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne')
+            ],
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm'
+            ],
+            'oneToMany',
+            'Test\SourceEntity',
+            'rel_otm'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testReverseRelationShouldBeCreatedForManyToOne($reverseElements)
+    {
+        $selfRelations = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
                 'owner'           => true,
@@ -451,6 +611,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -459,15 +631,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'manyToOne',
             'Test\SourceEntity',
             'rel_mto'
-        );
-
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE,
-                'relation'  => $targetRelations,
-            ],
-            'Test\TargetEntity'
         );
         $this->addConfigNewField(
             [
@@ -485,16 +648,80 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $selfRelations[$relationKey]['target_field_id'] =
             $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany');
-        $targetRelations[$relationKey]['field_id']      =
+        $targetRelations[$relationKey]['field_id'] =
             $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany');
 
         $this->assertEquals($selfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testManyToOneWhenRelationToBeCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testReverseRelationShouldBeCreatedForManyToOneAndSameOwningAndTarget($reverseElements)
     {
-        $selfRelations   = [
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => false
+            ],
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse' => [
+                'field_id'        => false,
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'rel_mto'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse'
+            ],
+            'oneToMany',
+            'Test\SourceEntity',
+            'rev_rel_mto'
+        );
+        if ($reverseElements) {
+            $this->configs['Test\SourceEntity'] = array_reverse($this->configs['Test\SourceEntity']);
+        }
+
+        $this->extension->preUpdate();
+
+        $selfRelations['manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto']['target_field_id'] =
+            $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany');
+        $selfRelations['manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse']['field_id'] =
+            $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany');
+
+        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testSelfRelationShouldBeCreatedForManyToOne($reverseElements)
+    {
+        $expectedSelfRelations = [
             'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
                 'owner'           => true,
@@ -521,25 +748,29 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
                 'relation_key'  => 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto',
                 'cascade'       => ['persist', 'remove'],
-                'on_delete'       => 'CASCADE',
-                'nullable'        => true
+                'on_delete'     => 'CASCADE',
+                'nullable'      => true
             ],
             'manyToOne',
             'Test\SourceEntity',
             'rel_mto'
-        );
-
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE
-            ],
-            'Test\TargetEntity'
         );
         $this->addConfigNewField(
             [
@@ -553,23 +784,35 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $this->extension->preUpdate();
 
-        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testManyToOneWhenUnidirectionalRelationToBeCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testSelfRelationShouldBeCreatedForManyToOneAndSameOwningAndTarget($reverseElements)
     {
-        $selfRelations   = [
-            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
-                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
-                'owner'           => true,
-                'target_entity'   => 'Test\TargetEntity',
-                'target_field_id' => false
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
             ]
         ];
-        $targetRelations = [
-            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
-                'field_id'        => false,
+        $expectedSelfRelations = [
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany'),
+                'cascade'         => ['persist', 'remove'],
+                'on_delete'       => 'CASCADE',
+                'nullable'        => true
+            ],
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany'),
                 'owner'           => false,
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
@@ -579,37 +822,48 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $selfConfig = $this->addEntityConfig(
             [
                 'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations
             ],
             'Test\SourceEntity'
         );
+
         $this->addConfigNewField(
             [
-                'target_entity' => 'Test\TargetEntity',
-                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto'
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto',
+                'cascade'       => ['persist', 'remove'],
+                'on_delete'     => 'CASCADE',
+                'nullable'      => true
             ],
             'manyToOne',
             'Test\SourceEntity',
             'rel_mto'
         );
-
-        $targetConfig = $this->addEntityConfig(
+        $this->addConfigNewField(
             [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse'
             ],
-            'Test\TargetEntity'
+            'oneToMany',
+            'Test\SourceEntity',
+            'rev_rel_mto'
         );
+        if ($reverseElements) {
+            $this->configs['Test\SourceEntity'] = array_reverse($this->configs['Test\SourceEntity']);
+        }
 
         $this->extension->preUpdate();
 
-        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
-        $this->assertEquals($targetRelations, $targetConfig->get('relation'));
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
     }
 
-    public function testManyToManyWhenRelationToBeCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testSelfRelationShouldBeCreatedForManyToMany($reverseElements)
     {
-        $selfRelations   = [
+        $expectedSelfRelations = [
             'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
                 'owner'           => true,
@@ -634,6 +888,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -643,14 +909,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'manyToMany',
             'Test\SourceEntity',
             'rel_mtm'
-        );
-
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE
-            ],
-            'Test\TargetEntity'
         );
         $this->addConfigNewField(
             [
@@ -664,23 +922,33 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $this->extension->preUpdate();
 
-        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testManyToManyWhenUnidirectionalRelationToBeCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testSelfRelationShouldBeCreatedForManyToManyAndSameOwningAndTarget($reverseElements)
     {
-        $selfRelations   = [
-            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
+        $expectedSelfRelations = [
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm'         => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
                 'owner'           => true,
-                'target_entity'   => 'Test\TargetEntity',
-                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany')
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany'),
+                'cascade'         => ['persist', 'remove']
+            ],
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
             ]
         ];
-        $targetRelations = [
-            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
-                'field_id'        => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany'),
+        $selfRelations = [
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany'),
                 'owner'           => false,
                 'target_entity'   => 'Test\SourceEntity',
                 'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
@@ -690,37 +958,46 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $selfConfig = $this->addEntityConfig(
             [
                 'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations
             ],
             'Test\SourceEntity'
         );
+
         $this->addConfigNewField(
             [
-                'target_entity' => 'Test\TargetEntity',
-                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm'
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm',
+                'cascade'       => ['persist', 'remove']
             ],
             'manyToMany',
             'Test\SourceEntity',
             'rel_mtm'
         );
-
-        $targetConfig = $this->addEntityConfig(
+        $this->addConfigNewField(
             [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse'
             ],
-            'Test\TargetEntity'
+            'manyToMany',
+            'Test\SourceEntity',
+            'sourceentity_rel_mtm'
         );
+        if ($reverseElements) {
+            $this->configs['Test\SourceEntity'] = array_reverse($this->configs['Test\SourceEntity']);
+        }
 
         $this->extension->preUpdate();
 
-        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
-        $this->assertEquals($targetRelations, $targetConfig->get('relation'));
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
     }
 
-    public function testOneToManyWhenRelationToBeCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testSelfRelationShouldBeCreatedForOneToMany($reverseElements)
     {
-        $selfRelations   = [
+        $expectedSelfRelations = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
                 'owner'           => false,
@@ -745,6 +1022,18 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -754,14 +1043,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'oneToMany',
             'Test\SourceEntity',
             'rel_otm'
-        );
-
-        $targetConfig = $this->addEntityConfig(
-            [
-                'is_extend' => true,
-                'state'     => ExtendScope::STATE_ACTIVE
-            ],
-            'Test\TargetEntity'
         );
         $this->addConfigNewField(
             [
@@ -775,13 +1056,259 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $this->extension->preUpdate();
 
-        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
     }
 
-    public function testOneToManyWhenUnidirectionalRelationToBeCreated()
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testSelfRelationShouldBeCreatedForOneToManyAndSameOwningAndTarget($reverseElements)
     {
-        $selfRelations   = [
+        $expectedSelfRelations = [
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne'),
+                'cascade'         => ['persist', 'remove']
+            ],
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
+            ]
+        ];
+        $selfRelations = [
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm',
+                'cascade'       => ['persist', 'remove']
+            ],
+            'oneToMany',
+            'Test\SourceEntity',
+            'rel_otm'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'sourceentity_rel_otm'
+        );
+        if ($reverseElements) {
+            $this->configs['Test\SourceEntity'] = array_reverse($this->configs['Test\SourceEntity']);
+        }
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+    }
+
+    public function testUnidirectionalRelationShouldBeCreatedForManyToOne()
+    {
+        $expectedSelfRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => false
+            ]
+        ];
+        $expectedTargetRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
+                'field_id'        => false,
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE
+            ],
+            'Test\SourceEntity'
+        );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE
+            ],
+            'Test\TargetEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\TargetEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'rel_mto'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($expectedTargetRelations, $targetConfig->get('relation'));
+    }
+
+    public function testUnidirectionalRelationShouldBeCreatedForManyToOneAndSameOwningAndTarget()
+    {
+        $expectedSelfRelations = [
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => false
+            ],
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse' => [
+                'field_id'        => false,
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'rel_mto'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+    }
+
+    public function testUnidirectionalRelationShouldBeCreatedForManyToMany()
+    {
+        $expectedSelfRelations = [
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany')
+            ]
+        ];
+        $expectedTargetRelations = [
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
+                'field_id'        => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_mtm', 'manyToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE
+            ],
+            'Test\SourceEntity'
+        );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE
+            ],
+            'Test\TargetEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\TargetEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm'
+            ],
+            'manyToMany',
+            'Test\SourceEntity',
+            'rel_mtm'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($expectedTargetRelations, $targetConfig->get('relation'));
+    }
+
+    public function testUnidirectionalRelationShouldBeCreatedForManyToManyAndSameOwningAndTarget()
+    {
+        $expectedSelfRelations = [
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany')
+            ],
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_mtm', 'manyToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm'
+            ],
+            'manyToMany',
+            'Test\SourceEntity',
+            'rel_mtm'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+    }
+
+    public function testUnidirectionalRelationShouldBeCreatedForOneToMany()
+    {
+        $expectedSelfRelations = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
                 'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
                 'owner'           => false,
@@ -789,7 +1316,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                 'target_field_id' => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne')
             ]
         ];
-        $targetRelations = [
+        $expectedTargetRelations = [
             'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
                 'field_id'        => $this->getFieldId('Test\TargetEntity', 'sourceentity_rel_otm', 'manyToOne'),
                 'owner'           => true,
@@ -805,6 +1332,14 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             ],
             'Test\SourceEntity'
         );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE
+            ],
+            'Test\TargetEntity'
+        );
+
         $this->addConfigNewField(
             [
                 'target_entity' => 'Test\TargetEntity',
@@ -815,18 +1350,467 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
             'rel_otm'
         );
 
-        $targetConfig = $this->addEntityConfig(
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($expectedTargetRelations, $targetConfig->get('relation'));
+    }
+
+    public function testUnidirectionalRelationShouldBeCreatedForOneToManyAndSameOwningAndTarget()
+    {
+        $expectedSelfRelations = [
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm'         => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne')
+            ],
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'sourceentity_rel_otm', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
             [
                 'is_extend' => true,
                 'state'     => ExtendScope::STATE_ACTIVE
             ],
-            'Test\TargetEntity'
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm'
+            ],
+            'oneToMany',
+            'Test\SourceEntity',
+            'rel_otm'
         );
 
         $this->extension->preUpdate();
 
-        $this->assertEquals($selfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testCompleteSelfRelationForManyToOne($reverseElements)
+    {
+        $expectedSelfRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany')
+            ]
+        ];
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany')
+            ]
+        ];
+        $targetRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto' => [
+                'field_id'        => $this->getFieldId('Test\TargetEntity', 'rev_rel_mto', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\TargetEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'rel_mto'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto'
+            ],
+            'oneToMany',
+            'Test\TargetEntity',
+            'rev_rel_mto'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
         $this->assertEquals($targetRelations, $targetConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testCompleteSelfRelationForManyToOneAndSameOwningAndTarget($reverseElements)
+    {
+        $expectedSelfRelations = [
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany')
+            ],
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
+            ]
+        ];
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto' => [
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany')
+            ],
+            'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_mto', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mto', 'manyToOne')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'rel_mto'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto|inverse'
+            ],
+            'oneToMany',
+            'Test\SourceEntity',
+            'rev_rel_mto'
+        );
+        if ($reverseElements) {
+            $this->configs['Test\SourceEntity'] = array_reverse($this->configs['Test\SourceEntity']);
+        }
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testCompleteSelfRelationForManyToMany($reverseElements)
+    {
+        $expectedSelfRelations = [
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mtm', 'manyToMany')
+            ]
+        ];
+        $selfRelations = [
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_mtm', 'manyToMany')
+            ]
+        ];
+        $targetRelations = [
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm' => [
+                'field_id'        => $this->getFieldId('Test\TargetEntity', 'rev_rel_mtm', 'manyToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\TargetEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm'
+            ],
+            'manyToMany',
+            'Test\SourceEntity',
+            'rel_mtm'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm'
+            ],
+            'manyToMany',
+            'Test\TargetEntity',
+            'rev_rel_mtm'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($targetRelations, $targetConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testCompleteSelfRelationForManyToManyAndSameOwningAndTarget($reverseElements)
+    {
+        $expectedSelfRelations = [
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mtm', 'manyToMany')
+            ],
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_mtm', 'manyToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
+            ]
+        ];
+        $selfRelations = [
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm' => [
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_mtm', 'manyToMany')
+            ],
+            'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_mtm', 'manyToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_mtm', 'manyToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm'
+            ],
+            'manyToMany',
+            'Test\SourceEntity',
+            'rel_mtm'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm|inverse'
+            ],
+            'manyToMany',
+            'Test\SourceEntity',
+            'rev_rel_mtm'
+        );
+        if ($reverseElements) {
+            $this->configs['Test\SourceEntity'] = array_reverse($this->configs['Test\SourceEntity']);
+        }
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testCompleteSelfRelationForOneToMany($reverseElements)
+    {
+        $expectedSelfRelations = [
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_otm', 'manyToOne')
+            ]
+        ];
+        $selfRelations = [
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
+                'target_field_id' => $this->getFieldId('Test\TargetEntity', 'rev_rel_otm', 'manyToOne')
+            ]
+        ];
+        $targetRelations = [
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm' => [
+                'field_id'        => $this->getFieldId('Test\TargetEntity', 'rev_rel_otm', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+        $targetConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $targetRelations,
+            ],
+            'Test\TargetEntity'
+        );
+        if ($reverseElements) {
+            $this->configs[null] = array_reverse($this->configs[null]);
+        }
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\TargetEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm'
+            ],
+            'oneToMany',
+            'Test\SourceEntity',
+            'rel_otm'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm'
+            ],
+            'manyToOne',
+            'Test\TargetEntity',
+            'rev_rel_otm'
+        );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
+        $this->assertEquals($targetRelations, $targetConfig->get('relation'));
+    }
+
+    /**
+     * @dataProvider elementsOrderProvider
+     */
+    public function testCompleteSelfRelationForOneToManyAndSameOwningAndTarget($reverseElements)
+    {
+        $expectedSelfRelations = [
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany'),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_otm', 'manyToOne')
+            ],
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_otm', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
+            ]
+        ];
+        $selfRelations = [
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm' => [
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rev_rel_otm', 'manyToOne')
+            ],
+            'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse' => [
+                'field_id'        => $this->getFieldId('Test\SourceEntity', 'rev_rel_otm', 'manyToOne'),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => $this->getFieldId('Test\SourceEntity', 'rel_otm', 'oneToMany')
+            ]
+        ];
+
+        $selfConfig = $this->addEntityConfig(
+            [
+                'is_extend' => true,
+                'state'     => ExtendScope::STATE_ACTIVE,
+                'relation'  => $selfRelations,
+            ],
+            'Test\SourceEntity'
+        );
+
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm'
+            ],
+            'oneToMany',
+            'Test\SourceEntity',
+            'rel_otm'
+        );
+        $this->addConfigNewField(
+            [
+                'target_entity' => 'Test\SourceEntity',
+                'relation_key'  => 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm|inverse'
+            ],
+            'manyToOne',
+            'Test\SourceEntity',
+            'rev_rel_otm'
+        );
+        if ($reverseElements) {
+            $this->configs['Test\SourceEntity'] = array_reverse($this->configs['Test\SourceEntity']);
+        }
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
     }
 
     /**
@@ -902,5 +1886,16 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     protected function getFieldId($className, $fieldName, $fieldType)
     {
         return new FieldConfigId('extend', $className, $fieldName, $fieldType);
+    }
+
+    /**
+     * @return array
+     */
+    public function elementsOrderProvider()
+    {
+        return [
+            ['reverseElements' => false],
+            ['reverseElements' => true],
+        ];
     }
 }

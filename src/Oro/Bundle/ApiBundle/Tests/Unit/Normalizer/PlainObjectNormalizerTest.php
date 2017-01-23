@@ -68,11 +68,14 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'id'        => 123,
-                'name'      => 'product_name',
-                'updatedAt' => null,
-                'category'  => null,
-                'owner'     => null
+                'id'            => 123,
+                'name'          => 'product_name',
+                'updatedAt'     => null,
+                'category'      => null,
+                'owner'         => null,
+                'price'         => null,
+                'priceValue'    => null,
+                'priceCurrency' => null,
             ],
             $result
         );
@@ -86,11 +89,14 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'id'        => 123,
-                'name'      => 'product_name',
-                'updatedAt' => new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')),
-                'category'  => 'category_name',
-                'owner'     => 'user_name'
+                'id'            => 123,
+                'name'          => 'product_name',
+                'updatedAt'     => new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')),
+                'category'      => 'category_name',
+                'owner'         => 'user_name',
+                'price'         => null,
+                'priceValue'    => null,
+                'priceCurrency' => null,
             ],
             $result
         );
