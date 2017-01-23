@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension;
 
-class StartTransitionButtonProviderExtensionTestTest extends StartTransitionButtonProviderExtensionTestCase
+class StartTransitionButtonProviderExtensionTest extends StartTransitionButtonProviderExtensionTestCase
 {
     /**
      * @return string
