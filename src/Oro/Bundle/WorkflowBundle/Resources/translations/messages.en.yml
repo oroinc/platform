@@ -303,3 +303,5 @@ oro:
             name.label: Name
             position.label: Position
             final.label: Final
+            exclusive_active_groups.tooltip: "Only one of same exclusive active group workflows can be activated in the system at the same time"
+            exclusive_record_groups.tooltip: "Only one workflow can be started for a related entity within a same exclusive record group"

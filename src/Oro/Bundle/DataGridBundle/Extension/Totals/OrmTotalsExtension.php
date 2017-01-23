@@ -299,13 +299,6 @@ class OrmTotalsExtension extends AbstractExtension
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
 
-        $parameters = $queryBuilder->getParameters();
-        if ($parameters->count()) {
-            $queryBuilder->resetDQLPart('where')
-                ->resetDQLPart('having');
-            QueryUtils::removeUnusedParameters($queryBuilder);
-        }
-
         $this->addPageLimits($queryBuilder, $pageData, $perPage);
 
         $query = $queryBuilder->getQuery();

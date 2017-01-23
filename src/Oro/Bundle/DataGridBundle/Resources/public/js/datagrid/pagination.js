@@ -69,6 +69,7 @@ define([
             this.listenTo(this.collection, 'reset', this.render);
 
             this.hidden = options.hide === true;
+            this.scrollToPosition = $(options.el).closest('.toolbar').prevAll('.toolbar').position();
 
             this.template = _.template($(options.template || this.template).html());
 
@@ -116,6 +117,10 @@ define([
 
             var collection = this.collection;
             var state = collection.state;
+
+            if (this.scrollToPosition) {
+                $('body,html').stop().animate({scrollTop: this.scrollToPosition.top}, '500', 'swing');
+            }
 
             if (ffConfig) {
                 var prevDirection = _.has(ffConfig.prev, 'direction') ? ffConfig.prev.direction : undefined;

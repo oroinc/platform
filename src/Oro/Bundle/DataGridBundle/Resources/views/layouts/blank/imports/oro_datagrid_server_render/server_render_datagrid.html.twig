@@ -63,7 +63,9 @@
          data-layout="separate"
             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
     >
-        <div class="oro-datagrid">
+        <div class="oro-datagrid"
+             data-skip-input-widgets
+        >
             {% if toolbarOptions.placement.top %}
                 <div class="toolbar" data-grid-toolbar="top">
                     {{ block_widget(block[id ~ '_toolbar']) }}
@@ -172,9 +174,9 @@
 {% endblock %}
 
 {% block __oro_datagrid_server_render__datagrid_cell_widget %}
-        {% for child in block if child.vars.visible -%}
-            {{ block_widget(child) }}
-        {%- endfor %}
+    {% for child in block if child.vars.visible -%}
+        {{ block_widget(child) }}
+    {%- endfor %}
 {% endblock %}
 
 {%- block __oro_datagrid_server_render__datagrid_cell_value_widget -%}

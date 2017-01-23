@@ -42,8 +42,11 @@ class AjaxController extends Controller
         try {
             $operation = $this->getOperationRegistry()->findByName($operationName);
 
-            if (!$operation instanceof Operation || !$operation->isAvailable($data)) {
+            if (!$operation instanceof Operation) {
                 throw new OperationNotFoundException($operationName);
+            }
+            if (!$operation->isAvailable($data)) {
+                throw new ForbiddenOperationException();
             }
 
             $operation->execute($data, $errors);

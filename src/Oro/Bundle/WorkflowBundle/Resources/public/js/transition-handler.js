@@ -2,9 +2,10 @@ define([
     'jquery',
     'underscore',
     'oroui/js/modal',
-    'oroworkflow/js/transition-executor',
-    'oroworkflow/js/transition-event-handlers'
-], function($, _, Modal, performTransition, TransitionEventHandlers) {
+    'oroui/js/tools',
+    'backbone',
+    'oroworkflow/js/transition-executor'
+], function($, _, Modal, tools, Backbone, performTransition) {
     'use strict';
 
     /**
@@ -46,31 +47,14 @@ define([
                 dialogOptions = _.extend(dialogOptions, additionalOptions);
             }
 
-            require(['oro/dialog-widget'],
-                function(DialogWidget) {
-                    var transitionFormWidget = new DialogWidget(dialogOptions);
-                    transitionFormWidget.on('widgetRemove', function() {
-                        resetInProgress();
-                    });
+            tools.loadModules('oroworkflow/transition-dialog-widget', function(Widget) {
+                var _widget = new Widget(dialogOptions);
+                Backbone.listenTo(_widget, 'widgetRemove', _.bind(function() {
+                    resetInProgress();
+                }, this));
 
-                    transitionFormWidget.on('formSave', function(data) {
-                        transitionFormWidget.remove();
-                        performTransition(element, data, pageRefresh);
-                    });
-
-                    transitionFormWidget.on('transitionSuccess', function(response) {
-                        transitionFormWidget.remove();
-                        TransitionEventHandlers.getOnSuccess(element, pageRefresh)(response);
-                    });
-
-                    transitionFormWidget.on('transitionFailure', function(jqxhr) {
-                        transitionFormWidget.remove();
-                        TransitionEventHandlers.getOnFailure(element, pageRefresh)(jqxhr);
-                    });
-
-                    transitionFormWidget.render();
-                }
-            );
+                _widget.render();
+            });
         };
 
         var showConfirmationModal = function() {

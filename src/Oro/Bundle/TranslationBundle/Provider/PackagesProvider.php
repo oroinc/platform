@@ -6,9 +6,9 @@ use Composer\Config;
 use Composer\Package\PackageInterface;
 
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
 
-class PackagesProvider
+class PackagesProvider implements PackageProviderInterface
 {
     /** @var ServiceLink */
     protected $pmLink;
@@ -25,26 +25,28 @@ class PackagesProvider
     /** @var array|TranslationPackagesProviderExtensionInterface[] */
     protected $extensions = [];
 
+    /** @var PackageProviderInterface[] */
+    protected $packageProviders;
+
     /**
      * @param ServiceLink $pmLink
      * @param array $bundles
      * @param string $kernelRootDir
      * @param string $composerCacheHome
+     * @param array $packageProviders
      */
-    public function __construct(ServiceLink $pmLink, array $bundles, $kernelRootDir, $composerCacheHome)
-    {
+    public function __construct(
+        ServiceLink $pmLink,
+        array $bundles,
+        $kernelRootDir,
+        $composerCacheHome,
+        array $packageProviders = []
+    ) {
         $this->pmLink            = $pmLink;
         $this->bundles           = $bundles;
         $this->kernelRootDir     = $kernelRootDir;
         $this->composerCacheHome = $composerCacheHome;
-    }
-
-    /**
-     * @param TranslationPackagesProviderExtensionInterface $extension
-     */
-    public function addExtension(TranslationPackagesProviderExtensionInterface $extension)
-    {
-        $this->extensions[] = $extension;
+        $this->packageProviders  = $packageProviders;
     }
 
     /**
@@ -89,10 +91,8 @@ class PackagesProvider
         }
 
         // collect extra package names from different extensions
-        foreach ($this->extensions as $extension) {
-            foreach ($extension->getPackageNames() as $packageName) {
-                $packages[] = $packageName;
-            }
+        foreach ($this->packageProviders as $provider) {
+            $packages = array_merge($packages, $provider->getInstalledPackages());
         }
 
         return array_unique($packages);

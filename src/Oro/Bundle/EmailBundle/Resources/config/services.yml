@@ -800,6 +800,7 @@ services:
             - '@oro_locale.formatter.name'
             - '@oro_email.email.address.helper'
             - '@oro_email.provider.email_recipients.helper'
+            - '@oro_entity.entity_field_provider'
 
     oro_email.email_recipients.provider:
         class: %oro_email.email_recipients.provider.class%

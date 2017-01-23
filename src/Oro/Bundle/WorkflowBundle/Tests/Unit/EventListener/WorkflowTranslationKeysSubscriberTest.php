@@ -40,6 +40,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->translationManager->expects($this->once())
             ->method('findTranslationKey')
             ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        $this->translationManager->expects($this->once())->method('flush');
 
         $this->translationKeysSubscriber->ensureTranslationKeys($changes);
     }
@@ -72,6 +73,8 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('removeTranslationKey')
             ->with('test_workflow_transition_2_translation_key', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
+        $this->translationManager->expects($this->once())->method('flush');
+
         $this->translationKeysSubscriber->clearTranslationKeys($changes);
     }
 
@@ -93,6 +96,7 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->translationManager->expects($this->once())
             ->method('removeTranslationKey')
             ->with('label_translation_key');
+        $this->translationManager->expects($this->once())->method('flush');
 
         $this->translationKeysSubscriber->deleteTranslationKeys(new WorkflowChangesEvent($deletedDefinition));
     }
