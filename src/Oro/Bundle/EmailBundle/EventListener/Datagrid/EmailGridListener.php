@@ -115,9 +115,7 @@ class EmailGridListener implements FeatureToggleableInterface
 
         if ($this->configManager->get('oro_email.threads_grouping')) {
             $queryBuilder->andWhere('e.head = :enabled')->setParameter('enabled', true);
-            if ($countQb) {
-                $countQb->andWhere('e.head = :enabled')->setParameter('enabled', true);
-            }
+            $countQb->andWhere('e.head = :enabled')->setParameter('enabled', true);
         }
 
         $this->prepareQueryToFilter($parameters, $queryBuilder, $countQb);
