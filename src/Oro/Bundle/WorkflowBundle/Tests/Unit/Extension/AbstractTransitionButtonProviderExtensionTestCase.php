@@ -12,7 +12,7 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-abstract class AbstractTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUnit_Framework_TestCase
 {
     /** @var WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowRegistry;
