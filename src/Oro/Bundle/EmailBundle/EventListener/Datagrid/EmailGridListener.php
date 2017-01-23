@@ -49,17 +49,22 @@ class EmailGridListener
      * @param EmailQueryFactory $factory
      * @param SecurityFacade $securityFacade
      * @param GridViewManager $gridViewManager
-     * @param ConfigManager $configManager
      */
     public function __construct(
         EmailQueryFactory $factory,
         SecurityFacade $securityFacade,
-        GridViewManager $gridViewManager,
-        ConfigManager $configManager
+        GridViewManager $gridViewManager
     ) {
         $this->factory = $factory;
         $this->securityFacade = $securityFacade;
         $this->gridViewManager = $gridViewManager;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
         $this->configManager = $configManager;
     }
 
@@ -101,11 +106,9 @@ class EmailGridListener
             $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
         }
 
-        if ($this->configManager->get('oro_email.threads_grouping')) {
+        if ($this->configManager && $this->configManager->get('oro_email.threads_grouping')) {
             $queryBuilder->andWhere('e.head = :enabled')->setParameter('enabled', true);
-            if ($countQb) {
-                $countQb->andWhere('e.head = :enabled')->setParameter('enabled', true);
-            }
+            $countQb->andWhere('e.head = :enabled')->setParameter('enabled', true);
         }
 
         $this->prepareQueryToFilter($parameters, $queryBuilder, $countQb);
