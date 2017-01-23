@@ -375,6 +375,8 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+        calls:
+            - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 100 }
 
