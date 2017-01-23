@@ -42,4 +42,22 @@ class LocalizationQueryTraitTest extends \PHPUnit_Framework_TestCase
             $this->joinDefaultLocalizedValue($this->queryBuilder, 'join', 'joinAlias', 'fieldAlias')
         );
     }
+
+    public function testLeftJoinDefaultLocalizedValue()
+    {
+        $this->queryBuilder->expects($this->at(0))
+            ->method('addSelect')
+            ->with('joinAlias.string as fieldAlias')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->at(1))
+            ->method('leftJoin')
+            ->with('join', 'joinAlias', Join::WITH, 'joinAlias.localization IS NULL')
+            ->willReturn($this->queryBuilder);
+
+        $this->assertSame(
+            $this->queryBuilder,
+            $this->joinDefaultLocalizedValue($this->queryBuilder, 'join', 'joinAlias', 'fieldAlias', 'leftJoin')
+        );
+    }
 }

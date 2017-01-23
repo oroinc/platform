@@ -1,0 +1,21 @@
+workflows:
+    test_workflow:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\Item
+        entity_attribute: entity
+        steps:
+            step1:
+                allowed_transitions:
+                    - transition_1
+            step2:
+                allowed_transitions:
+                    - transition_2
+        transitions:
+            transition_1:
+                step_to: step2
+                transition_definition: transition_1_definition
+            transition_2:
+                step_to: step1
+                transition_definition: transition_2_definition
+        transition_definitions:
+            transition_1_definition: ~
+            transition_2_definition: ~

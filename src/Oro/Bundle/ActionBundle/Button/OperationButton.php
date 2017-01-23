@@ -122,6 +122,7 @@ class OperationButton implements ButtonInterface
                 'executionRoute' => $this->buttonContext->getExecutionRoute(),
                 'dialogRoute' => $this->buttonContext->getFormDialogRoute(),
                 'additionalData' => $this->getDatagridData(),
+                'jsDialogWidget' => self::DEFAULT_JS_DIALOG_WIDGET,
             ]
         );
     }

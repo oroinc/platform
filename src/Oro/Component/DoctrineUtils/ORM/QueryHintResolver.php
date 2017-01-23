@@ -152,7 +152,7 @@ class QueryHintResolver implements QueryHintResolverInterface
      *
      * @return string
      */
-    protected function resolveHintName($name)
+    public function resolveHintName($name)
     {
         if (isset($this->aliases[$name])) {
             return $this->aliases[$name];
