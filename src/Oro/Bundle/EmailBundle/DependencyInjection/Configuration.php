@@ -54,7 +54,8 @@ class Configuration implements ConfigurationInterface
                 'attachment_sync_enable' => ['value' => true],
                 'attachment_sync_max_size' => ['value' => 50],
                 'attachment_preview_limit' => ['value' => 8],
-                'sanitize_html' => ['value' => false]
+                'sanitize_html' => ['value' => false],
+                'threads_grouping' => ['value' => true]
             ]
         );
 

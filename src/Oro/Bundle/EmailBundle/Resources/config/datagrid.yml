@@ -193,15 +193,6 @@ datagrid:
 
     email-grid:
         extends: base-email-grid
-        source:
-            count_query:
-                where:
-                    and:
-                        - e.head = true
-            query:
-                where:
-                    and:
-                        - e.head = true
         # joins for filters to, cc, bcc, folders, folder and mailbox processes dynamically in
         # Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener for performance reasons
         filters:

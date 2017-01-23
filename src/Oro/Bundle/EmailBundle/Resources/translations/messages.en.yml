@@ -51,6 +51,11 @@ oro:
 
             email_threads:
                 label: Email Threads
+                use_threads:
+                  label: Display Emails As
+                  choices:
+                    non_threaded.label: Non-Threaded
+                    threaded.label: Threaded
 
             attachment_configuration:
                 label: Attachments
