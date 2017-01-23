@@ -46,7 +46,8 @@ class ExportMessageProcessorTest extends WebTestCase
         $resultReadsCount,
         $resultErrorsCount,
         $expectedEmailBody,
-        $expectedResult
+        $expectedResult,
+        $expectedContentType
     ) {
         /** @var User $user */
         $user = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(User::class)->find(1);
@@ -93,6 +94,7 @@ class ExportMessageProcessorTest extends WebTestCase
             'toEmail' => $user->getEmail(),
             'subject' => 'Export result for job oro.importexport.export_alias',
             'body' => $expectedEmailBody,
+            'contentType' => $expectedContentType,
         ]);
     }
 
@@ -117,6 +119,7 @@ class ExportMessageProcessorTest extends WebTestCase
                 100 User were exported.
                 <a href="http://localhost" target="_blank">Download</a></p></div>',
                 'processResult' => ExportMessageProcessor::ACK,
+                'contentType' => 'text/html',
             ], [
                 'resultSuccess' => true,
                 'readsCount' => 0,
@@ -134,6 +137,7 @@ class ExportMessageProcessorTest extends WebTestCase
             Export operation failed, 0 error(s) found.
             <a href="http://localhost" target="_blank">Error log</a></p></div>',
                 'processResult' => ExportMessageProcessor::ACK,
+                'contentType' => 'text/html',
             ], [
                 'resultSuccess' => false,
                 'readsCount' => 0,
@@ -151,6 +155,7 @@ class ExportMessageProcessorTest extends WebTestCase
             Export operation failed, 5 error(s) found.
             <a href="http://localhost" target="_blank">Error log</a></p></div>',
                 'processResult' => ExportMessageProcessor::REJECT,
+                'contentType' => 'text/html',
             ],
         ];
     }

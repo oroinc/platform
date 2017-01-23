@@ -267,6 +267,10 @@ class AclPrivilegeRepository
 
         /** @var FieldSecurityMetadata $fieldInfo */
         foreach ($classInfo->getFields() as $fieldInfo) {
+            if ($fieldInfo->isHidden()) {
+                continue;
+            }
+
             $privilege = new AclPrivilege();
             $privilege->setIdentity(
                 new AclPrivilegeIdentity(
@@ -674,7 +678,6 @@ class AclPrivilegeRepository
      * @param \SplObjectStorage     $acls
      * @param AclExtensionInterface $extension
      * @param AclInterface          $rootAcl
-     * @param null|string           $field
      */
     protected function addPermissions(
         SID $sid,

@@ -33,7 +33,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'room', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             'name', // column name is used to show related entity
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
@@ -71,7 +71,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'room', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             'name', // column name is used to show related entity
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
@@ -79,11 +79,11 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'room', // owning side field name
-            'acme_user_room', // target side table
-            'users', // target side field name
-            ['name'], // column names are used to show a title of related entity
-            ['name'], // column names are used to show detailed info about related entity
-            ['name'], // Column names are used to show related entity in a grid
+            'acme_user_room', // inverse side table
+            'users', // inverse side field name
+            ['name'], // column names are used to show a title of owning side entity
+            ['name'], // column names are used to show detailed info about owning side entity
+            ['name'], // Column names are used to show owning side entity in a grid
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
     }
@@ -120,7 +120,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -160,7 +160,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -200,7 +200,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -210,11 +210,11 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
-            'users', // target side field name
-            ['name'], // column names are used to show a title of related entity
-            ['name'], // column names are used to show detailed info about related entity
-            ['name'], // Column names are used to show related entity in a grid
+            'acme_user_room', // inverse side table
+            'users', // inverse side field name
+            ['name'], // column names are used to show a title of owning side entity
+            ['name'], // column names are used to show detailed info about owning side entity
+            ['name'], // Column names are used to show owning side entity in a grid
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
     }
@@ -251,7 +251,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -261,11 +261,11 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
-            'users', // target side field name
-            ['name'], // column names are used to show a title of related entity
-            ['name'], // column names are used to show detailed info about related entity
-            ['name'], // Column names are used to show related entity in a grid
+            'acme_user_room', // inverse side table
+            'users', // inverse side field name
+            ['name'], // column names are used to show a title of owning side entity
+            ['name'], // column names are used to show detailed info about owning side entity
+            ['name'], // Column names are used to show owning side entity in a grid
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
     }
@@ -302,7 +302,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -342,7 +342,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -382,7 +382,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -392,9 +392,9 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
-            'user', // target side field name
-            'name', // column name is used to show related entity
+            'acme_user_room', // inverse side table
+            'user', // inverse side field name
+            'name', // column name is used to show owning side entity
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
     }
@@ -431,7 +431,7 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
+            'acme_user_room', // inverse side table
             ['name'], // column names are used to show a title of related entity
             ['name'], // column names are used to show detailed info about related entity
             ['name'], // Column names are used to show related entity in a grid
@@ -441,9 +441,9 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
             $schema,
             'oro_user', // owning side table
             'rooms', // owning side field name
-            'acme_user_room', // target side table
-            'user', // target side field name
-            'name', // column name is used to show related entity
+            'acme_user_room', // inverse side table
+            'user', // inverse side field name
+            'name', // column name is used to show owning side entity
             ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
         );
     }

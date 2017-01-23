@@ -8,13 +8,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
-use Oro\Bundle\IntegrationBundle\Entity\Status;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command to clean up old integration status records
@@ -32,6 +32,26 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     public function getDefaultDefinition()
     {
         return '0 1 * * *';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        $completedInterval = new \DateTime('now', new \DateTimeZone('UTC'));
+        $completedInterval->sub(\DateInterval::createFromDateString(self::DEFAULT_COMPLETED_STATUSES_INTERVAL));
+
+        $failedInterval = new \DateTime('now', new \DateTimeZone('UTC'));
+        $failedInterval->sub(\DateInterval::createFromDateString(self::FAILED_STATUSES_INTERVAL));
+
+        $qb = $this->getOldIntegrationStatusesQueryBuilder($completedInterval, $failedInterval)
+            ->select('COUNT(status.id)')
+        ;
+
+        $count = $qb->getQuery()->getSingleScalarResult();
+
+        return ($count>0);
     }
 
     /**

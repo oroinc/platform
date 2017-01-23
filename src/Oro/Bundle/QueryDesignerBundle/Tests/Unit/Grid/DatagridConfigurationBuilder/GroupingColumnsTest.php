@@ -86,10 +86,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
             ],
             'name'    => 'test_grid',
             'sorters' => [
-                'columns' => [
-                    'c1' => ['data_name' => 'c1'],
-                    'c2' => ['data_name' => 'c2'],
-                ],
+                'columns' => ['c1' => ['data_name' => 'c1'], 'c2' => ['data_name' => 'c2']],
                 'default' => ['c1' => 'DESC']
             ],
             'filters' => [
@@ -102,6 +99,9 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                         FilterUtility::BY_HAVING_KEY => true
                     ],
                 ]
+            ],
+            'fields_acl' => [
+                'columns' => ['c1' => ['data_name' => 't1.column1'], 'c2' => ['data_name' => 't1.column2']]
             ]
         ];
 
@@ -324,6 +324,13 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                     'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
                     'c2' => ['data_name' => 'c2', 'type' => 'number', 'translatable' => false],
                     'c3' => ['data_name' => 'c3', 'type' => 'number', 'translatable' => false]
+                ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 't2.column2'],
+                    'c3' => ['data_name' => 't4.column3']
                 ]
             ]
         ];

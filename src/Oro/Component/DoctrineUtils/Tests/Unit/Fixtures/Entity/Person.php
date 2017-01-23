@@ -18,11 +18,26 @@ class Person
     protected $id;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $name;
+
+    /**
      * @var Item
      *
      * @ORM\ManyToOne(targetEntity="Item")
      */
     protected $bestItem;
+
+    /**
+     * @var Item
+     *
+     * @ORM\ManyToOne(targetEntity="Item")
+     * @ORM\JoinColumn(name="some_item", referencedColumnName="id", nullable=true)
+     */
+    protected $someItem;
 
     /**
      * @var Item[]

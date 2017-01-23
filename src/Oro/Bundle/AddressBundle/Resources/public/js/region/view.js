@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
+    var $ = require('jquery');
     var Backbone = require('backbone');
     var module = require('module');
     var config = _.defaults(module.config(), {
@@ -9,8 +10,7 @@ define(function(require) {
     });
     require('jquery.select2');
     require('jquery.validate');
-
-    var $ = Backbone.$;
+    require('oroui/js/input-widget-manager');
 
     /**
      * @export  oro/region/view

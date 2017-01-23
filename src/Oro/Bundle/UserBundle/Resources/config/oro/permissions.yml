@@ -5,3 +5,9 @@ oro_permissions:
         apply_to_all: false
         apply_to_entities:
             - 'Oro\Bundle\UserBundle\Entity\User'
+    MANAGE_API_KEY:
+        label: oro.user.permission.manage_api_key.label
+        group_names: ""
+        apply_to_all: false
+        apply_to_entities:
+            - 'Oro\Bundle\UserBundle\Entity\User'

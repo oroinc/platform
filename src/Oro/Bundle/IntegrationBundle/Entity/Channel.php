@@ -91,7 +91,7 @@ class Channel
      * @var []
      * @ORM\Column(name="connectors", type="array")
      */
-    protected $connectors;
+    protected $connectors = [];
 
     /**
      * @var ConfigObject
@@ -363,7 +363,7 @@ class Channel
 
     /**
      * @deprecated Deprecated since 1.7.0 in favor of getLastStatusForConnector because of performance impact.
-     * @see Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector
+     * @see \Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector
      * @param string $connector
      * @param int|null $codeFilter
      *
@@ -403,10 +403,14 @@ class Channel
 
     /**
      * @param Organization $organization
+     *
+     * @return $this
      */
     public function setOrganization($organization)
     {
         $this->organization = $organization;
+
+        return $this;
     }
 
     /**
@@ -419,10 +423,14 @@ class Channel
 
     /**
      * @param boolean $enabled
+     *
+     * @return $this
      */
     public function setEnabled($enabled)
     {
         $this->enabled = $enabled;
+
+        return $this;
     }
 
     /**

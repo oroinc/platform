@@ -19,7 +19,7 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      *            | Type            | N | isSelected |
      *            | All             | 3 | yes        |
      *            | Business Units  | 1 |            |
-     *            | Calendar events | 1 |            |
+     *            | Calendar Events | 1 |            |
      *            | Organizations   | 1 |            |
      *
      * @Then /^(?:|I )should see following search entity types:$/

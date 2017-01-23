@@ -14,6 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 class DoctrineIsolator implements IsolatorInterface, SuiteAwareInterface
 {
@@ -192,7 +193,15 @@ class DoctrineIsolator implements IsolatorInterface, SuiteAwareInterface
         $fixtureFiles = $this->getFixtureFiles($this->suite, $event->getTags());
 
         foreach ($fixtureFiles as $fixtureFile) {
-            $this->fixtureLoader->loadFile($fixtureFile);
+            try {
+                $this->fixtureLoader->loadFile($fixtureFile);
+            } catch (\Exception $e) {
+                throw new RuntimeException(
+                    sprintf('Exception while loading "%s" fixture file', $fixtureFile),
+                    0,
+                    $e
+                );
+            }
         }
     }
 }

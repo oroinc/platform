@@ -128,19 +128,30 @@
     -webkit-border-radius: 4px;
     border: 1px solid #ddd;
   }
-}
-
-.dropup, .dropup-area {
-  .column-manager .dropdown-menu {
-    top: auto;
+  .column-manager-right-flap {
+    position: absolute;
+    left: 100%;
+    width: 22px;
+    top: 27px;
     bottom: 0;
-    &:before {
+  }
+  .dropup &,
+  .dropup-area & {
+    .dropdown-menu {
       top: auto;
-      bottom: 6px;
+      bottom: 0;
+      &:before {
+        top: auto;
+        bottom: 6px;
+      }
+      &:after {
+        top: auto;
+        bottom: 7px;
+      }
     }
-    &:after {
-      top: auto;
-      bottom: 7px;
+    .column-manager-right-flap {
+      top: 0;
+      bottom: 27px;
     }
   }
 }

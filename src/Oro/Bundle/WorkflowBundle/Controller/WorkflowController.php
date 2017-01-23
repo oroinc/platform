@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvents;
@@ -120,6 +119,6 @@ class WorkflowController extends Controller
      */
     protected function getRouteProvider()
     {
-        return $this->container->get('oro_workflow.provider.route');
+        return $this->container->get('oro_workflow.provider.start_transition_route');
     }
 }

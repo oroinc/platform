@@ -16,7 +16,7 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 /**
  * @ORM\Table(name="oro_attribute_group")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
- * @ORM\HasLifecycleCallbacks()
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *      mode="hidden"
  * )
@@ -64,13 +64,15 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="code", type="string", length=255, unique=false, nullable=true)
+     * @ORM\Column(name="code", type="string", length=255, unique=false)
      */
     private $code;
 
     /**
      * @var AttributeFamily
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups")
+     * @ORM\ManyToOne(
+     *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily", inversedBy="attributeGroups"
+     * )
      * @ORM\JoinColumn(name="attribute_family_id", referencedColumnName="id")
      */
     private $attributeFamily;
@@ -85,6 +87,12 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
      * )
      */
     private $attributeRelations;
+
+    /**
+     * @var bool
+     * @ORM\Column(name="is_visible", type="boolean", nullable=false, options={"default"=true})
+     */
+    private $isVisible = true;
 
     /**
      * {@inheritdoc}
@@ -213,12 +221,21 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     }
 
     /**
-     * @PrePersist
+     * @param bool $isVisible
+     * @return $this
      */
-    public function prePersist()
+    public function setIsVisible($isVisible)
     {
-        if (!$this->code) {
-            $this->code = uniqid('group_code', false); //Todo: should be removed in #BB-6143 for real code generating
-        }
+        $this->isVisible = $isVisible;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsVisible()
+    {
+        return $this->isVisible;
     }
 }
