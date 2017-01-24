@@ -1,16 +1,23 @@
 {% macro renderTransitionButton(workflow, transition, workflowItem, transitionData, onlyLink, noIcon, noIconText, aClass) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
 
-    {% if transition.displayType == 'dialog' and (transitionData['dialog-url'] is not defined or not transitionData['dialog-url']) and transition.hasForm() %}
-        {% set transitionData = transitionData|merge({
-            'dialog-url': path(
-                'oro_workflow_widget_transition_form',
-                {
-                    workflowItemId: workflowItem.id,
-                    transitionName: transition.name
-                }
-            )
-        }) %}
+    {% if transition.displayType == 'dialog' and transition.hasForm() %}
+        {% if transitionData['dialog-url'] is not defined or not transitionData['dialog-url'] %}
+            {% set transitionData = transitionData|merge({
+                'dialog-url': path(
+                    'oro_workflow_widget_transition_form',
+                    {
+                        workflowItemId: workflowItem.id,
+                        transitionName: transition.name
+                    }
+                )
+            }) %}
+        {% endif %}
+        {% if transitionData['jsDialogWidget'] is not defined or not transitionData['jsDialogWidget'] %}
+            {% set transitionData = transitionData|merge({
+                'jsDialogWidget': constant('Oro\\Bundle\\WorkflowBundle\\Button\\AbstractTransitionButton::TRANSITION_JS_DIALOG_WIDGET')
+            }) %}
+        {% endif %}
     {% endif %}
 
     {% if transitionData['transition-url'] is not defined or not transitionData['transition-url'] %}
