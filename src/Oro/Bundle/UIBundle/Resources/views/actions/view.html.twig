@@ -159,6 +159,23 @@
                     }]) %}
                 {% endif %}
 
+                {%- set marketingActivitiesData -%}
+                    {% placeholder view_content_data_marketing_activities with {entity: entity} %}
+                {%- endset -%}
+
+                {% if marketingActivitiesData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'oro.marketingactivity.sections.marketingactivities'|trans,
+                        'priority' : 1003,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty',
+                                'data': [marketingActivitiesData]
+                            }
+                        ]
+                    }]) %}
+                {% endif %}
+
                 {%- set communicationsData -%}
                     {% placeholder view_content_data_communications with {entity: entity} %}
                 {%- endset -%}
