@@ -12,6 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
  * Check if route exists.
  * Usage:
  * @route_exists: route_name
+ *
+ * @deprecated since 2.0.1. Will be removed in 2.3.
  */
 class RouteExists extends AbstractCondition implements ContextAccessorAwareInterface
 {
