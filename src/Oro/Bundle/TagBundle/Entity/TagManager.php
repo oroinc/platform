@@ -542,7 +542,7 @@ class TagManager
     /**
      * Return current organization
      *
-     * @return Organization
+     * @return OrganizationInterface
      */
     protected function getOrganization()
     {
