@@ -4,7 +4,7 @@
 {% set menuViewRoute   = 'oro_navigation_user_menu_view' %}
 {% set menuCreateRoute = 'oro_navigation_user_menu_create' %}
 {% set menuUpdateRoute = 'oro_navigation_user_menu_update' %}
-
+{% set ajaxRoutePrefix = 'oro_navigation_menuupdate_user_' %}
 {% set fullname = app.user|oro_format_name|default('N/A') %}
 
 {% oro_title_set({params : {"%username%": fullname, "%title%": entity.name}}) %}

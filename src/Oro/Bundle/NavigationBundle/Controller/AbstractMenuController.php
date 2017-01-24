@@ -4,8 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
-use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,8 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Event\MenuUpdateScopeChangeEvent;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -22,30 +19,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 
 abstract class AbstractMenuController extends Controller
 {
-    /**
-     * @return String
-     */
-    protected function getScopeType()
-    {
-        return $this->getParameter('oro_navigation.menu_update.scope_type');
-    }
-
-    /**
-     * @return MenuUpdateManager
-     */
-    protected function getMenuUpdateManager()
-    {
-        return $this->get('oro_navigation.manager.menu_update');
-    }
-
-    /**
-     * @return string
-     */
-    protected function getEntityClass()
-    {
-        return MenuUpdate::class;
-    }
-
     /**
      * @return mixed
      */
@@ -62,6 +35,30 @@ abstract class AbstractMenuController extends Controller
         if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
             throw $this->createAccessDeniedException();
         }
+    }
+
+    /**
+     * @return MenuUpdateManager
+     */
+    protected function getMenuUpdateManager()
+    {
+        return $this->get('oro_navigation.manager.menu_update');
+    }
+
+    /**
+     * @return String
+     */
+    protected function getScopeType()
+    {
+        return $this->getMenuUpdateManager()->getScopeType();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getEntityClass()
+    {
+        return $this->getMenuUpdateManager()->getEntityClass();
     }
 
     /**
@@ -168,8 +165,6 @@ abstract class AbstractMenuController extends Controller
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
 
-        $scope = $this->getScope($context);
-
         if (is_array($response)) {
             $response['context'] = $this->normalizeContext($context);
             $response['menuName'] = $menu->getName();
@@ -177,7 +172,7 @@ abstract class AbstractMenuController extends Controller
             $response['menuItem'] = $menuItem;
             $response = array_merge($response, $context);
         } else {
-            $this->dispatchMenuUpdateScopeChangeEvent($menu->getName(), $scope);
+            $this->dispatchMenuUpdateChangeEvent($menu->getName(), $context);
         }
 
         return $response;
@@ -209,7 +204,6 @@ abstract class AbstractMenuController extends Controller
      */
     protected function getMenu($menuName, array $context)
     {
-        $this->prepareMenuTreeContext($context);
         $options = [
             MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context
         ];
@@ -232,13 +226,13 @@ abstract class AbstractMenuController extends Controller
 
     /**
      * @param string $menuName
-     * @param Scope $scope
+     * @param array  $context
      */
-    protected function dispatchMenuUpdateScopeChangeEvent($menuName, Scope $scope)
+    protected function dispatchMenuUpdateChangeEvent($menuName, array $context)
     {
         $this->get('event_dispatcher')->dispatch(
-            MenuUpdateScopeChangeEvent::NAME,
-            new MenuUpdateScopeChangeEvent($menuName, $scope)
+            MenuUpdateChangeEvent::NAME,
+            new MenuUpdateChangeEvent($menuName, $context)
         );
     }
 
@@ -256,22 +250,11 @@ abstract class AbstractMenuController extends Controller
 
     /**
      * @param Request $request
+     * @param array   $allowedKeys
      * @return array
      */
-    protected function getContextFromRequest(Request $request)
+    protected function getContextFromRequest(Request $request, array $allowedKeys = [])
     {
-        $context = (array)$request->query->get('context', []);
-        if (empty($context)) {
-            throw $this->createNotFoundException('Context can\'t be empty');
-        }
-
-        return $context;
-    }
-
-    /**
-     * @param array $context
-     */
-    protected function prepareMenuTreeContext(array &$context)
-    {
+        return $this->get('oro_scope.context_request_helper')->getFromRequest($request, $allowedKeys);
     }
 }

@@ -1,0 +1,35 @@
+reset:
+    path:            "/reset/{menuName}"
+    methods:         [DELETE]
+    defaults:
+        _controller: Oro\Bundle\NavigationBundle\Controller\AjaxMenuController::resetAction
+
+create:
+    path:            "/create/{menuName}/{parentKey}"
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\NavigationBundle\Controller\AjaxMenuController::createAction
+
+delete:
+    path:            "/delete/{menuName}/{key}"
+    methods:         [DELETE]
+    defaults:
+        _controller: Oro\Bundle\NavigationBundle\Controller\AjaxMenuController::deleteAction
+
+show:
+    path:            "/show/{menuName}/{key}"
+    methods:         [PUT]
+    defaults:
+        _controller: Oro\Bundle\NavigationBundle\Controller\AjaxMenuController::showAction
+
+hide:
+    path:            "/hide/{menuName}/{key}"
+    methods:         [PUT]
+    defaults:
+        _controller: Oro\Bundle\NavigationBundle\Controller\AjaxMenuController::hideAction
+
+move:
+    path:            "/move/{menuName}"
+    methods:         [PUT]
+    defaults:
+        _controller: Oro\Bundle\NavigationBundle\Controller\AjaxMenuController::moveAction

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Oro\Bundle\CustomerBundle\Entity\Account;
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -89,12 +89,14 @@ class UserMenuController extends AbstractMenuController
     /**
      * {@inheritDoc}
      */
-    protected function prepareMenuTreeContext(array &$context)
+    protected function getMenu($menuName, array $context)
     {
         if (array_key_exists(ScopeUserCriteriaProvider::SCOPE_KEY, $context)) {
-            /** @var Account $customer */
-            $customer = $context[ScopeUserCriteriaProvider::SCOPE_KEY];
-            $context[ScopeOrganizationCriteriaProvider::SCOPE_KEY] = $customer->getOrganization();
+            /** @var User $user */
+            $user = $context[ScopeUserCriteriaProvider::SCOPE_KEY];
+            $context[ScopeOrganizationCriteriaProvider::SCOPE_KEY] = $user->getOrganization();
         }
+
+        return parent::getMenu($menuName, $context);
     }
 }

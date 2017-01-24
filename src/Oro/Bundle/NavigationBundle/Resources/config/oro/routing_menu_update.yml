@@ -1,0 +1,20 @@
+oro_navigation_menu_update_ajax.global:
+    resource: "@OroNavigationBundle/Resources/config/oro/routing_menu_update_ajax.yml"
+    type: rest
+    prefix: /global
+    name_prefix: oro_navigation_menuupdate_global_
+    defaults:
+        _is_granted:  'oro_config_system'
+        _manager:  'oro_navigation.manager.menu_update'
+
+oro_navigation_menu_update_ajax.user:
+    resource: "@OroNavigationBundle/Resources/config/oro/routing_menu_update_ajax.yml"
+    type: rest
+    prefix: /user
+    name_prefix: oro_navigation_menuupdate_user_
+    defaults:
+        _is_granted:  'oro_user_user_update'
+        _manager:  'oro_navigation.manager.menu_update'
+        _context_keys: ['user']
+
+

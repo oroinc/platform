@@ -32,7 +32,7 @@
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
                     'successMessage': 'oro.navigation.menuupdate.deleted_message'|trans(),
-                    'dataUrl': path('oro_navigation_menuupdate_delete', {context: context, menuName: menuName, key: app.request.get('key')}),
+                    'dataUrl': path(ajaxRoutePrefix ~ 'delete', {context: context, menuName: menuName, key: app.request.get('key')}),
                     'dataRedirect': path(menuViewRoute, {menuName: entity.menu, context: context}),
                     'aCss': 'no-hash remove-button',
                     'id': 'btn-remove-attribute',
@@ -49,7 +49,7 @@
                             'title': 'oro.navigation.menuupdate.hide'|trans,
                             'dataId': entity.id,
                             'dataMethod': 'PUT',
-                            'dataUrl': path('oro_navigation_menuupdate_hide', {context: context, menuName: menuName, key: app.request.get('key')}),
+                            'dataUrl': path(ajaxRoutePrefix ~ 'hide', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
                             'successMessage': 'oro.navigation.menuupdate.hide_success_message'
                         }) }}
@@ -64,7 +64,7 @@
                             'title': 'oro.navigation.menuupdate.show'|trans,
                             'dataId': entity.id,
                             'dataMethod': 'PUT',
-                            'dataUrl': path('oro_navigation_menuupdate_show', {context: context, menuName: menuName, key: app.request.get('key')}),
+                            'dataUrl': path(ajaxRoutePrefix ~ 'show', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
                             'successMessage': 'oro.navigation.menuupdate.show_success_message'
                         }) }}
@@ -86,7 +86,7 @@
                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                 'dataMethod': 'POST',
-                'dataUrl': path('oro_navigation_menuupdate_create', {context: context, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
+                'dataUrl': path(ajaxRoutePrefix ~ 'create', {context: context, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
                 'dataRedirect': app.request.uri,
                 'successMessage': 'oro.navigation.menuupdate.divider_created'
             }) %}
@@ -182,7 +182,7 @@
                             'updateAllowed' : true,
                             'onRootSelectRoute' : menuViewRoute,
                             'onSelectRoute' : menuUpdateRoute,
-                            'onMoveRoute' : 'oro_navigation_menuupdate_move'
+                            'onMoveRoute' : ajaxRoutePrefix ~ 'move'
                         } %}
                         {{ UI.renderJsTree(
                         {

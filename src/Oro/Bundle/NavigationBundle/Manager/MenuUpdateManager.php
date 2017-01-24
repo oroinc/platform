@@ -32,27 +32,28 @@ class MenuUpdateManager
     /** @var string */
     private $entityClass;
 
+    /** @var string */
+    private $scopeType;
+
     /**
      * @param ManagerRegistry      $managerRegistry
      * @param BuilderChainProvider $builderChainProvider
      * @param MenuUpdateHelper     $menuUpdateHelper
+     * @param string               $entityClass
+     * @param string               $scopeType
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         BuilderChainProvider $builderChainProvider,
-        MenuUpdateHelper $menuUpdateHelper
+        MenuUpdateHelper $menuUpdateHelper,
+        $entityClass,
+        $scopeType
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->builderChainProvider = $builderChainProvider;
         $this->menuUpdateHelper = $menuUpdateHelper;
-    }
-
-    /**
-     * @param string $entityClass
-     */
-    public function setEntityClass($entityClass)
-    {
         $this->entityClass = $entityClass;
+        $this->scopeType = $scopeType;
     }
 
     /**
@@ -242,7 +243,7 @@ class MenuUpdateManager
      */
     public function hideMenuItem($menuName, $key, Scope $scope)
     {
-        $item = $this->findMenuItem($menuName, $key, $context);
+        $item = $this->findMenuItem($menuName, $key, $scope);
         if ($item !== null) {
             $update = $this->findOrCreateMenuUpdate($menuName, $item->getName(), $scope);
             $update->setActive(false);
@@ -390,5 +391,21 @@ class MenuUpdateManager
     private function getEntityManager()
     {
         return $this->managerRegistry->getManagerForClass($this->entityClass);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScopeType()
+    {
+        return $this->scopeType;
     }
 }

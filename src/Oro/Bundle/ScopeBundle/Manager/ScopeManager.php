@@ -62,7 +62,7 @@ class ScopeManager
     /**
      * @param string            $scopeType
      * @param array|object|null $context
-     * @return Scope
+     * @return Scope|null
      */
     public function find($scopeType, $context = null)
     {

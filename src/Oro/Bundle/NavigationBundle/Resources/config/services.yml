@@ -375,6 +375,15 @@ services:
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
+    oro_navigation.manager.menu_update:
+        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
+        arguments:
+            - "@doctrine"
+            - "@oro_menu.builder_chain"
+            - "@oro_navigation.menu_helper.menu_update"
+            - '%oro_navigation.entity.menu_update.class%'
+            - '%oro_navigation.menu_update.scope_type%'
+
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
         public: false
@@ -387,15 +396,6 @@ services:
             - '%oro_navigation.menu_update.scope_type%'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update }
-
-    oro_navigation.manager.menu_update:
-        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
-        arguments:
-            - "@doctrine"
-            - "@oro_menu.builder_chain"
-            - "@oro_navigation.menu_helper.menu_update"
-        calls:
-            - [ setEntityClass, [ '%oro_navigation.entity.menu_update.class%' ]]
 
     oro_navigation.widget_provider.actions.edit_menus:
         parent: oro_ui.widget_provider.action_button.abstract
@@ -446,8 +446,9 @@ services:
         arguments:
             - '@oro_navigation.repository.menu_update'
             - '@oro_navigation.menu_update.cache'
+            - '@oro_scope.scope_manager'
         tags:
-            - { name: kernel.event_listener, event: oro_menu.menu_update_scope_change, method: onMenuUpdateScopeChange }
+            - { name: kernel.event_listener, event: oro_menu.menu_update_change, method: onMenuUpdateScopeChange }
 
     oro_navigation.repository.menu_update:
         class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'

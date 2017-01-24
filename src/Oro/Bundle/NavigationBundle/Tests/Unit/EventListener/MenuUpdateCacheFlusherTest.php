@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
-use Oro\Bundle\NavigationBundle\Event\MenuUpdateScopeChangeEvent;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -34,8 +34,8 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit_Framework_TestCase
     {
         $scope = $this->getEntity(Scope::class);
 
-        /** @var MenuUpdateScopeChangeEvent|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->createMock(MenuUpdateScopeChangeEvent::class);
+        /** @var MenuUpdateChangeEvent|\PHPUnit_Framework_MockObject_MockObject $event */
+        $event = $this->createMock(MenuUpdateChangeEvent::class);
         $event->expects($this->any())->method('getMenuName')->willReturn('application_menu');
         $event->expects($this->any())->method('getScope')->willReturn($scope);
 
