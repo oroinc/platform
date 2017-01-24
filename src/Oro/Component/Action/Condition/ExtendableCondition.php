@@ -4,10 +4,11 @@ namespace Oro\Component\Action\Condition;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
-use Oro\Component\Action\Exception\ExtendableEventNameMissingException;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 
@@ -25,29 +26,24 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     protected $eventDispatcher;
 
     /**
-     * @var string[]
-     */
-    protected $subscribedEvents = [];
-
-    /**
      * @var FlashBag
      */
     protected $flashBag;
 
     /**
-     * @var FlashBag
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @var bool
+     * @var OptionsResolver
      */
-    private $showErrors;
+    private $optionsResolver;
 
     /**
-     * @var string
+     * @var array
      */
-    private $messageType;
+    private $options;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -70,7 +66,7 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
     public function isConditionAllowed($context)
     {
         $event = new ExtendableConditionEvent($context);
-        foreach ($this->subscribedEvents as $eventName) {
+        foreach ($this->options['events'] as $eventName) {
             if (!$this->eventDispatcher->hasListeners($eventName)) {
                 continue;
             }
@@ -102,19 +98,38 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      */
     public function initialize(array $options)
     {
-        if (!array_key_exists('events', $options)) {
-            throw new ExtendableEventNameMissingException(
-                sprintf(
-                    'You need to specify a list of event names for the "@%s" condition type with "events" config key',
-                    self::NAME
-                )
-            );
+        $resolver = $this->getOptionsResolver();
+        $this->configureOptions($resolver);
+
+        $this->options = $resolver->resolve($options);
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired('events');
+        $resolver->setDefined(['messageType', 'showErrors']);
+        $resolver->setAllowedTypes('events', 'array');
+        $resolver->setAllowedTypes('messageType', 'string');
+
+        $resolver->setDefaults([
+            'showErrors' => false,
+            'messageType' => self::DEFAULT_MESSAGE_TYPE
+        ]);
+    }
+
+    /**
+     * @return OptionsResolver
+     */
+    private function getOptionsResolver()
+    {
+        if (!$this->optionsResolver) {
+            $this->optionsResolver = new OptionsResolver();
         }
-        $this->subscribedEvents = $options['events'];
-        $this->showErrors = array_key_exists('showErrors', $options) ? $options['showErrors'] : false;
-        $this->messageType = array_key_exists('messageType', $options)
-            ? $options['messageType']
-            : self::DEFAULT_MESSAGE_TYPE;
+
+        return $this->optionsResolver;
     }
 
     /**
@@ -127,9 +142,15 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             $errors[] = $this->translator->trans($error['message']);
         }
 
-        if ($this->contextAccessor->getValue($event->getContext(), $this->showErrors)) {
+        if ($this->options['showErrors'] instanceof PropertyPath) {
+            $showErrors = $this->contextAccessor->getValue($event->getContext(), $this->options['showErrors']);
+        } else {
+            $showErrors = $this->options['showErrors'];
+        }
+
+        if ($showErrors) {
             foreach ($errors as $error) {
-                $this->flashBag->add($this->messageType, $error);
+                $this->flashBag->add($this->options['messageType'], $error);
             }
         }
 
