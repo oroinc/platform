@@ -42,7 +42,8 @@ class FormScopeCriteriaResolverTest extends \PHPUnit_Framework_TestCase
                     [
                         'field1' => 'parent_scope_value',
                         'field2' => 'parent_scope_value',
-                    ]
+                    ],
+                    []
                 )
             );
         $parentFormConfig->method('hasOption')
