@@ -184,11 +184,7 @@
             {%- else -%}
                 {{ label|trans({}, translation_domain) }}
             {%- endif -%}
-
-            {% set frontRoutes = ['oro_frontend_workflow_widget_start_transition_form','oro_frontend_workflow_widget_transition_form'] %}
-            {% if app.request.get('_route') not in frontRoutes %}
-                <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
-            {% endif %}
+             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {%- endif -%}
     {% endspaceless %}
