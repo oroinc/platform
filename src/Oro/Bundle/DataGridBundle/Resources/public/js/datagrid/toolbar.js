@@ -161,15 +161,15 @@ define([
         render: function() {
             var $pagination;
             var selector = this.selector;
+
             this.$el.empty();
             this.$el.append(this.template());
 
-            if (this.collection.state.totalPages > 1) {
+            if (this.subviews.pagination) {
                 $pagination = this.subviews.pagination.render().$el;
                 $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
+                this.$(selector.pagination).replaceWith($pagination);
             }
-
-            this.$(selector.pagination).replaceWith($pagination);
 
             if (this.subviews.pageSize) {
                 this.$(selector.pagesize).append(this.subviews.pageSize.render().$el);
