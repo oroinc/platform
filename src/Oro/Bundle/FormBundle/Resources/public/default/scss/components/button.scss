@@ -35,8 +35,24 @@
         }
     }
 
+    &--default {
+        border-color: get-color('additional', 'light');
+        background-color: get-color('additional', 'ultra');
+        color: lighten(get-color('additional', 'dark'), 21.5%);
+
+        @include element-state('hover') {
+            border-color: darken(get-color('additional', 'light'), 5%);
+            background-color: darken(get-color('additional', 'ultra'), 5%);
+            color: lighten(get-color('additional', 'dark'), 20%);
+        }
+
+        @include element-state('focus') {
+            border-color: darken(get-color('additional', 'light'), 5%);
+        }
+    }
+
     &--info {
-        border-color: get-color('primary', 'base') ;
+        border-color: get-color('primary', 'base');
         background-color: get-color('primary', 'base');
         color: get-color('additional', 'ultra');
 

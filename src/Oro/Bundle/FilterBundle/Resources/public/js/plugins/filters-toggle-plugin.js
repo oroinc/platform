@@ -22,9 +22,9 @@ define(function(require) {
         onBeforeToolbarInit: function(toolbarOptions) {
             var options = {
                 datagrid: this.main,
-                launcherOptions: _.extend(config, {
+                launcherOptions: _.extend({
                     className: 'btn'
-                }),
+                }, config),
                 order: 50
             };
 
