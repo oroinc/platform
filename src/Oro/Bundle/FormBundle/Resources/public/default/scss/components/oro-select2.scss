@@ -38,7 +38,7 @@
 
                 margin-top: -($oro-select2-arrow-size - 2);
 
-                border-top: ($oro-select2-arrow-size + 1) solid get-color('additional', 'dark');
+                border-top: ($oro-select2-arrow-size + 1) solid lighten(get-color('additional', 'dark'), 21.5%);
                 border-left: $oro-select2-arrow-size solid transparent;
                 border-right: $oro-select2-arrow-size solid transparent;
 
