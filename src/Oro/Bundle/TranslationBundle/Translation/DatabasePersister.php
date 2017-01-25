@@ -26,9 +26,6 @@ class DatabasePersister
     /** @var TranslationManager */
     private $translationManager;
 
-    /** @var array */
-    private $toWrite = [];
-
     /**
      * @param Registry $registry
      * @param TranslationManager $translationManager
@@ -50,7 +47,7 @@ class DatabasePersister
      */
     public function persist($locale, array $catalogData, $scope = Translation::SCOPE_INSTALLED)
     {
-        $em = $this->getEntityManager();
+        $em = $this->getEntityManager(Translation::class);
 
         $em->beginTransaction();
         try {
@@ -109,11 +106,12 @@ class DatabasePersister
     }
 
     /**
+     * @param string $class
      * @return EntityManager
      */
-    protected function getEntityManager()
+    protected function getEntityManager($class)
     {
-        return $this->registry->getManagerForClass(Translation::class);
+        return $this->registry->getManagerForClass($class);
     }
 
     /**
@@ -122,7 +120,7 @@ class DatabasePersister
      */
     protected function getConnection($class)
     {
-        return $this->getEntityManager()->getConnection();
+        return $this->getEntityManager($class)->getConnection();
     }
 
     /**
@@ -132,7 +130,7 @@ class DatabasePersister
      */
     protected function getEntityRepository($class)
     {
-        return $this->getEntityManager()->getRepository($class);
+        return $this->getEntityManager($class)->getRepository($class);
     }
 
 
