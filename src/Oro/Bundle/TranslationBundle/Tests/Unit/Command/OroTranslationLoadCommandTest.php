@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
@@ -17,6 +16,7 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Command\Stubs\OutputStub;
+use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 use Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -71,16 +71,14 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
 
         $language = new Language();
 
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $connection = $this->createMock(Connection::class);
-        $entityManager->expects($this->any())->method('getConnection')->willReturn($connection);
-
         $entityRepository = $this->createMock(EntityRepository::class);
         $entityRepository->expects($this->any())->method('findOneBy')->willReturn($language);
         $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $entityManager = $this->createMock(EntityManager::class);
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
         $entityManager->expects($this->any())->method('getRepository')->willReturn($entityRepository);
+
+        $databasePersister = $this->createMock(DatabasePersister::class);
 
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
@@ -91,6 +89,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
                 ['oro_translation.manager.translation', 1, $this->translationManager],
                 ['oro_translation.database_translation.loader', 1, $this->translationLoader],
                 ['doctrine', 1, $managerRegistry],
+                ['oro_translation.database_translation.persister', 1, $databasePersister],
             ]));
 
         $this->input = $this->createMock(InputInterface::class);
@@ -148,14 +147,11 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
             [
                 'Available locales: locale1, currentLocale. Should be processed: locale1, currentLocale.',
                 'Loading translations [locale1] (2) ...',
-                '  > loading [domain1] (1) ... ',
-                'processed 1 records.',
-                '  > loading [domain2] (1) ... ',
-                'processed 1 records.',
+                '  > loading [domain1] ... processed 1 records.',
+                '  > loading [domain2] ... processed 1 records.',
                 'Loading translations [currentLocale] (1) ...',
-                '  > loading [domain1] (2) ... ',
-                'processed 2 records.',
-                'All messages successfully loaded.',
+                '  > loading [domain1] ... processed 2 records.',
+                'All messages successfully processed.',
                 'Done.',
             ],
             $this->output->messages
@@ -184,11 +180,9 @@ class OroTranslationLoadCommandTest extends \PHPUnit_Framework_TestCase
             [
                 'Available locales: locale1, currentLocale. Should be processed: locale1.',
                 'Loading translations [locale1] (2) ...',
-                '  > loading [domain1] (1) ... ',
-                'processed 1 records.',
-                '  > loading [domain2] (1) ... ',
-                'processed 1 records.',
-                'All messages successfully loaded.',
+                '  > loading [domain1] ... processed 1 records.',
+                '  > loading [domain2] ... processed 1 records.',
+                'All messages successfully processed.',
                 'Rebuilding cache ... ',
                 'Done.',
             ],
