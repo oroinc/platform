@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
-use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
+use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
 
 class WorkflowRegistry
 {
@@ -24,19 +24,22 @@ class WorkflowRegistry
     /** @var Workflow[] */
     protected $workflowByName = [];
 
-    /** @var array|WorkflowDefinitionFilterInterface[] */
-    protected $definitionFilters = [];
+    /** @var WorkflowDefinitionFilters */
+    protected $definitionFilters;
 
     /**
      * @param ManagerRegistry $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
+     * @param WorkflowDefinitionFilters $definitionFilters
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
-        WorkflowAssembler $workflowAssembler
+        WorkflowAssembler $workflowAssembler,
+        WorkflowDefinitionFilters $definitionFilters
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;
+        $this->definitionFilters = $definitionFilters;
     }
 
     /**
@@ -61,6 +64,11 @@ class WorkflowRegistry
         if (!array_key_exists($name, $this->workflowByName)) {
             /** @var WorkflowDefinition $definition */
             $definition = $this->getEntityRepository()->find($name);
+
+            if ($definition) {
+                $definition = $this->processDefinitionFilters(new ArrayCollection([$definition]))->first();
+            }
+
             if (!$definition) {
                 if ($exceptionOnNotFound) {
                     throw new WorkflowNotFoundException($name);
@@ -186,7 +194,7 @@ class WorkflowRegistry
             return $workflowDefinitions;
         }
 
-        foreach ($this->definitionFilters as $definitionFilter) {
+        foreach ($this->definitionFilters->getFilters() as $definitionFilter) {
             $workflowDefinitions = $definitionFilter->filter($workflowDefinitions);
         }
 
@@ -257,13 +265,5 @@ class WorkflowRegistry
         }
 
         return $definition;
-    }
-
-    /**
-     * @param WorkflowDefinitionFilterInterface $definitionFilter
-     */
-    public function addDefinitionFilter(WorkflowDefinitionFilterInterface $definitionFilter)
-    {
-        $this->definitionFilters[] = $definitionFilter;
     }
 }

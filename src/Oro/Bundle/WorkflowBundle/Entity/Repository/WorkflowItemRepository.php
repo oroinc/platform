@@ -161,10 +161,15 @@ class WorkflowItemRepository extends EntityRepository
      * @param string $entityClass
      * @param array $entityIds
      * @param bool $withWorkflowName
+     * @param array|null $workflowNames
      * @return array
      */
-    public function getGroupedWorkflowNameAndWorkflowStepName($entityClass, array $entityIds, $withWorkflowName = true)
-    {
+    public function getGroupedWorkflowNameAndWorkflowStepName(
+        $entityClass,
+        array $entityIds,
+        $withWorkflowName = true,
+        array $workflowNames = null
+    ) {
         $entityIds = array_map(function ($item) {
             return (string)$item;
         }, $entityIds);
@@ -180,6 +185,11 @@ class WorkflowItemRepository extends EntityRepository
 
         if ($withWorkflowName) {
             $qb->addSelect('d.label AS workflowName');
+        }
+
+        if (null !== $workflowNames) {
+            $qb->andWhere($qb->expr()->in('d.name', ':workflowNames'))
+                ->setParameter('workflowNames', $workflowNames);
         }
 
         $items = $qb->getQuery()->getArrayResult();

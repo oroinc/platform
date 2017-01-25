@@ -139,7 +139,7 @@ class WorkflowControllerTest extends WebTestCase
      */
     protected function getWorkflowManager()
     {
-        return $this->client->getContainer()->get('oro_workflow.manager');
+        return $this->client->getContainer()->get('oro_workflow.manager.system');
     }
 
     /**

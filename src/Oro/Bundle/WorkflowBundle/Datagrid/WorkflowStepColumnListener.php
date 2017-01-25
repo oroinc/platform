@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
@@ -22,7 +18,8 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
 class WorkflowStepColumnListener
 {
@@ -40,37 +37,31 @@ class WorkflowStepColumnListener
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /** @var WorkflowRegistry */
-    protected $workflowRegistry;
+    /** @var WorkflowManagerRegistry */
+    protected $workflowManagerRegistry;
 
     /** @var array */
     protected $workflowStepColumns = [self::WORKFLOW_STEP_COLUMN];
 
-    /** @var ArrayCollection[] key(Entity Class) => value(ArrayCollection of Workflow instances) */
+    /** @var array key(Entity Class) => value(array of Workflow instances) */
     protected $workflows = [];
-
-    /** @var CurrentApplicationProviderInterface */
-    private $currentApplicationProvider;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
      * @param ConfigProvider $configProvider
-     * @param WorkflowRegistry $workflowRegistry
-     * @param CurrentApplicationProviderInterface $currentApplicationProvider
+     * @param WorkflowManagerRegistry $workflowManagerRegistry
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         ConfigProvider $configProvider,
-        WorkflowRegistry $workflowRegistry,
-        CurrentApplicationProviderInterface $currentApplicationProvider
+        WorkflowManagerRegistry $workflowManagerRegistry
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityClassResolver = $entityClassResolver;
         $this->configProvider = $configProvider;
-        $this->workflowRegistry = $workflowRegistry;
-        $this->currentApplicationProvider = $currentApplicationProvider;
+        $this->workflowManagerRegistry = $workflowManagerRegistry;
     }
 
     /**
@@ -88,11 +79,6 @@ class WorkflowStepColumnListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        //Applications other than "default" is not supported
-        //@fixme in BB-6995
-        if (!$this->isDefaultApplication()) {
-            return;
-        }
         $config = $event->getConfig();
 
         $rootEntity = $this->getRootEntity($config);
@@ -107,8 +93,7 @@ class WorkflowStepColumnListener
         }
 
         // whether entity has active workflow and entity should render workflow step field
-        $isShowWorkflowStep = $this->getWorkflows($rootEntity)->isEmpty() === false
-            && $this->isShowWorkflowStep($rootEntity);
+        $isShowWorkflowStep = !empty($this->getWorkflows($rootEntity)) && $this->isShowWorkflowStep($rootEntity);
 
         // check whether grid contains workflow step column
         $columns = $config->offsetGetByPath('[columns]', []);
@@ -148,12 +133,6 @@ class WorkflowStepColumnListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        //Applications other than "default" is not supported
-        //@fixme in BB-6995
-        if (!$this->isDefaultApplication()) {
-            return;
-        }
-
         $datagrid = $event->getDatagrid();
 
         $config = $datagrid->getConfig();
@@ -172,12 +151,6 @@ class WorkflowStepColumnListener
      */
     public function onResultAfter(OrmResultAfter $event)
     {
-        //Applications other than "default" is not supported
-        //@fixme in BB-6995
-        if (!$this->isDefaultApplication()) {
-            return;
-        }
-
         $config = $event->getDatagrid()->getConfig();
 
         if (!$this->isApplicable($config)) {
@@ -198,7 +171,8 @@ class WorkflowStepColumnListener
                 },
                 $records
             ),
-            $this->isEntityHaveMoreThanOneWorkflow($rootEntity)
+            $this->isEntityHaveMoreThanOneWorkflow($rootEntity),
+            array_keys($this->getWorkflows($rootEntity))
         );
 
         foreach ($records as $record) {
@@ -249,18 +223,8 @@ class WorkflowStepColumnListener
         $config->offsetSetByPath('[columns]', $columns);
 
         $isManyWorkflows = $this->isEntityHaveMoreThanOneWorkflow($rootEntity);
-        if (!$isManyWorkflows) {
-            $config->offsetSetByPath(
-                '[source][query]',
-                $this->addDatagridQuery(
-                    $config->offsetGetByPath('[source][query]', []),
-                    $rootEntityAlias,
-                    $rootEntity,
-                    'id',
-                    self::WORKFLOW_STEP_COLUMN
-                )
-            );
-        }
+
+        // TODO: add sorting by WorkflowStep Label in scope https://magecore.atlassian.net/browse/BAP-13321
 
         // add filter (only if there is at least one filter)
         $filters = $config->offsetGetByPath('[filters][columns]', []);
@@ -293,13 +257,6 @@ class WorkflowStepColumnListener
                 ]
             ];
             $config->offsetSetByPath('[filters][columns]', $filters);
-        }
-
-        // add sorter (only if there is at least one sorter)
-        $sorters = $config->offsetGetByPath('[sorters][columns]', []);
-        if ($sorters && !$isManyWorkflows) {
-            $sorters[self::WORKFLOW_STEP_COLUMN] = ['data_name' => self::WORKFLOW_STEP_COLUMN . '.stepOrder'];
-            $config->offsetSetByPath('[sorters][columns]', $sorters);
         }
     }
 
@@ -386,12 +343,12 @@ class WorkflowStepColumnListener
     /**
      * @param string $className
      *
-     * @return ArrayCollection
+     * @return array
      */
     protected function getWorkflows($className)
     {
         if (!array_key_exists($className, $this->workflows)) {
-            $this->workflows[$className] = $this->workflowRegistry->getActiveWorkflowsByEntityClass($className);
+            $this->workflows[$className] = $this->getWorkflowManager()->getApplicableWorkflows($className);
         }
 
         return $this->workflows[$className];
@@ -404,15 +361,14 @@ class WorkflowStepColumnListener
      */
     protected function isEntityHaveMoreThanOneWorkflow($className)
     {
-        return $this->getWorkflows($className)->count() > 1;
+        return count($this->getWorkflows($className)) > 1;
     }
 
     /**
-     * @return bool
+     * @return WorkflowManager
      */
-    protected function isDefaultApplication()
+    protected function getWorkflowManager()
     {
-        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION
-        === $this->currentApplicationProvider->getCurrentApplication();
+        return $this->workflowManagerRegistry->getManager();
     }
 }

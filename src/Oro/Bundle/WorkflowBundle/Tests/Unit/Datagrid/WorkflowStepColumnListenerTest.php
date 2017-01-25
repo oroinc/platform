@@ -21,7 +21,8 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -49,14 +50,14 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
     protected $configProvider;
 
     /**
-     * @var \Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $workflowRegistry;
+    protected $workflowManager;
 
     /**
-     * @var CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $currentApplicationProvider;
+    protected $workflowManagerRegistry;
 
     /**
      * @var WorkflowStepColumnListener
@@ -77,19 +78,19 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->currentApplicationProvider = $this->getMockBuilder(CurrentApplicationProviderInterface::class)
+        $this->workflowManagerRegistry = $this->getMockBuilder(WorkflowManagerRegistry::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->listener = new WorkflowStepColumnListener(
             $this->doctrineHelper,
             $this->entityClassResolver,
             $this->configProvider,
-            $this->workflowRegistry,
-            $this->currentApplicationProvider
+            $this->workflowManagerRegistry
         );
     }
 
@@ -99,14 +100,13 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             $this->listener,
             $this->doctrineHelper,
             $this->configProvider,
-            $this->workflowRegistry,
-            $this->currentApplicationProvider
+            $this->workflowManager,
+            $this->workflowManagerRegistry
         );
     }
 
     public function testAddWorkflowStepColumn()
     {
-        $this->mockCurrentApplication();
         $this->assertAttributeEquals(
             [WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN],
             'workflowStepColumns',
@@ -134,9 +134,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildBeforeNoUpdate(array $config, $hasWorkflow = true, $hasConfig = true, $isShowStep = true)
     {
-        $this->mockCurrentApplication();
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY);
-        $this->setUpWorkflowRegistryMock(self::ENTITY, $hasWorkflow);
+        $this->setUpWorkflowManagerMock(self::ENTITY, $hasWorkflow);
         $this->setUpConfigProviderMock(self::ENTITY, $hasConfig, $isShowStep);
 
         $this->listener->addWorkflowStepColumn(self::COLUMN);
@@ -227,9 +226,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildBeforeAddColumn(array $inputConfig, array $expectedConfig, $multiWorkflows = true)
     {
-        $this->mockCurrentApplication();
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        $this->setUpWorkflowRegistryMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
+        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
@@ -434,21 +432,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                 'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
                                 'left' => [
                                     ['join' => self::ALIAS . '.c', 'alias' => 'c'],
-                                    [
-                                        'join' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
-                                        'alias' => 'workflowItem',
-                                        'conditionType' => 'WITH',
-                                        'condition' => sprintf(
-                                            'CAST(%s.id as string) = CAST(workflowItem.entityId as string) ' .
-                                            'AND workflowItem.entityClass = %s',
-                                            self::ALIAS,
-                                            "'" . self::ENTITY_FULL_NAME . "'"
-                                        )
-                                    ],
-                                    [
-                                        'join' => 'workflowItem.currentStep',
-                                        'alias' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN
-                                    ]
                                 ]
                             ],
                         ],
@@ -489,7 +472,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'rootField' => ['data_name' => self::ALIAS . '.rootField'],
                             'innerJoinField' => ['data_name' => 'b.innerJoinField'],
                             'leftJoinField' => ['data_name' => 'c.leftJoinField'],
-                            'workflowStepLabel' => ['data_name' => 'workflowStepLabel.stepOrder']
                         ],
                     ],
                 ],
@@ -505,9 +487,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuildBeforeRemoveColumn(array $inputConfig, array $expectedConfig)
     {
-        $this->mockCurrentApplication();
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
-        $this->setUpWorkflowRegistryMock(self::ENTITY_FULL_NAME);
+        $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME, true, false);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
@@ -606,18 +587,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testSkipApplicationOnBuildBefore()
-    {
-        $this->mockCurrentApplication('other');
-        /**@var BuildBefore|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->getMockBuilder(BuildBefore::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->never())->method('getConfig');
-
-        $this->listener->onBuildBefore($event);
-    }
-
     /**
      * @dataProvider buildAfterNoUpdateDataProvider
      *
@@ -626,8 +595,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnBuildAfterNoUpdate(DatasourceInterface $datasource, DatagridConfiguration $inputConfig)
     {
-        $this->mockCurrentApplication();
-
         $datasource->expects($this->never())->method($this->anything());
 
         $event = $this->createBuildAfterEvent($datasource, $inputConfig);
@@ -674,7 +641,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildAfter()
     {
-        $this->mockCurrentApplication();
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
 
         $repository = $this->setUpWorkflowItemRepository();
@@ -744,21 +710,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $parameters->get('_filter'));
     }
 
-    public function testSkipApplicationOnBuildAfter()
-    {
-        $this->mockCurrentApplication('other');
-        /** @var BuildAfter|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->getMockBuilder(BuildAfter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->never())->method('getDatagrid');
-
-        $this->listener->onBuildAfter($event);
-    }
-
     public function testOnResultAfterNoUpdate()
     {
-        $this->mockCurrentApplication();
         $event = $this->createResultAfterEvent(DatagridConfiguration::create([]));
         $event->expects($this->never())->method('getRecords');
 
@@ -770,7 +723,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnResultAfter()
     {
-        $this->mockCurrentApplication();
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
 
         $recordOne = new ResultRecord(['id' => 42]);
@@ -805,29 +757,23 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         $repository = $this->setUpWorkflowItemRepository();
         $repository->expects($this->once())
             ->method('getGroupedWorkflowNameAndWorkflowStepName')
-            ->with(self::ENTITY_FULL_NAME, [42, 100])
+            ->with(self::ENTITY_FULL_NAME, [42, 100], true, ['test1', 'test2'])
             ->willReturn([42 => $data]);
 
-        $this->workflowRegistry->expects($this->once())->method('getActiveWorkflowsByEntityClass')
-            ->with(WorkflowStepColumnListenerTest::ENTITY_FULL_NAME)->willReturn(new ArrayCollection());
+        $this->workflowManagerRegistry->expects($this->once())->method('getManager')
+            ->willReturn($this->workflowManager);
+
+        $this->workflowManager->expects($this->once())->method('getApplicableWorkflows')
+            ->with(WorkflowStepColumnListenerTest::ENTITY_FULL_NAME)
+            ->willReturn([
+                'test1' => $this->getWorkflowMock(),
+                'test2' => $this->getWorkflowMock(),
+            ]);
 
         $this->listener->onResultAfter($event);
 
         $this->assertEquals($data, $recordOne->getValue(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN));
         $this->assertEquals([], $recordTwo->getValue(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN));
-    }
-
-    public function testSkipApplicationOnResultAfter()
-    {
-        $this->mockCurrentApplication('other');
-
-        /** @var OrmResultAfter|\PHPUnit_Framework_MockObject_MockObject $event */
-        $event = $this->getMockBuilder(OrmResultAfter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->never())->method('getDatagrid');
-
-        $this->listener->onResultAfter($event);
     }
 
     /**
@@ -903,7 +849,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
      * @param bool $hasWorkflow
      * @param bool $multiWorkflow
      */
-    protected function setUpWorkflowRegistryMock($entityClass, $hasWorkflow = true, $multiWorkflow = true)
+    protected function setUpWorkflowManagerMock($entityClass, $hasWorkflow = true, $multiWorkflow = true)
     {
         $workflows = new ArrayCollection();
 
@@ -914,8 +860,12 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->workflowRegistry->expects($this->any())
-            ->method('getActiveWorkflowsByEntityClass')
+        $this->workflowManagerRegistry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->workflowManager);
+
+        $this->workflowManager->expects($this->any())
+            ->method('getApplicableWorkflows')
             ->with($entityClass)
             ->willReturn($workflows);
     }
@@ -970,15 +920,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->any())->method('getDatagrid')->willReturn($datagrid);
 
         return $event;
-    }
-
-    /**
-     * @param string $application
-     */
-    protected function mockCurrentApplication($application = CurrentApplicationProviderInterface::DEFAULT_APPLICATION)
-    {
-        $this->currentApplicationProvider->expects($this->any())
-            ->method('getCurrentApplication')->willReturn($application);
     }
 
     /**
