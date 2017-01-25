@@ -17,6 +17,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ApiTestCase extends WebTestCase
 {
+    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
