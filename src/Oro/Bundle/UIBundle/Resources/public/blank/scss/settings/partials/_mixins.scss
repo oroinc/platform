@@ -64,8 +64,10 @@
 
 // Check devices on server, if device is desktop added class to body (.desktop-version)
 @mixin only-desktop {
-    .desktop-version {
-        @content;
+    @include breakpoint('desktop') {
+        .desktop-version {
+            @content;
+        }
     }
 }
 
