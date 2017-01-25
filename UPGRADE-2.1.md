@@ -1,6 +1,9 @@
 UPGRADE FROM 2.0 to 2.1
 ========================
 
+##DataGridBundle
+ - Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
+
 ##SecurityBundle
 - Service overriding in compiler pass was replaced by service decoration for next services:
     - `sensio_framework_extra.converter.doctrine.orm`
