@@ -29,7 +29,13 @@ api:
     entities:
         Acme\Bundle\ProductBundle\Product: ~
 ```
+**Attention**: In version 1.10, use:
 
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product: ~
+```
 Turn on API for entity disabled in Resources/config/oro/entity.yml
 ------------------------------------------------------------------
 
