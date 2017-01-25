@@ -43,6 +43,14 @@
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
 {% endblock %}
 
+{% block __datagrid_toolbar__datagrid_items_counter_widget %}
+    {% set attr = attr|merge({
+    class: attr.class|default('') ~ " pull-left form-horizontal",
+    'data-grid-items-counter': ''
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
 {% block __datagrid_toolbar__datagrid_toolbar_pagination_widget %}
     {% set attr = attr|merge({
     class: attr.class|default('') ~ " pagination pagination-centered",

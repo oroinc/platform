@@ -63,6 +63,7 @@ config:
         'orodatagrid/js/datagrid/listener/change-editable-cell-listener': 'bundles/orodatagrid/js/datagrid/listener/change-editable-cell-listener.js'
         'orodatagrid/js/datagrid/sorting/dropdown': 'bundles/orodatagrid/js/datagrid/sorting/dropdown.js'
         'orodatagrid/js/datagrid/page-size': 'bundles/orodatagrid/js/datagrid/page-size.js'
+        'orodatagrid/js/datagrid/items-counter': 'bundles/orodatagrid/js/datagrid/items-counter.js'
         'orodatagrid/js/datagrid/grid-views/view': 'bundles/orodatagrid/js/datagrid/grid-views/view.js'
         'orodatagrid/js/datagrid/grid-views/model': 'bundles/orodatagrid/js/datagrid/grid-views/model.js'
         'orodatagrid/js/datagrid/grid-views/collection': 'bundles/orodatagrid/js/datagrid/grid-views/collection.js'
