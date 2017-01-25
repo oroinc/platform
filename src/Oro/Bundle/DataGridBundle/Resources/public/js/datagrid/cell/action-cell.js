@@ -192,7 +192,10 @@ define([
                 return this;
             }
 
+            console.log(this.actions);
+
             if (this.actions.length < this.actionsHideCount) {
+                console.log(this.actions.length < this.actionsHideCount);
                 isSimplifiedMarkupApplied = true;
                 this.baseMarkup = this.simpleBaseMarkup;
                 this.launchersListTemplate = this.simpleLaunchersListTemplate;
@@ -205,6 +208,8 @@ define([
             if (isSimplifiedMarkupApplied) {
                 this.fillLauncherList();
             }
+
+            console.log(this.$(this.launchersContainerSelector));
 
             return this;
         },
