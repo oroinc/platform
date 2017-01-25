@@ -17,7 +17,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     /**
      * Command name
      */
-    const COMMAND_MAME = 'oro:cron:email-body-sync';
+    const COMMAND_NAME = 'oro:cron:email-body-sync';
 
     /**
      * Number of emails in batch
@@ -44,7 +44,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     {
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
-        return $featureChecker->isResourceEnabled(self::COMMAND_MAME, 'cron_jobs');
+        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
     }
 
     /**
@@ -53,7 +53,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_MAME)
+            ->setName(self::COMMAND_NAME)
             ->setDescription('Synchronize email body')
             ->addOption(
                 'max-exec-time',

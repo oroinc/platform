@@ -16,7 +16,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     /**
      * Command name
      */
-    const COMMAND_MAME = 'oro:cron:imap-sync';
+    const COMMAND_NAME = 'oro:cron:imap-sync';
 
     /**
      * The maximum number of email origins which can be synchronized
@@ -58,7 +58,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     {
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
 
-        return $featureChecker->isResourceEnabled(self::COMMAND_MAME, 'cron_jobs');
+        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
     }
 
     /**
@@ -67,7 +67,7 @@ class EmailSyncCommand extends ContainerAwareCommand implements CronCommandInter
     protected function configure()
     {
         $this
-            ->setName(self::COMMAND_MAME)
+            ->setName(self::COMMAND_NAME)
             ->setDescription('Synchronization emails via IMAP')
             ->addOption(
                 'max-concurrent-tasks',
