@@ -90,6 +90,7 @@ oro:
             actions:
                 expand: 'Expand all'
                 collapse: 'Collapse all'
+                move: 'Move To'
                 subcategories:
                     select: 'Select Sub Categories'
                     do_not_select: 'Do Not Select Sub Categories'
