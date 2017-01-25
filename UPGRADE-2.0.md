@@ -184,7 +184,6 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 - `Oro\Bundle\ActionBundle\Provider\ButtonProvider` (`@oro_action.provider.button`) - to operate all buttons
 - Changed signature of constructor of `Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 - Changed signature of constructor of `Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
-- Added aware interface `Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareInterface` and trait `ApplicationProviderAwareTrait`
 
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
@@ -292,7 +291,6 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 Used with new class `Oro\Bundle\WorkflowBundle\Model\WorkflowExclusiveRecordGroupFilter` now represents `exclusive_record_groups` functionality part.
 * Added `priority` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` and workflow configuration to be able configure priorities in workflow applications.
 * Added `isActive` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instead of EntityConfig
-* Methods `getApplications()`, `setApplications(array $applications)` was added to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * Added `groups` property to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` that contains `WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE` and `WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_RECORD` nodes of array with corresponding groups that `WorkflowDefintiion` is belongs to.
 * Added methods `getExclusiveRecordGroups` and `getExclusiveActiveGroups` to `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 * `getName`, `getLabel` and `isActive` methods of `Oro\Bundle\WorkflowBundle\Model\Workflow` now are proxy methods to its `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition` instance.
@@ -383,7 +381,6 @@ To migrate all labels from configuration translatable fields automatically you c
   * `Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition`
   * `Oro\Bundle\WorkflowBundle\Model\Condition\Configurable`
 - Added new node `sopes` to `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`.
-- Added new node `applications` to `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`.
 - Added method `Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getScopedByNames(array $names, ScopeCriteria $scopeCriteria)`.
 - Added ManyToMany relation from `WorkflowDefinition` to `Oro\Bundle\ScopeBundle\Entity\Scope`.
 - Added interface `Oro\Bundle\WorkflowBundle\Model/Filter\WorkflowDefinitionFilterInterface.` It can be used for extensions of `WorkflowRegisty`.
@@ -417,7 +414,6 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
 - Changed signature of constructor of `Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 - Changed signature of constructor of `Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener`. The argument `EntityClassResolver $entityClassResolver` was added.
-- Added `applications` property for `Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition`
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -683,7 +679,6 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added Data Provider `Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider` that provides the translator to Layouts.
 - Added helper `Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper`.
 - Changed signature of constructor of `Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
-- Added query `Oro\Bundle\TranslationBundle\Migration\DeleteTranslationKeysQuery` to delete custom translation keys during migration.
 
 
 ####EntityExtendBundle
@@ -753,7 +748,6 @@ tag if it works with extend classes
         - `RouterInterface` $router,
         - `EntityClassNameHelper` $entityClassNameHelper,
         - `DoctrineHelper` $doctrineHelper
-- Added query `Oro\Bundle\EntityConfigBundle\Migration\RemoveTableQuery` to remove entity config during migration.
 
 ####HelpBundle:
 - Help configuration now loads from `Resources/config/oro/help.yml` instead of `Resources/config/oro_help.yml` file.
