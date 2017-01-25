@@ -54,6 +54,10 @@
         @include element-state('focus') {
             border-color: lighten(get-color('primary', 'base'), 5%);
         }
+        
+        &.no-icon:before {
+            display: none;
+        }
     }
 
     &--info {
