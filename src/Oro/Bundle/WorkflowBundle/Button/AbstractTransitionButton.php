@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 abstract class AbstractTransitionButton implements ButtonInterface
 {
     const DEFAULT_TEMPLATE = 'OroWorkflowBundle::Button\transitionButton.html.twig';
+    const TRANSITION_JS_DIALOG_WIDGET = 'oroworkflow/transition-dialog-widget';
 
     /** @var Workflow */
     protected $workflow;
@@ -100,6 +101,7 @@ abstract class AbstractTransitionButton implements ButtonInterface
                     ? $this->buttonContext->getFormDialogRoute()
                     : $this->buttonContext->getFormPageRoute(),
                 'additionalData' => $this->getDatagridData(),
+                'jsDialogWidget' => static::TRANSITION_JS_DIALOG_WIDGET,
             ],
             $customData
         );

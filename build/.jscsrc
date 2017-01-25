@@ -3,8 +3,8 @@
   "excludeFiles": [
     "../../**/node_modules/**",
     "../../**/public/lib/**",
+    "../../**/public/*/vendors/**",
     "../../**/Karma/lib/**",
-    "../../**/commerce/**",
     "../../**/*.min.js"
   ],
   "validateIndentation": 4,

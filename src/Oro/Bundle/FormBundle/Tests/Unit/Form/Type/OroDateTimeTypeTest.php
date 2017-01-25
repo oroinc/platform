@@ -56,32 +56,38 @@ class OroDateTimeTypeTest extends TypeTestCase
     /**
      * @dataProvider optionsDataProvider
      * @param array  $options
-     * @param string $expectedKey
-     * @param mixed  $expectedValue
+     * @param array $expectedKeys
+     * @param array  $expectedValues
      */
-    public function testFinishView($options, $expectedKey, $expectedValue)
+    public function testFinishView($options, $expectedKeys, $expectedValues)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()->getMock();
 
         $view = new FormView();
         $this->type->finishView($view, $form, $options);
-        $this->assertArrayHasKey($expectedKey, $view->vars);
-        $this->assertEquals($expectedValue, $view->vars[$expectedKey]);
+        foreach ($expectedKeys as $key => $expectedKey) {
+            $this->assertArrayHasKey($expectedKey, $view->vars);
+            $this->assertEquals($expectedValues[$key], $view->vars[$expectedKey]);
+        }
     }
 
     public function optionsDataProvider()
     {
         return array(
             array(
-                array('placeholder' => 'some.placeholder'),
-                'attr',
-                array('placeholder' => 'some.placeholder'),
+                array('placeholder' => 'some.placeholder', 'minDate' => '-120y', 'maxDate' => '0'),
+                array('attr', 'minDate', 'maxDate'),
+                array(
+                    ['placeholder' => 'some.placeholder'],
+                    '-120y',
+                    '0'
+                ),
             ),
             array(
-                array('years' => [2001, 2002, 2003]),
-                'years',
-                '2001:2003',
+                array('years' => [2001, 2002, 2003], 'minDate' => '-120y', 'maxDate' => '0'),
+                array('years', 'minDate', 'maxDate'),
+                array('2001:2003', '-120y', '0')
             ),
         );
     }

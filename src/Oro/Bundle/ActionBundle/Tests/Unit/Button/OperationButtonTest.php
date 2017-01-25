@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
@@ -112,6 +113,7 @@ class OperationButtonTest extends \PHPUnit_Framework_TestCase
             'dialogRoute' => null,
             'additionalData' => [],
             'aClass' => '',
+            'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
         ];
 
         $templateData = $this->button->getTemplateData();
