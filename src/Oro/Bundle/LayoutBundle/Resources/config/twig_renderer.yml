@@ -39,5 +39,5 @@ services:
 
     oro_layout.twig.form.engine:
         class: %oro_layout.twig.form.engine.class%
-        arguments:
-            - %twig.form.resources%
+        decorates: 'twig.form.engine'
+        parent: 'twig.form.engine'

@@ -365,6 +365,8 @@ class Translator extends BaseTranslator
                         if ($this->resourceCache instanceof ClearableCache) {
                             $this->resourceCache->deleteAll();
                         }
+                        clearstatcache(true, $catalogueFile);
+
                         break;
                     }
                 }
