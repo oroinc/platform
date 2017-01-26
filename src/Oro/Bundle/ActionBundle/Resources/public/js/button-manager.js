@@ -88,7 +88,7 @@ define(function(require) {
                     var widget = new DialogWidget(options);
 
                     Backbone.listenTo(widget, 'formSave', _.bind(function(response) {
-                        widget.remove();
+                        widget.hide();
                         this.doResponse(response, e);
                     }, this));
 
