@@ -27,15 +27,26 @@ class MenuUpdateCacheFlusher
     protected $scopeManager;
 
     /**
+     * @var string
+     */
+    protected $scopeType;
+
+    /**
      * @param MenuUpdateRepository $repository
      * @param CacheProvider        $cache
      * @param ScopeManager         $scopeManager
+     * @param string               $scopeType
      */
-    public function __construct(MenuUpdateRepository $repository, CacheProvider $cache, ScopeManager $scopeManager)
-    {
+    public function __construct(
+        MenuUpdateRepository $repository,
+        CacheProvider $cache,
+        ScopeManager $scopeManager,
+        $scopeType
+    ) {
         $this->repository = $repository;
         $this->cache = $cache;
         $this->scopeManager = $scopeManager;
+        $this->scopeType = $scopeType;
     }
 
     /**
@@ -43,7 +54,7 @@ class MenuUpdateCacheFlusher
      */
     public function onMenuUpdateScopeChange(MenuUpdateChangeEvent $event)
     {
-        $scope = $this->scopeManager->find($event->getContext());
+        $scope = $this->scopeManager->find($this->scopeType, $event->getContext());
         if (null === $scope) {
             $this->cache->delete(MenuUpdateUtils::generateKey($event->getMenuName(), $scope));
             $this->repository->findMenuUpdatesByScope($event->getMenuName(), $scope);

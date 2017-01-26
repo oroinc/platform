@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
+use Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 abstract class AbstractScopeCriteriaProvider implements ScopeCriteriaProviderInterface
 {
@@ -16,15 +18,22 @@ abstract class AbstractScopeCriteriaProvider implements ScopeCriteriaProviderInt
     /**
      * @param array|object $context
      * @return array
+     * @throws \Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException
      */
     public function getCriteriaByContext($context)
     {
         $this->propertyAccessor = new PropertyAccessor();
         if (is_object($context) || is_array($context)) {
             $value = $this->getValue($context);
+            if ($value === null) {
+                return [];
+            }
             if ($this->isSupportedValue($value)) {
                 return [$this->getCriteriaField() => $value];
             }
+            throw new NotSupportedCriteriaValueException(
+                sprintf('Context[%s] doesn\'t support value of type %s.', $this->getCriteriaField(), gettype($value))
+            );
         }
 
         return [];

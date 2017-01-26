@@ -447,6 +447,7 @@ services:
             - '@oro_navigation.repository.menu_update'
             - '@oro_navigation.menu_update.cache'
             - '@oro_scope.scope_manager'
+            - '%oro_navigation.menu_update.scope_type%'
         tags:
             - { name: kernel.event_listener, event: oro_menu.menu_update_change, method: onMenuUpdateScopeChange }
 
@@ -475,7 +476,7 @@ services:
     oro_navigation.scope_criteria_provider.user:
         parent: oro_user.scope_criteria_provider.user
         tags:
-            - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}
+            - {name: oro_scope.provider, scopeType: 'menu_default_visibility', priority: 20}
 
     oro_navigation.event_listener.scope_grid_listener:
         class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'

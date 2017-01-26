@@ -4,9 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +27,7 @@ class AjaxMenuController extends Controller
         $this->checkAcl($request);
         $manager = $this->getMenuUpdateManager($request);
         $context = $this->getContextFromRequest($request);
-        $scope = $this->get('oro_scope.scope_manager')->find($context);
+        $scope = $this->get('oro_scope.scope_manager')->find($manager->getScopeType(), $context);
         if (null === $scope) {
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
         }
@@ -62,9 +59,9 @@ class AjaxMenuController extends Controller
         $this->checkAcl($request);
         $manager = $this->getMenuUpdateManager($request);
 
-        $scope = $this->findOrCreateScope($request, $menuName);
+        $context = $this->getContextFromRequest($request);
         $menuUpdate = $manager->createMenuUpdate(
-            $scope,
+            $context,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
@@ -78,12 +75,14 @@ class AjaxMenuController extends Controller
 
             return new JsonResponse(['message' => $message], Response::HTTP_BAD_REQUEST);
         }
+        $scope = $this->findOrCreateScope($context, $manager->getScopeType());
+        $menuUpdate->setScope($scope);
 
         $em = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
         $em->persist($menuUpdate);
         $em->flush();
 
-        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
         return new JsonResponse(null, Response::HTTP_CREATED);
     }
@@ -102,7 +101,7 @@ class AjaxMenuController extends Controller
 
         $context = $this->getContextFromRequest($request);
 
-        $scope = $this->get('oro_scope.scope_manager')->find($context);
+        $scope = $this->get('oro_scope.scope_manager')->find($manager->getScopeType(), $context);
 
         if (!$scope) {
             throw $this->createNotFoundException();
@@ -140,10 +139,13 @@ class AjaxMenuController extends Controller
     public function showAction($menuName, $key, Request $request)
     {
         $this->checkAcl($request);
-        $scope = $this->findOrCreateScope($request, $menuName);
+        $context = $this->getContextFromRequest($request);
+        $manager = $this->getMenuUpdateManager($request);
+
+        $scope = $this->findOrCreateScope($context, $manager->getScopeType());
         $this->getMenuUpdateManager($request)->showMenuItem($menuName, $key, $scope);
 
-        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -235,8 +237,11 @@ class AjaxMenuController extends Controller
     protected function getContextFromRequest(Request $request)
     {
         $allowedKeys = $request->attributes->get('_context_keys', []);
+        $manager = $this->getMenuUpdateManager($request);
 
-        return $this->get('oro_scope.context_request_helper')->getFromRequest($request, $allowedKeys);
+        $context = $this->get('oro_scope.context_request_helper')->getFromRequest($request, $allowedKeys);
+
+        return $this->get('oro_scope.context_normalizer')->denormalizeContext($manager->getScopeType(), $context);
     }
 
     /**
@@ -246,6 +251,7 @@ class AjaxMenuController extends Controller
      */
     protected function findOrCreateScope($context, $scopeType)
     {
+        $context = $this->get('oro_scope.context_normalizer')->denormalizeContext($scopeType, $context);
         return $this->get('oro_scope.scope_manager')->findOrCreate($scopeType, $context);
     }
 

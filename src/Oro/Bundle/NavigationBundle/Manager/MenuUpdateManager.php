@@ -367,7 +367,7 @@ class MenuUpdateManager
         foreach ($orderedChildren as $priority => $child) {
             $update = $this->createMenuUpdate(
                 $scope,
-                ['key' => $child->getName(), 'menu' => $menuName]
+                ['key' => $child->getName(), 'menu' => $menuName, 'scope' => $scope]
             );
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menuName, $this->menuUpdateHelper);
             $update->setPriority($priority);

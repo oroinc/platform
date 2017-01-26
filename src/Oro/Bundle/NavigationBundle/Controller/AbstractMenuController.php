@@ -86,7 +86,8 @@ abstract class AbstractMenuController extends Controller
     protected function view($menuName, array $context = [])
     {
         $this->checkAcl();
-        $menu = $this->getMenu($menuName, $context);
+        $denormalizedContext = $this->denormalizeContext($context);
+        $menu = $this->getMenu($menuName, $denormalizedContext);
 
         return array_merge(
             [
@@ -94,7 +95,7 @@ abstract class AbstractMenuController extends Controller
                 'context' => $context,
                 'tree' => $this->createMenuTree($menu)
             ],
-            $this->denormalizeContext($context)
+            $denormalizedContext
         );
     }
 
