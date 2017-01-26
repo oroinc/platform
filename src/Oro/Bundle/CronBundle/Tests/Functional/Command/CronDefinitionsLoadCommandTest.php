@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
+namespace Oro\Bundle\CronBundle\Tests\Functional\Command;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
@@ -55,7 +55,7 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron:definitions:load');
         $this->assertNotEmpty($result);
 
-        $this->assertEquals("Removing all previously loaded commands...\n", $result);
+        $this->assertContains("Removing all previously loaded commands...\n", $result);
     }
 
     /**

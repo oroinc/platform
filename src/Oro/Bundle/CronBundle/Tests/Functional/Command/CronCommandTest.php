@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
+namespace Oro\Bundle\CronBundle\Tests\Functional\Command;
 
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Async\Topics;
