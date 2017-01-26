@@ -111,6 +111,7 @@ services:
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
+            - ~
         tags:
             - { name: 'suite_aware' }
 

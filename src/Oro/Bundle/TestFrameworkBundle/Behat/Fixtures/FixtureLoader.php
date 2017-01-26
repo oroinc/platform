@@ -7,9 +7,8 @@ use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DbalMessageQueueIsolator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
-use Oro\Bundle\EntityBundle\ORM\Registry;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class FixtureLoader implements SuiteAwareInterface
@@ -23,11 +22,6 @@ class FixtureLoader implements SuiteAwareInterface
      * @var KernelInterface
      */
     protected $kernel;
-
-    /**
-     * @var string
-     */
-    protected $fallbackPath;
 
     /**
      * @var Suite
@@ -45,22 +39,29 @@ class FixtureLoader implements SuiteAwareInterface
     protected $entitySupplement;
 
     /**
-     * @param Registry $registry
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
+
+    /**
+     * @param KernelInterface $kernel
      * @param EntityClassResolver $entityClassResolver
      * @param EntitySupplement $entitySupplement
      * @param OroAliceLoader $aliceLoader
+     * @param MessageQueueIsolatorInterface $messageQueueIsolator
      */
     public function __construct(
         KernelInterface $kernel,
         EntityClassResolver $entityClassResolver,
         EntitySupplement $entitySupplement,
-        OroAliceLoader $aliceLoader
+        OroAliceLoader $aliceLoader,
+        MessageQueueIsolatorInterface $messageQueueIsolator
     ) {
         $this->kernel = $kernel;
-        $this->fallbackPath = str_replace('/', DIRECTORY_SEPARATOR, __DIR__.'/../../Tests/Behat');
         $this->aliceLoader = $aliceLoader;
         $this->entityClassResolver = $entityClassResolver;
         $this->entitySupplement = $entitySupplement;
+        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 
     /**
@@ -112,7 +113,7 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -156,7 +157,7 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         return $entities;
     }
@@ -170,7 +171,7 @@ class FixtureLoader implements SuiteAwareInterface
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         $this->aliceLoader->setDoctrine($doctrine);
         $result = $this->aliceLoader->load($dataOrFilename);
-        DbalMessageQueueIsolator::waitForMessageQueue($doctrine->getManager()->getConnection());
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         return $result;
     }
@@ -196,7 +197,7 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**

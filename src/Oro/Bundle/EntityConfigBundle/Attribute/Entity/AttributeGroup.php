@@ -221,16 +221,6 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     }
 
     /**
-     * @PrePersist
-     */
-    public function prePersist()
-    {
-        if (!$this->code) {
-            $this->code = uniqid('group_code', false); //Todo: should be removed in #BB-6143 for real code generating
-        }
-    }
-
-    /**
      * @param bool $isVisible
      * @return $this
      */
