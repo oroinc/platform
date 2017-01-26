@@ -9,6 +9,7 @@ parameters:
     oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
     oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
     oro_entity_config.helper.entity_config.class:               Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper
+    oro_entity_config.attribute.entity.attribute_group.class:   Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup
 
 services:
     oro_entity_config.link.entity_manager:
@@ -284,6 +285,9 @@ services:
         arguments:
             - '@translator'
 
+    oro_entity_config.attribute_group_rendrer_registry:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\AttributeGroupRenderRegistry'
+
     oro_entity_config.form.extension.dynamic_attributes:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\DynamicAttributesExtension
         arguments:
@@ -309,10 +313,59 @@ services:
     oro_entity_config.datagrid.attribute_family_actions_configuration:
         class: 'Oro\Bundle\EntityConfigBundle\Datagrid\AttributeFamilyActionsConfiguration'
         arguments:
-            - '@oro_entity_config.manager.attribute_family_manager'
+            - '@oro_security.security_facade'
+            - '@doctrine.orm.entity_manager'
 
     oro_entity_config.manager.attribute_family_manager:
         class: 'Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager'
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
+
+    oro_entity_config.entity_listener.attribute_group:
+        class: Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener
+        public: false
+        arguments:
+             - "@oro_entity_config.slug.generator"
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: '%oro_entity_config.attribute.entity.attribute_group.class%', event: prePersist}
+
+    oro_entity_config.slug.generator:
+        class: 'Oro\Bundle\EntityConfigBundle\Generator\SlugGenerator'
+
+    oro_entity_config.block_type.abstract_attribute_block_type_mapper:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\AbstractAttributeBlockTypeMapper'
+        abstract: true
+        arguments:
+            - '@doctrine'
+
+    oro_entity_config.layout.chain_attribute_block_type_mapper:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\Mapper\ChainAttributeBlockTypeMapper'
+        arguments:
+            - '@doctrine'
+        calls:
+            - [setDefaultBlockType, ['attribute_text']]
+            - [addBlockType, ['percent', 'attribute_percent']]
+            - [addBlockType, ['money', 'attribute_currency']]
+            - [addBlockType, ['date', 'attribute_date']]
+            - [addBlockType, ['datetime', 'attribute_datetime']]
+            - [addBlockType, ['decimal', 'attribute_decimal']]
+            - [addBlockType, ['file', 'attribute_file']]
+            - [addBlockType, ['image', 'attribute_image']]
+            - [addBlockType, ['boolean', 'attribute_boolean']]
+            - [addBlockType, ['multiEnum', 'attribute_multiselect']]
+            - [addBlockTypeUsingMetadata, ['%oro_locale.entity.localized_fallback_value.class%', 'attribute_localized_fallback']]
+
+    oro_entity_config.layout.data_provider.attribute_config_provider:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider'
+        arguments:
+            - '@oro_entity_config.provider.attribute'
+        tags:
+            - { name: layout.data_provider, alias: attribute_config }
+
+    oro_entity_config.layout.data_provider.attachment_config_provider:
+        class: 'Oro\Bundle\EntityConfigBundle\Layout\DataProvider\ConfigProvider'
+        arguments:
+            - '@oro_entity_config.provider.attachment'
+        tags:
+            - { name: layout.data_provider, alias: attachment_config }

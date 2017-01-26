@@ -41,6 +41,9 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|RequestStack */
     protected $requestStack;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    private $logger;
+
     protected function setUp()
     {
         $this->manager = $this->createMock(ManagerInterface::class);
@@ -54,13 +57,18 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->requestStack = $this->createMock(RequestStack::class);
 
+        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->twigExtension = new DataGridExtension(
             $this->manager,
             $this->nameStrategy,
             $this->router,
             $this->securityFacade,
             $this->datagridRouteHelper,
-            $this->requestStack
+            $this->requestStack,
+            $this->logger
         );
     }
 
@@ -267,6 +275,40 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($gridDataArray));
 
         $this->assertSame($gridDataArray, $this->twigExtension->getGridData($grid));
+    }
+
+    public function testGetGridDataException()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        $grid = $this->createMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $gridData = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\ResultsObject')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $grid->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($gridData));
+
+        $exception = new \Exception('Page not found');
+
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with(
+                'Getting grid data failed.',
+                ['exception' => $exception]
+            );
+
+        $errorArray = [
+            "data" => [],
+            "metadata" => [],
+            "options" => []
+        ];
+
+        $gridData->expects($this->once())
+            ->method('toArray')
+            ->willThrowException($exception);
+
+        $this->assertSame($errorArray, $this->twigExtension->getGridData($grid));
     }
 
     /**

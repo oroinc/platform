@@ -390,6 +390,20 @@ services:
             - '@oro_user.provider.role_privilege_category_provider'
             - '@oro_user.form.handler.abstract.acl_role='
 
+    oro_user.provider.role_privilege_capability_provider_commerce:
+            class: %oro_user.provider.role_privilege_capability_provider.class%
+            arguments:
+                - '@translator'
+                - '@oro_user.provider.role_privilege_category_provider'
+                - '@oro_user.form.handler.acl_role.commerce='
+
+    oro_user.provider.role_privilege_capability_provider_backend:
+            class: %oro_user.provider.role_privilege_capability_provider.class%
+            arguments:
+                - '@translator'
+                - '@oro_user.provider.role_privilege_category_provider'
+                - '@oro_user.form.handler.acl_role.backend='
+
     oro_user.datagrid.datasource.role_permission_datasource:
         class: %oro_user.datagrid.datasource.role_permission_datasource.class%
         arguments:

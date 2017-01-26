@@ -7,6 +7,7 @@ define(function(require) {
     var TransitionHandler = require('oroworkflow/js/transition-handler');
     var $ = require('jquery');
     var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
 
     var ButtonComponent = BaseComponent.extend({
 
@@ -48,6 +49,11 @@ define(function(require) {
                     this.$button.on('click', function(e) {
                         e.preventDefault();
                         $(this).data('executor').call();
+                    });
+                } else {
+                    this.$button.on('click', function(e) {
+                        e.preventDefault();
+                        mediator.execute('redirectTo', {url: self.$button.data('transition-url')}, {redirect: true});
                     });
                 }
             } else {

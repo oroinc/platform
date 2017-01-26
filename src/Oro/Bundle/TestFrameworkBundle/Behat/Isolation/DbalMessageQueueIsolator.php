@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
-class DbalMessageQueueIsolator implements IsolatorInterface
+class DbalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolatorInterface
 {
     /**
      * @var KernelInterface
@@ -49,9 +49,7 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
-        /** @var EntityManager $em */
-        $em = $this->kernel->getContainer()->get('doctrine')->getManager();
-        DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
+        $this->waitWhileProcessingMessages();
 
         $process = new Process('pkill -f oro:message-queue:consume', $this->kernel->getRootDir());
 
@@ -97,11 +95,13 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     }
 
     /**
-     * @param Connection $connection
+     * @param int $timeLimit
      */
-    public static function waitForMessageQueue(Connection $connection, $timeLimit = 60)
+    public function waitWhileProcessingMessages($timeLimit = 60)
     {
         $time = $timeLimit;
+        /** @var Connection $connection */
+        $connection = $this->kernel->getContainer()->get('doctrine')->getManager()->getConnection();
         $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
 
         while (0 !== $result) {

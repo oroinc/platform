@@ -6,6 +6,8 @@
     {% set class = 'label-success' %}
 {% elseif job.status is constant('STATUS_FAILED', job) %}
     {% set class = 'label-warning' %}
+{% elseif job.status is constant('STATUS_FAILED_REDELIVERED', job) %}
+    {% set class = 'label-warning' %}
 {% elseif job.status is constant('STATUS_CANCELLED', job) %}
     {% set class = 'label-inverse' %}
 {% else %}

@@ -3,6 +3,7 @@ OroEntityConfigBundle
 
 - Allows to add metadata (configuration) to any entity class
 - Provides functionality to manage this metadata
+- [Gives possibility to assign functionality for entity to create and manipulate attributes](Resources/doc/attributes.md)
 
 Getting Started
 ---------------

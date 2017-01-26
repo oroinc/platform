@@ -11,6 +11,7 @@ use Oro\Bundle\UIBundle\Route\Router;
 
 /**
  * @dbIsolation
+ * @group dist
  */
 class AttributeControllerTest extends AbstractConfigControllerTest
 {

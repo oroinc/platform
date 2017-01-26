@@ -261,10 +261,11 @@ class LayoutDataCollector extends DataCollector
             if (is_array($value)) {
                 $value = json_encode($value);
             } elseif ($value instanceof ContextItemInterface) {
-                $value = $value->toString();
+                $className = (new \ReflectionClass($value))->getShortName();
+                $value = sprintf('(%s) %s::%s', gettype($value), $className, $value->toString());
             }
 
-            $this->data['context']['items'][$key] = $value;
+            $this->data['context']['items'][$key] =  $value;
         }
     }
 

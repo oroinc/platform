@@ -246,6 +246,119 @@ class OrmQueryConfiguration
     }
 
     /**
+     * Converts an association based join to a subquery.
+     * This can be helpful in case of performance issues with a datagrid.
+     *
+     * For example, the following method
+     * <code>
+     *  $query->convertAssociationJoinToSubquery('g', 'groupName', 'AcmeBundle:UserGroup');
+     * </code>
+     * converts the query
+     * <code>
+     *  query:
+     *      select:
+     *          - g.name as groupName
+     *      from:
+     *          - { table: AcmeBundle:User, alias: u }
+     *      join:
+     *          left:
+     *              - { join: u.group, alias: g }
+     * </code>
+     * to
+     * <code>
+     *  query:
+     *      select:
+     *          - (SELECT g.name FROM AcmeBundle:UserGroup AS g WHERE g = u.group) as groupName
+     *      from:
+     *          - { table: AcmeBundle:User, alias: u }
+     * </code>
+     *
+     * @param string $joinAlias
+     * @param string $columnAlias
+     * @param string $joinEntityClass
+     */
+    public function convertAssociationJoinToSubquery($joinAlias, $columnAlias, $joinEntityClass)
+    {
+        list(
+            $join,
+            $joinPath,
+            $selectExpr,
+            $selectPath
+            ) = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
+        if (!$join || !$selectExpr) {
+            return;
+        }
+
+        $subQuery = sprintf(
+            'SELECT %1$s FROM %4$s AS %3$s WHERE %3$s = %2$s',
+            $selectExpr,
+            $join[self::JOIN_KEY],
+            $joinAlias,
+            $joinEntityClass
+        );
+        if (!empty($join[self::CONDITION_KEY])) {
+            $subQuery .= sprintf(' AND %s', $join[self::CONDITION_KEY]);
+        }
+
+        $this->config->offsetSetByPath($selectPath, sprintf('(%s) AS %s', $subQuery, $columnAlias));
+        $this->config->offsetUnsetByPath($joinPath);
+    }
+
+    /**
+     * Converts an entity based join to a subquery.
+     * This can be helpful in case of performance issues with a datagrid.
+     *
+     * For example, the following method
+     * <code>
+     *  $query->convertEntityJoinToSubquery('g', 'groupName');
+     * </code>
+     * converts the query
+     * <code>
+     *  query:
+     *      select:
+     *          - g.name as groupName
+     *      from:
+     *          - { table: AcmeBundle:User, alias: u }
+     *      join:
+     *          left:
+     *              - { join: AcmeBundle:UserGroup, alias: g, conditionType: WITH, condition: g = u.group }
+     * </code>
+     * to
+     * <code>
+     *  query:
+     *      select:
+     *          - (SELECT g.name FROM AcmeBundle:UserGroup AS g WHERE g = u.group) as groupName
+     *      from:
+     *          - { table: AcmeBundle:User, alias: u }
+     * </code>
+     *
+     * @param string $joinAlias
+     * @param string $columnAlias
+     */
+    public function convertEntityJoinToSubquery($joinAlias, $columnAlias)
+    {
+        list(
+            $join,
+            $joinPath,
+            $selectExpr,
+            $selectPath
+            ) = $this->findJoinAndSelectByAliases($joinAlias, $columnAlias);
+        if (!$join || !$selectExpr || empty($join[self::CONDITION_KEY])) {
+            return;
+        }
+
+        $subQuery = sprintf(
+            'SELECT %s FROM %s AS %s WHERE %s',
+            $selectExpr,
+            $join[self::JOIN_KEY],
+            $joinAlias,
+            $join[self::CONDITION_KEY]
+        );
+        $this->config->offsetSetByPath($selectPath, sprintf('(%s) AS %s', $subQuery, $columnAlias));
+        $this->config->offsetUnsetByPath($joinPath);
+    }
+
+    /**
      * Gets FROM part of the query.
      *
      * @return array [['table' => entity class name, 'alias' => entity alias], ...]
@@ -757,5 +870,70 @@ class OrmQueryConfiguration
         return
             array_key_exists($attributeName, $item)
             && $attributeValue === $item[$attributeName];
+    }
+
+    /**
+     * @param string $joinAlias
+     * @param string $joinsPath
+     *
+     * @return array [join, join path]
+     */
+    private function findJoinByAlias($joinAlias, $joinsPath)
+    {
+        $foundJoin = null;
+        $foundJoinPath = null;
+        $joins = $this->config->offsetGetByPath($joinsPath, []);
+        foreach ($joins as $key => $join) {
+            if ($join[self::ALIAS_KEY] === $joinAlias) {
+                $foundJoin = $join;
+                $foundJoinPath = sprintf('%s[%s]', $joinsPath, $key);
+                break;
+            }
+        }
+
+        return [$foundJoin, $foundJoinPath];
+    }
+
+    /**
+     * @param string $columnAlias
+     *
+     * @return array [select expression without column alias, select item path]
+     */
+    private function findSelectExprByAlias($columnAlias)
+    {
+        $foundSelectExpr = null;
+        $foundSelectPath = null;
+        $pattern = sprintf('#(?P<expr>.+?)\\s+AS\\s+%s#i', $columnAlias);
+        $selects = $this->config->offsetGetByPath(self::SELECT_PATH, []);
+        foreach ($selects as $key => $select) {
+            if (preg_match($pattern, $select, $matches)) {
+                $foundSelectExpr = $matches['expr'];
+                $foundSelectPath = sprintf('%s[%s]', self::SELECT_PATH, $key);
+                break;
+            }
+        }
+
+        return [$foundSelectExpr, $foundSelectPath];
+    }
+
+    /**
+     * @param string $joinAlias
+     * @param string $columnAlias
+     *
+     * @return array [join, join path, select expression without column alias, select item path]
+     */
+    private function findJoinAndSelectByAliases($joinAlias, $columnAlias)
+    {
+        list($join, $joinPath) = $this->findJoinByAlias($joinAlias, self::INNER_JOIN_PATH);
+        if (null === $join) {
+            list($join, $joinPath) = $this->findJoinByAlias($joinAlias, self::LEFT_JOIN_PATH);
+        }
+        $selectExpr = null;
+        $selectPath = null;
+        if (null !== $join) {
+            list($selectExpr, $selectPath) = $this->findSelectExprByAlias($columnAlias);
+        }
+
+        return [$join, $joinPath, $selectExpr, $selectPath];
     }
 }

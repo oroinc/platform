@@ -90,7 +90,8 @@ class AttributeFamilyType extends AbstractType
                 'options' => [
                     'attributeEntityClass' => $options['attributeEntityClass'],
                     'data_class' => AttributeGroup::class
-                ]
+                ],
+                'prototype_data' => new AttributeGroup()
             ]
         );
     }

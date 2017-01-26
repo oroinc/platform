@@ -134,12 +134,8 @@ define([
             if (!this._criteriaRenderd) {
                 this._renderCriteria();
             }
-            ChoiceFilter.__super__._showCriteria.apply(this, arguments);
-        },
-
-        _onClickCriteriaSelector: function() {
-            ChoiceFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
             this._updateValueField();
+            ChoiceFilter.__super__._showCriteria.apply(this, arguments);
         },
 
         _onClickChoiceValue: function() {

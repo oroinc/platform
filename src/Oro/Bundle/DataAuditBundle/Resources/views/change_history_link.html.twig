@@ -1,11 +1,24 @@
+{% import 'OroUIBundle::macros.html.twig' as UI%}
+
 {% if entity_class is empty %}
     {% set entity_class = oro_class_name(entity, true) %}
 {% endif %}
 <li>
-    <a class="no-hash"
-       href="{{ path(audit_path, {entity:entity_class, id:id}) }}"
-       id="view-activity-btn"
-       title="{{ 'oro.dataaudit.change_history.title'|trans({'%item%': title}) }}">
+    <a href="#" data-url="{{ path(audit_path, {entity:entity_class, id:id}) }}"
+        title="{{ 'oro.dataaudit.change_history.title'|trans({'%item%': title}) }}"
+        {{ UI.renderWidgetDataAttributes({
+            'type': 'dialog',
+            'options': {
+                'dialogOptions': {
+                    'allowMaximize': true,
+                    'allowMinimize': true,
+                    'dblclick': 'maximize',
+                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                    'width': 1000,
+                    'title': 'oro.dataaudit.change_history.title'|trans({'%item%': title})
+                }
+            }
+        }) }}>
         {{ 'oro.dataaudit.change_history'|trans }}
     </a>
 </li>

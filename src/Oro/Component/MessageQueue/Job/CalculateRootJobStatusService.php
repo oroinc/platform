@@ -70,6 +70,7 @@ class CalculateRootJobStatusService
         $cancelled = 0;
         $failed = 0;
         $success = 0;
+        $failedRedelivery = 0;
 
         foreach ($jobs as $job) {
             switch ($job->getStatus()) {
@@ -85,6 +86,9 @@ class CalculateRootJobStatusService
                 case Job::STATUS_FAILED:
                     $failed++;
                     break;
+                case Job::STATUS_FAILED_REDELIVERED:
+                    $failedRedelivery++;
+                    break;
                 case Job::STATUS_SUCCESS:
                     $success++;
                     break;
@@ -97,7 +101,7 @@ class CalculateRootJobStatusService
             }
         }
 
-        return $this->getRootJobStatus($new, $running, $cancelled, $failed, $success);
+        return $this->getRootJobStatus($new, $running, $cancelled, $failed, $success, $failedRedelivery);
     }
 
     /**
@@ -109,10 +113,10 @@ class CalculateRootJobStatusService
      *
      * @return string
      */
-    protected function getRootJobStatus($new, $running, $cancelled, $failed, $success)
+    protected function getRootJobStatus($new, $running, $cancelled, $failed, $success, $failedRedelivery)
     {
         $status = Job::STATUS_NEW;
-        if (! $new && ! $running) {
+        if (! $new && ! $running && !$failedRedelivery) {
             if ($cancelled) {
                 $status = Job::STATUS_CANCELLED;
             } elseif ($failed) {
@@ -120,7 +124,7 @@ class CalculateRootJobStatusService
             } else {
                 $status = Job::STATUS_SUCCESS;
             }
-        } elseif ($running || $cancelled || $failed || $success) {
+        } elseif ($running || $cancelled || $failed || $success || $failedRedelivery) {
             $status = Job::STATUS_RUNNING;
         }
 

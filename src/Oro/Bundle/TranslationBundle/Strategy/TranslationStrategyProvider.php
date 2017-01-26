@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Strategy;
 
+use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationStrategyProvider
@@ -76,6 +77,10 @@ class TranslationStrategyProvider
 
         // set order from most specific to most common
         $fallback = array_reverse($fallback);
+
+        if ($strategy->getName() === LocalizationFallbackStrategy::NAME) {
+            $fallback = array_unique($fallback);
+        }
 
         return $fallback;
     }

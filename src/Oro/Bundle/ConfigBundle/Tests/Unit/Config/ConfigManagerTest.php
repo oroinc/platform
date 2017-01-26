@@ -6,7 +6,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigValueBag;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
@@ -65,8 +64,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new ConfigManager(
             'user',
             $this->bag,
-            $this->dispatcher,
-            new ConfigValueBag()
+            $this->dispatcher
         );
 
         $this->globalScopeManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\GlobalScopeManager')

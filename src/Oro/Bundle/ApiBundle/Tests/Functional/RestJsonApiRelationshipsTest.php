@@ -249,6 +249,6 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertApiResponseStatusCodeEquals($response, 204, $resourceKey, 'delete relationship');
+        $this->assertApiResponseStatusCodeEquals($response, [204, 400], $resourceKey, 'delete relationship');
     }
 }

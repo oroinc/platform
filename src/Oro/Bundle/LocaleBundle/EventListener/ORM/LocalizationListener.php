@@ -12,7 +12,7 @@ class LocalizationListener
     /**
      * @var LocalizationFallbackStrategy
      */
-    protected $localizationFallbackStrategy;
+    private $localizationFallbackStrategy;
 
     /**
      * @param LocalizationFallbackStrategy $localizationFallbackStrategy
@@ -23,7 +23,7 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization       $localization
      * @param LifecycleEventArgs $event
      * @throws \Exception
      */
@@ -33,7 +33,7 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization       $localization
      * @param LifecycleEventArgs $event
      * @throws \Exception
      */
@@ -43,7 +43,7 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization       $localization
      * @param LifecycleEventArgs $event
      * @throws \Exception
      */
@@ -52,7 +52,7 @@ class LocalizationListener
         $this->handleChanges();
     }
 
-    protected function handleChanges()
+    private function handleChanges()
     {
         $this->localizationFallbackStrategy->clearCache();
     }
