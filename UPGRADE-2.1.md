@@ -4,6 +4,9 @@ UPGRADE FROM 2.0 to 2.1
 ##ActionBundle
 - Added aware interface `Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareInterface` and trait `ApplicationProviderAwareTrait`
 
+##DataGridBundle
+ - Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
+
 ##EntityConfigBundle
 - Added query `Oro\Bundle\EntityConfigBundle\Migration\RemoveTableQuery` to remove entity config during migration
 
@@ -46,4 +49,4 @@ UPGRADE FROM 2.0 to 2.1
 - **Migrations**
     - Fixture loading or any other container aware *migration scripts* now should rely on `oro_workflow.manager.system` service to manage workflows if any.
     - If your current workflow that is managed by migration is disabled as feature you should turn of workflow filters by calling 
-        `->setEnabled(false)` in corresponding filter service (`oro_workflow.registry.definition_filters` or `oro_workflow.registry.definition_filters.system`)  
+        `->setEnabled(false)` in corresponding filter service (`oro_workflow.registry.definition_filters` or `oro_workflow.registry.definition_filters.system`)
