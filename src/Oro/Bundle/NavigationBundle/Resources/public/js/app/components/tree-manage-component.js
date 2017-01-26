@@ -27,6 +27,11 @@ define(function(require) {
         scopeId: 0,
 
         /**
+         * @property {Boolean}
+         */
+        checkboxEnabled: true,
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {

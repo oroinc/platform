@@ -185,13 +185,27 @@
                             'onMoveRoute' : 'oro_navigation_menuupdate_move'
                         } %}
                         {{ UI.renderJsTree(
-                        {
-                            'module': 'oronavigation/js/app/components/tree-manage-component',
-                            'label': 'oro.navigation.menu.menu_list_default.label'|trans,
-                            'treeOptions': treeOptions
-                        },
-                        ['expand', 'collapse', 'move']
+                            {
+                                'module': 'oronavigation/js/app/components/tree-manage-component',
+                                'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                                'treeOptions': treeOptions
+                            },
+                            {
+                                'expand': 'expand',
+                                'collapse': 'collapse',
+                                'move': {
+                                    'view': 'oroui/js/app/views/jstree/move-action-view'
+                                }
+                            }
                         ) }}
+                        {#
+                            TODO replace move routeName and routeParams with move popup action
+                                'move': {
+                                    'view': 'oroui/js/app/views/jstree/move-action-view',
+                                    'routeName': menuViewRoute,
+                                    'routeParams': {menuName: entity.root.name, scopeId: scope.id}
+                                }
+                        #}
                     </div>
                 </div>
                 <div class="content ">

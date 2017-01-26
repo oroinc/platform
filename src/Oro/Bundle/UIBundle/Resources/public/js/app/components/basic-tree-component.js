@@ -79,7 +79,7 @@ define(function(require) {
                     'key': options.key,
                     'filter': _.bind(this.onFilter, this)
                 },
-                'plugins': ['state', 'wholerow', 'checkbox']
+                'plugins': ['state', 'wholerow']
             };
 
             config = this.customizeTreeConfig(options, config);
@@ -88,7 +88,6 @@ define(function(require) {
 
             this._deferredInit();
             this.initialization = true;
-            this.checkboxEnabled = true;
 
             this.$tree.jstree(config);
             this.jsTreeInstance = $.jstree.reference(this.$tree);
