@@ -7,8 +7,7 @@ use Symfony\Component\Validator\Constraint;
 class MailboxOrigin extends Constraint
 {
     /** @var string */
-    public $message = 'At least one folder for sent emails is required. '
-        . 'Make sure you clicked button "%button%" and there are some folders for incoming messages.';
+    public $message = 'oro.email.message.mailbox_origin_constraint';
 
     /**
      * {@inheritdoc}
