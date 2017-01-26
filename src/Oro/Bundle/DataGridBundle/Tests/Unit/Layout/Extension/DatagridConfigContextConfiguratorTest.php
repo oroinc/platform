@@ -77,13 +77,12 @@ class DatagridConfigContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $context = new LayoutContext();
         $context['grid_config'] = 123;
         $this->contextConfigurator->configureContext($context);
+
+        $this->expectException(\LogicException::class);
+        $expectedMessage = 'Failed to resolve the context variables. Reason: The option "grid_config" with value 123';
+        $this->expectExceptionMessage($expectedMessage);
+
         $context->resolve();
-
-        $this->dataGridManager
-            ->expects($this->never())
-            ->method('getConfigurationForGrid');
-
-        $this->assertEquals([], $context->get('grid_config'));
     }
 
     /**

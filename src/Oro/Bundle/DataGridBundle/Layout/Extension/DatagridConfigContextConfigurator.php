@@ -21,7 +21,7 @@ class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
     }
 
     /**
-     * Sets current request route name into layout context
+     * Sets grid config for given grid name(-s) into layout context
      *
      * {@inheritdoc}
      */
@@ -36,6 +36,7 @@ class DatagridConfigContextConfigurator implements ContextConfiguratorInterface
             ->setAllowedTypes(['grid_config' => ['array']]);
 
         $data = $context->getOr('grid_config');
+
         if (!is_array($data)) {
             return;
         }
