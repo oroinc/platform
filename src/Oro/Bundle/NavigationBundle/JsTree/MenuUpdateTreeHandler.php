@@ -6,6 +6,8 @@ use Knp\Menu\ItemInterface;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\UIBundle\Model\TreeItem;
+
 class MenuUpdateTreeHandler
 {
     const MENU_ITEM_DIVIDER_LABEL = '---------------';
@@ -112,5 +114,31 @@ class MenuUpdateTreeHandler
             ],
             'li_attr' => !$entity->isDisplayed() ? ['class' => 'hidden'] : []
         ];
+    }
+
+    /**
+     * @param object|null $root
+     * @param bool        $includeRoot
+     * @return TreeItem[]
+     */
+    public function getTreeItemList($root = null, $includeRoot = true)
+    {
+        $nodes = $this->createTree($root, $includeRoot);
+
+        $items = [];
+
+        foreach ($nodes as $node) {
+            $items[$node['id']] = new TreeItem($node['id'], $node['text']);
+        }
+
+        foreach ($nodes as $node) {
+            if (array_key_exists($node['parent'], $items)) {
+                /** @var TreeItem $treeItem */
+                $treeItem = $items[$node['id']];
+                $treeItem->setParent($items[$node['parent']]);
+            }
+        }
+
+        return $items;
     }
 }

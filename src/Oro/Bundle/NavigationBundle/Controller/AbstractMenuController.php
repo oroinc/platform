@@ -6,6 +6,7 @@ use Knp\Menu\ItemInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
@@ -16,6 +17,8 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
+use Oro\Bundle\UIBundle\Model\TreeCollection;
 
 abstract class AbstractMenuController extends Controller
 {
@@ -111,6 +114,44 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param string  $menuName
+     * @param array   $context
+     * @param array   $menuTreeContext
+     * @return array|RedirectResponse
+     */
+    protected function move(Request $request, $menuName, array $context = [], array $menuTreeContext = [])
+    {
+        $this->checkAcl();
+
+        $menu = $this->getMenu($menuName, $menuTreeContext);
+
+        $choices = $this->get('oro_navigation.tree.menu_update_tree_handler')->getTreeItemList($menu, false);
+
+        $collection = new TreeCollection();
+        $collection->source = [current($choices), next($choices)];
+        $collection->target = next($choices);
+        $form = $this->createForm(TreeMoveType::class, $collection, [
+            'source_config' => [
+                'choices' => $choices,
+            ],
+            'target_config' => [
+                'choices' => $choices,
+            ],
+        ]);
+
+        $form->handleRequest($request);
+
+        $scope = $this->getScope($context);
+
+        return [
+            'form' => $form->createView(),
+            'scope' => $scope,
+            'menuName' => $menu->getName(),
+        ];
+    }
+
+    /**
      * @param MenuUpdateInterface $menuUpdate
      * @param array               $context
      * @param array               $menuTreeContext
@@ -159,8 +200,8 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
-     * @param       $menuName
-     * @param array $menuTreeContext
+     * @param string $menuName
+     * @param array  $menuTreeContext
      * @return ItemInterface
      */
     protected function getMenu($menuName, array $menuTreeContext = [])
