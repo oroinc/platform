@@ -56,7 +56,7 @@ class DriverFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function createNullSessionMock()
     {
-        return $this->createMock(NullSession::class);
+        return $this->createMock(NullSession::class, [], [], '', false);
     }
 
     /**

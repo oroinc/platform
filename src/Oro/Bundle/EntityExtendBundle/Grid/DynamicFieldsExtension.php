@@ -13,14 +13,12 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtension extends AbstractFieldsExtension
 {
-    const EXTEND_ENTITY_CONFIG_PATH = 'extended_entity_name';
-
     /**
      * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        if (!parent::isApplicable($config) || $config->offsetGetOr(self::EXTEND_ENTITY_CONFIG_PATH, false) === false) {
+        if (!parent::isApplicable($config) || !$config->getExtendedEntityClassName()) {
             return false;
         }
 
@@ -49,7 +47,7 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
      */
     protected function getEntityName(DatagridConfiguration $config)
     {
-        return $config->offsetGetOr(self::EXTEND_ENTITY_CONFIG_PATH);
+        return $config->getExtendedEntityClassName();
     }
 
     /**

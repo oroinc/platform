@@ -2,19 +2,25 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional;
 
-use Oro\Bundle\EntityExtendBundle\Tests\Functional\AbstractConfigControllerTest;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeData;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UIBundle\Route\Router;
 
 /**
  * @dbIsolationPerTest
  */
-class AttributeFamilyControllerTest extends AbstractConfigControllerTest
+class AttributeFamilyControllerTest extends WebTestCase
 {
+    protected function setUp()
+    {
+        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
+    }
+
     public function testCreate()
     {
         $this->loadFixtures([LoadAttributeData::class]);
@@ -37,7 +43,6 @@ class AttributeFamilyControllerTest extends AbstractConfigControllerTest
 
     public function testUpdate()
     {
-        $this->markTestSkipped('Fix history.html.twig issue - #BB-6719');
         $this->loadFixtures([LoadAttributeFamilyData::class]);
 
         $attributeFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
@@ -113,5 +118,15 @@ class AttributeFamilyControllerTest extends AbstractConfigControllerTest
         $manager->flush();
 
         $this->assertFamilyIsNotDeleted($family);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTestEntityAlias()
+    {
+        return $this->getContainer()
+            ->get('oro_entity.entity_alias_resolver')
+            ->getAlias(TestActivityTarget::class);
     }
 }

@@ -23,6 +23,14 @@ class EntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetClassNames()
+    {
+        $this->assertEquals(
+            ['Test\Entity1'],
+            $this->entityAliasProvider->getClassNames()
+        );
+    }
+
     public function testGetEntityAliasForExistingEntity()
     {
         $this->assertEquals(

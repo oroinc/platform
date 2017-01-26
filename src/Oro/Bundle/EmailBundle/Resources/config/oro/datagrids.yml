@@ -130,6 +130,9 @@ datagrids:
                         -
                             join: e.emailBody
                             alias: eb
+                        -
+                            join: e.recipients
+                            alias: r
 # The next join is performed in EmailGridListener, when any of grid filters are applied: folder, folders, mailbox.
 #                        -
 #                            join: eu.folders
@@ -144,14 +147,9 @@ datagrids:
                                 JOIN act_f.origin act_o
                                 WHERE act_o.isActive = true AND eu.id = act_eu.id
                             )
-            count_hints:
-                - { name: oro.use_index, value: user_owner_id_mailbox_owner_id_organization_id }
-            hints:
-                - { name: oro.use_index, value: user_owner_id_mailbox_owner_id_organization_id }
-
         columns:
             contacts:
-                data_name: email.contacts
+                data_name: ~
                 type: twig
                 label: oro.email.contact.label
                 frontend_type: html
@@ -193,15 +191,6 @@ datagrids:
 
     email-grid:
         extends: base-email-grid
-        source:
-            count_query:
-                where:
-                    and:
-                        - e.head = true
-            query:
-                where:
-                    and:
-                        - e.head = true
         # joins for filters to, cc, bcc, folders, folder and mailbox processes dynamically in
         # Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener for performance reasons
         filters:

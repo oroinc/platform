@@ -12,10 +12,13 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
 /**
  * The ACL extensions based permission granting strategy to apply to the access control list.
  * The default Symfony permission granting strategy is supported as well.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 {
@@ -27,6 +30,11 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @var AuditLoggerInterface
      */
     protected $auditLogger;
+
+    /**
+     * @var EntitySecurityMetadataProvider
+     */
+    protected $entitySecurityMetadataProvider;
 
     /**
      * @var ServiceLink
@@ -41,6 +49,14 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     public function setAuditLogger(AuditLoggerInterface $auditLogger)
     {
         $this->auditLogger = $auditLogger;
+    }
+
+    /**
+     * @param EntitySecurityMetadataProvider $entitySecurityMetadataProvider
+     */
+    public function setSecurityMetadataProvider(EntitySecurityMetadataProvider $entitySecurityMetadataProvider)
+    {
+        $this->entitySecurityMetadataProvider = $entitySecurityMetadataProvider;
     }
 
     /**
@@ -108,6 +124,16 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
         $result = null;
+
+        // check if field security metadata has alias and if so - use it instead of field being passed
+        $type = $acl->getObjectIdentity()->getType();
+        if ($this->entitySecurityMetadataProvider->isProtectedEntity($type)) {
+            $entityMetadata = $this->entitySecurityMetadataProvider->getMetadata($type);
+            $entityFieldsMetadata = $entityMetadata->getFields();
+            if (isset($entityFieldsMetadata[$field])) {
+                $field = $entityFieldsMetadata[$field]->getAlias() ? : $field;
+            }
+        }
 
         // check object ACEs
         $aces = $acl->getObjectFieldAces($field);

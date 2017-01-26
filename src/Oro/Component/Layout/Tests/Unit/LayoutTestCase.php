@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\ArrayCollection;
+use Oro\Component\Layout\BlockViewCollection;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 
@@ -21,7 +21,7 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
             array_walk($view->children, $collectViews);
         };
         $collectViews($actual);
-        $views = new ArrayCollection($views);
+        $views = new BlockViewCollection($views);
 
         $this->completeView($expected, ['blocks' => $views]);
         $actualArray = $this->convertBlockViewToArray($actual, $ignoreAuxiliaryVariables);
@@ -154,7 +154,7 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         }
 
         if ($root) {
-            $viewsCollection = new ArrayCollection($views);
+            $viewsCollection = new BlockViewCollection($views);
             foreach ($views as $view) {
                 $view->blocks = $viewsCollection;
             }

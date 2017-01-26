@@ -10,25 +10,19 @@ use Oro\Component\Layout\LayoutManager as BaseLayoutManager;
 
 class LayoutManager extends BaseLayoutManager
 {
-    /** @var string */
-    protected $defaultActiveTheme;
-
     /** @var LayoutContextHolder */
     protected $contextHolder;
 
     /**
      * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
      * @param LayoutContextHolder           $contextHolder
-     * @param string                        $defaultActiveTheme
      */
     public function __construct(
         LayoutFactoryBuilderInterface $layoutFactoryBuilder,
-        LayoutContextHolder $contextHolder,
-        $defaultActiveTheme
+        LayoutContextHolder $contextHolder
     ) {
         parent::__construct($layoutFactoryBuilder);
         $this->contextHolder = $contextHolder;
-        $this->defaultActiveTheme = $defaultActiveTheme;
     }
 
     /**
@@ -44,10 +38,6 @@ class LayoutManager extends BaseLayoutManager
         $layoutBuilder->add('root', null, 'root');
 
         $this->contextHolder->setContext($context);
-
-        if (!$context->has('theme')) {
-            $context->set('theme', $this->defaultActiveTheme);
-        }
 
         return $layoutBuilder->getLayout($context, $rootId);
     }

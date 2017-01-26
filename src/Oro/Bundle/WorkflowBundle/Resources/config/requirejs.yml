@@ -24,3 +24,4 @@ config:
         'oroworkflow/js/app/views/workflow-deactivate-btn-view': 'bundles/oroworkflow/js/app/views/workflow-deactivate-btn-view.js'
         'oroworkflow/js/app/components/button-component': 'bundles/oroworkflow/js/app/components/button-component.js'
         'oroworkflow/js/datagrid/workflow-datagrid-builder': 'oroworkflow/js/datagrid/workflow-datagrid-builder.js'
+        'oroworkflow/transition-dialog-widget': 'bundles/oroworkflow/js/app/widget/transition-dialog-widget.js'

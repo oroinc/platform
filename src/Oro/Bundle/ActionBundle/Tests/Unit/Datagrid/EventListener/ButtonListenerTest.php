@@ -25,7 +25,6 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class ButtonListenerTest extends \PHPUnit_Framework_TestCase
@@ -38,9 +37,6 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
     protected $entityClassResolver;
-
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
@@ -60,8 +56,6 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
         $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->gridConfigurationHelper = new GridConfigurationHelper($this->entityClassResolver);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
         $contextHelper = $this->getMockBuilder(ContextHelper::class)
@@ -115,7 +109,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
             $contextHelper,
             $this->massActionProviderRegistry,
             $optionsHelper,
-            $this->gridConfigurationHelper,
+            $this->entityClassResolver,
             new StubTranslator()
         );
     }
@@ -129,8 +123,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
             $this->listener,
             $this->massActionProviderRegistry,
             $this->buttonProvider,
-            $this->entityClassResolver,
-            $this->gridConfigurationHelper
+            $this->entityClassResolver
         );
     }
 

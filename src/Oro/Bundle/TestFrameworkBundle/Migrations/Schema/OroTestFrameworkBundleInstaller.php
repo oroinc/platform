@@ -54,7 +54,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -78,6 +78,7 @@ class OroTestFrameworkBundleInstaller implements
         $this->createTestProductTypeTable($schema);
         $this->createTestAuditDataTables($schema);
         $this->createTestUserOwnershipTable($schema);
+        $this->createTestNestedObjectsTable($schema);
 
         /** Entity extensions generation */
         $this->extendScopeForTestActivity($schema);
@@ -549,6 +550,22 @@ class OroTestFrameworkBundleInstaller implements
         $table->setPrimaryKey(['id']);
         $table->addIndex(['organization_id'], 'IDX_673C997D32C8A3DE', []);
         $table->addIndex(['owner_id'], 'IDX_673C997D7E3C61F9', []);
+    }
+
+    /**
+     * Create test_nested_objects table
+     *
+     * @param Schema $schema
+     */
+    public function createTestNestedObjectsTable(Schema $schema)
+    {
+        $table = $schema->createTable('test_nested_objects');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('related_class', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('related_id', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
     }
 
     /**
