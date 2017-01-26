@@ -28,7 +28,8 @@ UPGRADE FROM 2.0 to 2.1
   * added methods `getApplications()`, `setApplications(array $applications)`
 - Added new node `applications` to `Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration`
 - Added `Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry` to manage system or default WorkflowManagers.
-System WorkflowManager should use only for internal needs and haven't any filters except filters by features
+- Added service `oro_workflow.registry.definition_filters` that applies `feature`, `scope` and `application` filtering in WorkflowRegistry.
+- Added service `oro_workflow.manager.system` as a system WorkflowManager that should be used only for internal needs and haven't any filters except filters by features.
 - Changed fourth constructor argument of `Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener` from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry` to `Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry`
 - Changed fifth constructor argument from `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry` to `Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry` for next classes:
   * `Oro\Bundle\WorkflowBundle\Acl\Extension` 
@@ -42,3 +43,7 @@ System WorkflowManager should use only for internal needs and haven't any filter
 - Changes in `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
   * added third constructor argument `Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters $definitionFilters`
   * removed public method `public function addDefinitionFilter(WorkflowDefinitionFilterInterface $definitionFilter)`
+- **Migrations**
+    - Fixture loading or any other container aware *migration scripts* now should rely on `oro_workflow.manager.system` service to manage workflows if any.
+    - If your current workflow that is managed by migration is disabled as feature you should turn of workflow filters by calling 
+        `->setEnabled(false)` in corresponding filter service (`oro_workflow.registry.definition_filters` or `oro_workflow.registry.definition_filters.system`)  
