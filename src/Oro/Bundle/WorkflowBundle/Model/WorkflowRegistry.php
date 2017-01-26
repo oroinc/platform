@@ -62,25 +62,24 @@ class WorkflowRegistry
         }
 
         if (!array_key_exists($name, $this->workflowByName)) {
-            /** @var WorkflowDefinition $definition */
             $definition = $this->getEntityRepository()->find($name);
-
-            if ($definition) {
-                $definition = $this->processDefinitionFilters(new ArrayCollection([$definition]))->first();
-            }
-
-            if (!$definition) {
-                if ($exceptionOnNotFound) {
-                    throw new WorkflowNotFoundException($name);
-                } else {
-                    return null;
-                }
-            }
-
-            return $this->getAssembledWorkflow($definition);
+        } else {
+            $definition = $this->workflowByName[$name]->getDefinition();
         }
 
-        return $this->refreshWorkflow($this->workflowByName[$name]);
+        if ($definition) {
+            $definition = $this->processDefinitionFilters(new ArrayCollection([$definition]))->first();
+        }
+
+        if (!$definition) {
+            if ($exceptionOnNotFound) {
+                throw new WorkflowNotFoundException($name);
+            } else {
+                return null;
+            }
+        }
+
+        return $this->getAssembledWorkflow($definition);
     }
 
     /**
