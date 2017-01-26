@@ -40,7 +40,7 @@ class MoveToChildValidator extends ConstraintValidator
                 $itemLabel = $this->translator->trans($source->getLabel());
                 $targetLabel = $this->translator->trans($collection->target->getLabel());
                 $this->context->addViolation(sprintf(
-                    'Can\'t move "%s" to "%s". "%s" is child of "%s".',
+                    'Can\'t move node "%s" to "%s". Node "%s" is a child of "%s" already.',
                     $itemLabel,
                     $targetLabel,
                     $targetLabel,
@@ -63,6 +63,7 @@ class MoveToChildValidator extends ConstraintValidator
         }
 
         $children = $item->getChildren();
+
         if (count($children) !== 0) {
             foreach ($children as $child) {
                 $child = $this->findChildRecursive($child, $key);

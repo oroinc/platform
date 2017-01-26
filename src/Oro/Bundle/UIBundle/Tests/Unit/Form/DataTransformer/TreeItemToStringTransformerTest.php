@@ -43,6 +43,15 @@ class TreeItemToStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage Value must be instance of TreeItem or list of TreeItem[], but "string" is given.
+     */
+    public function testTransformNotValidScalarValue()
+    {
+        $this->transformer->transform('value');
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Form\Exception\TransformationFailedException
      * @expectedExceptionMessage Value must be instance of TreeItem or list of TreeItem[], but "stdClass" is given.
      */
     public function testTransformArrayHasNotValidValue()

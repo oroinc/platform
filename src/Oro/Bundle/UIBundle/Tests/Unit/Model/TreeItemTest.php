@@ -41,17 +41,6 @@ class TreeItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['key' => $treeItem, 'child' => $childTreeItem], $parentTreeItem->getChildren());
     }
 
-    public function testLevel()
-    {
-        $firstLevelTreeItem = new Treeitem('first', 'First');
-        $secondLevelTreeItem = new Treeitem('second', 'Second');
-        $secondLevelTreeItem->setParent($firstLevelTreeItem);
-        $thirdLevelTreeItem = new Treeitem('third', 'Third');
-        $thirdLevelTreeItem->setParent($secondLevelTreeItem);
-
-        $this->assertEquals(2, $thirdLevelTreeItem->getLevel());
-    }
-
     public function testToString()
     {
         $treeItem = new Treeitem('key', 'Label');

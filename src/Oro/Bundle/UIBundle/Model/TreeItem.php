@@ -88,14 +88,6 @@ class TreeItem
     }
 
     /**
-     * @return int
-     */
-    public function getLevel()
-    {
-        return $this->parent ? $this->parent->getLevel() + 1 : 0;
-    }
-
-    /**
      * @return string
      */
     public function __toString()

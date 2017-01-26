@@ -56,7 +56,7 @@ class MoveToChildValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with('Can\'t move "Parent" to "Child". "Child" is child of "Parent".');
+            ->with('Can\'t move node "Parent" to "Child". Node "Child" is a child of "Parent" already.');
 
         $this->validator->validate($collection, $constraint);
     }
@@ -86,7 +86,13 @@ class MoveToChildValidatorTest extends \PHPUnit_Framework_TestCase
         $this->context
             ->expects($this->once())
             ->method('addViolation')
-            ->with('Can\'t move "Parent" to "Second Level Child". "Second Level Child" is child of "Parent".');
+            ->with(sprintf(
+                'Can\'t move node "%s" to "%s". Node "%s" is a child of "%s" already.',
+                'Parent',
+                'Second Level Child',
+                'Second Level Child',
+                'Parent'
+            ));
 
         $this->validator->validate($collection, $constraint);
     }
