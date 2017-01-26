@@ -19,7 +19,6 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
-use Oro\Bundle\UIBundle\Utils\TreeUtils;
 
 abstract class AbstractMenuController extends Controller
 {
@@ -127,7 +126,7 @@ abstract class AbstractMenuController extends Controller
 
         $menu = $this->getMenu($menuName, $menuTreeContext);
 
-        $choices = TreeUtils::buildFlatTreeItemList($menu, 'name', 'label');
+        $choices = $this->get('oro_navigation.tree.menu_update_tree_handler')->getTreeItemList($menu, false);
 
         $collection = new TreeCollection();
         $collection->source = [current($choices), next($choices)];
