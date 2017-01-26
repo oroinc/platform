@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
 class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
@@ -38,13 +39,17 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject $workflowManagerRegistry */
+        $workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
+        $workflowManagerRegistry->expects($this->any())->method('getManager')->willReturn($this->workflowManager);
+
         $this->entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->listener = new WorkflowItemListener(
             $this->doctrineHelper,
-            $this->workflowManager,
+            $workflowManagerRegistry,
             $this->entityConnector
         );
     }

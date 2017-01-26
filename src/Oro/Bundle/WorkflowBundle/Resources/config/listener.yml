@@ -27,7 +27,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener'
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_workflow.manager.system'
+            - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.entity_connector'
         tags:
             - { name: doctrine.event_listener, event: postPersist }

@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
 class WorkflowItemListener
@@ -19,9 +20,9 @@ class WorkflowItemListener
     protected $doctrineHelper;
 
     /**
-     * @var WorkflowManager
+     * @var WorkflowManagerRegistry
      */
-    protected $workflowManager;
+    protected $workflowManagerReistry;
 
     /**
      * @var WorkflowEntityConnector
@@ -40,16 +41,16 @@ class WorkflowItemListener
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowManagerRegistry $workflowManagerRegistry
      * @param WorkflowEntityConnector $entityConnector
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        WorkflowManager $workflowManager,
+        WorkflowManagerRegistry $workflowManagerRegistry,
         WorkflowEntityConnector $entityConnector
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->workflowManager = $workflowManager;
+        $this->workflowManagerReistry = $workflowManagerRegistry;
         $this->entityConnector = $entityConnector;
     }
 
@@ -70,7 +71,7 @@ class WorkflowItemListener
     protected function scheduleStartWorkflowForNewEntity(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        $activeWorkflows = $this->workflowManager->getApplicableWorkflows($entity);
+        $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entity);
 
         foreach ($activeWorkflows as $activeWorkflow) {
             if ($activeWorkflow->getStepManager()->hasStartStep()) {
@@ -134,7 +135,7 @@ class WorkflowItemListener
             $this->deepLevel++;
             $massStartData = $this->entitiesScheduledForWorkflowStart[$currentDeepLevel];
             unset($this->entitiesScheduledForWorkflowStart[$currentDeepLevel]);
-            $this->workflowManager->massStartWorkflow($massStartData);
+            $this->getWorkflowManager()->massStartWorkflow($massStartData);
             $this->deepLevel--;
         }
     }
@@ -152,7 +153,7 @@ class WorkflowItemListener
             return;
         }
 
-        $workflowItems = $this->workflowManager->getWorkflowItemsByEntity($entity);
+        $workflowItems = $this->getWorkflowManager()->getWorkflowItemsByEntity($entity);
 
         if ($workflowItems) {
             $em = $args->getEntityManager();
@@ -160,5 +161,13 @@ class WorkflowItemListener
                 $em->remove($workflowItem);
             }
         }
+    }
+
+    /**
+     * @return WorkflowManager
+     */
+    protected function getWorkflowManager()
+    {
+        return $this->workflowManagerReistry->getManager();
     }
 }

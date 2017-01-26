@@ -46,6 +46,7 @@ UPGRADE FROM 2.0 to 2.1
 - Changes in `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`:
   * added third constructor argument `Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters $definitionFilters`
   * removed public method `public function addDefinitionFilter(WorkflowDefinitionFilterInterface $definitionFilter)`
+- Changed second constructor argument of `Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener` from `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` to `Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry`
 - **Migrations**
     - Fixture loading or any other container aware *migration scripts* now should rely on `oro_workflow.manager.system` service to manage workflows if any.
     - If your current workflow that is managed by migration is disabled as feature you should turn of workflow filters by calling 
