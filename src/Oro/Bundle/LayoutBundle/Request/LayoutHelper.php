@@ -21,6 +21,11 @@ class LayoutHelper
     protected $configManager;
 
     /**
+     * @var bool
+     */
+    protected $profilerEnabled;
+
+    /**
      * @param RequestStack $requestStack
      * @param ConfigManager $configManager
      */
@@ -66,6 +71,10 @@ class LayoutHelper
      */
     public function isProfilerEnabled()
     {
-        return $this->configManager->get('oro_layout.debug_block_info');
+        if (null === $this->profilerEnabled) {
+            $this->profilerEnabled = $this->configManager->get('oro_layout.debug_block_info');
+        }
+
+        return $this->profilerEnabled;
     }
 }
