@@ -38,16 +38,22 @@
     &--default {
         border-color: get-color('additional', 'light');
         background-color: get-color('additional', 'ultra');
-        color: lighten(get-color('additional', 'dark'), 21.5%);
+        color: get-color('additional', 'dark');
 
         @include element-state('hover') {
-            border-color: darken(get-color('additional', 'light'), 5%);
-            background-color: darken(get-color('additional', 'ultra'), 5%);
-            color: lighten(get-color('additional', 'dark'), 20%);
+            border-color: darken(get-color('additional', 'light'), 3%);
+            background-color: darken(get-color('additional', 'ultra'), 3%);
+            color: get-color('additional', 'dark');
         }
 
         @include element-state('focus') {
             border-color: darken(get-color('additional', 'light'), 5%);
+        }
+
+        &.pressed {
+            background: get-color('additional', 'base');
+            
+            box-shadow: $btn-shadow;
         }
     }
 
@@ -70,7 +76,7 @@
         @include element-state('focus') {
             border-color: lighten(get-color('primary', 'base'), 5%);
         }
-        
+
         &.no-icon:before {
             display: none;
         }

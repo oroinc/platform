@@ -22,15 +22,15 @@
         <span class="oro-pagination__label">{{ "oro.datagrid.pagination.label"|trans }}:</span>
         <div class="oro-pagination__pager">
             <a href="{% if currentPage <= 1 %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage - 1) }}{% endif %}"
-               class="oro-pagination__prev{% if currentPage <= 1 %} disabled{% endif %}"
+               class="btn btn--size-s btn--default oro-pagination__prev{% if currentPage <= 1 %} disabled{% endif %}"
                data-grid-pagination-trigger data-grid-pagination-direction="prev">
                 <i class="fa-angle-left fa--base-line"></i>
             </a>
 
-            <input type="text" class="oro-pagination__input" value="{{ currentPage }}" data-grid-pagination-trigger-input />
+            <input type="text" class="input input--size-s oro-pagination__input" value="{{ currentPage }}" data-grid-pagination-trigger-input />
 
             <a href="{% if currentPage >= totalPages %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage + 1) }}{% endif %}"
-               class="oro-pagination__next{% if currentPage >= totalPages %} disabled{% endif %}"
+               class="btn btn--size-s btn--default oro-pagination__next{% if currentPage >= totalPages %} disabled{% endif %}"
                data-grid-pagination-trigger data-grid-pagination-direction="next">
                 <i class="fa-angle-right fa--base-line"></i>
             </a>

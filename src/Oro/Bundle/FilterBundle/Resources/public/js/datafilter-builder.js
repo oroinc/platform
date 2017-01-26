@@ -48,15 +48,20 @@ define(function(require) {
 
             var filtersList;
             var options = methods.combineOptions.call(this);
+            if (this.$el.find('[data-datafilter-container]').length) {
+                var $filterContainer = this.$el.find('[data-datafilter-container]');
+            } else {
+                var $filterContainer = this.$el;
+            }
             options.collection = this.collection;
-            options.el = $('<div/>').prependTo(this.$el);
+            options.el = $('<div/>').prependTo($filterContainer);
             if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
                 options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
             } else {
                 var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
                 options.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
                 if (this.enableToggleFilters) {
-                    options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo(this.$el);
+                    options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo($filterContainer);
                 }
             }
             filtersList = new FiltersManager(options);
