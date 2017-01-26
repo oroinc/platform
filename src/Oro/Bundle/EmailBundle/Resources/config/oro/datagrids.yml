@@ -245,6 +245,8 @@ datagrids:
 
     user-email-grid:
         extends: email-grid
+        source:
+            skip_acl_apply: true
 
         properties:
             id: ~
