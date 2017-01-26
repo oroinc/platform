@@ -939,6 +939,25 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * @param Response  $response
+     * @param string    $expected
+     * @param null      $message
+     */
+    public static function assertButtonClickSuccess(Response $response, $expected, $message = null)
+    {
+        self::assertResponseStatusCodeEquals($response, 200, $message);
+
+        $data = json_decode($response->getContent());
+
+        \PHPUnit_Framework_TestCase::assertTrue($data->successful, $message);
+        \PHPUnit_Framework_TestCase::assertContains(
+            $expected,
+            $data->message,
+            $message
+        );
+    }
+
+    /**
      * Get intersect of $target array with values of keys in $source array.
      * If key is an array in both places then the value of this key will be returned as intersection as well.
      * Not associative arrays will be returned completely
