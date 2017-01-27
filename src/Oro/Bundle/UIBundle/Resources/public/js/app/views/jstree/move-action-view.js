@@ -40,6 +40,14 @@ define(function(require) {
                 }
             });
 
+            this.dialogWidget.once('formSave', _.bind(function(changed) {
+                for (var key in changed) {
+                    var data = changed[key];
+                    $tree.jstree('move_node', data.id, data.parent, data.position);
+                }
+                $tree.jstree('deselect_all');
+            }, this));
+
             this.dialogWidget.render();
         },
 

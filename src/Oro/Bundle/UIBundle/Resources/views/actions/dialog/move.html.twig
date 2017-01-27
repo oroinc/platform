@@ -6,10 +6,10 @@
                         widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                             messenger.notificationFlashMessage('success', __('oro.ui.jstree.move_success', {'nodes': '{{ nodesName }}'}));
 
-                            console.log(widget);
-
                             mediator.trigger('widget_success:' + widget.getWid());
                             mediator.trigger('widget_success:' + widget.getAlias());
+
+                            widget.trigger('formSave', {{ changed|json_encode|raw }});
 
                             widget.remove();
                         });
