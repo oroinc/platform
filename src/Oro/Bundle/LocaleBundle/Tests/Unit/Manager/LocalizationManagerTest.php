@@ -124,7 +124,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($localization1, $this->manager->getDefaultLocalization());
     }
 
-    public function testGetDefaultLocalizationAndNoDefaultLocalization()
+    public function testGetFirstLocalizationWhenNoDefaultLocalizationExist()
     {
         $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
         $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
@@ -134,16 +134,14 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
             ->willReturn(false);
 
-        $this->repository->expects($this->never())->method('find');
         $this->repository->expects($this->once())->method('findBy')
             ->willReturn([1 => $localization1, 2 => $localization2]);
 
         $this->assertSame($localization1, $this->manager->getDefaultLocalization());
     }
 
-    public function testGetDefaultLocalizationAndNoDefaultLocalizationAndNoLocalizations()
+    public function testDefaultLocalizationIsNullWhenNoLocalizationsExist()
     {
-        $this->repository->expects($this->never())->method('find');
         $this->repository->expects($this->once())->method('findBy')->willReturn([]);
 
         $this->configManager->expects($this->once())
@@ -154,7 +152,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->manager->getDefaultLocalization());
     }
 
-    public function testGetDefaultLocalizationAndUnknownConfigDefaultLocalization()
+    public function testGetFirstLocalizationWhenUnknownDefaultLocalizationReturnedFromConfig()
     {
         $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
         $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
@@ -164,20 +162,10 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
             ->willReturn('13');
 
-        $this->repository->expects($this->never())->method('find');
         $this->repository->expects($this->once())->method('findBy')
             ->willReturn([1 => $localization1, 2 => $localization2]);
 
         $this->assertSame($localization1, $this->manager->getDefaultLocalization());
-    }
-
-    public function testWarmUpCache()
-    {
-        $this->repository->expects($this->once())
-            ->method('findBy')
-            ->willReturn($this->entities);
-
-        $this->manager->warmUpCache();
     }
 
     protected function assertRepositoryCalls()

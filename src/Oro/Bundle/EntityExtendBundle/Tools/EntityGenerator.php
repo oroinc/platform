@@ -113,10 +113,9 @@ class EntityGenerator
 
         // write PHP class to the file
         $strategy = new DefaultGeneratorStrategy(new Visitor());
-        file_put_contents(
-            $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.php',
-            "<?php\n\n" . $strategy->generate($class)
-        );
+        $fileName = $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.php';
+        file_put_contents($fileName, "<?php\n\n" . $strategy->generate($class));
+        clearstatcache(true, $fileName);
         // write doctrine metadata in separate yaml file
         file_put_contents(
             $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.orm.yml',

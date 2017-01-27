@@ -96,4 +96,50 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
         $result = $this->configValidator->validate($file, $dataClass, $fieldName);
         $this->assertSame($violationList, $result);
     }
+
+    public function testValidateWithEmptyFieldName()
+    {
+        $dataClass = 'testClass';
+        $file = new ComponentFile(
+            realpath(__DIR__ . '/../Fixtures/testFile/test.txt')
+        );
+        $fieldName = '';
+        $mimeTypes = "image/*\ntext/plain";
+        $maxsize = 1; // 1Mb
+
+        $entityAttachConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->attachmentConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($dataClass)
+            ->will($this->returnValue($entityAttachConfig));
+        $entityAttachConfig->expects($this->any())
+            ->method('get')
+            ->willReturnOnConsecutiveCalls(false, $maxsize);
+        $this->config->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnOnConsecutiveCalls('', $mimeTypes);
+
+        $violationList = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with(
+                $this->identicalTo($file),
+                [
+                    new FileConstraint(
+                        [
+                            'maxSize'   => $maxsize * 1024 * 1024,
+                            'mimeTypes' => explode("\n", $mimeTypes)
+                        ]
+                    )
+                ]
+            )
+            ->willReturn($violationList);
+
+        $result = $this->configValidator->validate($file, $dataClass, $fieldName);
+        $this->assertSame($violationList, $result);
+    }
 }

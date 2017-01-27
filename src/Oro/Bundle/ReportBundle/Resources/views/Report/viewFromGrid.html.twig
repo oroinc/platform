@@ -1,0 +1,11 @@
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set gridName = gridName %}
+{% set pageTitle = pageTitle|trans %}
+
+{% oro_title_set({
+titleTemplate : "%title%",
+params : {
+"%title%": pageTitle|trans|capitalize,
+}
+}) %}

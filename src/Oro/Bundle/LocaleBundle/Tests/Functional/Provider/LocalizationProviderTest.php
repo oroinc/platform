@@ -39,6 +39,7 @@ class LocalizationProviderTest extends WebTestCase
 
     public function testCache()
     {
+        $this->markTestSkipped('Memory cache has been disabled due to BAP-12888. @todo BB-6952');
         $manager = $this->getContainer()->get('oro_locale.manager.localization');
 
         $queryAnalyzer = new QueryAnalyzer($this->em->getConnection()->getDatabasePlatform());

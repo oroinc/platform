@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Manager;
 
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\CacheProvider;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -32,21 +28,13 @@ class LocalizationManager
     protected $configManager;
 
     /**
-     * @var CacheProvider
-     */
-    protected $cache;
-
-    /**
      * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager $configManager
+     * @param ConfigManager  $configManager
      */
     public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager = $configManager;
-
-        /** used to minimize SQL Queries */
-        $this->cache = new ArrayCache();
     }
 
     /**
@@ -56,9 +44,9 @@ class LocalizationManager
      */
     public function getLocalization($id)
     {
-        $cache = $this->getLocalizations();
+        $localizations = $this->getLocalizations();
 
-        return isset($cache[$id]) ? $cache[$id] : null;
+        return isset($localizations[$id]) ? $localizations[$id] : null;
     }
 
     /**
@@ -68,36 +56,29 @@ class LocalizationManager
      */
     public function getLocalizations(array $ids = null)
     {
-        $cache = $this->cache ? $this->cache->fetch(self::CACHE_NAMESPACE) : false;
-
-        if ($cache === false) {
-            $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
-            $cache = array_combine(
-                array_map(
-                    function (Localization $element) {
-                        return $element->getId();
-                    },
-                    $cache
-                ),
-                array_values($cache)
-            );
-            if ($this->cache) {
-                $this->cache->save(self::CACHE_NAMESPACE, $cache);
-            }
-        }
+        $localizations = $this->getRepository()->findBy([], ['name' => 'ASC']);
+        $localizations = array_combine(
+            array_map(
+                function (Localization $element) {
+                    return $element->getId();
+                },
+                $localizations
+            ),
+            array_values($localizations)
+        );
 
         if (null === $ids) {
-            return $cache;
+            return $localizations;
         } else {
             $keys = array_filter(
-                array_keys($cache),
+                array_keys($localizations),
                 function ($key) use ($ids) {
                     // strict comparing is not allowed because ID might be represented by a string
                     return in_array($key, $ids);
                 }
             );
 
-            return array_intersect_key($cache, array_flip($keys));
+            return array_intersect_key($localizations, array_flip($keys));
         }
     }
 
@@ -108,39 +89,17 @@ class LocalizationManager
     {
         $id = (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
 
-        $localization = $this->getLocalization($id);
+        $localizations = $this->getLocalizations();
 
-        if ($localization instanceof Localization) {
-            return $localization;
+        if (isset($localizations[$id])) {
+            return $localizations[$id];
         }
 
-        $localizations = $this->getLocalizations();
         if (count($localizations)) {
             return reset($localizations);
         }
 
         return null;
-    }
-
-    /**
-     * Warms up the cache
-     */
-    public function warmUpCache()
-    {
-        if ($this->cache) {
-            $this->clearCache();
-            $this->getLocalizations();
-        }
-    }
-
-    /**
-     * Clears the cache
-     */
-    public function clearCache()
-    {
-        if ($this->cache) {
-            $this->cache->delete(self::CACHE_NAMESPACE);
-        }
     }
 
     /**

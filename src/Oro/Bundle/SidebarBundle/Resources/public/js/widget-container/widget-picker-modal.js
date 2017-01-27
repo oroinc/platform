@@ -37,6 +37,7 @@ define(function(require) {
             this.options = _.defaults(options || {}, this.options);
             options.content = _.template(widgetPickerModalTemplate)({});
             options.title = __('oro.sidebar.widget.add.dialog.title');
+            options.cancelText = __('Close');
             Modal.prototype.initialize.apply(this, arguments);
         },
 
