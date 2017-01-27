@@ -15,3 +15,6 @@ UPGRADE FROM 2.0 to 2.1
 
 ##LayoutBundle
 - Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
+####WorkflowBundle
+* Added `variable_definitions` to workflow definition
