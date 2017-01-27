@@ -15,13 +15,15 @@ define(function(require) {
             routeParams: {}
         }),
 
-        onClick: function(e) {
+        onClick: function() {
             var $tree = this.options.$tree;
-            var selectedIds = $tree.jstree('get_selected');
+            var selectedIds = $tree.jstree('get_checked');
 
             var url = false;
             if (this.options.routeName) {
-                url = routing.generate(this.options.routeName, this.options.routeParams);
+                var routeParams = this.options.routeParams;
+                routeParams['selected'] = selectedIds;
+                url = routing.generate(this.options.routeName, routeParams);
             }
 
             this.dialogWidget = new DialogWidget({

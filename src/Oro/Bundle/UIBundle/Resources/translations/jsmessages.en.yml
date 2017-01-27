@@ -87,6 +87,7 @@ oro:
             other: Other
         jstree:
             move_node_error: "You can not move node {{ nodeText }} here."
+            move_success: '{{ nodes }} was successfully moved'
             actions:
                 expand: 'Expand all'
                 collapse: 'Collapse all'
