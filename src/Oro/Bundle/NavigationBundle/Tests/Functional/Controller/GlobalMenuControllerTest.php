@@ -155,4 +155,50 @@ class GlobalMenuControllerTest extends WebTestCase
         $this->assertContains('Menu item saved successfully.', $html);
         $this->assertContains('menu_update.changed.title.default', $html);
     }
+
+    public function testMove()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_navigation_global_menu_move',
+                ['menuName' => self::MENU_NAME]
+            ),
+            [
+                'selected' => [
+                    $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1_1)->getId()
+                ],
+                '_widgetContainer' => 'dialog',
+            ],
+            [],
+            $this->generateWsseAuthHeader()
+        );
+
+        $form = $crawler->selectButton('Save')->form();
+        $values = $form->getValues();
+
+        $this->assertEquals(
+            [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_1_1)->getId()],
+            $values['tree_move[source]']
+        );
+
+        $form['tree_move[source]'] = [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_2_1_1)->getId()];
+        $form['tree_move[target]'] = $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1)->getId();
+
+        $this->client->followRedirects(true);
+
+        /** TODO Change after BAP-1813 */
+        $form->getFormNode()->setAttribute(
+            'action',
+            $form->getFormNode()->getAttribute('action') . '?_widgetContainer=dialog'
+        );
+
+        $crawler = $this->client->submit($form);
+        $result = $this->client->getResponse();
+
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $html = $crawler->html();
+        $this->assertContains('oro.ui.jstree.move_success', $html);
+    }
 }
