@@ -9,7 +9,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
 class WorkflowItemListener
@@ -20,9 +19,9 @@ class WorkflowItemListener
     protected $doctrineHelper;
 
     /**
-     * @var WorkflowManagerRegistry
+     * @var WorkflowManager
      */
-    protected $workflowManagerReistry;
+    protected $workflowManager;
 
     /**
      * @var WorkflowEntityConnector
@@ -41,16 +40,16 @@ class WorkflowItemListener
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowManagerRegistry $workflowManagerRegistry
+     * @param WorkflowManager $workflowManager
      * @param WorkflowEntityConnector $entityConnector
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        WorkflowManagerRegistry $workflowManagerRegistry,
+        WorkflowManager $workflowManager,
         WorkflowEntityConnector $entityConnector
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->workflowManagerReistry = $workflowManagerRegistry;
+        $this->workflowManager= $workflowManager;
         $this->entityConnector = $entityConnector;
     }
 
@@ -168,6 +167,6 @@ class WorkflowItemListener
      */
     protected function getWorkflowManager()
     {
-        return $this->workflowManagerReistry->getManager();
+        return $this->workflowManager;
     }
 }
