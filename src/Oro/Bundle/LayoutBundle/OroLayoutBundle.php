@@ -10,7 +10,6 @@ use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\CustomImageFilterProvidersCompilerPass;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ResourcePathProvidersPass;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass;
-use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\OverrideServiceCompilerPass;
 
 class OroLayoutBundle extends Bundle
 {
@@ -24,7 +23,6 @@ class OroLayoutBundle extends Bundle
         $container->addCompilerPass(new ConfigurationPass());
         $container->addCompilerPass(new ExpressionCompilerPass());
         $container->addCompilerPass(new ResourcePathProvidersPass());
-        $container->addCompilerPass(new OverrideServiceCompilerPass());
         $container->addCompilerPass(new CustomImageFilterProvidersCompilerPass());
         $container->addCompilerPass(new BlockViewSerializerNormalizersPass());
     }
