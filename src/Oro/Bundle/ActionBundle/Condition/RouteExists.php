@@ -13,7 +13,7 @@ use Symfony\Component\Routing\RouterInterface;
  * Usage:
  * @route_exists: route_name
  *
- * @deprecated since 2.0.1. Will be removed in 2.3.
+ * @deprecated since 2.1. Will be removed in 2.3.
  */
 class RouteExists extends AbstractCondition implements ContextAccessorAwareInterface
 {

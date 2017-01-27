@@ -15,3 +15,8 @@ UPGRADE FROM 2.0 to 2.1
 
 ##LayoutBundle
 - Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
+####ActionBundle
+- `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
+    - work with `RouteCollection` is performance consuming
+    - it was used to check bundle presence, which could be done with `service_exists`
