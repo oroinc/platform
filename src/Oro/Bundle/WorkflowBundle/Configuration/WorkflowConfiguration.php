@@ -23,6 +23,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_ATTRIBUTES = 'attributes';
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
+    const NODE_VARIABLE_DEFINITIONS = 'variable_definitions';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
     const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
@@ -108,6 +109,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->append($this->getDisableOperationsNode())
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
+            ->append($this->getVariableDefinitionsNode())
             ->append($this->getTransitionsNode())
             ->append($this->getTransitionDefinitionsNode())
             ->append($this->getEntityRestrictionsNode())
@@ -229,6 +231,46 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                             return $value;
                         }
                     )
+                ->end()
+            ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getVariableDefinitionsNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::NODE_VARIABLE_DEFINITIONS);
+        $rootNode
+            ->children()
+                ->arrayNode('variables')
+                    ->requiresAtLeastOneElement()
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->beforeNormalization()
+                            ->ifString()
+                            ->then(function ($v) {
+                                return [
+                                    'type' => 'string',
+                                    'value' => $v
+                                ];
+                            })
+                        ->end()
+                        ->children()
+                            ->scalarNode('name')
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('type')
+                                ->defaultNull()
+                            ->end()
+                            ->variableNode('value')
+                                ->isRequired()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end();
 
@@ -426,6 +468,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
         return $triggersNode;
     }
+
     /**
      * @return NodeDefinition
      */

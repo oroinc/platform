@@ -1,0 +1,10 @@
+workflows:
+    first_workflow:
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    value: 'Var2Value'
+                var3: 'Var3Value'

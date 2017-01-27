@@ -40,6 +40,16 @@ workflows:
                     delete: false
                 options:
                     class: DateTime
+
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    value: 'Var2Value'
+                var3: 'Var3Value'
+
         disable_operations:
             operation1: [entity1, entity2]
         transitions:
