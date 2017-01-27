@@ -125,7 +125,7 @@ oro_api:
         Acme\Bundle\ProductBundle\Product:
             actions:
                 delete:
-                    excluded: true
+                    exclude: true
 ```
 
 Also, you can use short syntax:
