@@ -95,7 +95,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
         $fieldMetadata->setDataType($dataType);
-        
+
         return $fieldMetadata;
     }
 
@@ -378,7 +378,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
                 'oro_api_collection',
                 [
                     'entry_data_class' => 'Test\TargetEntity',
-                    'entry_type'       => 'oro_api_compound_entity',
+                    'entry_type'       => 'oro_api_compound_object',
                     'entry_options'    => [
                         'metadata' => $targetMetadata,
                         'config'   => $associationConfig
@@ -422,7 +422,7 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
                 'oro_api_entity_collection',
                 [
                     'entry_data_class' => 'Test\TargetEntity',
-                    'entry_type'       => 'oro_api_compound_entity',
+                    'entry_type'       => 'oro_api_compound_object',
                     'entry_options'    => [
                         'metadata' => $targetMetadata,
                         'config'   => $associationConfig
@@ -608,11 +608,49 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->assertEquals(
             new TypeGuess(
-                'oro_api_compound_entity',
+                'oro_api_compound_object',
                 [
                     'data_class' => 'Test\TargetEntity',
                     'metadata'   => $targetMetadata,
                     'config'     => $associationTargetConfig
+                ],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
+    public function testGuessTypeForNestedAssociation()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            true,
+            'integer'
+        );
+        $metadata->addAssociation($associationMetadata);
+
+        $targetMetadata = new EntityMetadata();
+        $targetMetadata->setClassName('Test\TargetEntity');
+        $associationMetadata->setTargetMetadata($targetMetadata);
+
+        $config = new EntityDefinitionConfig();
+        $associationConfig = $config->addField(self::TEST_PROPERTY);
+        $associationConfig->setDataType('nestedAssociation');
+        $associationConfig->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $associationTargetConfig = $associationConfig->getOrCreateTargetEntity();
+        $associationTargetConfig->addField('childField');
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
+        $this->assertEquals(
+            new TypeGuess(
+                'oro_api_nested_association',
+                [
+                    'metadata' => $associationMetadata,
+                    'config'   => $associationConfig
                 ],
                 TypeGuess::HIGH_CONFIDENCE
             ),

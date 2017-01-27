@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -519,6 +520,16 @@ class TagManager
     }
 
     /**
+     * @return null|OrganizationInterface
+     */
+    protected function getOrganizationByUser()
+    {
+        $user = $this->getUser();
+
+        return $user ? $user->getOrganization() : null;
+    }
+
+    /**
      * Return current user
      *
      * @return User
@@ -531,11 +542,13 @@ class TagManager
     /**
      * Return current organization
      *
-     * @return Organization
+     * @return OrganizationInterface
      */
     protected function getOrganization()
     {
-        return $this->securityFacade->getOrganization();
+        return $this->securityFacade->getOrganization()
+                ? $this->securityFacade->getOrganization()
+                : $this->getOrganizationByUser();
     }
 
     /**

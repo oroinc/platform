@@ -34,7 +34,7 @@ class RootJobProgressCalculator
         }
 
         foreach ($children as $child) {
-            if (in_array($child->getStatus(), self::$stopStatuses)) {
+            if (in_array($child->getStatus(), self::$stopStatuses, true)) {
                 $processed++;
             }
         }

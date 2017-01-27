@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class NotSqlKeyword extends Constraint
 {
-    public $message = "This value should not be the reserved SQL word.";
+    public $message = 'This value should not be the reserved SQL word.';
 
     /**
      * {@inheritdoc}

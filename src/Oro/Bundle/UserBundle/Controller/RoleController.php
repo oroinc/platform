@@ -168,7 +168,7 @@ class RoleController extends Controller
      */
     protected function getRolePrivilegeCapabilityProvider()
     {
-        return $this->get('oro_user.provider.role_privilege_capability_provider');
+        return $this->get('oro_user.provider.role_privilege_capability_provider_backend');
     }
 
     /**

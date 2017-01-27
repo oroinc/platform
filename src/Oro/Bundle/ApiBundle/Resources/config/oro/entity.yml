@@ -1,9 +1,0 @@
-oro_entity:
-    entity_aliases:
-        Oro\Bundle\ApiBundle\Model\EntityIdentifier:
-            alias:        entityidentifier
-            plural_alias: entityidentifiers
-        # @deprecated since 2.0. Use Oro\Bundle\ApiBundle\Model\EntityIdentifier instead
-        Oro\Bundle\ApiBundle\Model\EntityDescriptor:
-            alias:        entitydescriptor
-            plural_alias: entitydescriptors

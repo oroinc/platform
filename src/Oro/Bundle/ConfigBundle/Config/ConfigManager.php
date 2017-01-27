@@ -20,9 +20,6 @@ class ConfigManager
     /** @var array Settings array, initiated with global application settings */
     protected $settings;
 
-    /** @var ConfigValueBag */
-    protected $localCache;
-
     /** @var AbstractScopeManager[] */
     protected $managers;
 
@@ -36,18 +33,15 @@ class ConfigManager
      * @param string                       $scope
      * @param ConfigDefinitionImmutableBag $configDefinition
      * @param EventDispatcherInterface     $eventDispatcher
-     * @param ConfigValueBag               $valueBag
      */
     public function __construct(
         $scope,
         ConfigDefinitionImmutableBag $configDefinition,
-        EventDispatcherInterface $eventDispatcher,
-        ConfigValueBag $valueBag
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->scope           = $scope;
         $this->settings        = $configDefinition->all();
         $this->eventDispatcher = $eventDispatcher;
-        $this->localCache      = $valueBag;
     }
 
     /**
@@ -69,11 +63,10 @@ class ConfigManager
 
     /**
      * @param object $entity
-     * @return int
      */
     public function setScopeIdFromEntity($entity)
     {
-        return $this->getScopeManager()->setScopeIdFromEntity($entity);
+        $this->getScopeManager()->setScopeIdFromEntity($entity);
     }
 
     /**
@@ -112,24 +105,7 @@ class ConfigManager
      */
     public function get($name, $default = false, $full = false, $scopeIdentifier = null)
     {
-
-        // full and default values are not cached locally
-        if ($full || $default) {
-            return $this->getValue($name, $default, $full, $scopeIdentifier);
-        }
-
-        // try to get a value from a local cache
-        $entityId = $this->resolveIdentifier($scopeIdentifier);
-        if ($this->localCache->hasValue($this->scope, $entityId, $name)) {
-            return $this->localCache->getValue($this->scope, $entityId, $name);
-        }
-
-        $value = $this->getValue($name, $default, $full, $scopeIdentifier);
-
-        // put to a local cache
-        $this->localCache->setValue($this->scope, $entityId, $name, $value);
-
-        return $value;
+        return $this->getValue($name, $default, $full, $scopeIdentifier);
     }
 
     /**
@@ -205,9 +181,6 @@ class ConfigManager
     public function set($name, $value, $scopeIdentifier = null)
     {
         $this->getScopeManager()->set($name, $value, $scopeIdentifier);
-
-        // put to a local cache
-        $this->localCache->setValue($this->scope, $this->resolveIdentifier($scopeIdentifier), $name, $value);
     }
 
     /**
@@ -219,9 +192,6 @@ class ConfigManager
     public function reset($name, $scopeIdentifier = null)
     {
         $this->getScopeManager()->reset($name, $scopeIdentifier);
-
-        // remove from a local cache
-        $this->localCache->removeValue($this->scope, $this->resolveIdentifier($scopeIdentifier), $name);
     }
 
     /**
@@ -258,9 +228,6 @@ class ConfigManager
 
         list($updated, $removed) = $this->getScopeManager()->save($event->getSettings(), $scopeIdentifier);
 
-        // clear a local cache
-        $this->localCache->clear();
-
         $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
         $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->getScopeId());
         $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
@@ -292,9 +259,6 @@ class ConfigManager
     public function reload($scopeIdentifier = null)
     {
         $this->getScopeManager()->reload($scopeIdentifier);
-
-        // clear a local cache
-        $this->localCache->clear();
     }
 
     /**

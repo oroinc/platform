@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Doctrine\Common\Cache\CacheProvider;
@@ -12,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 
 class EntitySecurityMetadataProvider
 {
@@ -46,6 +48,9 @@ class EntitySecurityMetadataProvider
      */
     protected $localCache = [];
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * @param ConfigProvider      $securityConfigProvider
      * @param ConfigProvider      $entityConfigProvider
@@ -53,6 +58,7 @@ class EntitySecurityMetadataProvider
      * @param ManagerRegistry     $doctrine
      * @param TranslatorInterface $translator
      * @param CacheProvider|null  $cache
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         ConfigProvider $securityConfigProvider,
@@ -60,7 +66,8 @@ class EntitySecurityMetadataProvider
         ConfigProvider $extendConfigProvider,
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
-        CacheProvider  $cache = null
+        CacheProvider  $cache = null,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
@@ -68,6 +75,7 @@ class EntitySecurityMetadataProvider
         $this->doctrine = $doctrine;
         $this->translator = $translator;
         $this->cache = $cache;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -261,11 +269,15 @@ class EntitySecurityMetadataProvider
                     $this->translator->trans($this->getFieldLabel($classMetadata, $fieldName)),
                     $permissions
                 );
-
-                uasort($fields, function (FieldSecurityMetadata $a, FieldSecurityMetadata $b) {
-                    return strcmp($a->getLabel(), $b->getLabel());
-                });
             }
+
+            $event = new LoadFieldsMetadata($className, $fields);
+            $this->eventDispatcher->dispatch(LoadFieldsMetadata::NAME, $event);
+            $fields = $event->getFields();
+
+            uasort($fields, function (FieldSecurityMetadata $a, FieldSecurityMetadata $b) {
+                return strcmp($a->getLabel(), $b->getLabel());
+            });
         }
 
         return $fields;

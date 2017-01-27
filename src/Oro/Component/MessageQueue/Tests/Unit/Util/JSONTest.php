@@ -41,10 +41,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase
     public function testShouldThrowExceptionIfInputIsNotString($value)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Accept only string argument but got:'
-        );
-
+        $this->expectExceptionMessage('Accept only string argument but got:');
         $this->assertSame(0, JSON::decode($value));
     }
 
@@ -94,9 +91,7 @@ class JSONTest extends \PHPUnit_Framework_TestCase
     public function testThrowIfValueIsResource()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Could not encode value into json. Error 8 and message Type is not supported'
-        );
+        $this->expectExceptionMessage('Could not encode value into json. Error 8 and message Type is not supported');
 
         $resource = fopen('php://memory', 'r');
         fclose($resource);

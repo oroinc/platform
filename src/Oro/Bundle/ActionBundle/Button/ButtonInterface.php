@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Button;
 interface ButtonInterface
 {
     const DEFAULT_GROUP = '';
+    const DEFAULT_JS_DIALOG_WIDGET = 'oro/dialog-widget';
 
     /**
      * @return string

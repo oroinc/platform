@@ -12,7 +12,7 @@ class TranslationPackagesProviderPass implements CompilerPassInterface
     use TaggedServicesCompilerPassTrait;
 
     const EXTENSION_TAG = 'oro_translation.extension.packages_provider';
-    const SERVICE_ID = 'oro_translation.packages_provider';
+    const SERVICE_ID = 'oro_translation.packages_provider.translation';
 
     /**
      * {@inheritdoc}

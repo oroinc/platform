@@ -189,6 +189,11 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         }
         $this->datagridGuesser->applyColumnGuesses($entityClassName, $fieldName, $fieldType, $columnOptions);
         $this->datagridGuesser->setColumnOptions($this->config, $columnAlias, $columnOptions);
+
+        $this->config->offsetSetByPath(
+            sprintf('[fields_acl][columns][%s][data_name]', $columnAlias),
+            $columnExpr
+        );
     }
 
     /**

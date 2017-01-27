@@ -10,6 +10,8 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class RestJsonApiTestCase extends ApiTestCase
 {
+    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+
     /**
      * {@inheritdoc}
      */
@@ -19,7 +21,7 @@ class RestJsonApiTestCase extends ApiTestCase
             [],
             array_replace(
                 $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
+                ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]
             )
         );
 
@@ -48,7 +50,7 @@ class RestJsonApiTestCase extends ApiTestCase
             $uri,
             $parameters,
             [],
-            ['CONTENT_TYPE' => 'application/vnd.api+json']
+            ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]
         );
 
         return $this->client->getResponse();

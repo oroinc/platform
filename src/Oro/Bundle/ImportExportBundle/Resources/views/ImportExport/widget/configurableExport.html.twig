@@ -32,7 +32,6 @@
                         var form = $('[name="oro_importexport_export"]');
                         form.on('submit', function(e) {
                             e.preventDefault();
-                            var exportStartedMessage = exportHandler.startExportNotificationMessage();
                             widget.remove();
                             $.ajax(e.target.action, {
                                 data: form.serialize(),
@@ -41,11 +40,9 @@
                                 exportHandler.handleExportResponse(data);
                             }).fail(function() {
                                 messenger.notificationFlashMessage(
-                                        'error',
-                                        '{{ 'Errors occured during file export.'|trans }}'
+                                    'error',
+                                    '{{ 'Errors occured during file export.'|trans }}'
                                 );
-                            }).always(function() {
-                                exportStartedMessage.close();
                             });
                         });
                     });

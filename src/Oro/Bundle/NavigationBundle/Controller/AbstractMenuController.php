@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
@@ -131,11 +132,15 @@ abstract class AbstractMenuController extends Controller
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
 
+        $scope = $this->getScope($context);
+
         if (is_array($response)) {
-            $response['scope'] = $this->getScope($context);
+            $response['scope'] = $scope;
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
             $response['menuItem'] = $menuItem;
+        } else {
+            $this->dispatchMenuUpdateScopeChangeEvent($menu->getName(), $scope);
         }
 
         return $response;
@@ -178,5 +183,17 @@ abstract class AbstractMenuController extends Controller
     protected function createMenuTree($menu)
     {
         return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
+    }
+
+    /**
+     * @param string $menuName
+     * @param Scope $scope
+     */
+    protected function dispatchMenuUpdateScopeChangeEvent($menuName, Scope $scope)
+    {
+        $this->get('event_dispatcher')->dispatch(
+            MenuUpdateScopeChangeEvent::NAME,
+            new MenuUpdateScopeChangeEvent($menuName, $scope)
+        );
     }
 }

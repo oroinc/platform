@@ -164,7 +164,7 @@ entity_config:
                     route:                  'oro_attribute_unremove'
                     type:                   'ajaxrestorefield'
                     icon:                   'backward'
-                    acl_resource:           oro_attribute_unremove
+                    acl_resource:           oro_attribute_remove
                     filter:                 { extend_owner: 'Custom', extend_state: ['Deleted'], attribute_is_attribute: true }
                     args:                   ['id']
                 -

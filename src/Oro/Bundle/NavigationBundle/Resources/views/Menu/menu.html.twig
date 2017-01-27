@@ -152,8 +152,8 @@
     {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
         {{- item.label|trans|raw -}}
     {% elseif item.getExtra('translate_disabled', false) == false %}
-        {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages'))|title -}}
+        {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
     {% else %}
-        {{- item.label|title -}}
+        {{- item.label -}}
     {% endif %}
 {% endblock %}

@@ -20,13 +20,16 @@
                 {% if data.workflowItem is not defined %}
                     {% set data = data|merge({'workflowItem': null}) %}
                     {% if data.transition.hasForm() %}
-                        {% set transitionData = transitionData|merge({'dialog-url': path(
-                            'oro_workflow_widget_start_transition_form',
-                            {
-                                workflowName: data.workflow.name,
-                                transitionName: data.transition.name,
-                                entityId: entity_id
-                            })
+                        {% set transitionData = transitionData|merge({
+                            'dialog-url': path(
+                                'oro_workflow_widget_start_transition_form',
+                                {
+                                    workflowName: data.workflow.name,
+                                    transitionName: data.transition.name,
+                                    entityId: entity_id
+                                }
+                            ),
+                            'jsDialogWidget': constant('Oro\\Bundle\\WorkflowBundle\\Button\\AbstractTransitionButton::TRANSITION_JS_DIALOG_WIDGET')
                         }) %}
                     {% endif %}
 

@@ -17,6 +17,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ApiTestCase extends WebTestCase
 {
+    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -285,7 +287,7 @@ abstract class ApiTestCase extends WebTestCase
                 && $response->getStatusCode() >= 400
                 && (
                     $response->headers->contains('Content-Type', 'application/json')
-                    || $response->headers->contains('Content-Type', 'application/vnd.api+json')
+                    || $response->headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE)
                 )
             ) {
                 $e = new \PHPUnit_Framework_ExpectationFailedException(
