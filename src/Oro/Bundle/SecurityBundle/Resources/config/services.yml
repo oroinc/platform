@@ -12,7 +12,6 @@ parameters:
     oro_security.acl.extension_selector.class:                 Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
     oro_security.acl.extension.entity.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension
     oro_security.acl.extension.action.class:                   Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension
-    oro_security.acl.voter.class:                              Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
     oro_security.acl.provider.class:                           Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclProvider
     oro_security.acl.dbal.provider.class:                      Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider
     oro_security.acl.permission_granting_strategy.class:       Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy
@@ -208,6 +207,7 @@ services:
         calls:
              - [setAuditLogger, ["@?security.acl.audit_logger"]]
              - [setSecurityMetadataProvider, ["@oro_security.entity_security_metadata_provider"]]
+             - [setContext, ["@oro_security.acl.voter_link"]]
 
     oro_security.acl.permission_map:
         public: false
@@ -749,3 +749,38 @@ services:
             - '@security.authorization_checker'
             - '@doctrine'
             - '@oro_entity_config.provider.entity'
+
+    oro_security.framework_extra.converter.doctrine.orm_decorator:
+        class: Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter
+        decorates: 'sensio_framework_extra.converter.doctrine.orm'
+        parent: 'sensio_framework_extra.converter.doctrine.orm'
+        arguments:
+            - '@oro_security.security_facade'
+
+    oro_security.acl.cache.doctrine_decorator:
+        class: Oro\Bundle\SecurityBundle\Acl\Cache\AclCache
+        decorates: 'security.acl.cache.doctrine'
+        parent: 'security.acl.cache.doctrine'
+        arguments:
+            index_1: '@oro_security.acl.permission_granting_strategy'
+        calls:
+            - [setUnderlyingCache, ['@security.acl.underlying.cache']]
+
+    oro_security.acl.voter.basic_permissions:
+        class: Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
+        decorates: 'security.acl.voter.basic_permissions'
+        parent: 'security.acl.voter.basic_permissions'
+        arguments:
+            index_1: '@oro_security.acl.object_identity_retrieval_strategy'
+            index_3: '@oro_security.acl.permission_map'
+        calls:
+            - [setAclExtensionSelector, ['@oro_security.acl.extension_selector']]
+            - [setAclGroupProvider, ['@oro_security.acl.group_provider.chain']]
+
+    oro_security.acl.dbal.provider:
+        decorates: 'security.acl.dbal.provider'
+        parent: 'security.acl.dbal.provider'
+        # make ACL DBAL provider public because it can be used as standalone service, for example in migrations
+        public: true
+        arguments:
+            index_1: '@oro_security.acl.permission_granting_strategy'

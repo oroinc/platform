@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Cache;
 
-use Doctrine\Common\Cache\PhpFileCache as BasePhpFileCache;
+use Oro\Bundle\CacheBundle\Provider\PhpFileCache as BasePhpFileCache;
 
 class WsseNoncePhpFileCache extends BasePhpFileCache
 {
