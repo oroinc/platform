@@ -10,6 +10,8 @@ Table of Contents
    - [Example](#example)
  - [Attributes Configuration](#attributes-configuration)
    - [Example](#example-1)
+ - [Variables Configuration](#variables-configuration)
+   - [Example](#example-10)
  - [Steps configuration](#steps-configuration)
    - [Example](#example-2)
  - [Transitions Configuration](#transitions-configuration)
@@ -21,8 +23,6 @@ Table of Contents
    - [Example](#example-5)
  - [Post Actions](#post-actions)
    - [Example](#example-6)
- - [Variables Configuration](#variables-configuration)
-   - [Example](#example-7)
  - [Example Workflow Configuration](#example-workflow-configuration)
    - [Configuration](#configuration)
    - [PhoneCall Entity](#phonecall-entity)
@@ -859,6 +859,11 @@ workflows:
                 type: entity
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
         transitions:
             start_call:
                 is_start: true                         # this transition used to start new workflow
