@@ -15,7 +15,8 @@ use Oro\Bundle\UserBundle\Api\Model\UserProfile;
 
 class UserProfileRestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
-    const GET_ROUTE_NAME = 'oro_rest_api_get';
+    const GET_ROUTE_NAME          = 'oro_rest_api_get';
+    const USER_PROFILE_ROUTE_NAME = 'oro_rest_api_get_user_profile';
 
     /** @var RestDocViewDetector */
     private $docViewDetector;
@@ -72,7 +73,7 @@ class UserProfileRestRouteOptionsResolver implements RouteOptionsResolverInterfa
         $userProfileGetRoute->setRequirements($requirements);
         // add the user profile route before the default "get" route
         $routes->insert(
-            $routes->generateRouteName(self::GET_ROUTE_NAME),
+            self::USER_PROFILE_ROUTE_NAME,
             $userProfileGetRoute,
             self::GET_ROUTE_NAME,
             true

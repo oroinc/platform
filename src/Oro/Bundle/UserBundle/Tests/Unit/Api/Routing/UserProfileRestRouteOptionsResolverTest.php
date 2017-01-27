@@ -134,6 +134,11 @@ class UserProfileRestRouteOptionsResolverTest extends \PHPUnit_Framework_TestCas
 
         self::assertCount(2, $routes);
         $allRoutes = $routes->all();
-        self::assertEquals($expectedRoute, reset($allRoutes));
+        $userProfileRoute = reset($allRoutes);
+        self::assertEquals($expectedRoute, $userProfileRoute);
+        self::assertSame(
+            $userProfileRoute,
+            $routes->get(UserProfileRestRouteOptionsResolver::USER_PROFILE_ROUTE_NAME)
+        );
     }
 }
