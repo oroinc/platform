@@ -391,7 +391,8 @@ define(function(require) {
             var $toggle = $(toggleDropdown, $dropdown);
             var $dropdownMenu = $('>.dropdown-menu', $dropdown);
             var dropdownMenuContainer = $toggle.closest('.ui-dialog-content')[0] ||
-                $toggle.closest('.scrollable-container')[0];
+                $toggle.closest('.scrollable-container')[0] ||
+                $toggle.closest('.grid-scrollable-container')[0];
             var scrollableRect = scrollHelper.getFinalVisibleRect(dropdownMenuContainer);
             var toggleRect = $toggle[0].getBoundingClientRect();
 

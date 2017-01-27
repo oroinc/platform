@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 /**
  * Represents the response status code.
  */
-class StatusCodeConfig
+class StatusCodeConfig implements ConfigBagInterface
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;

@@ -67,6 +67,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /** response status codes */
     const STATUS_CODES = 'status_codes';
 
+    /** the class name of a parent API resource */
+    const PARENT_RESOURCE_CLASS = 'parent_resource_class';
+
     /**
      * A string that unique identify this instance of entity definition config.
      * This value is set by config providers and is used by a metadata provider
@@ -93,13 +96,39 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     /**
      * Sets a string that unique identify this instance of entity definition config.
      * Do not set this value in your code.
-     * @see Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig::id
+     * @see Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig::key
      *
      * @param string|null $key
      */
     public function setKey($key)
     {
         $this->key = $key;
+    }
+
+    /**
+     * Gets the class name of a parent API resource.
+     *
+     * @return string|null
+     */
+    public function getParentResourceClass()
+    {
+        return array_key_exists(self::PARENT_RESOURCE_CLASS, $this->items)
+            ? $this->items[self::PARENT_RESOURCE_CLASS]
+            : null;
+    }
+
+    /**
+     * Sets the class name of a parent API resource.
+     *
+     * @param string|null $parentResourceClass
+     */
+    public function setParentResourceClass($parentResourceClass)
+    {
+        if (!empty($parentResourceClass)) {
+            $this->items[self::PARENT_RESOURCE_CLASS] = $parentResourceClass;
+        } else {
+            unset($this->items[self::PARENT_RESOURCE_CLASS]);
+        }
     }
 
     /**

@@ -47,20 +47,43 @@ class EntityDefinitionConfigTest extends \PHPUnit_Framework_TestCase
         $config = new EntityDefinitionConfig();
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, null);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
         $this->assertEquals([], $config->toArray());
+        $this->assertSame([], $config->keys());
 
         $config->set($attrName, false);
         $this->assertTrue($config->has($attrName));
         $this->assertFalse($config->get($attrName));
         $this->assertEquals([$attrName => false], $config->toArray());
+        $this->assertEquals([$attrName], $config->keys());
 
         $config->remove($attrName);
         $this->assertFalse($config->has($attrName));
         $this->assertNull($config->get($attrName));
+        $this->assertSame([], $config->toArray());
+        $this->assertSame([], $config->keys());
+    }
+
+    public function testParentResourceClass()
+    {
+        $config = new EntityDefinitionConfig();
+        $this->assertNull($config->getParentResourceClass());
+
+        $config->setParentResourceClass('Test\Class');
+        $this->assertEquals('Test\Class', $config->getParentResourceClass());
+        $this->assertEquals(['parent_resource_class' => 'Test\Class'], $config->toArray());
+
+        $config->setParentResourceClass(null);
+        $this->assertNull($config->getParentResourceClass());
+        $this->assertEquals([], $config->toArray());
+
+        $config->setParentResourceClass('Test\Class');
+        $config->setParentResourceClass(null);
+        $this->assertNull($config->getParentResourceClass());
         $this->assertEquals([], $config->toArray());
     }
 
