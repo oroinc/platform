@@ -22,6 +22,7 @@ services:
             - '@oro_message_queue.client.message_producer'
             - '@oro_config.user'
             - '@logger'
+            - '@router'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -33,6 +34,7 @@ services:
             - '@oro_message_queue.client.message_producer'
             - '@oro_config.user'
             - '@logger'
+            - '@router'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

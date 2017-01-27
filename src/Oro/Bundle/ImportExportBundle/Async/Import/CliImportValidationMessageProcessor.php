@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Routing\Router;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
@@ -13,8 +18,6 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
 
 class CliImportValidationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -43,18 +46,25 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
      */
     private $logger;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $router;
+
     public function __construct(
         CliImportHandler $cliImportHandler,
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
         ConfigManager $configManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Router $router
     ) {
         $this->cliImportHandler = $cliImportHandler;
         $this->jobRunner = $jobRunner;
         $this->producer = $producer;
         $this->configManager = $configManager;
         $this->logger = $logger;
+        $this->router = $router;
     }
 
     /**
@@ -93,27 +103,37 @@ class CliImportValidationMessageProcessor implements MessageProcessorInterface, 
                 );
 
                 $summary = sprintf(
-                    'Import validation from file %s for the %s is completed,
-                    success: %s, counts: %d, errors: %d, message: %s',
-                    $body['fileName'],
-                    $result['success'],
-                    $result['counts'],
-                    $result['errors'],
-                    $result['message']
+                    'Import validation from file %s was completed for Entity "%s",
+                    processed: %s, read: %d, errors: %d.',
+                    basename($body['fileName']),
+                    $result['entityName'],
+                    $result['counts']['process'],
+                    $result['counts']['read'],
+                    $result['errors']
                 );
 
                 $this->logger->info($summary);
 
                 $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
                 $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
+                if ($result['counts']['errors']) {
+                    $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
+                        'oro_importexport_error_log',
+                        ['jobCode' => $result['jobCode']]
+                    );
+                    $downloadLink = sprintf('<br><a target="_blank" href="%s">Download</a>', $url);
+                    $summary .= $downloadLink;
+                }
+
                 $this->producer->send(
                     NotificationTopics::SEND_NOTIFICATION_EMAIL,
                     [
                         'fromEmail' => $fromEmail,
                         'fromName' => $fromName,
                         'toEmail' => $body['notifyEmail'],
-                        'subject' => $result['message'],
-                        'body' => $summary
+                        'subject' => sprintf('Result of import validation file %s', basename($body['fileName'])),
+                        'body' => $summary,
+                        'contentType' => 'text/html'
                     ]
                 );
 

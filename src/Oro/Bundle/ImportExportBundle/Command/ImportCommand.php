@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
-
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportCommand extends ContainerAwareCommand
 {
@@ -63,7 +63,7 @@ class ImportCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException(sprintf('File not found: %s', $sourceFile));
         }
 
-        $validation = $input->hasOption('validation');
+        $validation = $input->hasOption('validation') && $input->getOption('validation');
 
         $this->getImportHandler()->setImportingFileName($sourceFile);
 
@@ -86,14 +86,12 @@ class ImportCommand extends ContainerAwareCommand
             [
                 'fileName' => $sourceFile,
                 'notifyEmail' => $email,
-                'jobName' =>  $jobName,
+                'jobName' => $jobName,
                 'processorAlias' => $processorAlias
             ]
         );
 
-        $output->writeln(
-            sprintf('%s scheduled successfully. The result will be sent to the email ')
-        );
+        $output->writeln('Scheduled successfully. The result will be sent to the email');
     }
 
     /**
