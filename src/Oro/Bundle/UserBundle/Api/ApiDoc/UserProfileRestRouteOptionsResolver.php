@@ -13,6 +13,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\UserBundle\Api\Model\UserProfile;
 
+/**
+ * Removes auto-generated API route "GET /api/userprofile/{id}".
+ */
 class UserProfileRestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     /** @var RestDocViewDetector */

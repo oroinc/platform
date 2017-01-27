@@ -13,6 +13,9 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\UserBundle\Api\Model\UserProfile;
 
+/**
+ * Adds the route "GET /api/userprofile". The name of this route is "oro_rest_api_get_user_profile".
+ */
 class UserProfileRestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
     const GET_ROUTE_NAME          = 'oro_rest_api_get';
