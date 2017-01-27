@@ -11,6 +11,14 @@
     </div>
 {% endblock %}
 
+{% block __oro_datagrid_server_render__datagrid_items_counter_widget %}
+    {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
+
+    {% if toolbarPosition != 'bottom' %}
+        <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+    {% endif %}
+{% endblock %}
+
 {% block __oro_datagrid_server_render__datagrid_toolbar_pagination_widget %}
     <div{{ block('block_attributes') }}>
         {% set metadata = oro_datagrid_metadata(datagrid) %}

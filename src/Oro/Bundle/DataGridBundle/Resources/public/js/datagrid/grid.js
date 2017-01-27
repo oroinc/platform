@@ -974,6 +974,7 @@ define(function(require) {
         renderToolbar: function() {
             var self = this;
             _.each(this.toolbarOptions.placement, function(enabled, position) {
+                console.log(enabled, self.getToolbar(position).render().$el);
                 if (enabled) {
                     self.$(self.selectors.toolbars[position]).append(self.getToolbar(position).render().$el);
                 }
