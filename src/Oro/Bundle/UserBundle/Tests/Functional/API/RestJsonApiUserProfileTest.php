@@ -33,4 +33,28 @@ class RestJsonApiUserProfileTest extends RestJsonApiTestCase
             $result['data']['attributes']['username']
         );
     }
+
+    /**
+     * @dataProvider getNotAllowedMethods
+     */
+    public function testNotAllowedMethods($method)
+    {
+        $response = $this->request(
+            $method,
+            $this->getUrl('oro_rest_api_get_user_profile')
+        );
+
+        self::assertResponseStatusCodeEquals($response, 405);
+    }
+
+    /**
+     * @return array
+     */
+    public function getNotAllowedMethods()
+    {
+        return [
+            ['POST'],
+            ['DELETE'],
+        ];
+    }
 }
