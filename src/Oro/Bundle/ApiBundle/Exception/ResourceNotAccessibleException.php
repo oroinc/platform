@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Exception;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 /**
- * The resource was found but it is accessible through Data API.
+ * This exception thrown if the resource was found but it is not accessible through Data API.
  */
 class ResourceNotAccessibleException extends ForbiddenException implements ExceptionInterface
 {
