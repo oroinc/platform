@@ -86,7 +86,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
         $this->callConfigureCallbacks($node, $sectionName);
         $this->addPreProcessCallbacks($parentNode, $sectionName);
         $this->addPostProcessCallbacks(
@@ -193,7 +192,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
         $this->callConfigureCallbacks($node, $sectionName);
         $this->addPreProcessCallbacks($parentNode, $sectionName);
         $this->addPostProcessCallbacks($parentNode, $sectionName);
@@ -208,7 +206,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
         $this->callConfigureCallbacks($node, $sectionName);
         $this->addPreProcessCallbacks($parentNode, $sectionName);
         $this->addPostProcessCallbacks(
