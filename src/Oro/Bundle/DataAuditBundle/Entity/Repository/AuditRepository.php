@@ -7,6 +7,11 @@ use Gedmo\Tool\Wrapper\EntityWrapper;
 
 class AuditRepository extends LogEntryRepository
 {
+    /**
+     * @param object $entity
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
     public function getLogEntriesQueryBuilder($entity)
     {
         $wrapped     = new EntityWrapper($entity, $this->_em);
