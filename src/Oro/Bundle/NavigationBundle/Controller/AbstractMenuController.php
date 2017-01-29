@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Knp\Menu\ItemInterface;
 
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,7 +111,8 @@ abstract class AbstractMenuController extends Controller
         $this->checkAcl();
         $context = $this->denormalizeContext($context);
         $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
-        $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
+        $menu = $this->getMenu($menuName, $context);
+        $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate($menu,
             $context,
             [
                 'menu' => $menuName,
@@ -120,7 +122,7 @@ abstract class AbstractMenuController extends Controller
             ]
         );
 
-        return $this->handleUpdate($menuUpdate, $context);
+        return $this->handleUpdate($menuUpdate, $context, $menu);
     }
 
     /**
@@ -134,7 +136,8 @@ abstract class AbstractMenuController extends Controller
         $this->checkAcl();
         $context = $this->denormalizeContext($context);
         $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
-        $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menuName, $key, $scope);
+        $menu = $this->getMenu($menuName, $context);
+        $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menu, $key, $scope);
 
         if (!$menuUpdate->getKey()) {
             throw $this->createNotFoundException(
@@ -142,17 +145,17 @@ abstract class AbstractMenuController extends Controller
             );
         }
 
-        return $this->handleUpdate($menuUpdate, $context);
+        return $this->handleUpdate($menuUpdate, $context, $menu);
     }
 
     /**
      * @param MenuUpdateInterface $menuUpdate
      * @param array               $context
+     * @param ItemInterface       $menu
      * @return array|RedirectResponse
      */
-    protected function handleUpdate(MenuUpdateInterface $menuUpdate, array $context)
+    protected function handleUpdate(MenuUpdateInterface $menuUpdate, array $context, ItemInterface $menu)
     {
-        $menu = $this->getMenu($menuUpdate->getMenu(), $context);
         $menuItem = null;
         if (!$menuUpdate->isCustom()) {
             $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
@@ -206,9 +209,10 @@ abstract class AbstractMenuController extends Controller
     protected function getMenu($menuName, array $context)
     {
         $options = [
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context,
+            BuilderChainProvider::IGNORE_CACHE_OPTION => true
         ];
-        $menu = $this->getMenuUpdateManager()->getMenu($menuName, $options);
+        $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
         if (!count($menu->getChildren())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
         }

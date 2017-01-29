@@ -4,15 +4,19 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
+use Knp\Menu\ItemInterface;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class AjaxMenuController extends Controller
 {
@@ -24,8 +28,8 @@ class AjaxMenuController extends Controller
      */
     public function resetAction($menuName, Request $request)
     {
-        $this->checkAcl($request);
-        $manager = $this->getMenuUpdateManager($request);
+        $this->checkAcl();
+        $manager = $this->getMenuUpdateManager();
         $context = $this->getContextFromRequest($request);
         $scope = $this->get('oro_scope.scope_manager')->find($manager->getScopeType(), $context);
         if (null === $scope) {
@@ -42,7 +46,7 @@ class AjaxMenuController extends Controller
 
         $em->flush($updates);
 
-        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -56,11 +60,12 @@ class AjaxMenuController extends Controller
      */
     public function createAction(Request $request, $menuName, $parentKey)
     {
-        $this->checkAcl($request);
-        $manager = $this->getMenuUpdateManager($request);
-
+        $this->checkAcl();
+        $manager = $this->getMenuUpdateManager();
         $context = $this->getContextFromRequest($request);
+        $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $manager->createMenuUpdate(
+            $menu,
             $context,
             [
                 'menu' => $menuName,
@@ -96,8 +101,8 @@ class AjaxMenuController extends Controller
      */
     public function deleteAction($menuName, $key, Request $request)
     {
-        $this->checkAcl($request);
-        $manager = $this->getMenuUpdateManager($request);
+        $this->checkAcl();
+        $manager = $this->getMenuUpdateManager();
 
         $context = $this->getContextFromRequest($request);
 
@@ -124,7 +129,7 @@ class AjaxMenuController extends Controller
 
         $entityManager->flush($menuUpdate);
 
-        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -138,12 +143,13 @@ class AjaxMenuController extends Controller
      */
     public function showAction($menuName, $key, Request $request)
     {
-        $this->checkAcl($request);
+        $this->checkAcl();
         $context = $this->getContextFromRequest($request);
-        $manager = $this->getMenuUpdateManager($request);
+        $manager = $this->getMenuUpdateManager();
 
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
-        $this->getMenuUpdateManager($request)->showMenuItem($menuName, $key, $scope);
+        $menu = $this->getMenu($menuName, $context);
+        $this->getMenuUpdateManager()->showMenuItem($menu, $key, $scope);
 
         $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
@@ -159,13 +165,13 @@ class AjaxMenuController extends Controller
      */
     public function hideAction($menuName, $key, Request $request)
     {
-        $this->checkAcl($request);
-        $manager = $this->getMenuUpdateManager($request);
+        $this->checkAcl();
+        $manager = $this->getMenuUpdateManager();
 
         $context = $this->getContextFromRequest($request);
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
-
-        $manager->hideMenuItem($menuName, $key, $scope);
+        $menu = $this->getMenu($menuName, $context);
+        $manager->hideMenuItem($menu, $key, $scope);
 
         $this->dispatchMenuUpdateScopeChangeEvent($menuName, $context);
 
@@ -180,8 +186,8 @@ class AjaxMenuController extends Controller
      */
     public function moveAction(Request $request, $menuName)
     {
-        $this->checkAcl($request);
-        $manager = $this->getMenuUpdateManager($request);
+        $this->checkAcl();
+        $manager = $this->getMenuUpdateManager();
 
         $key = $request->get('key');
         $parentKey = $request->get('parentKey');
@@ -192,8 +198,9 @@ class AjaxMenuController extends Controller
 
         $context = $this->getContextFromRequest($request);
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
+        $menu = $this->getMenu($menuName, $context);
         $updates = $manager->moveMenuItem(
-            $menuName,
+            $menu,
             $key,
             $scope,
             $parentKey,
@@ -219,7 +226,7 @@ class AjaxMenuController extends Controller
 
     /**
      * @param string $menuName
-     * @param array $context
+     * @param array  $context
      */
     protected function dispatchMenuUpdateScopeChangeEvent($menuName, array $context)
     {
@@ -231,15 +238,16 @@ class AjaxMenuController extends Controller
 
     /**
      * @param Request $request
-     * @param array   $allowedKeys
      * @return array
      */
     protected function getContextFromRequest(Request $request)
     {
-        $allowedKeys = $request->attributes->get('_context_keys', []);
-        $manager = $this->getMenuUpdateManager($request);
+        $manager = $this->getMenuUpdateManager();
 
-        $context = $this->get('oro_scope.context_request_helper')->getFromRequest($request, $allowedKeys);
+        $context = $this->get('oro_scope.context_request_helper')->getFromRequest(
+            $request,
+            $this->getAllowedContextKeys()
+        );
 
         return $this->get('oro_scope.context_normalizer')->denormalizeContext($manager->getScopeType(), $context);
     }
@@ -252,17 +260,43 @@ class AjaxMenuController extends Controller
     protected function findOrCreateScope($context, $scopeType)
     {
         $context = $this->get('oro_scope.context_normalizer')->denormalizeContext($scopeType, $context);
+
         return $this->get('oro_scope.scope_manager')->findOrCreate($scopeType, $context);
+    }
+
+    /**
+     * @param string $menuName
+     * @param array  $context
+     * @return ItemInterface
+     */
+    protected function getMenu($menuName, array $context)
+    {
+        $options = [
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $context,
+            BuilderChainProvider::IGNORE_CACHE_OPTION => true
+        ];
+        $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
+        if (!count($menu->getChildren())) {
+            throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
+        }
+
+        return $menu;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAllowedContextKeys()
+    {
+        return [];
     }
 
     /**
      * @throws AccessDeniedException
      */
-    protected function checkAcl(Request $request)
+    protected function checkAcl()
     {
-        $acl = $request->attributes->get('_is_granted');
-        $securityFacade = $this->get('oro_security.security_facade');
-        if (!$securityFacade->isGranted('oro_navigation_manage_menus') || !$securityFacade->isGranted($acl)) {
+        if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
             throw $this->createAccessDeniedException();
         }
     }
@@ -270,10 +304,8 @@ class AjaxMenuController extends Controller
     /**
      * @return MenuUpdateManager
      */
-    protected function getMenuUpdateManager(Request $request)
+    protected function getMenuUpdateManager()
     {
-        $managerName = $request->attributes->get('_manager');
-
-        return $this->get($managerName);
+        return $this->get('oro_navigation.manager.menu_update');
     }
 }

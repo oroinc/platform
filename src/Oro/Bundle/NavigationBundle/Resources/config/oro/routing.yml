@@ -47,8 +47,3 @@ oro_api_post_pagestate_deprecated:
     requirements:
         _format:     json|html
         version:     latest|v1
-
-oro_navigation_menu_update_ajax:
-    type: rest
-    prefix: /menu
-    resource: "@OroNavigationBundle/Resources/config/oro/routing_menu_update.yml"
