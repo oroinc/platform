@@ -97,6 +97,15 @@ define(function(require) {
                         }
                     },
                     yaxis: {
+                        ticks: function() {
+                            var ticks = [];
+                            for (var i in yLabels) {
+                                if (yLabels[i]) {
+                                    ticks.push([i, yLabels[i]]);
+                                }
+                            }
+                            return ticks;
+                        },
                         tickFormatter: function(x) {
                             return yLabels[parseInt(x)];
                         }
