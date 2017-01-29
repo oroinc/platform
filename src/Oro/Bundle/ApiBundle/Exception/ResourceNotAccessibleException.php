@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Exception;
 
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * This exception thrown if the resource was found but it is not accessible through Data API.
  */
-class ResourceNotAccessibleException extends ForbiddenException implements ExceptionInterface
+class ResourceNotAccessibleException extends NotFoundHttpException
 {
     /**
      * {@inheritdoc}

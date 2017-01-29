@@ -360,7 +360,6 @@ services:
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'
                 - '\OutOfBoundsException'
-                - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
                 - 'Symfony\Component\PropertyAccess\Exception\ExceptionInterface'
                 - 'Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException'
         tags:

@@ -23,14 +23,14 @@ class RestJsonApiNotAccessibleResourceTest extends RestJsonApiTestCase
             $method,
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
-        self::assertApiResponseStatusCodeEquals($response, 403, $entityType, $action);
+        self::assertApiResponseStatusCodeEquals($response, 404, $entityType, $action);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         self::assertEquals(
             [
                 'errors' => [
                     [
-                        'status' => '403',
-                        'title'  => 'forbidden exception',
+                        'status' => '404',
+                        'title'  => 'resource not accessible exception',
                         'detail' => 'The resource is not accessible.'
                     ]
                 ]

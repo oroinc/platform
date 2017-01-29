@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Oro\Bundle\ApiBundle\Exception\ExceptionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\Exception\AccessException as PropertyAccessException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
-use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
+use Oro\Bundle\ApiBundle\Exception\ExceptionInterface as ApiException;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
@@ -30,6 +30,10 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     {
         $this->debug = $debug;
         $this->safeExceptions = $safeExceptions;
+        $this->safeExceptions[] = ApiException::class;
+        $this->safeExceptions[] = HttpExceptionInterface::class;
+        $this->safeExceptions[] = AccessDeniedException::class;
+        $this->safeExceptions[] = ForbiddenException::class;
     }
 
     /**
@@ -41,16 +45,12 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         if ($underlyingException instanceof HttpExceptionInterface) {
             return $underlyingException->getStatusCode();
         }
-        if ($underlyingException instanceof AccessDeniedException) {
-            return $underlyingException->getCode();
-        }
-        if ($underlyingException instanceof ForbiddenException) {
+        if ($underlyingException instanceof AccessDeniedException
+            || $underlyingException instanceof ForbiddenException
+        ) {
             return Response::HTTP_FORBIDDEN;
         }
         if ($underlyingException instanceof PropertyAccessException) {
-            return Response::HTTP_METHOD_NOT_ALLOWED;
-        }
-        if ($underlyingException instanceof ActionNotAllowedException) {
             return Response::HTTP_METHOD_NOT_ALLOWED;
         }
 
@@ -70,13 +70,10 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     public function getExceptionType(\Exception $exception)
     {
-        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
-        $exceptionClass = get_class($underlyingException);
-        if ($underlyingException instanceof ForbiddenException) {
-            $exceptionClass = ForbiddenException::class;
-        }
-
-        return ValueNormalizerUtil::humanizeClassName($exceptionClass, 'Exception');
+        return ValueNormalizerUtil::humanizeClassName(
+            get_class(ExceptionUtil::getProcessorUnderlyingException($exception)),
+            'Exception'
+        );
     }
 
     /**
@@ -122,12 +119,6 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     protected function isSafeException(\Exception $exception)
     {
-        if ($exception instanceof ExceptionInterface
-            || $exception instanceof ForbiddenException
-        ) {
-            return true;
-        }
-
         foreach ($this->safeExceptions as $class) {
             if (is_a($exception, $class)) {
                 return true;
