@@ -69,8 +69,9 @@ public function onPreBuild(PreBuild $event)
     $config = $event->getConfig();
     $parameters = $event->getParameters();
 
+    $filters = $parameters->get(OrmFilterExtension::FILTER_ROOT_PARAM, []);
     $sorters = $parameters->get(OrmSorterExtension::SORTERS_ROOT_PARAM, []);
-    if (empty($sorters['channelName'])) {
+    if (empty($filters['channelName']) && empty($sorters['channelName'])) {
         $config->getOrmQuery()->convertAssociationJoinToSubquery(
             'g',
             'groupName',

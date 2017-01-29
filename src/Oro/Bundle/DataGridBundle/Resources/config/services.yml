@@ -347,3 +347,9 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_datagrid.layout_context_configurator.data:
+        class: Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator
+        arguments:
+            - '@oro_datagrid.datagrid.manager'
+        tags:
+            - { name: layout.context_configurator }

@@ -10,9 +10,11 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResourceHelper;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -24,17 +26,31 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     /** @var ConfigBag */
     private $configBag;
 
+    /** @var ResourcesProvider */
+    private $resourcesProvider;
+
+    /** @var MergeParentResourceHelper */
+    private $mergeParentResourceHelper;
+
     /** @var MergeActionConfigHelper */
     private $mergeActionConfigHelper;
 
     /** @var MergeSubresourceConfigHelper */
     private $mergeSubresourceConfigHelper;
 
+    /** @var string|null */
+    private $entityClass;
+
+    /** @var string|null */
+    private $parentResourceClass;
+
     /**
      * @param ConfigExtensionRegistry      $configExtensionRegistry
      * @param ConfigLoaderFactory          $configLoaderFactory
      * @param ResourceHierarchyProvider    $resourceHierarchyProvider
      * @param ConfigBag                    $configBag
+     * @param ResourcesProvider            $resourcesProvider
+     * @param MergeParentResourceHelper    $mergeParentResourceHelper
      * @param MergeEntityConfigHelper      $mergeEntityConfigHelper
      * @param MergeActionConfigHelper      $mergeActionConfigHelper
      * @param MergeSubresourceConfigHelper $mergeSubresourceConfigHelper
@@ -44,6 +60,8 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
         ConfigLoaderFactory $configLoaderFactory,
         ResourceHierarchyProvider $resourceHierarchyProvider,
         ConfigBag $configBag,
+        ResourcesProvider $resourcesProvider,
+        MergeParentResourceHelper $mergeParentResourceHelper,
         MergeEntityConfigHelper $mergeEntityConfigHelper,
         MergeActionConfigHelper $mergeActionConfigHelper,
         MergeSubresourceConfigHelper $mergeSubresourceConfigHelper
@@ -55,8 +73,33 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
             $mergeEntityConfigHelper
         );
         $this->configBag = $configBag;
+        $this->resourcesProvider = $resourcesProvider;
+        $this->mergeParentResourceHelper = $mergeParentResourceHelper;
         $this->mergeActionConfigHelper = $mergeActionConfigHelper;
         $this->mergeSubresourceConfigHelper = $mergeSubresourceConfigHelper;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function processConfig(ConfigContext $context)
+    {
+        $this->entityClass = $context->getClassName();
+        $config = null;
+        $parentResourceClass = null;
+        try {
+            $config = $this->loadConfig($this->entityClass, $context->getVersion(), $context->getRequestType());
+            $parentResourceClass = $this->parentResourceClass;
+        } finally {
+            $this->entityClass = null;
+            $this->parentResourceClass = null;
+        }
+        if (null !== $config) {
+            $this->saveConfig($context, $config);
+            if (null !== $parentResourceClass) {
+                $this->mergeParentResourceHelper->mergeParentResourceConfig($context, $parentResourceClass);
+            }
+        }
     }
 
     /**
@@ -100,6 +143,20 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
      */
     protected function getConfig($entityClass, $version, RequestType $requestType)
     {
+        if ($this->entityClass
+            && $entityClass !== $this->entityClass
+            && !$this->parentResourceClass
+            && $this->resourcesProvider->isResourceKnown($entityClass, $version, $requestType)
+        ) {
+            /**
+             * remember the class name of parent API resource and stop processing of other parents
+             * @see processConfig
+             */
+            $this->parentResourceClass = $entityClass;
+
+            return false;
+        }
+
         return $this->configBag->getConfig($entityClass, $version);
     }
 }

@@ -296,6 +296,7 @@ services:
             - '@oro_api.entity_serializer.field_accessor'
             - '@oro_api.entity_serializer.config_normalizer'
             - '@oro_api.entity_serializer.data_normalizer'
+            - '@oro_api.entity_serializer.config_converter'
         calls:
             - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
 
@@ -323,6 +324,10 @@ services:
 
     oro_api.entity_serializer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Util\ConfigNormalizer
+        public: false
+
+    oro_api.entity_serializer.config_converter:
+        class: Oro\Bundle\ApiBundle\Util\ConfigConverter
         public: false
 
     oro_api.entity_serializer.data_normalizer:
@@ -355,8 +360,6 @@ services:
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'
                 - '\OutOfBoundsException'
-                - 'Oro\Bundle\ApiBundle\Exception\ExceptionInterface'
-                - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
                 - 'Symfony\Component\PropertyAccess\Exception\ExceptionInterface'
                 - 'Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException'
         tags:
