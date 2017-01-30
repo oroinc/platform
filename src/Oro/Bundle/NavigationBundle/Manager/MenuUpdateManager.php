@@ -253,8 +253,10 @@ class MenuUpdateManager
         $currentUpdate = $this->findOrCreateMenuUpdate($menu, $key, $scope);
 
         $parent = $this->findMenuItem($menu, $parentKey);
-        if ($menu->getName() !== $parentKey) {
-            $currentUpdate->setParentKey($parent ? $parent->getName() : null);
+        if ($parent && $parentKey !== $menu->getName()) {
+            $currentUpdate->setParentKey($parent->getName());
+        } else {
+            $currentUpdate->setParentKey(null);
         }
 
         $order = [];
