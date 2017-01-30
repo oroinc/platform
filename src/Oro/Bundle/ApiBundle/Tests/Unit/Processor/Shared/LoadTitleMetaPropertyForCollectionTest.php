@@ -204,4 +204,51 @@ class LoadTitleMetaPropertyForCollectionTest extends GetProcessorTestCase
             $this->context->getResult()
         );
     }
+
+    public function testProcessForResourceBasedOnAnotherResource()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->setParentResourceClass('Test\ParentEntity');
+        $config->setIdentifierFieldNames(['id']);
+        $idField = $config->addField('id');
+        $idField->setDataType('integer');
+        $titleField = $config->addField('__title__');
+        $titleField->setMetaProperty(true);
+        $titleField->setMetaPropertyResultName('title');
+
+        $data = [
+            ['id' => 123]
+        ];
+
+        $expandedAssociations = [];
+
+        $titles = [
+            ['entity' => 'Test\ParentEntity', 'id' => 123, 'title' => 'title 123']
+        ];
+
+        $identifierMap = [
+            'Test\ParentEntity' => [123]
+        ];
+
+        $this->expandedAssociationExtractor->expects(self::exactly(2))
+            ->method('getExpandedAssociations')
+            ->with(self::identicalTo($config))
+            ->willReturn($expandedAssociations);
+        $this->entityTitleProvider->expects(self::once())
+            ->method('getTitles')
+            ->with($identifierMap)
+            ->willReturn($titles);
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                ['id' => 123, '__title__' => 'title 123']
+            ],
+            $this->context->getResult()
+        );
+    }
 }

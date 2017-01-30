@@ -60,9 +60,14 @@ class PdoPgsql extends BaseDriver
     {
         $useFieldName = $searchCondition['fieldName'] !== '*';
         $condition = $searchCondition['condition'];
-        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldName'], $searchCondition['fieldValue']);
 
         switch ($condition) {
+            case Query::OPERATOR_LIKE:
+                $searchString = parent::createContainsStringQuery($index, $useFieldName);
+                $setOrderBy = false;
+                break;
+
             case Query::OPERATOR_CONTAINS:
                 $searchString = $this->createContainsStringQuery($index, $useFieldName);
                 break;
@@ -235,6 +240,8 @@ class PdoPgsql extends BaseDriver
             }
         } elseif ($searchCondition === Query::OPERATOR_STARTS_WITH) {
             $qb->setParameter('value' . $index, $fieldValue . '%');
+        } elseif ($searchCondition === Query::OPERATOR_LIKE) {
+            $qb->setParameter('value' . $index, '%' . $fieldValue . '%');
         } else {
             $qb->setParameter('value' . $index, $fieldValue);
         }
