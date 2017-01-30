@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -62,5 +63,15 @@ class RestJsonApiTestCase extends ApiTestCase
     protected function getEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
+    }
+
+    /**
+     * @param ResponseHeaderBag $headers
+     *
+     * @return bool
+     */
+    protected static function isApplicableContentType(ResponseHeaderBag $headers)
+    {
+        return $headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE);
     }
 }

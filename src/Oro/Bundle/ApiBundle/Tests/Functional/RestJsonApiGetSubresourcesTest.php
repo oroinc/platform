@@ -38,7 +38,7 @@ class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
         );
         $this->assertApiResponseStatusCodeEquals(
             $response,
-            200,
+            [200, 404],
             sprintf('%s(%s)->%s', $entityType, $entityId, $associationName),
             'get subresource'
         );

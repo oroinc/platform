@@ -100,7 +100,11 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertApiResponseStatusCodeEquals($response, 200, $resourceKey, 'get relationship');
+        $this->assertApiResponseStatusCodeEquals($response, [200, 404, 405], $resourceKey, 'get relationship');
+
+        if (200 !== $response->getStatusCode()) {
+            return null;
+        }
 
         $responseContent = $this->jsonToArray($response->getContent());
         $this->assertArrayHasKey('data', $responseContent, sprintf('"get relationship" for %s', $resourceKey));
@@ -165,7 +169,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         $this->assertUpdateApiResponseStatusCodeEquals(
             $response,
-            204,
+            [204, 404, 405],
             $resourceKey,
             'update relationship',
             ['data' => $data]
@@ -208,7 +212,7 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
         $this->assertUpdateApiResponseStatusCodeEquals(
             $response,
-            204,
+            [204, 404, 405],
             $resourceKey,
             'add relationship',
             ['data' => $data]
@@ -249,6 +253,11 @@ class RestJsonApiRelationshipsTest extends RestJsonApiTestCase
         );
 
         $resourceKey = sprintf('%s(%s)->%s', $entityType, $entityId, $associationName);
-        $this->assertApiResponseStatusCodeEquals($response, 204, $resourceKey, 'delete relationship');
+        $this->assertApiResponseStatusCodeEquals(
+            $response,
+            [204, 400, 404, 405],
+            $resourceKey,
+            'delete relationship'
+        );
     }
 }
