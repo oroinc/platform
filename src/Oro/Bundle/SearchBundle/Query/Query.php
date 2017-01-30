@@ -40,6 +40,7 @@ class Query
     const OPERATOR_STARTS_WITH         = 'starts_with';
     const OPERATOR_EXISTS              = 'exists';
     const OPERATOR_NOT_EXISTS          = 'notexists';
+    const OPERATOR_LIKE                = 'like';
 
     const TYPE_TEXT     = 'text';
     const TYPE_INTEGER  = 'integer';
@@ -247,6 +248,9 @@ class Query
         $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldName);
 
         switch ($condition) {
+            case self::OPERATOR_LIKE:
+                $expr = $expr->like($fieldName, $fieldValue);
+                break;
             case self::OPERATOR_CONTAINS:
                 $expr = $expr->contains($fieldName, $fieldValue);
                 break;

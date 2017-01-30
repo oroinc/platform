@@ -67,7 +67,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     /**
      * Click link in shortcuts search results
      * Example: And click "Create new user" in shortcuts search results
-     * Example: And click "Compose email" in shortcuts search results
+     * Example: And click "Compose Email" in shortcuts search results
      *
      * @When /^(?:|I )click "(?P<link>[^"]+)" in shortcuts search results$/
      */

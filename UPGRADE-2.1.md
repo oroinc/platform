@@ -21,3 +21,8 @@ UPGRADE FROM 2.0 to 2.1
 
 ##ImapBundle
 - Updated `Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor::__construct()` signature to use `Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface`.
+
+####ActionBundle
+- `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
+    - work with `RouteCollection` is performance consuming
+    - it was used to check bundle presence, which could be done with `service_exists`
