@@ -45,12 +45,11 @@ define(function(require) {
     };
 
     Typeahead = function(element, options) {
-        var _this = this;
         var opts = $.extend({}, $.fn.typeahead.defaults, typeaheadPatches, options);
 
         _.each(opts, function(value, name) {
-            _this[name] = value || _this[name];
-        });
+            this[name] = value || this[name];
+        }, this);
 
         this.$holder = $(opts.holder || '');
 
