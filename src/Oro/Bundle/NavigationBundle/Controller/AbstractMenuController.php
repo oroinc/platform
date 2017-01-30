@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
@@ -125,12 +127,20 @@ abstract class AbstractMenuController extends Controller
         $this->checkAcl();
 
         $menu = $this->getMenu($menuName, $menuTreeContext);
+        $scope = $this->getScope($context);
 
-        $choices = $this->get('oro_navigation.tree.menu_update_tree_handler')->getTreeItemList($menu, false);
+        $handler = $this->get('oro_navigation.tree.menu_update_tree_handler');
+        $choices = $handler->getTreeItemList($menu, false);
+        $selected = $request->get('selected', []);
 
         $collection = new TreeCollection();
-        $collection->source = [current($choices), next($choices)];
-        $collection->target = next($choices);
+
+        foreach ($choices as $choice) {
+            if (in_array($choice->getKey(), $selected)) {
+                $collection->source[$choice->getKey()] = $choice;
+            }
+        }
+
         $form = $this->createForm(TreeMoveType::class, $collection, [
             'source_config' => [
                 'choices' => $choices,
@@ -140,15 +150,56 @@ abstract class AbstractMenuController extends Controller
             ],
         ]);
 
+        $responseData = [
+            'scope' => $scope,
+            'menuName' => $menu->getName()
+        ];
+
+        $manager = $this->get('oro_navigation.manager.menu_update');
+
         $form->handleRequest($request);
 
-        $scope = $this->getScope($context);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var EntityManager $entityManager */
+            $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
 
-        return [
-            'form' => $form->createView(),
-            'scope' => $scope,
-            'menuName' => $menu->getName(),
-        ];
+            $updates = $manager->moveMenuItems(
+                $menuName,
+                $collection->source,
+                $scope,
+                $collection->target->getKey(),
+                0
+            );
+
+            $changed = [];
+
+            foreach ($updates as $update) {
+                $errors = $this->get('validator')->validate($update);
+                if (count($errors)) {
+                    $form->addError(new FormError(
+                        $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message')
+                    ));
+                    $responseData['form'] = $form->createView();
+
+                    return $responseData;
+                }
+                $entityManager->persist($update);
+                $changed[] = [
+                    'id' => $update->getKey(),
+                    'parent' => $collection->target->getKey(),
+                    'position' => $update->getPriority()
+                ];
+            }
+
+            $entityManager->flush();
+            $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
+            $responseData['saved'] = true;
+            $responseData['changed'] = $changed;
+        }
+        $responseData['form'] = $form->createView();
+
+        return $responseData;
     }
 
     /**

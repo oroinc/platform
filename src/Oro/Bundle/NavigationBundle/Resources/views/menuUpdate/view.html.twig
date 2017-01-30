@@ -106,7 +106,15 @@
                                             'label': 'oro.navigation.menu.menu_list_default.label'|trans,
                                             'treeOptions': treeOptions
                                         },
-                                        ['expand', 'collapse', 'move']
+                                        {
+                                            'expand': 'expand',
+                                            'collapse': 'collapse',
+                                            'move': {
+                                                'view': 'oroui/js/app/views/jstree/move-action-view',
+                                                'routeName': menuJsMoveRoute,
+                                                'routeParams': {menuName: entity.root.name, scopeId: scope.id}
+                                            }
+                                        }
                                     ) }}
                                 </div>
                             </div>

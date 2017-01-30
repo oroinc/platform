@@ -45,7 +45,7 @@ define(function(require) {
                     var data = changed[key];
                     $tree.jstree('move_node', data.id, data.parent, data.position);
                 }
-                $tree.jstree('deselect_all');
+                $tree.jstree('uncheck_all');
             }, this));
 
             this.dialogWidget.render();
