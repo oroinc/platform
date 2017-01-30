@@ -124,6 +124,24 @@ class ActionFieldConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([], $config->toArray());
     }
 
+    public function testSetFormOption()
+    {
+        $config = new ActionFieldConfig();
+
+        $config->setFormOption('option1', 'value1');
+        $config->setFormOption('option2', 'value2');
+        $this->assertEquals(
+            ['option1' => 'value1', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
+
+        $config->setFormOption('option1', 'newValue');
+        $this->assertEquals(
+            ['option1' => 'newValue', 'option2' => 'value2'],
+            $config->getFormOptions()
+        );
+    }
+
     public function testAddFormConstraint()
     {
         $config = new ActionFieldConfig();
