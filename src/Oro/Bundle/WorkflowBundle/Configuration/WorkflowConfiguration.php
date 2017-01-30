@@ -24,6 +24,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
     const NODE_VARIABLE_DEFINITIONS = 'variable_definitions';
+    const NODE_VARIABLES = 'variables';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
     const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
@@ -246,7 +247,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         $rootNode = $treeBuilder->root(self::NODE_VARIABLE_DEFINITIONS);
         $rootNode
             ->children()
-                ->arrayNode('variables')
+                ->arrayNode(self::NODE_VARIABLES)
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
