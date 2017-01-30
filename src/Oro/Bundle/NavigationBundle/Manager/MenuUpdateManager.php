@@ -52,11 +52,11 @@ class MenuUpdateManager
     /**
      * Create menu update entity
      *
-     * @param mixed $context
-     * @param array $options
+     * @param ItemInterface $menu
+     * @param array         $options
      * @return MenuUpdateInterface
      */
-    public function createMenuUpdate(ItemInterface $menu, $context, array $options = [])
+    public function createMenuUpdate(ItemInterface $menu, array $options = [])
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
@@ -128,7 +128,7 @@ class MenuUpdateManager
     {
         $update = $this->findMenuUpdate($menu->getName(), $key, $scope);
         if (null === $update) {
-            $update = $this->createMenuUpdate($menu, $scope, ['key' => $key, 'scope' => $scope]);
+            $update = $this->createMenuUpdate($menu, ['key' => $key, 'scope' => $scope]);
         }
 
         return $update;
@@ -142,7 +142,7 @@ class MenuUpdateManager
      */
     protected function findMenuItem(ItemInterface $menu, $key)
     {
-        if (null === $key || $menu->getName() === $key) {
+        if ($menu->getName() === $key) {
             return $menu;
         }
 
@@ -334,7 +334,6 @@ class MenuUpdateManager
         foreach ($orderedChildren as $priority => $child) {
             $update = $this->createMenuUpdate(
                 $menu,
-                $scope,
                 ['key' => $child->getName(), 'scope' => $scope]
             );
             MenuUpdateUtils::updateMenuUpdate($update, $child, $menu->getName(), $this->menuUpdateHelper);

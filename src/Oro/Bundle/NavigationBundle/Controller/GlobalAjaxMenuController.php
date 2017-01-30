@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @Route("/menu/global")
  */
-class GlobalAjaxMenuController extends AjaxMenuController
+class GlobalAjaxMenuController extends AbstractAjaxMenuController
 {
     /**
      * {@inheritDoc}
@@ -34,7 +34,7 @@ class GlobalAjaxMenuController extends AjaxMenuController
     }
 
     /**
-     * @Route("/create/{menuName}/{parentKey}", name="oro_navigation_global_menu_create")
+     * @Route("/create/{menuName}/{parentKey}", name="oro_navigation_global_menu_ajax_create")
      * @Method({"POST"})
      *
      * {@inheritdoc}

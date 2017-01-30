@@ -18,7 +18,7 @@ use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
-class AjaxMenuController extends Controller
+abstract class AbstractAjaxMenuController extends Controller
 {
     /**
      * @param string  $menuName
@@ -66,7 +66,6 @@ class AjaxMenuController extends Controller
         $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $manager->createMenuUpdate(
             $menu,
-            $context,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,

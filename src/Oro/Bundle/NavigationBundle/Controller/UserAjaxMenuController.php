@@ -14,7 +14,7 @@ use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 /**
  * @Route("/menu/user")
  */
-class UserAjaxMenuController extends AjaxMenuController
+class UserAjaxMenuController extends AbstractAjaxMenuController
 {
     /**
      * {@inheritDoc}
@@ -60,7 +60,7 @@ class UserAjaxMenuController extends AjaxMenuController
     }
 
     /**
-     * @Route("/create/{menuName}/{parentKey}", name="oro_navigation_user_menu_create")
+     * @Route("/create/{menuName}/{parentKey}", name="oro_navigation_user_menu_ajax_create")
      * @Method({"POST"})
      *
      * {@inheritdoc}

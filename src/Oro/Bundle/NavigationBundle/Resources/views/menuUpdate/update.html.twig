@@ -86,7 +86,7 @@
                 'label': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                 'title': 'oro.ui.create_entity'|trans({'%entityName%': 'oro.navigation.menuupdate.divider'|trans}),
                 'dataMethod': 'POST',
-                'dataUrl': path(routePrefix ~ 'create', {context: context, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
+                'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
                 'dataRedirect': app.request.uri,
                 'successMessage': 'oro.navigation.menuupdate.divider_created'
             }) %}

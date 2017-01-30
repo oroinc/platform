@@ -113,7 +113,6 @@ abstract class AbstractMenuController extends Controller
         $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate($menu,
-            $context,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
