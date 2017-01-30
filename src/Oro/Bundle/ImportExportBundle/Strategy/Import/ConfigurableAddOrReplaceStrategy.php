@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
-use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ConfigurableAddOrReplaceStrategy
@@ -260,15 +260,12 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 $fieldName         = $field['name'];
                 $isFullRelation    = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
                 $isPersistRelation = $this->databaseHelper->isCascadePersist($entityName, $fieldName);
-                $inversedFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
-
-                // additional search parameters to find only related entities
-                $searchContext = [];
-                if ($isPersistRelation && $inversedFieldName
-                    && $this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)
-                ) {
-                    $searchContext[$inversedFieldName] = $entity;
-                }
+                $searchContext     = $this->generateSearchContextForRelationsUpdate(
+                    $entity,
+                    $entityName,
+                    $fieldName,
+                    $isPersistRelation
+                );
 
                 if ($this->fieldHelper->isSingleRelation($field)) {
                     // single relation
@@ -387,14 +384,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         foreach ($identityValues as $fieldName => $value) {
             if (null !== $value) {
                 if ('' !== $value) {
-                    if (is_object($value)) {
-                        $identifier = $this->databaseHelper->getIdentifier($value);
-                        if ($identifier !== null) {
-                            $notEmptyValues[$fieldName] = $identifier;
-                        }
-                    } else {
-                        $notEmptyValues[$fieldName] = $value;
+                    $valueForIdentity = $this->generateValueForIdentityField($value);
+
+                    if (null === $valueForIdentity) {
+                        continue;
                     }
+
+                    $notEmptyValues[$fieldName] = $valueForIdentity;
                 }
             } elseif ($this->fieldHelper->isRequiredIdentityField($entityClass, $fieldName)) {
                 $nullRequiredValues[$fieldName] = null;
@@ -404,5 +400,53 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         return !empty($notEmptyValues)
             ? array_merge($notEmptyValues, $nullRequiredValues)
             : null;
+    }
+
+    /**
+     * @param mixed $fieldValue
+     *
+     * @return mixed|null
+     */
+    protected function generateValueForIdentityField($fieldValue)
+    {
+        if (false === is_object($fieldValue)) {
+            return $fieldValue;
+        }
+
+        $identifier = $this->databaseHelper->getIdentifier($fieldValue);
+        if (null !== $identifier) {
+            return $identifier;
+        }
+
+        return null;
+    }
+
+    /**
+     * Additional search parameters to find only related entities
+     *
+     * @param object $entity
+     * @param string $entityName
+     * @param string $fieldName
+     * @param bool $isPersistRelation
+     *
+     * @return array
+     */
+    protected function generateSearchContextForRelationsUpdate($entity, $entityName, $fieldName, $isPersistRelation)
+    {
+        if (!$isPersistRelation) {
+            return [];
+        }
+
+        if (!$this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)) {
+            return [];
+        }
+
+        $inversedFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
+
+        if (!$inversedFieldName) {
+            return [];
+        }
+
+        return [$inversedFieldName => $entity];
     }
 }

@@ -95,6 +95,14 @@ services:
     # get_metadata
     #
 
+    oro_api.get_metadata.load_parent_resource_metadata:
+        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadParentResourceMetadata
+        arguments:
+            - '@oro_api.metadata_provider'
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_metadata, priority: -5 }
+
     oro_api.get_metadata.load_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadMetadata
         arguments:
