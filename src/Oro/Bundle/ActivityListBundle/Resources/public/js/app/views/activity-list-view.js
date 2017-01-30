@@ -20,6 +20,8 @@ define(function(require) {
             listSelector: '.items.list-box',
             fallbackSelector: '.no-data',
             loadingSelector: '.loading-mask',
+            listWidgetSelector: '.activity-list-widget',
+            activityListSelector: '.activity-list',
             collection: null,
             urls: {
                 viewItem: null,
@@ -28,7 +30,9 @@ define(function(require) {
             },
             messages: {},
             ignoreHead: false,
-            doNotFetch: false
+            doNotFetch: false,
+            reloadOnAdd: true,
+            reloadOnUpdate: true
         },
 
         listen: {
@@ -68,17 +72,23 @@ define(function(require) {
 
             this.template = _.template($(this.options.template).html());
             this.isFiltersEmpty = true;
-            this.gridToolbar = $('.activity-list-widget .activity-list .grid-toolbar');
+            this.gridToolbar = $(
+                this.options.listWidgetSelector + ' ' + this.options.activityListSelector + ' .grid-toolbar'
+            );
 
-            /**
-             * on adding activity item listen to "widget:doRefresh:activity-list-widget"
-             */
-            mediator.on('widget:doRefresh:activity-list-widget', this._reloadOnAdd, this);
+            if (this.options.reloadOnAdd) {
+                /**
+                 * on adding activity item listen to "widget:doRefresh:activity-list-widget"
+                 */
+                mediator.on('widget:doRefresh:activity-list-widget', this._reloadOnAdd, this);
+            }
 
-            /**
-             * on editing activity item listen to "widget_success:activity_list:item:update"
-             */
-            mediator.on('widget_success:activity_list:item:update', this._reload, this);
+            if (this.options.reloadOnUpdate) {
+                /**
+                 * on editing activity item listen to "widget_success:activity_list:item:update"
+                 */
+                mediator.on('widget_success:activity_list:item:update', this._reload, this);
+            }
 
             ActivityListView.__super__.initialize.call(this, options);
 
@@ -250,17 +260,17 @@ define(function(require) {
 
         _togglePrevious: function(enable) {
             if (_.isUndefined(enable)) {
-                $('.activity-list-widget .pagination-previous').addClass('disabled');
+                $(this.options.listWidgetSelector + ' .pagination-previous').addClass('disabled');
             } else {
-                $('.activity-list-widget .pagination-previous').removeClass('disabled');
+                $(this.options.listWidgetSelector + ' .pagination-previous').removeClass('disabled');
             }
         },
 
         _toggleNext: function(enable) {
             if (_.isUndefined(enable)) {
-                $('.activity-list-widget .pagination-next').addClass('disabled');
+                $(this.options.listWidgetSelector + ' .pagination-next').addClass('disabled');
             } else {
-                $('.activity-list-widget .pagination-next').removeClass('disabled');
+                $(this.options.listWidgetSelector + ' .pagination-next').removeClass('disabled');
             }
         },
 

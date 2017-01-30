@@ -1,5 +1,5 @@
 @import "oroui/css/less/mixins";
-.activity-list-widget {
+.activity-list-widget, .marketing-activities-list-widget {
   position: relative;
   .actions-bottom {
     border-top: 1px solid #ddd;
@@ -7,7 +7,7 @@
   .title {
     display: none;
   }
-  .activity-list {
+  .activity-list, .marketing-activities {
     position: relative;
     .no-data {
       margin: 20px;
@@ -218,6 +218,16 @@
           color: #555;
         }
       }
+      > .marketing-activity-type {
+        margin-left: 8px;
+        color: #888;
+        width: 50%;
+      }
+      > .marketing-activity-date {
+        margin-left: 8px;
+        color: #888;
+        width: 50%;
+      }
     }
   }
   .accordion-body {
@@ -279,4 +289,18 @@ li[data-criteria="condition-activity"] {
             margin-right: 0;
         }
     }
+}
+
+.marketing-activities-list-widget {
+  .accordion-heading {
+    > .extra-info {
+      width: 60%;
+    }
+    > .campaign-name {
+      width: 30%;
+      margin: 9px 7px 0 0;
+      padding-bottom: 1px;
+      float: left;
+    }
+  }
 }
