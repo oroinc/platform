@@ -247,8 +247,12 @@ class CompleteDefinition implements ProcessorInterface
                     $this->completeAssociation($field, $targetClass, $version, $requestType);
 
                     $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
-                    $field->setDependsOn(array_values($targets));
-                    $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
+                    if (empty($targets)) {
+                        $field->setFormOption('mapped', false);
+                    } else {
+                        $field->setDependsOn(array_values($targets));
+                        $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
+                    }
                 }
             }
         }

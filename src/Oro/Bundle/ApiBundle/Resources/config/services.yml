@@ -360,7 +360,6 @@ services:
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'
                 - '\OutOfBoundsException'
-                - 'Symfony\Component\PropertyAccess\Exception\ExceptionInterface'
                 - 'Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }
