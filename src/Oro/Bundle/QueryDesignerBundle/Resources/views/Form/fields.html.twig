@@ -14,3 +14,31 @@
         });
     </script>
 {% endblock %}
+
+{% block oro_date_field_choice_row %}
+    {{ block('form_row') }}
+    {% set fieldConditionOptions = {
+        select2: {
+            placeholder: placeholder|trans
+        },
+        fieldsLoaderSelector: entity_choice_selector
+    } %}
+    <script type="text/javascript">
+        require(['oroentity/js/field-choice', 'underscore'], function ($, _) {
+            var params = {{ fieldConditionOptions|json_encode|raw }};
+            var relationEntityTypes = ['datetime', 'manyToOne', 'oneToMany', 'manyToMany', 'ref-one', 'ref-many'];
+            params['dataFilter'] = function(entityName, entityFields) {
+                var result = [];
+                for (var i = 0; i<entityFields.length; i++) {
+                    if (_.contains(relationEntityTypes, entityFields[i]['type'])) {
+                        result.push(entityFields[i]);
+                    }
+                }
+
+                return result;
+            };
+            var $field = $('#{{ id }}');
+            $field.fieldChoice(params);
+        });
+    </script>
+{% endblock %}

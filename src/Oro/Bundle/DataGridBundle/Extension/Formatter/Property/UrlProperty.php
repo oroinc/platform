@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
@@ -35,11 +36,15 @@ class UrlProperty extends AbstractProperty
      */
     public function getRawValue(ResultRecordInterface $record)
     {
-        $route = $this->router->generate(
-            $this->get(self::ROUTE_KEY),
-            $this->getParameters($record),
-            $this->getOr(self::IS_ABSOLUTE_KEY, false)
-        );
+        try {
+            $route = $this->router->generate(
+                $this->get(self::ROUTE_KEY),
+                $this->getParameters($record),
+                $this->getOr(self::IS_ABSOLUTE_KEY, false)
+            );
+        } catch (InvalidParameterException $e) {
+            return null;
+        }
 
         return $route . $this->getOr(self::ANCHOR_KEY);
     }

@@ -11,6 +11,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
 
 class DateGroupingFilter extends ChoiceFilter
 {
+    const NAME = 'date_grouping';
     const COLUMN_NAME_SUFFIX = 'DateGroupingFilter';
     const CALENDAR_TABLE = 'calendarDate';
     const CALENDAR_COLUMN = 'date';

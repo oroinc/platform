@@ -45,6 +45,15 @@ services:
     oro_report.grid.datagrid_configuration_builder:
         class: %oro_report.grid.datagrid_configuration_builder.class%
         parent: oro_report.grid.base_configuration_builder
+        calls:
+            - [setDispatcher, ['@event_dispatcher']]
+
+    oro_report.listener.grid_config_build:
+        class: Oro\Bundle\ReportBundle\EventListener\ReportGridConfigurationListener
+        arguments:
+            - "%oro_report.calendar_date.entity.class%"
+        tags:
+            - { name: kernel.event_listener, event: after_build_grid_configuration_event, method: onReportGridConfigurationBuild}
 
     oro_report.listener.segment_subscriber:
         class: %oro_report.listener.segment_subscriber.class%
