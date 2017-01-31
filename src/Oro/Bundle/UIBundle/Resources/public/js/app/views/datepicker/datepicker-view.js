@@ -226,7 +226,7 @@ define(function(require) {
             var momentInstance = this.getFrontendMoment();
             var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
-                value = momentInstance.format(format);
+                value = momentInstance.utc().format(format);
             }
             return value;
         },
