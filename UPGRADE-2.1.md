@@ -4,6 +4,14 @@ UPGRADE FROM 2.0 to 2.1
 ##DataGridBundle
  - Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
 
+##SearchBundle
+- `DbalStorer` is deprecated. If you need its functionality, please compose your class with `DBALPersistenceDriverTrait` 
+- Deprecated services and classes:
+    - `oro_search.search.engine.storer`
+    - `Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer`
+- `entityManager` instead of `em` should be used in `BaseDriver` children
+- `OrmIndexer` should be decoupled from `DbalStorer` dependency
+ 
 ##SecurityBundle
 - Service overriding in compiler pass was replaced by service decoration for next services:
     - `sensio_framework_extra.converter.doctrine.orm`
