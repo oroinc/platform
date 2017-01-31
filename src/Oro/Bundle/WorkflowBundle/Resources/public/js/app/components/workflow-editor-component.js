@@ -256,6 +256,8 @@ define(function(require) {
             this.model.set('steps_display_ordered', formData.steps_display_ordered);
             this.model.set('entity', formData.related_entity);
             this.model.set('start_step', formData.start_step);
+            this.model.set('exclusive_active_groups', formData.exclusive_active_groups);
+            this.model.set('exclusive_record_groups', formData.exclusive_record_groups);
 
             if (!this.validateWorkflow()) {
                 return;

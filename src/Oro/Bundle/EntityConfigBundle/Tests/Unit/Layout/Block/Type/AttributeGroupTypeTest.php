@@ -123,6 +123,34 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
         $this->assertTrue($this->attributeGroupRenderRegistry->isRendered($attributeFamily, $attributeGroup));
     }
 
+    public function testGetBlockViewWithNonExistentAttributeGroup()
+    {
+        $this->attributeManager->expects($this->never())
+            ->method('getAttributesByGroup');
+
+        $this->blockTypeMapper->expects($this->never())
+            ->method('getBlockType');
+
+        $attributeFamily = new AttributeFamily();
+        $attributeFamily->setCode('family_code');
+
+        $entityValue = new Expression('context["entity"]');
+
+        $view = $this->getBlockView(
+            AttributeGroupType::NAME,
+            [
+                'group' => 'group_code',
+                'entity' => $entityValue,
+                'attribute_family' => $attributeFamily,
+                'attribute_options' => [
+                    'vars' => ['foo' => 'bar']
+                ]
+            ]
+        );
+
+        $this->assertCount(0, $view->children);
+    }
+
     public function testGetBlockViewNotExcludeFromRest()
     {
         $attribute = new FieldConfigModel('attribute', 'string');

@@ -77,6 +77,11 @@ oro:
 
             email_threads:
                 label: Email Threads
+                use_threads:
+                  label: Display email conversations as
+                  choices:
+                    non_threaded.label: Non-Threaded
+                    threaded.label: Threaded
 
             attachment_configuration:
                 label: Attachments
@@ -186,7 +191,7 @@ oro:
             emailtemplate_list.description: List of email templates
             user_emails: My Emails
             compose: Compose
-            shortcut_compose_email.label: Compose email
+            shortcut_compose_email.label: Compose Email
             shortcut_compose_email.description: Compose email
             mark_read.label: Mark read
             mark_unread.label: Mark unread

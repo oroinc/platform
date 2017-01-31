@@ -3,7 +3,6 @@ services:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\TestIsolationSubscriber'
     arguments:
       - ~
-      - '@symfony2_extension.kernel'
     tags:
       - { name: 'event_dispatcher.subscriber', priority: 100 }
 
@@ -55,6 +54,21 @@ services:
       - '@symfony2_extension.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 200 }
+
+  oro_behat_extension.isolation.amqp_message_queue_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\AmqpMessageQueueIsolator'
+    arguments:
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 200 }
+
+  oro_behat_extension.isolation.inital_massage_queue_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\InitalMessageQueueIsolator'
+    arguments:
+      - ~
+      - '@symfony2_extension.kernel'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 50 }
 
   oro_behat_extension.isolation.doctrine_isolator:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator'

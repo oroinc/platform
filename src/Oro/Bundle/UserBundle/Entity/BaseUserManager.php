@@ -220,7 +220,7 @@ class BaseUserManager implements UserProviderInterface
             );
         }
 
-        return $this->findUserByUsername($user->getUsername());
+        return $this->loadUserByUsername($user->getUsername());
     }
 
     /**

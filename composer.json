@@ -130,9 +130,7 @@
         }
     },
     "autoload": {
-        "psr-0": {
-              "Oro\\Component": "src/",
-              "Oro\\Bundle": "src/"
-        }
+        "psr-4": {"": "src/"},
+        "exclude-from-classmap": ["/Tests/"]
     }
 }

@@ -408,4 +408,26 @@ class UserTest extends AbstractUserTest
             ]
         ];
     }
+
+    public function testOrganizations()
+    {
+        $user = $this->getUser();
+        $disabledOrganization = new Organization();
+        $organization = new Organization();
+        $organization->setEnabled(true);
+
+        $user->setOrganizations(new ArrayCollection([$organization]));
+        $this->assertContains($organization, $user->getOrganizations());
+
+        $user->removeOrganization($organization);
+        $this->assertNotContains($organization, $user->getOrganizations());
+
+        $user->addOrganization($organization);
+        $this->assertContains($organization, $user->getOrganizations());
+
+        $user->addOrganization($disabledOrganization);
+        $result = $user->getOrganizations(true);
+        $this->assertCount(1, $result);
+        $this->assertSame($result->first(), $organization);
+    }
 }
