@@ -40,7 +40,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $startDate = new \DateTime('first day of this year');
-        $endDate = new \DateTime('tomorrow + 1 day');
+        $endDate = new \DateTime('tomorrow');
         $entityManager
             ->expects($this->exactly(1 + $endDate->diff($startDate)->format('%a')))
             ->method('persist')
@@ -56,7 +56,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
         $startDate->modify('+15 days');
         $calendarDate = new CalendarDate();
         $calendarDate->setDate($startDate);
-        $endDate = new \DateTime('tomorrow + 1 day');
+        $endDate = new \DateTime('tomorrow');
         $repository = $this->getMockBuilder(CalendarDateRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -115,7 +115,7 @@ class CalendarDateManagerTest extends \PHPUnit_Framework_TestCase
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $startDate = new \DateTime('first day of this year');
-        $endDate = new \DateTime('tomorrow + 1 day');
+        $endDate = new \DateTime('tomorrow');
         $entityManager
             ->expects($this->exactly(1 + $endDate->diff($startDate)->format('%a')))
             ->method('persist')
