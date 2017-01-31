@@ -126,8 +126,8 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
                     'black/index',
                     'base/route',
                     'black/route',
-                    'base/sample_page_template',
-                    'black/sample_page_template'
+                    'base/route/page_template/sample_page_template',
+                    'black/route/page_template/sample_page_template'
                 ],
                 'theme'           => 'black',
                 'route'           => 'route',
