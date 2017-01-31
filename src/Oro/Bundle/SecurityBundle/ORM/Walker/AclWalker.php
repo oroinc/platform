@@ -107,7 +107,6 @@ class AclWalker extends TreeWalkerAdapter
         }
     }
 
-
     /**
      * @param ConditionalPrimary $factor
      * @param int                $factorId
@@ -125,7 +124,12 @@ class AclWalker extends TreeWalkerAdapter
                 ->conditionalFactors[$factorId]
                 ->simpleConditionalExpression
                 ->subselect;
-        } elseif (isset($factor->conditionalExpression->conditionalTerms)) {
+        } elseif (
+            isset(
+                $factor->conditionalExpression->conditionalTerms,
+                $factor->conditionalExpression->conditionalTerms[$factorId]->simpleConditionalExpression
+            )
+        ) {
             $subSelect = $factor
                 ->conditionalExpression
                 ->conditionalTerms[$factorId]
@@ -204,7 +208,8 @@ class AclWalker extends TreeWalkerAdapter
         $aclConditionalFactors = $this->aclConditionFactorBuilder->addWhereAclConditionalFactors(
             [], //default empty conditional factors
             $whereConditions,
-            $this->_getQuery()
+            $this->_getQuery(),
+            ['AST' => $AST]
         );
 
         if (!empty($aclConditionalFactors)) {
