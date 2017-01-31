@@ -124,8 +124,7 @@ class AclWalker extends TreeWalkerAdapter
                 ->conditionalFactors[$factorId]
                 ->simpleConditionalExpression
                 ->subselect;
-        } elseif (
-            isset(
+        } elseif (isset(
                 $factor->conditionalExpression->conditionalTerms,
                 $factor->conditionalExpression->conditionalTerms[$factorId]->simpleConditionalExpression
             )
