@@ -53,16 +53,15 @@ class AddAssociationValidators implements ProcessorInterface
         foreach ($fields as $fieldName => $field) {
             $fieldName = $field->getPropertyPath($fieldName);
             if ($metadata->hasAssociation($fieldName)) {
-                $fieldOptions = $field->getFormOptions();
                 if ($metadata->isCollectionValuedAssociation($fieldName)) {
-                    $fieldOptions['constraints'][] = new Assert\HasAdderAndRemover(
-                        ['class' => $entityClass, 'property' => $fieldName]
-                    );
-                    $fieldOptions['constraints'][] = new Assert\All(new Assert\AccessGranted());
+                    $field->addFormConstraint(new Assert\HasAdderAndRemover([
+                        'class'    => $entityClass,
+                        'property' => $fieldName
+                    ]));
+                    $field->addFormConstraint(new Assert\All(new Assert\AccessGranted()));
                 } else {
-                    $fieldOptions['constraints'][] = new Assert\AccessGranted();
+                    $field->addFormConstraint(new Assert\AccessGranted());
                 }
-                $field->setFormOptions($fieldOptions);
             }
         }
     }
@@ -76,11 +75,10 @@ class AddAssociationValidators implements ProcessorInterface
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->getTargetClass() && $field->isCollectionValuedAssociation()) {
-                $fieldOptions = $field->getFormOptions();
-                $fieldOptions['constraints'][] = new Assert\HasAdderAndRemover(
-                    ['class' => $entityClass, 'property' => $field->getPropertyPath($fieldName)]
-                );
-                $field->setFormOptions($fieldOptions);
+                $field->addFormConstraint(new Assert\HasAdderAndRemover([
+                    'class'    => $entityClass,
+                    'property' => $field->getPropertyPath($fieldName)
+                ]));
             }
         }
     }

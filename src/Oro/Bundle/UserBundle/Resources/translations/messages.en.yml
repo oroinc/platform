@@ -62,7 +62,7 @@ oro:
             user_create.label: Create User
             shortcut_new_user.label: Create new User
             shortcut_new_user.description: Create new user instance
-            shortcut_list_users.label: Show users list
+            shortcut_list_users.label: Show Users list
             shortcut_list_users.description: List of all system users
             shortcut_new_role.label: Create new Role
             shortcut_new_role.description: Create new role instance

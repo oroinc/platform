@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -50,8 +49,11 @@ class BuildSingleItemQuery implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
+            // only manageable entities or resources based on manageable entities are supported
+            $entityClass = $context->getConfig()->getParentResourceClass();
+            if (!$entityClass || !$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+                return;
+            }
         }
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');

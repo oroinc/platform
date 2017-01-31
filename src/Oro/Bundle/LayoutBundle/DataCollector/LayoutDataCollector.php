@@ -43,6 +43,9 @@ class LayoutDataCollector extends DataCollector
         'attr'
     ];
 
+    /** @var bool */
+    private $debugDeveloperToolbar;
+
     /**
      * @param LayoutContextHolder $contextHolder
      * @param ConfigManager $configManager
@@ -104,7 +107,7 @@ class LayoutDataCollector extends DataCollector
      */
     public function collectBuildBlockOptions($blockId, $blockType, array $options)
     {
-        if ($this->isDebug && $this->configManager->get('oro_layout.debug_developer_toolbar')) {
+        if ($this->isDebug && $this->isDebugDeveloperToolbar()) {
             $this->dataByBlock[$blockId] = [
                 'id' => $blockId,
                 'type' => $blockType,
@@ -122,7 +125,7 @@ class LayoutDataCollector extends DataCollector
      */
     public function collectBuildViewOptions(BlockInterface $block, $blockTypeClass, array $options)
     {
-        if ($this->isDebug && $this->configManager->get('oro_layout.debug_developer_toolbar')) {
+        if ($this->isDebug && $this->isDebugDeveloperToolbar()) {
             $this->dataByBlock[$block->getId()]['type_class'] = $blockTypeClass;
             $this->dataByBlock[$block->getId()]['build_view_options'] = $this->prepareOptions($options);
         }
@@ -136,7 +139,7 @@ class LayoutDataCollector extends DataCollector
      */
     public function collectBlockTree(BlockInterface $block, BlockView $view)
     {
-        if ($this->isDebug && $this->configManager->get('oro_layout.debug_developer_toolbar')) {
+        if ($this->isDebug && $this->isDebugDeveloperToolbar()) {
             if (!$this->rootBlockView) {
                 $this->rootBlockView = $view;
             }
@@ -287,5 +290,17 @@ class LayoutDataCollector extends DataCollector
 
             $this->data['context']['data'][$key] = $value;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isDebugDeveloperToolbar()
+    {
+        if (null === $this->debugDeveloperToolbar) {
+            $this->debugDeveloperToolbar = (bool)$this->configManager->get('oro_layout.debug_developer_toolbar');
+        }
+
+        return $this->debugDeveloperToolbar;
     }
 }

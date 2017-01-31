@@ -76,6 +76,17 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $whereExpression->getValue()->getValue());
     }
 
+    public function testWhereLike()
+    {
+        $query = new Query();
+        $query->setMappingConfig($this->config);
+        $query->from('Oro\Bundle\DataBundle\Entity\Product');
+        $query->andWhere('all_data', Query::OPERATOR_LIKE, 'test', 'string');
+
+        $whereExpression = $query->getCriteria()->getWhereExpression();
+        $this->assertEquals(Comparison::LIKE, $whereExpression->getOperator());
+    }
+
     public function testGetMaxResults()
     {
         $query = new Query();
@@ -137,6 +148,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($testString, $result);
+    }
+
+    /**
+     * @dataProvider dataProviderForClearString
+     *
+     * @param string $textToClear
+     * @param string $expected
+     */
+    public function testClearString($textToClear, $expected)
+    {
+        $this->assertEquals($expected, Query::clearString($textToClear));
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForClearString()
+    {
+        return [
+            ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re: FW: Test One äöü ßü abc 3 again'],
+            ['text with ___ \' special chars \/ "', 'text with ___ special chars'],
+            ['at @ * . test', 'at @ * . test'],
+        ];
     }
 
     public function testAddingSelect()

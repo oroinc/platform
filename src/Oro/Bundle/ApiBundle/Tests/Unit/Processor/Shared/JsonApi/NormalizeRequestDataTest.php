@@ -496,6 +496,95 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->assertEquals($expectedData, $this->context->getRequestData());
     }
 
+    public function testProcessWithEmptyAcceptableEntityTypesShouldBeRejected()
+    {
+        $inputData = [
+            'data' => [
+                'relationships' => [
+                    'toOneRelation'  => [
+                        'data' => [
+                            'type' => 'users',
+                            'id'   => '89'
+                        ]
+                    ],
+                    'toManyRelation' => [
+                        'data' => [
+                            [
+                                'type' => 'groups',
+                                'id'   => '1'
+                            ],
+                            [
+                                'type' => 'groups',
+                                'id'   => '2'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $metadata = new EntityMetadata();
+        $toOneRelation = new AssociationMetadata();
+        $toOneRelation->setName('toOneRelation');
+        $toOneRelation->setEmptyAcceptableTargetsAllowed(false);
+        $metadata->addAssociation($toOneRelation);
+        $toManyRelation = new AssociationMetadata();
+        $toManyRelation->setName('toManyRelation');
+        $toManyRelation->setIsCollection(true);
+        $toManyRelation->setEmptyAcceptableTargetsAllowed(false);
+        $metadata->addAssociation($toManyRelation);
+
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->willReturnMap(
+                [
+                    ['users', 'entityClass', $this->context->getRequestType(), false, 'Test\User'],
+                    ['groups', 'entityClass', $this->context->getRequestType(), false, 'Test\Group']
+                ]
+            );
+        $this->entityIdTransformer->expects($this->any())
+            ->method('reverseTransform')
+            ->willReturnCallback(
+                function ($entityClass, $value) {
+                    return 'normalized::' . $entityClass . '::' . $value;
+                }
+            );
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'toOneRelation'  => [
+                'id'    => '89',
+                'class' => 'Test\User'
+            ],
+            'toManyRelation' => [
+                [
+                    'id'    => '1',
+                    'class' => 'Test\Group'
+                ],
+                [
+                    'id'    => '2',
+                    'class' => 'Test\Group'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expectedData, $this->context->getRequestData());
+        $this->assertEquals(
+            [
+                Error::createValidationError('entity type constraint', 'Not acceptable entity type.')
+                    ->setSource(ErrorSource::createByPointer('/data/relationships/toOneRelation/data/type')),
+                Error::createValidationError('entity type constraint', 'Not acceptable entity type.')
+                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/0/type')),
+                Error::createValidationError('entity type constraint', 'Not acceptable entity type.')
+                    ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type')),
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessWithInvalidIdentifiers()
     {
         $inputData = [
