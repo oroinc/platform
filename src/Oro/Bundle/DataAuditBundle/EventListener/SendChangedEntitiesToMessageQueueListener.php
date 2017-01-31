@@ -17,6 +17,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -76,21 +77,29 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     private $enabled = true;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param MessageProducerInterface $messageProducer
      * @param TokenStorageInterface $securityTokenStorage
      * @param EntityToEntityChangeArrayConverter $entityToArrayConverter
      * @param AuditConfigProvider $configProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $securityTokenStorage,
         EntityToEntityChangeArrayConverter $entityToArrayConverter,
-        AuditConfigProvider $configProvider
+        AuditConfigProvider $configProvider,
+        LoggerInterface $logger
     ) {
         $this->messageProducer = $messageProducer;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->entityToArrayConverter = $entityToArrayConverter;
         $this->configProvider = $configProvider;
+        $this->logger = $logger;
 
         $this->allInsertions = new \SplObjectStorage;
         $this->allUpdates = new \SplObjectStorage;
@@ -368,7 +377,18 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $updates = [];
         foreach ($this->allUpdates[$em] as $entity) {
             $changeSet = $this->allUpdates[$em][$entity];
-            $updates[] = $this->convertEntityToArray($em, $entity, $changeSet);
+            $update = $this->convertEntityToArray($em, $entity, $changeSet);
+            if ($update['entity_id']) {
+                $updates[] = $this->convertEntityToArray($em, $entity, $changeSet);
+            } else {
+                $this->logger->error(
+                    sprintf(
+                        'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
+                        $update['entity_class']
+                    ),
+                    ['entity' => $entity, 'update' => $update]
+                );
+            }
         }
 
         return $updates;
