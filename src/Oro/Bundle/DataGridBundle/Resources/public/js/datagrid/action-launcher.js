@@ -10,7 +10,8 @@ define(function(require) {
 
     var config = module.config();
     config = _.extend({
-        iconHideText: true
+        iconHideText: true,
+        launcherMode: false
     }, config);
 
     /**
@@ -45,11 +46,14 @@ define(function(require) {
         /** @property {String} */
         icon: undefined,
 
+        /** @property {String} */
+        iconClassName: undefined,
+
         /** @property {Boolean} */
         iconHideText: config.iconHideText,
 
         /** @property {String} */
-        iconClassName: undefined,
+        launcherMode: config.launcherMode,
 
         /** @property {String} */
         className: undefined,
@@ -90,6 +94,7 @@ define(function(require) {
          * @param {String} [options.label]
          * @param {String} [options.icon]
          * @param {Boolean} [options.iconHideText]
+         * @param {String} [options.launcherMode]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
          * @param {Boolean} [options.onClickReturnValue]
@@ -119,16 +124,20 @@ define(function(require) {
                 this.icon = opts.icon;
             }
 
-            if (opts.iconHideText !== undefined) {
-                this.iconHideText = opts.iconHideText;
-            }
-
             if (opts.link) {
                 this.link = opts.link;
             }
 
             if (opts.iconClassName) {
                 this.iconClassName = opts.iconClassName;
+            }
+
+            if (opts.iconHideText !== undefined) {
+                this.iconHideText = opts.iconHideText;
+            }
+
+            if (opts.launcherMode) {
+                this.launcherMode = opts.launcherMode;
             }
 
             if (opts.className) {
@@ -169,10 +178,11 @@ define(function(require) {
             return {
                 label: label,
                 icon: this.icon,
-                iconHideText: this.iconHideText,
                 title: this.title || label,
                 className: this.className,
                 iconClassName: this.iconClassName,
+                iconHideText: this.iconHideText,
+                launcherMode: this.launcherMode,
                 link: this.link,
                 links: this.links,
                 action: this.action,

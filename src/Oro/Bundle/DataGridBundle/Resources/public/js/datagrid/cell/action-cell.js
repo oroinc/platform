@@ -103,6 +103,8 @@ define([
                 this.actionsHideCount = opts.themeOptions.actionsHideCount;
             }
 
+            this.launcherOptions = opts.themeOptions.launcherOptions || {};
+
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
             _.each(this.actions, function(action) {
@@ -176,7 +178,7 @@ define([
          */
         createLaunchers: function() {
             return _.map(this.actions, function(action) {
-                return action.createLauncher({});
+                return action.createLauncher(this.launcherOptions);
             }, this);
         },
 
