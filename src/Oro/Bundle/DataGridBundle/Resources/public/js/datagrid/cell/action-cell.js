@@ -92,6 +92,8 @@ define([
          * Initialize cell actions and launchers
          */
         initialize: function(options) {
+            console.log(options);
+
             var opts = options || {};
             this.subviews = [];
 
@@ -192,15 +194,12 @@ define([
                 return this;
             }
 
-            console.log(this.actions);
-
-            if (this.actions.length < this.actionsHideCount) {
-                console.log(this.actions.length < this.actionsHideCount);
+            // if (this.actions.length < this.actionsHideCount) {
                 isSimplifiedMarkupApplied = true;
                 this.baseMarkup = this.simpleBaseMarkup;
                 this.launchersListTemplate = this.simpleLaunchersListTemplate;
                 this.launchersContainerSelector = '.more-bar-holder';
-            }
+            // }
 
             this.$el.html(this.baseMarkup);
             this.isLauncherListFilled = false;
@@ -209,7 +208,9 @@ define([
                 this.fillLauncherList();
             }
 
-            console.log(this.$(this.launchersContainerSelector));
+            console.log(setTimeout(_.bind(function() {
+                return this.$(this.launchersContainerSelector).innerWidth();
+            }, this), 100), this.$(this.launchersContainerSelector), this.actions);
 
             return this;
         },
