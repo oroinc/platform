@@ -218,6 +218,8 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
 
             $isAllowed = false;
+
+            return true;
         }
 
         return false;
