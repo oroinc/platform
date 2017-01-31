@@ -16,6 +16,8 @@
     .page-content {
         &--has-sidebar {
             width: calc(#{$page-content-width} - #{$page-sidebar-width});
+
+            flex: 1;
         }
     }
 }
