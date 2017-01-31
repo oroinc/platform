@@ -148,6 +148,8 @@ define([
 
             _.each(actions, function(action, name) {
                 // filter available actions for current row
+                console.log(name, action, config[name] || {});
+
                 if (!config || config[name] !== false) {
                     result.push(this.createAction(action, config[name] || {}));
                 }
