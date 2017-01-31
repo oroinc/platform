@@ -3,11 +3,11 @@ define([
     'backbone',
     'orotranslation/js/translator',
     './pagination-input',
-    './visible-items-counter',
     './page-size',
+    './items-counter',
     './actions-panel',
     './sorting/dropdown'
-], function(_, Backbone, __, PaginationInput, VisibleItemsCounter, PageSize, ActionsPanel, SortingDropdown) {
+], function(_, Backbone, __, PaginationInput, PageSize, ItemsCounter, ActionsPanel, SortingDropdown) {
     'use strict';
 
     var Toolbar;
@@ -28,7 +28,7 @@ define([
         pagination: PaginationInput,
 
         /** @property */
-        itemsCounter: VisibleItemsCounter,
+        itemsCounter: ItemsCounter,
 
         /** @property */
         pageSize: PageSize,
@@ -71,32 +71,41 @@ define([
                 throw new TypeError('"collection" is required');
             }
 
+            var $el = $(options.el);
+            var isBottomToolbar = $el && $el.data('gridToolbar') === 'bottom';
+
             this.collection = options.collection;
 
-            this.subviews = {
-                pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
-                itemsCounter: new this.itemsCounter(_.defaults({collection: this.collection}, options.itemsCounter)),
-                actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
-                extraActionsPanel: new this.extraActionsPanel()
-            };
+            if (isBottomToolbar) {
+                this.subviews = {
+                    pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination))
+                };
+            } else {
+                this.subviews = {
+                    pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
+                    itemsCounter: new this.itemsCounter(_.defaults({collection: this.collection}, options.itemsCounter)),
+                    actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
+                    extraActionsPanel: new this.extraActionsPanel()
+                };
 
-            if (_.result(options.pageSize, 'hide') !== true) {
-                this.subviews.pageSize = new this.pageSize(_.defaults({collection: this.collection}, options.pageSize));
+                if (_.result(options.pageSize, 'hide') !== true) {
+                    this.subviews.pageSize = new this.pageSize(_.defaults({collection: this.collection}, options.pageSize));
+                }
+
+                if (options.addSorting) {
+                    this.subviews.sortingDropdown = new this.sortingDropdown(
+                        _.defaults({
+                            collection: this.collection,
+                            columns: options.columns
+                        }, options.addSorting)
+                    );
+                }
             }
 
-            if (options.addSorting) {
-                this.subviews.sortingDropdown = new this.sortingDropdown(
-                    _.defaults({
-                        collection: this.collection,
-                        columns: options.columns
-                    }, options.addSorting)
-                );
-            }
-
-            if (options.actions) {
+            if (options.actions && this.subviews.actionsPanel) {
                 this.subviews.actionsPanel.setActions(options.actions);
             }
-            if (options.extraActions) {
+            if (options.extraActions && this.subviews.extraActionsPanel) {
                 this.subviews.extraActionsPanel.setActions(options.extraActions);
             }
 
@@ -151,29 +160,38 @@ define([
          */
         render: function() {
             var $pagination;
+            var selector = this.selector;
+
             this.$el.empty();
             this.$el.append(this.template());
 
-            $pagination = this.subviews.pagination.render().$el;
-            $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
+            if (this.subviews.pagination) {
+                $pagination = this.subviews.pagination.render().$el;
+                $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
+                this.$(selector.pagination).replaceWith($pagination);
+            }
 
-            this.$(this.selector.pagination).replaceWith($pagination);
             if (this.subviews.pageSize) {
-                this.$(this.selector.pagesize).append(this.subviews.pageSize.render().$el);
+                this.$(selector.pagesize).append(this.subviews.pageSize.render().$el);
             }
-            this.$(this.selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
 
-            this.$(this.selector.itemsCounter).replaceWith(this.subviews.itemsCounter.render().$el);
-            this.subviews.itemsCounter.$el.hide();
+            if (this.subviews.actionsPanel) {
+                this.$(selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
+            }
 
+            if (this.subviews.itemsCounter) {
+                this.$(selector.itemsCounter).replaceWith(this.subviews.itemsCounter.render().$el);
+            }
             if (this.subviews.sortingDropdown) {
-                this.$(this.selector.sortingDropdown).append(this.subviews.sortingDropdown.render().$el);
+                this.$(selector.sortingDropdown).append(this.subviews.sortingDropdown.render().$el);
             }
 
-            if (this.subviews.extraActionsPanel.haveActions()) {
-                this.$(this.selector.extraActionsPanel).append(this.subviews.extraActionsPanel.render().$el);
-            } else {
-                this.$(this.selector.extraActionsPanel).hide();
+            if (this.subviews.extraActionsPanel) {
+                if (this.subviews.extraActionsPanel.haveActions()) {
+                    this.$(selector.extraActionsPanel).append(this.subviews.extraActionsPanel.render().$el);
+                } else {
+                    this.$(selector.extraActionsPanel).hide();
+                }
             }
 
             return this;
