@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 
 class ThemeTest extends \PHPUnit_Framework_TestCase
@@ -83,6 +86,21 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
 
         $this->theme->setDescription('test');
         $this->assertEquals('test', $this->theme->getDescription());
+    }
+
+    public function testAddPageTemplate()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+        $this->assertEquals(new ArrayCollection([$pageTemplate]), $this->theme->getPageTemplates());
+    }
+
+    public function testAddPageTemplateAlreadyExists()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+        $this->theme->addPageTemplate($pageTemplate);
+        $this->assertEquals(new ArrayCollection([$pageTemplate]), $this->theme->getPageTemplates());
     }
 
     public function testConfigMethods()
