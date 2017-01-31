@@ -13,6 +13,12 @@ services:
             - '@oro_api.processor_bag'
             - get_relation_config
 
+    oro_api.merge_config_helper.parent_resource:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResourceHelper
+        public: false
+        arguments:
+            - '@oro_api.config_provider'
+
     oro_api.merge_config_helper.entity:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper
         public: false
@@ -51,6 +57,8 @@ services:
             - '@oro_api.config_loader_factory'
             - '@oro_api.resource_hierarchy_provider'
             - '@oro_api.config_bag'
+            - '@oro_api.resources_provider'
+            - '@oro_api.merge_config_helper.parent_resource'
             - '@oro_api.merge_config_helper.entity'
             - '@oro_api.merge_config_helper.action'
             - '@oro_api.merge_config_helper.subresource'

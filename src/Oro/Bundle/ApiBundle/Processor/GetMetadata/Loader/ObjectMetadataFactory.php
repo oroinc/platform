@@ -138,10 +138,14 @@ class ObjectMetadataFactory
             $associationMetadata->addAcceptableTargetClassName($targetClass);
         } elseif (DataType::isExtendedAssociation($dataType)) {
             list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
-            $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
             $this->setAssociationDataType($associationMetadata, $field);
             $associationMetadata->setAssociationType($associationType);
-            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
+            $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
+            if (empty($targets)) {
+                $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
+            } else {
+                $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
+            }
             $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
         } else {
             $associationMetadata->setDataType($dataType);

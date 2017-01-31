@@ -298,7 +298,7 @@ class LayoutDataCollector extends DataCollector
     protected function isDebugDeveloperToolbar()
     {
         if (null === $this->debugDeveloperToolbar) {
-            $this->debugDeveloperToolbar = $this->configManager->get('oro_layout.debug_developer_toolbar');
+            $this->debugDeveloperToolbar = (bool)$this->configManager->get('oro_layout.debug_developer_toolbar');
         }
 
         return $this->debugDeveloperToolbar;

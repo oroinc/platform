@@ -9,7 +9,8 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 
 /**
- * Disables the "delete" and "delete_list" actions for dictionary entities.
+ * Disables the "delete", "delete_list", "create" and "update" actions
+ * for entities marked as a dictionary.
  */
 class AddExcludedActionsForDictionaries implements ProcessorInterface
 {

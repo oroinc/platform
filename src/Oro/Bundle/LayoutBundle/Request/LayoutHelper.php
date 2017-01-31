@@ -72,7 +72,7 @@ class LayoutHelper
     public function isProfilerEnabled()
     {
         if (null === $this->profilerEnabled) {
-            $this->profilerEnabled = $this->configManager->get('oro_layout.debug_block_info');
+            $this->profilerEnabled = (bool)$this->configManager->get('oro_layout.debug_block_info');
         }
 
         return $this->profilerEnabled;
