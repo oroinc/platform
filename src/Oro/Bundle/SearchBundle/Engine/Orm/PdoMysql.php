@@ -3,9 +3,9 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
@@ -26,10 +26,10 @@ class PdoMysql extends BaseDriver
     /**
      * Init additional doctrine functions
      *
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param ClassMetadata $class
      */
-    public function initRepo(EntityManager $em, ClassMetadata $class)
+    public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
         $ormConfig = $em->getConfiguration();
         $ormConfig->addCustomStringFunction(
@@ -180,7 +180,7 @@ class PdoMysql extends BaseDriver
     protected function getFullTextMinWordLength()
     {
         if (null === $this->fullTextMinWordLength) {
-            $this->fullTextMinWordLength = (int)$this->em->getConnection()->fetchColumn(
+            $this->fullTextMinWordLength = (int)$this->entityManager->getConnection()->fetchColumn(
                 "SHOW VARIABLES LIKE 'ft_min_word_len'",
                 [],
                 1
