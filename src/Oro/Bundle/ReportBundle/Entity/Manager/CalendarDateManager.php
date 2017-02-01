@@ -46,7 +46,6 @@ class CalendarDateManager
     {
         $timeZone = new \DateTimeZone('UTC');
         $startDate = new \DateTime('now midnight', $timeZone);
-        $startDate->setTimezone($timeZone);
         $startDate->setDate($startDate->format('Y'), 1, 1);
 
         if ($append) {
