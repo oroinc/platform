@@ -40,7 +40,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'configuration' => [],
                 'entities' => [],
                 'field_configs' => [],
-                'cron_jobs' => [],
             ]
         ];
 
@@ -58,7 +57,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
                 'field_configs' => [],
-                'cron_jobs' => [],
             ],
         ];
 
@@ -71,7 +69,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
                 'field_configs' => [],
-                'cron_jobs' => [],
             ]
         ];
 

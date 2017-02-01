@@ -359,7 +359,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
                             'entities' => [],
                             'field_configs' => [],
-                            'cron_jobs' => [],
                         ],
                         'feature2' => [
                             'label' => 'Feature 2',
@@ -369,7 +368,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'configuration' => ['config_leaf2'],
                             'entities' => [],
                             'field_configs' => [],
-                            'cron_jobs' => [],
                         ],
                         'feature3' => [
                             'label' => 'Feature 3',
@@ -379,7 +377,6 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'configuration' => [],
                             'entities' => [],
                             'field_configs' => [],
-                            'cron_jobs' => [],
                         ],
                     ],
                     ConfigurationProvider::INTERNAL => [
