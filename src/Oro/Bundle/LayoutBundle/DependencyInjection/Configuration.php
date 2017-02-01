@@ -255,7 +255,6 @@ class Configuration implements ConfigurationInterface
         $configNode->append($this->getPageTemplatesNode($treeBuilder));
     }
 
-
     /**
      * @param TreeBuilder $treeBuilder
      * @return ArrayNodeDefinition
