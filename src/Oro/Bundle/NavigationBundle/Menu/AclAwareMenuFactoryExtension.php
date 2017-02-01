@@ -8,7 +8,6 @@ use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
 
 use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
@@ -57,9 +56,6 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected $hideAllForNotLoggedInUsers = true;
 
-    /** @var array */
-    private $optionsByCacheKey = [];
-
     /**
      * @param RouterInterface $router
      * @param ServiceLink     $securityFacadeLink
@@ -107,65 +103,62 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     }
 
     /**
-     * Check permissions and set options for renderer.
+     * Check Permissions and set options for renderer.
      *
-     * @param array $options
+     * @param  array $options
      * @return array
      */
     public function buildOptions(array $options = [])
     {
-        $cacheKey = $this->getCacheKey('all_options', $options);
-        if (!array_key_exists($cacheKey, $this->optionsByCacheKey)) {
-            if (!$this->alreadyDenied($options)) {
-                $aclCacheKey = $this->getCacheKey('acl_options', $options);
-                $aclOptions = $this->getFromCache($aclCacheKey);
-                if ($aclOptions === false) {
-                    $aclOptions = $this->getAclOptions($options);
-                    $this->saveToCache($aclCacheKey, $aclOptions);
-                }
-
-                $this->appendOptions($options, $aclOptions);
-
-                $routeCacheKey = $this->getCacheKey('route_options', $options);
-                $hasRouteOptions = $options['extras']['isAllowed'] && !empty($options['route']);
-                if ($hasRouteOptions) {
-                    $routeOptions = $this->getFromCache($routeCacheKey);
-                    if ($routeOptions === false) {
-                        $routeOptions = $this->getRouteOptions($options);
-                        $this->saveToCache($routeCacheKey, $routeOptions);
-                    }
-
-                    $this->appendOptions($options, $routeOptions);
-                }
+        if (!$this->alreadyDenied($options)) {
+            $localCache = $this->getGlobalCacheKey($options);
+            if ($this->cache && $this->cache->contains($localCache)) {
+                return $this->cache->fetch($localCache);
             }
 
-            $this->optionsByCacheKey[$cacheKey] = $options;
+            $this->processAcl($options);
+
+            if ($options['extras']['isAllowed'] && !empty($options['route'])) {
+                $this->processRoute($options);
+            }
+
+            if ($this->cache) {
+                $this->cache->save($localCache, $options);
+            }
         }
 
-        return $this->optionsByCacheKey[$cacheKey];
+        return $options;
     }
 
     /**
      * Check ACL based on acl_resource_id, route or uri.
      *
      * @param array $options
-     * @return array
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function getAclOptions(array $options = [])
+    protected function processAcl(array &$options)
     {
-        $isAllowed = self::DEFAULT_ACL_POLICY;
+        $isAllowed                      = self::DEFAULT_ACL_POLICY;
+        $options['extras']['isAllowed'] = self::DEFAULT_ACL_POLICY;
+        $securityFacade = $this->securityFacadeLink->getService();
 
-        if ($this->useDefaultAclPolicy($options, $isAllowed)) {
-            return [
-                'extras' => [
-                    'isAllowed' => $isAllowed
-                ]
-            ];
+        if (isset($options['check_access']) && $options['check_access'] === false) {
+            return;
         }
 
-        $securityFacade = $this->securityFacadeLink->getService();
-        if ($securityFacade->getToken() !== null) { // don't check access if it's CLI
-            $isAllowed = $this->getOptionExtras($options, self::ACL_POLICY_KEY, $isAllowed);
+        if ($this->hideAllForNotLoggedInUsers && !$securityFacade->hasLoggedUser()) {
+            if (!empty($options['extras']['show_non_authorized'])) {
+                return;
+            }
+
+            $isAllowed = false;
+        } elseif ($securityFacade->getToken() !== null) { // don't check access if it's CLI
+            if (array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
+                $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
+            }
 
             if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
                 if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
@@ -191,100 +184,111 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
         }
 
-        return [
-            'extras' => [
-                'isAllowed' => $isAllowed
-            ]
-        ];
-    }
-
-    /**
-     * @param array $options
-     * @param bool  $isAllowed
-     * @return bool
-     */
-    private function useDefaultAclPolicy(array $options, &$isAllowed)
-    {
-        $hasAccess = array_key_exists('check_access', $options) && $options['check_access'] === false;
-        if ($hasAccess) {
-            return true;
-        }
-
-        $securityFacade = $this->securityFacadeLink->getService();
-        $hideForNotLoggedIn = $this->hideAllForNotLoggedInUsers && !$securityFacade->hasLoggedUser();
-        if ($hideForNotLoggedIn) {
-            if ($this->getOptionExtras($options, 'show_non_authorized', false) !== false) {
-                return true;
-            }
-
-            $isAllowed = false;
-
-            return true;
-        }
-
-        return false;
+        $options['extras']['isAllowed'] = $isAllowed;
     }
 
     /**
      * Add uri based on route.
      *
      * @param array $options
-     * @return array
      */
-    protected function getRouteOptions(array $options = [])
+    protected function processRoute(array &$options)
     {
         $params = [];
         if (isset($options['routeParameters'])) {
             $params = $options['routeParameters'];
         }
-
-        $absolute = false;
-        if (isset($options['routeAbsolute'])) {
-            $absolute = $options['routeAbsolute'];
+        $cacheKey   = null;
+        $hasInCache = false;
+        $uri        = null;
+        if ($this->cache) {
+            $cacheKey = $this->getCacheKey('route_uri', $options['route'] . ($params ? serialize($params) : ''));
+            if ($this->cache->contains($cacheKey)) {
+                $uri        = $this->cache->fetch($cacheKey);
+                $hasInCache = true;
+            }
+        }
+        if (!$hasInCache) {
+            $absolute = false;
+            if (isset($options['routeAbsolute'])) {
+                $absolute = $options['routeAbsolute'];
+            }
+            $uri = $this->router->generate($options['route'], $params, $absolute);
+            if ($this->cache) {
+                $this->cache->save($cacheKey, $uri);
+            }
         }
 
-        $uri = $this->router->generate($options['route'], $params, $absolute);
+        $options['uri'] = $uri;
 
-        return [
-            'uri' => $uri,
-            'extras' => [
-                'routes' => [$options['route']],
-                'routesParameters' => [$options['route'] => $params],
-            ]
-        ];
+        $options = array_merge_recursive(
+            [
+                'extras' => [
+                    'routes'           => [$options['route']],
+                    'routesParameters' => [$options['route'] => $params],
+                ]
+            ],
+            $options
+        );
     }
 
     /**
      * Get route information based on MenuItem options
      *
-     * @param array $options
-     * @return array
+     * @param  array         $options
+     * @return array|boolean
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function getRouteInfo(array $options = [])
+    protected function getRouteInfo(array $options)
     {
         $key = null;
+        $cacheKey = null;
+        $hasInCache = false;
         if (array_key_exists('route', $options)) {
-            $key = $this->getRouteInfoByRouteName($options['route']);
+            if ($this->cache) {
+                $cacheKey = $this->getCacheKey('route_acl', $options['route']);
+                if ($this->cache->contains($cacheKey)) {
+                    $key = $this->cache->fetch($cacheKey);
+                    $hasInCache = true;
+                }
+            }
+            if (!$hasInCache) {
+                $key = $this->getRouteInfoByRouteName($options['route']);
+            }
         } elseif (array_key_exists('uri', $options)) {
-            $key = $this->getRouteInfoByUri($options['uri']);
+            if ($this->cache) {
+                $cacheKey = $this->getCacheKey('uri_acl', $options['uri']);
+                if ($this->cache->contains($cacheKey)) {
+                    $key = $this->cache->fetch($cacheKey);
+                    $hasInCache = true;
+                }
+            }
+            if (!$hasInCache) {
+                $key = $this->getRouteInfoByUri($options['uri']);
+            }
+        }
+
+        if ($this->cache && $cacheKey && !$hasInCache) {
+            $this->cache->save($cacheKey, $key);
         }
 
         $info = explode(self::CONTROLLER_ACTION_DELIMITER, $key);
-        if (count($info) === 2) {
+        if (count($info) == 2) {
             return [
                 'controller' => $info[0],
                 'action' => $info[1],
                 'key' => $key
             ];
+        } else {
+            return false;
         }
-
-        return [];
     }
 
     /**
      * Get route info by route name
      *
-     * @param string $routeName
+     * @param $routeName
      * @return string|null
      */
     protected function getRouteInfoByRouteName($routeName)
@@ -300,7 +304,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     /**
      * Get route info by uri
      *
-     * @param string $uri
+     * @param  string      $uri
      * @return null|string
      */
     protected function getRouteInfoByUri($uri)
@@ -319,13 +323,13 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     /**
      * Get safe cache key
      *
-     * @param string $space
-     * @param array  $value
+     * @param  string $space
+     * @param  string $value
      * @return string
      */
-    protected function getCacheKey($space, array $value)
+    protected function getCacheKey($space, $value)
     {
-        return md5($space . ':' . serialize($value));
+        return md5($space . ':' . $value);
     }
 
     /**
@@ -334,64 +338,40 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function alreadyDenied(array $options)
     {
-        $isAllowed = $this->getOptionExtras($options, 'isAllowed');
-        return $isAllowed === false;
-    }
-
-    /**
-     * @param array      $options
-     * @param string     $key
-     * @param mixed|null $default
-     * @return mixed|null
-     */
-    private function getOptionExtras(array $options, $key, $default = null)
-    {
-        if (array_key_exists('extras', $options) && array_key_exists($key, $options['extras'])) {
-            return $options['extras'][$key];
-        }
-
-        return $default;
-    }
-
-    /**
-     * @param string $cacheKey
-     * @param mixed  $data
-     */
-    private function saveToCache($cacheKey, $data)
-    {
-        if ($this->cache) {
-            $this->cache->save($cacheKey, $data);
-        }
-    }
-
-    /**
-     * @param string $cacheKey
-     * @return array|bool
-     */
-    private function getFromCache($cacheKey)
-    {
-        if ($this->cache && $this->cache->contains($cacheKey)) {
-            return $this->cache->fetch($cacheKey);
-        }
-
-        return false;
+        return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
+        ($options['extras']['isAllowed'] === false);
     }
 
     /**
      * @param array $options
-     * @param array $newOptions
+     * @return string
      */
-    private function appendOptions(array &$options, array $newOptions)
+    private function getGlobalCacheKey(array $options)
     {
-        foreach ($newOptions as $key => $value) {
-            if (is_array($value)) {
-                if (!array_key_exists($key, $options) || !is_array($options[$key])) {
-                    $options[$key] = [];
-                }
-                $this->appendOptions($options[$key], $value);
-            } else {
-                $options[$key] = $value;
-            }
-        }
+        $securityFacade = $this->securityFacadeLink->getService();
+
+        $data = [
+            $this->hideAllForNotLoggedInUsers,
+            $securityFacade->hasLoggedUser(),
+            $this->getOptionIfExist('route', $options),
+            $this->getOptionIfExist('routeParameters', $options),
+            $this->getOptionIfExist('uri', $options),
+            $this->getOptionIfExist('check_access', $options) === false,
+            $securityFacade->getToken() !== null,
+            $this->getOptionIfExist('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras']),
+            $this->getOptionIfExist(self::ACL_RESOURCE_ID_KEY, $options),
+        ];
+
+        return $this->getCacheKey('global', serialize($data));
+    }
+
+    /**
+     * @param string $key
+     * @param array  $options
+     * @return mixed|null
+     */
+    private function getOptionIfExist($key, array $options)
+    {
+        return array_key_exists($key, $options) ? $options[$key] : null;
     }
 }

@@ -253,43 +253,6 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $this->factory->createItem('test', $options);
     }
 
-    public function testBuildOptionsWithCache()
-    {
-        $options = ['uri' => '#', 'route' => 'route', 'extras' => ['isAllowed' => true]];
-
-        $cacheOptions = $options;
-        $aclCacheKey = md5('acl_options:' . serialize($cacheOptions));
-        $cacheOptions['extras']['acl_options'] = true;
-        $routeCacheKey = md5('route_options:' . serialize($cacheOptions));
-
-        /** @var ArrayCache|\PHPUnit_Framework_MockObject_MockObject $cache */
-        $cache = $this->getMockBuilder(ArrayCache::class)->getMock();
-        $cache->expects($this->exactly(2))
-            ->method('contains')
-            ->willReturnMap([
-                [$aclCacheKey, true],
-                [$routeCacheKey, true],
-            ]);
-
-        $cache->expects($this->exactly(2))
-            ->method('fetch')
-            ->willReturnMap([
-                [$aclCacheKey, ['extras' => ['acl_options' => true]]],
-                [$routeCacheKey, ['extras' => ['route_options' => true]]],
-            ]);
-
-        $this->factoryExtension->setCache($cache);
-
-        $item = $this->factory->createItem('test', $options);
-        $this->assertArrayHasKey('acl_options', $item->getExtras());
-        $this->assertArrayHasKey('route_options', $item->getExtras());
-
-        // test local cache
-        $item = $this->factory->createItem('test', $options);
-        $this->assertArrayHasKey('acl_options', $item->getExtras());
-        $this->assertArrayHasKey('route_options', $item->getExtras());
-    }
-
     /**
      * @param array $options
      * @param bool $expected
@@ -494,5 +457,143 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertAttributeCount(1, 'aclCache', $this->factoryExtension);
         $this->assertAttributeEquals(['controller::action' => true], 'aclCache', $this->factoryExtension);
+    }
+
+    /**
+     * @dataProvider hasInCacheDataProvider
+     * @param boolean $hasInCache
+     */
+    public function testUriCaching($hasInCache)
+    {
+        $cacheKey = md5('uri_acl:#');
+        $globalCacheKey = md5(
+            'global:' . serialize([true, true, null, null, '#', false, true, false, null])
+        );
+
+        $cache = $this->getMockBuilder('Doctrine\Common\Cache\ArrayCache')
+            ->getMock();
+
+        $cache->expects($this->exactly(2))
+            ->method('contains')
+            ->willReturnMap([
+                [$globalCacheKey, false],
+                [$cacheKey, $hasInCache],
+            ]);
+
+        if ($hasInCache) {
+            $cache->expects($this->once())
+                ->method('fetch')
+                ->with($cacheKey)
+                ->willReturnMap([
+                    $this->returnValue('controller::action')
+                ]);
+        } else {
+            $cache->expects($this->exactly(2))
+                ->method('save')
+                ->willReturnMap([
+                    [$cacheKey, 'controller::action'],
+                    [$globalCacheKey],
+                ]);
+        }
+
+        $this->factoryExtension->setCache($cache);
+
+        $options = ['uri' => '#'];
+
+        if ($hasInCache) {
+            $this->securityFacade->expects($this->never())
+                ->method('isClassMethodGranted');
+
+            $this->router->expects($this->never())
+                ->method('match');
+        } else {
+            $this->router->expects($this->once())
+                ->method('match')
+                ->will($this->returnValue(['_controller' => 'controller::action']));
+
+            $this->securityFacade->expects($this->once())
+                ->method('isClassMethodGranted')
+                ->with('controller', 'action')
+                ->will($this->returnValue(true));
+        }
+
+        $item = $this->factory->createItem('test', $options);
+        $this->assertTrue($item->getExtra('isAllowed'));
+        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+    }
+
+    /**
+     * @dataProvider hasInCacheDataProvider
+     * @param boolean $hasInCache
+     */
+    public function testRouteCaching($hasInCache)
+    {
+        $params = ['id' => 20];
+        $uriKey = md5('route_uri:route_name' . serialize($params));
+        $aclKey = md5('route_acl:route_name');
+        $globalCacheKey = md5(
+            'global:' . serialize([true, true, 'route_name', $params, null, false, true, false, null])
+        );
+
+        $cache = $this->getMockBuilder('Doctrine\Common\Cache\ArrayCache')
+            ->getMock();
+
+        $cache->expects($this->exactly(3))
+            ->method('contains')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$globalCacheKey, false],
+                        [$uriKey, $hasInCache],
+                        [$aclKey, $hasInCache],
+                    ]
+                )
+            );
+
+        if ($hasInCache) {
+            $cache->expects($this->exactly(2))
+                ->method('fetch')
+                ->will(
+                    $this->returnValueMap(
+                        [
+                            [$uriKey, '/'],
+                            [$aclKey, 'controller::action'],
+                        ]
+                    )
+                );
+        } else {
+            $cache->expects($this->exactly(3))
+                ->method('save')
+                ->with(
+                    $this->logicalOr(
+                        $this->equalTo($aclKey),
+                        $this->equalTo('controller::action'),
+                        $this->equalTo($uriKey),
+                        $this->equalTo('/'),
+                        $this->equalTo($globalCacheKey)
+                    )
+                );
+        }
+
+        $this->factoryExtension->setCache($cache);
+
+        $options = ['route' => 'route_name', 'routeParameters' => $params];
+
+        $this->assertRouteByRouteNameCalls(true, 'route_name', 'controller', 'action', (int) !$hasInCache);
+
+        $item = $this->factory->createItem('test', $options);
+        $this->assertTrue($item->getExtra('isAllowed'));
+        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+    }
+
+    /**
+     * @return array
+     */
+    public function hasInCacheDataProvider()
+    {
+        return [
+            'in cache' => [true],
+            'not in cache' => [false]
+        ];
     }
 }
