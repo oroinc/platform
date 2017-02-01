@@ -58,14 +58,17 @@
 
         &.btn-toggle {
             &:after {
-                content: "";
+                content: '';
+
                 display: inline-block;
                 width: 0;
                 height: 0;
+
+                border-top: 4px solid;
+                border-right: 4px solid transparent;
+                border-left: 4px solid transparent;
+
                 vertical-align: middle;
-                border-top: 0.3em solid;
-                border-right: 0.3em solid transparent;
-                border-left: 0.3em solid transparent;
             }
         }
     }
