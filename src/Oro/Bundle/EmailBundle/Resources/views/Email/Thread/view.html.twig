@@ -49,7 +49,8 @@
             {{ oro_widget_render({
                 'widgetType': 'block',
                 'wid': 'thread-view',
-                'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false}),
+                'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false,
+                    'showSingleEmail': not oro_config_value('oro_email.threads_grouping')}),
                 'alias': 'thread-view',
                 'contextsRendered': true
             }) }}

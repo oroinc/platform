@@ -38,7 +38,7 @@
             {{ EA.wrapTextToTag(firstLastRecipients, isNew) }}
         {% endif %}
 {% endif %}
-{% if threadEmailCount > 1 %}
+{% if oro_config_value('oro_email.threads_grouping') and threadEmailCount > 1 %}
     {{ EA.wrapTextToTag('(' ~ threadEmailCount ~ ')', isNew) }}
 {% endif %}
 </span>

@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EmailGridListener
 {
@@ -31,6 +32,11 @@ class EmailGridListener
      * @var GridViewManager
      */
     protected $gridViewManager;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
 
     /**
      * Stores join's root and alias if joins for filters are added - ['eu' => ['alias1']]
@@ -52,6 +58,14 @@ class EmailGridListener
         $this->factory = $factory;
         $this->securityFacade = $securityFacade;
         $this->gridViewManager = $gridViewManager;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -90,6 +104,11 @@ class EmailGridListener
                 $emailIds = explode(',', $emailIds);
             }
             $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
+        }
+
+        if ($this->configManager && $this->configManager->get('oro_email.threads_grouping')) {
+            $queryBuilder->andWhere('e.head = :enabled')->setParameter('enabled', true);
+            $countQb->andWhere('e.head = :enabled')->setParameter('enabled', true);
         }
 
         $this->prepareQueryToFilter($parameters, $queryBuilder, $countQb);
