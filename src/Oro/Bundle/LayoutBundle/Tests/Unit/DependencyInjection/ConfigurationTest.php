@@ -61,7 +61,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                     'description' => null,
                                     'screenshot' => null
                                 ]
-
                             ]
                         ],
                         'assets' => [],

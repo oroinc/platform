@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
@@ -149,7 +150,6 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $childTheme = new Theme('Child theme', 'parent_theme');
-
         $parentTheme = new Theme('Parent theme');
         $parentPageTemplate1 = new PageTemplate('Parent page template label 1', 'page_template_1', 'some_route');
         $parentPageTemplate2 = new PageTemplate('Parent page template label 2', 'page_template_2', 'some_route');

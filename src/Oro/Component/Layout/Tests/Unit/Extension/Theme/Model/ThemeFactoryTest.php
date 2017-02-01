@@ -58,7 +58,7 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
                     [
                         'label' => 'Some label',
                         'key' => 'some_key',
-                        'routeName' => 'some_route_name',
+                        'route_name' => 'some_route_name',
                         'screenshot' => 'some_screenshot',
                         'description' => 'Some description'
                     ]

@@ -100,7 +100,7 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
         $this->theme->addPageTemplate($pageTemplate);
-        $this->assertEquals(new ArrayCollection([$pageTemplate]), $this->theme->getPageTemplates());
+        $this->assertCount(1, $this->theme->getPageTemplates());
     }
 
     public function testConfigMethods()

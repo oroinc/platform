@@ -91,7 +91,6 @@ class ThemeManager
                 if (!$isOverwritten) {
                     $theme->addPageTemplate($parentPageTemplate);
                 }
-
             }
         }
 

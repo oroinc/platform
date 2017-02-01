@@ -46,7 +46,7 @@ class ThemeFactory implements ThemeFactoryInterface
                 $pageTemplate = new PageTemplate(
                     $pageTemplateConfig['label'],
                     $pageTemplateConfig['key'],
-                    $pageTemplateConfig['routeName']
+                    $pageTemplateConfig['route_name']
                 );
                 $pageTemplate->setDescription($pageTemplateConfig['description']);
                 $pageTemplate->setScreenshot($pageTemplateConfig['screenshot']);
