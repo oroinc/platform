@@ -61,10 +61,41 @@ class ThemeManager
         }
 
         if (!isset($this->instances[$themeName])) {
-            $this->instances[$themeName] = $this->themeFactory->create($themeName, $this->themeDefinitions[$themeName]);
+            $theme = $this->themeFactory->create($themeName, $this->themeDefinitions[$themeName]);
+            $this->instances[$themeName] = $this->mergePageTemplates($theme);
         }
 
         return $this->instances[$themeName];
+    }
+
+    /**
+     * @param Theme $theme
+     * @return Theme
+     */
+    private function mergePageTemplates(Theme $theme)
+    {
+        if ($theme->getParentTheme()) {
+            $parentTheme = $this->getTheme($theme->getParentTheme());
+
+            foreach ($parentTheme->getPageTemplates() as $parentPageTemplate) {
+                $isOverwritten = $theme->getPageTemplates()->exists(
+                    function ($key, $childPageTemplate) use ($parentPageTemplate) {
+                        /** @var PageTemplate $childPageTemplate */
+                        return (
+                            $parentPageTemplate->getRouteName() === $childPageTemplate->getRouteName() &&
+                            $parentPageTemplate->getKey() === $childPageTemplate->getKey()
+                        );
+                    }
+                );
+
+                if (!$isOverwritten) {
+                    $theme->addPageTemplate($parentPageTemplate);
+                }
+
+            }
+        }
+
+        return $theme;
     }
 
     /**

@@ -41,6 +41,19 @@ class ThemeFactory implements ThemeFactoryInterface
             $theme->setConfig($themeDefinition['config']);
         }
 
+        if (isset($themeDefinition['config']['page_templates']['templates'])) {
+            foreach ($themeDefinition['config']['page_templates']['templates'] as $pageTemplateConfig) {
+                $pageTemplate = new PageTemplate(
+                    $pageTemplateConfig['label'],
+                    $pageTemplateConfig['key'],
+                    $pageTemplateConfig['routeName']
+                );
+                $pageTemplate->setDescription($pageTemplateConfig['description']);
+                $pageTemplate->setScreenshot($pageTemplateConfig['screenshot']);
+                $theme->addPageTemplate($pageTemplate);
+            }
+        }
+
         return $theme;
     }
 }
