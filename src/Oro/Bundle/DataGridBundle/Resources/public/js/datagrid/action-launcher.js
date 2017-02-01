@@ -169,6 +169,7 @@ define(function(require) {
             }
             delete this.action;
             delete this.runAction;
+            delete this.launcherMode;
             ActionLauncher.__super__.dispose.apply(this, arguments);
         },
 

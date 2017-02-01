@@ -9,8 +9,7 @@ define(function(require) {
 
     var config = module.config();
     config = _.extend({
-        iconHideText: true,
-        launcherMode: ''
+        iconHideText: true
     }, config);
 
     /**
@@ -115,10 +114,10 @@ define(function(require) {
                 this.iconHideText = opts.iconHideText;
             }
 
-            if (opts.launcherMode !== '') {
+            if (opts.launcherMode) {
                 this.launcherMode = opts.launcherMode;
             }
-            
+
             if (opts.className) {
                 this.className = opts.className;
             }
@@ -144,6 +143,7 @@ define(function(require) {
             }
             delete this.action;
             delete this.runAction;
+            delete this.launcherMode;
             SelectChoiceLauncher.__super__.dispose.apply(this, arguments);
         },
 
