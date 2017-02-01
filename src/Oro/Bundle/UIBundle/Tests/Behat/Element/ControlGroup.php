@@ -53,14 +53,10 @@ class ControlGroup extends Element
 
         if ($expectedValueType !== $actualValueType) {
             throw new \RuntimeException(sprintf(
-                'Expected(%s) and Actual(%s) values has different types, and can\'t be compare'
+                'Expected(%s) and Actual(%s) values has different types, and can\'t be compare',
+                print_r($expectedValue, true), print_r($actualValue, true)
             ));
         }
-
-        var_dump($expectedValueType);
-        var_dump($actualValueType);
-        var_dump($expectedValue);
-        var_dump($actualValue);
 
         switch ($expectedValueType) {
             case 'string':

@@ -560,6 +560,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Mass inline grid field edit
+     * Accept table and pass it to inlineEditField
+     * Example: When I edit first record from grid:
+     *            | name      | editedName       |
+     *            | status    | Qualified        |
+     *
+     * @Then I edit first record from grid:
+     * @param TableNode $table
+     */
+    public function iEditFirstRecordFromGrid(TableNode $table)
+    {
+        foreach ($table->getRows() as $row) {
+            list($field, $value) = $row;
+            $this->inlineEditField($field, $value);
+        }
+    }
+
+    /**
      * Inline edit field
      * Example: When I edit Status as "Open"
      * Example: Given I edit Probability as "30"
