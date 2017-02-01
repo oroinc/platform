@@ -158,9 +158,12 @@
 
     &--size {
         &-s {
-            font-size: $base-font-size;
             padding: 0 10px;
+
+            font-size: $base-font-size;
             line-height: 30px;
+
+            border-radius: 6px;
         }
         &-m {
             font-size: 17px;
@@ -168,8 +171,9 @@
         }
 
         &-l {
-            padding: 10px 15px;
             font-size: $base-font-size--l;
+
+            padding: 10px 15px;
             line-height: 54px;
         }
 
