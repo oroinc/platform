@@ -81,10 +81,10 @@ class FeatureToggleConfiguration implements ConfigurationInterface
             ->arrayNode('field_configs')
                 ->prototype('variable')
                 ->end()
-            ->end()
-            ->arrayNode('cron_jobs')
-                ->prototype('variable')
-                ->end()
+//            ->end()
+//            ->arrayNode('cron_jobs')
+//                ->prototype('variable')
+//                ->end()
             ->end();
     }
 

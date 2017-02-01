@@ -25,8 +25,8 @@ class ScheduleRepository extends EntityRepository
         $disabledJobs = $this->featureChecker->getDisabledResourcesByType('cron_jobs');
         if ($disabledJobs) {
             $queryBuilder
-                ->where($queryBuilder->expr()->notIn('s.command', '?1'))
-                ->setParameter(1, $disabledJobs)
+                ->where($queryBuilder->expr()->notIn('s.command', ':disabledJobs'))
+                ->setParameter('disabledJobs', $disabledJobs)
             ;
         }
 

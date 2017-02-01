@@ -75,3 +75,8 @@ services:
             - 'Oro\Bundle\CronBundle\Entity\Schedule'
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
+
+    oro_cron.configuration.feature_configuration_extension:
+        class: Oro\Bundle\CronBundle\Configuration\FeatureConfigurationExtension
+        tags:
+            - { name: oro_feature.config_extension }

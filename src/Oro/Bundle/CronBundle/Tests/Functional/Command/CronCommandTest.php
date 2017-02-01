@@ -77,7 +77,6 @@ class CronCommandTest extends WebTestCase
         $this->mockCronHelper(true);
         $this->mockFeatureChecker();
 
-
         $result = $this->runCommand('oro:cron', ['-vvv' => true]);
         $this->assertNotEmpty($result);
 
