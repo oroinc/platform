@@ -32,7 +32,7 @@ class PageTemplate
     }
 
     /**
-     * @param $label
+     * @param string $label
      * @return $this
      */
     public function setLabel($label)
@@ -51,7 +51,7 @@ class PageTemplate
     }
 
     /**
-     * @param $description
+     * @param string $description
      * @return $this
      */
     public function setDescription($description)
@@ -70,7 +70,7 @@ class PageTemplate
     }
 
     /**
-     * @param $screenshot
+     * @param string $screenshot
      * @return $this
      */
     public function setScreenshot($screenshot)
@@ -89,7 +89,7 @@ class PageTemplate
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return $this
      */
     public function setKey($key)
@@ -108,7 +108,7 @@ class PageTemplate
     }
 
     /**
-     * @param $routeName
+     * @param string $routeName
      * @return $this
      */
     public function setRouteName($routeName)
