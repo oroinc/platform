@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\RouterInterface;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 
 class ExportHandler extends AbstractHandler
 {
@@ -164,7 +164,7 @@ class ExportHandler extends AbstractHandler
     public function handleDownloadExportResult($fileName)
     {
         $fullFileName = $this->fileSystemOperator
-            ->getTemporaryFile($fileName)
+            ->getTemporaryFile($fileName, true)
             ->getRealPath();
 
         $headers     = [];

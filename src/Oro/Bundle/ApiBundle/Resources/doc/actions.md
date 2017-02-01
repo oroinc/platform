@@ -90,6 +90,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted. | If you add a new processor in this group, it should be added in the **security_check** group of actions that execute this action, e.g. look at **security_check** group of [create](#create-action) or [update](#update-action) actions. |
 | build_query | Building a query that will be used to load data | |
@@ -122,6 +123,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
@@ -154,6 +156,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load an entity to be deleted | |
@@ -192,6 +195,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load an entities list to be deleted | |
@@ -224,6 +228,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
 | load_data | Creating an new entity object | |
@@ -257,6 +262,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
 | load_data | Loading an entity object to be updated | |
@@ -290,6 +296,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
@@ -322,6 +329,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | build_query | Building a query that will be used to load data | |
@@ -354,6 +362,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
@@ -386,6 +395,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |
@@ -418,6 +428,7 @@ This action has the following processor groups:
 | Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| resource_check | Checking whether the requested resource type is accessible via API | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | security_check | Checking whether an access to the requested resource is granted | |
 | load_data | Loading an entity object to be updated | |

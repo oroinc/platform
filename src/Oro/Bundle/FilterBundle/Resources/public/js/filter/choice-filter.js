@@ -228,7 +228,8 @@ define([
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+            if (!tools.isEqualsLoosely(newValue, oldValue) && (!_.isEmpty(newValue.value) ||
+                (!_.isEmpty(oldValue.value) && _.isEmpty(newValue.value)))) {
                 this.trigger('update');
             }
         },
