@@ -50,6 +50,12 @@ class ThemeFactory implements ThemeFactoryInterface
                 );
                 $pageTemplate->setDescription($pageTemplateConfig['description']);
                 $pageTemplate->setScreenshot($pageTemplateConfig['screenshot']);
+
+                if (isset($themeDefinition['config']['page_templates']['titles'][$pageTemplateConfig['route_name']])) {
+                    $pageTemplate->setTitle(
+                        $themeDefinition['config']['page_templates']['titles'][$pageTemplateConfig['route_name']]
+                    );
+                }
                 $theme->addPageTemplate($pageTemplate);
             }
         }

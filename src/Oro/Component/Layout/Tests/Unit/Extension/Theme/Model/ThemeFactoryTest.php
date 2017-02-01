@@ -62,6 +62,9 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
                         'screenshot' => 'some_screenshot',
                         'description' => 'Some description'
                     ]
+                ],
+                'titles' => [
+                    'some_route_name' => 'Title for some route name'
                 ]
             ]
         ];
@@ -69,7 +72,8 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
         $fullDefinition->setConfig($config);
         $pageTemplate = (new PageTemplate('Some label', 'some_key', 'some_route_name'))
             ->setDescription('Some description')
-            ->setScreenshot('some_screenshot');
+            ->setScreenshot('some_screenshot')
+            ->setTitle('Title for some route name');
 
         $fullDefinition->addPageTemplate($pageTemplate);
 

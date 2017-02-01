@@ -61,6 +61,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                     'description' => null,
                                     'screenshot' => null
                                 ]
+                            ],
+                            'titles' => [
+                                'route_1' => 'Title for route 1',
+                                'route_2' => 'Title for route 2',
+                                'route_3' => 'Title for route 3',
                             ]
                         ],
                         'assets' => [],
@@ -83,7 +88,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                         'label' => 'Some label',
                                         'key' => 'some_key',
                                         'route_name' => 'some_route_name',
-                                    ]
+                                    ],
+                                ],
+                                'titles' => [
+                                    'route_1' => 'Title for route 1',
+                                    'route_2' => 'Title for route 2',
+                                    'route_3' => 'Title for route 3',
                                 ]
                             ]
                         ]

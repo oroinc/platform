@@ -276,6 +276,11 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('titles')
+                    ->useAttributeAsKey('titles')
+                        ->prototype('scalar')->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $pageTemplatesNode;
