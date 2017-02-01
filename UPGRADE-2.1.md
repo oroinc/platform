@@ -24,7 +24,13 @@ UPGRADE FROM 2.0 to 2.1
 ##LayoutBundle
 - Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
 
-####ActionBundle
+##ActionBundle
 - `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
     - work with `RouteCollection` is performance consuming
     - it was used to check bundle presence, which could be done with `service_exists`
+    
+##SearchBundle
+- Interface `Oro\Bundle\SearchBundle\Engine\EngineV2Interface` marked as deprecated - please, use
+`Oro\Bundle\SearchBundle\Engine\EngineInterface` instead
+- Return value types in `Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and
+`Oro\Bundle\SearchBundle\Query\AbstractSearchQuery` were fixed to support fluent interface
