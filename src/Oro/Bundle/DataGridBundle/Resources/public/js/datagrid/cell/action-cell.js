@@ -103,6 +103,9 @@ define([
                 this.actionsHideCount = opts.themeOptions.actionsHideCount;
             }
 
+            this.launcherMode = _.isObject(opts.themeOptions.launcherOptions) ?
+                                    opts.themeOptions.launcherOptions.launcherMode : false;
+
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
             _.each(this.actions, function(action) {
@@ -121,6 +124,7 @@ define([
             }
             delete this.actions;
             delete this.column;
+            delete this.launcherMode;
             this.$('.dropdown-toggle').dropdown('destroy');
             ActionCell.__super__.dispose.apply(this, arguments);
         },
@@ -176,7 +180,7 @@ define([
          */
         createLaunchers: function() {
             return _.map(this.actions, function(action) {
-                return action.createLauncher({});
+                return action.createLauncher({launcherMode: this.launcherMode});
             }, this);
         },
 
