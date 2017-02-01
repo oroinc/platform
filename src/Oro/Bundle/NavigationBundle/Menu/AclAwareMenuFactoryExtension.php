@@ -111,20 +111,23 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     public function buildOptions(array $options = [])
     {
         if (!$this->alreadyDenied($options)) {
+            $newOptions = [];
+
             $localCache = $this->getGlobalCacheKey($options);
             if ($this->cache && $this->cache->contains($localCache)) {
-                return $this->cache->fetch($localCache);
-            }
+                $newOptions = $this->cache->fetch($localCache);
+            } else {
+                $this->processAcl($newOptions, $options);
 
-            $this->processAcl($options);
+                if ($newOptions['extras']['isAllowed'] && !empty($options['route'])) {
+                    $this->processRoute($newOptions, $options);
+                }
 
-            if ($options['extras']['isAllowed'] && !empty($options['route'])) {
-                $this->processRoute($options);
+                if ($this->cache) {
+                    $this->cache->save($localCache, $newOptions);
+                }
             }
-
-            if ($this->cache) {
-                $this->cache->save($localCache, $options);
-            }
+            $options = array_merge_recursive($newOptions, $options);
         }
 
         return $options;
@@ -133,16 +136,16 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     /**
      * Check ACL based on acl_resource_id, route or uri.
      *
+     * @param array $newOptions
      * @param array $options
-     *
-     * @return void
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function processAcl(array &$options)
+    protected function processAcl(array &$newOptions, $options)
     {
         $isAllowed                      = self::DEFAULT_ACL_POLICY;
-        $options['extras']['isAllowed'] = self::DEFAULT_ACL_POLICY;
+        $newOptions['extras']['isAllowed'] = $isAllowed;
+        $options['extras']['isAllowed'] = $isAllowed;
         $securityFacade = $this->securityFacadeLink->getService();
 
         if (isset($options['check_access']) && $options['check_access'] === false) {
@@ -184,15 +187,16 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
         }
 
-        $options['extras']['isAllowed'] = $isAllowed;
+        $newOptions['extras']['isAllowed'] = $isAllowed;
     }
 
     /**
      * Add uri based on route.
      *
+     * @param array $newOptions
      * @param array $options
      */
-    protected function processRoute(array &$options)
+    protected function processRoute(array &$newOptions, $options)
     {
         $params = [];
         if (isset($options['routeParameters'])) {
@@ -219,17 +223,9 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
         }
 
-        $options['uri'] = $uri;
-
-        $options = array_merge_recursive(
-            [
-                'extras' => [
-                    'routes'           => [$options['route']],
-                    'routesParameters' => [$options['route'] => $params],
-                ]
-            ],
-            $options
-        );
+        $newOptions['uri'] = $uri;
+        $newOptions['extras']['routes'] = [$options['route']];
+        $newOptions['extras']['routesParameters'] = [$options['route'] => $params];
     }
 
     /**
@@ -359,6 +355,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             $this->getOptionIfExist('check_access', $options) === false,
             $securityFacade->getToken() !== null,
             $this->getOptionIfExist('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras']),
+            $this->getOptionIfExist('extras', $options) && !empty($options['extras']['show_non_authorized']),
             $this->getOptionIfExist(self::ACL_RESOURCE_ID_KEY, $options),
         ];
 

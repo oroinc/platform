@@ -467,7 +467,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $cacheKey = md5('uri_acl:#');
         $globalCacheKey = md5(
-            'global:' . serialize([true, true, null, null, '#', false, true, false, null])
+            'global:' . serialize([true, true, null, null, '#', false, true, false, false, null])
         );
 
         $cache = $this->getMockBuilder('Doctrine\Common\Cache\ArrayCache')
@@ -532,7 +532,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $uriKey = md5('route_uri:route_name' . serialize($params));
         $aclKey = md5('route_acl:route_name');
         $globalCacheKey = md5(
-            'global:' . serialize([true, true, 'route_name', $params, null, false, true, false, null])
+            'global:' . serialize([true, true, 'route_name', $params, null, false, true, false, false, null])
         );
 
         $cache = $this->getMockBuilder('Doctrine\Common\Cache\ArrayCache')
