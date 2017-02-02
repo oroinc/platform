@@ -179,7 +179,7 @@ define(function(require) {
          * @param {string} propertyPath
          * @returns {boolean}
          */
-        hasEntityField: function (propertyPath) {
+        hasEntityField: function(propertyPath) {
             return typeof this.entityFields.fieldsIndex[propertyPath] !== 'undefined';
         },
 
