@@ -7,14 +7,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class SetHttpResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
+class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
 {
     /** @var SetHttpResponseStatusCode */
     protected $processor;
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->processor = new SetHttpResponseStatusCode();
     }
 
@@ -23,14 +26,12 @@ class SetHttpResponseStatusCodeTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $errors, $expectedCode)
     {
-        $context = $this->getContext();
-
         foreach ($errors as $error) {
-            $context->addError($error);
+            $this->context->addError($error);
         }
 
-        $this->processor->process($context);
-        $this->assertEquals($expectedCode, $context->getResponseStatusCode());
+        $this->processor->process($this->context);
+        $this->assertEquals($expectedCode, $this->context->getResponseStatusCode());
     }
 
     public function processDataProvider()

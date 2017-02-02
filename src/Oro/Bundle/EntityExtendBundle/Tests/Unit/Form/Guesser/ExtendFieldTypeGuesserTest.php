@@ -288,7 +288,11 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit_Framework_TestCase
                     'required' => false,
                     'block' => 'general',
                     'configs' => ['allowClear' => false],
-                    'choices' => ['No', 'Yes']
+                    'choices' => [
+                        'No' => false,
+                        'Yes' => true
+                    ],
+                    'choices_as_values' => true
                 ]
             ],
             'string' => [

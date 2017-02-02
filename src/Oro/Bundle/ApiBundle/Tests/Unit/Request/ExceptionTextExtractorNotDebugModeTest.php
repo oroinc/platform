@@ -6,6 +6,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
+use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
@@ -56,8 +59,11 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             [new BadRequestHttpException(), 400],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 400],
             [new AccessDeniedException(), 403],
-            [new ForbiddenException('test'), 403],
             [new \InvalidArgumentException(), 500],
+            [new RuntimeException(), 500],
+            [new ActionNotAllowedException(), 405],
+            [new ForbiddenException('Reason.'), 403],
+            [new ResourceNotAccessibleException(), 404],
         ];
     }
 
@@ -86,16 +92,20 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             [new \InvalidArgumentException(), 'invalid argument exception'],
             [new BadRequestHttpException(), 'bad request http exception'],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 'bad request http exception'],
+            [new RuntimeException('Some error.'), 'runtime exception'],
+            [new ActionNotAllowedException(), 'action not allowed exception'],
+            [new ForbiddenException('Reason.'), 'forbidden exception'],
+            [new ResourceNotAccessibleException(), 'resource not accessible exception'],
         ];
     }
 
     /**
      * @dataProvider getExceptionTextDataProvider
      */
-    public function testExceptionText(\Exception $exception, $expectedType)
+    public function testExceptionText(\Exception $exception, $expectedText)
     {
         $this->assertEquals(
-            $expectedType,
+            $expectedText,
             $this->exceptionTextExtractor->getExceptionText($exception)
         );
     }
@@ -109,6 +119,17 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 new \Exception(),
+                null
+            ],
+            [
+                $this->createExecutionFailedException(new \Exception('some error')),
+                null
+            ],
+            [
+                $this->createExecutionFailedException(
+                    $this->createExecutionFailedException(new \Exception('some error')),
+                    'processor0'
+                ),
                 null
             ],
             [
@@ -132,18 +153,34 @@ class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 new BadRequestHttpException('some error in request'),
-                null
+                'some error in request.'
             ],
             [
                 $this->createExecutionFailedException(new BadRequestHttpException('some error in request')),
-                null
+                'some error in request. Processor: processor1.'
             ],
             [
                 $this->createExecutionFailedException(
                     $this->createExecutionFailedException(new BadRequestHttpException('some error in request')),
                     'processor0'
                 ),
-                null
+                'some error in request. Processor: processor0->processor1.'
+            ],
+            [
+                new RuntimeException('Some error.'),
+                'Some error.'
+            ],
+            [
+                new ActionNotAllowedException(),
+                'The action is not allowed.'
+            ],
+            [
+                new ForbiddenException('Reason.'),
+                'Reason.'
+            ],
+            [
+                new ResourceNotAccessibleException(),
+                'The resource is not accessible.'
             ],
         ];
     }
