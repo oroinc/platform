@@ -43,12 +43,22 @@ services:
         public: false
         class: Oro\Bundle\EntityConfigBundle\Config\LockObject
 
+    oro_entity_config.database_checker:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker
+        arguments:
+            - '@oro_entity_config.config_model_lock_object'
+            - '@doctrine'
+            - ['oro_entity_config', 'oro_entity_config_field', 'oro_entity_config_index_value']
+            - '%installed%'
+
     oro_entity_config.config_model_manager:
         public: false
         class: %oro_entity_config.config_model_manager.class%
         arguments:
             - '@oro_entity_config.link.entity_manager'
             - '@oro_entity_config.config_model_lock_object'
+            - '@oro_entity_config.database_checker'
 
     oro_entity_config.attribute.config_model_manager:
         alias: oro_entity_config.config_model_manager
@@ -369,3 +379,36 @@ services:
             - '@oro_entity_config.provider.attachment'
         tags:
             - { name: layout.data_provider, alias: attachment_config }
+
+    oro_entity_config.event_listener.deleted_attribute_relation:
+      class: Oro\Bundle\EntityConfigBundle\EventListener\DeletedAttributeRelationListener
+      arguments:
+          - '@oro_message_queue.message_producer'
+          - '@oro_entity_config.provider.deleted_attribute'
+      calls:
+          - [setTopic, ['oro_entity_config.attribute_was_removed_from_family']]
+      tags:
+        - { name: doctrine.event_listener, event: onFlush }
+        - { name: doctrine.event_listener, event: postFlush }
+
+    oro_entity_config.async.deleted_attribute_relation:
+        class: Oro\Bundle\EntityConfigBundle\Async\DeletedAttributeRelationProcessor
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@logger'
+            - '@oro_entity.database_exception_helper'
+            - '@oro_entity_config.provider.deleted_attribute'
+        tags:
+            - { name: oro_message_queue.client.message_processor, topicName: 'oro_entity_config.attribute_was_removed_from_family' }
+
+    oro_entity_config.provider.deleted_attribute:
+        class: Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProvider
+        arguments:
+            - '@oro_entity_config.config_model_manager'
+            - '@oro_entity_config.provider.attribute_value'
+
+    oro_entity_config.provider.attribute_value:
+        class: Oro\Bundle\EntityConfigBundle\Provider\AttributeValueProvider
+        arguments:
+            - '@oro_entity.doctrine_helper'
+
