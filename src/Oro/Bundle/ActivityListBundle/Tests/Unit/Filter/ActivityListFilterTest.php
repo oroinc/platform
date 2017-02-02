@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 
 class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
 {
@@ -70,8 +71,8 @@ class ActivityListFilterTest extends \PHPUnit_Framework_TestCase
             $this->activityListChaingProvider,
             $this->activityListFilterHelper,
             $this->entityRouterHelper,
-            $this->queryDesignerManager,
-            $this->datagridHelper
+            new ServiceLink($this->queryDesignerManager),
+            new ServiceLink($this->datagridHelper)
         );
     }
 

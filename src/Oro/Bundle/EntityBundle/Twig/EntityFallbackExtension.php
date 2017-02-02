@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\EntityBundle\Twig;
 
-use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class EntityFallbackExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_fallback_extension';
 
     /**
-     * @var EntityFallbackResolver
+     * @var ServiceLink
      */
-    protected $fallbackResolver;
+    protected $fallbackResolverLink;
 
     /**
-     * @param $fallbackResolver
+     * @param ServiceLink $fallbackResolverLink
      */
-    public function __construct(EntityFallbackResolver $fallbackResolver)
+    public function __construct(ServiceLink $fallbackResolverLink)
     {
-        $this->fallbackResolver = $fallbackResolver;
+        $this->fallbackResolverLink = $fallbackResolverLink;
     }
 
     /**
@@ -29,7 +29,7 @@ class EntityFallbackExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction(
                 'oro_entity_fallback_value',
-                [$this->fallbackResolver, 'getFallbackValue']
+                [$this->fallbackResolverLink->getService(), 'getFallbackValue']
             ),
         ];
     }

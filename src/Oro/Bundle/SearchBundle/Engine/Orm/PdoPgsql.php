@@ -3,7 +3,7 @@ namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
@@ -11,17 +11,22 @@ use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
 {
+    /** @var array */
     public $columns = [];
+
+    /** @var string */
     public $needle;
+
+    /** @var string */
     public $mode;
 
     /**
      * Init additional doctrine functions
      *
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param ClassMetadata $class
      */
-    public function initRepo(EntityManager $em, ClassMetadata $class)
+    public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
         $ormConfig = $em->getConfiguration();
         $ormConfig->addCustomStringFunction(
