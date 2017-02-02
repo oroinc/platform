@@ -106,9 +106,9 @@ class RoleController extends Controller
      */
     public function indexAction()
     {
-        return array(
+        return [
             'entity_class' => $this->container->getParameter('oro_user.role.entity.class')
-        );
+        ];
     }
 
     /**
@@ -133,10 +133,7 @@ class RoleController extends Controller
             $publisher = $this->get('oro_wamp.publisher');
             $publisher->send('oro/outdated_user_page', ['role' => $role->getRole()]);
 
-            return $this->get('oro_ui.router')->redirect([
-                'id' => $role->getId(),
-                '_enableContentProviders' => 'mainMenu'
-            ]);
+            return $this->get('oro_ui.router')->redirect($role);
         }
 
         $form = $aclRoleHandler->createView();
