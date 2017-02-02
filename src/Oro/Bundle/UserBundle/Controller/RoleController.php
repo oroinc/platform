@@ -130,7 +130,13 @@ class RoleController extends Controller
                 $this->get('translator')->trans('oro.user.controller.role.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($role);
+            $publisher = $this->get('oro_wamp.publisher');
+            $publisher->send('oro/outdated_user_page', ['role' => $role->getRole()]);
+
+            return $this->get('oro_ui.router')->redirect([
+                'id' => $role->getId(),
+                '_enableContentProviders' => 'mainMenu'
+            ]);
         }
 
         $form = $aclRoleHandler->createView();
