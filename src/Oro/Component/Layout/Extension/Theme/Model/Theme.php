@@ -253,8 +253,8 @@ class Theme
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param string $value
      * @return $this
      */
     public function addPageTemplateTitle($key, $value)
@@ -265,12 +265,12 @@ class Theme
     }
 
     /**
-     * @param $key
-     * @return mixed|null
+     * @param string $key
+     * @return string|null
      */
     public function getPageTemplateTitle($key)
     {
-        return isset($this->pageTemplateTitles[$key]) ? $this->pageTemplateTitles[$key] : null;
+        return array_key_exists($key, $this->pageTemplateTitles) ? $this->pageTemplateTitles[$key] : null;
     }
 
     /**

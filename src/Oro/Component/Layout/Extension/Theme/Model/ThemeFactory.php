@@ -65,6 +65,7 @@ class ThemeFactory implements ThemeFactoryInterface
                 $theme->addPageTemplateTitle($routeKey, $title);
             }
         }
+
         if (isset($themeDefinition['config']['page_templates']['templates'])) {
             foreach ($themeDefinition['config']['page_templates']['templates'] as $pageTemplateConfig) {
                 $pageTemplate = new PageTemplate(

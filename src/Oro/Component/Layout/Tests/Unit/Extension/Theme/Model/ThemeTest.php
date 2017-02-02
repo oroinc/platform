@@ -124,7 +124,7 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $this->theme->getPageTemplates());
         $this->assertEquals(
-            new ArrayCollection($pageTemplate),
+            new ArrayCollection(['key_route_name' => $pageTemplate]),
             $this->theme->getPageTemplates()
         );
     }

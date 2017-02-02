@@ -5,7 +5,6 @@ namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
-use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
@@ -137,13 +136,19 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
      * @param string          $childThemeKey
      * @param array           $themesDefinitions
      * @param ArrayCollection $expectedResult
+     * @param array           $expectedTitlesResult
      */
-    public function testGetThemeMergingPageTemplates($childThemeKey, $themesDefinitions, $expectedResult)
-    {
+    public function testGetThemeMergingPageTemplates(
+        $childThemeKey,
+        $themesDefinitions,
+        $expectedResult,
+        $expectedTitlesResult
+    ) {
         $manager = new ThemeManager(new ThemeFactory(), $themesDefinitions);
         $theme = $manager->getTheme($childThemeKey);
 
         $this->assertEquals($expectedResult, $theme->getPageTemplates());
+        $this->assertEquals($expectedTitlesResult, $theme->getPageTemplateTitles());
     }
 
     /**
@@ -151,57 +156,34 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function pageTemplatesDataProvider()
     {
-        $childThemeDefinition = [
-            'label' => 'Oro Child theme',
-            'parent' => 'parent_theme',
-            'config' => [
-                'page_templates' => [
-                    'templates' => [
-                        [
-                            'label' => 'Child Page 1',
-                            'key' => 'child_1',
-                            'route_name' => 'child_route_1',
-                        ],
-                    ]
-                ]
-            ]
-        ];
+        $childThemeDefinition = $this->getThemeDefinition('Oro Child Theme', 'parent_theme', [
+            'templates' => [
+                $this->getPageTemplateDefinition('Child Page 1', 'child_1', 'child_route_1'),
+            ],
+            'titles' => [
+                'child_route_1' => 'Child Route 1',
+            ],
+        ]);
 
-        $parentThemeDefinition = [
-            'label' => 'Oro Parent theme',
-            'parent' => 'upper_theme',
-            'config' => [
-                'page_templates' => [
-                    'templates' => [
-                        [
-                            'label' => 'Parent Page 1',
-                            'key' => 'parent_1',
-                            'route_name' => 'parent_route_1',
-                        ],
-                    ]
-                ]
-            ]
-        ];
+        $parentThemeDefinition = $this->getThemeDefinition('Oro Parent Theme', 'upper_theme', [
+            'templates' => [
+                $this->getPageTemplateDefinition('Parent Page 1', 'parent_1', 'parent_route_1'),
+            ],
+            'titles' => [
+                'parent_route_1' => 'Parent Route 1',
+            ],
+        ]);
 
-        $upperThemeDefinition = [
-            'label' => 'Oro Upper Theme',
-            'config' => [
-                'page_templates' => [
-                    'templates' => [
-                        [
-                            'label' => 'Upper Page 1',
-                            'key' => 'upper_1',
-                            'route_name' => 'upper_route_1',
-                        ],
-                        [
-                            'label' => 'Upper Page 2',
-                            'key' => 'upper_2',
-                            'route_name' => 'upper_route_2',
-                        ],
-                    ]
-                ]
-            ]
-        ];
+        $upperThemeDefinition = $this->getThemeDefinition('Oro Upper Theme', null, [
+            'templates' => [
+                $this->getPageTemplateDefinition('Upper Page 1', 'upper_1', 'upper_route_1'),
+                $this->getPageTemplateDefinition('Upper Page 2', 'upper_2', 'upper_route_2'),
+            ],
+            'titles' => [
+                'upper_route_1' => 'Upper Route 1',
+                'upper_route_2' => 'Upper Route 2',
+            ],
+        ]);
 
         return [
             'is single theme' => [
@@ -213,6 +195,10 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
                     'upper_1_upper_route_1' => new PageTemplate('Upper Page 1', 'upper_1', 'upper_route_1'),
                     'upper_2_upper_route_2' => new PageTemplate('Upper Page 2', 'upper_2', 'upper_route_2'),
                 ]),
+                'expectedTitlesResult' => [
+                    'upper_route_1' => 'Upper Route 1',
+                    'upper_route_2' => 'Upper Route 2',
+                ],
             ],
             'with parent theme' => [
                 'childThemeKey' => 'parent_theme',
@@ -225,6 +211,11 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
                     'upper_1_upper_route_1' => new PageTemplate('Upper Page 1', 'upper_1', 'upper_route_1'),
                     'upper_2_upper_route_2' => new PageTemplate('Upper Page 2', 'upper_2', 'upper_route_2'),
                 ]),
+                'expectedTitlesResult' => [
+                    'parent_route_1' => 'Parent Route 1',
+                    'upper_route_1' => 'Upper Route 1',
+                    'upper_route_2' => 'Upper Route 2',
+                ],
             ],
             'recursive' => [
                 'childThemeKey' => 'child_theme',
@@ -239,60 +230,45 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
                     'upper_1_upper_route_1' => new PageTemplate('Upper Page 1', 'upper_1', 'upper_route_1'),
                     'upper_2_upper_route_2' => new PageTemplate('Upper Page 2', 'upper_2', 'upper_route_2'),
                 ]),
+                'expectedTitlesResult' => [
+                    'child_route_1' => 'Child Route 1',
+                    'parent_route_1' => 'Parent Route 1',
+                    'upper_route_1' => 'Upper Route 1',
+                    'upper_route_2' => 'Upper Route 2',
+                ],
             ]
         ];
     }
 
     /**
-     * @param Theme $parentTheme
-     * @param Theme $childTheme
+     * @param string $label
+     * @param string $key
+     * @param string $routeName
      * @return array
      */
-    private function configureThemeFactory(Theme $parentTheme, Theme $childTheme)
+    private function getPageTemplateDefinition($label, $key, $routeName)
     {
-        $parentThemeDefinition = [
-            'label' => 'Oro Parent theme',
-            'config' => []
-        ];
-
-        $childThemeDefinition = [
-            'label' => 'Oro Child theme',
-            'parent' => 'parent_theme',
-            'config' => []
-        ];
-
-        $this->factory
-            ->expects($this->exactly(2))
-            ->method('create')
-            ->withConsecutive(
-                ['child_theme', $childThemeDefinition],
-                ['parent_theme', $parentThemeDefinition]
-            )
-            ->willReturnOnConsecutiveCalls($childTheme, $parentTheme);
-
-        return  [
-            'parent_theme' => $parentThemeDefinition,
-            'child_theme' => $childThemeDefinition
+        return [
+            'label' => $label,
+            'key' => $key,
+            'route_name' => $routeName,
         ];
     }
 
-    public function testGetThemeMergingPageTemplateTitles()
+    /**
+     * @param string $label
+     * @param string $parent
+     * @param array  $pageTemplates
+     * @return array
+     */
+    private function getThemeDefinition($label, $parent, $pageTemplates)
     {
-        $childTheme = new Theme('Child theme', 'parent_theme');
-        $parentTheme = new Theme('Parent theme');
-        $parentTheme->addPageTemplateTitle('some_route', 'Some route title');
-        $parentTheme->addPageTemplateTitle('some_other_route', 'Some other route title');
-        $childTheme->addPageTemplateTitle('some_other_route', 'Some other route title from child theme');
-        $themeDefinitions = $this->configureThemeFactory($parentTheme, $childTheme);
-        $manager = $this->createManager($themeDefinitions);
-
-        $expectedPageTemplateTitles = [
-            'some_route' => 'Some route title',
-            'some_other_route' => 'Some other route title from child theme'
+        return [
+            'label' => $label,
+            'parent' => $parent,
+            'config' => [
+                'page_templates' => $pageTemplates
+            ]
         ];
-
-        $resultAfterMerge = $manager->getTheme('child_theme');
-
-        $this->assertEquals($expectedPageTemplateTitles, $resultAfterMerge->getPageTemplateTitles());
     }
 }

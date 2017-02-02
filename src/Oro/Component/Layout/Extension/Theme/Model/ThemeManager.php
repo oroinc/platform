@@ -81,6 +81,7 @@ class ThemeManager
             foreach ($parentTheme->getPageTemplates() as $parentPageTemplate) {
                 $theme->addPageTemplate($parentPageTemplate);
             }
+
             foreach ($parentTheme->getPageTemplateTitles() as $route => $title) {
                 if (!$theme->getPageTemplateTitle($route)) {
                     $theme->addPageTemplateTitle($route, $title);
