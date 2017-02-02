@@ -12,11 +12,25 @@ class DateRangeTypeTest extends AbstractTypeTestCase
     /** @var string */
     protected $defaultLocale = 'en';
 
+    /**
+     * @var string
+     */
+    protected $defaultTimezone = 'Pacific/Honolulu';
+
     protected function setUp()
     {
         parent::setUp();
 
-        $this->type = new DateRangeType();
+        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getTimezone'))
+            ->getMock();
+
+        $localeSettings->expects($this->any())
+            ->method('getTimezone')
+            ->will($this->returnValue($this->defaultTimezone));
+
+        $this->type = new DateRangeType($localeSettings);
     }
 
     /**
@@ -66,7 +80,9 @@ class DateRangeTypeTest extends AbstractTypeTestCase
                 ),
                 'customOptions' => array(
                     'field_options' => array(
-                        'format' => \IntlDateFormatter::MEDIUM
+                    'model_timezone' => 'UTC',
+                    'view_timezone' => 'UTC',
+                    'format' => \IntlDateFormatter::MEDIUM
                     )
                 )
             )

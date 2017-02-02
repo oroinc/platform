@@ -103,13 +103,15 @@ class ImportExportJobSummaryResultService
     public function getErrorLog(Job $job)
     {
         $errorLog = null;
-        foreach ($job->getChildJobs() as $key => $childrenJob) {
+        $i = 0;
+        foreach ($job->getChildJobs() as $childrenJob) {
             $childrenJobData = $childrenJob->getData();
             if (empty($childrenJobData)) {
                 continue;
             }
+            $i++;
             foreach ($childrenJobData['errors'] as $errorMessage) {
-                $errorLog .= sprintf("error in part #%s: %s\n\r", ++$key, $errorMessage);
+                $errorLog .= sprintf("error in part #%s: %s\n\r", $i, $errorMessage);
             }
         }
         return $errorLog;

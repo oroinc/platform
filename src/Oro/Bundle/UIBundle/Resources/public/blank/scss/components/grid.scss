@@ -28,6 +28,12 @@
     }
 
     &__column {
+        float: left;
+
+        box-sizing: border-box;
+
+        padding: 0 10px;
+
         &-half {
             float: left;
 
@@ -54,14 +60,6 @@
                 margin-right: $grid-offset;
             }
         }
-    }
-
-    &__column {
-        float: left;
-
-        box-sizing: border-box;
-
-        padding: 0 9px;
     }
 
     @for $i from 1 through $grid-count {
