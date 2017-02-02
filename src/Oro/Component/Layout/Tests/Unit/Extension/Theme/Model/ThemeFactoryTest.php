@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
+use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 
@@ -49,7 +50,28 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
         $fullDefinition->setDirectory('OroBlack');
         $fullDefinition->setGroups(['main', 'frontend']);
         $fullDefinition->setDescription('description');
-        $fullDefinition->setConfig(['key' => 'value']);
+
+        $config = [
+            'key' => 'value',
+            'page_templates' => [
+                'templates' => [
+                    [
+                        'label' => 'Some label',
+                        'key' => 'some_key',
+                        'route_name' => 'some_route_name',
+                        'screenshot' => 'some_screenshot',
+                        'description' => 'Some description'
+                    ]
+                ]
+            ]
+        ];
+
+        $fullDefinition->setConfig($config);
+        $pageTemplate = (new PageTemplate('Some label', 'some_key', 'some_route_name'))
+            ->setDescription('Some description')
+            ->setScreenshot('some_screenshot');
+
+        $fullDefinition->addPageTemplate($pageTemplate);
 
         return [
             'minimal definition given' => [
@@ -68,7 +90,7 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
                     'logo'       => 'oro-black-logo.png',
                     'directory'  => 'OroBlack',
                     'description' => 'description',
-                    'config' => ['key' => 'value']
+                    'config' => $config
                 ],
                 '$expectedResult' => $fullDefinition,
             ]

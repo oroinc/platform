@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class Theme
 {
     /** @var string */
@@ -34,6 +36,9 @@ class Theme
     /** @var array */
     protected $config = [];
 
+    /** @var ArrayCollection|PageTemplate[] */
+    protected $pageTemplates;
+
     /**
      * @param string $name
      * @param        $parentTheme
@@ -42,6 +47,7 @@ class Theme
     {
         $this->name        = $name;
         $this->parentTheme = $parentTheme;
+        $this->pageTemplates = new ArrayCollection();
     }
 
     /**
@@ -218,5 +224,28 @@ class Theme
             return $this->config[$key];
         }
         return $default;
+    }
+
+    /**
+     * @param PageTemplate $pageTemplate
+     * @param bool         $force
+     * @return $this
+     */
+    public function addPageTemplate(PageTemplate $pageTemplate, $force = false)
+    {
+        $key = $pageTemplate->getKey() . '_' . $pageTemplate->getRouteName();
+        if ($force === true || !$this->pageTemplates->containsKey($key)) {
+            $this->pageTemplates->set($key, $pageTemplate);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection|PageTemplate[]
+     */
+    public function getPageTemplates()
+    {
+        return $this->pageTemplates;
     }
 }
