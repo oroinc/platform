@@ -1327,8 +1327,13 @@ footer {
   li {
     margin:0 0 5px;
     float: none;
+    display: inline-block;
+  }
+
+  .icons-holder li {
     display: table-cell;
   }
+
   .nav-pills {
     padding:0 10px;
   }
@@ -1344,6 +1349,17 @@ footer {
     }
   }
 }
+
+.dropdown-menu__action-cell {
+  .launchers-list {
+    margin: 0;
+    &.icons-holder li {
+      float: none;
+      display: table-cell;
+    }
+  }
+}
+
 .launchers-dropdown-menu {
   min-width: 35px;
   &.detach .nav {

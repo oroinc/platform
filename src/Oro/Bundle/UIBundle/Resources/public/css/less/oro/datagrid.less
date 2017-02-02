@@ -190,10 +190,8 @@
   }
 }
 .dropdown-menu__action-cell {
+  min-width: 0;
   padding: 0;
-  > li {
-    display: table-cell;
-  }
 }
 .grid {
   overflow: visible;
@@ -206,19 +204,23 @@
   }
   .action-cell {
     vertical-align: top;
-    width: 50px;
+    max-width: 10%;
+    text-align: right;
+
     .dropdown-menu {
-      margin-right: -5px;
+      margin-right: -10px;
     }
     .horizontal-icon-menu;
   }
   .action-column {
-    width: 50px;
+    width: 10%;
+
     #header-cell-dropdown();
+
     [class^="fa-"],
     [class*=" fa-"] {
       font-size: @baseFontSize;
-      margin:0 2px 0 0
+      margin: 0 2px 0 0
     }
     .dropdown-menu {
       right: 0;

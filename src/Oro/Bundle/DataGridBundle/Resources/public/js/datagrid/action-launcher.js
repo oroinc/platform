@@ -98,56 +98,23 @@ define(function(require) {
          */
         initialize: function(options) {
             var opts = options || {};
+            var optKeys = [
+                'template', 'label', 'title', 'icon', 'iconHideText', 'link',
+                'iconClassName', 'className', 'runAction', 'onClickReturnValue', 'links'
+            ];
 
             if (!opts.action) {
                 throw new TypeError('"action" is required');
             }
 
-            if (opts.template) {
-                this.template = opts.template;
-            }
-
-            if (opts.label) {
-                this.label = opts.label;
-            }
-
-            if (opts.title) {
-                this.title = opts.title;
-            }
-
-            if (opts.icon) {
-                this.icon = opts.icon;
-            }
-
-            if (opts.iconHideText !== undefined) {
-                this.iconHideText = opts.iconHideText;
-            }
-
-            if (opts.link) {
-                this.link = opts.link;
-            }
-
-            if (opts.iconClassName) {
-                this.iconClassName = opts.iconClassName;
-            }
-
-            if (opts.className) {
-                this.className = opts.className;
-            }
-
-            if (_.has(opts, 'runAction')) {
-                this.runAction = opts.runAction;
-            }
-
-            if (_.has(opts, 'onClickReturnValue')) {
-                this.onClickReturnValue = opts.onClickReturnValue;
-            }
-
-            if (_.has(opts, 'links')) {
-                this.links = options.links;
-            }
-
             this.action = opts.action;
+
+            _.each(optKeys, function(name) {
+                if (_.has(opts, name)) {
+                    this[name] = opts[name];
+                }
+            }, this);
+
             ActionLauncher.__super__.initialize.apply(this, arguments);
         },
 
