@@ -19,9 +19,6 @@ class PageTemplate
     /** @var string */
     private $routeName;
 
-    /** @var string Title for route_name */
-    private $title;
-
     /**
      * @param string $key
      * @param string $label
@@ -127,24 +124,5 @@ class PageTemplate
     public function getRouteName()
     {
         return $this->routeName;
-    }
-
-    /**
-     * @param string $title
-     * @return $this
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title ?: $this->routeName;
     }
 }

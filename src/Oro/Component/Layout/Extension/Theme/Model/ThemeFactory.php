@@ -41,6 +41,22 @@ class ThemeFactory implements ThemeFactoryInterface
             $theme->setConfig($themeDefinition['config']);
         }
 
+        $this->addPageTemplatesConfig($themeDefinition, $theme);
+
+        return $theme;
+    }
+
+    /**
+     * @param array $themeDefinition
+     * @param Theme $theme
+     */
+    private function addPageTemplatesConfig(array $themeDefinition, Theme $theme)
+    {
+        if (isset($themeDefinition['config']['page_templates']['titles'])) {
+            foreach ($themeDefinition['config']['page_templates']['titles'] as $routeKey => $title) {
+                $theme->addPageTemplateTitle($routeKey, $title);
+            }
+        }
         if (isset($themeDefinition['config']['page_templates']['templates'])) {
             foreach ($themeDefinition['config']['page_templates']['templates'] as $pageTemplateConfig) {
                 $pageTemplate = new PageTemplate(
@@ -50,16 +66,8 @@ class ThemeFactory implements ThemeFactoryInterface
                 );
                 $pageTemplate->setDescription($pageTemplateConfig['description']);
                 $pageTemplate->setScreenshot($pageTemplateConfig['screenshot']);
-
-                if (isset($themeDefinition['config']['page_templates']['titles'][$pageTemplateConfig['route_name']])) {
-                    $pageTemplate->setTitle(
-                        $themeDefinition['config']['page_templates']['titles'][$pageTemplateConfig['route_name']]
-                    );
-                }
                 $theme->addPageTemplate($pageTemplate);
             }
         }
-
-        return $theme;
     }
 }

@@ -39,6 +39,9 @@ class Theme
     /** @var ArrayCollection|PageTemplate[] */
     protected $pageTemplates;
 
+    /** @var array */
+    protected $pageTemplateTitles = [];
+
     /**
      * @param string $name
      * @param        $parentTheme
@@ -245,5 +248,34 @@ class Theme
     public function getPageTemplates()
     {
         return $this->pageTemplates;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function addPageTemplateTitle($key, $value)
+    {
+        $this->pageTemplateTitles[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param $key
+     * @return mixed|null
+     */
+    public function getPageTemplateTitle($key)
+    {
+        return isset($this->pageTemplateTitles[$key]) ? $this->pageTemplateTitles[$key] : null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPageTemplateTitles()
+    {
+        return $this->pageTemplateTitles;
     }
 }

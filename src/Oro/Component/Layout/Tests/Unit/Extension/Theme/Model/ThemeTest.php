@@ -117,4 +117,29 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->theme->setConfigByKey('unknown key', 'unknown value');
         $this->assertEquals('unknown value', $this->theme->getConfigByKey('unknown key', 'default value'));
     }
+
+    public function testAddPageTemplateTitle()
+    {
+        $this->theme->addPageTemplateTitle('some_route', 'Some title');
+        $this->assertEquals('Some title', $this->theme->getPageTemplateTitle('some_route'));
+    }
+
+    public function testGetNotExistingPageTemplateTitle()
+    {
+        $this->theme->addPageTemplateTitle('some_route', 'Some title');
+        $this->assertEquals(null, $this->theme->getPageTemplateTitle('not_existing_route'));
+    }
+
+    public function testGetPageTemplateTitles()
+    {
+        $expected = [
+            'some_route' => 'Some route',
+            'some_other_route' => 'Some other route',
+        ];
+
+        $this->theme->addPageTemplateTitle('some_route', 'Some route');
+        $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
+        $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
+        $this->assertEquals($expected, $this->theme->getPageTemplateTitles());
+    }
 }

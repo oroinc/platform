@@ -132,23 +132,6 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetThemeMergingPageTemplates()
     {
-        $parentThemeDefinition = [
-            'label' => 'Oro Parent theme',
-            'config' => []
-        ];
-
-        $childThemeDefinition = [
-            'label' => 'Oro Child theme',
-            'parent' => 'parent_theme',
-            'config' => []
-        ];
-        $manager = $this->createManager(
-            [
-                'parent_theme' => $parentThemeDefinition,
-                'child_theme' => $childThemeDefinition
-            ]
-        );
-
         $childTheme = new Theme('Child theme', 'parent_theme');
         $parentTheme = new Theme('Parent theme');
         $parentPageTemplate1 = new PageTemplate('Parent page template label 1', 'page_template_1', 'some_route');
@@ -159,6 +142,34 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
         $childPageTemplate = new PageTemplate('Child Page template 1', 'page_template_1', 'some_route');
         $childTheme->addPageTemplate($childPageTemplate);
 
+        $manager = $this->createManager($this->configureThemeFactory($parentTheme, $childTheme));
+
+        $resultAfterMerge = $manager->getTheme('child_theme');
+
+        $this->assertEquals(
+            new ArrayCollection([$childPageTemplate, $parentPageTemplate2]),
+            $resultAfterMerge->getPageTemplates()
+        );
+    }
+
+    /**
+     * @param Theme $parentTheme
+     * @param Theme $childTheme
+     * @return array
+     */
+    private function configureThemeFactory(Theme $parentTheme, Theme $childTheme)
+    {
+        $parentThemeDefinition = [
+            'label' => 'Oro Parent theme',
+            'config' => []
+        ];
+
+        $childThemeDefinition = [
+            'label' => 'Oro Child theme',
+            'parent' => 'parent_theme',
+            'config' => []
+        ];
+
         $this->factory
             ->expects($this->exactly(2))
             ->method('create')
@@ -168,11 +179,29 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturnOnConsecutiveCalls($childTheme, $parentTheme);
 
+        return  [
+            'parent_theme' => $parentThemeDefinition,
+            'child_theme' => $childThemeDefinition
+        ];
+    }
+
+    public function testGetThemeMergingPageTemplateTitles()
+    {
+        $childTheme = new Theme('Child theme', 'parent_theme');
+        $parentTheme = new Theme('Parent theme');
+        $parentTheme->addPageTemplateTitle('some_route', 'Some route title');
+        $parentTheme->addPageTemplateTitle('some_other_route', 'Some other route title');
+        $childTheme->addPageTemplateTitle('some_other_route', 'Some other route title from child theme');
+        $themeDefinitions = $this->configureThemeFactory($parentTheme, $childTheme);
+        $manager = $this->createManager($themeDefinitions);
+
+        $expectedPageTemplateTitles = [
+            'some_route' => 'Some route title',
+            'some_other_route' => 'Some other route title from child theme'
+        ];
+
         $resultAfterMerge = $manager->getTheme('child_theme');
 
-        $this->assertEquals(
-            new ArrayCollection([$childPageTemplate, $parentPageTemplate2]),
-            $resultAfterMerge->getPageTemplates()
-        );
+        $this->assertEquals($expectedPageTemplateTitles, $resultAfterMerge->getPageTemplateTitles());
     }
 }
