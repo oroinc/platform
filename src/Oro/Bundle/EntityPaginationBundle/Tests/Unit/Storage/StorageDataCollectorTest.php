@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Storage;
 
-use Symfony\Component\HttpFoundation\Request;
-
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
-use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
+use Symfony\Component\HttpFoundation\Request;
 
 class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -72,7 +71,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
 
         $this->collector = new StorageDataCollector(
-            $this->datagridManager,
+            new ServiceLink($this->datagridManager),
             $this->doctrineHelper,
             $this->aclHelper,
             $this->storage,

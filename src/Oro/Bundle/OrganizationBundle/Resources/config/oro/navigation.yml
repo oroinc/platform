@@ -10,7 +10,7 @@ navigation:
                     description: 'oro.business_unit.menu.list.description'
 
             oro_organization_list:
-                label: 'oro.organization.entity_plural_label'
+                label: 'oro.organization.entity_label'
                 route: 'oro_organization_update_current'
                 extras:
                     position: 50

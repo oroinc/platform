@@ -755,7 +755,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.security_facade'
-            - '@oro_email.related_emails.provider'
+            - '@oro_email.related_emails.provider.link'
         tags:
             - { name: twig.extension }
 
@@ -802,6 +802,10 @@ services:
             - '@oro_email.email.address.helper'
             - '@oro_email.provider.email_recipients.helper'
             - '@oro_entity.entity_field_provider'
+
+    oro_email.related_emails.provider.link:
+        tags:
+            - { name: oro_service_link, service: oro_email.related_emails.provider }
 
     oro_email.email_recipients.provider:
         class: %oro_email.email_recipients.provider.class%
@@ -1199,3 +1203,8 @@ services:
         class: Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker
         arguments:
             - '@oro_email.direct_mailer'
+
+    oro_email.command.email_body_sync:
+        class: 'Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand'
+        tags:
+            - { name: console.command }
