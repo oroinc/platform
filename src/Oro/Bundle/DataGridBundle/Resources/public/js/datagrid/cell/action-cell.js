@@ -82,7 +82,7 @@ define([
 
         /** @property */
         launcherItemTemplate: _.template(
-            '<li class="launcher-item"></li>'
+            '<li class="launcher-item <%= className %>"></li>'
         ),
 
         /** @property */
@@ -226,9 +226,12 @@ define([
             } else {
                 setTimeout(_.bind(function() {
                     var $list = this.$(this.launchersListSelector);
-                    var $listItems = $list.find('.launcher-item');
+                    var listHeight = $list.height();
+                    var testListItemHeight = $list.find('.launcher-item').height() * 1.5;
 
-                    if ($list.height() > $listItems.height()) {
+
+
+                    if (listHeight > testListItemHeight) {
                         wrapDropdown();
                     }
 
@@ -287,7 +290,6 @@ define([
          */
         renderLaunchersList: function(launchers, params) {
             params = params || {};
-
             var result = $(this.launchersListTemplate(params));
             var $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
             _.each(launchers, function(launcher) {
@@ -305,7 +307,7 @@ define([
          * @return {jQuery} Rendered element wrapped with jQuery
          */
         renderLauncherItem: function(launcher, params) {
-            params = params || {};
+            params = _.extend(params || {}, {className: launcher.launcherMode || ''});
             var result = $(this.launcherItemTemplate(params));
             var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);
