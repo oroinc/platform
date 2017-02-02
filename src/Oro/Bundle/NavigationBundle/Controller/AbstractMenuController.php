@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+
 use Knp\Menu\ItemInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -130,16 +131,11 @@ abstract class AbstractMenuController extends Controller
         $scope = $this->getScope($context);
 
         $handler = $this->get('oro_navigation.tree.menu_update_tree_handler');
-        $choices = $handler->getTreeItemList($menu, false);
+        $choices = $handler->getTreeItemList($menu, true);
         $selected = $request->get('selected', []);
 
         $collection = new TreeCollection();
-
-        foreach ($choices as $choice) {
-            if (in_array($choice->getKey(), $selected)) {
-                $collection->source[$choice->getKey()] = $choice;
-            }
-        }
+        $collection->source = array_intersect_key($choices, array_flip($selected));
 
         $form = $this->createForm(TreeMoveType::class, $collection, [
             'source_config' => [

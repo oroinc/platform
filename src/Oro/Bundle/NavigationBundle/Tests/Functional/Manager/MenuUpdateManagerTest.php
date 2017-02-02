@@ -13,6 +13,7 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UIBundle\Model\TreeItem;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
