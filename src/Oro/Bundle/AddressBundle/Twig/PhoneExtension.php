@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\AddressBundle\Twig;
 
-use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class PhoneExtension extends \Twig_Extension
 {
     /**
-     * @var PhoneProvider
+     * @var ServiceLink
      */
-    protected $provider;
+    protected $providerLink;
 
     /**
-     * @param PhoneProvider $provider
+     * @param ServiceLink $providerLink
      */
-    public function __construct(PhoneProvider $provider)
+    public function __construct(ServiceLink $providerLink)
     {
-        $this->provider = $provider;
+        $this->providerLink = $providerLink;
     }
 
     /**
@@ -40,7 +40,7 @@ class PhoneExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->provider->getPhoneNumber($object);
+        return $this->providerLink->getService()->getPhoneNumber($object);
     }
 
     /**
@@ -54,7 +54,7 @@ class PhoneExtension extends \Twig_Extension
         }
 
         $result = [];
-        foreach ($this->provider->getPhoneNumbers($object) as $row) {
+        foreach ($this->providerLink->getService()->getPhoneNumbers($object) as $row) {
             $result[] = ['phone' => $row[0], 'object' => $row[1]];
         }
 
