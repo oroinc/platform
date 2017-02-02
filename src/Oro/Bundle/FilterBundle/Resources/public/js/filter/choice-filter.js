@@ -228,8 +228,22 @@ define([
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+            if (!tools.isEqualsLoosely(newValue, oldValue) && (!this._isEmpty(newValue.value) ||
+                (!this._isEmpty(oldValue.value) && this._isEmpty(newValue.value)))) {
                 this.trigger('update');
+            }
+        },
+
+        /**
+         * Is a given integer, array, string, or object empty
+         * @param {Object} value
+         * @return {Boolean}
+         */
+        _isEmpty: function(value) {
+            if (_.isNumber(value)) {
+                return false;
+            } else {
+                return _.isEmpty(value);
             }
         },
 
