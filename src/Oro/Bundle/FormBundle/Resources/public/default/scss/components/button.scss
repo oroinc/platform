@@ -35,6 +35,44 @@
         }
     }
 
+    &--default {
+        border-color: get-color('additional', 'light');
+        background-color: get-color('additional', 'ultra');
+        color: get-color('additional', 'dark');
+
+        @include element-state('hover') {
+            border-color: darken(get-color('additional', 'light'), 3%);
+            background-color: darken(get-color('additional', 'ultra'), 3%);
+            color: get-color('additional', 'dark');
+        }
+
+        @include element-state('focus') {
+            border-color: darken(get-color('additional', 'light'), 5%);
+        }
+
+        &.pressed {
+            background: get-color('additional', 'base');
+            
+            box-shadow: $btn-shadow;
+        }
+
+        &.btn-toggle {
+            &:after {
+                content: '';
+
+                display: inline-block;
+                width: 0;
+                height: 0;
+
+                border-top: 4px solid;
+                border-right: 4px solid transparent;
+                border-left: 4px solid transparent;
+
+                vertical-align: middle;
+            }
+        }
+    }
+
     &--create {
         border-color: get-color('primary', 'base');
         background-color: get-color('primary', 'base');
@@ -120,9 +158,12 @@
 
     &--size {
         &-s {
+            padding: 0 10px;
+
             font-size: $base-font-size;
-            padding: 0 20px;
             line-height: 30px;
+
+            border-radius: 6px;
         }
         &-m {
             font-size: 17px;
@@ -130,8 +171,9 @@
         }
 
         &-l {
-            padding: 10px 15px;
             font-size: $base-font-size--l;
+
+            padding: 10px 15px;
             line-height: 54px;
         }
 

@@ -44,11 +44,14 @@ define(function(require) {
         /** @property {String} */
         icon: undefined,
 
+        /** @property {String} */
+        iconClassName: undefined,
+
         /** @property {Boolean} */
         iconHideText: config.iconHideText,
 
         /** @property {String} */
-        iconClassName: undefined,
+        launcherMode: config.launcherMode,
 
         /** @property {String} */
         className: undefined,
@@ -84,6 +87,7 @@ define(function(require) {
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
          * @param {String} [options.icon]
+         * @param {Boolean} [options.launcherMode]
          * @param {Boolean} [options.iconHideText]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
@@ -108,6 +112,10 @@ define(function(require) {
 
             if (opts.iconHideText !== undefined) {
                 this.iconHideText = opts.iconHideText;
+            }
+
+            if (opts.launcherMode) {
+                this.launcherMode = opts.launcherMode;
             }
 
             if (opts.className) {
@@ -135,6 +143,7 @@ define(function(require) {
             }
             delete this.action;
             delete this.runAction;
+            delete this.launcherMode;
             SelectChoiceLauncher.__super__.dispose.apply(this, arguments);
         },
 
@@ -144,10 +153,11 @@ define(function(require) {
             return {
                 label: label,
                 icon: this.selectedItem.icon,
-                iconHideText: this.iconHideText,
                 title: this.selectedItem.title,
                 className: this.selectedItem.className,
                 iconClassName: this.selectedItem.iconClassName,
+                iconHideText: this.iconHideText,
+                launcherMode: this.launcherMode,
                 link: this.link,
                 links: this.items,
                 action: this.action,

@@ -16,7 +16,7 @@ _.each(attributes, function(attribute, name) { %>
         <% } else { %>
             <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
         <% } %>
-        <%= label %>
+        <% if (!iconHideText) { %><%= label %><% } %>
     </a>
     <div class="dropdown-menu"></div>
 </div>

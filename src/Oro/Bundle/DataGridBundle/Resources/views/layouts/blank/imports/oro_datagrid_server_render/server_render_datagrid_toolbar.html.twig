@@ -11,6 +11,14 @@
     </div>
 {% endblock %}
 
+{% block __oro_datagrid_server_render__datagrid_items_counter_widget %}
+    {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
+
+    {% if toolbarPosition != 'bottom' %}
+        <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+    {% endif %}
+{% endblock %}
+
 {% block __oro_datagrid_server_render__datagrid_toolbar_pagination_widget %}
     <div{{ block('block_attributes') }}>
         {% set metadata = oro_datagrid_metadata(datagrid) %}
@@ -23,13 +31,13 @@
 
         <div class="oro-pagination__pager">
             <a href="{% if currentPage <= 1 %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage - 1) }}{% endif %}"
-               class="oro-pagination__prev{% if currentPage <= 1 %} disabled{% endif %}"
+               class="btn btn--size-s btn--default oro-pagination__prev{% if currentPage <= 1 %} disabled{% endif %}"
                data-grid-pagination-trigger data-grid-pagination-direction="prev">
                 <i class="fa-angle-left fa--base-line"></i>
                 {{ "oro.datagrid.pagination.prev"|trans }}
             </a>
 
-            <input type="text" class="oro-pagination__input" value="{{ currentPage }}"
+            <input type="text" class="input input--size-s oro-pagination__input" value="{{ currentPage }}"
                    data-grid-pagination-trigger-input/>
 
             <span class="oro-pagination__total">
@@ -38,7 +46,7 @@
             </span>
 
             <a href="{% if currentPage >= totalPages %}#{% else %}{{ oro_datagrid_get_page_url(datagrid, currentPage + 1) }}{% endif %}"
-               class="oro-pagination__next{% if currentPage >= totalPages %} disabled{% endif %}"
+               class="btn btn--size-s btn--default oro-pagination__next{% if currentPage >= totalPages %} disabled{% endif %}"
                data-grid-pagination-trigger data-grid-pagination-direction="next">
                 {{ "oro.datagrid.pagination.next"|trans }}
                 <i class="fa-angle-right fa--base-line"></i>
