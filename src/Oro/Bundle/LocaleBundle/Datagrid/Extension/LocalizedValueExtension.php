@@ -39,15 +39,16 @@ class LocalizedValueExtension extends AbstractExtension
     protected $propertyAccessor;
 
     /**
-     * @param DoctrineHelper      $doctrineHelper
+     * @param DoctrineHelper $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
-     * @param LocalizationHelper  $localizationHelper
+     * @param LocalizationHelper $localizationHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
         LocalizationHelper $localizationHelper
-    ) {
+    )
+    {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityClassResolver = $entityClassResolver;
         $this->localizationHelper = $localizationHelper;
@@ -129,6 +130,11 @@ class LocalizedValueExtension extends AbstractExtension
                 $joinType
             );
 
+            // in case of left join , use only default localization
+            if ($shouldAllowEmpty) {
+                $queryBuilder->andWhere(sprintf('%s.id IS NOT NULL', Inflector::pluralize($name)));
+            }
+
             if ($queryBuilder->getDQLPart('groupBy')) {
                 $queryBuilder->addGroupBy($name);
             }
@@ -199,7 +205,7 @@ class LocalizedValueExtension extends AbstractExtension
             $config->offsetGetOr(Configuration::PROPERTIES_KEY, []),
             function ($property) {
                 return isset($property[LocalizedValueProperty::TYPE_KEY]) &&
-                    $property[LocalizedValueProperty::TYPE_KEY] === LocalizedValueProperty::NAME;
+                $property[LocalizedValueProperty::TYPE_KEY] === LocalizedValueProperty::NAME;
             }
         );
 
