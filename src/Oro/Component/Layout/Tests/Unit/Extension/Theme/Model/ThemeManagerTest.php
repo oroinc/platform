@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 
@@ -130,26 +131,116 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
         return new ThemeManager($this->factory, $definitions);
     }
 
-    public function testGetThemeMergingPageTemplates()
+    /**
+     * @dataProvider pageTemplatesDataProvider
+     *
+     * @param string          $childThemeKey
+     * @param array           $themesDefinitions
+     * @param ArrayCollection $expectedResult
+     */
+    public function testGetThemeMergingPageTemplates($childThemeKey, $themesDefinitions, $expectedResult)
     {
-        $childTheme = new Theme('Child theme', 'parent_theme');
-        $parentTheme = new Theme('Parent theme');
-        $parentPageTemplate1 = new PageTemplate('Parent page template label 1', 'page_template_1', 'some_route');
-        $parentPageTemplate2 = new PageTemplate('Parent page template label 2', 'page_template_2', 'some_route');
-        $parentTheme->addPageTemplate($parentPageTemplate1);
-        $parentTheme->addPageTemplate($parentPageTemplate2);
-        //Overwrites Parent page template 1
-        $childPageTemplate = new PageTemplate('Child Page template 1', 'page_template_1', 'some_route');
-        $childTheme->addPageTemplate($childPageTemplate);
+        $manager = new ThemeManager(new ThemeFactory(), $themesDefinitions);
+        $theme = $manager->getTheme($childThemeKey);
 
-        $manager = $this->createManager($this->configureThemeFactory($parentTheme, $childTheme));
+        $this->assertEquals($expectedResult, $theme->getPageTemplates());
+    }
 
-        $resultAfterMerge = $manager->getTheme('child_theme');
+    /**
+     * @return array
+     */
+    public function pageTemplatesDataProvider()
+    {
+        $childThemeDefinition = [
+            'label' => 'Oro Child theme',
+            'parent' => 'parent_theme',
+            'config' => [
+                'page_templates' => [
+                    'templates' => [
+                        [
+                            'label' => 'Child Page 1',
+                            'key' => 'child_1',
+                            'route_name' => 'child_route_1',
+                        ],
+                    ]
+                ]
+            ]
+        ];
 
-        $this->assertEquals(
-            new ArrayCollection([$childPageTemplate, $parentPageTemplate2]),
-            $resultAfterMerge->getPageTemplates()
-        );
+        $parentThemeDefinition = [
+            'label' => 'Oro Parent theme',
+            'parent' => 'upper_theme',
+            'config' => [
+                'page_templates' => [
+                    'templates' => [
+                        [
+                            'label' => 'Parent Page 1',
+                            'key' => 'parent_1',
+                            'route_name' => 'parent_route_1',
+                        ],
+                    ]
+                ]
+            ]
+        ];
+
+        $upperThemeDefinition = [
+            'label' => 'Oro Upper Theme',
+            'config' => [
+                'page_templates' => [
+                    'templates' => [
+                        [
+                            'label' => 'Upper Page 1',
+                            'key' => 'upper_1',
+                            'route_name' => 'upper_route_1',
+                        ],
+                        [
+                            'label' => 'Upper Page 2',
+                            'key' => 'upper_2',
+                            'route_name' => 'upper_route_2',
+                        ],
+                    ]
+                ]
+            ]
+        ];
+
+        return [
+            'is single theme' => [
+                'childThemeKey' => 'upper_theme',
+                'themesDefinitions' => [
+                    'upper_theme' => $upperThemeDefinition,
+                ],
+                'expectedResult' => new ArrayCollection([
+                    'upper_1_upper_route_1' => new PageTemplate('Upper Page 1', 'upper_1', 'upper_route_1'),
+                    'upper_2_upper_route_2' => new PageTemplate('Upper Page 2', 'upper_2', 'upper_route_2'),
+                ]),
+            ],
+            'with parent theme' => [
+                'childThemeKey' => 'parent_theme',
+                'themesDefinitions' => [
+                    'parent_theme' => $parentThemeDefinition,
+                    'upper_theme' => $upperThemeDefinition,
+                ],
+                'expectedResult' => new ArrayCollection([
+                    'parent_1_parent_route_1' => new PageTemplate('Parent Page 1', 'parent_1', 'parent_route_1'),
+                    'upper_1_upper_route_1' => new PageTemplate('Upper Page 1', 'upper_1', 'upper_route_1'),
+                    'upper_2_upper_route_2' => new PageTemplate('Upper Page 2', 'upper_2', 'upper_route_2'),
+                ]),
+            ],
+            'recursive' => [
+                'childThemeKey' => 'child_theme',
+                'themesDefinitions' => [
+                    'child_theme' => $childThemeDefinition,
+                    'parent_theme' => $parentThemeDefinition,
+                    'upper_theme' => $upperThemeDefinition
+                ],
+                'expectedResult' => new ArrayCollection([
+                    'child_1_child_route_1' => new PageTemplate('Child Page 1', 'child_1', 'child_route_1'),
+                    'parent_1_parent_route_1' => new PageTemplate('Parent Page 1', 'parent_1', 'parent_route_1'),
+                    'upper_1_upper_route_1' => new PageTemplate('Upper Page 1', 'upper_1', 'upper_route_1'),
+                    'upper_2_upper_route_2' => new PageTemplate('Upper Page 2', 'upper_2', 'upper_route_2'),
+                ]),
+            ]
+        ];
     }
 
     /**

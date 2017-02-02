@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ThemeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Theme */
@@ -92,15 +95,38 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
-        $this->assertEquals(new ArrayCollection([$pageTemplate]), $this->theme->getPageTemplates());
+
+        $this->assertEquals(
+            new ArrayCollection(['key_route_name' => $pageTemplate]),
+            $this->theme->getPageTemplates()
+        );
+    }
+
+    public function testAddPageTemplateForce()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+        $newPageTemplate = new PageTemplate('NewLabel', 'key', 'route_name');
+        $this->theme->addPageTemplate($newPageTemplate, true);
+
+        $this->assertEquals(
+            new ArrayCollection(['key_route_name' => $newPageTemplate]),
+            $this->theme->getPageTemplates()
+        );
     }
 
     public function testAddPageTemplateAlreadyExists()
     {
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
-        $this->theme->addPageTemplate($pageTemplate);
+        $newPageTemplate = new PageTemplate('NewLabel', 'key', 'route_name');
+        $this->theme->addPageTemplate($newPageTemplate);
+
         $this->assertCount(1, $this->theme->getPageTemplates());
+        $this->assertEquals(
+            new ArrayCollection($pageTemplate),
+            $this->theme->getPageTemplates()
+        );
     }
 
     public function testConfigMethods()

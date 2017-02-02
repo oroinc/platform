@@ -231,12 +231,14 @@ class Theme
 
     /**
      * @param PageTemplate $pageTemplate
+     * @param bool         $force
      * @return $this
      */
-    public function addPageTemplate(PageTemplate $pageTemplate)
+    public function addPageTemplate(PageTemplate $pageTemplate, $force = false)
     {
-        if (!$this->pageTemplates->contains($pageTemplate)) {
-            $this->pageTemplates->add($pageTemplate);
+        $key = $pageTemplate->getKey() . '_' . $pageTemplate->getRouteName();
+        if ($force === true || !$this->pageTemplates->containsKey($key)) {
+            $this->pageTemplates->set($key, $pageTemplate);
         }
 
         return $this;

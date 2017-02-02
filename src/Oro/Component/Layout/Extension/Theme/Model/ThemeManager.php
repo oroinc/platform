@@ -70,6 +70,7 @@ class ThemeManager
 
     /**
      * @param Theme $theme
+     *
      * @return Theme
      */
     private function mergePageTemplates(Theme $theme)
@@ -78,19 +79,7 @@ class ThemeManager
             $parentTheme = $this->getTheme($theme->getParentTheme());
 
             foreach ($parentTheme->getPageTemplates() as $parentPageTemplate) {
-                $isOverwritten = $theme->getPageTemplates()->exists(
-                    function ($key, $childPageTemplate) use ($parentPageTemplate) {
-                        /** @var PageTemplate $childPageTemplate */
-                        return (
-                            $parentPageTemplate->getRouteName() === $childPageTemplate->getRouteName() &&
-                            $parentPageTemplate->getKey() === $childPageTemplate->getKey()
-                        );
-                    }
-                );
-
-                if (!$isOverwritten) {
-                    $theme->addPageTemplate($parentPageTemplate);
-                }
+                $theme->addPageTemplate($parentPageTemplate);
             }
             foreach ($parentTheme->getPageTemplateTitles() as $route => $title) {
                 if (!$theme->getPageTemplateTitle($route)) {

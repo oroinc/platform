@@ -6,8 +6,6 @@ class ThemeFactory implements ThemeFactoryInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function create($themeName, array $themeDefinition)
     {
@@ -16,6 +14,23 @@ class ThemeFactory implements ThemeFactoryInterface
             isset($themeDefinition['parent']) ? $themeDefinition['parent'] : null
         );
 
+        $this->applyThemeProperties($theme, $themeDefinition);
+
+        if (isset($themeDefinition['config'])) {
+            $theme->setConfig($themeDefinition['config']);
+        }
+
+        $this->addPageTemplatesConfig($themeDefinition, $theme);
+
+        return $theme;
+    }
+
+    /**
+     * @param Theme $theme
+     * @param array $themeDefinition
+     */
+    private function applyThemeProperties(Theme $theme, array $themeDefinition)
+    {
         if (isset($themeDefinition['label'])) {
             $theme->setLabel($themeDefinition['label']);
         }
@@ -37,13 +52,6 @@ class ThemeFactory implements ThemeFactoryInterface
         if (isset($themeDefinition['description'])) {
             $theme->setDescription($themeDefinition['description']);
         }
-        if (isset($themeDefinition['config'])) {
-            $theme->setConfig($themeDefinition['config']);
-        }
-
-        $this->addPageTemplatesConfig($themeDefinition, $theme);
-
-        return $theme;
     }
 
     /**
@@ -64,8 +72,13 @@ class ThemeFactory implements ThemeFactoryInterface
                     $pageTemplateConfig['key'],
                     $pageTemplateConfig['route_name']
                 );
-                $pageTemplate->setDescription($pageTemplateConfig['description']);
-                $pageTemplate->setScreenshot($pageTemplateConfig['screenshot']);
+                if (isset($pageTemplateConfig['description'])) {
+                    $pageTemplate->setDescription($pageTemplateConfig['description']);
+                }
+                if (isset($pageTemplateConfig['screenshot'])) {
+                    $pageTemplate->setScreenshot($pageTemplateConfig['screenshot']);
+                }
+
                 $theme->addPageTemplate($pageTemplate);
             }
         }

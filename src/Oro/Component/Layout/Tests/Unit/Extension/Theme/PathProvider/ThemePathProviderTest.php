@@ -30,13 +30,15 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
      * @param string|null $theme
      * @param string|null $route
      * @param string|null $action
+     * @param string|null $pageTemplate
      */
-    public function testGetPaths(array $expectedResults, $theme, $route, $action)
+    public function testGetPaths(array $expectedResults, $theme, $route, $action, $pageTemplate)
     {
         $context = new LayoutContext();
         $context->set('theme', $theme);
         $context->set('route_name', $route);
         $context->set('action', $action);
+        $context->set('page_template', $pageTemplate);
         $this->setUpThemeManager(
             [
                 'black' => $this->getThemeMock('black', 'base'),
@@ -57,7 +59,8 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
                 'expectedResults' => [],
                 'theme'           => null,
                 'route'           => null,
-                'action'          => null
+                'action'          => null,
+                'page_template'   => null,
             ],
             [
                 'expectedResults' => [
@@ -65,7 +68,8 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'theme'           => 'base',
                 'route'           => null,
-                'action'          => null
+                'action'          => null,
+                'page_template'   => null,
             ],
             [
                 'expectedResults' => [
@@ -74,7 +78,8 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'theme'           => 'base',
                 'route'           => 'route',
-                'action'          => null
+                'action'          => null,
+                'page_template'   => null,
             ],
             [
                 'expectedResults' => [
@@ -85,7 +90,8 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'theme'           => 'black',
                 'route'           => 'route',
-                'action'          => null
+                'action'          => null,
+                'page_template'   => null,
             ],
             [
                 'expectedResults' => [
@@ -95,7 +101,8 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'theme'           => 'base',
                 'route'           => 'route',
-                'action'          => 'index'
+                'action'          => 'index',
+                'page_template'   => null,
             ],
             [
                 'expectedResults' => [
@@ -108,7 +115,24 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'theme'           => 'black',
                 'route'           => 'route',
-                'action'          => 'index'
+                'action'          => 'index',
+                'page_template'   => null,
+            ],
+            [
+                'expectedResults' => [
+                    'base',
+                    'black',
+                    'base/index',
+                    'black/index',
+                    'base/route',
+                    'black/route',
+                    'base/route/page_template/sample_page_template',
+                    'black/route/page_template/sample_page_template'
+                ],
+                'theme'           => 'black',
+                'route'           => 'route',
+                'action'          => 'index',
+                'page_template'   => 'sample_page_template',
             ]
         ];
     }
