@@ -48,6 +48,7 @@ class CountQueryBuilderOptimizer
      * Get optimized query builder for count calculation.
      *
      * @param QueryBuilder $queryBuilder
+     *
      * @return QueryBuilder
      * @throws \Exception
      */
@@ -60,11 +61,9 @@ class CountQueryBuilderOptimizer
             $this->context = null;
 
             return $qb;
-        } catch (\Exception $e) {
+        } finally {
             // make sure that a link to the context is removed even if an exception occurred
             $this->context = null;
-            // rethrow an exception
-            throw $e;
         }
     }
 
@@ -159,43 +158,52 @@ class CountQueryBuilderOptimizer
         $havingAliases  = $this->qbTools->getUsedTableAliases($originalQueryParts['having']);
         $joinAliases    = array_merge($whereAliases, $groupByAliases, $havingAliases);
         $joinAliases    = array_unique($joinAliases);
+        $fromQueryPart = $originalQueryParts['from'];
+        $joinQueryPart = $originalQueryParts['join'];
 
         // this joins cannot be removed outside of this class
         $requiredJoinAliases = $joinAliases;
 
-        if ($useNonSymmetricJoins) {
-            $joinAliases = array_merge(
-                $joinAliases,
-                $this->getNonSymmetricJoinAliases(
-                    $originalQueryParts['from'],
-                    $originalQueryParts['join'],
-                    $groupByAliases
-                )
-            );
-        }
+        $rootAliases = array_map(
+            function ($from) {
+                return $from->getAlias();
+            },
+            $fromQueryPart
+        );
 
-        $rootAliases = [];
-        /** @var Expr\From $from */
-        foreach ($originalQueryParts['from'] as $from) {
-            $rootAliases[] = $from->getAlias();
-            $joinAliases   = array_merge(
-                $joinAliases,
-                $this->qbTools->getUsedJoinAliases($originalQueryParts['join'], $joinAliases, $from->getAlias())
-            );
-        }
+        $joinAliases = $this->addRequiredJoins(
+            $joinAliases,
+            $fromQueryPart,
+            $joinQueryPart,
+            $groupByAliases,
+            $useNonSymmetricJoins
+        );
 
-        $allAliases          = $this->context->getAliases();
-        $joinAliases         = array_intersect(array_diff(array_unique($joinAliases), $rootAliases), $allAliases);
-        $requiredJoinAliases = array_intersect(array_diff($requiredJoinAliases, $rootAliases), $allAliases);
+        $requiredJoinAliases = array_intersect(
+            array_diff($requiredJoinAliases, $rootAliases),
+            $this->context->getAliases()
+        );
 
+        $collectedAliases = $joinAliases;
         $joinAliases = $this->dispatchQueryOptimizationEvent($joinAliases, $requiredJoinAliases);
 
+        // additional check joins after the events in case if events change joins list
+        if (count($joinAliases) !== count($collectedAliases)) {
+            $joinAliases = $this->addRequiredJoins(
+                $requiredJoinAliases,
+                $fromQueryPart,
+                $this->removeAliasesFromQueryJoinParts($joinQueryPart, $joinAliases),
+                $groupByAliases,
+                $useNonSymmetricJoins
+            );
+        }
+
         foreach ($rootAliases as $rootAlias) {
-            if (!isset($originalQueryParts['join'][$rootAlias])) {
+            if (!isset($joinQueryPart[$rootAlias])) {
                 continue;
             }
             /** @var Expr\Join $join */
-            foreach ($originalQueryParts['join'][$rootAlias] as $join) {
+            foreach ($joinQueryPart[$rootAlias] as $join) {
                 $alias = $join->getAlias();
                 // To count results number join all tables with inner join and required to tables
                 if ($join->getJoinType() === Expr\Join::INNER_JOIN || in_array($alias, $joinAliases, true)) {
@@ -421,6 +429,7 @@ class CountQueryBuilderOptimizer
      * then them also should be selected as DISTINCT in optimized Query Builder.
      *
      * @param array $originalQueryParts
+     *
      * @return array
      */
     protected function getFieldsToSelect(array $originalQueryParts)
@@ -451,5 +460,77 @@ class CountQueryBuilderOptimizer
         }
 
         return $fieldsToSelect;
+    }
+
+    /**
+     * Removes list of aliases from original query parts
+     *
+     * @param array $originalQueryParts
+     * @param array $joinAliases
+     *
+     * @return array
+     */
+    protected function removeAliasesFromQueryJoinParts(array $originalQueryParts, array $joinAliases)
+    {
+        $filteredJoins = [];
+        foreach ($originalQueryParts as $root => $joins) {
+            foreach ($joins as $declaration) {
+                /** @var Expr\Join $name */
+                $name = $declaration->getAlias();
+                if (in_array($name, $joinAliases)) {
+                    if (!array_key_exists($root, $filteredJoins)) {
+                        $filteredJoins[$root] = [];
+                    }
+                    $filteredJoins[$root][] = $declaration;
+                }
+            }
+        }
+
+        return $filteredJoins;
+    }
+
+    /**
+     * Collect and add the joins should be added to query
+     *
+     * @param array   $joinAliases
+     * @param array   $fromQueryPart
+     * @param array   $joinQueryPart
+     * @param array   $groupByAliases
+     * @param boolean $useNonSymmetricJoins
+     *
+     * @return array
+     */
+    protected function addRequiredJoins(
+        array $joinAliases,
+        array $fromQueryPart,
+        array $joinQueryPart,
+        array $groupByAliases,
+        $useNonSymmetricJoins
+    ) {
+        if ($useNonSymmetricJoins) {
+            $joinAliases = array_merge(
+                $joinAliases,
+                $this->getNonSymmetricJoinAliases(
+                    $fromQueryPart,
+                    $joinQueryPart,
+                    $groupByAliases
+                )
+            );
+        }
+
+        $rootAliases = [];
+        /** @var Expr\From $from */
+        foreach ($fromQueryPart as $from) {
+            $rootAliases[] = $from->getAlias();
+            $joinAliases = array_merge(
+                $joinAliases,
+                $this->qbTools->getUsedJoinAliases($joinQueryPart, $joinAliases, $from->getAlias())
+            );
+        }
+
+        $allAliases = $this->context->getAliases();
+        $joinAliases = array_intersect(array_diff(array_unique($joinAliases), $rootAliases), $allAliases);
+
+        return $joinAliases;
     }
 }

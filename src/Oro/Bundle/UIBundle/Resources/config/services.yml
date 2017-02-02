@@ -143,10 +143,14 @@ services:
     oro_ui.formatter:
         class: %oro_ui.formatter.class%
 
+    oro_ui.formatter.link:
+        tags:
+            - { name: oro_service_link,  service: oro_ui.formatter }
+
     oro_ui.twig.extension.formatter:
         class: %oro_ui.twig.extension.formatter.class%
         arguments:
-            - '@oro_ui.formatter'
+            - '@oro_ui.formatter.link'
         tags:
             - { name: twig.extension }
 

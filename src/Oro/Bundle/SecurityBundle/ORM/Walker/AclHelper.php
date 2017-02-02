@@ -48,6 +48,9 @@ class AclHelper
     /** @var AclConditionalFactorBuilder */
     protected $aclConditionFactorBuilder;
 
+    /** @var bool */
+    private $checkRootEntity = true;
+
     /**
      * @param OwnershipConditionDataBuilder $builder
      * @param EventDispatcherInterface      $eventDispatcher
@@ -126,8 +129,19 @@ class AclHelper
 
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
-            list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
-            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : []);
+            if ($this->checkRootEntity) {
+                list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
+                if (!$checkRelations) {
+                    $joinConditions = [];
+                }
+            } elseif ($checkRelations) {
+                $whereConditions = [];
+                $joinConditions = $this->processJoins($ast, $permission);
+            } else {
+                $whereConditions = [];
+                $joinConditions = [];
+            }
+            $conditionStorage = new AclConditionStorage($whereConditions, $joinConditions);
             if ($ast->whereClause) {
                 $this->processSubselects($ast, $conditionStorage, $permission);
             }
@@ -148,6 +162,17 @@ class AclHelper
         }
 
         return $query;
+    }
+
+    /**
+     * Sets a flag indicates whether the root entity should be protected by ACL or not.
+     * The separate method is used instead of a parameter in "apply" method to avoid BC break.
+     *
+     * @param bool $checkRootEntity
+     */
+    public function setCheckRootEntity($checkRootEntity)
+    {
+        $this->checkRootEntity = $checkRootEntity;
     }
 
     /**
@@ -230,8 +255,6 @@ class AclHelper
     protected function processSelect($select, $permission)
     {
         $whereConditions = [];
-        $joinConditions  = [];
-
         $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             $condition = $this->processRangeVariableDeclaration(
@@ -242,9 +265,33 @@ class AclHelper
             if ($condition) {
                 $whereConditions[] = $condition;
             }
+        }
 
-            // check joins
+        $joinConditions = $this->processJoins($select, $permission);
+
+        $event = new ProcessSelectAfter($select, $whereConditions, $joinConditions);
+        $this->eventDispatcher->dispatch(ProcessSelectAfter::NAME, $event);
+
+        $whereConditions = $event->getWhereConditions();
+        $joinConditions  = $event->getJoinConditions();
+
+        return [$whereConditions, $joinConditions];
+    }
+
+    /**
+     * @param Subselect|SelectStatement $select
+     * @param string                    $permission
+     *
+     * @return array
+     */
+    protected function processJoins($select, $permission)
+    {
+        $joinConditions  = [];
+
+        $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
+        foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             if (!empty($identificationVariableDeclaration->joins)) {
+                $this->addEntityAlias($identificationVariableDeclaration->rangeVariableDeclaration);
                 /** @var $join Join */
                 foreach ($identificationVariableDeclaration->joins as $joinKey => $join) {
                     //check if join is simple join (join some_table on (some_table.id = parent_table.id))
@@ -270,13 +317,7 @@ class AclHelper
             }
         }
 
-        $event = new ProcessSelectAfter($select, $whereConditions, $joinConditions);
-        $this->eventDispatcher->dispatch(ProcessSelectAfter::NAME, $event);
-
-        $whereConditions = $event->getWhereConditions();
-        $joinConditions  = $event->getJoinConditions();
-
-        return [$whereConditions, $joinConditions];
+        return $joinConditions;
     }
 
     /**

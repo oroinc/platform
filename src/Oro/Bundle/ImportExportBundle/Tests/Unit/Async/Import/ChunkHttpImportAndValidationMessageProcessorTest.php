@@ -206,7 +206,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
             ->method('find')
             ->with(1)
             ->willReturn($user);
-        ;
+
         $doctrine = $this->createDoctrineMock();
         $doctrine
             ->expects($this->once())
@@ -225,14 +225,13 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
                         return $callback($jobRunner, $job);
                     }
                 )
-            )
-        ;
+            );
+
         $logger = $this->createLoggerInterfaceMock();
         $logger
             ->expects($this->once())
             ->method('info')
-            ->with('Import of the csv is completed, success: 1, info: imports was done, message: ')
-        ;
+            ->with('Import of the csv is completed, success: 1, info: imports was done, message: ');
 
         $httpImportHandler = $this->createHttpImportHandlerMock();
         $httpImportHandler
@@ -251,12 +250,15 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
                     'message' => '',
                 ]
             );
-        ;
         $jobStorage = $this->createJobStorageMock();
         $jobStorage
             ->expects($this->once())
-            ->method('saveJob')
-            ;
+            ->method('saveJob');
+        $jobStorage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(1)
+            ->willReturn($job);
         $processor = new ChunkHttpImportMessageProcessor(
             $httpImportHandler,
             $jobRunner,
@@ -282,8 +284,7 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
                         'options' => [],
                     ]
                 )
-            )
-        ;
+            );
         $result = $processor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -379,6 +380,12 @@ class ChunkHttpImportAndValidationMessageProcessorTest extends \PHPUnit_Framewor
         $jobStorage
             ->expects($this->once())
             ->method('saveJob');
+        $jobStorage
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with(1)
+            ->willReturn($job);
+
         $processor = new ChunkHttpImportValidationMessageProcessor(
             $httpImportHandler,
             $jobRunner,

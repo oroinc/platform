@@ -66,8 +66,8 @@
             'loadingMaskEnabled': false
         }) }}
         <script type="text/javascript">
-            require(['jquery', 'oroui/js/mediator', 'oroui/js/widget-manager', 'oroworkflow/js/transition-executor'],
-            function($, mediator, widgetManager, performTransition) {
+            require(['jquery', 'oroui/js/mediator', 'oroui/js/widget-manager', 'oroworkflow/js/transition-executor', 'oroworkflow/js/transition-event-handlers'],
+            function($, mediator, widgetManager, performTransition, TransitionEventHandlers) {
                 var saveAndTransitBtn = $('#save-and-transit');
 
                 widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
@@ -81,6 +81,16 @@
 
                     widget.on('formSaveError', function() {
                         mediator.execute('hideLoading');
+                    });
+
+                    widget.on('transitionSuccess', function(response) {
+                        var element = $('<div>');
+                        TransitionEventHandlers.getOnSuccess(element)(response);
+                    });
+
+                    widget.on('transitionFailure', function(responseCode) {
+                        var element = $('<div>');
+                        TransitionEventHandlers.getOnFailure(element)({status: responseCode}, '', '');
                     });
                 });
 
