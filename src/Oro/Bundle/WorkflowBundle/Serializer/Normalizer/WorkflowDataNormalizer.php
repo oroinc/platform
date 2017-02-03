@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
-use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
@@ -34,7 +37,16 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
     {
         $attributes = array();
         $workflow = $this->getWorkflow();
+
+        $workflowConfig = $workflow->getDefinition()->getConfiguration();
+        $variableNames = $this->getVariablesNamesFromConfiguration($workflowConfig);
+
         foreach ($object as $attributeName => $attributeValue) {
+            // skip variable serialization
+            if (in_array($attributeName, $variableNames, true)) {
+                continue;
+            }
+
             $attribute = $this->getAttribute($workflow, $attributeName);
             $attributeValue = $this->normalizeAttribute($workflow, $attribute, $attributeValue);
 
@@ -70,6 +82,13 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
         /** @var WorkflowData $object */
         $object = new $class($denormalizedData);
         $object->setFieldsMapping($workflow->getAttributesMapping());
+
+        // populate WorkflowData with variables
+        $workflowConfig = $workflow->getDefinition()->getConfiguration();
+        if ($variables = $this->assembleVariables($workflow, $workflowConfig)) {
+            //$denormalized = $this->denormalizeVariables($workflow, $variables);
+            $object->add($variables->toArray());
+        }
 
         return $object;
     }
@@ -108,11 +127,11 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * @param Workflow $workflow
-     * @param Attribute $attribute
+     * @param AttributeInterface $attribute
      * @param mixed $attributeValue
      * @return mixed
      */
-    protected function normalizeAttribute(Workflow $workflow, Attribute $attribute, $attributeValue)
+    protected function normalizeAttribute(Workflow $workflow, AttributeInterface $attribute, $attributeValue)
     {
         $normalizer = $this->findAttributeNormalizer('normalization', $workflow, $attribute, $attributeValue);
         return $normalizer->normalize($workflow, $attribute, $attributeValue);
@@ -120,12 +139,12 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * @param Workflow $workflow
-     * @param Attribute $attribute
+     * @param AttributeInterface $attribute
      * @param mixed $attributeValue
      * @return AttributeNormalizer
      * @throws SerializerException
      */
-    protected function denormalizeAttribute(Workflow $workflow, Attribute $attribute, $attributeValue)
+    protected function denormalizeAttribute(Workflow $workflow, AttributeInterface $attribute, $attributeValue)
     {
         $normalizer = $this->findAttributeNormalizer('denormalization', $workflow, $attribute, $attributeValue);
         return $normalizer->denormalize($workflow, $attribute, $attributeValue);
@@ -134,13 +153,17 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
     /**
      * @param string $direction
      * @param Workflow $workflow
-     * @param Attribute $attribute
+     * @param AttributeInterface $attribute
      * @param mixed $attributeValue
      * @return AttributeNormalizer
      * @throws SerializerException
      */
-    protected function findAttributeNormalizer($direction, Workflow $workflow, Attribute $attribute, $attributeValue)
-    {
+    protected function findAttributeNormalizer(
+        $direction,
+        Workflow $workflow,
+        AttributeInterface $attribute,
+        $attributeValue
+    ) {
         $method = 'supports' . ucfirst($direction);
         foreach ($this->attributeNormalizers as $normalizer) {
             if ($normalizer->$method($workflow, $attribute, $attributeValue)) {
@@ -203,5 +226,55 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
             );
         }
         return $this->serializer->getWorkflow();
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param array    $configuration
+     *
+     * @return ArrayCollection
+     */
+    protected function assembleVariables(Workflow $workflow, array $configuration)
+    {
+        $manager = $workflow->getVariableManager();
+
+        return $manager->getVariableAssembler()->assemble(
+            $workflow->getDefinition(),
+            $configuration
+        );
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return array
+     */
+    protected function getVariablesNamesFromConfiguration(array $configuration)
+    {
+        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variablesNode   = WorkflowConfiguration::NODE_VARIABLES;
+
+        if (!isset($configuration[$definitionsNode][$variablesNode])) {
+            return [];
+        }
+
+        return array_keys($configuration[$definitionsNode][$variablesNode]);
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param ArrayCollection $variables
+     *
+     * @return array
+     */
+    protected function denormalizeVariables(Workflow $workflow, ArrayCollection $variables)
+    {
+        $denormalizedData = [];
+        foreach ($variables as $name => $variable) {
+            /** @var Variable $variable */
+            $denormalizedData[$name] = $this->denormalizeAttribute($workflow, $variable, $variable->getValue());
+        }
+
+        return $denormalizedData;
     }
 }

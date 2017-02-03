@@ -59,16 +59,33 @@ return [
             'variables' => [
                 'var1' => [
                     'type' => 'string',
-                    'value' => 'Var1Value'
+                    'value' => 'Var1Value',
+                    'options' => [],
                 ],
                 'var2' => [
                     'type' => null,
-                    'value' => 'Var2Value'
+                    'value' => 'Var2Value',
+                    'options' => [],
                 ],
                 'var3' => [
                     'type' => 'string',
-                    'value' => 'Var3Value'
-                ]
+                    'value' => 'Var3Value',
+                    'options' => [],
+                ],
+                'var4' => [
+                    'type' => 'entity',
+                    'value' => null,
+                    'options' => [
+                        'class' => 'DateTime',
+                    ],
+                ],
+                'var5' => [
+                    'type' => 'entity',
+                    'value' => null,
+                    'options' => [
+                        'class' => 'DateTime',
+                    ],
+                ],
             ]
         ],
         'disable_operations' => [

@@ -58,6 +58,11 @@ class Workflow
     protected $transitionManager;
 
     /**
+     * @var VariableManager
+     */
+    protected $variableManager;
+
+    /**
      * @var Collection
      */
     protected $errors;
@@ -79,6 +84,7 @@ class Workflow
      * @param StepManager|null $stepManager
      * @param BaseAttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
+     * @param VariableManager|null $variableManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -86,7 +92,8 @@ class Workflow
         RestrictionManager $restrictionManager,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
-        TransitionManager $transitionManager = null
+        TransitionManager $transitionManager = null,
+        VariableManager $variableManager = null
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->aclManager = $aclManager;
@@ -94,6 +101,7 @@ class Workflow
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager = $attributeManager ? $attributeManager : new BaseAttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
+        $this->variableManager = $variableManager ? $variableManager : new VariableManager();
     }
 
     /**
@@ -146,6 +154,14 @@ class Workflow
     public function getTransitionManager()
     {
         return $this->transitionManager;
+    }
+
+    /**
+     * @return VariableManager
+     */
+    public function getVariableManager()
+    {
+        return $this->variableManager;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-class Attribute
+class Attribute implements AttributeInterface
 {
     /**
      * @var string
@@ -33,6 +33,11 @@ class Attribute
      * @var array
      */
     protected $options = array();
+
+    /**
+     * @var string
+     */
+    private static $internalType = AttributeInterface::INTERNAL_TYPE_ATTRIBUTE;
 
     /**
      * Set attribute type
@@ -198,5 +203,23 @@ class Attribute
         $this->propertyPath = $propertyPath;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInternalType()
+    {
+        return static::$internalType;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isInternalType($type)
+    {
+        return ($type === static::$internalType);
     }
 }

@@ -49,6 +49,15 @@ workflows:
                 var2:
                     value: 'Var2Value'
                 var3: 'Var3Value'
+                var4:
+                    type: 'entity'
+                    value: ~
+                    options:
+                        class: DateTime
+                var5:
+                    type: 'entity'
+                    options:
+                        class: DateTime
 
         disable_operations:
             operation1: [entity1, entity2]

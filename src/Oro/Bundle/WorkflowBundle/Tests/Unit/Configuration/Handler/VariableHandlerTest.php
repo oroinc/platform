@@ -83,6 +83,36 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
+            'no value configuration' => [
+                'expected' => [
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            [
+                                'name'  => 'test_variable',
+                                'value' => null,
+                                'label' => 'Test Variable',
+                                'type'  => 'entity',
+                                'options' => [
+                                    'class' => 'DateTime'
+                                ]
+                            ],
+                        ],
+                    ],
+                ],
+                'input' => [
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_variable' => [
+                                'label' => 'Test Variable', //should be kept as filtering disposed to another class
+                                'type'  => 'entity',
+                                'options' => [
+                                    'class' => 'DateTime'
+                                ]
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             'full configuration' => [
                 'expected' => [
                     WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
@@ -92,6 +122,9 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                                 'value' => 'value_1',
                                 'label' => 'Test Variable',
                                 'type'  => 'entity',
+                                'options' => [
+                                    'class' => 'DateTime'
+                                ]
                             ],
                         ],
                     ],
@@ -103,6 +136,9 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                                 'value' => 'value_1',
                                 'label' => 'Test Variable', //should be kept as filtering disposed to another class
                                 'type'  => 'entity',
+                                'options' => [
+                                    'class' => 'DateTime'
+                                ]
                             ],
                         ],
                     ],
