@@ -8,12 +8,14 @@ define(function(require) {
     var ShowComponentAction = require('oro/datagrid/action/show-component-action');
     var ColumnsCollection = require('orodatagrid/js/app/models/column-manager/columns-collection');
     var ColumnManagerComponent = require('orodatagrid/js/app/components/column-manager-component');
+    var FrontendColumnManagerComponent = require('orofrontend/js/app/components/column-manager-component');
 
     var config = require('module').config();
     config = _.extend({
         icon: 'cog',
         wrapperClassName: 'column-manager',
-        label: __('oro.datagrid.column_manager.title')
+        label: __('oro.datagrid.column_manager.title'),
+        customColumnManagerComponent: false
     }, config);
 
     ColumnManagerPlugin = BasePlugin.extend({
@@ -27,7 +29,7 @@ define(function(require) {
             var options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
-                    componentConstructor: ColumnManagerComponent,
+                    componentConstructor: config.customColumnManagerComponent ? FrontendColumnManagerComponent : ColumnManagerComponent,
                     columns: this.main.columns,
                     managedColumns: this.managedColumns,
                     addSorting: true

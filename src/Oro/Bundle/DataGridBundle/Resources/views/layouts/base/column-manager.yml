@@ -1,0 +1,11 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'column-manager.html.twig'
+        - '@addTree':
+            items:
+                column_manager:
+                    blockType: block
+            tree:
+                page_container:
+                    column_manager: ~

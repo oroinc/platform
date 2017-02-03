@@ -54,6 +54,8 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['columns', 'grid']));
 
+            this.templateSelector = options.templateSelector;
+
             this.managedColumns = options.managedColumns;
 
             this.addSorting = options.addSorting;
@@ -107,7 +109,8 @@ define(function(require) {
             this.columnManagerView = new ColumnManagerView({
                 el: options._sourceElement,
                 collection: this.managedColumns,
-                columnFilterModel: this.columnFilterModel
+                columnFilterModel: this.columnFilterModel,
+                templateSelector: this.templateSelector
             });
             this.columnFilterView = new ColumnFilterView({
                 el: this.columnManagerView.$('.column-manager-filter').get(0),

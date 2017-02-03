@@ -5,12 +5,15 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
+
     ColumnManagerView = BaseView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager.html'),
         autoRender: true,
         className: 'dropdown-menu',
         events: {
-            'click [data-role="column-manager-select-all"]': 'onSelectAll'
+            'click [data-role="column-manager-select-all"]': 'onSelectAll',
+            'click [data-role="column-manager-unselect-all"]': 'onunselectAll',
+            'click [data-role="column-manager-reset"]': 'reset'
         },
 
         listen: {
@@ -18,6 +21,9 @@ define(function(require) {
         },
 
         initialize: function(options) {
+            if(options.templateSelector){
+                this.template = _.template($(options.templateSelector).html());
+            }
             ColumnManagerView.__super__.initialize.call(this, options);
             this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
             // to handle renderable change at once for multiple changes
@@ -52,6 +58,19 @@ define(function(require) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
                 model.set('renderable', true);
+            });
+        },
+        onunselectAll: function(e) {
+            e.preventDefault();
+            _.each(this._getFilteredModels(), function(model) {
+                model.set('renderable', false);
+            });
+        },
+
+        reset: function (e) {
+            e.preventDefault();
+            _.each(this._getFilteredModels(), function(model) {
+                model.set('renderable', model.get('metadata').renderable);
             });
         },
 
