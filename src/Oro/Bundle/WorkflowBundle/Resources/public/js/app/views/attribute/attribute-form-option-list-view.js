@@ -53,8 +53,10 @@ define(function(require) {
             }
             var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
             var $fieldChoice = this.options.fields_selector_el;
+            var hasEntityField = this.options.workflow.hasEntityField(fieldId);
             data.isSystemLabel = !data.label;
-            if (fieldId) {
+
+            if (fieldId && hasEntityField) {
                 if (!data.label) {
                     data.label = _.last($fieldChoice.fieldChoice('splitFieldId', fieldId)).field.label;
                 }
@@ -64,7 +66,13 @@ define(function(require) {
                     var attribute = this.options.workflow.getAttributeByName(data.attribute_name);
                     data.label = attribute.get('label');
                 }
-                data.entityField = data.property_path || data.attribute_name;
+
+                if (hasEntityField) {
+                    data.entityField = data.property_path || data.attribute_name;
+                } else {
+                    data.entityField = data.attribute_name;
+                    data.is_entity_attribute = null;
+                }
             }
 
             var viewId = data.view_id ||
