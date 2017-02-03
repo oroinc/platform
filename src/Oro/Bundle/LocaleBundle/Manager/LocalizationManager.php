@@ -7,34 +7,43 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheHelper;
 
 class LocalizationManager
 {
-    const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
-
     /**
      * @var DoctrineHelper
      */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @var LocalizationRepository
      */
-    protected $repository;
+    private $repository;
 
     /**
      * @var ConfigManager
      */
-    protected $configManager;
+    private $configManager;
+
+    /**
+     * @var LocalizationCacheHelper
+     */
+    private $localizationCacheHelper;
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager  $configManager
+     * @param ConfigManager $configManager
+     * @param LocalizationCacheHelper $localizationCacheHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager,
+        LocalizationCacheHelper $localizationCacheHelper
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager = $configManager;
+        $this->localizationCacheHelper = $localizationCacheHelper;
     }
 
     /**
@@ -56,30 +65,21 @@ class LocalizationManager
      */
     public function getLocalizations(array $ids = null)
     {
-        $localizations = $this->getRepository()->findBy([], ['name' => 'ASC']);
-        $localizations = array_combine(
-            array_map(
-                function (Localization $element) {
-                    return $element->getId();
-                },
-                $localizations
-            ),
-            array_values($localizations)
-        );
+        $cache = $this->localizationCacheHelper->get();
+
+        if ($cache === false) {
+            $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
+            $cache = $this->associateLocalizationsArray($cache);
+            $this->localizationCacheHelper->save($cache);
+        }
 
         if (null === $ids) {
-            return $localizations;
-        } else {
-            $keys = array_filter(
-                array_keys($localizations),
-                function ($key) use ($ids) {
-                    // strict comparing is not allowed because ID might be represented by a string
-                    return in_array($key, $ids);
-                }
-            );
-
-            return array_intersect_key($localizations, array_flip($keys));
+            return $cache;
         }
+
+        $keys = $this->filterOnlyExistingKeys($ids, $cache);
+
+        return array_intersect_key($cache, array_flip($keys));
     }
 
     /**
@@ -112,5 +112,44 @@ class LocalizationManager
         }
 
         return $this->repository;
+    }
+
+    /**
+     * Set ids of the localizations as keys
+     *
+     * @param Localization[] $localizations
+     * @return Localization[]
+     */
+    private function associateLocalizationsArray(array $localizations)
+    {
+        $localizations = array_combine(
+            array_map(
+                function (Localization $element) {
+                    return $element->getId();
+                },
+                $localizations
+            ),
+            $localizations
+        );
+
+        return $localizations;
+    }
+
+    /**
+     * @param array $ids
+     * @param Localization[] $localizations
+     * @return array
+     */
+    private function filterOnlyExistingKeys(array $ids, $localizations)
+    {
+        $keys = array_filter(
+            array_keys($localizations),
+            function ($key) use ($ids) {
+                // strict comparing is not allowed because ID might be represented by a string
+                return in_array($key, $ids);
+            }
+        );
+
+        return $keys;
     }
 }

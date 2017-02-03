@@ -8,6 +8,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheHelper;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -28,6 +29,9 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
+    /** @var LocalizationCacheHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $localizationCacheHelper;
+
     /** @var Localization[]|array */
     protected $entities = [];
 
@@ -40,12 +44,12 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepositoryForClass')
-            ->with(Localization::class)
-            ->willReturn($this->repository);
 
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->localizationCacheHelper = $this->getMockBuilder(LocalizationCacheHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -56,7 +60,11 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             2 => $this->getEntity(Localization::class, ['id' => 2]),
         ];
 
-        $this->manager = new LocalizationManager($this->doctrineHelper, $this->configManager);
+        $this->manager = new LocalizationManager(
+            $this->doctrineHelper,
+            $this->configManager,
+            $this->localizationCacheHelper
+        );
     }
 
     public function tearDown()
@@ -74,6 +82,8 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         /** @var Localization $entity */
         $entity = $this->getEntity(Localization::class, ['id' => 1]);
 
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->assertCacheReads(false);
         $this->assertRepositoryCalls();
 
         $result = $this->manager->getLocalization($entity->getId());
@@ -83,7 +93,19 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLocalizations()
     {
+        $this->assertGetEntityRepositoryForClassIsCalled();
         $this->assertRepositoryCalls();
+        $this->assertCacheReads(false);
+
+        $result = $this->manager->getLocalizations();
+
+        $this->assertEquals($this->entities, $result);
+    }
+
+    public function testGetLocalizationsCached()
+    {
+        $this->assertGetEntityRepositoryForClassIsNotCalled();
+        $this->assertCacheReads($this->entities);
 
         $result = $this->manager->getLocalizations();
 
@@ -92,7 +114,9 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLocalizationsByIds()
     {
+        $this->assertGetEntityRepositoryForClassIsCalled();
         $this->assertRepositoryCalls();
+        $this->assertCacheReads(false);
 
         /** @var Localization[] $entities */
         $entities = [
@@ -109,6 +133,9 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDefaultLocalization()
     {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->assertCacheReads(false);
+
         $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
         $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
 
@@ -126,6 +153,9 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFirstLocalizationWhenNoDefaultLocalizationExist()
     {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->assertCacheReads(false);
+
         $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
         $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
 
@@ -142,6 +172,8 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultLocalizationIsNullWhenNoLocalizationsExist()
     {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->assertCacheReads(false);
         $this->repository->expects($this->once())->method('findBy')->willReturn([]);
 
         $this->configManager->expects($this->once())
@@ -154,6 +186,9 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFirstLocalizationWhenUnknownDefaultLocalizationReturnedFromConfig()
     {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->assertCacheReads(false);
+
         $localization1 = $this->getEntity(Localization::class, ['id' => 1]);
         $localization2 = $this->getEntity(Localization::class, ['id' => 2]);
 
@@ -172,5 +207,29 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->repository->expects($this->never())->method('find');
         $this->repository->expects($this->once())->method('findBy')->willReturn($this->entities);
+    }
+
+    /**
+     * @param $results
+     */
+    protected function assertCacheReads($results)
+    {
+        $this->localizationCacheHelper->expects($this->once())
+            ->method('get')
+            ->willReturn($results);
+    }
+
+    private function assertGetEntityRepositoryForClassIsCalled()
+    {
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->with(Localization::class)
+            ->willReturn($this->repository);
+    }
+
+    private function assertGetEntityRepositoryForClassIsNotCalled()
+    {
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityRepositoryForClass');
     }
 }
