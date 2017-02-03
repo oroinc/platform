@@ -10,6 +10,9 @@
 
         order: $page-content-with-sidebar-order;
     }
+    &--has-sidebar-right {
+        padding: $page-content-with-sidebar-right-inner-offset;
+    }
 }
 
 @include breakpoint('desktop') {

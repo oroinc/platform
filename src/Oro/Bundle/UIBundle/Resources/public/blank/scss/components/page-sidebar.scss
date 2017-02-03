@@ -6,6 +6,12 @@
 
     order: $page-sidebar-order;
     flex: $page-sidebar-flex;
+
+    &--right {
+        padding: $page-sidebar-right-inner-offset;
+
+        order: $page-sidebar-right-order;
+    }
 }
 
 @include breakpoint('tablet') {
