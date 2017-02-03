@@ -110,8 +110,19 @@ services:
         class: 'Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader'
         arguments:
             - '@doctrine'
+            - '@oro_translation.database_checker'
         tags:
             - { name: translation.loader, alias: oro_database_translation }
+
+    oro_translation.database_checker:
+        public: false
+        class: Oro\Bundle\EntityBundle\Tools\DatabaseChecker
+        arguments:
+            - '@doctrine'
+            - ['oro_translation']
+            - '%installed%'
+        tags:
+            - { name: oro_entity.database_checker }
 
     oro_translation.empty_array.loader:
         class: %oro_translation.empty_array.loader.class%

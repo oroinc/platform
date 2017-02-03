@@ -2,6 +2,7 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Psr\Log\LoggerInterface;
+
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -147,8 +148,8 @@ abstract class AbstractChunkImportMessageProcessor implements MessageProcessorIn
     {
         unset($data['message']);
         unset($data['importInfo']);
-        $this->jobStorage->saveJob($job, function (Job $job) use ($data) {
-            $job->setData($data);
-        });
+        $job = $this->jobStorage->findJobById($job->getId());
+        $job->setData($data);
+        $this->jobStorage->saveJob($job);
     }
 }

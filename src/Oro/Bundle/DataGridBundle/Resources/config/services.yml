@@ -110,7 +110,7 @@ services:
     oro_datagrid.twig.datagrid:
         class: 'Oro\Bundle\DataGridBundle\Twig\DataGridExtension'
         arguments:
-            - '@oro_datagrid.datagrid.manager'
+            - '@oro_datagrid.datagrid.manager.link'
             - '@oro_datagrid.datagrid.name_strategy'
             - '@router'
             - '@oro_security.security_facade'
