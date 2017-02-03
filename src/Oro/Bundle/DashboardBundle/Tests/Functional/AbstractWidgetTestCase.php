@@ -62,4 +62,25 @@ class AbstractWidgetTestCase extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertEquals($response->getStatusCode(), 200, "Failed in submit widget configuration options !");
     }
+
+    /**
+     * Returns data for which will be used to show widget's chart
+     *
+     * @param $crawler
+     * @return array
+     */
+    protected function getChartData($crawler)
+    {
+        $dataComponent = $crawler->filter('.column-chart');
+        if ($dataComponent->extract(['data-page-component-options'])) {
+            $data = $dataComponent->extract(['data-page-component-options']);
+            $data = json_decode($data[0]);
+            return $data->chartOptions->dataSource->data;
+        } else {
+            $dataComponent = $crawler->filter('.dashboard-widget-content > [data-page-component-options]');
+            $data = $dataComponent->extract(['data-page-component-options']);
+            $data = json_decode($data[0]);
+            return $data->data;
+        }
+    }
 }
