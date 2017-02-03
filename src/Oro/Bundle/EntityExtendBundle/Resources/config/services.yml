@@ -72,6 +72,7 @@ services:
             - "@oro_entity_config.config_manager"
             - "@oro_entity.orm.entity_class_resolver"
             - "@oro_datagrid.datagrid.guesser"
+            - "@oro_featuretoggle.checker.feature_checker"
         tags:
             - { name: oro_datagrid.extension }
 
@@ -82,6 +83,7 @@ services:
             - "@router"
             - "@translator"
             - "@oro_entity.doctrine_helper"
+            - "@oro_featuretoggle.checker.feature_checker"
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
@@ -329,6 +331,7 @@ services:
             - "@oro_entity_extend.extend.field_type_helper"
             - "@event_dispatcher"
             - "@oro_security.security_facade"
+            - "@oro_featuretoggle.checker.feature_checker"
         tags:
             - { name: twig.extension }
 

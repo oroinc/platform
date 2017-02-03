@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -13,16 +10,19 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 {
@@ -47,6 +47,9 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param ConfigManager            $configManager
      * @param FieldTypeHelper          $fieldTypeHelper
@@ -57,15 +60,17 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
         ConfigManager $configManager,
         FieldTypeHelper $fieldTypeHelper,
         EventDispatcherInterface $dispatcher,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        FeatureChecker $featureChecker
     ) {
         $this->fieldTypeHelper  = $fieldTypeHelper;
         $this->eventDispatcher  = $dispatcher;
         $this->viewProvider     = $configManager->getProvider('view');
         $this->extendProvider   = $configManager->getProvider('extend');
         $this->entityProvider   = $configManager->getProvider('entity');
+        $this->securityFacade   = $securityFacade;
+        $this->featureChecker   = $featureChecker;
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -129,6 +134,13 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
             && !ExtendHelper::isEntityAccessible(
                 $this->extendProvider->getConfig($extendConfig->get('target_entity'))
             )
+        ) {
+            return false;
+        }
+
+        // skip disabled entities by feature flags
+        if ($extendConfig->has('target_entity')
+            && !$this->featureChecker->isResourceEnabled($extendConfig->get('target_entity'), 'entities')
         ) {
             return false;
         }

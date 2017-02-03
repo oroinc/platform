@@ -2,17 +2,41 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class DynamicFieldsExtension extends AbstractFieldsExtension
 {
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
+    /**
+     * @param ConfigManager       $configManager
+     * @param EntityClassResolver $entityClassResolver
+     * @param DatagridGuesser     $datagridGuesser
+     * @param FeatureChecker      $featureChecker
+     */
+    public function __construct(
+        ConfigManager $configManager,
+        EntityClassResolver $entityClassResolver,
+        DatagridGuesser $datagridGuesser,
+        FeatureChecker $featureChecker
+    ) {
+        parent::__construct($configManager, $entityClassResolver, $datagridGuesser);
+
+        $this->featureChecker = $featureChecker;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -70,10 +94,9 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         /** @var FieldConfigId $fieldId */
         foreach ($fieldIds as $fieldId) {
             $extendConfig = $extendConfigProvider->getConfigById($fieldId);
-            if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                && ExtendHelper::isFieldAccessible($extendConfig)
-                && $datagridConfigProvider->getConfigById($fieldId)->is('is_visible')
-            ) {
+            $fieldConfig = $datagridConfigProvider->getConfigById($fieldId);
+
+            if ($this->isApplicableField($extendConfig, $fieldConfig)) {
                 $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
                 $fields[] = [
                     'id'       => $fieldId,
@@ -102,5 +125,24 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         if ($this->getFieldConfig('datagrid', $field)->is('show_filter')) {
             $columnOptions[DatagridGuesser::FILTER]['enabled'] = true;
         }
+    }
+
+    /**
+     * @param ConfigInterface $extendConfig
+     * @param ConfigInterface $fieldConfig
+     *
+     * @return bool
+     */
+    protected function isApplicableField(ConfigInterface $extendConfig, ConfigInterface $fieldConfig)
+    {
+        if ($extendConfig->has('target_entity')
+            && !$this->featureChecker->isResourceEnabled($extendConfig->get('target_entity'), 'entities')
+        ) {
+            return false;
+        }
+
+        return $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+                && ExtendHelper::isFieldAccessible($extendConfig)
+                && $fieldConfig->is('is_visible');
     }
 }
