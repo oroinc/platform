@@ -28,6 +28,7 @@ services:
 
     oro_filter.form.type.date_range:
         class: %oro_filter.form.type.date_range.class%
+        arguments: ["@oro_locale.settings"]
         tags:
             - { name: form.type, alias: oro_type_date_range }
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\UIBundle\Twig\FormatExtension;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 
 class FormatExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +17,7 @@ class FormatExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager = $this->getMockBuilder('Oro\Bundle\UIBundle\Formatter\FormatterManager')
             ->getMock();
-        $this->extension = new FormatExtension($this->manager);
+        $this->extension = new FormatExtension(new ServiceLink($this->manager));
     }
 
     public function testGetFilters()

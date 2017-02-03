@@ -60,6 +60,24 @@ services:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -60 }
 
     #
+    # resource_check
+    #
+
+    oro_api.delete_list.resource_availability_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ActionAvailabilityCheck
+        arguments:
+            - '@oro_api.resources_provider'
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: resource_check, priority: 20 }
+
+    oro_api.delete_list.entity_type_feature_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: resource_check, priority: 10 }
+
+    #
     # normalize_input
     #
 
@@ -217,6 +235,11 @@ services:
            - 204
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -30 }
+
+    oro_api.delete_list.rest.remove_response_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveResponseErrors
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -35 }
 
     oro_api.delete_list.rest.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument

@@ -18,6 +18,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
         public: false
+        deprecated: ~
 
     oro_search.search.engine.indexer:
         class: '%oro_search.engine.indexer.class%'

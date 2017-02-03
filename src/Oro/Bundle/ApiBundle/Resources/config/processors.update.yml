@@ -36,6 +36,24 @@ services:
             - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
 
     #
+    # resource_check
+    #
+
+    oro_api.update.resource_availability_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ActionAvailabilityCheck
+        arguments:
+            - '@oro_api.resources_provider'
+        tags:
+            - { name: oro.api.processor, action: update, group: resource_check, priority: 20 }
+
+    oro_api.update.entity_type_feature_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro.api.processor, action: update, group: resource_check, priority: 10 }
+
+    #
     # normalize_input
     #
 
@@ -101,13 +119,6 @@ services:
     #
     # security_check
     #
-
-    oro_api.update.entity_type_feature_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
-        arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
-        tags:
-            - { name: oro.api.processor, action: update, group: security_check, priority: 20 }
 
     oro_api.update.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
@@ -295,6 +306,11 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         tags:
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: -30 }
+
+    oro_api.update.rest.remove_response_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveResponseErrors
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: -35 }
 
     oro_api.update.rest.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
