@@ -12,11 +12,8 @@ class BeforeRemoveFieldEvent extends SymfonyEvent
     /** @var string */
     protected $fieldName;
 
-    /** @var bool */
-    protected $hasErrors = false;
-
-    /** @var string */
-    protected $validationMessage = '';
+    /** @var string[] */
+    protected $validationMessages = [];
 
     /**
      * @param string $className The FQCN of an entity
@@ -45,40 +42,21 @@ class BeforeRemoveFieldEvent extends SymfonyEvent
     }
 
     /**
-     * @param bool $hasErrors
-     * @return $this
-     */
-    public function setHasErrors($hasErrors)
-    {
-        $this->hasErrors = $hasErrors;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasErrors()
-    {
-        return $this->hasErrors;
-    }
-
-    /**
      * @param string $validationMessage
      * @return $this
      */
-    public function setValidationMessage($validationMessage)
+    public function addValidationMessage($validationMessage)
     {
-        $this->validationMessage = $validationMessage;
+        $this->validationMessages[] = $validationMessage;
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getValidationMessage()
+    public function getValidationMessages()
     {
-        return $this->validationMessage;
+        return $this->validationMessages;
     }
 }

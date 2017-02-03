@@ -13,13 +13,10 @@ class BeforeRemoveFieldEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('className', $event->getClassName());
         $this->assertEquals('fieldName', $event->getFieldName());
 
-        $this->assertFalse($event->hasErrors());
-        $this->assertEquals('', $event->getValidationMessage());
+        $this->assertEquals([], $event->getValidationMessages());
 
-        $event->setHasErrors(true);
-        $event->setValidationMessage('Validation Message');
+        $event->addValidationMessage('Validation Message');
 
-        $this->assertTrue($event->hasErrors());
-        $this->assertEquals('Validation Message', $event->getValidationMessage());
+        $this->assertEquals(['Validation Message'], $event->getValidationMessages());
     }
 }

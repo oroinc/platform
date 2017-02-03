@@ -63,12 +63,18 @@ class RemoveRestoreConfigFieldHandler
         $event = new BeforeRemoveFieldEvent($field->getEntity()->getClassName(), $field->getFieldName());
         $this->eventDispatcher->dispatch(Events::BEFORE_REMOVE_FIELD, $event);
 
-        if ($event->hasErrors()) {
-            $validationMessage = $event->getValidationMessage();
+        if ($validationMessages = $event->getValidationMessages()) {
+            foreach ($validationMessages as $validationMessage) {
+                $this->session->getFlashBag()->add('error', $validationMessage);
+            }
 
-            $this->session->getFlashBag()->add('error', $validationMessage);
-
-            return new JsonResponse(['message' => $validationMessage, 'successful' => false], JsonResponse::HTTP_OK);
+            return new JsonResponse(
+                [
+                    'message' => implode('. ', $validationMessages),
+                    'successful' => false
+                ],
+                JsonResponse::HTTP_OK
+            );
         }
 
         $fields = $this->configHelper->filterEntityConfigByField(
