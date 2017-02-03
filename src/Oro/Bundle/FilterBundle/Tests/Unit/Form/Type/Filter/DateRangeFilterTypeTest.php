@@ -22,8 +22,17 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
 
         $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
 
+        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getTimezone'))
+            ->getMock();
+
+        $localeSettings->expects($this->any())
+            ->method('getTimezone')
+            ->will($this->returnValue('UTC'));
+
         $types = array(
-            new DateRangeType(),
+            new DateRangeType($localeSettings),
             new FilterType($translator)
         );
 

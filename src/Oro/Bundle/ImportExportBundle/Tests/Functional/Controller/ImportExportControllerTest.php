@@ -23,11 +23,7 @@ class ImportExportControllerTest extends WebTestCase
             $this->getUrl('oro_importexport_export_instant', ['processorAlias' => 'oro_account'])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        $this->assertCount(1, $result);
-        $this->assertTrue($result['success']);
+        $this->assertJsonResponseSuccess();
 
         $organization = $this->getSecurityFacade()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
@@ -57,11 +53,7 @@ class ImportExportControllerTest extends WebTestCase
             ])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        $this->assertCount(1, $result);
-        $this->assertTrue($result['success']);
+        $this->assertJsonResponseSuccess();
 
         $organization = $this->getSecurityFacade()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
@@ -79,6 +71,76 @@ class ImportExportControllerTest extends WebTestCase
         ]);
     }
 
+    public function testImportProcessAction()
+    {
+        $options = [
+            'first' => 'first value',
+            'second' => 'second value',
+        ];
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_import_process',
+                [
+                    'processorAlias' => 'oro_account',
+                    'importJob' => JobExecutor::JOB_IMPORT_FROM_CSV,
+                    'fileName' => 'test_file',
+                    'originFileName' => 'test_file_original',
+                    'options' => $options,
+                ]
+            )
+        );
+
+        $this->assertJsonResponseSuccess();
+
+        $this->assertMessageSent(
+            Topics::IMPORT_HTTP_PREPARING,
+            [
+                'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
+                'processorAlias' => 'oro_account',
+                'filePath' => 'test_file',
+                'originFileName' => 'test_file_original',
+                'options' => $options,
+                'userId' => $this->getCurrentUser()->getId(),
+            ]
+        );
+    }
+
+    public function testImportValidateAction()
+    {
+        $options = [
+            'first' => 'first value',
+            'second' => 'second value',
+        ];
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_import_validate',
+                [
+                    'processorAlias' => 'oro_account',
+                    'importValidateJob' => JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
+                    'fileName' => 'test_file',
+                    'originFileName' => 'test_file_original',
+                    'options' => $options,
+                ]
+            )
+        );
+
+        $this->assertJsonResponseSuccess();
+
+        $this->assertMessageSent(
+            Topics::IMPORT_HTTP_VALIDATION_PREPARING,
+            [
+                'jobName' => JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
+                'processorAlias' => 'oro_account',
+                'filePath' => 'test_file',
+                'originFileName' => 'test_file_original',
+                'options' => $options,
+                'userId' => $this->getCurrentUser()->getId(),
+            ]
+        );
+    }
+
     /**
      * @return object
      */
@@ -93,5 +155,14 @@ class ImportExportControllerTest extends WebTestCase
     private function getCurrentUser()
     {
         return $this->getContainer()->get('security.token_storage')->getToken()->getUser();
+    }
+
+    private function assertJsonResponseSuccess()
+    {
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertCount(1, $result);
+        $this->assertTrue($result['success']);
     }
 }

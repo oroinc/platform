@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -36,29 +35,25 @@ class ConfigModelManager
     /** @var array [{class name} => [{field name} => FieldConfigModel, ...], ...] */
     private $fields = [];
 
-    /** @var bool */
-    private $dbCheck;
-
     /** @var ServiceLink */
     protected $emLink;
 
     /** @var LockObject */
     protected $lockObject;
 
-    private $requiredTables = [
-        'oro_entity_config',
-        'oro_entity_config_field',
-        'oro_entity_config_index_value',
-    ];
+    /** @var ConfigDatabaseChecker */
+    private $databaseChecker;
 
     /**
-     * @param ServiceLink $emLink A link to the EntityManager
-     * @param LockObject  $lockObject
+     * @param ServiceLink           $emLink          A link to the EntityManager
+     * @param LockObject            $lockObject
+     * @param ConfigDatabaseChecker $databaseChecker
      */
-    public function __construct(ServiceLink $emLink, LockObject $lockObject)
+    public function __construct(ServiceLink $emLink, LockObject $lockObject, ConfigDatabaseChecker $databaseChecker)
     {
-        $this->emLink     = $emLink;
+        $this->emLink = $emLink;
         $this->lockObject = $lockObject;
+        $this->databaseChecker = $databaseChecker;
     }
 
     /**
@@ -74,24 +69,12 @@ class ConfigModelManager
      */
     public function checkDatabase()
     {
-        if (null !== $this->dbCheck) {
-            return $this->dbCheck;
-        }
-        if ($this->lockObject->isLocked()) {
-            return true;
-        }
-
-        $this->dbCheck = SafeDatabaseChecker::tablesExist(
-            $this->getEntityManager()->getConnection(),
-            $this->requiredTables
-        );
-
-        return $this->dbCheck;
+        return $this->databaseChecker->checkDatabase();
     }
 
     public function clearCheckDatabase()
     {
-        $this->dbCheck = null;
+        $this->databaseChecker->clearCheckDatabase();
     }
 
     /**

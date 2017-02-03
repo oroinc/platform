@@ -151,6 +151,7 @@ services:
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.name'
+            - '@property_accessor'
 
     oro_locale.formatter.date_time:
         class: %oro_locale.formatter.date_time.class%

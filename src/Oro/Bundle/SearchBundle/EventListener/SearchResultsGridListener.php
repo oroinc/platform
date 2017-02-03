@@ -30,10 +30,8 @@ class SearchResultsGridListener
             $searchString = $parameters->get('search', '');
 
             $datasource->getSearchQuery()
-                ->getQuery()
-                ->from($searchEntity)
-                ->getCriteria()
-                ->andWhere(Criteria::expr()->contains(Indexer::TEXT_ALL_DATA_FIELD, $searchString));
+                ->setFrom($searchEntity)
+                ->addWhere(Criteria::expr()->contains(Indexer::TEXT_ALL_DATA_FIELD, $searchString));
         }
     }
 }
