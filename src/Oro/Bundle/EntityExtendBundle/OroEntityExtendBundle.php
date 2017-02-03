@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -82,7 +83,7 @@ class OroEntityExtendBundle extends Bundle
             )
         );
         $container->addCompilerPass(new ExtensionPass());
-        $container->addCompilerPass(new WarmerPass());
+        $container->addCompilerPass(new WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
     private function ensureInitialized()
