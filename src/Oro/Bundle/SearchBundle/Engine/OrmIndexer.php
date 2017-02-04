@@ -22,9 +22,6 @@ class OrmIndexer extends AbstractIndexer
     /** @var OroEntityManager */
     private $indexManager;
 
-    /** @var DbalStorer */
-    protected $dbalStorer;
-
     /**
      * @param ManagerRegistry $registry
      * @param DoctrineHelper $doctrineHelper
@@ -40,8 +37,6 @@ class OrmIndexer extends AbstractIndexer
         DbalStorer $dbalStorer
     ) {
         parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
-
-        $this->dbalStorer = $dbalStorer;
     }
 
     /**
@@ -66,7 +61,7 @@ class OrmIndexer extends AbstractIndexer
 
         if ($hasSavedEntities) {
             $this->getIndexManager()->getConnection()->transactional(function () {
-                $this->dbalStorer->store();
+                $this->getIndexRepository()->flushWrites();
                 $this->getIndexManager()->clear();
             });
         }
@@ -149,7 +144,7 @@ class OrmIndexer extends AbstractIndexer
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $this->dbalStorer->addItem($item);
+            $this->getIndexRepository()->writeItem($item);
 
             $hasSavedEntities = true;
         }

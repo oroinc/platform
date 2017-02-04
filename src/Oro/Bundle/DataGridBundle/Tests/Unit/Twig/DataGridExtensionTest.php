@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Twig;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -62,7 +62,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->twigExtension = new DataGridExtension(
-            $this->manager,
+            new ServiceLink($this->manager),
             $this->nameStrategy,
             $this->router,
             $this->securityFacade,

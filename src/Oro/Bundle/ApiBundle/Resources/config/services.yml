@@ -1,3 +1,6 @@
+parameters:
+    nelmio_api_doc.twig.extension.extra_markdown.class: Oro\Bundle\ApiBundle\Twig\MarkdownExtension
+
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag

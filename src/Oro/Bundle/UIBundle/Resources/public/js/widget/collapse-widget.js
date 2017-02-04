@@ -13,6 +13,8 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             forcedState: null,
             uid: '',
             openClass: 'expanded',
+            overflowClass: 'overflows',
+            toggleClassesOnly: false,
             animationSpeed: 250
         },
 
@@ -41,6 +43,15 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             this._initEvents();
 
             this.$el.toggleClass(this.options.openClass, this.options.open);
+            this.$el.toggleClass(
+                this.options.overflowClass,
+                this.$container[0].scrollHeight > this.$container[0].clientHeight
+            );
+
+            if (this.options.toggleClassesOnly) {
+                return;
+            }
+
             if (this.options.open) {
                 this.$container.show();
                 mediator.trigger('scrollable-table:reload');
@@ -50,10 +61,12 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
         },
 
         _destroy: function() {
-            this._setState(true, true);
-            this.$el.removeClass('init');
-            this.$container.css('display', '');
             this._off(this.$trigger, 'click');
+            this.$el.removeClass('init');
+            if (!this.options.toggleClassesOnly) {
+                this.$container.css('display', '');
+                this._setState(true, true);
+            }
             this._super();
         },
 
@@ -72,6 +85,10 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
             };
 
             this.$el.toggleClass(this.options.openClass, isOpen);
+            this.$el.toggleClass(
+                this.options.overflowClass,
+                this.$container[0].scrollHeight > this.$container[0].clientHeight
+            );
 
             if (this.options.hideSibling) {
                 this._hideSiblings(isOpen && !isDestroy);
@@ -92,14 +109,19 @@ define(['jquery', 'oroui/js/mediator', 'underscore', 'jquery-ui'], function($, m
                 event.preventDefault();
             }
 
-            if (this.$container.is(':animated')) {
+            var self = this;
+            if (!this.options.toggleClassesOnly) {
+                if (!this.$container.is(':animated')) {
+                    this.$container.slideToggle(this.options.animationSpeed, function() {
+                        self._setState($(this).is(':visible'));
+                    });
+                }
+
                 return false;
             }
 
-            var self = this;
-            this.$container.slideToggle(this.options.animationSpeed, function() {
-                self._setState($(this).is(':visible'));
-            });
+            this.options.open = !this.options.open;
+            self._setState(this.options.open);
         },
 
         _hideSiblings: function(isOpen) {

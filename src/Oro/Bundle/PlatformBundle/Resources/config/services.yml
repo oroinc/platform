@@ -11,8 +11,20 @@ parameters:
 
     oro_platform.optional_listeners.manager.class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
     oro_platform.event_listener.optional_listeners.class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener
+    jms_serializer.twig_extension.class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
 
 services:
+    jms_serializer.link:
+        tags:
+            - { name: oro_service_link,  service: jms_serializer }
+
+    jms_serializer.twig_extension.serializer:
+        class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
+        arguments:
+            - '@jms_serializer.link'
+        tags:
+            - { name: twig.extension }
+
     oro_platform.maintenance:
         class:                                %oro_platform.maintenance.class%
         arguments:

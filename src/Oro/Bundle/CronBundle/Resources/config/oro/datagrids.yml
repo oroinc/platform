@@ -6,13 +6,7 @@ datagrids:
             entityHint: schedule
         source:
             type: orm
-            query:
-                select:
-                    - s.command
-                    - s.arguments
-                    - s.definition
-                from:
-                    - { table: OroCronBundle:Schedule , alias: s }
+            query_builder: "@oro_cron.repository.schedule->getEnabledSchedulesQb"
         columns:
             command:
                 label: oro.cron.schedule.command.label
