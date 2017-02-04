@@ -61,6 +61,16 @@ EntityBundle
     - construction signature was changed now it takes next arguments:
         - `ServiceLink` $fallbackResolverLink
 
+EntityConfigBundle
+------------------
+- Class `Oro\Bundle\EntityConfigBundle\Config\ConfigManager`
+    - removed property `protected $providers`
+    - removed property `protected $propertyConfigs`
+    - removed method `public function addProvider(ConfigProvider $provider)` in favor of `public function setProviderBag(ConfigProviderBag $providerBag)`
+- Class `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider`
+    - removed property `protected $propertyConfig`
+    - construction signature was changed. The parameter `array $config` was replaced with `PropertyConfigBag $configBag`
+
 EntityPaginationBundle
 ----------------------
 - Class `Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector`
