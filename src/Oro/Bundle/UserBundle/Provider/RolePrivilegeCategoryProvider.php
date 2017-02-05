@@ -137,7 +137,7 @@ class RolePrivilegeCategoryProvider
         }
         ksort($orderedCategoryList);
         $categoryList = call_user_func_array('array_merge', $orderedCategoryList);
-        
+
         return $categoryList;
     }
 
