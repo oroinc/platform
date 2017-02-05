@@ -47,7 +47,7 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerNames')
-            ->will($this->returnValue(['default']));
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))
@@ -82,7 +82,7 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerNames')
-            ->will($this->returnValue(['default']));
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))
@@ -118,7 +118,7 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerNames')
-            ->will($this->returnValue(['default']));
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))
@@ -156,7 +156,7 @@ class EntityMetadataHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerNames')
-            ->will($this->returnValue(['default']));
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->once())
             ->method('getManager')
             ->with($this->equalTo('default'))

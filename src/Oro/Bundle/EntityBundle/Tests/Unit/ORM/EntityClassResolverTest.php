@@ -89,7 +89,7 @@ class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->exactly(2))
             ->method('getManagerNames')
-            ->will($this->returnValue(['default']));
+            ->will($this->returnValue(['default' => 'service.default']));
         $this->doctrine->expects($this->exactly(2))
             ->method('getManager')
             ->with('default')
