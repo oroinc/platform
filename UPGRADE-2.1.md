@@ -162,6 +162,9 @@ SecurityBundle
             TokenStorageInterface $tokenStorage
         )
         ```
+- `Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension`:
+    - removed parameter `EntityClassResolver $entityClassResolver` from the constructor
+    - removed property `protected $entityClassResolver`
 
 TranslationBundle
 -----------------
