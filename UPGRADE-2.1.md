@@ -173,6 +173,12 @@ UIBundle
     - construction signature was changed now it takes next arguments:
         - `ServiceLink` $formatterManagerLink
 
+UserBundle
+----------
+- Class `Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator`
+    - replaced parameter `EntityManager $em` with `ManagerRegistry $doctrine` in the constructor
+    - removed property `protected $em`
+
 WorkflowBundle
 --------------
 - `Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader`:
