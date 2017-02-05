@@ -134,7 +134,7 @@ class EntityMetadataHelper
     {
         $this->tableToClassesMap  = [];
         $this->classToTableMap  = [];
-        $names = array_keys($this->doctrine->getManagers());
+        $names = $this->doctrine->getManagerNames();
         foreach ($names as $name) {
             $manager = $this->doctrine->getManager($name);
             if ($manager instanceof EntityManager) {
