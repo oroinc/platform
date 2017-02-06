@@ -83,13 +83,17 @@ define([
             } else {
                 this.subviews = {
                     pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
-                    itemsCounter: new this.itemsCounter(_.defaults({collection: this.collection}, options.itemsCounter)),
+                    itemsCounter: new this.itemsCounter(
+                                        _.defaults({collection: this.collection}, options.itemsCounter)
+                                      ),
                     actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
                     extraActionsPanel: new this.extraActionsPanel()
                 };
 
                 if (_.result(options.pageSize, 'hide') !== true) {
-                    this.subviews.pageSize = new this.pageSize(_.defaults({collection: this.collection}, options.pageSize));
+                    this.subviews.pageSize = new this.pageSize(
+                                                    _.defaults({collection: this.collection}, options.pageSize)
+                                                 );
                 }
 
                 if (options.addSorting) {

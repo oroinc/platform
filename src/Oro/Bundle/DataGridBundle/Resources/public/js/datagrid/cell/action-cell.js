@@ -229,8 +229,6 @@ define([
                     var listHeight = $list.height();
                     var testListItemHeight = $list.find('.launcher-item').height() * 1.5;
 
-
-
                     if (listHeight > testListItemHeight) {
                         wrapDropdown();
                     }
