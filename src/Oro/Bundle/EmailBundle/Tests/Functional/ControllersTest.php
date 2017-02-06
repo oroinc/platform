@@ -6,9 +6,6 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ControllersTest extends WebTestCase
 {
     /**

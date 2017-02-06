@@ -54,6 +54,7 @@ EmailBundle
         - `MailboxProcessStorage` $mailboxProcessStorage,
         - `SecurityFacade` $securityFacade,
         - `ServiceLink` $relatedEmailsProviderLink
+- `Oro/Bundle/EmailBundle/Migrations/Data/ORM/EnableEmailFeature` removed, feature enabled by default
 
 EntityBundle
 ------------
@@ -126,6 +127,8 @@ SearchBundle
 `Oro\Bundle\SearchBundle\Engine\EngineInterface` instead
 - Return value types in `Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and
 `Oro\Bundle\SearchBundle\Query\AbstractSearchQuery` were fixed to support fluent interface
+`Oro\Bundle\SearchBundle\Engine\Orm` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
+`Oro\Bundle\SearchBundle\Engine\OrmIndexer` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
 
 SecurityBundle
 --------------
@@ -192,3 +195,23 @@ WorkflowBundle
     - removed method `protected function checkDatabase()`
     - removed method `protected function getEntityManager()`
     
+
+TestFrameworkBundle
+-------------------
+- `@dbIsolation annotation removed, applied as defult behavior`
+- `@dbReindex annotation removed, use \Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait::clearIndexTextTable`
+- `Oro/Bundle/TestFrameworkBundle/Test/Client`:
+    - removed property `$pdoConnection`
+    - removed property `$kernel`
+    - removed property `$hasPerformedRequest`
+    - removed property `$loadedFixtures`
+    - removed method `reboot`
+    - removed method `doRequest`
+- `Oro/Bundle/TestFrameworkBundle/Test/WebTestCase`:
+    - removed property `$dbIsolation`
+    - removed property `$dbReindex`
+    - removed method `getDbIsolationSetting`
+    - removed method `getDbReindexSetting`
+    - removed method `getDbReindexSetting`
+    - renamed method `setUpBeforeClass` to `beforeClass`
+    - renamed method `tearDownAfterClass` to `afterClass`
