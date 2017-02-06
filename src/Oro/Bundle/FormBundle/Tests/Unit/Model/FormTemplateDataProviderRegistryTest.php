@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
-use Oro\Bundle\FormBundle\Model\FormDataProviderRegistry;
+use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 
-class FormDataProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class FormTemplateDataProviderRegistryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var FormDataProviderRegistry
+     * @var FormTemplateDataProviderRegistry
      */
     private $registry;
 
     protected function setUp()
     {
-        $this->registry = new FormDataProviderRegistry();
+        $this->registry = new FormTemplateDataProviderRegistry();
     }
 
     public function testRegisterAndGet()

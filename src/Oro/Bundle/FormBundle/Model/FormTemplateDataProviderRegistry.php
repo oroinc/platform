@@ -5,7 +5,7 @@ namespace Oro\Bundle\FormBundle\Model;
 use Oro\Bundle\FormBundle\Exception\UnknownProviderException;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 
-class FormDataProviderRegistry
+class FormTemplateDataProviderRegistry
 {
     /** @var FormTemplateDataProviderInterface[] */
     private $formDataProviders = [];

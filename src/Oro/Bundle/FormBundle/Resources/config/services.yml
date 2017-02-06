@@ -44,4 +44,4 @@ services:
             - '@event_dispatcher'
 
     oro_form.registry.form_template_data_provider:
-        class: Oro\Bundle\FormBundle\Model\FormDataProviderRegistry
+        class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry
