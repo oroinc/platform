@@ -10,13 +10,15 @@ class ImportData
     /**
      * @var UploadedFile
      *
-     * @Assert\File(mimeTypes = {"text/plain", "text/csv"}, disallowEmptyMessage = "")
+     * @Assert\File(mimeTypes = {"text/plain", "text/csv"})
      * @Assert\NotBlank()
      */
     protected $file;
 
     /**
      * @var string
+     *
+     * @Assert\NotBlank()
      */
     protected $processorAlias;
 
