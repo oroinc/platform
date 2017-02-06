@@ -7,10 +7,10 @@
 
 {% block pageHeader %}
     {% set breadcrumbs = {
-    'entity': entity,
-    'indexPath': path('oro_workflow_definition_index'),
-    'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
-    'entityTitle': entity.label
+        'entity': entity,
+        'indexPath': path('oro_workflow_definition_index'),
+        'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+        'entityTitle': entity.label
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
