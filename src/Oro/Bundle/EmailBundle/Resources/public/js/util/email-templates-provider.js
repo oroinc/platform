@@ -3,7 +3,6 @@ define(function(require) {
 
     var $ = require('jquery');
     var routing = require('routing');
-    var messenger = require('oroui/js/messenger');
     var __ = require('orotranslation/js/translator');
 
     return {
@@ -13,15 +12,13 @@ define(function(require) {
                 {'id': templateId, 'entityId': relatedEntityId}
             );
 
-            return $.ajax(url, {dataType: 'json'}).then(
-                function(data, textStatus, jqXHR) {
-                    return data;
-                },
-                function(jqXHR, textStatus, errorThrown) {
-                    messenger.showErrorMessage(__('oro.email.emailtemplate.load_failed'));
-                    return errorThrown;
-                }
-            );
+            return $.ajax({
+                url: url,
+                dataType: 'json',
+                errorHandlerMessage: __('oro.email.emailtemplate.load_failed')
+            }).then(function(data, textStatus, jqXHR) {
+                return data;
+            });
         }
     };
 });
