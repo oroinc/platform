@@ -311,8 +311,8 @@ services:
             - '@oro_locale.formatter.formatting_code'
             - '@oro_locale.manager.localization'
 
-    oro_locale.helper.localization_cache:
-        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationCacheHelper'
+    oro_locale.decorator.localization_cache:
+        class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator'
         public: false
         arguments:
             - '@oro_locale.cache'
@@ -322,7 +322,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_config.global'
-            - '@oro_locale.helper.localization_cache'
+            - '@oro_locale.decorator.localization_cache'
 
     oro_locale.provider.current_localization:
         class: 'Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider'

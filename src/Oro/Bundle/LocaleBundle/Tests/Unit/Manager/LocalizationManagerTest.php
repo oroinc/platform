@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheHelper;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -29,8 +29,8 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    /** @var LocalizationCacheHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $localizationCacheHelper;
+    /** @var CacheProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $cacheProvider;
 
     /** @var Localization[]|array */
     protected $entities = [];
@@ -49,7 +49,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->localizationCacheHelper = $this->getMockBuilder(LocalizationCacheHelper::class)
+        $this->cacheProvider = $this->getMockBuilder(CacheProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -63,7 +63,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new LocalizationManager(
             $this->doctrineHelper,
             $this->configManager,
-            $this->localizationCacheHelper
+            $this->cacheProvider
         );
     }
 
@@ -214,8 +214,8 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertCacheReads($results)
     {
-        $this->localizationCacheHelper->expects($this->once())
-            ->method('get')
+        $this->cacheProvider->expects($this->once())
+            ->method('fetch')
             ->willReturn($results);
     }
 

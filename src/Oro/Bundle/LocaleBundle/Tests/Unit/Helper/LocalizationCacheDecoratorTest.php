@@ -5,11 +5,12 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Helper;
 use Doctrine\Common\Cache\ArrayCache;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheHelper;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
-class LocalizationCacheHelperTest extends \PHPUnit_Framework_TestCase
+class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
 
@@ -17,14 +18,14 @@ class LocalizationCacheHelperTest extends \PHPUnit_Framework_TestCase
      * @param Localization[] $localizations
      * @dataProvider getLocalizations
      */
-    public function testGet(array $localizations)
+    public function testFetch(array $localizations)
     {
         $cacheProvider =new ArrayCache();
-        $cacheProvider->save(LocalizationCacheHelper::CACHE_NAMESPACE, $this->serializeLocalizations($localizations));
+        $cacheProvider->save(LocalizationManager::CACHE_NAMESPACE, $this->serializeLocalizations($localizations));
 
-        $localizationCacheHelper = new LocalizationCacheHelper($cacheProvider);
+        $localizationCacheHelper = new LocalizationCacheDecorator($cacheProvider);
 
-        $result = $localizationCacheHelper->get();
+        $result = $localizationCacheHelper->fetch(LocalizationManager::CACHE_NAMESPACE);
         $this->assertCount(count($localizations), $result);
 
         foreach ($result as $i => $localization) {
@@ -41,13 +42,13 @@ class LocalizationCacheHelperTest extends \PHPUnit_Framework_TestCase
     {
         $cacheProvider = new ArrayCache();
 
-        $localizationCacheHelper = new LocalizationCacheHelper($cacheProvider);
+        $localizationCacheHelper = new LocalizationCacheDecorator($cacheProvider);
 
-        $localizationCacheHelper->save($localizations);
+        $localizationCacheHelper->save(LocalizationManager::CACHE_NAMESPACE, $localizations);
 
         $this->assertEquals(
             $this->serializeLocalizations($localizations),
-            $cacheProvider->fetch(LocalizationCacheHelper::CACHE_NAMESPACE)
+            $cacheProvider->fetch(LocalizationManager::CACHE_NAMESPACE)
         );
     }
 

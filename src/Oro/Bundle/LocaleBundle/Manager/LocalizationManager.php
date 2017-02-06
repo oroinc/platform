@@ -2,15 +2,18 @@
 
 namespace Oro\Bundle\LocaleBundle\Manager;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheHelper;
 
 class LocalizationManager
 {
+    const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
+
     /**
      * @var DoctrineHelper
      */
@@ -27,23 +30,23 @@ class LocalizationManager
     private $configManager;
 
     /**
-     * @var LocalizationCacheHelper
+     * @var CacheProvider
      */
-    private $localizationCacheHelper;
+    private $cacheProvider;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager $configManager
-     * @param LocalizationCacheHelper $localizationCacheHelper
+     * @param CacheProvider $cacheProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
-        LocalizationCacheHelper $localizationCacheHelper
+        CacheProvider $cacheProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager = $configManager;
-        $this->localizationCacheHelper = $localizationCacheHelper;
+        $this->cacheProvider = $cacheProvider;
     }
 
     /**
@@ -65,12 +68,12 @@ class LocalizationManager
      */
     public function getLocalizations(array $ids = null)
     {
-        $cache = $this->localizationCacheHelper->get();
+        $cache = $this->cacheProvider->fetch(static::CACHE_NAMESPACE);
 
         if ($cache === false) {
             $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
             $cache = $this->associateLocalizationsArray($cache);
-            $this->localizationCacheHelper->save($cache);
+            $this->cacheProvider->save(static::CACHE_NAMESPACE, $cache);
         }
 
         if (null === $ids) {

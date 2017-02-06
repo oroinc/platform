@@ -6,10 +6,8 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
-class LocalizationCacheHelper
+class LocalizationCacheDecorator extends CacheProvider
 {
-    const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
-
     /**
      * @var CacheProvider
      */
@@ -26,26 +24,73 @@ class LocalizationCacheHelper
     /**
      * Gets array of Localization or false, if there is no cache
      *
-     * @return Localization[]|false
+     * @param string $id
+     * @return false|Localization[]
      */
-    public function get()
+    public function fetch($id)
     {
-        $cache = $this->cacheProvider->fetch(self::CACHE_NAMESPACE);
+        $cache = $this->cacheProvider->fetch($id);
 
-        if ($cache) {
-            return $this->unserializeLocalizations($cache);
-        }
-
-        return false;
+        return $cache ? $this->unserializeLocalizations($cache) : false;
     }
 
     /**
-     * @param Localization[] $cache
+     * @param string $id
+     * @param Localization[] $data
+     * @param int $lifeTime
      * @return bool
      */
-    public function save(array $cache)
+    public function save($id, $data, $lifeTime = 0)
     {
-        return $this->cacheProvider->save(self::CACHE_NAMESPACE, $this->serializeLocalcations($cache));
+        return $this->cacheProvider->save($id, $this->serializeLocalcations($data), $lifeTime);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doFetch($id)
+    {
+        return $this->cacheProvider->fetch($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doContains($id)
+    {
+        return $this->cacheProvider->contains($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doSave($id, $data, $lifeTime = 0)
+    {
+        return $this->cacheProvider->save($id, $data, $lifeTime);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doDelete($id)
+    {
+        return $this->cacheProvider->delete($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doFlush()
+    {
+        return $this->cacheProvider->flushAll();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doGetStats()
+    {
+        return $this->cacheProvider->getStats();
     }
 
     /**
