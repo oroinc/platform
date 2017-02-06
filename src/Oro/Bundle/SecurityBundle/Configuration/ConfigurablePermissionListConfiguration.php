@@ -38,7 +38,7 @@ class ConfigurablePermissionListConfiguration implements PermissionConfiguration
                         ->useAttributeAsKey('name')
                         ->prototype('variable')->end()
                     ->end()
-                    ->arrayNode('capability')
+                    ->arrayNode('capabilities')
                         ->prototype('variable')->end()
                     ->end()
                 ->end()

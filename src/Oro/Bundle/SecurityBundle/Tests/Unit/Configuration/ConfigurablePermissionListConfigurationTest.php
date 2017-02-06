@@ -45,7 +45,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                 'commerce' => [
                     'default' => false,
                     'entities' => [],
-                    'capability' => [],
+                    'capabilities' => [],
                 ]
             ]
         ];
@@ -64,7 +64,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                     'entities' => [
                         'Entity1' => ['created' => false]
                     ],
-                    'capability' => [],
+                    'capabilities' => [],
                 ]
             ]
         ];
@@ -73,7 +73,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
             'config' => [
                 'commerce' => [
                     'default' => true,
-                    'capability' => [
+                    'capabilities' => [
                         'test1' => false,
                         'test2' => false
                     ]
@@ -83,7 +83,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                 'commerce' => [
                     'default' => true,
                     'entities' => [],
-                    'capability' => [
+                    'capabilities' => [
                         'test1' => false,
                         'test2' => false
                     ]

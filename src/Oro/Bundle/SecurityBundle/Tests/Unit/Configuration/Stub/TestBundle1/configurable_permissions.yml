@@ -3,5 +3,5 @@ oro_configurable_permissions:
         entities:
             TestItem:
                 update: true
-        capability:
+        capabilities:
             action1: true

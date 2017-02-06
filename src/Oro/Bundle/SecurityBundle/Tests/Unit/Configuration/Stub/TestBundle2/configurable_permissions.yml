@@ -5,6 +5,6 @@ oro_configurable_permissions:
             TestItem:
                 update: false
                 delete: true
-        capability:
+        capabilities:
             action1: false
             action2: true

@@ -50,7 +50,7 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework
                             'update' => true
                         ]
                     ],
-                    'capability' => [
+                    'capabilities' => [
                         'action1' => true
                     ]
                 ]
@@ -68,7 +68,7 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework
                             'delete' => true,
                         ]
                     ],
-                    'capability' => [
+                    'capabilities' => [
                         'action1' => false,
                         'action2' => true
                     ]
