@@ -86,25 +86,31 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
      * @param TokenStorageInterface $securityTokenStorage
      * @param EntityToEntityChangeArrayConverter $entityToArrayConverter
      * @param AuditConfigProvider $configProvider
-     * @param LoggerInterface $logger
      */
     public function __construct(
         MessageProducerInterface $messageProducer,
         TokenStorageInterface $securityTokenStorage,
         EntityToEntityChangeArrayConverter $entityToArrayConverter,
-        AuditConfigProvider $configProvider,
-        LoggerInterface $logger
+        AuditConfigProvider $configProvider
     ) {
         $this->messageProducer = $messageProducer;
         $this->securityTokenStorage = $securityTokenStorage;
         $this->entityToArrayConverter = $entityToArrayConverter;
         $this->configProvider = $configProvider;
-        $this->logger = $logger;
 
         $this->allInsertions = new \SplObjectStorage;
         $this->allUpdates = new \SplObjectStorage;
         $this->allDeletions = new \SplObjectStorage;
         $this->allCollectionUpdates = new \SplObjectStorage;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @deprecated since 2.0, will be removed in 2.1
+     */
+    public function setLogger(LoggerInterface  $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -381,13 +387,15 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             if ($update['entity_id']) {
                 $updates[] = $this->convertEntityToArray($em, $entity, $changeSet);
             } else {
-                $this->logger->error(
-                    sprintf(
-                        'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
-                        $update['entity_class']
-                    ),
-                    ['entity' => $entity, 'update' => $update]
-                );
+                if (null !== $this->logger) {
+                    $this->logger->error(
+                        sprintf(
+                            'The entity %s has an empty id. Possibly $entity->setId(null) was executed',
+                            $update['entity_class']
+                        ),
+                        ['entity' => $entity, 'update' => $update]
+                    );
+                }
             }
         }
 
