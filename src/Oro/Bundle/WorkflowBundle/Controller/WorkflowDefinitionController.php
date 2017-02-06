@@ -101,6 +101,35 @@ class WorkflowDefinitionController extends Controller
 
     /**
      * @Route(
+     *      "/configure/{name}",
+     *      name="oro_workflow_definition_configure"
+     * )
+     * @Template("OroWorkflowBundle:WorkflowDefinition:configure.html.twig")
+     * @Acl(
+     *      id="oro_workflow_definition_configure",
+     *      type="entity",
+     *      class="OroWorkflowBundle:WorkflowDefinition",
+     *      permission="CONFIGURE"
+     * )
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     *
+     * @return array
+     * @throws AccessDeniedHttpException
+     */
+    public function configureAction(WorkflowDefinition $workflowDefinition)
+    {
+        $form = $this->get('oro_workflow.form.workflow_definition');
+        $form->setData($workflowDefinition);
+
+        return [
+            'form' => $form->createView(),
+            'entity' => $workflowDefinition,
+        ];
+    }
+
+    /**
+     * @Route(
      *      "/view/{name}",
      *      name="oro_workflow_definition_view"
      * )
