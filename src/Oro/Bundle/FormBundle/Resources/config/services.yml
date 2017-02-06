@@ -42,3 +42,9 @@ services:
         class: %oro_form.event.event_dispatcher.class%
         arguments:
             - '@event_dispatcher'
+
+    oro_form.doctrine.orm.validator_initializer:
+        class: Oro\Bundle\FormBundle\Validator\DoctrineInitializer
+        public: false
+        decorates: doctrine.orm.validator_initializer
+        parent: doctrine.orm.validator_initializer

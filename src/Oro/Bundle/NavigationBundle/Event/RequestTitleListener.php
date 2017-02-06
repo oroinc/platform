@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Event;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 
