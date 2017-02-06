@@ -7,7 +7,6 @@ use Doctrine\Common\Cache\ArrayCache;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
@@ -20,8 +19,7 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testFetch(array $localizations)
     {
-        $cacheProvider =new ArrayCache();
-        $cacheProvider->save(LocalizationManager::CACHE_NAMESPACE, $this->serializeLocalizations($localizations));
+        $cacheProvider = $this->getArrayCache($localizations);
 
         $localizationCacheHelper = new LocalizationCacheDecorator($cacheProvider);
 
@@ -40,7 +38,7 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSave(array $localizations)
     {
-        $cacheProvider = new ArrayCache();
+        $cacheProvider = $this->getArrayCache();
 
         $localizationCacheHelper = new LocalizationCacheDecorator($cacheProvider);
 
@@ -74,6 +72,24 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    /**
+     * @param Localization[]|null $localizations Set it if you want cache to be filled
+     * @return ArrayCache
+     */
+    private function getArrayCache(array $localizations = null)
+    {
+        $arrayCache = new ArrayCache();
+
+        if ($localizations) {
+            $arrayCache->save(
+                LocalizationManager::CACHE_NAMESPACE,
+                $this->serializeLocalizations($localizations)
+            );
+        }
+
+        return $arrayCache;
     }
 
     /**

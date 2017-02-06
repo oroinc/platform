@@ -10,7 +10,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
@@ -201,6 +200,17 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn([1 => $localization1, 2 => $localization2]);
 
         $this->assertSame($localization1, $this->manager->getDefaultLocalization());
+    }
+
+    public function testWarmUpCache()
+    {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->assertCacheReads(false);
+        $this->repository->expects($this->once())
+            ->method('findBy')
+            ->willReturn($this->entities);
+
+        $this->manager->warmUpCache();
     }
 
     protected function assertRepositoryCalls()

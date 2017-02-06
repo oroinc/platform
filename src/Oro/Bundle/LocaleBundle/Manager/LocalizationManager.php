@@ -106,6 +106,20 @@ class LocalizationManager
     }
 
     /**
+     * @return bool
+     */
+    public function clearCache()
+    {
+        return $this->cacheProvider->delete(static::CACHE_NAMESPACE);
+    }
+
+    public function warmUpCache()
+    {
+        $this->clearCache();
+        $this->getLocalizations();
+    }
+
+    /**
      * @return LocalizationRepository
      */
     protected function getRepository()
