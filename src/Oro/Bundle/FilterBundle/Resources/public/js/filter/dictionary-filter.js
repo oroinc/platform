@@ -7,7 +7,6 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('oro/filter/choice-filter');
-    var messenger = require('oroui/js/messenger');
     var tools = require('oroui/js/tools');
     require('jquery.select2');
 
@@ -139,9 +138,6 @@ define(function(require) {
                     },
                     success: function(response) {
                         self.trigger(successEventName, response);
-                    },
-                    error: function(jqXHR) {
-                        messenger.showErrorMessage(__('Sorry, an unexpected error has occurred.'), jqXHR.responseJSON);
                     }
                 });
             } else {

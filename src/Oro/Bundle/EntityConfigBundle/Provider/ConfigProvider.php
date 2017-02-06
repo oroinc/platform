@@ -9,7 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
@@ -21,32 +20,32 @@ class ConfigProvider implements ConfigProviderInterface
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var PropertyConfigContainer */
-    protected $propertyConfig;
-
     /** @var string */
     protected $scope;
 
+    /** @var PropertyConfigBag */
+    private $configBag;
+
     /**
-     * @param ConfigManager $configManager The configuration manager
-     * @param string        $scope         The configuration scope this provider works with
-     * @param array         $config        The scope configuration
+     * @param ConfigManager     $configManager The configuration manager
+     * @param string            $scope         The configuration scope this provider works with
+     * @param PropertyConfigBag $configBag     A bag contains the configuration of all scopes
      */
-    public function __construct(ConfigManager $configManager, $scope, array $config)
+    public function __construct(ConfigManager $configManager, $scope, PropertyConfigBag $configBag)
     {
-        $this->scope          = $scope;
-        $this->configManager  = $configManager;
-        $this->propertyConfig = new PropertyConfigContainer($config);
+        $this->scope = $scope;
+        $this->configManager = $configManager;
+        $this->configBag = $configBag;
     }
 
     /**
-     * Gets a configuration the scope this provider works with.
+     * Gets a configuration of the scope this provider works with.
      *
      * @return PropertyConfigContainer
      */
     public function getPropertyConfig()
     {
-        return $this->propertyConfig;
+        return $this->configBag->getPropertyConfig($this->scope);
     }
 
     /**

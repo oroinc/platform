@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -13,7 +14,6 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
-
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
@@ -218,6 +218,47 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Process and replace all references and functions to values
+     *
+     * @param  array|string $data Can be path to yml template file or array
+     * @return array|string
+     */
+    protected static function processTemplateData($data)
+    {
+        if (!self::$referenceRepository) {
+            return $data;
+        }
+
+        /** @var AliceFixtureLoader $aliceLoader */
+        $aliceLoader = self::getContainer()->get('oro_test.alice_fixture_loader');
+        $aliceLoader->setReferences(self::$referenceRepository->getReferences());
+
+        if (is_string($data)) {
+            try {
+                $file = $aliceLoader->locateFile($data);
+                if (is_file($file)) {
+                    $data = Yaml::parse(file_get_contents($file));
+                }
+            } catch (\InvalidArgumentException $e) {
+            }
+        }
+
+        if (is_array($data)) {
+            array_walk_recursive($data, function (&$item) use ($aliceLoader) {
+                $item = $aliceLoader->getProcessor()->process($item, [], null);
+            });
+        } elseif (is_int($data) || is_string($data)) {
+            $data = $aliceLoader->getProcessor()->process($data, [], null);
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf('Expected argument of type "array or string", "%s" given.', gettype($data))
+            );
+        }
+
+        return $data;
+    }
+
+    /**
      * Get value of dbIsolation option from annotation of called class
      *
      * @return bool
@@ -369,7 +410,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * @param string[] $fixtures Each fixture can be a class name or a path to nelmio/alice file
-     * @param bool     $force
+     * @param bool     $force    Load fixtures even if its was loaded
      *
      * @link https://github.com/nelmio/alice
      */
@@ -378,27 +419,13 @@ abstract class WebTestCase extends BaseWebTestCase
         $container = $this->getContainer();
         $fixtureIdentifierResolver = new AliceFixtureIdentifierResolver($container->get('kernel'));
 
-        $fixtures = array_map(
-            function ($value) use ($fixtureIdentifierResolver) {
-                return $fixtureIdentifierResolver->resolveId($value);
-            },
-            $fixtures
-        );
-        if (!$force) {
-            $fixtures = array_values(array_filter(
-                $fixtures,
-                function ($value) {
-                    return !in_array($value, self::$loadedFixtures, true);
-                }
-            ));
-            if (!$fixtures) {
-                return;
-            }
+        $filteredFixtures = $this->filterFixtures($fixtures, $force);
+        if (!$filteredFixtures) {
+            return;
         }
-        self::$loadedFixtures = array_merge(self::$loadedFixtures, $fixtures);
 
         $loader = new DataFixturesLoader(new AliceFixtureFactory(), $fixtureIdentifierResolver, $container);
-        foreach ($fixtures as $fixture) {
+        foreach ($filteredFixtures as $fixture) {
             $loader->addFixture($fixture);
         }
 
@@ -406,6 +433,34 @@ abstract class WebTestCase extends BaseWebTestCase
         $executor->execute($loader->getFixtures(), true);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
+    }
+
+    /**
+     * @param array  $fixtures Existing references that will be filtered
+     * @param bool   $force    Load fixtures even if its was loaded
+     * @return array
+     */
+    protected function filterFixtures(array $fixtures, $force = false)
+    {
+        $container = $this->getContainer();
+        $fixtureIdentifierResolver = new AliceFixtureIdentifierResolver($container->get('kernel'));
+        $filteredFixtures = [];
+
+        foreach ($fixtures as $fixture) {
+            $filteredFixtures[$fixtureIdentifierResolver->resolveId($fixture)] = $fixture;
+        }
+
+        if (!$force) {
+            $removeLoadedFixturesCallback = function ($fixtureId) {
+                return !in_array($fixtureId, self::$loadedFixtures, true);
+            };
+
+            $filteredFixtures = array_filter($filteredFixtures, $removeLoadedFixturesCallback, ARRAY_FILTER_USE_KEY);
+        }
+
+        self::$loadedFixtures = array_merge(self::$loadedFixtures, array_keys($filteredFixtures));
+
+        return $filteredFixtures;
     }
 
     /**

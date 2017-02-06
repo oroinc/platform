@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit;
 
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
@@ -70,7 +71,7 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $configProvider = new ConfigProvider($this->configManager, self::SCOPE, []);
+        $configProvider = new ConfigProvider($this->configManager, self::SCOPE, new PropertyConfigBag([]));
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->willReturn($configProvider);

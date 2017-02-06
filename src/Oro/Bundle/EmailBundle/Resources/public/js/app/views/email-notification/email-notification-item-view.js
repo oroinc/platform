@@ -66,7 +66,6 @@ define(function(require) {
                 },
                 error: function(xhr, err, message) {
                     model.set('seen', status);
-                    mediator.execute('showErrorMessage', message, err);
                 }
             });
         }

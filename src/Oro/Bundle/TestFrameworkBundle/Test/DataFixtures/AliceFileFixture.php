@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
-class AliceFileFixture extends AliceFixture
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Symfony\Component\Yaml\Yaml;
+
+class AliceFileFixture extends AliceFixture implements DependentFixtureInterface
 {
     /** @var string */
     private $fileName;
@@ -21,6 +24,20 @@ class AliceFileFixture extends AliceFixture
     public function getFileName()
     {
         return $this->fileName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        $data = Yaml::parse($this->loader->locateFile($this->fileName));
+
+        if (isset($data['dependencies'])) {
+            return $data['dependencies'];
+        }
+
+        return [];
     }
 
     /**
