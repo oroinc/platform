@@ -48,11 +48,9 @@ define(function(require) {
 
             var filtersList;
             var options = methods.combineOptions.call(this);
-            if (this.$el.find('[data-datafilter-container]').length) {
-                var $filterContainer = this.$el.find('[data-datafilter-container]');
-            } else {
-                var $filterContainer = this.$el;
-            }
+            var $filterContainer = this.$el.find('[data-datafilter-container]').length ?
+                                        this.$el.find('[data-datafilter-container]') : this.$el;
+
             options.collection = this.collection;
             options.el = $('<div/>').prependTo($filterContainer);
             if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
