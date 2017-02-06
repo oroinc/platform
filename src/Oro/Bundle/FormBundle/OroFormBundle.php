@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle;
 
+use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormTemplateDataProviderCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -22,6 +23,7 @@ class OroFormBundle extends Bundle
         $container->addCompilerPass(new AutocompleteCompilerPass());
         $container->addCompilerPass(new FormCompilerPass());
         $container->addCompilerPass(new FormGuesserCompilerPass());
+        $container->addCompilerPass(new FormTemplateDataProviderCompilerPass());
     }
 
     /**

@@ -42,3 +42,6 @@ services:
         class: %oro_form.event.event_dispatcher.class%
         arguments:
             - '@event_dispatcher'
+
+    oro_form.registry.form_template_data_provider:
+        class: Oro\Bundle\FormBundle\Model\FormDataProviderRegistry
