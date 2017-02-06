@@ -95,6 +95,7 @@ ImapBundle
 LayoutBundle
 ------------
 - Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+- Changed default value option name for `page_title` block type, from `text` to `defaultValue`
 
 LocaleBundle
 ------------
