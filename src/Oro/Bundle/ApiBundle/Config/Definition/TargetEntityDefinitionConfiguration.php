@@ -66,7 +66,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
         $this->callConfigureCallbacks($node, $sectionName);
         $this->addPreProcessCallbacks($parentNode, $sectionName);
         $this->addPostProcessCallbacks(
@@ -168,7 +167,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
         $this->callConfigureCallbacks($node, $sectionName);
         $this->addPreProcessCallbacks($parentNode, $sectionName);
         $this->addPostProcessCallbacks(

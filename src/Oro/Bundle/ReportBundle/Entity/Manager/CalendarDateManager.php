@@ -44,15 +44,15 @@ class CalendarDateManager
      */
     protected function getDatesFromInterval($append = false)
     {
-        $startDate = new \DateTime();
+        $timeZone = new \DateTimeZone('UTC');
+        $startDate = new \DateTime('now midnight', $timeZone);
         $startDate->setDate($startDate->format('Y'), 1, 1);
-        $startDate->setTime(0, 0, 0);
 
         if ($append) {
             $startDate = $this->getLastDate() ?: $startDate;
         }
 
-        $period = new \DatePeriod($startDate, new \DateInterval('P1D'), new \DateTime('tomorrow + 1 day'));
+        $period = new \DatePeriod($startDate, new \DateInterval('P1D'), new \DateTime('tomorrow midnight', $timeZone));
 
         return $period;
     }

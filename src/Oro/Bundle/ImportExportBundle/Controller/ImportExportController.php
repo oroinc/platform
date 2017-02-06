@@ -166,7 +166,7 @@ class ImportExportController extends Controller
                 'userId' => $this->getUser()->getId(),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
-                $this->getOptionsFromRequest($request)
+                'options' => $this->getOptionsFromRequest($request),
             ]
         );
 
@@ -196,10 +196,9 @@ class ImportExportController extends Controller
                 'userId' => $this->getUser()->getId(),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
-                $this->getOptionsFromRequest($request)
+                'options' => $this->getOptionsFromRequest($request),
             ]
         );
-
 
         return new JsonResponse(['success' => true]);
     }

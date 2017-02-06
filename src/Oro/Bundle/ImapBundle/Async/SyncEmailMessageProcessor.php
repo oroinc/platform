@@ -3,7 +3,7 @@ namespace Oro\Bundle\ImapBundle\Async;
 
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -13,7 +13,7 @@ use Oro\Component\MessageQueue\Util\JSON;
 class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var ImapEmailSynchronizer
+     * @var EmailSynchronizerInterface
      */
     private $emailSynchronizer;
 
@@ -23,10 +23,10 @@ class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
     private $logger;
 
     /**
-     * @param ImapEmailSynchronizer $emailSynchronizer
+     * @param EmailSynchronizerInterface $emailSynchronizer
      * @param LoggerInterface $logger
      */
-    public function __construct(ImapEmailSynchronizer $emailSynchronizer, LoggerInterface $logger)
+    public function __construct(EmailSynchronizerInterface $emailSynchronizer, LoggerInterface $logger)
     {
         $this->emailSynchronizer = $emailSynchronizer;
         $this->logger = $logger;

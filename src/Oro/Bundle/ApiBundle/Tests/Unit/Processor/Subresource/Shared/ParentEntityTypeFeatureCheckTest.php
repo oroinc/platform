@@ -3,24 +3,21 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeFeatureCheck;
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ParentEntityTypeFeatureCheckTest extends \PHPUnit_Framework_TestCase
+class ParentEntityTypeFeatureCheckTest extends GetSubresourceProcessorTestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var FeatureChecker|\PHPUnit_Framework_MockObject_MockObject */
     protected $featureChecker;
 
-    /**
-     * @var ParentEntityTypeFeatureCheck
-     */
+    /** @var ParentEntityTypeFeatureCheck */
     protected $processor;
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -28,40 +25,32 @@ class ParentEntityTypeFeatureCheckTest extends \PHPUnit_Framework_TestCase
         $this->processor = new ParentEntityTypeFeatureCheck($this->featureChecker);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     */
     public function testProcessDisabled()
     {
-        $className = 'TestClass';
+        $parentClassName = 'Test\Class';
 
-        $context = $this->getMockBuilder(SubresourceContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $context->expects($this->once())
-            ->method('getParentClassName')
-            ->willReturn($className);
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
-            ->with($className, 'api_resources')
+            ->with($parentClassName, 'api_resources')
             ->willReturn(false);
-        $this->expectException(AccessDeniedException::class);
 
-        $this->processor->process($context);
+        $this->context->setParentClassName($parentClassName);
+        $this->processor->process($this->context);
     }
 
     public function testProcessEnabled()
     {
-        $className = 'TestClass';
+        $parentClassName = 'Test\Class';
 
-        $context = $this->getMockBuilder(SubresourceContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $context->expects($this->once())
-            ->method('getParentClassName')
-            ->willReturn($className);
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
-            ->with($className, 'api_resources')
+            ->with($parentClassName, 'api_resources')
             ->willReturn(true);
 
-        $this->processor->process($context);
+        $this->context->setParentClassName($parentClassName);
+        $this->processor->process($this->context);
     }
 }

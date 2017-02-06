@@ -333,7 +333,7 @@ datagrids:
             query:
                 select:
                     - attributeGroup.id
-                    - attributeFamily.code
+                    - attributeGroup.code
                     - attributeGroup.isVisible
                 from:
                     - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup', alias: attributeGroup }

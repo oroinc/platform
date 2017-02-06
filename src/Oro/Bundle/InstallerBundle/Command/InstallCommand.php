@@ -112,6 +112,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         if ($forceInstall) {
             // if --force option we have to clear cache and set installed to false
             $this->updateInstalledFlag(false);
+            $this->clearCheckDatabaseState();
             $commandExecutor->runCommand(
                 'cache:clear',
                 [
@@ -610,6 +611,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $params                        = $dumper->parse();
         $params['system']['installed'] = $installed;
         $dumper->dump($params);
+    }
+
+    /**
+     * Clears the state of all database checkers to make sure they will recheck the database state
+     */
+    protected function clearCheckDatabaseState()
+    {
+        $this->getContainer()->get('oro_entity.database_checker.state_manager')->clearState();
     }
 
     /**
