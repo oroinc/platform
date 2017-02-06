@@ -24,38 +24,115 @@ class PageTemplatesManagerTest extends \PHPUnit_Framework_TestCase
         $this->pageTemplatesManager = new PageTemplatesManager($this->themeManagerMock);
     }
 
-    public function testGetRoutePageTemplates()
+    /**
+     * @dataProvider routePageTemplatesDataProvider
+     *
+     * @param array $themes
+     * @param array $expected
+     */
+    public function testGetRoutePageTemplates(array $themes, array $expected)
     {
-        $theme1 = new Theme('Theme1');
-        $theme1->addPageTemplate(new PageTemplate('Page template 1', 'some_key1', 'route_name_1'));
-        $theme1->addPageTemplateTitle('route_name_1', 'Route title 1');
-        $theme2 = new Theme('Theme2');
-        $theme2->addPageTemplate(new PageTemplate('Page template 2', 'some_key2', 'route_name_1'));
-        $theme2->addPageTemplateTitle('route_name_1', 'Route title 2');
-        $theme3 = new Theme('Theme3');
-        $theme3->addPageTemplate(new PageTemplate('Page template 3', 'some_key3', 'route_name_with_no_title_defined'));
-
         $this->themeManagerMock->expects($this->once())
             ->method('getAllThemes')
-            ->willReturn([$theme1, $theme2, $theme3]);
+            ->willReturn($themes);
 
-        $expected = [
-            'route_name_1' => [
-                'label' => 'Route title 2',
-                'choices' => [
-                    'some_key1' => 'Page template 1',
-                    'some_key2' => 'Page template 2'
+        $this->assertEquals($expected, $this->pageTemplatesManager->getRoutePageTemplates());
+    }
+
+    /**
+     * @return array
+     */
+    public function routePageTemplatesDataProvider()
+    {
+        return [
+            'with title' => [
+                'themes' => [
+                    $this->getTheme('Theme1', [
+                        new PageTemplate('Page Template 1', 'some_key1_1', 'route_name_1'),
+                    ], [
+                        'route_name_1' => 'Route Title 1',
+                    ]),
+                    $this->getTheme('Theme2', [
+                        new PageTemplate('Page Template 2', 'some_key2_1', 'route_name_2'),
+                    ], [
+                        'route_name_2' => 'Route Title 2',
+                    ]),
+                ],
+                'expected' => [
+                    'route_name_1' => [
+                        'label' => 'Route Title 1',
+                        'choices' => [
+                            'some_key1_1' => 'Page Template 1',
+                        ]
+                    ],
+                    'route_name_2' => [
+                        'label' => 'Route Title 2',
+                        'choices' => [
+                            'some_key2_1' => 'Page Template 2'
+                        ]
+                    ],
                 ]
             ],
-            'route_name_with_no_title_defined' => [
-                'label' => 'route_name_with_no_title_defined',
-                'choices' => [
-                    'some_key3' => 'Page template 3',
+            'with title overriding' => [
+                'themes' => [
+                    $this->getTheme('Theme1', [
+                        new PageTemplate('Page Template 1', 'some_key1_1', 'route_name_1'),
+                    ], [
+                        'route_name_1' => 'Route Title 1',
+                    ]),
+                    $this->getTheme('Theme2', [
+                        new PageTemplate('Page Template 2', 'some_key2_1', 'route_name_1'),
+                    ], [
+                        'route_name_1' => 'New Route Title 1',
+                    ]),
+                ],
+                'expected' => [
+                    'route_name_1' => [
+                        'label' => 'New Route Title 1',
+                        'choices' => [
+                            'some_key1_1' => 'Page Template 1',
+                            'some_key2_1' => 'Page Template 2'
+                        ]
+                    ],
                 ]
-            ]
+            ],
+            'without title' => [
+                'themes' => [
+                    $this->getTheme('Theme1', [
+                        new PageTemplate('Page Template 1', 'some_key1_1', 'route_name_1'),
+                    ])
+                ],
+                'expected' => [
+                    'route_name_1' => [
+                        'label' => 'route_name_1',
+                        'choices' => [
+                            'some_key1_1' => 'Page Template 1',
+                        ]
+                    ]
+                ]
+            ],
         ];
-        $result = $this->pageTemplatesManager->getRoutePageTemplates();
+    }
 
-        $this->assertEquals($expected, $result);
+    /**
+     * @param string         $themeName
+     * @param PageTemplate[] $pageTemplates
+     * @param array          $pageTemplateTitles
+     *
+     * @return Theme
+     */
+    private function getTheme($themeName, array $pageTemplates, array $pageTemplateTitles = [])
+    {
+        $theme = new Theme($themeName);
+
+        foreach ($pageTemplates as $pageTemplate) {
+            $theme->addPageTemplate($pageTemplate);
+        }
+
+        foreach ($pageTemplateTitles as $key => $value) {
+            $theme->addPageTemplateTitle($key, $value);
+        }
+
+        return $theme;
     }
 }
