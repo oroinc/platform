@@ -1,0 +1,68 @@
+layout:
+    actions:
+        - '@setOption':
+            id: page_title
+            optionName: text
+            optionValue: 'oro_frontend_style_book.groups.forms.title'
+            
+        - '@add':
+            id: form_text
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["text"]'
+        - '@add':
+            id: form_password
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["password"]'
+        - '@add':
+            id: form_checkbox
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["checkbox"]'
+        - '@add':
+            id: form_radio
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["radio"]'
+        - '@add':
+            id: form_checkboxes
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["checkboxes"]'
+        - '@add':
+            id: form_radios
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["radios"]'
+        - '@add':
+            id: form_select
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["select"]'
+        - '@add':
+            id: form_multiselect
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["multiselect"]'
+        - '@add':
+            id: form_datetime
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["datetime"]'
+        - '@add':
+            id: form_textarea
+            parentId: style_book_group_elements_container
+            blockType: form_field
+            options:
+                form: '=data["style_book_form"].getStyleBookFormView()["textarea"]'
+    conditions: 'context["action"]=="forms"'
