@@ -219,7 +219,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
         $this->expectsJsonResponseWithContent($response, $expectedContent);
     }
 
-
     public function testHandleRemoveValidationError()
     {
         $entityClassName = TestActivityTarget::class;
