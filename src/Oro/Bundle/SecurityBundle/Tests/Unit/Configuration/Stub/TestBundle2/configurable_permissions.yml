@@ -1,0 +1,10 @@
+oro_configurable_permissions:
+    commerce:
+        default: true
+        entities:
+            TestItem:
+                update: false
+                delete: true
+        capability:
+            action1: false
+            action2: true

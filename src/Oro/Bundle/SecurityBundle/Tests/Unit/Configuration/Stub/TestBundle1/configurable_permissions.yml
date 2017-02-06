@@ -1,0 +1,7 @@
+oro_configurable_permissions:
+    commerce:
+        entities:
+            TestItem:
+                update: true
+        capability:
+            action1: true

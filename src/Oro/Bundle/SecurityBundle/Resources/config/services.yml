@@ -677,10 +677,19 @@ services:
     oro_security.configuration.permission_list_configuration:
         class: %oro_security.configuration.permission_list_configuration.class%
 
+    oro_security.configurable_configuration.permission_list_configuration:
+        class: 'Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionListConfiguration'
+
     oro_security.configuration.provider.permission_configuration:
         class: %oro_security.configuration.provider.permission_configuration.class%
         arguments:
             - '@oro_security.configuration.permission_list_configuration'
+            - %kernel.bundles%
+
+    oro_security.configuration.provider.configurable_permission_configuration:
+        class: 'Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider'
+        arguments:
+            - '@oro_security.configurable_configuration.permission_list_configuration'
             - %kernel.bundles%
 
     oro_security.configuration.builder.permission_configuration:
