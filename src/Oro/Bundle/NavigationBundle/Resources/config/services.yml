@@ -63,6 +63,7 @@ services:
             - '@oro_security.security_facade.link'
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: oro_navigation.menu_extension, priority: 100 }
 
