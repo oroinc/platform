@@ -10,13 +10,13 @@ use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 
 /**
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class LanguageOperationsTest extends ActionTestCase
 {
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader(), true);
+        $this->initClient([], $this->generateBasicAuthHeader());
 
         $this->loadFixtures(
             [

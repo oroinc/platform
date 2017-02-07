@@ -6,8 +6,7 @@ class NestedImportWithConditionsTest extends AbstractLayoutBuilderTest
 {
     public function testLayoutTree()
     {
-        $expectedTree = [
-            'head' => [],
+        $expectedTree = ['head' => [],
             'body' => [
                 'wrapper' => [
                     'layout_1_wrapper' => [

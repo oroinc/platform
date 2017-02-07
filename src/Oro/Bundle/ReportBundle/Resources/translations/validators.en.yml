@@ -1,0 +1,5 @@
+oro:
+    report:
+        definition:
+            columns:
+                mandatory: You must specify at least one column for the report grid

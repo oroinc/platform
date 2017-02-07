@@ -3,49 +3,49 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
+use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * Class OwnerTreeProvider
- * @package Oro\Bundle\SecurityBundle\Owner
- */
 class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
-    /**
-     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::CACHE_KEY instead
-     */
-    const CACHE_KEY = 'data';
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var EntityManager
-     *
-     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::getManagerForClass instead
-     */
-    protected $em;
-
-    /** @var CacheProvider */
-    private $cache;
+    /** @var TokenStorageInterface */
+    private $tokenStorage;
 
     /** @var OwnershipMetadataProvider */
     private $ownershipMetadataProvider;
 
     /**
-     * {@inheritdoc}
+     * @param ManagerRegistry           $doctrine
+     * @param DatabaseChecker           $databaseChecker
+     * @param CacheProvider             $cache
+     * @param MetadataProviderInterface $ownershipMetadataProvider
+     * @param TokenStorageInterface     $tokenStorage
      */
-    public function getCache()
-    {
-        if (!$this->cache) {
-            $this->cache = $this->getContainer()->get('oro_security.ownership_tree_provider.cache');
-        }
-
-        return $this->cache;
+    public function __construct(
+        ManagerRegistry $doctrine,
+        DatabaseChecker $databaseChecker,
+        CacheProvider $cache,
+        MetadataProviderInterface $ownershipMetadataProvider,
+        TokenStorageInterface $tokenStorage
+    ) {
+        parent::__construct($databaseChecker, $cache);
+        $this->doctrine = $doctrine;
+        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -53,19 +53,12 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      */
     public function supports()
     {
-        return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
-    }
+        $token = $this->tokenStorage->getToken();
+        if (null === $token) {
+            return false;
+        }
 
-    /**
-     * @param EntityManager $em
-     * @param CacheProvider $cache
-     *
-     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::getContainer instead
-     */
-    public function __construct(EntityManager $em, CacheProvider $cache)
-    {
-        $this->cache = $cache;
-        $this->em    = $em;
+        return $token->getUser() instanceof User;
     }
 
     /**
@@ -167,6 +160,16 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     }
 
     /**
+     * @param string $className
+     *
+     * @return EntityManager
+     */
+    protected function getManagerForClass($className)
+    {
+        return $this->doctrine->getManagerForClass($className);
+    }
+
+    /**
      * @param string $entityClass
      *
      * @return EntityRepository
@@ -177,15 +180,10 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     }
 
     /**
-     * {@inheritdoc}
+     * @return MetadataProviderInterface
      */
     protected function getOwnershipMetadataProvider()
     {
-        if (!$this->ownershipMetadataProvider) {
-            $this->ownershipMetadataProvider = $this->getContainer()
-                ->get('oro_security.owner.ownership_metadata_provider');
-        }
-
         return $this->ownershipMetadataProvider;
     }
 }

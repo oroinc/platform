@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional;
 
+use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 
@@ -59,5 +62,23 @@ trait SearchExtensionTrait
                 )
             );
         }
+    }
+
+    /**
+     * Workaround to clear MyISAM table as it's not rolled back by transaction.
+     */
+    protected function clearIndexTextTable($class = IndexText::class)
+    {
+        /** @var OroEntityManager $manager */
+        $manager = $this->getContainer()->get('doctrine')->getManager('search');
+        if ($manager->getConnection()->getDatabasePlatform()->getName() !== DatabasePlatformInterface::DATABASE_MYSQL) {
+            return;
+        }
+
+        $repository = $manager->getRepository($class);
+        $repository->createQueryBuilder('t')
+            ->delete()
+            ->getQuery()
+            ->execute();
     }
 }

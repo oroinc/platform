@@ -159,7 +159,7 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|AttributeGroupRelation[]
      */
     public function getAttributeRelations()
     {
