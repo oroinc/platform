@@ -227,6 +227,17 @@ services:
             - '@oro_security.configuration.builder.permission_configuration'
             - '@oro_security.cache.provider.permission'
 
+    oro_security.cache.provider.configurable_permission:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_security_configurable_permission' ] ]
+
+    oro_security.acl.configurable_permission_provider:
+        class: Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider
+        arguments:
+            - '@oro_security.configuration.provider.configurable_permission_configuration'
+            - '@oro_security.cache.provider.configurable_permission'
+
     oro_security.acl.object_identity_factory:
         class: %oro_security.acl.object_identity_factory.class%
         arguments:
