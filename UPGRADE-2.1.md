@@ -54,12 +54,23 @@ EmailBundle
         - `MailboxProcessStorage` $mailboxProcessStorage,
         - `SecurityFacade` $securityFacade,
         - `ServiceLink` $relatedEmailsProviderLink
+- `Oro/Bundle/EmailBundle/Migrations/Data/ORM/EnableEmailFeature` removed, feature enabled by default
 
 EntityBundle
 ------------
 - Class `Oro\Bundle\EntityBundle\Twig\EntityFallbackExtension`
     - construction signature was changed now it takes next arguments:
         - `ServiceLink` $fallbackResolverLink
+
+EntityConfigBundle
+------------------
+- Class `Oro\Bundle\EntityConfigBundle\Config\ConfigManager`
+    - removed property `protected $providers`
+    - removed property `protected $propertyConfigs`
+    - removed method `public function addProvider(ConfigProvider $provider)` in favor of `public function setProviderBag(ConfigProviderBag $providerBag)`
+- Class `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider`
+    - removed property `protected $propertyConfig`
+    - construction signature was changed. The parameter `array $config` was replaced with `PropertyConfigBag $configBag`
 
 EntityPaginationBundle
 ----------------------
@@ -116,6 +127,8 @@ SearchBundle
 `Oro\Bundle\SearchBundle\Engine\EngineInterface` instead
 - Return value types in `Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and
 `Oro\Bundle\SearchBundle\Query\AbstractSearchQuery` were fixed to support fluent interface
+`Oro\Bundle\SearchBundle\Engine\Orm` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
+`Oro\Bundle\SearchBundle\Engine\OrmIndexer` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
 
 SecurityBundle
 --------------
@@ -152,6 +165,9 @@ SecurityBundle
             TokenStorageInterface $tokenStorage
         )
         ```
+- `Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension`:
+    - removed parameter `EntityClassResolver $entityClassResolver` from the constructor
+    - removed property `protected $entityClassResolver`
 
 TranslationBundle
 -----------------
@@ -163,6 +179,12 @@ UIBundle
     - construction signature was changed now it takes next arguments:
         - `ServiceLink` $formatterManagerLink
 
+UserBundle
+----------
+- Class `Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator`
+    - replaced parameter `EntityManager $em` with `ManagerRegistry $doctrine` in the constructor
+    - removed property `protected $em`
+
 WorkflowBundle
 --------------
 - `Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader`:
@@ -173,3 +195,23 @@ WorkflowBundle
     - removed method `protected function checkDatabase()`
     - removed method `protected function getEntityManager()`
     
+
+TestFrameworkBundle
+-------------------
+- `@dbIsolation annotation removed, applied as defult behavior`
+- `@dbReindex annotation removed, use \Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait::clearIndexTextTable`
+- `Oro/Bundle/TestFrameworkBundle/Test/Client`:
+    - removed property `$pdoConnection`
+    - removed property `$kernel`
+    - removed property `$hasPerformedRequest`
+    - removed property `$loadedFixtures`
+    - removed method `reboot`
+    - removed method `doRequest`
+- `Oro/Bundle/TestFrameworkBundle/Test/WebTestCase`:
+    - removed property `$dbIsolation`
+    - removed property `$dbReindex`
+    - removed method `getDbIsolationSetting`
+    - removed method `getDbReindexSetting`
+    - removed method `getDbReindexSetting`
+    - renamed method `setUpBeforeClass` to `beforeClass`
+    - renamed method `tearDownAfterClass` to `afterClass`

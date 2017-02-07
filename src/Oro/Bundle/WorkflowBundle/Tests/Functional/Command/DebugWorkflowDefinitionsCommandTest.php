@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithGroups;
 
-/**
- * @dbIsolation
- */
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {
     protected function setUp()

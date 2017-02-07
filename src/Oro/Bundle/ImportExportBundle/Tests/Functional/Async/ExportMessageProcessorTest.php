@@ -20,15 +20,7 @@ class ExportMessageProcessorTest extends WebTestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->initClient();
-    }
-    protected function tearDown()
-    {
-        $this->tearDownMessageCollector();
-
-        parent::tearDown();
     }
 
     public function testCouldBeConstructedByContainer()

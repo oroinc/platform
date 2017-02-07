@@ -9,9 +9,6 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTransitionTriggers;
 
-/**
- * @dbIsolation
- */
 class TransitionEventTriggerRepositoryTest extends WebTestCase
 {
     /** @var TransitionEventTriggerRepository */

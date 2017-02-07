@@ -1,7 +1,7 @@
 define([
     'jquery',
     'oroui/js/error'
-], function($, Error) {
+], function($, error) {
     'use strict';
-    $(document).ajaxError($.proxy(Error.handle, Error));
+    $(document).ajaxError($.proxy(error.handle, error));
 });

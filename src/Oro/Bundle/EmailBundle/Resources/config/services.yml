@@ -307,6 +307,7 @@ services:
 
     oro_email.listener.auto_response_listener:
         class: %oro_email.listener.auto_response_listener.class%
+        public: false
         arguments:
             - '@oro_email.link.autoresponserule_manager'
             - '@oro_message_queue.client.message_producer'
