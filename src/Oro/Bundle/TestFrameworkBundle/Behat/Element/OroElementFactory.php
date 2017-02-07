@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Testwork\Suite\Suite;
@@ -105,12 +106,21 @@ class OroElementFactory implements SuiteAwareInterface
      * Specific element most commonly has more wide interface than NodeElement
      *
      * @param string $name Element name
-     * @param NodeElement $element
-     *
+     * @param NodeElement|null $element
      * @return Element
+     * @throws ElementNotFoundException
      */
-    public function wrapElement($name, NodeElement $element)
+    public function wrapElement($name, $element)
     {
+        if (null === $element) {
+            throw new ElementNotFoundException(
+                $this->mink->getSession()->getDriver(),
+                'OroElement',
+                'NodeElement',
+                $name
+            );
+        }
+
         if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find element with "%s" name',

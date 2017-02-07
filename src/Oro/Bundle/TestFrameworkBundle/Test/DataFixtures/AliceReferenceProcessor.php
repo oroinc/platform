@@ -9,7 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class AliceReferenceProcessor implements MethodInterface
 {
-    private static $regex = '/^@(?P<ref>[^<]*)$/';
+    private static $regex = '/^@(?P<ref>[^<*]*)$/';
 
     /**
      * @var Collection
