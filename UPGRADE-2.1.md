@@ -7,17 +7,113 @@ ActionBundle
     - work with `RouteCollection` is performance consuming
     - it was used to check bundle presence, which could be done with `service_exists`
 
+ActivityListBundle
+------------------
+- Class `Oro\Bundle\ActivityListBundle\Filter`
+    - construction signature was changed now it takes next arguments:
+        - `FormFactoryInterface` $factory,
+        - `FilterUtility` $util,
+        - `ActivityAssociationHelper` $activityAssociationHelper,
+        - `ActivityListChainProvider` $activityListChainProvider,
+        - `ActivityListFilterHelper` $activityListFilterHelper,
+        - `EntityRoutingHelper` $entityRoutingHelper,
+        - `ServiceLink` $queryDesignerManagerLink,
+        - `ServiceLink` $datagridHelperLink
+
+AddressBundle
+-------------
+- Class `Oro\Bundle\AddressBundle\Twig\PhoneExtension`
+    - construction signature was changed now it takes next arguments:
+        - `ServiceLink` $providerLink
+
+DashboardBundle
+---------------
+- Class `Oro\Bundle\DashboardBundle\Twig\DashboardExtension`
+    - construction signature was changed now it takes next arguments:
+        - `ServiceLink` $converterLink,
+        - `ServiceLink` $managerLink,
+        - `EntityProvider` $entityProvider
+
+DataAuditBundle
+---------------
+- Class `Oro\Bundle\DataAuditBundle\Filter\AuditFilter`
+    - construction signature was changed now it takes next arguments:
+        - `FormFactoryInterface` $factory,
+        - `FilterUtility` $util,
+        - `ServiceLink` $queryDesignerManagerLink
+
+EmailBundle
+-----------
+- Added `Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface` and implemented it in `Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer`
+- Class `Oro\Bundle\EmailBundle\Twig\EmailExtension`
+    - construction signature was changed now it takes next arguments:
+        - `EmailHolderHelper` $emailHolderHelper,
+        - `EmailAddressHelper` $emailAddressHelper,
+        - `EmailAttachmentManager` $emailAttachmentManager,
+        - `EntityManager` $em,
+        - `MailboxProcessStorage` $mailboxProcessStorage,
+        - `SecurityFacade` $securityFacade,
+        - `ServiceLink` $relatedEmailsProviderLink
+- `Oro/Bundle/EmailBundle/Migrations/Data/ORM/EnableEmailFeature` removed, feature enabled by default
+
+EntityBundle
+------------
+- Class `Oro\Bundle\EntityBundle\Twig\EntityFallbackExtension`
+    - construction signature was changed now it takes next arguments:
+        - `ServiceLink` $fallbackResolverLink
+
+EntityConfigBundle
+------------------
+- Class `Oro\Bundle\EntityConfigBundle\Config\ConfigManager`
+    - removed property `protected $providers`
+    - removed property `protected $propertyConfigs`
+    - removed method `public function addProvider(ConfigProvider $provider)` in favor of `public function setProviderBag(ConfigProviderBag $providerBag)`
+- Class `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider`
+    - removed property `protected $propertyConfig`
+    - construction signature was changed. The parameter `array $config` was replaced with `PropertyConfigBag $configBag`
+
+EntityPaginationBundle
+----------------------
+- Class `Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector`
+    - construction signature was changed now it takes next arguments:
+        - `ServiceLink` $dataGridManagerLink,
+        - `DoctrineHelper` $doctrineHelper,
+        - `AclHelper` $aclHelper,
+        - `EntityPaginationStorage` $storage,
+        - `EntityPaginationManager` $paginationManager
+
 DataGridBundle
 --------------
- - Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
+- Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
+- Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
+    - construction signature was changed now it takes next arguments:
+        - `ServiceLink` $managerLink,
+        - `NameStrategyInterface` $nameStrategy,
+        - `RouterInterface` $router,
+        - `SecurityFacade` $securityFacade,
+        - `DatagridRouteHelper` $datagridRouteHelper,
+        - `RequestStack` $requestStack,
+        - `LoggerInterface` $logger = null
 
 EntityConfigBundle
 ------------------
 - Added parameter `ConfigDatabaseChecker $databaseChecker` to the constructor of `Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager`
 
+ImapBundle
+----------
+- Updated `Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor::__construct()` signature to use `Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface`.
+
 LayoutBundle
 ------------
 - Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
+LocaleBundle
+------------
+- Class `Oro\Bundle\LocaleBundle\Formatter\AddressFormatter`
+    - construction signature was changed now it takes next arguments:
+        - `LocaleSettings` $localeSettings,
+        - `NameFormatter` $nameFormatter,
+        - `PropertyAccessor` $propertyAccessor
 
 SearchBundle
 ------------
@@ -31,6 +127,8 @@ SearchBundle
 `Oro\Bundle\SearchBundle\Engine\EngineInterface` instead
 - Return value types in `Oro\Bundle\SearchBundle\Query\SearchQueryInterface` and
 `Oro\Bundle\SearchBundle\Query\AbstractSearchQuery` were fixed to support fluent interface
+`Oro\Bundle\SearchBundle\Engine\Orm` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
+`Oro\Bundle\SearchBundle\Engine\OrmIndexer` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
 
 SecurityBundle
 --------------
@@ -67,10 +165,25 @@ SecurityBundle
             TokenStorageInterface $tokenStorage
         )
         ```
+- `Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension`:
+    - removed parameter `EntityClassResolver $entityClassResolver` from the constructor
+    - removed property `protected $entityClassResolver`
 
 TranslationBundle
 -----------------
 - Added parameter `ConfigDatabaseChecker $databaseChecker` to the constructor of `Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader`
+
+UIBundle
+--------
+- Class `Oro\Bundle\UIBundle\Twig\FormatExtension`
+    - construction signature was changed now it takes next arguments:
+        - `ServiceLink` $formatterManagerLink
+
+UserBundle
+----------
+- Class `Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator`
+    - replaced parameter `EntityManager $em` with `ManagerRegistry $doctrine` in the constructor
+    - removed property `protected $em`
 
 WorkflowBundle
 --------------
@@ -81,3 +194,24 @@ WorkflowBundle
     - removed property `protected $requiredTables`
     - removed method `protected function checkDatabase()`
     - removed method `protected function getEntityManager()`
+    
+
+TestFrameworkBundle
+-------------------
+- `@dbIsolation annotation removed, applied as defult behavior`
+- `@dbReindex annotation removed, use \Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait::clearIndexTextTable`
+- `Oro/Bundle/TestFrameworkBundle/Test/Client`:
+    - removed property `$pdoConnection`
+    - removed property `$kernel`
+    - removed property `$hasPerformedRequest`
+    - removed property `$loadedFixtures`
+    - removed method `reboot`
+    - removed method `doRequest`
+- `Oro/Bundle/TestFrameworkBundle/Test/WebTestCase`:
+    - removed property `$dbIsolation`
+    - removed property `$dbReindex`
+    - removed method `getDbIsolationSetting`
+    - removed method `getDbReindexSetting`
+    - removed method `getDbReindexSetting`
+    - renamed method `setUpBeforeClass` to `beforeClass`
+    - renamed method `tearDownAfterClass` to `afterClass`

@@ -73,7 +73,7 @@ services:
             - '@oro_message_queue.job.dependent_job_service'
 
     oro_importexport.async.preparing_http_import_validation:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor
+        class: 'Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor'
         parent: oro_importexport.async.abstract_preparing_http_import
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

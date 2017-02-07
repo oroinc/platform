@@ -267,12 +267,6 @@ define([
          */
         _onErrorResponse: function(collection, jqxhr) {
             this.finishSync();
-            if (jqxhr.status === 403) {
-                mediator.execute('showFlashMessage', 'error', __('oro.ui.forbidden_error'));
-            } else if (jqxhr.status !== 400) {
-                // handling of 400 response should be implemented
-                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-            }
         },
 
         /**

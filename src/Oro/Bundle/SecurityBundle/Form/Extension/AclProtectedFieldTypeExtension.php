@@ -16,7 +16,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Validator\ConstraintViolation;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -29,9 +28,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 {
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -49,21 +45,18 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     protected $disabledFields = [];
 
     /**
-     * @param SecurityFacade           $securityFacade
-     * @param EntityClassResolver      $entityClassResolver
-     * @param DoctrineHelper           $doctrineHelper
-     * @param ConfigProvider           $configProvider
-     * @param LoggerInterface          $logger
+     * @param SecurityFacade  $securityFacade
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ConfigProvider  $configProvider
+     * @param LoggerInterface $logger
      */
     public function __construct(
         SecurityFacade $securityFacade,
-        EntityClassResolver $entityClassResolver,
         DoctrineHelper $doctrineHelper,
         ConfigProvider $configProvider,
         LoggerInterface $logger
     ) {
         $this->securityFacade = $securityFacade;
-        $this->entityClassResolver = $entityClassResolver;
         $this->doctrineHelper = $doctrineHelper;
         $this->configProvider = $configProvider;
         $this->logger = $logger;
@@ -214,7 +207,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     protected function isApplicable(array $options)
     {
         $className = empty($options['data_class']) ? false : $options['data_class'];
-        if (!$className || !$this->entityClassResolver->isEntity($className)) {
+        if (!$className || !$this->doctrineHelper->isManageableEntityClass($className)) {
             // apply extension only to forms that bound to entities
             // cause there's no way to get object identifier for non-entity (can be any field, or even without it)
             return false;

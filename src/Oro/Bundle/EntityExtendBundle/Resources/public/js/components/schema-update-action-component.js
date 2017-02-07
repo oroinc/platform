@@ -57,7 +57,10 @@ define(function(require) {
                     modal.$el.find('.modal-footer').html(progress);
                     progress.show();
 
-                    $.post(url, function() {
+                    $.post({
+                        url: url,
+                        errorHandlerMessage: __('oro.entity_extend.schema_update_failed')
+                    }).done(function() {
                         modal.close();
                         mediator.execute(
                             'showFlashMessage',
@@ -68,15 +71,13 @@ define(function(require) {
                         mediator.execute('showMessage', 'info', __('Please wait until page will be reloaded...'));
                         mediator.execute('showLoading');
                         // force reload of the application to make sure 'js/routes' is reloaded
-                        if (typeof self.options.redirectRoute  !== 'undefined') {
+                        if (typeof self.options.redirectRoute !== 'undefined') {
                             window.location.href = routing.generate(self.options.redirectRoute);
                         } else {
                             window.location.reload();
                         }
-
                     }).fail(function() {
                         modal.close();
-                        mediator.execute('showFlashMessage', 'error', __('oro.entity_extend.schema_update_failed'));
                     });
                 }
 

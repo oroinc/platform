@@ -47,6 +47,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
         arguments:
           - '@knp_gaufrette.filesystem_map'
+        lazy: true
 
     oro_attachment.image_factory:
         class: Oro\Bundle\AttachmentBundle\Tools\ImageFactory

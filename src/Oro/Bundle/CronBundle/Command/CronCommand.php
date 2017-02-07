@@ -39,7 +39,6 @@ class CronCommand extends ContainerAwareCommand
         }
 
         $schedules = $this->getAllSchedules();
-
         foreach ($schedules as $schedule) {
             $cronExpression = $this->getCronHelper()->createCron($schedule->getDefinition());
             if ($cronExpression->isDue()) {
