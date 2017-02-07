@@ -5,11 +5,10 @@ define([
     'oroui/js/tools',
     'oroui/js/tools/logger',
     'oroform/js/optional-validation-groups-handler',
+    'oroui/js/error',
     'jquery.validate'
-], function($, _, __, tools, logger, validationHandler) {
+], function($, _, __, tools, logger, validationHandler, error) {
     'use strict';
-
-    var console = window.console;
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -110,8 +109,8 @@ define([
         _.each(validationsOf(element), function(param, method) {
             if ($.validator.methods[method]) {
                 rules[method] = {param: param};
-            } else if ($(element.form).data('validator').settings.debug && console) {
-                console.error('Validation method "' + method + '" does not exist');
+            } else {
+                error.showErrorInConsole('Validation method "' + method + '" does not exist');
             }
         });
         // make sure required validators are at front

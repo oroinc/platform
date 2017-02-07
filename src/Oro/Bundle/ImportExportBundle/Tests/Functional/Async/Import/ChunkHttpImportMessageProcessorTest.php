@@ -10,6 +10,9 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
+/**
+ * @nestTransactionsWithSavepoints
+ */
 class ChunkHttpImportMessageProcessorTest extends WebTestCase
 {
     protected $fixturePath;

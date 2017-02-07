@@ -4,9 +4,6 @@ namespace Oro\Bundle\LoggerBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LoggerEmailNotificationCommandTest extends WebTestCase
 {
     /**

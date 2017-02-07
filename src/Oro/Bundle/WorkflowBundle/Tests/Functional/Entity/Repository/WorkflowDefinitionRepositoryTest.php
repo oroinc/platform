@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesFo
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionScopes;
 
-/**
- * @dbIsolation
- */
 class WorkflowDefinitionRepositoryTest extends WebTestCase
 {
     /** @var WorkflowDefinitionRepository */

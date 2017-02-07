@@ -6,9 +6,6 @@ use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ControllersTest extends WebTestCase
 {
 
