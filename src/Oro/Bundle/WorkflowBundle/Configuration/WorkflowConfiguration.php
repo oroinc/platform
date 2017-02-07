@@ -36,6 +36,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
+    const DEFAULT_PAGE_FORM_DATA_ATTRIBUTE = 'form_data';
+
+    const NODE_PAGE_FORM_CONFIGURATION = 'page_form_configuration';
 
     /**
      * @param array $configs
@@ -313,11 +316,14 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
-                ->end()
+                    ->append($this->getTransitionPageFormConfiguration())
+                 ->end()
                 ->validate()
                     ->always(
                         function ($value) {
-                            if ($value['display_type'] == 'page' && empty($value['form_options'])) {
+                            if ($value['display_type'] == 'page' &&
+                                (empty($value['form_options']) && empty($value[self::NODE_PAGE_FORM_CONFIGURATION]))
+                            ) {
                                 throw new WorkflowException(
                                     'Display type "page" require "form_options" to be set.'
                                 );
@@ -526,6 +532,32 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->end()
             ->prototype('scalar')
             ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return ArrayNodeDefinition|NodeDefinition
+     */
+    protected function getTransitionPageFormConfiguration()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::NODE_PAGE_FORM_CONFIGURATION);
+        $rootNode
+                ->children()
+                    ->scalarNode('handler')
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('data_attribute')
+                        ->defaultValue(self::DEFAULT_PAGE_FORM_DATA_ATTRIBUTE)
+                    ->end()
+                    ->scalarNode('template')
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('data_provider')
+                        ->isRequired()
+                    ->end()
+                ->end();
 
         return $rootNode;
     }

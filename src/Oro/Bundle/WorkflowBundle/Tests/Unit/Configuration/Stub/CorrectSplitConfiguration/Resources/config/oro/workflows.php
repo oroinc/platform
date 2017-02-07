@@ -66,7 +66,35 @@ return array(
                         )
                     )
                 ),
-            )
+            ),
+            'transition_with_page_form_configuration' =>
+                array(
+                    'step_to' => 'first_step',
+                    'transition_definition' => 'first_transition_definition',
+                    \Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION =>
+                        array(
+                            'handler' => 'handler',
+                            'template' => 'template',
+                            'data_provider' => 'data_provider',
+                            'data_attribute' => 'data_attribute',
+                        ),
+                    'is_start' => false,
+                    'is_hidden' => false,
+                    'is_unavailable_hidden' => false,
+                    'acl_message' => null,
+                    'frontend_options' => array(),
+                    'form_type' => 'oro_workflow_transition',
+                    'display_type' => 'dialog',
+                    'form_options' => array(),
+                    'page_template' => null,
+                    'dialog_template' => null,
+                    'init_entities' => array(),
+                    'init_routes' => array(),
+                    'init_datagrids' => array(),
+                    'init_context_attribute' => 'init_context',
+                    'triggers' => array(),
+                ),
+
         ),
         'transition_definitions' => array(
             'first_transition_definition' => array(

@@ -5,13 +5,16 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
 
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 /**
@@ -20,17 +23,17 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var FormOptionsAssembler|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $formOptionsAssembler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ExpressionFactory|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $conditionFactory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ActionFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $actionFactory;
 
@@ -71,20 +74,28 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'preconditions' => ['@true' => null],
             'conditions' => ['@true' => null],
             'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]],
-        ]
+        ],
+        'with_page_form_configuration' => [
+            WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION => [
+                'handler' => 'handler',
+                'template' => 'template',
+                'data_provider' => 'data_provider',
+                'data_attribute' => 'data_attribute',
+            ],
+        ],
     ];
 
     protected function setUp()
     {
-        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler')
+        $this->formOptionsAssembler = $this->getMockBuilder(FormOptionsAssembler::class)
             ->disableOriginalConstructor()
             ->setMethods(['assemble'])
             ->getMock();
 
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+        $this->conditionFactory = $this->getMockBuilder(ExpressionFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
+        $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
@@ -433,6 +444,19 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'step_to' => 'target_step',
                 ],
                 'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
+            ],
+            'with page_form_configuration' =>[
+                'configuration' => [
+                    'transition_definition' => 'empty_definition',
+                    'step_to' => 'target_step',
+                    WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION => [
+                        'handler' => 'handler',
+                        'template' => 'template',
+                        'data_provider' => 'data_provider',
+                        'data_attribute' => 'data_attribute',
+                    ],
+                ],
+                'transitionDefinition' => self::$transitionDefinitions['with_page_form_configuration'],
             ]
         ];
     }

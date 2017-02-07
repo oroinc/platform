@@ -89,6 +89,21 @@ class Transition
     /** @var string */
     protected $initContextAttribute;
 
+    /** @var string */
+    protected $pageFormHandler;
+
+    /** @var string */
+    protected $pageFormDataAttribute;
+
+    /** @var string */
+    protected $pageFormTemplate;
+
+    /** @var string */
+    protected $pageFormDataProvider;
+
+    /** @var bool */
+    protected $hasPageFormConfiguration = false;
+
     /**
      * Set label.
      *
@@ -668,6 +683,106 @@ class Transition
     public function setInitContextAttribute($initContextAttribute)
     {
         $this->initContextAttribute = $initContextAttribute;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageFormHandler()
+    {
+        return $this->pageFormHandler;
+    }
+
+    /**
+     * @param string $pageFormHandler
+     *
+     * @return $this
+     */
+    public function setPageFormHandler($pageFormHandler)
+    {
+        $this->pageFormHandler = $pageFormHandler;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageFormDataAttribute()
+    {
+        return $this->pageFormDataAttribute;
+    }
+
+    /**
+     * @param string $pageFormDataAttribute
+     *
+     * @return $this
+     */
+    public function setPageFormDataAttribute($pageFormDataAttribute)
+    {
+        $this->pageFormDataAttribute = $pageFormDataAttribute;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageFormTemplate()
+    {
+        return $this->pageFormTemplate;
+    }
+
+    /**
+     * @param string $pageFormTemplate
+     *
+     * @return $this
+     */
+    public function setPageFormTemplate($pageFormTemplate)
+    {
+        $this->pageFormTemplate = $pageFormTemplate;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageFormDataProvider()
+    {
+        return $this->pageFormDataProvider;
+    }
+
+    /**
+     * @param string $pageFormDataProvider
+     *
+     * @return $this
+     */
+    public function setPageFormDataProvider($pageFormDataProvider)
+    {
+        $this->pageFormDataProvider = $pageFormDataProvider;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasPageFormConfiguration()
+    {
+        return $this->hasPageFormConfiguration;
+    }
+
+    /**
+     * @param boolean $hasPageFormConfiguration
+     *
+     * @return $this
+     */
+    public function setHasPageFormConfiguration($hasPageFormConfiguration)
+    {
+        $this->hasPageFormConfiguration = $hasPageFormConfiguration;
 
         return $this;
     }

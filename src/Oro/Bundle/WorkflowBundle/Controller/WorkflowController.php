@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
 use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvents;
@@ -91,6 +92,10 @@ class WorkflowController extends Controller
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowItem);
         $transition = $workflow->getTransitionManager()->getTransition($transitionName);
+
+        if ($transition->hasPageFormConfiguration()) {
+            throw new \Exception('Support of custom forms not implemented. Should be implemented at BAP-13656');
+        }
 
         $routeParams = [
             'transitionName' => $transition->getName(),

@@ -14,13 +14,13 @@ return [
             'active' => true,
         ],
         'scopes' => [
-           [
-               'scope1' => 'value1',
-               'scope2' => 'value2',
-           ],
-           [
-               'scope1' => 'value3',
-           ],
+            [
+                'scope1' => 'value1',
+                'scope2' => 'value2',
+            ],
+            [
+                'scope1' => 'value3',
+            ],
         ],
         'datagrids' => ['datagrid1', 'datagrid2'],
         'steps' => [
@@ -131,7 +131,33 @@ return [
                         'require' => null
                     ]
                 ]
-            ]
+            ],
+            'transition_with_page_form_configuration' =>
+                [
+                    'step_to' => 'first_step',
+                    'transition_definition' => 'first_transition_definition',
+                    \Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION => [
+                        'handler' => 'handler',
+                        'template' => 'template',
+                        'data_provider' => 'data_provider',
+                        'data_attribute' => 'data_attribute',
+                    ],
+                    'is_start' => false,
+                    'is_hidden' => false,
+                    'is_unavailable_hidden' => false,
+                    'acl_message' => null,
+                    'frontend_options' => [],
+                    'form_type' => 'oro_workflow_transition',
+                    'display_type' => 'dialog',
+                    'form_options' => [],
+                    'page_template' => null,
+                    'dialog_template' => null,
+                    'init_entities' => [],
+                    'init_routes' => [],
+                    'init_datagrids' => [],
+                    'init_context_attribute' => 'init_context',
+                    'triggers' => [],
+                ],
         ],
         'transition_definitions' => [
             'first_transition_definition' => [

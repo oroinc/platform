@@ -168,6 +168,8 @@ class TransitionAssembler extends BaseAbstractAssembler
             );
         }
 
+        $transition = $this->assemblePageFormConfiguration($transition, $options);
+
         return $transition;
     }
 
@@ -240,5 +242,30 @@ class TransitionAssembler extends BaseAbstractAssembler
     {
         $formOptions = $this->getOption($options, 'form_options', array());
         return $this->formOptionsAssembler->assemble($formOptions, $attributes, 'transition', $transitionName);
+    }
+
+    /**
+     * @param Transition $transition
+     * @param array $options
+     *
+     * @return Transition
+     */
+    protected function assemblePageFormConfiguration(Transition $transition, array $options)
+    {
+        $pageFormConfiguration = $this->getOption(
+            $options,
+            WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION,
+            array()
+        );
+
+        if (!empty($pageFormConfiguration)) {
+            $transition->setPageFormHandler($pageFormConfiguration['handler']);
+            $transition->setPageFormDataAttribute($pageFormConfiguration['data_attribute']);
+            $transition->setPageFormTemplate($pageFormConfiguration['template']);
+            $transition->setPageFormDataProvider($pageFormConfiguration['data_provider']);
+            $transition->setHasPageFormConfiguration(true);
+        }
+
+        return $transition;
     }
 }
