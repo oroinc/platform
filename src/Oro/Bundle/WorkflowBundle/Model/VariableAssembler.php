@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
 
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
@@ -13,26 +13,26 @@ use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 class VariableAssembler extends BaseAbstractAssembler
 {
     /**
-     * @var AttributeAssembler
+     * @var WorkflowDataNormalizer
      */
-    protected $attributeAssembler;
+    protected $dataNormalizer;
 
     /**
-     * @param AttributeAssembler $attributeAssembler
+     * @param WorkflowDataNormalizer $dataNormalizer
      */
-    public function __construct(AttributeAssembler $attributeAssembler)
+    public function __construct(WorkflowDataNormalizer $dataNormalizer)
     {
-        $this->attributeAssembler = $attributeAssembler;
+        $this->dataNormalizer = $dataNormalizer;
     }
 
     /**
-     * @param WorkflowDefinition $definition
+     * @param Workflow $workflow
      * @param array $configuration
      *
-     * @return ArrayCollection
+     * @return Collection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(WorkflowDefinition $definition, array $configuration)
+    public function assemble(Workflow $workflow, array $configuration)
     {
         $variableDefinitionsConfiguration = $this->getOption(
             $configuration,
@@ -46,9 +46,9 @@ class VariableAssembler extends BaseAbstractAssembler
         );
 
         $definitions = $this->parseDefinitions($variablesConfiguration);
-        $variables = new ArrayCollection();
+        $variables = new Collection();
         foreach ($definitions as $name => $options) {
-            $variable = $this->assembleVariable($name, $options);
+            $variable = $this->assembleVariable($workflow, $name, $options);
             $variables->set($name, $variable);
         }
 
@@ -69,10 +69,10 @@ class VariableAssembler extends BaseAbstractAssembler
             }
 
             $definition = [
-                'label'         => $this->getOption($options, 'label'),
-                'type'          => $this->getOption($options, 'type', 'string'),
-                'value'         => $this->getOption($options, 'value'),
-                'options'       => $this->getOption($options, 'options', []),
+                'label'   => $this->getOption($options, 'label'),
+                'type'    => $this->getOption($options, 'type'),
+                'value'   => $this->getOption($options, 'value'),
+                'options' => $this->getOption($options, 'options', []),
             ];
 
             $definitions[$name] = $definition;
@@ -82,19 +82,22 @@ class VariableAssembler extends BaseAbstractAssembler
     }
 
     /**
+     * @param Workflow $workflow
      * @param string $name
      * @param array $options
      *
      * @return Variable
      */
-    protected function assembleVariable($name, array $options)
+    protected function assembleVariable(Workflow $workflow, $name, array $options)
     {
         $variable = new Variable();
         $variable->setName($name);
-        $variable->setValue($options['value']);
         $variable->setLabel($options['label']);
         $variable->setType($options['type']);
         $variable->setOptions($this->getOption($options, 'options', []));
+
+        $denormalizedValue = $this->dataNormalizer->denormalizeAttribute($workflow, $variable, $options['value']);
+        $variable->setValue($denormalizedValue);
 
         $this->validateVariable($variable);
 

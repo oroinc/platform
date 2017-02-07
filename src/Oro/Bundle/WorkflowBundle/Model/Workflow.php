@@ -78,6 +78,11 @@ class Workflow
     protected $restrictions;
 
     /**
+     * @var Collection
+     */
+    protected $variables;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param AclManager $aclManager
      * @param RestrictionManager $restrictionManager
@@ -356,6 +361,11 @@ class Workflow
             ->add($data);
         $workflowItem->setDefinition($this->getDefinition());
 
+        // populate WorkflowData with variables
+        if ($variables = $this->getVariables()) {
+            $workflowItem->getData()->add($variables->toArray());
+        }
+
         return $workflowItem;
     }
 
@@ -570,6 +580,24 @@ class Workflow
     public function getInitDatagrids()
     {
         return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_DATAGRIDS, []);
+    }
+
+    /**
+     * @return Collection|Variable[]
+     */
+    public function getVariables()
+    {
+        if (!$this->variables) {
+            $manager = $this->getVariableManager();
+            $definition = $this->getDefinition();
+
+            $this->variables = $manager->getVariableAssembler()->assemble(
+                $this,
+                $definition->getConfiguration()
+            );
+        }
+
+        return $this->variables;
     }
 
     /**

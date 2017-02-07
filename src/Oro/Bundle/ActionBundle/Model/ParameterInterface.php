@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-interface AttributeInterface
+interface ParameterInterface
 {
     const INTERNAL_TYPE_ATTRIBUTE = 'attribute';
     const INTERNAL_TYPE_VARIABLE = 'variable';
@@ -11,7 +11,7 @@ interface AttributeInterface
      * Set attribute type
      *
      * @param string $type
-     * @return AttributeInterface
+     * @return ParameterInterface
      */
     public function setType($type);
 
@@ -23,25 +23,10 @@ interface AttributeInterface
     public function getType();
 
     /**
-     * @param array $entityAcl
-     */
-    public function setEntityAcl(array $entityAcl);
-
-    /**
-     * @return bool
-     */
-    public function isEntityUpdateAllowed();
-
-    /**
-     * @return bool
-     */
-    public function isEntityDeleteAllowed();
-
-    /**
      * Set attribute label.
      *
      * @param string $label
-     * @return AttributeInterface
+     * @return ParameterInterface
      */
     public function setLabel($label);
 
@@ -56,7 +41,7 @@ interface AttributeInterface
      * Set attribute name.
      *
      * @param string $name
-     * @return AttributeInterface
+     * @return ParameterInterface
      */
     public function setName($name);
 
@@ -71,7 +56,7 @@ interface AttributeInterface
      * Set options.
      *
      * @param array $options
-     * @return AttributeInterface
+     * @return ParameterInterface
      */
     public function setOptions(array $options);
 
@@ -87,7 +72,7 @@ interface AttributeInterface
      *
      * @param string $key
      * @param mixed $value
-     * @return AttributeInterface
+     * @return ParameterInterface
      */
     public function setOption($key, $value);
 
@@ -106,17 +91,6 @@ interface AttributeInterface
      * @return bool
      */
     public function hasOption($key);
-
-    /**
-     * @return string
-     */
-    public function getPropertyPath();
-
-    /**
-     * @param string $propertyPath
-     * @return AttributeInterface
-     */
-    public function setPropertyPath($propertyPath);
 
     /**
      * @return string

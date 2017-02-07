@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Oro\Bundle\ActionBundle\Model\AttributeInterface;
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 
-class Variable implements AttributeInterface
+class Variable implements ParameterInterface
 {
     /**
      * @var string
@@ -26,10 +26,6 @@ class Variable implements AttributeInterface
      * @var array
      */
     protected $options = [];
-    /**
-     * @var string
-     */
-    private static $internalType = AttributeInterface::INTERNAL_TYPE_VARIABLE;
 
     /**
      * Set attribute type
@@ -73,31 +69,6 @@ class Variable implements AttributeInterface
     public function getValue()
     {
         return $this->value;
-    }
-
-    /**
-     * @param array $entityAcl
-     * @throws \LogicException
-     */
-    public function setEntityAcl(array $entityAcl)
-    {
-        throw $this->createMethodNotCallableException();
-    }
-
-    /**
-     * @throws \LogicException
-     */
-    public function isEntityUpdateAllowed()
-    {
-        throw $this->createMethodNotCallableException();
-    }
-
-    /**
-     * @throws \LogicException
-     */
-    public function isEntityDeleteAllowed()
-    {
-        throw $this->createMethodNotCallableException();
     }
 
     /**
@@ -212,28 +183,11 @@ class Variable implements AttributeInterface
     }
 
     /**
-     * @throws \LogicException
-     */
-    public function getPropertyPath()
-    {
-        throw $this->createMethodNotCallableException();
-    }
-
-    /**
-     * @param string $propertyPath
-     * @throws \LogicException
-     */
-    public function setPropertyPath($propertyPath)
-    {
-        throw $this->createMethodNotCallableException();
-    }
-
-    /**
      * @return string
      */
     public function getInternalType()
     {
-        return static::$internalType;
+        return ParameterInterface::INTERNAL_TYPE_VARIABLE;
     }
 
     /**
@@ -243,16 +197,6 @@ class Variable implements AttributeInterface
      */
     public function isInternalType($type)
     {
-        return ($type === static::$internalType);
-    }
-
-    /**
-     * @return \LogicException
-     */
-    private function createMethodNotCallableException()
-    {
-        return new \LogicException(
-            sprintf("Method %s is not callable on %s", __METHOD__, __CLASS__)
-        );
+        return (ParameterInterface::INTERNAL_TYPE_VARIABLE === $type);
     }
 }

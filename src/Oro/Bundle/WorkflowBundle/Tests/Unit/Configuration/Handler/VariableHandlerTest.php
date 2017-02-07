@@ -91,10 +91,7 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                                 'name'  => 'test_variable',
                                 'value' => null,
                                 'label' => 'Test Variable',
-                                'type'  => 'entity',
-                                'options' => [
-                                    'class' => 'DateTime'
-                                ]
+                                'type'  => 'string'
                             ],
                         ],
                     ],
@@ -104,10 +101,7 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                         WorkflowConfiguration::NODE_VARIABLES => [
                             'test_variable' => [
                                 'label' => 'Test Variable', //should be kept as filtering disposed to another class
-                                'type'  => 'entity',
-                                'options' => [
-                                    'class' => 'DateTime'
-                                ]
+                                'type'  => 'string',
                             ],
                         ],
                     ],
@@ -121,10 +115,7 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                                 'name'  => 'test_variable',
                                 'value' => 'value_1',
                                 'label' => 'Test Variable',
-                                'type'  => 'entity',
-                                'options' => [
-                                    'class' => 'DateTime'
-                                ]
+                                'type'  => 'string'
                             ],
                         ],
                     ],
@@ -135,10 +126,7 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                             'test_variable' => [
                                 'value' => 'value_1',
                                 'label' => 'Test Variable', //should be kept as filtering disposed to another class
-                                'type'  => 'entity',
-                                'options' => [
-                                    'class' => 'DateTime'
-                                ]
+                                'type'  => 'string'
                             ],
                         ],
                     ],

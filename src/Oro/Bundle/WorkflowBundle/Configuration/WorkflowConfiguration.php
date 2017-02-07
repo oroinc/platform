@@ -251,24 +251,15 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
-                        ->beforeNormalization()
-                            ->ifString()
-                            ->then(function ($v) {
-                                return [
-                                    'type' => 'string',
-                                    'value' => $v
-                                ];
-                            })
-                        ->end()
                         ->children()
                             ->scalarNode('name')
                                 ->cannotBeEmpty()
                             ->end()
                             ->scalarNode('type')
-                                ->defaultNull()
+                                ->isRequired()
                             ->end()
                             ->variableNode('value')
-                                ->defaultNull()
+                                ->isRequired()
                             ->end()
                             ->arrayNode('options')
                                 ->prototype('variable')
