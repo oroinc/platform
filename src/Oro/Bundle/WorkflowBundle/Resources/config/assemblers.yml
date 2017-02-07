@@ -16,7 +16,7 @@ services:
     oro_workflow.variable_assembler:
         class: %oro_workflow.variable_assembler.class%
         arguments:
-            - '@oro_workflow.serializer.data.normalizer'
+            - '@oro_workflow.serializer.variable.normalizer'
 
     oro_workflow.step_assembler:
         class: %oro_workflow.step_assembler.class%

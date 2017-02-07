@@ -3,9 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
 
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
@@ -13,14 +14,14 @@ use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 class VariableAssembler extends BaseAbstractAssembler
 {
     /**
-     * @var WorkflowDataNormalizer
+     * @var WorkflowVariableNormalizer
      */
     protected $dataNormalizer;
 
     /**
-     * @param WorkflowDataNormalizer $dataNormalizer
+     * @param WorkflowVariableNormalizer $dataNormalizer
      */
-    public function __construct(WorkflowDataNormalizer $dataNormalizer)
+    public function __construct(WorkflowVariableNormalizer $dataNormalizer)
     {
         $this->dataNormalizer = $dataNormalizer;
     }
@@ -46,7 +47,7 @@ class VariableAssembler extends BaseAbstractAssembler
         );
 
         $definitions = $this->parseDefinitions($variablesConfiguration);
-        $variables = new Collection();
+        $variables = new ArrayCollection();
         foreach ($definitions as $name => $options) {
             $variable = $this->assembleVariable($workflow, $name, $options);
             $variables->set($name, $variable);
@@ -96,7 +97,7 @@ class VariableAssembler extends BaseAbstractAssembler
         $variable->setType($options['type']);
         $variable->setOptions($this->getOption($options, 'options', []));
 
-        $denormalizedValue = $this->dataNormalizer->denormalizeAttribute($workflow, $variable, $options['value']);
+        $denormalizedValue = $this->dataNormalizer->denormalizeVariable($workflow, $variable, $options['value']);
         $variable->setValue($denormalizedValue);
 
         $this->validateVariable($variable);
