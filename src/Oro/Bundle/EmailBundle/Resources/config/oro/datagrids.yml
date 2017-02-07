@@ -148,6 +148,13 @@ datagrids:
                                 WHERE act_o.isActive = true AND eu.id = act_eu.id
                             )
         columns:
+            mailbox:
+                data_name: origin
+                label: oro.email.mailbox.entity_label
+                type: twig
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/mailbox.html.twig
+                renderable: false
             contacts:
                 data_name: ~
                 type: twig
@@ -166,6 +173,7 @@ datagrids:
                 label:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
+                manageable: false
             receivedAt:
                 data_name: receivedAt
                 type: twig
@@ -176,8 +184,9 @@ datagrids:
             id: ~
         sorters:
             columns:
-                subject:  { data_name: e.subject }
-                receivedAt:   { data_name: receivedAt }
+                subject: { data_name: e.subject }
+                receivedAt: { data_name: receivedAt }
+                mailbox: { data_name: eu.origin }
             default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
@@ -302,8 +311,6 @@ datagrids:
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 icon: minus
         options:
-            toolbarOptions:
-                addColumnManager: false
             entity_pagination: true
             entity_pagination_target: Oro\Bundle\EmailBundle\Entity\Email
 
