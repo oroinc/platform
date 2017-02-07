@@ -114,11 +114,49 @@ class HttpImportHandler extends AbstractImportHandler
      */
     public function saveImportingFile(File $file, $temporaryFilePrefix)
     {
+        $this->normalizeLineEndings($file->getPathname());
         $tmpFileName = $this->fileSystemOperator
             ->generateTemporaryFileName($temporaryFilePrefix);
         $file->move(dirname($tmpFileName), basename($tmpFileName));
 
         return $tmpFileName;
+    }
+
+    /**Convert the ending-lines CR et LF in CRLF.
+     *
+     * @param string $filename Name of the file
+     * @return boolean "true" if the conversion proceed without error and else "false".
+     */
+    protected function normalizeLineEndings($filename)
+    {
+        //Load the content of the file into a string
+        $fileContents = file_get_contents($filename);
+
+        if (!$fileContents) {
+            return false;
+        }
+
+        //Replace all the CRLF ending-lines by something uncommon
+        $dontReplaceThisString = "\r\n";
+        $specialString = "!£#!Dont_wanna_replace_that!#£!";
+        $fileContents = str_replace($dontReplaceThisString, $specialString, $fileContents);
+
+        //Convert the CR ending-lines into CRLF ones
+        $fileContents = str_replace("\r", "\r\n", $fileContents);
+
+        //Replace all the CRLF ending-lines by something uncommon
+        $fileContents = str_replace($dontReplaceThisString, $specialString, $fileContents);
+
+        //Convert the LF ending-lines into CRLF ones
+        $fileContents = str_replace("\n", "\r\n", $fileContents);
+
+        //Restore the CRLF ending-lines
+        $fileContents = str_replace($specialString, $dontReplaceThisString, $fileContents);
+
+        //Update the file contents
+        file_put_contents($filename, $fileContents);
+
+        return true;
     }
 
     /**
