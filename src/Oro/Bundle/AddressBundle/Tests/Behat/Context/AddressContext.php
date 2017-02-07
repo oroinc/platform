@@ -63,9 +63,9 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Delete all elements in collection field
-     * Example: And I delete all addresses
+     * Example: And I delete all "addresses"
      *
-     * @Given /^(?:|I )delete all (?P<field>[^"]+)$/
+     * @Given /^(?:|I )delete all "(?P<field>[^"]+)"$/
      */
     public function iDeleteAllAddresses($field)
     {
