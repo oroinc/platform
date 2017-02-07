@@ -289,21 +289,6 @@ define(function(require) {
         },
 
         /**
-         * Reads value of front field and converts it to backend format
-         *
-         * @returns {string}
-         */
-        getBackendFormattedValue: function() {
-            var value = '';
-            var momentInstance = this.getFrontendMoment();
-            var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
-            if (momentInstance) {
-                value = momentInstance.utc().format(format);
-            }
-            return value;
-        },
-
-        /**
          * Reads value of original field and converts it to frontend format
          *
          * @returns {string}

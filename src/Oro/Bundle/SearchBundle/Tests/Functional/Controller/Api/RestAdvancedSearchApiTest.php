@@ -19,15 +19,20 @@ class RestAdvancedSearchApiTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->initClient([], $this->generateWsseAuthHeader());
 
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
         $this->getSearchIndexer()->resetIndex(Item::class);
         $this->ensureItemsLoaded($alias, 0);
 
-        $this->loadFixtures([LoadSearchItemData::class], true);
+        $this->loadFixtures([LoadSearchItemData::class]);
         $this->getSearchIndexer()->reindex(Item::class);
         $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
+    }
+
+    protected function tearDown()
+    {
+        $this->clearIndexTextTable();
     }
 
     /**

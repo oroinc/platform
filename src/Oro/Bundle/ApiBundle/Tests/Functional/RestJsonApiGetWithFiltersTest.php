@@ -6,9 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestEmployee;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiGetWithFiltersTest extends RestJsonApiTestCase
 {
     /**

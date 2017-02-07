@@ -1,9 +1,7 @@
-define(function(require) {
+define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_, settings, moduleInst) {
     'use strict';
 
-    var _ = require('underscore');
-    var settings = require('orolocale/js/locale-settings/data');
-    var moduleConfig = require('module').config();
+    var moduleConfig = moduleInst.config();
 
     /**
      * Locale settings

@@ -9,9 +9,6 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
-/**
- * @dbIsolation
- */
 class WorkflowDefinitionControllerTest extends WebTestCase
 {
     const TEST_DEFINITION_NAME = 'TEST_DEFINITION';

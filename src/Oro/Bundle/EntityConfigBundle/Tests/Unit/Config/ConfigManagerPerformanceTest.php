@@ -397,23 +397,6 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $connection    = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['tablesExist'])
-            ->getMockForAbstractClass();
-        $schemaManager->expects($this->any())
-            ->method('tablesExist')
-            ->willReturn(true);
-        $connection->expects($this->any())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManager));
-        $this->em->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($connection);
-
         $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
@@ -437,10 +420,17 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->willReturn(null);
 
+        $databaseChecker = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigDatabaseChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $databaseChecker->expects(self::any())
+            ->method('checkDatabase')
+            ->willReturn(true);
+
         return new ConfigManager(
             $this->eventDispatcher,
             $this->metadataFactory,
-            new ConfigModelManager($emLink, new LockObject()),
+            new ConfigModelManager($emLink, new LockObject(), $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache(new ArrayCache(), new ArrayCache())
         );

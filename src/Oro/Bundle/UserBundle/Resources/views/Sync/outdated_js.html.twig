@@ -1,0 +1,36 @@
+{% set roles = [] %}
+{% for role in app.user.roles %}
+    {% set roles = roles|merge([role.role]) %}
+{% endfor %}
+
+<script type="text/javascript">
+    require(['orosync/js/sync', 'oroui/js/modal', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'],
+    function(sync, Modal, mediator, messenger, __) {
+        var notifier = null;
+        var sendNotification = true;
+
+        mediator.on('page:beforeChange', function() {
+            if (notifier) {
+                notifier.close();
+            }
+            sendNotification = false;
+        });
+
+        sync.subscribe('oro/outdated_user_page', function (response) {
+            var roles = {{ roles|json_encode|raw }};
+
+            if (roles.indexOf(response.role) != -1) {
+                if (notifier) {
+                    notifier.close();
+                }
+
+                if (sendNotification) {
+                    notifier = messenger.notificationMessage(
+                            'warning',
+                            __('oro.role.content_outdated')
+                    );
+                }
+            }
+        });
+    });
+</script>

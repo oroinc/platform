@@ -63,6 +63,7 @@ services:
             - '@oro_security.security_facade.link'
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: oro_navigation.menu_extension, priority: 100 }
 
@@ -260,6 +261,7 @@ services:
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager.link'
           - '@oro_navigation.title_provider'
+        lazy: true
 
     oro_navigation.title_provider:
         class: %oro_navigation.title_provider.class%
