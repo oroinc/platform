@@ -61,6 +61,14 @@ class LocalizationCacheDecorator extends CacheProvider
     /**
      * {@inheritdoc}
      */
+    public function delete($id)
+    {
+        $this->cacheProvider->delete($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function doFetch($id)
     {
         return $this->cacheProvider->fetch($id);
