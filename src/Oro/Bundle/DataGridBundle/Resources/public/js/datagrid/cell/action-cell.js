@@ -37,6 +37,9 @@ define([
         /** @property Boolean */
         showCloseButton: config.showCloseButton,
 
+        /** @property String */
+        actionsDropdown: 'hide',
+
         /** @property */
         cellMarkup: '<div class="more-bar-holder action-row"></div>',
 
@@ -213,6 +216,29 @@ define([
             this.$el.html(this.cellMarkup);
             this.fillLauncherList();
 
+            switch (this.actionsDropdown) {
+                case 'hide':
+                    wrapDropdown();
+                    this.$el.css({visibility: ''});
+                    break;
+                case 'show':
+                    this.$el.css({visibility: ''});
+                    break;
+                default:
+                    setTimeout(_.bind(function() {
+                        var $list = this.$(this.launchersListSelector);
+                        var listHeight = $list.height();
+                        var testListItemHeight = $list.find('.launcher-item').height() * 1.5;
+
+                        if (listHeight > testListItemHeight) {
+                            wrapDropdown();
+                        }
+
+                        this.$el.css({visibility: ''});
+                    }, this), 0);
+            }
+
+            /*
             if (_.has(this, 'actionsDropdown') && this.actionsDropdown !== 'auto') {
                 if (this.actionsDropdown) {
                     wrapDropdown();
@@ -232,6 +258,7 @@ define([
                     this.$el.css({visibility: ''});
                 }, this), 0);
             }
+*/
 
             return this;
         },
