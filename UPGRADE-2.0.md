@@ -112,6 +112,9 @@ UPGRADE FROM 1.10 to 2.0
 ####EntitySerializer Component
 - Method `isMetadataProperty` of `Oro\Component\EntitySerializer\ConfigUtil` marked as deprecated. Use `isMetadataProperty` of `Oro\Component\EntitySerializer\FieldAccessor` instead
 
+####OrganizationBundle
+- Changed signature of method `Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository::getEnabledOrganizations`.
+
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
@@ -922,6 +925,8 @@ placeholders:
 - Added `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction`.
 - Added `Oro\Bundle\EmailBundle\Mailer\DirectMailer::afterPrepareSmtpTransport`.
 - Added `Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider` to get smtp settings from configuration.
+- Added service `oro_email.command.email_body_sync` for `Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand` command.
+
 ####EntityBundle
 - Added possibility to define
 [entity repositories as a services](./src/Oro/Bundle/EntityBundle/Resources/doc/repositories_as_a_services.md)
@@ -1041,7 +1046,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
-
+ - Added service `oro_imap.command.email_sync` for `Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand` command.
 
 ####CronBundle
 - Removed class `Oro\Bundle\CronBundle\Action\CreateJobAction`, service `oro_cron.action.create_job` and action `@create_job`

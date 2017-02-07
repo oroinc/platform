@@ -14,9 +14,6 @@ use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Unit\EntityTrait;
 
-/**
- * @dbIsolation
- */
 class MenuUpdateManagerTest extends WebTestCase
 {
     use EntityTrait;

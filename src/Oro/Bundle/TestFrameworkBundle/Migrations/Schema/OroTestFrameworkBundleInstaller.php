@@ -54,7 +54,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -115,6 +115,7 @@ class OroTestFrameworkBundleInstaller implements
     {
         $table = $schema->createTable('test_activity_target');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('string', 'string', ['notnull' => false, 'length' => 255]);
         $table->setPrimaryKey(['id']);
     }
 

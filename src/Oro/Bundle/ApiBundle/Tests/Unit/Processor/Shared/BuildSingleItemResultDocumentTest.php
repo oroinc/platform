@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument;
@@ -65,6 +67,20 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
         $this->assertSame($this->documentBuilder, $this->context->getResponseDocumentBuilder());
+        $this->assertFalse($this->context->hasResult());
+    }
+
+    public function testProcessContextWithoutErrorsOnNonEmptyResultAndErroredStatusCode()
+    {
+        $this->documentBuilder->expects($this->never())
+            ->method('setDataCollection');
+        $this->documentBuilder->expects($this->never())
+            ->method('getDocument');
+
+        $this->context->setResponseStatusCode(Response::HTTP_BAD_REQUEST);
+        $this->context->setResult([new \stdClass()]);
+        $this->processor->process($this->context);
+        $this->assertNull($this->context->getResponseDocumentBuilder());
         $this->assertFalse($this->context->hasResult());
     }
 

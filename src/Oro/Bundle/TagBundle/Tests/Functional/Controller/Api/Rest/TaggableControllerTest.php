@@ -4,9 +4,6 @@ namespace Oro\Bundle\TagBundle\Tests\Functional\Controller\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class TaggableControllerTest extends WebTestCase
 {
     protected function setUp()

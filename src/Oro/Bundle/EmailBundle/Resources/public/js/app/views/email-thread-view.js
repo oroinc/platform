@@ -180,7 +180,6 @@ define(function(require) {
                 return;
             }
             this.$(this.selectors.loadMore).removeClass('process');
-            mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
         },
 
         /**

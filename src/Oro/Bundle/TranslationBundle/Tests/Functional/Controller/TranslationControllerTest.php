@@ -12,9 +12,6 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @dbIsolation
- */
 class TranslationControllerTest extends WebTestCase
 {
     const DATAGRID_NAME = 'oro-translation-translations-grid';

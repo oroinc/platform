@@ -13,17 +13,11 @@ use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 
 class OrmIndexer extends AbstractIndexer
 {
-    /** @var array */
-    protected $drivers = [];
-
     /** @var SearchIndexRepository */
     private $indexRepository;
 
     /** @var OroEntityManager */
     private $indexManager;
-
-    /** @var DbalStorer */
-    protected $dbalStorer;
 
     /**
      * @param ManagerRegistry $registry
@@ -40,16 +34,6 @@ class OrmIndexer extends AbstractIndexer
         DbalStorer $dbalStorer
     ) {
         parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
-
-        $this->dbalStorer = $dbalStorer;
-    }
-
-    /**
-     * @param array $drivers
-     */
-    public function setDrivers(array $drivers)
-    {
-        $this->drivers = $drivers;
     }
 
     /**
@@ -66,7 +50,7 @@ class OrmIndexer extends AbstractIndexer
 
         if ($hasSavedEntities) {
             $this->getIndexManager()->getConnection()->transactional(function () {
-                $this->dbalStorer->store();
+                $this->getIndexRepository()->flushWrites();
                 $this->getIndexManager()->clear();
             });
         }
@@ -149,7 +133,7 @@ class OrmIndexer extends AbstractIndexer
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $this->dbalStorer->addItem($item);
+            $this->getIndexRepository()->writeItem($item);
 
             $hasSavedEntities = true;
         }
@@ -208,8 +192,6 @@ EOF;
         }
 
         $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
-        $this->indexRepository->setDriversClasses($this->drivers);
-        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
     }
