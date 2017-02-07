@@ -111,6 +111,20 @@ class AttributeManager
     }
 
     /**
+     * @param string $type
+     * @return Collection|Attribute[]
+     */
+    public function getAttributesByInternalType($type)
+    {
+        return $this->attributes->filter(
+            function ($attribute) use ($type) {
+                /** @var Attribute $attribute */
+                return $attribute->isInternalType($type);
+            }
+        );
+    }
+
+    /**
      * Get list of all attributes with type entity
      *
      * @return Collection|Attribute[]

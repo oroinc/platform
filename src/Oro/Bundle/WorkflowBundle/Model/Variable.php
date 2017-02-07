@@ -2,25 +2,33 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-class Variable
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
+
+class Variable implements ParameterInterface
 {
     /**
      * @var string
      */
     protected $name;
-
     /**
      * @var string
      */
     protected $type;
-
+    /**
+     * @var mixed
+     */
+    protected $value;
     /**
      * @var string
      */
     protected $label;
+    /**
+     * @var array
+     */
+    protected $options = [];
 
     /**
-     * Set variable type
+     * Set attribute type
      *
      * @param string $type
      *
@@ -34,7 +42,7 @@ class Variable
     }
 
     /**
-     * Get variable type
+     * Get attribute type
      *
      * @return string
      */
@@ -44,7 +52,27 @@ class Variable
     }
 
     /**
-     * Set variable label.
+     * @param mixed $value
+     *
+     * @return Variable
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Set attribute label.
      *
      * @param string $label
      *
@@ -89,5 +117,86 @@ class Variable
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set options.
+     *
+     * @param array $options
+     *
+     * @return Variable
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * Get options.
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set option by key.
+     *
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return Variable
+     */
+    public function setOption($key, $value)
+    {
+        $this->options[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get option by key.
+     *
+     * @param string $key
+     *
+     * @return null|mixed
+     */
+    public function getOption($key)
+    {
+        return $this->hasOption($key) ? $this->options[$key] : null;
+    }
+
+    /**
+     * Check for option availability by key.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasOption($key)
+    {
+        return isset($this->options[$key]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getInternalType()
+    {
+        return ParameterInterface::INTERNAL_TYPE_VARIABLE;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isInternalType($type)
+    {
+        return (ParameterInterface::INTERNAL_TYPE_VARIABLE === $type);
     }
 }

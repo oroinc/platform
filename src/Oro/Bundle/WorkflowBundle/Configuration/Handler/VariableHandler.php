@@ -42,6 +42,10 @@ class VariableHandler extends AbstractHandler
         }
         $variable['name'] = $name;
 
+        if (!isset($variable['value'])) {
+            $variable['value'] = null;
+        }
+
         return $variable;
     }
 }

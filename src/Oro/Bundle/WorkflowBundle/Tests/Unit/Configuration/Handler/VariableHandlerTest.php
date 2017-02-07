@@ -83,6 +83,30 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
+            'no value configuration' => [
+                'expected' => [
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            [
+                                'name'  => 'test_variable',
+                                'value' => null,
+                                'label' => 'Test Variable',
+                                'type'  => 'string'
+                            ],
+                        ],
+                    ],
+                ],
+                'input' => [
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_variable' => [
+                                'label' => 'Test Variable', //should be kept as filtering disposed to another class
+                                'type'  => 'string',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             'full configuration' => [
                 'expected' => [
                     WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
@@ -91,7 +115,7 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                                 'name'  => 'test_variable',
                                 'value' => 'value_1',
                                 'label' => 'Test Variable',
-                                'type'  => 'entity',
+                                'type'  => 'string'
                             ],
                         ],
                     ],
@@ -102,7 +126,7 @@ class VariableHandlerTest extends \PHPUnit_Framework_TestCase
                             'test_variable' => [
                                 'value' => 'value_1',
                                 'label' => 'Test Variable', //should be kept as filtering disposed to another class
-                                'type'  => 'entity',
+                                'type'  => 'string'
                             ],
                         ],
                     ],
