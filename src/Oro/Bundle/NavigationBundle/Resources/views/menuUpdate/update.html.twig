@@ -194,25 +194,18 @@
                                 'expand': 'expand',
                                 'collapse': 'collapse',
                                 'move': {
-                                    'view': 'oroui/js/app/views/jstree/move-action-view'
+                                    'view': 'oroui/js/app/views/jstree/move-action-view',
+                                    'routeName': menuJsMoveRoute,
+                                    'routeParams': {menuName: menuName, scopeId: scope.id}
                                 }
                             }
                         ) }}
-                        {#
-                            TODO replace move routeName and routeParams with move popup action
-                                'move': {
-                                    'view': 'oroui/js/app/views/jstree/move-action-view',
-                                    'routeName': menuViewRoute,
-                                    'routeParams': {menuName: entity.root.name, scopeId: scope.id}
-                                }
-                        #}
                     </div>
                 </div>
                 <div class="content ">
                     <div class="system-content-wrapper">
                         {{ parent() }}
                     </div>
-
                 </div>
             </div>
         </div>

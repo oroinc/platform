@@ -12,6 +12,8 @@ use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UIBundle\Model\TreeItem;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
@@ -165,6 +167,34 @@ class MenuUpdateManagerTest extends WebTestCase
 
         $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2_1, $updates[1]->getKey());
         $this->assertEquals(1, $updates[1]->getPriority());
+    }
+
+    public function testMoveMenuItems()
+    {
+        $updates = $this->manager->moveMenuItems(
+            self::MENU_NAME,
+            [
+                new TreeItem(LoadMenuUpdateData::MENU_UPDATE_3_1),
+                new TreeItem(LoadMenuUpdateData::MENU_UPDATE_3)
+            ],
+            $this->getScope(),
+            LoadMenuUpdateData::MENU_UPDATE_2,
+            0
+        );
+
+        $this->assertCount(3, $updates);
+
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_3_1, $updates[0]->getKey());
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_3, $updates[1]->getKey());
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2_1, $updates[2]->getKey());
+
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2, $updates[0]->getParentKey());
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2, $updates[1]->getParentKey());
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_2, $updates[2]->getParentKey());
+
+        $this->assertEquals(0, $updates[0]->getPriority());
+        $this->assertEquals(1, $updates[1]->getPriority());
+        $this->assertEquals(2, $updates[2]->getPriority());
     }
 
     public function testDeleteMenuUpdates()

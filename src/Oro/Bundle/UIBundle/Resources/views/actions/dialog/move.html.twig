@@ -19,6 +19,7 @@
         {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
 
         <div class="form-container">
+            {% set formAction = app.request.uri %}
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post">
                 <fieldset class="form form-horizontal">
                     {% set formErrors = form_errors(form) %}
@@ -30,7 +31,6 @@
                         </div>
                     {% endif %}
                     <div class="span6">
-
                         {{ form_rest(form) }}
                     </div>
 
@@ -40,7 +40,6 @@
                     </div>
                 </fieldset>
             </form>
-
             {{ oro_form_js_validation(form) }}
         </div>
     {% endif %}
