@@ -13,7 +13,7 @@ layout:
                 form: '=data["style_book_form"].getStyleBookFormView()["text"]'
         - '@add':
             id: group_element_item_form_text
-            parentId: style_book_group_elements_container
+            parentId: style_book_main
             blockType: group_element_item
 
         - '@add':
@@ -24,7 +24,7 @@ layout:
                 form: '=data["style_book_form"].getStyleBookFormView()["select"]'
         - '@add':
             id: group_element_item_form_select
-            parentId: style_book_group_elements_container
+            parentId: style_book_main
             blockType: group_element_item
 
         - '@add':
