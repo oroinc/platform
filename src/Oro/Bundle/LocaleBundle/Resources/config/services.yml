@@ -62,6 +62,7 @@ services:
         public: false
         arguments:
             - '@oro_locale.translation.strategy.localization_fallback_strategy'
+            - '@oro_locale.manager.localization'
         tags:
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postPersist }
             - { name: doctrine.orm.entity_listener, entity: '%oro_locale.entity.localization.class%', event: postUpdate }
@@ -303,6 +304,10 @@ services:
         arguments:
             - '%oro_locale.entity.localization.class%'
 
+    oro_locale.serializer.localization_array_serializer:
+        class: 'Oro\Bundle\LocaleBundle\Serializer\LocalizationArraySerializer'
+        public: false
+
     oro_locale.provider.localization_choices:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
         arguments:
@@ -316,6 +321,7 @@ services:
         public: false
         arguments:
             - '@oro_locale.cache'
+            - '@oro_locale.serializer.localization_array_serializer'
 
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'

@@ -4,21 +4,34 @@ namespace Oro\Bundle\LocaleBundle\Helper;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Symfony\Component\Serializer\SerializerInterface;
+
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationCacheDecorator extends CacheProvider
 {
+    const SERIALIZATION_FORMAT = 'array';
+
     /**
      * @var CacheProvider
      */
     private $cacheProvider;
 
     /**
-     * @param CacheProvider $cacheProvider
+     * @var SerializerInterface
      */
-    public function __construct(CacheProvider $cacheProvider)
-    {
+    private $serializer;
+
+    /**
+     * @param CacheProvider $cacheProvider
+     * @param SerializerInterface $serializer
+     */
+    public function __construct(
+        CacheProvider $cacheProvider,
+        SerializerInterface $serializer
+    ) {
         $this->cacheProvider = $cacheProvider;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -42,7 +55,7 @@ class LocalizationCacheDecorator extends CacheProvider
      */
     public function save($id, $data, $lifeTime = 0)
     {
-        return $this->cacheProvider->save($id, $this->serializeLocalcations($data), $lifeTime);
+        return $this->cacheProvider->save($id, $this->serializeLocalizations($data), $lifeTime);
     }
 
     /**
@@ -94,33 +107,13 @@ class LocalizationCacheDecorator extends CacheProvider
     }
 
     /**
-     * @param string $element
-     * @return Localization
-     * @TODO - move unserialization to separate class, after that update test @BAP-13604
-     */
-    private function unserialize($element)
-    {
-        return unserialize($element);
-    }
-
-    /**
-     * @param Localization $element
-     * @return string
-     * @TODO - move serialization to separate class, after that update test @BAP-13604
-     */
-    private function serialize(Localization $element)
-    {
-        return serialize($element);
-    }
-
-    /**
      * @param string[] $localizations
      * @return Localization[]
      */
     private function unserializeLocalizations($localizations)
     {
         return array_map(function ($element) {
-            return $this->unserialize($element);
+            return $this->serializer->deserialize($element, Localization::class, static::SERIALIZATION_FORMAT);
         }, $localizations);
     }
 
@@ -128,10 +121,10 @@ class LocalizationCacheDecorator extends CacheProvider
      * @param Localization[] $localizations
      * @return array
      */
-    private function serializeLocalcations($localizations)
+    private function serializeLocalizations($localizations)
     {
         return array_map(function ($element) {
-            return $this->serialize($element);
+            return $this->serializer->serialize($element, static::SERIALIZATION_FORMAT);
         }, $localizations);
     }
 }

@@ -7,11 +7,22 @@ use Doctrine\Common\Cache\ArrayCache;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\LocaleBundle\Serializer\LocalizationArraySerializer;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTrait;
+
+    /**
+     * @var LocalizationArraySerializer
+     */
+    private $localizationArraySerializer;
+
+    public function setUp()
+    {
+        $this->localizationArraySerializer = new LocalizationArraySerializer();
+    }
 
     /**
      * @param Localization[] $localizations
@@ -21,7 +32,10 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         $cacheProvider = $this->getArrayCache($localizations);
 
-        $localizationCacheHelper = new LocalizationCacheDecorator($cacheProvider);
+        $localizationCacheHelper = new LocalizationCacheDecorator(
+            $cacheProvider,
+            $this->localizationArraySerializer
+        );
 
         $result = $localizationCacheHelper->fetch(LocalizationManager::CACHE_NAMESPACE);
         $this->assertCount(count($localizations), $result);
@@ -40,7 +54,10 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         $cacheProvider = $this->getArrayCache();
 
-        $localizationCacheHelper = new LocalizationCacheDecorator($cacheProvider);
+        $localizationCacheHelper = new LocalizationCacheDecorator(
+            $cacheProvider,
+            $this->localizationArraySerializer
+        );
 
         $localizationCacheHelper->save(LocalizationManager::CACHE_NAMESPACE, $localizations);
 
@@ -95,12 +112,11 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param Localization[] $localizations
      * @return string[]
-     * TODO this should be deleted and properly mocked while doing @BAP-13604
      */
     private function serializeLocalizations(array $localizations)
     {
         return array_map(function ($element) {
-            return serialize($element);
+            return $this->localizationArraySerializer->serialize($element);
         }, $localizations);
     }
 }
