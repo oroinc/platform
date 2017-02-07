@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\EventListener;
 
-use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
-use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
 use Prophecy\Argument;
 
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -13,7 +11,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
+use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
 
 class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
