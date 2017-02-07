@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTransitionTriggers;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
-/**
- * @dbIsolation
- */
 class HandleTransitionCronTriggerCommandTest extends WebTestCase
 {
     protected function setUp()

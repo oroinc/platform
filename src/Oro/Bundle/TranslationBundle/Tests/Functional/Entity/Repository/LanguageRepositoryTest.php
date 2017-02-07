@@ -17,9 +17,6 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslationUs
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
-/**
- * @dbIsolation
- */
 class LanguageRepositoryTest extends WebTestCase
 {
     /** @var EntityManager */

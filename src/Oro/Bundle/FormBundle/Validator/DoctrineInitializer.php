@@ -2,19 +2,31 @@
 
 namespace Oro\Bundle\FormBundle\Validator;
 
-use Symfony\Bridge\Doctrine\Validator\DoctrineInitializer as BaseDoctrineInitializer;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Util\OrderedHashMap;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 
-class DoctrineInitializer extends BaseDoctrineInitializer
+/**
+ * The default Symfony's implementation is decorated to avoid initialization
+ * of all entity managers for widely used types of objects
+ * that are not Doctrine manageable entities.
+ * @see \Symfony\Bridge\Doctrine\Validator\DoctrineInitializer::initialize
+ */
+class DoctrineInitializer implements ObjectInitializerInterface
 {
+    /** @var ObjectInitializerInterface */
+    private $innerInitializer;
+
+    /**
+     * @param ObjectInitializerInterface $innerInitializer
+     */
+    public function __construct(ObjectInitializerInterface $innerInitializer)
+    {
+        $this->innerInitializer = $innerInitializer;
+    }
+
     /**
      * {@inheritdoc}
-     *
-     * The default Symfony's implementation is overridden to avoid initialization
-     * of all entity managers for widely used types of objects
-     * that are not Doctrine manageable entities.
-     * @see \Symfony\Bridge\Doctrine\Validator\DoctrineInitializer::initialize
      */
     public function initialize($object)
     {
@@ -24,6 +36,6 @@ class DoctrineInitializer extends BaseDoctrineInitializer
             return;
         }
 
-        parent::initialize($object);
+        $this->innerInitializer->initialize($object);
     }
 }

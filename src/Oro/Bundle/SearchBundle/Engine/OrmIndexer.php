@@ -13,9 +13,6 @@ use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 
 class OrmIndexer extends AbstractIndexer
 {
-    /** @var array */
-    protected $drivers = [];
-
     /** @var SearchIndexRepository */
     private $indexRepository;
 
@@ -37,14 +34,6 @@ class OrmIndexer extends AbstractIndexer
         DbalStorer $dbalStorer
     ) {
         parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
-    }
-
-    /**
-     * @param array $drivers
-     */
-    public function setDrivers(array $drivers)
-    {
-        $this->drivers = $drivers;
     }
 
     /**
@@ -203,8 +192,6 @@ EOF;
         }
 
         $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
-        $this->indexRepository->setDriversClasses($this->drivers);
-        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
     }

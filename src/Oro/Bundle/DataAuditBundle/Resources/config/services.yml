@@ -126,7 +126,6 @@ services:
 
     oro_dataaudit.converter.entity_changes_to_audit_entry:
         class: 'Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter'
-        public: false
         arguments:
             - '@doctrine'
             - '@oro_dataaudit.loggable.audit_entity_mapper'

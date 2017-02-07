@@ -6,9 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-/**
- * @dbIsolation
- */
 class ControllersResetTest extends WebTestCase
 {
     protected function setUp()
