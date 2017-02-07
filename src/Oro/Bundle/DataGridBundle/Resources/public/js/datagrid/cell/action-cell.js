@@ -104,16 +104,12 @@ define([
                 this.actionsHideCount = opts.actionsHideCount;
             }
 
-            if (!_.isUndefined(opts.actionsHideCount)) {
-                this.actionsHideCount = opts.actionsHideCount;
-            }
-
             if (!_.isUndefined(opts.themeOptions.actionsHideCount)) {
                 this.actionsHideCount = opts.themeOptions.actionsHideCount;
             }
 
-            if (!_.isUndefined(opts.actionsDropdown)) {
-                this.actionsDropdown = opts.actionsDropdown;
+            if (!_.isUndefined(opts.themeOptions.actionsDropdown)) {
+                this.actionsDropdown = opts.themeOptions.actionsDropdown;
             }
 
             this.launcherMode = _.isObject(opts.themeOptions.launcherOptions) ?
@@ -217,7 +213,7 @@ define([
             this.$el.html(this.cellMarkup);
             this.fillLauncherList();
 
-            if (_.has(this, 'actionsDropdown')) {
+            if (_.has(this, 'actionsDropdown') && this.actionsDropdown !== 'auto') {
                 if (this.actionsDropdown) {
                     wrapDropdown();
                 }

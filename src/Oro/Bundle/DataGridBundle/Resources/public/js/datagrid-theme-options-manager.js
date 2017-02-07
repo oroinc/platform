@@ -14,7 +14,8 @@ define(function(require) {
             template: null,
             templateSelector: null,
             el: null,
-            elFilter: null
+            elFilter: null,
+            actionsDropdown: true
         },
 
         createConfigurator: function(gridThemeOptions) {
