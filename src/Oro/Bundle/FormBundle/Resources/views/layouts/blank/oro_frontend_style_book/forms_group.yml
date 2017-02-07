@@ -2,7 +2,7 @@ layout:
     actions:
         - '@add':
             id: form_item
-            parentId: style_book_groups_menu_list
+            parentId: style_book_groups_menu
             blockType: groups_menu_item
             options:
                 label: oro_frontend_style_book.groups.forms.title
