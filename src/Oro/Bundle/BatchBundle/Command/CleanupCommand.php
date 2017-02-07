@@ -177,6 +177,6 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     protected function getEntityManager()
     {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager();
     }
 }

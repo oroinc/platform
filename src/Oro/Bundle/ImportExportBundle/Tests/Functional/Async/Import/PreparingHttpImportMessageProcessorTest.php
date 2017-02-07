@@ -11,6 +11,9 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @nestTransactionsWithSavepoints
+ */
 class PreparingHttpImportMessageProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;

@@ -4,9 +4,6 @@ namespace Oro\Bundle\SidebarBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class WidgetTest extends WebTestCase
 {
     /** @var array  */

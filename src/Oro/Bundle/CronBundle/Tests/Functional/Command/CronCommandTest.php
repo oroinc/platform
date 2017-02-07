@@ -9,9 +9,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-/**
- * @dbIsolation
- */
 class CronCommandTest extends WebTestCase
 {
     use MessageQueueExtension;

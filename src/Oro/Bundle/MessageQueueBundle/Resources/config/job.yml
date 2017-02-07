@@ -17,6 +17,7 @@ services:
 
     oro_message_queue.job.runner:
         class: 'Oro\Component\MessageQueue\Job\JobRunner'
+        public: false
         arguments:
             - '@oro_message_queue.job.processor'
 
@@ -61,6 +62,7 @@ services:
 
     oro_message_queue.job.dependent_job_service:
         class: 'Oro\Component\MessageQueue\Job\DependentJobService'
+        public: false
         arguments:
             - '@oro_message_queue.job.storage'
 

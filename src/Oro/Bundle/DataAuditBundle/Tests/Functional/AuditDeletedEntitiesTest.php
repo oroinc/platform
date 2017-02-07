@@ -10,24 +10,16 @@ use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
+/**
+ * @dbIsolationPerTest
+ */
 class AuditDeletedEntitiesTest extends WebTestCase
 {
     use AuditChangedEntitiesExtensionTrait;
     
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->initClient([], [], true);
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
-        self::$loadedFixtures = [];
+        $this->initClient();
     }
 
     public function testShouldCreateAuditForDeletedEntity()

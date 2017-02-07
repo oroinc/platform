@@ -3,7 +3,6 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var tools = require('oroui/js/tools');
@@ -131,9 +130,6 @@ define(function(require) {
                             loader.success.call(this, data[loader.name]);
                         }
                     });
-                })
-                .fail(function() {
-                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
                 });
         },
 
