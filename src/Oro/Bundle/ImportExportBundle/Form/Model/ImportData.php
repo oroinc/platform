@@ -3,11 +3,15 @@
 namespace Oro\Bundle\ImportExportBundle\Form\Model;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ImportData
 {
     /**
      * @var UploadedFile
+     *
+     * @Assert\File(mimeTypes = {"text/plain", "text/csv"}, disallowEmptyMessage = "")
+     * @Assert\NotBlank()
      */
     protected $file;
 
