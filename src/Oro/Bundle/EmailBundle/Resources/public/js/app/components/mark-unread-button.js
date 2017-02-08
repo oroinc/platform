@@ -17,11 +17,12 @@ define(function(require) {
 
         url = $(e.target).data('url');
         mediator.execute('showLoading');
-        $.post(url).then(function() {
+        $.post({
+            url: url,
+            errorHandlerMessage: __(options.errorMessage)
+        }).done(function() {
             mediator.execute('showFlashMessage', 'success', __(options.successMessage));
             mediator.execute('redirectTo', {url: options.redirect}, {redirect: true});
-        }, function() {
-            mediator.execute('showFlashMessage', 'error', __(options.errorMessage));
         }).always(function() {
             mediator.execute('hideLoading');
         });

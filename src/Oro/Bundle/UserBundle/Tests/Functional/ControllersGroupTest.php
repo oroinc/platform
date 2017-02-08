@@ -7,9 +7,6 @@ use Symfony\Component\DomCrawler\Crawler;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ControllersGroupTest extends WebTestCase
 {
     protected function setUp()

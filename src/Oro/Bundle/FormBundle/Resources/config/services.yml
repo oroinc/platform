@@ -43,5 +43,12 @@ services:
         arguments:
             - '@event_dispatcher'
 
+    oro_form.doctrine.orm.validator_initializer:
+        class: Oro\Bundle\FormBundle\Validator\DoctrineInitializer
+        public: false
+        decorates: doctrine.orm.validator_initializer
+        arguments:
+            - '@oro_form.doctrine.orm.validator_initializer.inner'
+
     oro_form.registry.form_template_data_provider:
         class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry
