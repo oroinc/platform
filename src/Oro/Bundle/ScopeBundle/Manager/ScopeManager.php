@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -90,7 +90,7 @@ class ScopeManager
     /**
      * @param $scopeType
      * @param null $context
-     * @return BufferedQueryResultIterator|\Oro\Bundle\ScopeBundle\Entity\Scope[]
+     * @return BufferedQueryResultIteratorInterface|\Oro\Bundle\ScopeBundle\Entity\Scope[]
      */
     public function findBy($scopeType, $context = null)
     {
@@ -110,7 +110,7 @@ class ScopeManager
     /**
      * @param $scopeType
      * @param array|object|null $context
-     * @return BufferedQueryResultIterator|Scope[]
+     * @return BufferedQueryResultIteratorInterface|Scope[]
      */
     public function findRelatedScopes($scopeType, $context = null)
     {

@@ -26,6 +26,11 @@ AddressBundle
     - construction signature was changed now it takes next arguments:
         - `ServiceLink` $providerLink
 
+BatchBundle
+-----------
+- Added `Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator` that allows to iterate through changing dataset
+- `Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator` is deprecated. Use `Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator` instead
+
 DashboardBundle
 ---------------
 - Class `Oro\Bundle\DashboardBundle\Twig\DashboardExtension`
@@ -42,6 +47,10 @@ DataAuditBundle
         - `FilterUtility` $util,
         - `ServiceLink` $queryDesignerManagerLink
 
+DataGridBundle
+--------------
+- `Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult` is deprecated. Use `Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator` instead
+
 EmailBundle
 -----------
 - Added `Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface` and implemented it in `Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer`
@@ -55,6 +64,8 @@ EmailBundle
         - `SecurityFacade` $securityFacade,
         - `ServiceLink` $relatedEmailsProviderLink
 - `Oro/Bundle/EmailBundle/Migrations/Data/ORM/EnableEmailFeature` removed, feature enabled by default
+- Class `Oro\Bundle\EmailBundle\Async\Manager\AssociationManager`
+    - changed the return type of `getOwnerIterator` method from `BufferedQueryResultIterator` to `\Iterator`
 
 EntityBundle
 ------------
@@ -129,6 +140,13 @@ SearchBundle
 `Oro\Bundle\SearchBundle\Query\AbstractSearchQuery` were fixed to support fluent interface
 `Oro\Bundle\SearchBundle\Engine\Orm` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
 `Oro\Bundle\SearchBundle\Engine\OrmIndexer` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
+
+ScopeBundle
+-----------
+- Class `Oro\Bundle\ScopeBundle\Manager\ScopeManager`
+    - changed the return type of `findBy` method from `BufferedQueryResultIterator` to `BufferedQueryResultIteratorInterface`
+    - changed the return type of `findRelatedScopes` method from `BufferedQueryResultIterator` to `BufferedQueryResultIteratorInterface`
+
 
 SecurityBundle
 --------------
