@@ -1,0 +1,26 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'button.html.twig'
+
+        - '@add':
+            id: style_book_button_element_wrapp
+            parentId: style_book_main
+            blockType: group_element_item
+
+        - '@add':
+            id: style_book_button_element
+            parentId: style_book_button_element_wrapp
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_save
+            parentId: style_book_main
+            blockType: group_element_item
+
+        - '@add':
+            id: style_book_button_element_save
+            parentId: style_book_button_element_wrapp_save
+            blockType: block
+
+    conditions: 'context["action"]=="forms"'
