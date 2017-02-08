@@ -22,7 +22,7 @@ define(function(require) {
             var url = false;
             if (this.options.routeName) {
                 var routeParams = this.options.routeParams;
-                routeParams['selected'] = selectedIds;
+                routeParams.selected = selectedIds;
                 url = routing.generate(this.options.routeName, routeParams);
             }
 
@@ -41,10 +41,9 @@ define(function(require) {
             });
 
             this.dialogWidget.once('formSave', _.bind(function(changed) {
-                for (var key in changed) {
-                    var data = changed[key];
+                _.each(changed, function(data) {
                     $tree.jstree('move_node', data.id, data.parent, data.position);
-                }
+                });
                 $tree.jstree('uncheck_all');
             }, this));
 
