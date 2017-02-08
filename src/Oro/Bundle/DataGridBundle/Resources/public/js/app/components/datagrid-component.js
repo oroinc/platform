@@ -22,6 +22,7 @@ define(function(require) {
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
     var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
     var StickedScrollbarPlugin = require('orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin');
+    var config = require('module').config();
 
     helpers = {
         cellType: function(type) {
@@ -166,7 +167,7 @@ define(function(require) {
             this.metadataModel = new MetadataModel(this.metadata);
             this.modules = {};
 
-            this.collectModules();
+            this.collectModules(options);
 
             // load all dependencies and build grid
             tools.loadModules(this.modules, this.build, this);
@@ -188,7 +189,7 @@ define(function(require) {
         /**
          * Collects required modules
          */
-        collectModules: function() {
+        collectModules: function(options) {
             var modules = this.modules;
             var metadata = this.metadata;
             // cells
@@ -205,6 +206,11 @@ define(function(require) {
             _.each(_.values(metadata.massActions), function(action) {
                 var type = action.frontend_type;
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
+            });
+
+            var customComponents = _.extend(config.customComponents, options.customComponents);
+            _.mapObject(customComponents, function (val, key) {
+                modules[key] = val;
             });
         },
 
@@ -236,6 +242,10 @@ define(function(require) {
                 // otherwise, create collection from metadata
                 collection = new PageableCollection(collectionModels, collectionOptions);
             }
+
+            collection.on('get:module', function(key, options) {
+                options[key] = modules[key] || null;
+            });
 
             // create grid
             var options = this.combineGridOptions();
