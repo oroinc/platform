@@ -16,18 +16,13 @@ trait DbalSchemaExtensionTrait
         $dbalConnection = $connection->getDBALConnection();
         $schemaManager = $dbalConnection->getSchemaManager();
 
-        try {
-            $schemaManager->dropTable($tableName);
-        } catch (DriverException $e) {
-        }
-
         $schema = new DbalSchema($dbalConnection, $tableName);
         foreach ($schema->getTables() as $table) {
             $schemaManager->createTable($table);
         }
     }
 
-     /**
+    /**
      * @param string $tableName
      */
     public function dropTable($tableName)
@@ -36,10 +31,7 @@ trait DbalSchemaExtensionTrait
         $dbalConnection = $connection->getDBALConnection();
         $schemaManager = $dbalConnection->getSchemaManager();
 
-        try {
-            $schemaManager->dropTable($tableName);
-        } catch (DriverException $e) {
-        }
+        $schemaManager->dropTable($tableName);
     }
 
     /**

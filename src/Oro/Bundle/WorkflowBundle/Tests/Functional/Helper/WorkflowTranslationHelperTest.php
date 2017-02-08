@@ -8,9 +8,6 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
 
-/**
- * @dbIsolation
- */
 class WorkflowTranslationHelperTest extends WebTestCase
 {
     /** @var WorkflowTranslationHelper */
