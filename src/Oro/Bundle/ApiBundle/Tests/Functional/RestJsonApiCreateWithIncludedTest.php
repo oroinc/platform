@@ -7,9 +7,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
 {
     /**

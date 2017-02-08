@@ -27,7 +27,6 @@ services:
             - @oro_search.mapper
         calls:
             - [setLogQueries, [%oro_search.log_queries%]]
-            - [setDrivers, [%oro_search.drivers%]]
 ```
 
 Each supported DBMS has it's own driver that knows about specific search implementation and generates valid SQL.

@@ -12,9 +12,6 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LocalizationControllerTest extends WebTestCase
 {
     const NAME = 'Localization name';

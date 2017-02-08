@@ -2,28 +2,25 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Util\OrderedHashMap;
+use Symfony\Component\Validator\ObjectInitializerInterface;
 
 use Oro\Bundle\FormBundle\Validator\DoctrineInitializer;
 
 class DoctrineInitializerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrine;
+    protected $innerInitializer;
 
     /** @var DoctrineInitializer */
     protected $doctrineInitializer;
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->innerInitializer = $this->createMock(ObjectInitializerInterface::class);
 
-        $this->doctrineInitializer = new DoctrineInitializer($this->doctrine);
+        $this->doctrineInitializer = new DoctrineInitializer($this->innerInitializer);
     }
 
     /**
@@ -31,8 +28,8 @@ class DoctrineInitializerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitializeForPredefinedNotManageableObjects($object)
     {
-        $this->doctrine->expects(self::never())
-            ->method('getManagerForClass');
+        $this->innerInitializer->expects(self::never())
+            ->method('initialize');
 
         $this->doctrineInitializer->initialize($object);
     }
@@ -49,10 +46,9 @@ class DoctrineInitializerTest extends \PHPUnit_Framework_TestCase
     {
         $object = new \stdClass();
 
-        $this->doctrine->expects(self::once())
-            ->method('getManagerForClass')
-            ->with(get_class($object))
-            ->willReturn(null);
+        $this->innerInitializer->expects(self::once())
+            ->method('initialize')
+            ->with(self::identicalTo($object));
 
         $this->doctrineInitializer->initialize($object);
     }

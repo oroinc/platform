@@ -16,6 +16,17 @@ class Select2Entity extends Element
         $results = $this->getSuggestions();
 
         if (1 < count($results)) {
+            // Try remove (Add new) records
+            $results = array_filter($results, function (NodeElement $result) {
+                return !stripos($result->getText(), 'Add new');
+            });
+
+            if (1 === count($results)) {
+                array_shift($results)->click();
+                $this->getDriver()->waitForAjax();
+                return;
+            }
+
             foreach ($results as $result) {
                 if ($result->getText() == $value) {
                     $result->click();

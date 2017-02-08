@@ -7,9 +7,6 @@ use Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeRepository;
 use Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures\LoadAddressTypeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class AddressTypeRepositoryTest extends WebTestCase
 {
     protected function setUp()

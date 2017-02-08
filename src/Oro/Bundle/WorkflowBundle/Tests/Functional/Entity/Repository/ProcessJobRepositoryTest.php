@@ -7,16 +7,11 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
-/**
- * @dbIsolation
- */
 class ProcessJobRepositoryTest extends WebTestCase
 {
     /**
@@ -38,36 +33,11 @@ class ProcessJobRepositoryTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager()->beginTransaction();
-
-        $this->dropJobsRecords();
-
         $this->registry      = $this->getContainer()->get('doctrine');
         $this->entityManager = $this->registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
         $this->repository    = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
 
         $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities']);
-    }
-
-    protected function tearDown()
-    {
-        // clear DB from separate connection, close to avoid connection limit and memory leak
-        $manager = $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager();
-        $manager->rollback();
-        $manager->getConnection()->close();
-
-        $this->dropJobsRecords();
-
-        parent::tearDown();
-    }
-
-    protected function dropJobsRecords()
-    {
-        $this->getContainer()
-            ->get('doctrine')
-            ->getManager()
-            ->createQuery('DELETE OroWorkflowBundle:ProcessJob')
-            ->execute();
     }
 
     public function testDeleteByHashes()

@@ -55,9 +55,9 @@ define([
         toRemove: function(model) {
             model.destroy({
                 wait: true,
-                errorOutput: function(event, xhr) {
-                    // Suppress error if it's 404 response and not debug mode
-                    return xhr.status !== 404 || mediator.execute('retrieveOption', 'debug');
+                errorHandlerMessage: function(event, xhr) {
+                    // Suppress error if it's 404 response
+                    return xhr.status !== 404;
                 },
                 error: function(model, xhr) {
                     if (xhr.status === 404 && !mediator.execute('retrieveOption', 'debug')) {

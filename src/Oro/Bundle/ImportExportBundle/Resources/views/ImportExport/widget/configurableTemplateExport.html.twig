@@ -36,7 +36,8 @@
                             );
                             $.ajax(e.target.action, {
                                 data: form.serialize(),
-                                method: e.target.method
+                                method: e.target.method,
+                                errorHandlerMessage: false
                             }).done(function(data) {
                                 if (typeof data.url == 'undefined') {
                                     exportHandler.handleDataTemplateDownloadErrorMessage();
