@@ -31,6 +31,11 @@ class WorkflowVariableNormalizer extends WorkflowDataNormalizer
      */
     public function denormalizeVariable(Workflow $workflow, ParameterInterface $variable, $variableValue)
     {
+        // configuration is serialized with variable configuration
+        if ('array' === $variable->getType()) {
+            return $variableValue;
+        }
+
         return $this->denormalizeAttribute($workflow, $variable, $variableValue);
     }
 }
