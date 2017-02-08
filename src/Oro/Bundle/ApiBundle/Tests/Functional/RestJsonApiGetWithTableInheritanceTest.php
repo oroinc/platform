@@ -4,9 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
 {
     /**

@@ -12,9 +12,6 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-/**
- * @dbIsolation
- */
 class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 {
     const NAME = 'oro:workflow:definitions:load';

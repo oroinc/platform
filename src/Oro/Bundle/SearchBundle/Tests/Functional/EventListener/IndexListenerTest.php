@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @group search
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class IndexListenerTest extends WebTestCase
 {
@@ -20,14 +20,6 @@ class IndexListenerTest extends WebTestCase
         parent::setUp();
 
         $this->initClient();
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
     }
 
     public function testShouldCreateSearchIndexForEntityIfItWasCreated()

@@ -9,9 +9,6 @@ use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
 
-/**
- * @dbIsolation
- */
 class AjaxMenuControllerTest extends WebTestCase
 {
     const MENU_NAME = 'application_menu';
