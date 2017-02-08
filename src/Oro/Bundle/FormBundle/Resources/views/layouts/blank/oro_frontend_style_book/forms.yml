@@ -3,29 +3,46 @@ layout:
         - '@setOption':
             id: page_title
             optionName: text
-            optionValue: 'oro_frontend_style_book.groups.forms.title'
+            optionValue: 
+                label: 'oro_frontend_style_book.groups.forms.title'
 
+        - '@add':
+            id: group_element_form_text
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                id: form_text
+                label: Input text
+        - '@add':
+            id: group_element_item_form_text
+            parentId: group_element_form_text
+            blockType: group_element_item
         - '@add':
             id: form_text
             parentId: group_element_item_form_text
             blockType: form_field
             options:
                 form: '=data["style_book_form"].getStyleBookFormView()["text"]'
-        - '@add':
-            id: group_element_item_form_text
-            parentId: style_book_main
-            blockType: group_element_item
 
+
+        - '@add':
+            id: group_element_form_select
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                id: select_text
+                label: Select
+        - '@add':
+            id: group_element_item_form_select
+            parentId: group_element_form_select
+            blockType: group_element_item
         - '@add':
             id: form_select
             parentId: group_element_item_form_select
             blockType: form_field
             options:
                 form: '=data["style_book_form"].getStyleBookFormView()["select"]'
-        - '@add':
-            id: group_element_item_form_select
-            parentId: style_book_main
-            blockType: group_element_item
+        
 
         - '@add':
             id: form_password
