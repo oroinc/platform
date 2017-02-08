@@ -97,7 +97,7 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
      * @param mixed $attributeValue
      * @return mixed
      */
-    public function normalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    protected function normalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         $normalizer = $this->findAttributeNormalizer('normalization', $workflow, $attribute, $attributeValue);
 
@@ -111,7 +111,7 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
      * @return AttributeNormalizer
      * @throws SerializerException
      */
-    public function denormalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    protected function denormalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         $normalizer = $this->findAttributeNormalizer('denormalization', $workflow, $attribute, $attributeValue);
 

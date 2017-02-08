@@ -260,7 +260,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
     ) {
         /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
-            ->setMethods(['getTransitionManager'])
+            ->setMethods(['getTransitionManager', 'getVariables'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -272,6 +272,7 @@ class StartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_Test
 
         $workflow->setDefinition($definition);
         $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
+        $workflow->expects($this->any())->method('getVariables')->willReturn(new ArrayCollection());
 
         return $workflow;
     }
