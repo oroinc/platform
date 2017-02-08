@@ -12,17 +12,15 @@ class MenuUpdateScopeChangeEventTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMenuName()
     {
-        /** @var Scope $scope */
-        $scope = $this->getEntity(Scope::class);
-        $event = new MenuUpdateChangeEvent('application_menu', $scope);
+        $context = ['foo' => 'bar'];
+        $event = new MenuUpdateChangeEvent('application_menu', $context);
         $this->assertEquals('application_menu', $event->getMenuName());
     }
 
     public function testGetScope()
     {
-        /** @var Scope $scope */
-        $scope = $this->getEntity(Scope::class);
-        $event = new MenuUpdateChangeEvent('application_menu', $scope);
-        $this->assertSame($scope, $event->getScope());
+        $context = ['foo' => 'bar'];
+        $event = new MenuUpdateChangeEvent('application_menu', $context);
+        $this->assertSame($context, $event->getContext());
     }
 }

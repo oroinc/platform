@@ -55,7 +55,7 @@ class MenuUpdateCacheFlusher
     public function onMenuUpdateScopeChange(MenuUpdateChangeEvent $event)
     {
         $scope = $this->scopeManager->find($this->scopeType, $event->getContext());
-        if (null === $scope) {
+        if (null !== $scope) {
             $this->cache->delete(MenuUpdateUtils::generateKey($event->getMenuName(), $scope));
             $this->repository->findMenuUpdatesByScope($event->getMenuName(), $scope);
         }
