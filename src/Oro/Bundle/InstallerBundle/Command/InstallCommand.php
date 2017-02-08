@@ -14,6 +14,7 @@ use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\SecurityBundle\Command\ConfigurablePermissionLoadCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
@@ -456,6 +457,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             )
             ->runCommand(
                 LoadPermissionConfigurationCommand::NAME,
+                [
+                    '--process-isolation' => true
+                ]
+            )
+            ->runCommand(
+                ConfigurablePermissionLoadCommand::NAME,
                 [
                     '--process-isolation' => true
                 ]
