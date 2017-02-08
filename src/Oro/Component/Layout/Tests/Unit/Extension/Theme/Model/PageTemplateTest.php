@@ -17,6 +17,7 @@ class PageTemplateTest extends \PHPUnit_Framework_TestCase
             ['screenshot', 'some/screenshot/path/img.jpg'],
             ['key', 'some_key'],
             ['routeName', 'some_route_name'],
+            ['enabled', false]
         ];
 
         $entity = new PageTemplate(null, null, null);

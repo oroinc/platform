@@ -62,8 +62,12 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
 
             $pageTemplate = $this->context->getOr('page_template');
             if ($pageTemplate) {
-                foreach ($themePaths as $path) {
-                    $existingPaths[] = implode(self::DELIMITER, [$path, $routeName, 'page_template', $pageTemplate]);
+                $theme = $this->themeManager->getTheme($themeName);
+                if ($theme->getPageTemplate($this->context->getOr('page_template'), $routeName)) {
+                    foreach ($themePaths as $path) {
+                        $existingPaths[] =
+                            implode(self::DELIMITER, [$path, $routeName, 'page_template', $pageTemplate]);
+                    }
                 }
             }
         }

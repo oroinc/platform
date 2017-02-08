@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\PathProvider;
 
+use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
+use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider;
@@ -30,18 +32,20 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
      * @param string|null $theme
      * @param string|null $route
      * @param string|null $action
-     * @param string|null $pageTemplate
+     * @param string|null $pageTemplateKey
      */
-    public function testGetPaths(array $expectedResults, $theme, $route, $action, $pageTemplate)
+    public function testGetPaths(array $expectedResults, $theme, $route, $action, $pageTemplateKey)
     {
         $context = new LayoutContext();
         $context->set('theme', $theme);
         $context->set('route_name', $route);
         $context->set('action', $action);
-        $context->set('page_template', $pageTemplate);
+        $context->set('page_template', $pageTemplateKey);
+
+        $pageTemplate = $pageTemplateKey ? new PageTemplate('', $pageTemplateKey, $route) : null;
         $this->setUpThemeManager(
             [
-                'black' => $this->getThemeMock('black', 'base'),
+                'black' => $this->getThemeMock('black', 'base', $pageTemplate),
                 'base'  => $this->getThemeMock('base')
             ]
         );
@@ -152,16 +156,19 @@ class ThemePathProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param null|string $parent
-     * @param null|string $directory
+     * @param null|string  $directory
+     * @param null|string  $parent
+     * @param PageTemplate $pageTemplate
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getThemeMock($directory = null, $parent = null)
+    protected function getThemeMock($directory = null, $parent = null, PageTemplate $pageTemplate = null)
     {
         $theme = $this->createMock('Oro\Component\Layout\Extension\Theme\Model\Theme');
         $theme->expects($this->any())->method('getParentTheme')->willReturn($parent);
         $theme->expects($this->any())->method('getDirectory')->willReturn($directory);
+        $theme->expects($this->any())->method('getPageTemplate')
+            ->willReturn($pageTemplate);
 
         return $theme;
     }

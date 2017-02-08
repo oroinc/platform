@@ -239,6 +239,10 @@ class Theme
         $key = $pageTemplate->getKey() . '_' . $pageTemplate->getRouteName();
         if ($force === true || !$this->pageTemplates->containsKey($key)) {
             $this->pageTemplates->set($key, $pageTemplate);
+        } else {
+            /** @var PageTemplate $existing */
+            $existing = $this->pageTemplates->get($key);
+            $existing->mergeParent($pageTemplate);
         }
 
         return $this;
@@ -250,6 +254,20 @@ class Theme
     public function getPageTemplates()
     {
         return $this->pageTemplates;
+    }
+
+    /**
+     * @param string $key
+     * @param string $routeName
+     * @return PageTemplate
+     */
+    public function getPageTemplate($key, $routeName)
+    {
+        return $this->getPageTemplates()->filter(function (PageTemplate $pageTemplate) use ($key, $routeName) {
+            return $pageTemplate->getKey() === $key
+                && $pageTemplate->getRouteName() === $routeName
+                && $pageTemplate->isEnabled() !== false;
+        })->first();
     }
 
     /**

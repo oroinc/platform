@@ -19,6 +19,9 @@ class PageTemplate
     /** @var string */
     private $routeName;
 
+    /** @var bool */
+    private $enabled;
+
     /**
      * @param string $key
      * @param string $label
@@ -124,5 +127,45 @@ class PageTemplate
     public function getRouteName()
     {
         return $this->routeName;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param boolean $enabled
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @param PageTemplate $pageTemplate
+     * @return $this
+     */
+    public function mergeParent(PageTemplate $pageTemplate)
+    {
+        if ($this->getDescription() === null) {
+            $this->setDescription($pageTemplate->getDescription());
+        }
+
+        if ($this->getScreenshot() === null) {
+            $this->setScreenshot($pageTemplate->getScreenshot());
+        }
+
+        if ($this->isEnabled() === null) {
+            $this->setEnabled($pageTemplate->isEnabled());
+        }
+
+        return $this;
     }
 }

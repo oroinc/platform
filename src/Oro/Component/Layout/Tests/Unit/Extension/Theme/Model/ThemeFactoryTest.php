@@ -61,6 +61,12 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
                         'route_name' => 'some_route_name',
                         'screenshot' => 'some_screenshot',
                         'description' => 'Some description'
+                    ],
+                    [
+                        'label' => 'Some label (disabled)',
+                        'key' => 'some_key_disabled',
+                        'route_name' => 'some_route_name_disabled',
+                        'enabled' => false,
                     ]
                 ],
                 'titles' => [
@@ -70,11 +76,16 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         $fullDefinition->setConfig($config);
-        $pageTemplate = (new PageTemplate('Some label', 'some_key', 'some_route_name'))
-            ->setDescription('Some description')
-            ->setScreenshot('some_screenshot');
+
         $fullDefinition->addPageTemplateTitle('some_route_name', 'Title for some route name');
 
+        $pageTemplate = new PageTemplate('Some label', 'some_key', 'some_route_name');
+        $pageTemplate->setDescription('Some description')
+            ->setScreenshot('some_screenshot');
+        $fullDefinition->addPageTemplate($pageTemplate);
+
+        $pageTemplate = new PageTemplate('Some label (disabled)', 'some_key_disabled', 'some_route_name_disabled');
+        $pageTemplate->setEnabled(false);
         $fullDefinition->addPageTemplate($pageTemplate);
 
         return [

@@ -120,13 +120,47 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
         $this->theme->addPageTemplate($pageTemplate);
         $newPageTemplate = new PageTemplate('NewLabel', 'key', 'route_name');
+        $newPageTemplate->setDescription('Description');
         $this->theme->addPageTemplate($newPageTemplate);
 
         $this->assertCount(1, $this->theme->getPageTemplates());
         $this->assertEquals(
-            new ArrayCollection(['key_route_name' => $pageTemplate]),
+            new ArrayCollection(['key_route_name' => $pageTemplate->setDescription('Description')]),
             $this->theme->getPageTemplates()
         );
+    }
+
+    public function testGetPageTemplate()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertEquals($pageTemplate, $this->theme->getPageTemplate('key', 'route_name'));
+    }
+
+    public function testGetPageTemplateWithWrongKey()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertFalse($this->theme->getPageTemplate('key1', 'route_name'));
+    }
+
+    public function testGetPageTemplateWithWrongRouteName()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertFalse($this->theme->getPageTemplate('key', 'route_name1'));
+    }
+
+    public function testGetPageTemplateDisabled()
+    {
+        $pageTemplate = new PageTemplate('Label', 'key', 'route_name');
+        $pageTemplate->setEnabled(false);
+        $this->theme->addPageTemplate($pageTemplate);
+
+        $this->assertFalse($this->theme->getPageTemplate('key', 'route_name'));
     }
 
     public function testConfigMethods()
