@@ -24,11 +24,12 @@ services:
         class: %oro_form.model.update_handler.class%
         scope: request
         arguments:
-            - '@request'
+            - '@request_stack'
             - '@session'
             - '@oro_ui.router'
             - '@oro_entity.doctrine_helper'
             - '@oro_form.event.event_dispatcher'
+            - '@oro_form.registry.form_template_data_provider'
 
     oro_form.provider.html_tag_provider:
         class: %oro_form.provider.html_tag_provider.class%
@@ -51,4 +52,4 @@ services:
             - '@oro_form.doctrine.orm.validator_initializer.inner'
 
     oro_form.registry.form_template_data_provider:
-        class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry
+        class: 'Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry'

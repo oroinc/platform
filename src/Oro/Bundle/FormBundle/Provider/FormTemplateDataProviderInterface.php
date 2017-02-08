@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Provider;
 
-use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 interface FormTemplateDataProviderInterface
