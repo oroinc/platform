@@ -119,7 +119,7 @@ class ConfigurablePermissionTest extends \PHPUnit_Framework_TestCase
      * @dataProvider isWorkflowPermissionConfigurableDataProvider
      *
      * @param bool $default
-     * @param array $entities
+     * @param array $workflows
      * @param bool $expected
      */
     public function testIsWorkflowPermissionConfigurable($default, array $workflows, $expected)
