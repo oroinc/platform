@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -34,7 +33,7 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
 
         /** @var \DOMElement $link */
         foreach ($crawler->filter('ul li') as $link) {
-            preg_match('/([\w\s]+).+(\d+)/', $link->textContent, $matches);
+            preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
             $links[trim($matches[1])] = [
                 'number' => $matches[2],
                 'isSelected' => false !== stripos($link->getAttribute('class'), 'selected'),
@@ -154,5 +153,18 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
             (int) $number,
             $suggestions->findAll('css', 'li')
         );
+    }
+
+    /**
+     * Records in table on current page must match the count.
+     * Example: Then records in grid should be 5
+     *
+     * @Then records in grid should be :count
+     */
+    public function recordsInGridShouldBe($count)
+    {
+        $gridRows = $this->getPage()->findAll('css', '.grid-container tbody tr');
+
+        self::assertCount((int) $count, $gridRows);
     }
 }

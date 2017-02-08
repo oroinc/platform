@@ -1,7 +1,7 @@
 Field ACL extension
 ===================
 
-[Field ACL extension](../../../Extension/FieldAcl/FieldAclExtension.php) allows to check access to grid columns. Currently it is implemented only for ORM datasource.
+[Field ACL extension](../../../../Extension/FieldAcl/FieldAclExtension.php) allows to check access to grid columns. Currently it is implemented only for ORM datasource.
 
 To enable field ACL protection for a column, you should use `field_acl` section in a datagrid declaration:
 

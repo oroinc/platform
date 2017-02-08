@@ -6,9 +6,6 @@ use Oro\Bundle\ReportBundle\Command\CalendarDateCommand;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class CalendarDateCommandTest extends WebTestCase
 {
     const DATE_FORMAT = 'Y-m-d';

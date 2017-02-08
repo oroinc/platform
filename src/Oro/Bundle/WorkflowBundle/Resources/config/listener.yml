@@ -45,6 +45,7 @@ services:
 
     oro_workflow.listener.extension.process_trigger:
         class: 'Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension'
+        public: false
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.process.process_handler'

@@ -166,7 +166,7 @@ class ImportExportController extends Controller
                 'userId' => $this->getUser()->getId(),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
-                $this->getOptionsFromRequest($request)
+                'options' => $this->getOptionsFromRequest($request),
             ]
         );
 
@@ -196,10 +196,9 @@ class ImportExportController extends Controller
                 'userId' => $this->getUser()->getId(),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
-                $this->getOptionsFromRequest($request)
+                'options' => $this->getOptionsFromRequest($request),
             ]
         );
-
 
         return new JsonResponse(['success' => true]);
     }
@@ -311,7 +310,7 @@ class ImportExportController extends Controller
 
     /**
      * @Route("/export/template/{processorAlias}", name="oro_importexport_export_template")
-     * @AclAncestor("oro_importexport_export")
+     * @AclAncestor("oro_importexport_import")
      *
      * @param string $processorAlias
      * @param Request $request
@@ -335,7 +334,6 @@ class ImportExportController extends Controller
 
     /**
      * @Route("/export/download/{fileName}", name="oro_importexport_export_download")
-     * @AclAncestor("oro_importexport_export")
      *
      * @param string $fileName
      *
@@ -343,6 +341,13 @@ class ImportExportController extends Controller
      */
     public function downloadExportResultAction($fileName)
     {
+        $securityFacade = $this->get('oro_security.security_facade');
+        if (!$securityFacade->isGranted('oro_importexport_import') &&
+            !$securityFacade->isGranted('oro_importexport_export')
+        ) {
+            throw new AccessDeniedException('Insufficient permission');
+        }
+
         return $this->getExportHandler()->handleDownloadExportResult($fileName);
     }
 

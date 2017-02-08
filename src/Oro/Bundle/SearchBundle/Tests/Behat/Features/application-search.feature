@@ -24,6 +24,22 @@ Feature: Application search
       | Common Report        | Report        |
       | Common Business Unit | Business Unit |
 
+  Scenario: Search in search page
+    Given I follow "Search"
+    And type "Alice" in "search"
+    When I press "Go"
+    Then I should see following search entity types:
+      | Type            | N | isSelected |
+      | All             |15 | yes        |
+      | Users           |15 |            |
+
+  Scenario: Search result pagination
+    Given number of page should be 1
+    When I select 10 from per page list dropdown
+    And I press next page button
+    Then number of page should be 2
+    And records in grid should be 5
+
   Scenario: Search by Business Units
     Given I follow "Search"
     And I select "Business Unit" from search types

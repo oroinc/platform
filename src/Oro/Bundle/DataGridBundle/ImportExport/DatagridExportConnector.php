@@ -15,7 +15,7 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
 class DatagridExportConnector implements ItemReaderInterface, \Countable, ContextAwareInterface
 {
@@ -70,7 +70,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
     public function __construct(ServiceLink $gridManagerLink)
     {
         $this->gridManagerLink = $gridManagerLink;
-        $this->pageSize        = BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE;
+        $this->pageSize        = BufferedIdentityQueryResultIterator::DEFAULT_BUFFER_SIZE;
     }
 
     /**

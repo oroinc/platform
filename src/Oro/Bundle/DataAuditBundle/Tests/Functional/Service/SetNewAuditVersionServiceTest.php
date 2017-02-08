@@ -6,21 +6,16 @@ use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Service\SetNewAuditVersionService;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class SetNewAuditVersionServiceTest extends WebTestCase
 {
     public function setUp()
     {
         parent::setUp();
 
-        $this->initClient([], [], true);
-        $this->startTransaction();
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
+        $this->initClient();
     }
 
     public function testCouldBeGetFromContainerAsService()

@@ -5,10 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
-/**
- * @outputBuffering enabled
- * @dbIsolation
- */
 class EmailActivityTest extends WebTestCase
 {
     protected function setUp()

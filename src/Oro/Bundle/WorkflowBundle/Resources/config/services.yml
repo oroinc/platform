@@ -150,13 +150,23 @@ services:
             - '@request_stack'
             - '@oro_entity.doctrine_helper'
 
+    oro_workflow.database_checker:
+        public: false
+        class: Oro\Bundle\EntityBundle\Tools\DatabaseChecker
+        arguments:
+            - '@doctrine'
+            - ['oro_workflow_entity_acl', 'oro_workflow_entity_acl_ident', 'oro_workflow_restriction', 'oro_workflow_restriction_ident']
+            - '%installed%'
+        tags:
+            - { name: oro_entity.database_checker }
+
     oro_workflow.validation_loader:
         class: 'Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader'
         public: false
         arguments:
             - '@oro_workflow.permission_registry'
             - '@oro_workflow.restriction.manager'
-            - '@oro_entity_config.link.entity_manager'
+            - '@oro_workflow.database_checker'
 
     oro_workflow.restriction.manager:
         class: 'Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager'
