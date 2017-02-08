@@ -44,7 +44,8 @@ class ConfigurablePermissionProvider
             $name,
             array_key_exists('default', $data[$name]) ? $data[$name]['default'] : false,
             array_key_exists('entities', $data[$name]) ? $data[$name]['entities'] : [],
-            array_key_exists('capabilities', $data[$name]) ? $data[$name]['capabilities'] : []
+            array_key_exists('capabilities', $data[$name]) ? $data[$name]['capabilities'] : [],
+            array_key_exists('workflows', $data[$name]) ? $data[$name]['workflows'] : []
         );
     }
 

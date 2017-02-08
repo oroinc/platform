@@ -46,8 +46,13 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework
                 'commerce' => [
                     'default' => false,
                     'entities' => [
-                        'TestItem' => [
-                            'update' => true
+                        'TestEntity' => [
+                            'UPDATE' => true
+                        ]
+                    ],
+                    'workflows' => [
+                        'TestWorkflow' => [
+                            'TRANSIT' => false
                         ]
                     ],
                     'capabilities' => [
@@ -63,9 +68,16 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework
                 'commerce' => [
                     'default' => true,
                     'entities' => [
-                        'TestItem' => [
-                            'update' => false,
-                            'delete' => true,
+                        'TestEntity' => [
+                            'UPDATE' => false,
+                            'DELETE' => true,
+                        ]
+                    ],
+                    'workflows' => [
+                        'TestWorkflow' => [
+                            'VIEW' => false,
+                            'DELETE' => true,
+                            'TRANSIT' => false,
                         ]
                     ],
                     'capabilities' => [

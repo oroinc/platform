@@ -8,6 +8,7 @@ class ConfigurablePermissionTest extends \PHPUnit_Framework_TestCase
 {
     const CAPABILITY = 'test_capability';
     const ENTITY_CLASS = 'test_entity';
+    const WORKFLOW = 'test_workflow';
     const PERMISSION = 'test_permission';
 
     public function testGetName()
@@ -109,6 +110,59 @@ class ConfigurablePermissionTest extends \PHPUnit_Framework_TestCase
             'contains permission true' => [
                 'default' => false,
                 'entities' => [self::ENTITY_CLASS => [self::PERMISSION => true]],
+                'expected' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider isWorkflowPermissionConfigurableDataProvider
+     *
+     * @param bool $default
+     * @param array $entities
+     * @param bool $expected
+     */
+    public function testIsWorkflowPermissionConfigurable($default, array $workflows, $expected)
+    {
+        $model = new ConfigurablePermission('test_name', $default, [], [], $workflows);
+
+        $this->assertEquals($expected, $model->isWorkflowPermissionConfigurable(self::WORKFLOW, self::PERMISSION));
+    }
+
+    /**
+     * @return array
+     */
+    public function isWorkflowPermissionConfigurableDataProvider()
+    {
+        return [
+            'default true, not contains workflow' => [
+                'default' => true,
+                'workflows' => [],
+                'expected' => true,
+            ],
+            'default false, not contains workflow' => [
+                'default' => false,
+                'workflows' => [],
+                'expected' => false,
+            ],
+            'default true, workflow, no permission' => [
+                'default' => true,
+                'workflows' => [self::WORKFLOW => []],
+                'expected' => true,
+            ],
+            'default false, workflow, no permission' => [
+                'default' => true,
+                'workflows' => [self::WORKFLOW => []],
+                'expected' => true,
+            ],
+            'contains permission false' => [
+                'default' => true,
+                'workflows' => [self::WORKFLOW => [self::PERMISSION => false]],
+                'expected' => false,
+            ],
+            'contains permission true' => [
+                'default' => false,
+                'workflows' => [self::WORKFLOW => [self::PERMISSION => true]],
                 'expected' => true,
             ],
         ];

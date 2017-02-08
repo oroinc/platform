@@ -45,6 +45,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                 'commerce' => [
                     'default' => false,
                     'entities' => [],
+                    'workflows' => [],
                     'capabilities' => [],
                 ]
             ]
@@ -54,7 +55,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
             'config' => [
                 'commerce' => [
                     'entities' => [
-                        'Entity1' => ['created' => false]
+                        'Entity1' => ['create' => false]
                     ]
                 ]
             ],
@@ -62,9 +63,10 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                 'commerce' => [
                     'default' => false,
                     'entities' => [
-                        'Entity1' => ['created' => false]
+                        'Entity1' => ['CREATE' => false]
                     ],
                     'capabilities' => [],
+                    'workflows' => [],
                 ]
             ]
         ];
@@ -76,7 +78,13 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                     'capabilities' => [
                         'test1' => false,
                         'test2' => false
-                    ]
+                    ],
+                    'workflows' => [
+                        'workflow1' => [
+                            'Test1' => true,
+                            'test2' => false
+                        ]
+                    ],
                 ]
             ],
             'expected' => [
@@ -86,7 +94,13 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                     'capabilities' => [
                         'test1' => false,
                         'test2' => false
-                    ]
+                    ],
+                    'workflows' => [
+                        'workflow1' => [
+                            'TEST1' => true,
+                            'TEST2' => false
+                        ]
+                    ],
                 ]
             ]
         ];
