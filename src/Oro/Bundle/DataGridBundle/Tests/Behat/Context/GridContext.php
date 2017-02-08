@@ -19,6 +19,7 @@ use Symfony\Component\DomCrawler\Crawler;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class GridContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -389,6 +390,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iCheckAllRecordsInGrid()
     {
         $this->getGrid()->massCheck('All');
+    }
+
+    /**
+     * Asserts that no record with provided content in grid
+     * Example: And there is no "Glorious workflow" in grid
+     *
+     * @Then /^there is no "(?P<record>([\w\s]+))" in grid$/
+     * @param string $record
+     */
+    public function thereIsNoInGrid($record)
+    {
+        $gridRow = $this->findElementContains('GridRow', $record);
+        self::assertFalse($gridRow->isIsset(), sprintf('Grid still has record with "%s" content', $record));
     }
 
     /**
