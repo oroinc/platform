@@ -28,13 +28,18 @@ class VariableAssembler extends BaseAbstractAssembler
 
     /**
      * @param Workflow $workflow
-     * @param array $configuration
+     * @param array|null $configuration
      *
      * @return Collection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(Workflow $workflow, array $configuration)
+    public function assemble(Workflow $workflow, array $configuration = null)
     {
+        $variables = new ArrayCollection();
+        if (!is_array($configuration)) {
+            return $variables;
+        }
+
         $variableDefinitionsConfiguration = $this->getOption(
             $configuration,
             WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS,
@@ -47,7 +52,6 @@ class VariableAssembler extends BaseAbstractAssembler
         );
 
         $definitions = $this->parseDefinitions($variablesConfiguration);
-        $variables = new ArrayCollection();
         foreach ($definitions as $name => $options) {
             $variable = $this->assembleVariable($workflow, $name, $options);
             $variables->set($name, $variable);
