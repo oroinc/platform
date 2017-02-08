@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Role\RoleInterface;
@@ -21,9 +22,11 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
     const SIMPLE_USER_ROLE_LOCAL = 'simple_local_user@example.com';
     const SIMPLE_USER_2_ROLE_LOCAL = 'simple_local_user2@example.com';
     const SIMPLE_USER_2_ROLE_LOCAL_BU2 = 'simple_local_user2_bu2@example.com';
+    const SIMPLE_USER_ROLE_DEEP_WITHOUT_BU = 'simple_deep_user_without_bu@example.com';
 
     const ROLE_SYSTEM = 'ROLE_SYSTEM';
     const ROLE_LOCAL = 'ROLE_LOCAL';
+    const ROLE_DEEP = 'ROLE_DEEP';
 
     /**
      * @return array
@@ -50,6 +53,11 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
                 'email' => static::SIMPLE_USER_2_ROLE_LOCAL_BU2,
                 'role' => static::ROLE_LOCAL,
                 'businessUnit' => LoadBusinessUnitData::BUSINESS_UNIT_2
+            ],
+            [
+                'email' => static::SIMPLE_USER_ROLE_DEEP_WITHOUT_BU,
+                'role' => static::ROLE_DEEP,
+                'businessUnit' => null
             ]
         ];
     }
@@ -94,7 +102,11 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
         /* @var $aclManager AclManager */
         $aclManager = $this->container->get('oro_security.acl.manager');
 
-        $roles = [static::ROLE_LOCAL => 'VIEW_LOCAL', static::ROLE_SYSTEM => 'VIEW_SYSTEM'];
+        $roles = [
+            static::ROLE_LOCAL => 'VIEW_LOCAL',
+            static::ROLE_SYSTEM => 'VIEW_SYSTEM',
+            static::ROLE_DEEP => 'VIEW_DEEP'
+        ];
         foreach ($roles as $key => $roleName) {
             $role = new Role($key);
             $role->setLabel($key);
@@ -121,7 +133,7 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
         foreach (static::getUsers() as $item) {
             /** @var RoleInterface $role */
             $role = $this->getReference($item['role']);
-            $businessUnit = $this->getReference($item['businessUnit']);
+            /** @var User $user */
             $user = $userManager->createUser();
 
             $user->setUsername($item['email'])
@@ -132,8 +144,13 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
                 ->setLastName($item['email'])
                 ->setOrganization($organization)
                 ->addOrganization($organization)
-                ->setEnabled(true)
-                ->addBusinessUnit($businessUnit);
+                ->setEnabled(true);
+
+            if ($item['businessUnit']) {
+                /** @var BusinessUnit $businessUnit */
+                $businessUnit = $this->getReference($item['businessUnit']);
+                $user->addBusinessUnit($businessUnit);
+            }
             $userManager->updateUser($user);
 
             $this->setReference($item['email'], $user);
