@@ -1,10 +1,13 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ContactBundle\Entity\Contact;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImportExportControllerTest extends WebTestCase
 {
@@ -139,6 +142,70 @@ class ImportExportControllerTest extends WebTestCase
                 'userId' => $this->getCurrentUser()->getId(),
             ]
         );
+    }
+
+    public function testImportForm()
+    {
+        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
+        $tmpDirName = 'import_export';
+        $fileDir = __DIR__ . '/Import/fixtures';
+        $file = $fileDir . '/testLineEndings.csv';
+        $testFile = $fileDir . '/tmpTestLineEndings.csv';
+        copy($file, $testFile);
+
+        $csvFile = new UploadedFile(
+            $fileDir . '/tmpTestLineEndings.csv',
+            'tmpTestLineEndings.csv',
+            'text/csv'
+        );
+        $this->assertEquals(0, substr_count(file_get_contents($csvFile->getPathname()), "\r\n" ));
+        $this->assertEquals(11, substr_count(file_get_contents($csvFile->getPathname()), "\n" ));
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_importexport_import_form',
+                [
+                    '_widgetContainer' => 'dialog',
+                    '_wid' => 'test',
+                    'entity' => Contact::class,
+                ]
+            )
+        );
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        $uploadFileNode = $crawler->selectButton('Submit');
+        $uploadFileForm = $uploadFileNode->form();
+        $values = [
+            'oro_importexport_import' => [
+                '_token' => $uploadFileForm['oro_importexport_import[_token]']->getValue(),
+                'processorAlias' => 'oro_contact.add_or_replace'
+            ],
+        ];
+        $files = [
+            'oro_importexport_import' => [
+                'file' => $csvFile
+            ]
+        ];
+
+        $this->client->request(
+            $uploadFileForm->getMethod(),
+            $this->getUrl(
+                'oro_importexport_import_form',
+                [
+                    '_widgetContainer' => 'dialog',
+                    '_wid' => 'test',
+                    'entity' => Contact::class,
+                ]
+            ),
+            $values,
+            $files
+        );
+        $this->assertJsonResponseSuccess();
+        $tmpFiles = glob($cacheDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.tmp');
+        $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
+        $this->assertEquals(11, substr_count(file_get_contents($tmpFile->getPathname()), "\r\n" ));
+        unlink($tmpFile->getPathname());
     }
 
     /**

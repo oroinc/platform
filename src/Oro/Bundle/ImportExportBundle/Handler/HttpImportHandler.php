@@ -122,10 +122,10 @@ class HttpImportHandler extends AbstractImportHandler
         return $tmpFileName;
     }
 
-    /**Convert the ending-lines CR et LF in CRLF.
+    /**
+     * Convert the ending-lines CR and LF in CRLF.
      *
      * @param string $filename Name of the file
-     * @return boolean "true" if the conversion proceed without error and else "false".
      */
     protected function normalizeLineEndings($filename)
     {
@@ -133,7 +133,7 @@ class HttpImportHandler extends AbstractImportHandler
         $fileContents = file_get_contents($filename);
 
         if (!$fileContents) {
-            return false;
+            return;
         }
 
         //Replace all the CRLF ending-lines by something uncommon
@@ -156,7 +156,7 @@ class HttpImportHandler extends AbstractImportHandler
         //Update the file contents
         file_put_contents($filename, $fileContents);
 
-        return true;
+        return;
     }
 
     /**
