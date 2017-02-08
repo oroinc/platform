@@ -110,7 +110,7 @@ services:
     oro_datagrid.twig.datagrid:
         class: 'Oro\Bundle\DataGridBundle\Twig\DataGridExtension'
         arguments:
-            - '@oro_datagrid.datagrid.manager'
+            - '@oro_datagrid.datagrid.manager.link'
             - '@oro_datagrid.datagrid.name_strategy'
             - '@router'
             - '@oro_security.security_facade'
@@ -347,3 +347,9 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_datagrid.layout_context_configurator.data:
+        class: Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator
+        arguments:
+            - '@oro_datagrid.datagrid.manager'
+        tags:
+            - { name: layout.context_configurator }

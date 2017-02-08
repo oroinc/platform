@@ -29,7 +29,7 @@ oro:
         attachment:
             added: Attachment added
         send_email: Send email
-        menu.shortcut_compose_email.label: Compose email
+        menu.shortcut_compose_email.label: Compose Email
         action:
             success_mark_read: "Email has been marked as read"
             success_mark_unread: "Email has been marked as unread"

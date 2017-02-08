@@ -100,6 +100,7 @@ define(function(require) {
                     var message = __('oro.navigation.menuupdate.moved_success_message', {nodeText: data.node.text});
                     messenger.notificationFlashMessage('success', message);
                 },
+                errorHandlerMessage: false,
                 error: function(xhr) {
                     self.rollback(data);
                     var message = __('oro.ui.jstree.move_node_error', {nodeText: data.node.text});

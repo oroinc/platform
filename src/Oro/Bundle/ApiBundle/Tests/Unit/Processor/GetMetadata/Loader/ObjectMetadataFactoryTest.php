@@ -464,4 +464,41 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         self::assertSame($result, $entityMetadata->getAssociation('testField'));
         self::assertEquals($expected, $result);
     }
+
+    public function testCreateAndAddAssociationMetadataForExtendedAssociationWithEmptyTargets()
+    {
+        $entityMetadata = new EntityMetadata();
+        $field = new EntityDefinitionFieldConfig();
+        $field->setDataType('association:manyToOne');
+        $field->setTargetClass(EntityIdentifier::class);
+        $target = $field->createAndSetTargetEntity();
+        $target->setIdentifierFieldNames(['id']);
+        $target->addField('id')->setDataType('integer');
+
+        $this->associationManager->expects($this->once())
+            ->method('getAssociationTargets')
+            ->with('Test\Class', null, 'manyToOne', null)
+            ->willReturn([]);
+
+        $expected = $this->createAssociationMetadata(
+            'testField',
+            EntityIdentifier::class,
+            'manyToOne',
+            false,
+            'integer',
+            [],
+            false
+        );
+        $expected->setEmptyAcceptableTargetsAllowed(false);
+
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
+            $entityMetadata,
+            'Test\Class',
+            'testField',
+            $field,
+            'test'
+        );
+        self::assertSame($result, $entityMetadata->getAssociation('testField'));
+        self::assertEquals($expected, $result);
+    }
 }

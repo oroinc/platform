@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
@@ -10,6 +11,7 @@ use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
@@ -32,6 +34,21 @@ class OroTestFrameworkExtension implements TestworkExtension
     const PAGES_CONFIG_ROOT = 'pages';
 
     /**
+     * @var ServiceProcessor
+     */
+    private $processor;
+
+    /**
+     * Initializes compiler pass.
+     *
+     * @param null|ServiceProcessor $processor
+     */
+    public function __construct(ServiceProcessor $processor = null)
+    {
+        $this->processor = $processor ? : new ServiceProcessor();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
@@ -42,6 +59,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->injectMessageQueueIsolator($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
+        $this->processClassResolvers($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -78,8 +96,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                     )
                     ->defaultValue([])
                 ->end()
-                ->arrayNode('shared_contexts')
-                    ->prototype('scalar')->end()
+                ->variableNode('shared_contexts')
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
                 ->end()
@@ -178,6 +195,21 @@ class OroTestFrameworkExtension implements TestworkExtension
             0,
             $services
         );
+    }
+
+    /**
+     * Processes all context initializers.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function processClassResolvers(ContainerBuilder $container)
+    {
+        $references = $this->processor->findAndSortTaggedServices($container, ContextExtension::CLASS_RESOLVER_TAG);
+        $definition = $container->getDefinition('oro_test.environment.handler.feature_environment_handler');
+
+        foreach ($references as $reference) {
+            $definition->addMethodCall('registerClassResolver', array($reference));
+        }
     }
 
     /**

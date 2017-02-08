@@ -9,7 +9,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class IntegrationControllerTest extends WebTestCase
 {
@@ -24,7 +24,7 @@ class IntegrationControllerTest extends WebTestCase
     {
         parent::setUp();
 
-        $this->initClient([], $this->generateWsseAuthHeader(), true);
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->entityManager = $this->client->getContainer()->get('doctrine')
             ->getManagerForClass('OroIntegrationBundle:Channel');
     }

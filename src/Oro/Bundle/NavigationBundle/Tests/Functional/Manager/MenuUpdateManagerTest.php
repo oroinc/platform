@@ -16,9 +16,6 @@ use Oro\Bundle\UIBundle\Model\TreeItem;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 
-/**
- * @dbIsolation
- */
 class MenuUpdateManagerTest extends WebTestCase
 {
     use EntityTrait;

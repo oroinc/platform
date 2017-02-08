@@ -97,6 +97,7 @@ class JobProcessor
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
+        $rootJob->addChildJob($job);
         $job->setJobProgress(0);
         $this->jobStorage->saveJob($job);
 
