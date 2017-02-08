@@ -3,8 +3,7 @@ layout:
         - '@setOption':
             id: page_title
             optionName: text
-            optionValue: 
-                label: 'oro_frontend_style_book.groups.forms.title'
+            optionValue: 'oro_frontend_style_book.groups.forms.title'
 
         - '@add':
             id: group_element_form_text
