@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\LoadMenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -166,7 +167,7 @@ class UserMenuControllerTest extends WebTestCase
             ),
             [
                 'selected' => [
-                    $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1_1)->getId()
+                    $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1_1)->getKey()
                 ],
                 '_widgetContainer' => 'dialog',
             ],
@@ -178,12 +179,12 @@ class UserMenuControllerTest extends WebTestCase
         $values = $form->getValues();
 
         $this->assertEquals(
-            [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_1_1)->getId()],
+            [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_1_1)->getKey()],
             $values['tree_move[source]']
         );
 
-        $form['tree_move[source]'] = [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_2_1_1)->getId()];
-        $form['tree_move[target]'] = $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1)->getId();
+        $form['tree_move[source]'] = [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_2_1_1)->getKey()];
+        $form['tree_move[target]'] = $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1)->getKey();
 
         $this->client->followRedirects(true);
 
@@ -193,12 +194,16 @@ class UserMenuControllerTest extends WebTestCase
             $form->getFormNode()->getAttribute('action') . '?_widgetContainer=dialog'
         );
 
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        $html = $crawler->html();
-        $this->assertContains('oro.ui.jstree.move_success', $html);
+        /** @var MenuUpdateRepository $repository */
+        $repository = $this->getContainer()->get('doctrine')
+            ->getManagerForClass('OroNavigationBundle:MenuUpdate')
+            ->getRepository('OroNavigationBundle:MenuUpdate');
+        $menuUpdate = $repository->findOneBy(['key' => LoadMenuUpdateData::MENU_UPDATE_2_1_1]);
+        $this->assertEquals($menuUpdate->getParentKey(), LoadMenuUpdateData::MENU_UPDATE_1);
     }
 }
