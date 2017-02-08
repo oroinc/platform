@@ -238,28 +238,6 @@ define([
                     }, this), 0);
             }
 
-            /*
-            if (_.has(this, 'actionsDropdown') && this.actionsDropdown !== 'auto') {
-                if (this.actionsDropdown) {
-                    wrapDropdown();
-                }
-
-                this.$el.css({visibility: ''});
-            } else {
-                setTimeout(_.bind(function() {
-                    var $list = this.$(this.launchersListSelector);
-                    var listHeight = $list.height();
-                    var testListItemHeight = $list.find('.launcher-item').height() * 1.5;
-
-                    if (listHeight > testListItemHeight) {
-                        wrapDropdown();
-                    }
-
-                    this.$el.css({visibility: ''});
-                }, this), 0);
-            }
-*/
-
             return this;
         },
 
