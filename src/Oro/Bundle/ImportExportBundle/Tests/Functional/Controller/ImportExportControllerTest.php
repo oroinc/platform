@@ -1,13 +1,14 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\ContactBundle\Entity\Contact;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ImportExportControllerTest extends WebTestCase
 {
@@ -158,8 +159,8 @@ class ImportExportControllerTest extends WebTestCase
             'tmpTestLineEndings.csv',
             'text/csv'
         );
-        $this->assertEquals(0, substr_count(file_get_contents($csvFile->getPathname()), "\r\n" ));
-        $this->assertEquals(11, substr_count(file_get_contents($csvFile->getPathname()), "\n" ));
+        $this->assertEquals(substr_count(file_get_contents($file), "\r\n"), substr_count(file_get_contents($csvFile->getPathname()), "\r\n"));
+        $this->assertEquals(substr_count(file_get_contents($file), "\n"), substr_count(file_get_contents($csvFile->getPathname()), "\n"));
 
         $crawler = $this->client->request(
             'GET',
@@ -168,7 +169,7 @@ class ImportExportControllerTest extends WebTestCase
                 [
                     '_widgetContainer' => 'dialog',
                     '_wid' => 'test',
-                    'entity' => Contact::class,
+                    'entity' => User::class,
                 ]
             )
         );
@@ -179,7 +180,7 @@ class ImportExportControllerTest extends WebTestCase
         $values = [
             'oro_importexport_import' => [
                 '_token' => $uploadFileForm['oro_importexport_import[_token]']->getValue(),
-                'processorAlias' => 'oro_contact.add_or_replace'
+                'processorAlias' => 'oro_user.add_or_replace'
             ],
         ];
         $files = [
@@ -195,7 +196,7 @@ class ImportExportControllerTest extends WebTestCase
                 [
                     '_widgetContainer' => 'dialog',
                     '_wid' => 'test',
-                    'entity' => Contact::class,
+                    'entity' => User::class,
                 ]
             ),
             $values,
@@ -204,7 +205,7 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
         $tmpFiles = glob($cacheDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.tmp');
         $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
-        $this->assertEquals(11, substr_count(file_get_contents($tmpFile->getPathname()), "\r\n" ));
+        $this->assertEquals(substr_count(file_get_contents($file), "\n"), substr_count(file_get_contents($tmpFile->getPathname()), "\r\n"));
         unlink($tmpFile->getPathname());
     }
 
