@@ -3,9 +3,7 @@ define(function(require) {
 
     var ChoiceTreeFilter;
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var $ = require('jquery');
-    var messenger = require('oroui/js/messenger');
     var TextFilter = require('oro/filter/text-filter');
     var tools = require('oroui/js/tools');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
@@ -221,9 +219,6 @@ define(function(require) {
                 success: function(reposne) {
                     self.data = reposne.results;
                     self._updateCriteriaHint(true);
-                },
-                error: function(jqXHR) {
-                    messenger.showErrorMessage(__('Sorry, an unexpected error has occurred.'), jqXHR.responseJSON);
                 }
             });
         },

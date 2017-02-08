@@ -383,4 +383,16 @@ class PdoMysql extends BaseDriver
 
         $connection->query('SET FOREIGN_KEY_CHECKS=1');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
+    {
+        if ($this->em->getConnection()->isTransactionActive()) {
+            return sprintf('DELETE FROM %s', $tableName);
+        }
+
+        return parent::getTruncateQuery($dbPlatform, $tableName);
+    }
 }

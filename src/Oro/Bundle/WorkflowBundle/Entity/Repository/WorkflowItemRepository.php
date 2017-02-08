@@ -10,7 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
 class WorkflowItemRepository extends EntityRepository
 {
@@ -110,7 +110,7 @@ class WorkflowItemRepository extends EntityRepository
             ->setParameter(1, $workflowName)
             ->orderBy('workflowItem.id');
 
-        $iterator = new DeletionQueryResultIterator($queryBuilder);
+        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
         $iterator->setBufferSize($batchSize);
 
         if ($iterator->count() === 0) {

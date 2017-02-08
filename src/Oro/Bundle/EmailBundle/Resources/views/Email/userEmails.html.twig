@@ -123,16 +123,12 @@
                                     );
                                 }
                             },
+                            errorHandlerMessage: '{{ 'oro.email.action.message.error'|trans }}',
                             error: function () {
                                 clearInterval(loader);
 
                                 button.html('{{ actionSync|raw }}');
                                 button.removeAttr('disabled');
-
-                                messenger.notificationFlashMessage(
-                                    'error',
-                                    {{ 'oro.email.action.message.error'|trans|json_encode|raw }}
-                                );
                             }
                         })
                     };

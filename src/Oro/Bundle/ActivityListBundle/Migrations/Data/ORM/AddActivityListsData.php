@@ -14,7 +14,7 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
 /**
  * This fixture adds activity lists data for existing activity records.
@@ -55,7 +55,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         if ($isApplicationInstalled && !$this->hasRecordsInActivityList($activityClass)) {
             $provider     = $this->container->get('oro_activity_list.provider.chain');
             $queryBuilder = $manager->getRepository($activityClass)->createQueryBuilder('entity');
-            $iterator     = new BufferedQueryResultIterator($queryBuilder);
+            $iterator     = new BufferedIdentityQueryResultIterator($queryBuilder);
             $iterator->setBufferSize(self::BATCH_SIZE);
             $itemsCount = 0;
             $entities   = [];
