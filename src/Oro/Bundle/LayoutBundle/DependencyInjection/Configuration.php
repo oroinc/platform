@@ -273,6 +273,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('label')->cannotBeEmpty()->end()
                             ->scalarNode('description')->defaultNull()->end()
                             ->scalarNode('screenshot')->defaultNull()->end()
+                            ->booleanNode('enabled')->defaultNull()->end()
                         ->end()
                     ->end()
                 ->end()

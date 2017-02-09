@@ -59,13 +59,21 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                     'key' => 'some_key',
                                     'route_name' => 'some_route_name',
                                     'description' => null,
-                                    'screenshot' => null
+                                    'screenshot' => null,
+                                    'enabled' => null
+                                ],
+                                [
+                                    'label' => 'Some label (disabled)',
+                                    'key' => 'some_key_disabled',
+                                    'route_name' => 'some_route_name_disabled',
+                                    'description' => null,
+                                    'screenshot' => null,
+                                    'enabled' => false
                                 ]
                             ],
                             'titles' => [
                                 'route_1' => 'Title for route 1',
                                 'route_2' => 'Title for route 2',
-                                'route_3' => 'Title for route 3',
                             ]
                         ],
                         'assets' => [],
@@ -75,7 +83,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ],
             'debug' => '%kernel.debug%'
         ];
-
         $configs = [
             'oro_layout' => [
                 'themes' => [
@@ -89,11 +96,16 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                         'key' => 'some_key',
                                         'route_name' => 'some_route_name',
                                     ],
+                                    [
+                                        'label' => 'Some label (disabled)',
+                                        'key' => 'some_key_disabled',
+                                        'route_name' => 'some_route_name_disabled',
+                                        'enabled' => false
+                                    ],
                                 ],
                                 'titles' => [
                                     'route_1' => 'Title for route 1',
                                     'route_2' => 'Title for route 2',
-                                    'route_3' => 'Title for route 3',
                                 ]
                             ]
                         ]

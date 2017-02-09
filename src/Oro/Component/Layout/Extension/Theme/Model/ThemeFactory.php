@@ -79,6 +79,9 @@ class ThemeFactory implements ThemeFactoryInterface
                 if (isset($pageTemplateConfig['screenshot'])) {
                     $pageTemplate->setScreenshot($pageTemplateConfig['screenshot']);
                 }
+                if (isset($pageTemplateConfig['enabled'])) {
+                    $pageTemplate->setEnabled($pageTemplateConfig['enabled']);
+                }
 
                 $theme->addPageTemplate($pageTemplate);
             }
