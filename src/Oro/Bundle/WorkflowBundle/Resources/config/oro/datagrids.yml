@@ -98,7 +98,7 @@ datagrids:
 
     workflow-definitions-grid:
         options:
-            entityHint: workflowssss
+            entityHint: workflow
             export:     false
         acl_resource: oro_workflow_definition_view
         source:

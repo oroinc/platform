@@ -39,9 +39,7 @@ class StartTransitionButtonProviderExtension extends AbstractStartTransitionButt
             $isAvailable = $button->getTransition()->isAvailable($workflowItem, $errors);
         } catch (\Exception $e) {
             $isAvailable = false;
-            if (null !== $errors) {
-                $errors->add(['message' => $e->getMessage(), 'parameters' => []]);
-            }
+            $this->addError($button, $e, $errors);
         }
 
         return $isAvailable;

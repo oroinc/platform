@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionMaskBuilder as MaskBuilder;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
 {
@@ -22,21 +22,21 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      * @param MetadataProviderInterface                  $metadataProvider
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManagerRegistry                    $workflowManagerRegistry
+     * @param WorkflowManager                            $workflowManager
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         MetadataProviderInterface $metadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
-        WorkflowManagerRegistry $workflowManagerRegistry
+        WorkflowManager $workflowManager
     ) {
         parent::__construct(
             $objectIdAccessor,
             $metadataProvider,
             $entityOwnerAccessor,
             $decisionMaker,
-            $workflowManagerRegistry
+            $workflowManager
         );
 
         $this->permissions = [

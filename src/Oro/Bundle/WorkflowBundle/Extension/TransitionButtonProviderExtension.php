@@ -51,9 +51,7 @@ class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
                 $this->validateTransitionStep($workflow, $transition, $workflowItem);
         } catch (\Exception $e) {
             $isAvailable = false;
-            if (null !== $errors) {
-                $errors->add(['message' => $e->getMessage(), 'parameters' => []]);
-            }
+            $this->addError($button, $e, $errors);
         }
 
         return $isAvailable;

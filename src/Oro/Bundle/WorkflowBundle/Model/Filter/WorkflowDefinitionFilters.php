@@ -21,7 +21,7 @@ class WorkflowDefinitionFilters
     protected $type = self::TYPE_DEFAULT;
 
     /** @var bool */
-    protected $enabled = true;
+    protected static $enabled = true;
 
     /**
      * @param RequestStack $requestStack
@@ -78,7 +78,7 @@ class WorkflowDefinitionFilters
      */
     public function isEnabled()
     {
-        return $this->enabled;
+        return static::$enabled;
     }
 
     /**
@@ -86,7 +86,7 @@ class WorkflowDefinitionFilters
      */
     public function setEnabled($enabled)
     {
-        $this->enabled = (bool)$enabled;
+        static::$enabled = (bool)$enabled;
     }
 
     /**

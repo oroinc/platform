@@ -6,12 +6,14 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
 class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
@@ -22,29 +24,39 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowManager;
 
+    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $systemWorkflowManager;
+
+    /** @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowManagerRegistry;
+
     /** @var WorkflowEntityConnector|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityConnector;
 
     /** @var WorkflowItemListener */
     protected $listener;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->systemWorkflowManager = $this->createMock(WorkflowManager::class);
+        $this->workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
+        $this->entityConnector = $this->createMock(WorkflowEntityConnector::class);
 
-        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowManagerRegistry->expects($this->any())
+            ->method('getManager')
+            ->will($this->returnValueMap([
+                [null, $this->workflowManager],
+                ['system', $this->systemWorkflowManager],
+            ]));
 
         $this->listener = new WorkflowItemListener(
             $this->doctrineHelper,
-            $this->workflowManager,
+            $this->workflowManagerRegistry,
             $this->entityConnector
         );
     }
@@ -91,10 +103,12 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
 
-        $workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->getWorkflow();
         $this->workflowManager->expects($this->once())
+            ->method('getApplicableWorkflows')
+            ->with($workflowItem)
+            ->willReturn([$workflow]);
+        $this->systemWorkflowManager->expects($this->once())
             ->method('getApplicableWorkflows')
             ->with($workflowItem)
             ->willReturn([$workflow]);
@@ -149,14 +163,12 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $entity = new \DateTime();
         $workflowItem = new WorkflowItem();
 
-
-
         $this->entityConnector->expects($this->once())
             ->method('isApplicableEntity')
             ->with($entity)
             ->willReturn(true);
 
-        $this->workflowManager->expects($this->once())
+        $this->systemWorkflowManager->expects($this->once())
             ->method('getWorkflowItemsByEntity')
             ->with($entity)
             ->willReturn($hasWorkflowItems ? [$workflowItem] : null);
@@ -208,6 +220,10 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getApplicableWorkflows')
             ->with($entity)
             ->willReturn([]);
+        $this->systemWorkflowManager->expects($this->once())
+            ->method('getApplicableWorkflows')
+            ->with($entity)
+            ->willReturn([]);
 
         $this->listener->postPersist($this->getEvent($entity));
 
@@ -222,14 +238,17 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue(false));
 
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->getWorkflow();
         $workflow->expects($this->any())
             ->method('getStepManager')
             ->will($this->returnValue($stepManager));
 
         $this->workflowManager->expects($this->once())
+            ->method('getApplicableWorkflows')
+            ->with($entity)
+            ->willReturn([$workflow]);
+
+        $this->systemWorkflowManager->expects($this->once())
             ->method('getApplicableWorkflows')
             ->with($entity)
             ->willReturn([$workflow]);
@@ -245,6 +264,8 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $workflowName = 'test_workflow';
         $childWorkflowName = 'test_child_workflow';
 
+        $this->systemWorkflowManager->expects($this->any())->method('getApplicableWorkflows')->willReturn([]);
+
         list($event, $workflow) = $this->prepareEventForWorkflow($entity, $workflowName);
         $this->workflowManager->expects($this->at(0))
             ->method('getApplicableWorkflows')
@@ -252,7 +273,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn([$workflow]);
 
         list($childEvent, $childWorkflow) = $this->prepareEventForWorkflow($childEntity, $childWorkflowName);
-        $this->workflowManager->expects($this->at(2))
+        $this->workflowManager->expects($this->at(1))
             ->method('getApplicableWorkflows')
             ->with($childEntity)
             ->willReturn([$childWorkflow]);
@@ -284,11 +305,11 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
             $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
         };
 
-        $this->workflowManager->expects($this->at(0))
+        $this->systemWorkflowManager->expects($this->at(0))
             ->method('massStartWorkflow')
             ->with([new WorkflowStartArguments($workflowName, $entity)])
             ->will($this->returnCallback($startChildWorkflow));
-        $this->workflowManager->expects($this->at(1))
+        $this->systemWorkflowManager->expects($this->at(1))
             ->method('massStartWorkflow')
             ->with([new WorkflowStartArguments($childWorkflowName, $childEntity)]);
 
@@ -296,6 +317,19 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertAttributeEquals(0, 'deepLevel', $this->listener);
         $this->assertAttributeEmpty('entitiesScheduledForWorkflowStart', $this->listener);
+    }
+
+    /**
+     * @return Workflow|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getWorkflow()
+    {
+        $workflow = $this->createMock(Workflow::class);
+        $definition = new WorkflowDefinition();
+        $definition->setConfiguration(['start_type' => 'default']);
+        $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
+
+        return $workflow;
     }
 
     /**
@@ -311,9 +345,7 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $stepManager->expects($this->any())->method('hasStartStep')
             ->will($this->returnValue(true));
 
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->getWorkflow();
         $workflow->expects($this->any())
             ->method('getStepManager')
             ->will($this->returnValue($stepManager));

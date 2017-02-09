@@ -135,3 +135,4 @@ workflows:
             -
                 name: second_transition_definition
         applications: ['other_application']
+        force_autostart: true

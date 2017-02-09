@@ -171,6 +171,7 @@ return [
         'exclusive_active_groups' => ['active_group1'],
         'exclusive_record_groups' => ['record_group1'],
         WorkflowConfiguration::NODE_APPLICATIONS => [CurrentApplicationProviderInterface::DEFAULT_APPLICATION],
+        'force_autostart' => false,
     ],
     'second_workflow' => [
         'entity' => 'Second\Entity',
@@ -231,5 +232,6 @@ return [
         'exclusive_active_groups' => [],
         'exclusive_record_groups' => [],
         WorkflowConfiguration::NODE_APPLICATIONS => ['other_application'],
+        'force_autostart' => true,
     ]
 ];

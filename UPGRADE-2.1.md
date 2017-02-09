@@ -213,7 +213,18 @@ WorkflowBundle
     - removed property `protected $requiredTables`
     - removed method `protected function checkDatabase()`
     - removed method `protected function getEntityManager()`
-    
+- Created action `@get_available_workflow_by_record_group`
+    - class `Oro\Bundle\WorkflowBundle\Model\Action\GetAvailableWorkflowByRecordGroup`
+- Class `Oro\Bundle\WorkflowBundle\Acl\Extension\AbstractWorkflowAclExtension`
+    - signature of constructor changed, fifth argument `WorkflowRegistry $workflowRegistry` replaced by `WorkflowManager $workflowManager`
+- Class `Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension`
+    - signature of constructor changed, fifth argument `WorkflowRegistry $workflowRegistry` replaced by `WorkflowManager $workflowManager`
+- Class `Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowTransitionAclExtension`
+    - signature of constructor changed, fifth argument `WorkflowRegistry $workflowRegistry` replaced by `WorkflowManager $workflowManager`
+- Class `Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener`
+    - signature of constructor changed, second argument `WorkflowRegistry $workflowRegistry` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
+- Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`
+    - signature of constructor changed, added third argument `Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters $definitionFilters`
 
 TestFrameworkBundle
 -------------------

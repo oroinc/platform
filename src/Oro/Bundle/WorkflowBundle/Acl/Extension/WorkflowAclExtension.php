@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder as MaskBuilder;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowAclExtension extends AbstractWorkflowAclExtension
 {
@@ -32,7 +32,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
      * @param MetadataProviderInterface                  $metadataProvider
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManagerRegistry                    $workflowManagerRegistry
+     * @param WorkflowManager                            $workflowManager
      * @param WorkflowAclMetadataProvider                $workflowMetadataProvider
      * @param WorkflowTransitionAclExtension             $transitionAclExtension
      */
@@ -41,7 +41,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
         MetadataProviderInterface $metadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
-        WorkflowManagerRegistry $workflowManagerRegistry,
+        WorkflowManager $workflowManager,
         WorkflowAclMetadataProvider $workflowMetadataProvider,
         WorkflowTransitionAclExtension $transitionAclExtension
     ) {
@@ -50,7 +50,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
             $metadataProvider,
             $entityOwnerAccessor,
             $decisionMaker,
-            $workflowManagerRegistry
+            $workflowManager
         );
         $this->workflowMetadataProvider = $workflowMetadataProvider;
         $this->transitionAclExtension = $transitionAclExtension;

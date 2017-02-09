@@ -20,7 +20,6 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
 class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,9 +37,6 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowManager;
-
-    /** @var WorkflowManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowManagerRegistry;
 
     /** @var WorkflowAclMetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowMetadataProvider;
@@ -67,9 +63,6 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->workflowManagerRegistry = $this->getMockBuilder(WorkflowManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->workflowMetadataProvider = $this->getMockBuilder(WorkflowAclMetadataProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -82,7 +75,7 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
             $this->metadataProvider,
             $this->entityOwnerAccessor,
             $this->decisionMaker,
-            $this->workflowManagerRegistry,
+            $this->workflowManager,
             $this->workflowMetadataProvider,
             $this->transitionAclExtension
         );
@@ -270,9 +263,6 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadata')
             ->with(self::identicalTo($relatedEntity))
             ->willReturn(new OwnershipMetadata());
-        $this->workflowManagerRegistry->expects(self::once())
-            ->method('getManager')
-            ->willReturn($this->workflowManager);
         $this->workflowManager->expects(self::once())
             ->method('getWorkflow')
             ->willReturn($workflow);

@@ -233,6 +233,7 @@ workflows:
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
         entity_attribute: user                    # attribute name of current entity that can be used in configuration
         start_step: started                       # step that will be assigned automatically to new entities
+        force_autostart: false                    # if `start_step` is defined: force start workflow on entity creation like from cli, message queue (without any filters like applications, scopes, features)
         steps_display_ordered: true               # defines whether all steps will be shown on view page in steps widget
         defaults:
             active: true                          # active by default

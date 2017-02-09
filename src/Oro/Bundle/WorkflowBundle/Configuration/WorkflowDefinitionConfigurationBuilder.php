@@ -215,6 +215,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $configurationKeys = [
             WorkflowDefinition::CONFIG_SCOPES,
             WorkflowDefinition::CONFIG_DATAGRIDS,
+            WorkflowDefinition::CONFIG_FORCE_AUTOSTART,
             WorkflowConfiguration::NODE_DISABLE_OPERATIONS,
             WorkflowConfiguration::NODE_STEPS,
             WorkflowConfiguration::NODE_ATTRIBUTES,

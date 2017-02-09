@@ -63,7 +63,14 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
             $buttonSearchContext->getEntityId()
         );
 
-        return $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
+        try {
+            $isAvailable = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
+        } catch (\Exception $e) {
+            $isAvailable = false;
+            $this->addError($button, $e, $errors);
+        }
+
+        return $isAvailable;
     }
 
     /**

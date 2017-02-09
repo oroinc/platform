@@ -7,8 +7,11 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
 class WorkflowItemListener
@@ -19,9 +22,9 @@ class WorkflowItemListener
     protected $doctrineHelper;
 
     /**
-     * @var WorkflowManager
+     * @var WorkflowManagerRegistry
      */
-    protected $workflowManager;
+    protected $workflowManagerRegistry;
 
     /**
      * @var WorkflowEntityConnector
@@ -40,16 +43,16 @@ class WorkflowItemListener
 
     /**
      * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowManager $workflowManager
+     * @param WorkflowManagerRegistry $workflowManagerRegistry
      * @param WorkflowEntityConnector $entityConnector
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        WorkflowManager $workflowManager,
+        WorkflowManagerRegistry $workflowManagerRegistry,
         WorkflowEntityConnector $entityConnector
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->workflowManager= $workflowManager;
+        $this->workflowManagerRegistry= $workflowManagerRegistry;
         $this->entityConnector = $entityConnector;
     }
 
@@ -70,9 +73,8 @@ class WorkflowItemListener
     protected function scheduleStartWorkflowForNewEntity(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        $activeWorkflows = $this->getWorkflowManager()->getApplicableWorkflows($entity);
 
-        foreach ($activeWorkflows as $activeWorkflow) {
+        foreach ($this->getApplicableWorkflowsForStart($entity) as $activeWorkflow) {
             if ($activeWorkflow->getStepManager()->hasStartStep()) {
                 $this->entitiesScheduledForWorkflowStart[$this->deepLevel][] = new WorkflowStartArguments(
                     $activeWorkflow->getName(),
@@ -163,10 +165,31 @@ class WorkflowItemListener
     }
 
     /**
+     * @param object $entity
+     * @return array|Workflow[]
+     */
+    protected function getApplicableWorkflowsForStart($entity)
+    {
+        $applicableWorkflows = $this->getWorkflowManager(null)->getApplicableWorkflows($entity);
+
+        // apply force autostart (ignore default filters)
+        $workflows = $this->getWorkflowManager()->getApplicableWorkflows($entity);
+        foreach ($workflows as $name => $workflow) {
+            if (!$workflow->getDefinition()->isForceAutostart()) {
+                continue;
+            }
+            $applicableWorkflows[$name] = $workflow;
+        }
+
+        return $applicableWorkflows;
+    }
+
+    /**
+     * @param string $type
      * @return WorkflowManager
      */
-    protected function getWorkflowManager()
+    protected function getWorkflowManager($type = 'system')
     {
-        return $this->workflowManager;
+        return $this->workflowManagerRegistry->getManager($type);
     }
 }

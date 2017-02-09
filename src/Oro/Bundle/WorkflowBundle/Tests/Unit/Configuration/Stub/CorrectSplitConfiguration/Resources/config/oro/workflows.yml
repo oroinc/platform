@@ -20,3 +20,4 @@ workflows:
         transition_definitions:
             second_transition_definition: []
         applications: ['other_application']
+        force_autostart: true

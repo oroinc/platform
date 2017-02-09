@@ -53,6 +53,7 @@ class WorkflowDefinition implements DomainObjectInterface
 {
     const CONFIG_SCOPES = 'scopes';
     const CONFIG_DATAGRIDS = 'datagrids';
+    const CONFIG_FORCE_AUTOSTART = 'force_autostart';
 
     /**
      * @var string
@@ -251,6 +252,16 @@ class WorkflowDefinition implements DomainObjectInterface
     public function __toString()
     {
         return (string)$this->getLabel();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForceAutostart()
+    {
+        return array_key_exists(self::CONFIG_FORCE_AUTOSTART, $this->configuration)
+            ? (bool)$this->configuration[self::CONFIG_FORCE_AUTOSTART]
+            : false;
     }
 
     /**

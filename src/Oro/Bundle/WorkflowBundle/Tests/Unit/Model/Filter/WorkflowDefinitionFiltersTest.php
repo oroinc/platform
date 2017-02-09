@@ -79,6 +79,7 @@ class WorkflowDefinitionFiltersTest extends \PHPUnit_Framework_TestCase
 
     public function testSetEnabled()
     {
+        $this->filters->setEnabled(true);
         $this->assertTrue($this->filters->isEnabled());
         $this->filters->setEnabled(false);
         $this->assertFalse($this->filters->isEnabled());

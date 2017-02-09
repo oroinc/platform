@@ -161,6 +161,13 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->workflowDefinition->hasExclusiveRecordGroups());
     }
 
+    public function testIsForceAutostart()
+    {
+        $this->assertFalse($this->workflowDefinition->isForceAutostart());
+        $this->workflowDefinition->setConfiguration([WorkflowDefinition::CONFIG_FORCE_AUTOSTART => true]);
+        $this->assertTrue($this->workflowDefinition->isForceAutostart());
+    }
+
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      * @expectedExceptionMessage Workflow "test" does not contain step "start_step"

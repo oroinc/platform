@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
@@ -164,5 +165,25 @@ abstract class AbstractButtonProviderExtension implements
 
         return (null !== $this->applicationProvider->getCurrentApplication()) &&
         ($application === $this->applicationProvider->getCurrentApplication());
+    }
+
+    /**
+     * @param ButtonInterface $button
+     * @param \Exception $e
+     * @param Collection $errors
+     */
+    protected function addError(ButtonInterface $button, \Exception $e, Collection $errors = null)
+    {
+        if (null === $errors) {
+            return;
+        }
+
+        $errors->add([
+            'message' => $e->getMessage(),
+            'parameters' => [
+                'button' => $button->getName(),
+                'exception' => get_class($e),
+            ]
+        ]);
     }
 }

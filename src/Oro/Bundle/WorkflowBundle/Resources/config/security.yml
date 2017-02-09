@@ -33,7 +33,7 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.entity_owner_accessor'
             - '@oro_security.owner.ownership_decision_maker.chain'
-            - '@oro_workflow.registry.workflow_manager'
+            - '@oro_workflow.manager.system'
             - '@oro_workflow.acl.metadata_provider'
             - '@oro_workflow.acl.extension.workflow_transition'
         tags:
@@ -47,4 +47,4 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.entity_owner_accessor'
             - '@oro_security.owner.ownership_decision_maker.chain'
-            - '@oro_workflow.registry.workflow_manager'
+            - '@oro_workflow.manager.system'

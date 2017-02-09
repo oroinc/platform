@@ -12,29 +12,28 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInt
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 
 abstract class AbstractWorkflowAclExtension extends AbstractSimpleAccessLevelAclExtension
 {
-    /** @var WorkflowManagerRegistry */
-    protected $workflowManagerRegistry;
+    /** @var WorkflowManager */
+    protected $workflowManager;
 
     /**
      * @param ObjectIdAccessor                           $objectIdAccessor
      * @param MetadataProviderInterface                  $metadataProvider
      * @param EntityOwnerAccessor                        $entityOwnerAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManagerRegistry                    $workflowManagerRegistry
+     * @param WorkflowManager                            $workflowManager
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         MetadataProviderInterface $metadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
-        WorkflowManagerRegistry $workflowManagerRegistry
+        WorkflowManager $workflowManager
     ) {
         parent::__construct($objectIdAccessor, $metadataProvider, $entityOwnerAccessor, $decisionMaker);
-        $this->workflowManagerRegistry = $workflowManagerRegistry;
+        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -61,6 +60,6 @@ abstract class AbstractWorkflowAclExtension extends AbstractSimpleAccessLevelAcl
      */
     protected function getWorkflowManager()
     {
-        return $this->workflowManagerRegistry->getManager();
+        return $this->workflowManager;
     }
 }
