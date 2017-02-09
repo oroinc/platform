@@ -169,6 +169,7 @@ class QueueConsumer
             throw new ConsumptionInterruptedException();
         }
 
+        $logger->info('Pre receive Message');
         if ($message = $messageConsumer->receive($timeout = 1)) {
             $logger->info('Message received');
             $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
