@@ -7,8 +7,8 @@ use Symfony\Component\Routing\RouterInterface;
 class FilteredDatagridRouteHelper implements DatagridAwareRouteHelperInterface
 {
     /**
-     * @var string $gridRouteName
-     */
+    * @var string $gridRouteName
+    */
     protected $gridRouteName;
 
     /**
@@ -22,8 +22,8 @@ class FilteredDatagridRouteHelper implements DatagridAwareRouteHelperInterface
     protected $datagridRouteHelper;
 
     /**
-     * @param string $gridRouteName
-     * @param string $gridName
+     * @param string              $gridRouteName
+     * @param string              $gridName
      * @param DatagridRouteHelper $datagridRouteHelper
      */
     public function __construct($gridRouteName, $gridName, DatagridRouteHelper $datagridRouteHelper)
@@ -39,7 +39,7 @@ class FilteredDatagridRouteHelper implements DatagridAwareRouteHelperInterface
      * Param 'filters' uses next format ['filterName' => 'filterCriterion', ... , 'filterNameN' => 'filterCriterionN']
      *
      * @param array $filters
-     * @param int $referenceType
+     * @param int   $referenceType
      *
      * @return string
      */
