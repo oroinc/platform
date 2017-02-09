@@ -7,3 +7,5 @@ layout:
             options:
                 label: oro_frontend_style_book.groups.forms.title
                 action: forms
+                attr:
+                    class: '=context["action"]=="forms" ? "active" : ""'

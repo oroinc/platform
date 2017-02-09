@@ -10,7 +10,10 @@
 
         padding: $primary-menu-item-inner-offset;
 
-        &--current {}
+        &--current,
+        &.active {
+            font-weight: $primary-menu-link-font-weight-current;
+        }
 
         &--offset-m {
             &:not(:first-child) {

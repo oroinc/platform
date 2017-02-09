@@ -20,6 +20,10 @@
         &--has-sidebar {
             width: calc(#{$page-content-width} - #{$page-sidebar-width});
         }
+
+        &--has-sidebar-right {
+            width: calc(#{$page-content-width} - #{$page-sidebar-width});
+        }
     }
 }
 
