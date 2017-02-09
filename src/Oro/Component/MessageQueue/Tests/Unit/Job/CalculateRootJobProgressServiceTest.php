@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 
 class CalculateRootJobProgressServiceTest extends \PHPUnit_Framework_TestCase
 {
-
     public function calculateProgressProvider()
     {
         return [

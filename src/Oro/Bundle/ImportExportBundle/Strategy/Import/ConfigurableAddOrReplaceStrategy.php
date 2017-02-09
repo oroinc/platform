@@ -13,8 +13,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class ConfigurableAddOrReplaceStrategy
- * @package Oro\Bundle\ImportExportBundle\Strategy\Import
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy

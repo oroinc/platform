@@ -3,15 +3,18 @@ namespace Oro\Bundle\ImportExportBundle\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
-class ImportExportJobSummaryResultService
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
+
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Router;
+
+class ImportExportResultSummarizer
 {
     const TEMPLATE_IMPORT_RESULT = 'import_result';
     const TEMPLATE_IMPORT_VALIDATION_RESULT = 'import_validation_result';
@@ -58,7 +61,7 @@ class ImportExportJobSummaryResultService
     /**
      * @param string $emailTemplateName
      *
-     * @return null|EmailTemplateInterface
+     * @return EmailTemplateInterface
      */
     protected function findEmailTemplateByName($emailTemplateName)
     {
@@ -82,6 +85,7 @@ class ImportExportJobSummaryResultService
         $data['downloadLogUrl'] = $this->getImportDownloadLogUrl($job->getId());
         $emailTemplate = $this->findEmailTemplateByName($template);
 
+//        TODO refactor in https://magecore.atlassian.net/browse/BAP-13215
         return $this->renderer->compileMessage($emailTemplate, ['data' => $data]);
     }
 
@@ -96,7 +100,7 @@ class ImportExportJobSummaryResultService
 
         return $this->renderer->compileMessage(
             $emailTemplate,
-            ['exportResult' => $exportResult, 'jobName' => $jobUniqueName,]
+            ['exportResult' => $exportResult, 'jobName' => $jobUniqueName, ]
         );
     }
 
@@ -171,5 +175,39 @@ class ImportExportJobSummaryResultService
         }
 
         return $data;
+    }
+
+    public function getSummaryMessage(array $data, $process, LoggerInterface $logger)
+    {
+        switch ($process) {
+            case ProcessorRegistry::TYPE_IMPORT:
+                $message = sprintf(
+                    'Import of the %s is completed, success: %s, info: %s, message: %s',
+                    $data['originFileName'],
+                    $data['success'],
+                    $data['importInfo'],
+                    $data['message']
+                );
+                break;
+            case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
+                $message =  sprintf(
+                    'Import validation of the %s from %s is completed.
+                    Success: %s.
+                    Info: %s.
+                    Errors: %s',
+                    $data['originFileName'],
+                    $data['entityName'],
+                    $data['success'] ? 'true' : 'false',
+                    json_encode($data['counts']),
+                    json_encode($data['errors'])
+                );
+                break;
+            default:
+                $message = sprintf('The Process "%s" is not supported.', $process);
+                $logger->error($message, ['dataResult' => $data, 'process' => $process]);
+                break;
+        }
+
+        return $message;
     }
 }
