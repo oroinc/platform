@@ -4,8 +4,16 @@ layout:
             themes: 'button.html.twig'
 
         - '@add':
+            id: style_book_button_element_group_element
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_default
+                label: Button default
+
+        - '@add':
             id: style_book_button_element_wrapp
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_dafault
@@ -16,8 +24,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_action
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_acction
+                label: Button acction
+
+        - '@add':
             id: style_book_button_element_wrapp_action
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_action
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_action
@@ -28,8 +44,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_info
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_info
+                label: Button info
+
+        - '@add':
             id: style_book_button_element_wrapp_info
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_info
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_info
@@ -39,9 +63,18 @@ layout:
             parentId: style_book_button_element_wrapp_info
             blockType: block
 
+
+        - '@add':
+            id: style_book_button_element_group_element_primary
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_primary
+                label: Button primary
+
         - '@add':
             id: style_book_button_element_wrapp_primary
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_primary
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_primary
@@ -52,8 +85,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_link
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_link
+                label: Button link
+
+        - '@add':
             id: style_book_button_element_wrapp_link
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_link
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_link
@@ -64,8 +105,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_large_size
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_large_size
+                label: Button large size
+
+        - '@add':
             id: style_book_button_element_wrapp_large_size
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_large_size
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_large_size
@@ -76,8 +125,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_size_l
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_size_l
+                label: Button size l
+
+        - '@add':
             id: style_book_button_element_wrapp_size_l
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_size_l
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_size_l
@@ -88,8 +145,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_size_m
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_size_m
+                label: Button size m
+
+        - '@add':
             id: style_book_button_element_wrapp_size_m
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_size_m
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_size_m
@@ -100,8 +165,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_group
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_group
+                label: Button group
+
+        - '@add':
             id: style_book_button_element_wrapp_group
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_group
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_group
@@ -112,8 +185,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_inline_group
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_inline_group
+                label: Button inline group
+
+        - '@add':
             id: style_book_button_element_wrapp_inline_group
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_inline_group
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_inline_group
@@ -124,8 +205,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_btn_group
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_inline_btn_group
+                label: Button btn group
+
+        - '@add':
             id: style_book_button_element_wrapp_btn_group
-            parentId: style_book_main
+            parentId: style_book_content
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_btn_group
@@ -136,8 +225,16 @@ layout:
             blockType: block
 
         - '@add':
+            id: style_book_button_element_group_element_group_vertical
+            parentId: style_book_content
+            blockType: group_element
+            options:
+                anchor: button_inline_group_vertical
+                label: Button group vertical
+
+        - '@add':
             id: style_book_button_element_wrapp_btn_group_vertical
-            parentId: style_book_main
+            parentId: style_book_button_element_group_element_group_vertical
             blockType: group_element_item
             options:
               description: oro_frontend_style_book.groups.buttons.description_btn_group_vertical
