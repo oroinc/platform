@@ -114,6 +114,48 @@ ImapBundle
 ----------
 - Updated `Oro\Bundle\ImapBundle\Async\SyncEmailMessageProcessor::__construct()` signature to use `Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface`.
 
+ImportExportBundle
+------------------
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor`
+    - construction signature was changed now it takes next arguments: 
+        - `CliImportHandler $cliImportHandler`,
+        - `JobRunner $jobRunner`,
+        - `ImportExportResultSummarizer` $importExportResultSummarizer,
+        - `JobStorage` $jobStorage,
+        - `LoggerInterface` $logger,
+        - `FileManager` $fileManager
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`
+    - construction signature was changed now it takes next arguments: 
+        - HttpImportHandler $httpImportHandler,
+        - JobRunner $jobRunner,
+        - MessageProducerInterface $producer,
+        - RegistryInterface $doctrine,
+        - TokenStorageInterface $tokenStorage,
+        - ImportExportResultSummarizer $importExportResultSummarizer,
+        - JobStorage $jobStorage,
+        - LoggerInterface $logger,
+        - FileManager $fileManager
+- Class `Oro\Bundle\ImportExportBundle\Handler\AbstractHandler`
+    - construction signature was changed now it takes next arguments: 
+        - JobExecutor $jobExecutor,
+        - ProcessorRegistry $processorRegistry,
+        - ConfigProvider $entityConfigProvider,
+        - TranslatorInterface $translator
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\PreCliImportMessageProcessor` and its service `oro_importexport.async.pre_cli_import` were added.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and its service `oro_importexport.async.pre_http_import` were added.
+- Class `Oro\Bundle\ImportExportBundle\Splitter\SplitterChain` and its service `oro_importexport.async.send_import_error_notification` were added.
+- Class `Oro\Bundle\ImportExportBundle\File\FileManager` and its service `oro_importexport.file.file_manager` were added. We should use it instead of the `Oro\Bundle\ImportExportBundle\File\FileSystemOperator`
+- Class `Oro\Bundle\ImportExportBundle\File\FileSystemOperator` is deprecated now. Use `Oro\Bundle\ImportExportBundle\File\FileManager` instead.
+- Command `oro:import:csv` (class `Oro\Bundle\ImportExportBundle\Command\ImportCommand`) was renamed to `oro:import:file`        
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor` and its service `oro_importexport.async.abstract_preparing_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor` and its service `oro_importexport.async.preparing_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor` and its service `oro_importexport.async.preparing_http_import_validation` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\AbstractChunkImportMessageProcessor` and its service `oro_importexport.async.abstract_chunk_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportMessageProcessor` and its service `oro_importexport.async.chunck_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportValidationMessageProcessor` and its service `oro_importexport.async.chunck_http_import_validation` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\CliImportValidationMessageProcessor` and its service `oro_importexport.async.cli_import_validation` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreCliImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService` was renamed to `ImportExportResultSummarizer`. It will be moved after add supporting templates in notification process.
+
 LayoutBundle
 ------------
 - Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
-use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
@@ -57,8 +58,7 @@ class ImportExportController extends Controller
                 $data           = $importForm->getData();
                 $file           = $data->getFile();
                 $processorAlias = $data->getProcessorAlias();
-
-                $fileName = $this->getImportHandler()->saveImportingFile($file, $processorAlias);
+                $fileName = $this->getFileManager()->saveImportingFile($file);
 
                 return $this->forward(
                     'OroImportExportBundle:ImportExport:importProcess',
@@ -109,7 +109,7 @@ class ImportExportController extends Controller
                 $file           = $data->getFile();
                 $processorAlias = $data->getProcessorAlias();
 
-                $fileName = $this->getImportHandler()->saveImportingFile($file, $processorAlias);
+                $fileName = $this->getFileManager()->saveImportingFile($file);
 
                 return $this->forward(
                     'OroImportExportBundle:ImportExport:importValidate',
@@ -154,19 +154,20 @@ class ImportExportController extends Controller
      */
     public function importValidateAction(Request $request, $processorAlias)
     {
-        $jobName = $request->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
+        $jobName = $request->get('importValidateJob', JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV);
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
         $this->getMessageProducer()->send(
-            Topics::IMPORT_HTTP_VALIDATION_PREPARING,
+            Topics::PRE_HTTP_IMPORT,
             [
-                'filePath' => $fileName,
+                'fileName' => $fileName,
+                'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
                 'originFileName' => $originFileName,
                 'userId' => $this->getUser()->getId(),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
-                'options' => $this->getOptionsFromRequest($request),
+                'options' => $this->getOptionsFromRequest($request)
             ]
         );
 
@@ -189,14 +190,15 @@ class ImportExportController extends Controller
         $originFileName = $request->get('originFileName', null);
 
         $this->getMessageProducer()->send(
-            Topics::IMPORT_HTTP_PREPARING,
+            Topics::PRE_HTTP_IMPORT,
             [
-                'filePath' => $fileName,
+                'fileName' => $fileName,
+                'process' => ProcessorRegistry::TYPE_IMPORT,
                 'originFileName' => $originFileName,
                 'userId' => $this->getUser()->getId(),
                 'jobName' => $jobName,
                 'processorAlias' => $processorAlias,
-                'options' => $this->getOptionsFromRequest($request),
+                'options' => $this->getOptionsFromRequest($request)
             ]
         );
 
@@ -310,7 +312,7 @@ class ImportExportController extends Controller
 
     /**
      * @Route("/export/template/{processorAlias}", name="oro_importexport_export_template")
-     * @AclAncestor("oro_importexport_export")
+     * @AclAncestor("oro_importexport_import")
      *
      * @param string $processorAlias
      * @param Request $request
@@ -334,7 +336,6 @@ class ImportExportController extends Controller
 
     /**
      * @Route("/export/download/{fileName}", name="oro_importexport_export_download")
-     * @AclAncestor("oro_importexport_export")
      *
      * @param string $fileName
      *
@@ -342,6 +343,13 @@ class ImportExportController extends Controller
      */
     public function downloadExportResultAction($fileName)
     {
+        $securityFacade = $this->get('oro_security.security_facade');
+        if (!$securityFacade->isGranted('oro_importexport_import') &&
+            !$securityFacade->isGranted('oro_importexport_export')
+        ) {
+            throw new AccessDeniedException('Insufficient permission');
+        }
+
         return $this->getExportHandler()->handleDownloadExportResult($fileName);
     }
 
@@ -392,7 +400,7 @@ class ImportExportController extends Controller
             throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
         }
 
-        $content = $this->getImportJobSummaryResultService()->getErrorLog($job);
+        $content = $this->getImportExportResultSummarizer()->getErrorLog($job);
 
         return new Response($content, 200, ['Content-Type' => 'text/x-log']);
     }
@@ -406,6 +414,14 @@ class ImportExportController extends Controller
     }
 
     /**
+     * @return FileManager
+     */
+    protected function getFileManager()
+    {
+        return $this->get('oro_importexport.file.file_manager');
+    }
+
+    /**
      * @return ExportHandler
      */
     protected function getExportHandler()
@@ -414,11 +430,11 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @return ImportExportJobSummaryResultService
+     * @return ImportExportResultSummarizer
      */
-    protected function getImportJobSummaryResultService()
+    protected function getImportExportResultSummarizer()
     {
-        return $this->get('oro_importexport.async.import_export_job_summary_result_service');
+        return $this->get('oro_importexport.async.import_export_result_summarizer');
     }
 
     /**

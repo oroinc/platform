@@ -5,21 +5,20 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Symfony\Component\Routing\Router;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Routing\Router;
 
-class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCase
+class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCanBeConstructedWithRequiredAttributes()
     {
-        new ImportExportJobSummaryResultService(
+        new ImportExportResultSummarizer(
             $this->createRouterMock(),
             $this->createConfigManagerMock(),
             $this->createRenderMock(),
@@ -68,7 +67,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
         $repository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['name' => ImportExportJobSummaryResultService::TEMPLATE_IMPORT_RESULT])
+            ->with(['name' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT])
             ->willReturn($template)
             ;
         $objectManager = $this->createObjectManagerMock();
@@ -94,7 +93,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
             ->with($template, ['data' => $expectedData])
             ->willReturn(['subject', 'summary'])
             ;
-        $consolidateService = new ImportExportJobSummaryResultService(
+        $consolidateService = new ImportExportResultSummarizer(
             $this->createRouterMock(),
             $this->createConfigManagerMock(),
             $render,
@@ -104,7 +103,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
         list($subject, $summary) = $consolidateService->getSummaryResultForNotification(
             $job,
             'import.csv',
-            ImportExportJobSummaryResultService::TEMPLATE_IMPORT_RESULT
+            ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT
         );
 
         $this->assertEquals('subject', $subject);
@@ -157,7 +156,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
         $repository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['name' => ImportExportJobSummaryResultService::TEMPLATE_IMPORT_RESULT])
+            ->with(['name' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT])
             ->willReturn($template)
         ;
         $objectManager = $this->createObjectManagerMock();
@@ -195,7 +194,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
             ->method('get')
             ->with('oro_ui.application_url')
             ->willReturn('127.0.0.1/');
-        $consolidateService = new ImportExportJobSummaryResultService(
+        $consolidateService = new ImportExportResultSummarizer(
             $router,
             $configManager,
             $render,
@@ -205,7 +204,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
         list($subject, $summary) = $consolidateService->getSummaryResultForNotification(
             $job,
             'import.csv',
-            ImportExportJobSummaryResultService::TEMPLATE_IMPORT_RESULT
+            ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT
         );
         $this->assertEquals('subject', $subject);
         $this->assertEquals('summary', $summary);
@@ -236,7 +235,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
         $childJob2->setData($data);
         $job->addChildJob($childJob2);
 
-        $consolidateService = new ImportExportJobSummaryResultService(
+        $consolidateService = new ImportExportResultSummarizer(
             $this->createRouterMock(),
             $this->createConfigManagerMock(),
             $this->createRenderMock(),
@@ -263,7 +262,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
         $repository
             ->expects($this->once())
             ->method('findOneBy')
-            ->with(['name' => ImportExportJobSummaryResultService::TEMPLATE_EXPORT_RESULT])
+            ->with(['name' => ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT])
             ->willReturn($template)
         ;
         $objectManager = $this->createObjectManagerMock();
@@ -290,7 +289,7 @@ class ImportExportJobSummaryResultServiceTest extends \PHPUnit_Framework_TestCas
             ->willReturn(['subject', 'summary'])
         ;
 
-        $consolidateService = new ImportExportJobSummaryResultService(
+        $consolidateService = new ImportExportResultSummarizer(
             $this->createRouterMock(),
             $this->createConfigManagerMock(),
             $render,
