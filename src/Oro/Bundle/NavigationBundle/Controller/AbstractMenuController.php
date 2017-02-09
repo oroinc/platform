@@ -132,21 +132,16 @@ abstract class AbstractMenuController extends Controller
 
         $handler = $this->get('oro_navigation.tree.menu_update_tree_handler');
         $choices = $handler->getTreeItemList($menu, true);
-        $selected = $request->get('selected', []);
 
         $collection = new TreeCollection();
-        $collection->source = array_intersect_key($choices, array_flip($selected));
+        $collection->source = array_intersect_key($choices, array_flip($request->get('selected', [])));
 
         $form = $this->createForm(TreeMoveType::class, $collection, [
-            'source_config' => [
-                'choices' => $choices,
-            ],
-            'target_config' => [
-                'choices' => $choices,
-            ],
+            'source_config' => ['choices' => $choices],
+            'target_config' => ['choices' => $choices],
         ]);
 
-        $responseData = [
+        $response = [
             'scope' => $scope,
             'menuName' => $menu->getName()
         ];
@@ -167,20 +162,16 @@ abstract class AbstractMenuController extends Controller
                 0
             );
 
-            $changed = [];
-
             foreach ($updates as $update) {
                 $errors = $this->get('validator')->validate($update);
                 if (count($errors)) {
                     $form->addError(new FormError(
                         $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message')
                     ));
-                    $responseData['form'] = $form->createView();
-
-                    return $responseData;
+                    return array_merge($response, ['form' => $form->createView()]);
                 }
                 $entityManager->persist($update);
-                $changed[] = [
+                $response['changed'][] = [
                     'id' => $update->getKey(),
                     'parent' => $collection->target->getKey(),
                     'position' => $update->getPriority()
@@ -190,12 +181,10 @@ abstract class AbstractMenuController extends Controller
             $entityManager->flush();
             $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
 
-            $responseData['saved'] = true;
-            $responseData['changed'] = $changed;
+            $response['saved'] = true;
         }
-        $responseData['form'] = $form->createView();
 
-        return $responseData;
+        return array_merge($response, ['form' => $form->createView()]);
     }
 
     /**

@@ -43,8 +43,8 @@ define(function(require) {
             this.dialogWidget.once('formSave', _.bind(function(changed) {
                 _.each(changed, function(data) {
                     $tree.jstree('move_node', data.id, data.parent, data.position);
+                    $tree.jstree('uncheck_node', "#"+data.id);
                 });
-                $tree.jstree('uncheck_all');
             }, this));
 
             this.dialogWidget.render();
