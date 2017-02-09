@@ -78,18 +78,27 @@ class DebugCommand extends AbstractDebugCommand
 
         $output->writeln('<info>All Actions:</info>');
         $table = new Table($output);
-        $table->setHeaders(['Action', 'Groups']);
+        $table->setHeaders(['Action', 'Groups', 'Details']);
 
         $i = 0;
+        $totalNumberOfProcessors = 0;
         foreach ($processorBag->getActions() as $action) {
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
             }
-            $table->addRow([$action, implode(PHP_EOL, $processorBag->getActionGroups($action))]);
+            $numberOfProcessors = $this->getNumberOfProcessors($processorBag, $action);
+            $totalNumberOfProcessors += $numberOfProcessors;
+            $table->addRow([
+                $action,
+                implode(PHP_EOL, $processorBag->getActionGroups($action)),
+                sprintf('Number of processors: %s', $numberOfProcessors)
+            ]);
             $i++;
         }
 
         $table->render();
+
+        $output->writeln(sprintf('<info>Total number of processors:</info> %s', $totalNumberOfProcessors));
 
         $output->writeln('<info>Public Actions:</info>');
         foreach ($actionProcessorBag->getActions() as $action) {
@@ -251,5 +260,21 @@ class DebugCommand extends AbstractDebugCommand
                 $items
             )
         );
+    }
+
+    /**
+     * @param ProcessorBagInterface $processorBag
+     * @param string                $action
+     *
+     * @return int
+     */
+    protected function getNumberOfProcessors(ProcessorBagInterface $processorBag, $action)
+    {
+        $context = new Context();
+        $context->setAction($action);
+        $processors = $processorBag->getProcessors($context);
+        $processors->setApplicableChecker(new ChainApplicableChecker());
+
+        return count(iterator_to_array($processors));
     }
 }
