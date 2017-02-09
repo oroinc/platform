@@ -141,4 +141,11 @@ class Select2Entity extends Element
             }
         ));
     }
+
+    public function openFromPlusButtonDropDown($buttonName)
+    {
+        $content = $this->getPage();
+        $content->find('css', '.entity-create-dropdown button')->click();
+        $this->getPage()->pressButton($buttonName);
+    }
 }
