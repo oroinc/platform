@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-class Attribute
+class Attribute implements EntityParameterInterface
 {
     /**
      * @var string
@@ -17,7 +17,7 @@ class Attribute
     /**
      * @var array
      */
-    protected $entityAcl = array();
+    protected $entityAcl = [];
 
     /**
      * @var string
@@ -32,7 +32,7 @@ class Attribute
     /**
      * @var array
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * Set attribute type
@@ -198,5 +198,23 @@ class Attribute
         $this->propertyPath = $propertyPath;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInternalType()
+    {
+        return ParameterInterface::INTERNAL_TYPE_ATTRIBUTE;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isInternalType($type)
+    {
+        return (ParameterInterface::INTERNAL_TYPE_ATTRIBUTE === $type);
     }
 }

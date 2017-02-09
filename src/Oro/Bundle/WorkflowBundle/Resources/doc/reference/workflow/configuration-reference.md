@@ -797,14 +797,15 @@ Example
 
 ```
 workflows:
-    variable_definitions:
-        variables:
-            var1:
-                type: 'string'
-                value: 'Var1Value'
-            var2:
-                value: 'Var2Value'
-            var3: 'Var3Value' # short definition of variable with a string value
+    b2b_flow_sales:
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    value: 'Var2Value'
+                var3: 'Var3Value' # short definition of variable with a string value
 ```
 
 Example Workflow Configuration

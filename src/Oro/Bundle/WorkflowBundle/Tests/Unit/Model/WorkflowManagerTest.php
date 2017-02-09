@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -1173,9 +1174,21 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $restrictionManager */
+        $variableManager = $this->getMockBuilder(VariableManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(
-                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
+            ->setConstructorArgs([
+                $doctrineHelper,
+                    $aclManager,
+                    $restrictionManager,
+                    null,
+                    $attributeManager,
+                    $transitionManager,
+                    $variableManager
+                ]
             )
             ->setMethods(
                 [
