@@ -1,22 +1,71 @@
 {% block _style_book_button_element_widget %}
     <button class="btn btn-default" type="button">Button</button>
+{% endblock %}
 
-    <button class="role-submit btn btn--info" type="submit">Save</button>
+{% block _style_book_button_element_action_widget %}
+    <button class="btn btn--action" type="submit">Button</button>
+{% endblock %}
 
-    <button class="add-on btn entity-select-btn"><i class="fa-bars"></i></button>
+{% block _style_book_button_element_info_widget %}
+    <button class="btn btn--info" type="submit">Button info</button>
+{% endblock %}
 
-    <div class="btn-group" role="group" aria-label="...">
+{% block _style_book_button_element_primary_widget %}
+    <button class="btn btn--primary" type="submit">Button primary</button>
+{% endblock %}
+
+{% block _style_book_button_element_link_widget %}
+    <a href="#" class="btn btn--link">Button link</a>
+{% endblock %}
+
+{% block _style_book_button_element_large_size_widget %}
+    <button class="btn btn--default btn--large" type="submit">Button default large size</button>
+{% endblock %}
+
+{% block _style_book_button_element_size_l_widget %}
+    <button class="btn btn--default btn--size-l" type="submit">Button default large size</button>
+{% endblock %}
+
+{% block _style_book_button_element_size_m_widget %}
+    <button class="btn btn--default btn--size-m" type="submit">Button default medium size</button>
+{% endblock %}
+
+{% block _style_book_button_element_size_s_widget %}
+    <button class="btn btn--default btn--size-s" type="submit">Button default small size</button>
+{% endblock %}
+
+{% block _style_book_button_element_group_widget %}
+    <div class="btn-group">
+        <a href="javascript: void(0);" class="btn btn--info">Button with drop-down</a>
+        <a href="#" data-toggle="dropdown" class="btn dropdown-toggle btn--info">
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">some text</a></li>
+            <li><a class="dropdown-item" href="#">some text</a></li>
+            <li><a class="dropdown-item" href="#">some text</a></li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block _style_book_button_element_inline_group_widget %}
+    <button class="action btn"><i class="fa-filter hide-text"></i></button>
+    <button class="action btn"><i class="fa-repeat hide-text"></i></button>
+    <button class="action btn"><i class="fa-refresh hide-text"></i></button>
+{% endblock %}
+
+{% block _style_book_button_element_btn_group_widget %}
+    <div class="btn-group" role="group">
         <button type="button" class="btn btn-default">Left</button>
-
         <button type="button" class="btn btn-default">Middle</button>
-
         <button type="button" class="btn btn-default">Right</button>
     </div>
+{% endblock %}
 
-    <button class="dropdown-toggle" data-toggle="dropdown">
-        <span class="share-with-entity-current-item"></span>
-        <span class="fa-caret-down"></span>
-        text text
-    </button>
-
+{% block _style_book_button_element_btn_group_vertical_widget %}
+    <div class="btn-group-vertical" role="group">
+        <button type="button" class="btn btn-default">Left</button>
+        <button type="button" class="btn btn-default">Middle</button>
+        <button type="button" class="btn btn-default">Right</button>
+    </div>
 {% endblock %}

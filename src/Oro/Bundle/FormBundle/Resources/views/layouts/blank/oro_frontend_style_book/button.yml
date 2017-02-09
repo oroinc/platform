@@ -7,6 +7,8 @@ layout:
             id: style_book_button_element_wrapp
             parentId: style_book_main
             blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_dafault
 
         - '@add':
             id: style_book_button_element
@@ -14,13 +16,135 @@ layout:
             blockType: block
 
         - '@add':
-            id: style_book_button_element_wrapp_save
+            id: style_book_button_element_wrapp_action
             parentId: style_book_main
             blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_action
 
         - '@add':
-            id: style_book_button_element_save
-            parentId: style_book_button_element_wrapp_save
+            id: style_book_button_element_action
+            parentId: style_book_button_element_wrapp_action
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_info
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_info
+
+        - '@add':
+            id: style_book_button_element_info
+            parentId: style_book_button_element_wrapp_info
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_primary
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_primary
+
+        - '@add':
+            id: style_book_button_element_primary
+            parentId: style_book_button_element_wrapp_primary
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_link
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_link
+
+        - '@add':
+            id: style_book_button_element_link
+            parentId: style_book_button_element_wrapp_link
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_large_size
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_large_size
+
+        - '@add':
+            id: style_book_button_element_large_size
+            parentId: style_book_button_element_wrapp_large_size
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_size_l
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_size_l
+
+        - '@add':
+            id: style_book_button_element_size_l
+            parentId: style_book_button_element_wrapp_size_l
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_size_m
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_size_m
+
+        - '@add':
+            id: style_book_button_element_size_m
+            parentId: style_book_button_element_wrapp_size_m
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_group
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_group
+
+        - '@add':
+            id: style_book_button_element_group
+            parentId: style_book_button_element_wrapp_group
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_inline_group
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_inline_group
+
+        - '@add':
+            id: style_book_button_element_inline_group
+            parentId: style_book_button_element_wrapp_inline_group
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_btn_group
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_btn_group
+
+        - '@add':
+            id: style_book_button_element_btn_group
+            parentId: style_book_button_element_wrapp_btn_group
+            blockType: block
+
+        - '@add':
+            id: style_book_button_element_wrapp_btn_group_vertical
+            parentId: style_book_main
+            blockType: group_element_item
+            options:
+              description: oro_frontend_style_book.groups.buttons.description_btn_group_vertical
+
+        - '@add':
+            id: style_book_button_element_btn_group_vertical
+            parentId: style_book_button_element_wrapp_btn_group_vertical
             blockType: block
 
     conditions: 'context["action"]=="forms"'
