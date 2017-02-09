@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableLabelTemplate;
 
 class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTranslationFieldsIterator
 {
@@ -71,6 +72,15 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
 
             unset($context['step_name']);
         }
+
+        foreach ($this->variableFields($configuration, $context) as $key => &$varField) {
+            yield $key => $varField;
+            if ($this->hasChanges()) {
+                $configModified = true;
+                $varField = $this->pickChangedValue();
+            }
+        }
+        unset($varField);
 
         if ($configModified) {
             $this->workflowDefinition->setConfiguration($configuration);
