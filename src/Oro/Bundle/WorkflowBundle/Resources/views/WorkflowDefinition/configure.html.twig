@@ -17,7 +17,7 @@
         'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
         'entityTitle': entity.label
     } %}
-
+    
     {{ parent() }}
 
     <div class="pull-left">
@@ -35,13 +35,11 @@
     {% set dataBlocks = [{
         'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
         'class': 'active',
-        'subblocks': [
-        {
+        'subblocks': [{
             'data': [
-                    form_row(form)
-                ]
-            }
-        ]
+                form_row(form)
+            ]
+        }]
     }] %}
 
     {% set id = 'workflow-variables' %}
