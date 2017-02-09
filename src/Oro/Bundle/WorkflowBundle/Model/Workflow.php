@@ -58,6 +58,11 @@ class Workflow
     protected $transitionManager;
 
     /**
+     * @var VariableManager
+     */
+    protected $variableManager;
+
+    /**
      * @var Collection
      */
     protected $errors;
@@ -73,12 +78,18 @@ class Workflow
     protected $restrictions;
 
     /**
+     * @var Collection
+     */
+    protected $variables;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param AclManager $aclManager
      * @param RestrictionManager $restrictionManager
      * @param StepManager|null $stepManager
      * @param BaseAttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
+     * @param VariableManager|null $variableManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -86,7 +97,8 @@ class Workflow
         RestrictionManager $restrictionManager,
         StepManager $stepManager = null,
         BaseAttributeManager $attributeManager = null,
-        TransitionManager $transitionManager = null
+        TransitionManager $transitionManager = null,
+        VariableManager $variableManager = null
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->aclManager = $aclManager;
@@ -94,6 +106,7 @@ class Workflow
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager = $attributeManager ? $attributeManager : new BaseAttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
+        $this->variableManager = $variableManager ? $variableManager : new VariableManager();
     }
 
     /**
@@ -146,6 +159,14 @@ class Workflow
     public function getTransitionManager()
     {
         return $this->transitionManager;
+    }
+
+    /**
+     * @return VariableManager
+     */
+    public function getVariableManager()
+    {
+        return $this->variableManager;
     }
 
     /**
@@ -339,6 +360,11 @@ class Workflow
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
         $workflowItem->setDefinition($this->getDefinition());
+
+        // populate WorkflowData with variables
+        if ($variables = $this->getVariables()) {
+            $workflowItem->getData()->add($variables->toArray());
+        }
 
         return $workflowItem;
     }
@@ -554,6 +580,24 @@ class Workflow
     public function getInitDatagrids()
     {
         return $this->getConfigurationOption(WorkflowConfiguration::NODE_INIT_DATAGRIDS, []);
+    }
+
+    /**
+     * @return Collection|Variable[]
+     */
+    public function getVariables()
+    {
+        if (!$this->variables) {
+            $manager = $this->getVariableManager();
+            $definition = $this->getDefinition();
+
+            $this->variables = $manager->getVariableAssembler()->assemble(
+                $this,
+                $definition->getConfiguration()
+            );
+        }
+
+        return $this->variables;
     }
 
     /**

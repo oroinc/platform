@@ -15,6 +15,8 @@ parameters:
     oro_workflow.serializer.process.normalizer.traversable.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessTraversableNormalizer
     oro_workflow.serializer.process.normalizer.scalar.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessScalarNormalizer
 
+    oro_workflow.serializer.variable.normalizer.class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer
+
 services:
     # Services for WorkflowData serialization
     oro_workflow.serializer.data.serializer:
@@ -27,6 +29,10 @@ services:
 
     oro_workflow.serializer.data.normalizer:
         class: %oro_workflow.serializer.data.normalizer.class%
+
+    oro_workflow.serializer.variable.normalizer:
+        class: %oro_workflow.serializer.variable.normalizer.class%
+        parent: oro_workflow.serializer.data.normalizer
 
     oro_workflow.serializer.data.attribute_normalizer.standard:
         class: %oro_workflow.serializer.data.attribute_normalizer.standard.class%
