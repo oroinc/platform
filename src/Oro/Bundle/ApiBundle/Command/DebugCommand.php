@@ -82,11 +82,14 @@ class DebugCommand extends AbstractDebugCommand
 
         $i = 0;
         $totalNumberOfProcessors = 0;
+        $allProcessorsIds = [];
         foreach ($processorBag->getActions() as $action) {
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
             }
-            $numberOfProcessors = $this->getNumberOfProcessors($processorBag, $action);
+            $processorIds = $this->getProcessorIds($processorBag, $action);
+            $allProcessorsIds = array_merge($allProcessorsIds, $processorIds);
+            $numberOfProcessors = count($processorIds);
             $totalNumberOfProcessors += $numberOfProcessors;
             $table->addRow([
                 $action,
@@ -98,7 +101,15 @@ class DebugCommand extends AbstractDebugCommand
 
         $table->render();
 
-        $output->writeln(sprintf('<info>Total number of processors:</info> %s', $totalNumberOfProcessors));
+        $output->writeln(
+            sprintf('<info>Total number of processors:</info> %s', $totalNumberOfProcessors)
+        );
+        $output->writeln(
+            sprintf(
+                '<info>Total number of processor services:</info> %s',
+                count(array_unique($allProcessorsIds))
+            )
+        );
 
         $output->writeln('<info>Public Actions:</info>');
         foreach ($actionProcessorBag->getActions() as $action) {
@@ -266,15 +277,20 @@ class DebugCommand extends AbstractDebugCommand
      * @param ProcessorBagInterface $processorBag
      * @param string                $action
      *
-     * @return int
+     * @return string[]
      */
-    protected function getNumberOfProcessors(ProcessorBagInterface $processorBag, $action)
+    protected function getProcessorIds(ProcessorBagInterface $processorBag, $action)
     {
         $context = new Context();
         $context->setAction($action);
         $processors = $processorBag->getProcessors($context);
         $processors->setApplicableChecker(new ChainApplicableChecker());
 
-        return count(iterator_to_array($processors));
+        $result = [];
+        foreach ($processors as $processor) {
+            $result[] = $processors->getProcessorId();
+        }
+
+        return array_unique($result);
     }
 }
