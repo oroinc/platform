@@ -4,28 +4,23 @@ namespace Oro\Bundle\ImportExportBundle\Async;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
-use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
-
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-class SendImportNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+/**
+ * toDo: a temporary solution, send directly to the NotificationBundle after implementing BAP-13215
+ */
+class SendImportErrorNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var JobStorage
-     */
-    private $jobStorage;
-
     /**
      * @var MessageProducerInterface
      */
@@ -35,11 +30,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      *  @var LoggerInterface
      */
     private $logger;
-
-    /**
-     *  @var ImportExportResultSummarizer
-     */
-    private $importJobSummaryResultService;
 
     /**
      * @var ConfigManager
@@ -54,23 +44,17 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     /**
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
-     * @param JobStorage $jobStorage
-     * @param ImportExportResultSummarizer $importJobSummaryResultService
      * @param ConfigManager $configManager
      * @param RegistryInterface $doctrine
      */
     public function __construct(
         MessageProducerInterface $producer,
         LoggerInterface $logger,
-        JobStorage $jobStorage,
-        ImportExportResultSummarizer $importJobSummaryResultService,
         ConfigManager $configManager,
         RegistryInterface $doctrine
     ) {
         $this->producer = $producer;
         $this->logger = $logger;
-        $this->jobStorage = $jobStorage;
-        $this->importJobSummaryResultService = $importJobSummaryResultService;
         $this->configManager = $configManager;
         $this->doctrine = $doctrine;
     }
@@ -82,16 +66,10 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
     {
         $body = JSON::decode($message->getBody());
 
-        if (! isset($body['rootImportJobId'], $body['process']) &&
+        if (! isset($body['file'], $body['error']) &&
             ! (isset($body['userId']) || isset($body['notifyEmail']))
         ) {
             $this->logger->critical('Invalid message', ['message' => $body]);
-
-            return self::REJECT;
-        }
-
-        if (! ($job = $this->jobStorage->findJobById($body['rootImportJobId']))) {
-            $this->logger->critical('Job not found', ['message' => $body]);
 
             return self::REJECT;
         }
@@ -111,36 +89,14 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             $notifyEmail = $body['notifyEmail'];
         }
 
-        switch ($body['process']) {
-            case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
-                $template = ImportExportResultSummarizer::TEMPLATE_IMPORT_VALIDATION_RESULT;
-                break;
-            case ProcessorRegistry::TYPE_IMPORT:
-                $template = ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT;
-                break;
-            default:
-                throw new NotSupportedException(
-                    sprintf(
-                        'Not found template for "%s" process of Import',
-                        $body['process']
-                    )
-                );
-                break;
-        }
-
-//        TODO refactor in https://magecore.atlassian.net/browse/BAP-13215
-        list($subject, $summary) = $this->importJobSummaryResultService->getSummaryResultForNotification(
-            $job,
-            $body['originFileName'],
-            $template
-        );
-
-        $this->sendNotification($subject, $notifyEmail, $summary);
+//        TODO refactor in https://magecore.atlassian.net/browse/BAP-13215. should use template
+        $subject = sprintf('Cannot Import file %s', $body['file']);
+        $this->sendNotification($notifyEmail, $body['error'], $subject);
 
         return self::ACK;
     }
 
-    protected function sendNotification($subject, $toEmail, $summary)
+    protected function sendNotification($toEmail, $summary, $subject)
     {
         $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
         $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
@@ -150,7 +106,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             'toEmail' => $toEmail,
             'subject' => $subject,
             'body' => $summary,
-            'contentType' => 'text/html'
         ];
 
         $this->producer->send(
@@ -166,6 +121,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SEND_IMPORT_NOTIFICATION];
+        return [Topics::SEND_IMPORT_ERROR_NOTIFICATION];
     }
 }

@@ -2,56 +2,57 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor;
 
-use Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor;
-use Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor;
-use Oro\Bundle\ImportExportBundle\File\SplitterCsvFile;
+
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\ImportExportBundle\Splitter\SplitterChain;
+use Oro\Bundle\ImportExportBundle\Splitter\SplitterInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Class PreparingHttpImportMessageProcessorTest
  * @package Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import
  */
-class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
+class PreHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
     {
-        $chunkHttpImportMessageProcessor = new PreparingHttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
+        $chunkHttpImportMessageProcessor = new PreHttpImportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createMessageProducerInterfaceMock(),
             $this->createLoggerInterfaceMock(),
-            $this->createSplitterCsvFileMock(),
-            $this->createDoctrineMock(),
-            $this->createDependentJobMock()
+            $this->getSplitterChain(),
+            $this->createDependentJobMock(),
+            $this->createFileManagerMock()
         );
 
-        $this->assertInstanceOf(AbstractPreparingHttpImportMessageProcessor::class, $chunkHttpImportMessageProcessor);
         $this->assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
         $this->assertInstanceOf(TopicSubscriberInterface::class, $chunkHttpImportMessageProcessor);
     }
 
     public function testImportProcessShouldReturnSubscribedTopics()
     {
-        $expectedSubscribedTopics = [Topics::IMPORT_HTTP_PREPARING,];
-        $this->assertEquals($expectedSubscribedTopics, PreparingHttpImportMessageProcessor::getSubscribedTopics());
+        $expectedSubscribedTopics = [
+            Topics::PRE_HTTP_IMPORT,
+            Topics::IMPORT_HTTP_PREPARING,
+            Topics::IMPORT_HTTP_VALIDATION_PREPARING
+        ];
+        $this->assertEquals($expectedSubscribedTopics, PreHttpImportMessageProcessor::getSubscribedTopics());
     }
 
     public function testShouldLogErrorAndRejectMessageIfMessageWasInvalid()
@@ -63,14 +64,13 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->with('Got invalid message. body: []')
         ;
 
-        $processor = new PreparingHttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
+        $processor = new PreHttpImportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createMessageProducerInterfaceMock(),
             $logger,
-            $this->createSplitterCsvFileMock(),
-            $this->createDoctrineMock(),
-            $this->createDependentJobMock()
+            $this->getSplitterChain(),
+            $this->createDependentJobMock(),
+            $this->createFileManagerMock()
         );
 
         $message = $this->createMessageMock();
@@ -84,39 +84,37 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldLogErrorAndRejectMessageIfUserNotFound()
+    public function testShouldLogWarningAndUseDefaultIfSlpitterNotFound()
     {
         $logger = $this->createLoggerInterfaceMock();
         $logger
             ->expects($this->once())
-            ->method('error')
-            ->with('User not found. id: 1')
+            ->method('warning')
+            ->with('Not supported format: "test", using default')
         ;
-
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
+        $fileManager = $this->createFileManagerMock();
+        $fileManager
             ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn(null);
-        ;
+            ->method('writeToTmpLocalStorage')
+            ->with('123435.test')
+            ->willReturn('12345.test');
+        $csvSplitter = $this->createMock(SplitterInterface::class);
+        $csvSplitter
+            ->expects($this->at(0))
+            ->method('getSplittedFilesNames')
+            ->with('12345.test')
+            ->willReturn(['12345.test']);
+        $splitterChain = new SplitterChain();
+        $splitterChain->addSplitter($csvSplitter, 'default');
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
 
-        $processor = new PreparingHttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
+        $processor = new PreHttpImportMessageProcessor(
             $this->createJobRunnerMock(),
             $this->createMessageProducerInterfaceMock(),
             $logger,
-            $this->createSplitterCsvFileMock(),
-            $doctrine,
-            $this->createDependentJobMock()
+            $splitterChain,
+            $this->createDependentJobMock(),
+            $fileManager
         );
 
         $message = $this->createMessageMock();
@@ -124,11 +122,12 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->expects($this->once())
             ->method('getBody')
             ->willReturn(json_encode([
-                        'filePath' => 'test.csv',
+                        'fileName' => '123435.test',
+                        'originFileName' => 'test.test',
                         'userId' => '1',
-                        'jobId' => '1',
                         'jobName' => 'test',
                         'processorAlias' => 'test',
+                        'process' => 'import',
                         'options' => [],
                     ]))
         ;
@@ -139,24 +138,6 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
 
     public function testShouldRunRunUniqueAndACKMessage()
     {
-        $user = $this->getUser();
-
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($user);
-        ;
-
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
-
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects($this->once())
@@ -164,15 +145,28 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->with(1)
             ->willReturn(true)
             ;
+        $fileManager = $this->createFileManagerMock();
+        $fileManager
+            ->expects($this->once())
+            ->method('writeToTmpLocalStorage')
+            ->with('123435.csv')
+            ->willReturn('12345.csv');
+        $csvSplitter = $this->createMock(SplitterInterface::class);
+        $csvSplitter
+            ->expects($this->once())
+            ->method('getSplittedFilesNames')
+            ->with('12345.csv')
+            ->willReturn(['12345.csv']);
+        $splitterChain = new SplitterChain();
+        $splitterChain->addSplitter($csvSplitter, 'csv');
 
-        $processor = new PreparingHttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
+        $processor = new PreHttpImportMessageProcessor(
             $jobRunner,
             $this->createMessageProducerInterfaceMock(),
             $this->createLoggerInterfaceMock(),
-            $this->createSplitterCsvFileMock(),
-            $doctrine,
-            $this->createDependentJobMock()
+            $splitterChain,
+            $this->createDependentJobMock(),
+            $fileManager
         );
 
         $message = $this->createMessageMock();
@@ -180,11 +174,12 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->expects($this->once())
             ->method('getBody')
             ->willReturn(json_encode([
-                        'filePath' => 'test.csv',
+                        'fileName' => '123435.csv',
+                        'originFileName' => 'test.csv',
                         'userId' => '1',
-                        'jobId' => '1',
                         'jobName' => 'test',
                         'processorAlias' => 'test',
+                        'process' => 'import',
                         'options' => [],
                     ]))
         ;
@@ -198,45 +193,98 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
+    public function testShouldRejectMessageAndSendErrorNotification()
+    {
+        $message = $this->createMessageMock();
+        $message
+            ->expects($this->once())
+            ->method('getBody')
+            ->willReturn(json_encode([
+                        'fileName' => '12345.csv',
+                        'originFileName' => 'test.csv',
+                        'userId' => '1',
+                        'jobName' => 'test',
+                        'processorAlias' => 'test',
+                        'process' => 'import',
+                        'options' => [],
+                    ]))
+        ;
+
+        $fileManager = $this->createFileManagerMock();
+        $fileManager
+            ->expects($this->once())
+            ->method('writeToTmpLocalStorage')
+            ->with('12345.csv')
+            ->willReturn('12345.csv');
+
+        $csvSplitter = $this->createMock(SplitterInterface::class);
+        $csvSplitter
+            ->expects($this->once())
+            ->method('getSplittedFilesNames')
+            ->with('12345.csv')
+            ->willReturn([]);
+        $csvSplitter
+            ->expects($this->once())
+            ->method('getErrors')
+            ->willReturn(['test Error']);
+
+        $splitterChain = new SplitterChain();
+        $splitterChain->addSplitter($csvSplitter, 'csv');
+
+        $logger = $this->createLoggerInterfaceMock();
+        $logger
+            ->expects($this->once())
+            ->method('critical')
+            ->with('An error occurred while reading file test.csv: "test Error"');
+
+        $producer = $this->createMessageProducerInterfaceMock();
+        $producer
+            ->expects($this->once())
+            ->method('send')
+            ->with(
+                Topics::SEND_IMPORT_ERROR_NOTIFICATION,
+                [
+                    'file' => 'test.csv',
+                    'error' => 'An error occurred while reading file test.csv: "test Error"',
+                    'userId' => '1'
+                ]
+            );
+        $processor = new PreHttpImportMessageProcessor(
+            $this->createJobRunnerMock(),
+            $producer,
+            $logger,
+            $splitterChain,
+            $this->createDependentJobMock(),
+            $fileManager
+        );
+        $result = $processor->process($message, $this->createSessionMock());
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testShouldProcessPreparingMessageAndSendImportAndNotificationMessagesAndACKMessage()
     {
         $messageData = [
-            'filePath' => 'test.csv',
-            'userId' => '1',
-            'jobId' => '1',
-            'jobName' => 'test',
+            'fileName' => '12345.csv',
             'originFileName' => 'test.csv',
+            'userId' => '1',
+            'jobName' => 'test_import',
             'processorAlias' => 'processor_test',
+            'process' => 'import',
             'options' => [],
         ];
         $job = $this->getJob(1);
         $childJob1 = $this->getJob(2, $job);
         $childJob2 = $this->getJob(3, $job);
         $childJob = $this->getJob(10, $job);
-        $user = $this->getUser();
-
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($user);
-
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo));
 
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects($this->once())
             ->method('runUnique')
-            ->with(1, 'oro:import:http:processor_test:1')
+            ->with(1, 'oro:import:processor_test:test_import:1')
             ->will(
                 $this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
                     return $callback($jobRunner, $childJob);
@@ -246,7 +294,7 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $jobRunner
             ->expects($this->at(0))
             ->method('createDelayed')
-            ->with('oro:import:http:processor_test:1:chunk.1')
+            ->with('oro:import:processor_test:test_import:1:chunk.1')
             ->will(
                 $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
                     return $callback($jobRunner, $childJob1);
@@ -256,25 +304,29 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
         $jobRunner
             ->expects($this->at(1))
             ->method('createDelayed')
-            ->with('oro:import:http:processor_test:1:chunk.2')
+            ->with('oro:import:processor_test:test_import:1:chunk.2')
             ->will(
                 $this->returnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
                     return $callback($jobRunner, $childJob2);
                 })
             );
 
-        $csvSplitter = $this->createSplitterCsvFileMock();
+        $csvSplitter = $this->createMock(SplitterInterface::class);
         $csvSplitter
             ->expects($this->once())
-            ->method('getSplitFiles')
-            ->with('test.csv')
-            ->willReturn(['1_test.csv', '2_test.csv']);
+            ->method('getSplittedFilesNames')
+            ->with('12345.csv')
+            ->willReturn(['chunk_1_12345.csv', 'chunk_2_12345.csv']);
+
+        $splitterChain = new SplitterChain();
+        $splitterChain->addSplitter($csvSplitter, 'csv');
+
 
         $messageData1 = $messageData;
-        $messageData1['filePath'] = '1_test.csv';
+        $messageData1['fileName'] = 'chunk_1_12345.csv';
         $messageData1['jobId'] = 2;
         $messageData2 = $messageData;
-        $messageData2['filePath'] = '2_test.csv';
+        $messageData2['fileName'] = 'chunk_2_12345.csv';
         $messageData2['jobId'] = 3;
 
         $producer = $this->createMessageProducerInterfaceMock();
@@ -282,15 +334,15 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->expects($this->exactly(2))
             ->method('send')
             ->withConsecutive(
-                ['oro.importexport.import_http', $messageData1],
-                ['oro.importexport.import_http', $messageData2]
+                [Topics::HTTP_IMPORT, $messageData1],
+                [Topics::HTTP_IMPORT, $messageData2]
             );
 
         $dependentContext = $this->createDependentJobContextMock();
         $dependentContext
             ->expects($this->once())
             ->method('addDependentJob')
-            ->with('oro.importexport.send_notification');
+            ->with(Topics::SEND_IMPORT_NOTIFICATION);
 
         $dependentJob = $this->createDependentJobMock();
         $dependentJob
@@ -304,14 +356,20 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
             ->method('saveDependentJob')
             ->with($dependentContext);
 
-        $processor = new PreparingHttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
+        $fileManager = $this->createFileManagerMock();
+        $fileManager
+            ->expects($this->once())
+            ->method('writeToTmpLocalStorage')
+            ->with('12345.csv')
+            ->willReturn('12345.csv');
+
+        $processor = new PreHttpImportMessageProcessor(
             $jobRunner,
             $producer,
             $this->createLoggerInterfaceMock(),
-            $csvSplitter,
-            $doctrine,
-            $dependentJob
+            $splitterChain,
+            $dependentJob,
+            $fileManager
         );
 
         $message = $this->createMessageMock();
@@ -326,32 +384,6 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
 
         $result = $processor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
-    }
-
-    public function testValidationImportProcessCanBeConstructedWithRequiredAttributes()
-    {
-        $chunkHttpImportMessageProcessor = new PreparingHttpImportValidationMessageProcessor(
-            $this->createHttpImportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerInterfaceMock(),
-            $this->createLoggerInterfaceMock(),
-            $this->createSplitterCsvFileMock(),
-            $this->createDoctrineMock(),
-            $this->createDependentJobMock()
-        );
-
-        $this->assertInstanceOf(AbstractPreparingHttpImportMessageProcessor::class, $chunkHttpImportMessageProcessor);
-        $this->assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
-        $this->assertInstanceOf(TopicSubscriberInterface::class, $chunkHttpImportMessageProcessor);
-    }
-
-    public function testValidationImportProcessShouldReturnSubscribedTopics()
-    {
-        $expectedSubscribedTopics = [Topics::IMPORT_HTTP_VALIDATION_PREPARING,];
-        $this->assertEquals(
-            $expectedSubscribedTopics,
-            PreparingHttpImportValidationMessageProcessor::getSubscribedTopics()
-        );
     }
 
     protected function getJob($id, $rootJob = null)
@@ -410,11 +442,14 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SplitterCsvFile
+     * @return \PHPUnit_Framework_MockObject_MockObject|SplitterChain
      */
-    protected function createSplitterCsvFileMock()
+    protected function getSplitterChain()
     {
-        return $this->createMock(SplitterCsvFile::class);
+        $splitterChain = new SplitterChain();
+        $splitterChain->addSplitter($this->createMock(SplitterInterface::class), 'csv');
+
+        return $splitterChain;
     }
 
     /**
@@ -450,17 +485,18 @@ class PreparingHttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCas
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UserRepository
-     */
-    private function createUserRepositoryMock()
-    {
-        return $this->createMock(UserRepository::class);
-    }
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobContext
      */
     private function createDependentJobContextMock()
     {
         return $this->createMock(DependentJobContext::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|FileManager
+     */
+    private function createFileManagerMock()
+    {
+        return $this->createMock(FileManager::class);
     }
 }
