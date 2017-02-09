@@ -159,8 +159,14 @@ class ImportExportControllerTest extends WebTestCase
             'tmpTestLineEndings.csv',
             'text/csv'
         );
-        $this->assertEquals(substr_count(file_get_contents($file), "\r\n"), substr_count(file_get_contents($csvFile->getPathname()), "\r\n"));
-        $this->assertEquals(substr_count(file_get_contents($file), "\n"), substr_count(file_get_contents($csvFile->getPathname()), "\n"));
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\r\n"),
+            substr_count(file_get_contents($csvFile->getPathname()), "\r\n")
+        );
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\n"),
+            substr_count(file_get_contents($csvFile->getPathname()), "\n")
+        );
 
         $crawler = $this->client->request(
             'GET',
@@ -205,7 +211,10 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
         $tmpFiles = glob($cacheDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.tmp');
         $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
-        $this->assertEquals(substr_count(file_get_contents($file), "\n"), substr_count(file_get_contents($tmpFile->getPathname()), "\r\n"));
+        $this->assertEquals(
+            substr_count(file_get_contents($file), "\n"),
+            substr_count(file_get_contents($tmpFile->getPathname()), "\r\n")
+        );
         unlink($tmpFile->getPathname());
     }
 
