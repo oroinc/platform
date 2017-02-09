@@ -3,26 +3,23 @@
 namespace Oro\Bundle\DataAuditBundle\Filter;
 
 use Doctrine\ORM\Query\Expr;
-
 use LogicException;
-
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\DataAuditBundle\Form\Type\FilterType;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
-use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class AuditFilter extends EntityFilter
 {
     const TYPE_CHANGED = 'changed';
     const TYPE_CHANGED_TO_VALUE = 'changed_to_value';
 
-    /** @var Manager */
-    protected $queryDesignerManager;
+    /** @var ServiceLink */
+    protected $queryDesignerManagerLink;
 
     /** @var string */
     protected $auditAlias;
@@ -39,12 +36,15 @@ class AuditFilter extends EntityFilter
     /**
      * @param FormFactoryInterface $factory
      * @param FilterUtility $util
-     * @param Manager $queryDesignerManager
+     * @param ServiceLink $queryDesignerManagerLink
      */
-    public function __construct(FormFactoryInterface $factory, FilterUtility $util, Manager $queryDesignerManager)
-    {
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        ServiceLink $queryDesignerManagerLink
+    ) {
         parent::__construct($factory, $util);
-        $this->queryDesignerManager = $queryDesignerManager;
+        $this->queryDesignerManagerLink = $queryDesignerManagerLink;
     }
 
     /**
@@ -174,7 +174,7 @@ class AuditFilter extends EntityFilter
      */
     protected function applyFilter(FilterDatasourceAdapterInterface $ds, $name, $field, $data)
     {
-        $filter = $this->queryDesignerManager->createFilter($name, [
+        $filter = $this->queryDesignerManagerLink->getService()->createFilter($name, [
             FilterUtility::DATA_NAME_KEY => $field,
         ]);
 

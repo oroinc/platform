@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
-use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class ConfigurableAddOrReplaceStrategy
- * @package Oro\Bundle\ImportExportBundle\Strategy\Import
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
@@ -180,14 +178,51 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
         // import entity fields
         if ($existingEntity) {
+            $this->checkEntityAcl($entity, $existingEntity, $itemData);
             if ($isFullData) {
                 $this->importExistingEntity($entity, $existingEntity, $itemData);
             }
 
             $entity = $existingEntity;
+        } else {
+            $this->checkEntityAcl($entity, null, $itemData);
         }
 
         return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @param array|null $itemData
+     */
+    protected function checkEntityAcl($entity, $existingEntity = null, $itemData = null)
+    {
+        $entityName       = ClassUtils::getClass($entity);
+        $identifierName   = $this->databaseHelper->getIdentifierFieldName($entityName);
+        $excludedFields[] = $identifierName;
+        $fields           = $this->fieldHelper->getFields($entityName, true);
+        $action = $existingEntity ? 'EDIT' : 'CREATE';
+
+        foreach ($fields as $key => $field) {
+            $fieldName = $field['name'];
+            $importedValue = $this->fieldHelper->getObjectValue($entity, $fieldName);
+            if (!$this->strategyHelper->isGranted($action, $entity, $fieldName) && $importedValue) {
+                $error = $this->translator->trans(
+                    'oro.importexport.import.errors.access_denied_property_entity',
+                    [
+                        '%property_name%' => $fieldName,
+                        '%entity_name%' => $entityName,
+                    ]
+                );
+                $this->context->addError($error);
+                if ($existingEntity) {
+                    $existingValue = $this->fieldHelper->getObjectValue($existingEntity, $fieldName);
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, $existingValue);
+                } else {
+                    $this->fieldHelper->setObjectValue($entity, $fieldName, null);
+                }
+            }
+        }
     }
 
     /**
@@ -212,16 +247,6 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             if ($this->isFieldExcluded($entityName, $fieldName, $itemData)) {
                 $excludedFields[] = $fieldName;
                 unset($fields[$key]);
-            }
-            if (!$this->strategyHelper->isGranted('EDIT', $entity, $fieldName)) {
-                $error = $this->translator->trans(
-                    'oro.importexport.import.errors.access_denied_property_entity',
-                    [
-                        '%property_name%' => $fieldName,
-                        '%entity_name%' => $entityName,
-                    ]
-                );
-                $this->context->addError($error);
             }
         }
 
@@ -260,15 +285,12 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 $fieldName         = $field['name'];
                 $isFullRelation    = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
                 $isPersistRelation = $this->databaseHelper->isCascadePersist($entityName, $fieldName);
-                $inversedFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
-
-                // additional search parameters to find only related entities
-                $searchContext = [];
-                if ($isPersistRelation && $inversedFieldName
-                    && $this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)
-                ) {
-                    $searchContext[$inversedFieldName] = $entity;
-                }
+                $searchContext     = $this->generateSearchContextForRelationsUpdate(
+                    $entity,
+                    $entityName,
+                    $fieldName,
+                    $isPersistRelation
+                );
 
                 if ($this->fieldHelper->isSingleRelation($field)) {
                     // single relation
@@ -387,14 +409,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         foreach ($identityValues as $fieldName => $value) {
             if (null !== $value) {
                 if ('' !== $value) {
-                    if (is_object($value)) {
-                        $identifier = $this->databaseHelper->getIdentifier($value);
-                        if ($identifier !== null) {
-                            $notEmptyValues[$fieldName] = $identifier;
-                        }
-                    } else {
-                        $notEmptyValues[$fieldName] = $value;
+                    $valueForIdentity = $this->generateValueForIdentityField($value);
+
+                    if (null === $valueForIdentity) {
+                        continue;
                     }
+
+                    $notEmptyValues[$fieldName] = $valueForIdentity;
                 }
             } elseif ($this->fieldHelper->isRequiredIdentityField($entityClass, $fieldName)) {
                 $nullRequiredValues[$fieldName] = null;
@@ -404,5 +425,53 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         return !empty($notEmptyValues)
             ? array_merge($notEmptyValues, $nullRequiredValues)
             : null;
+    }
+
+    /**
+     * @param mixed $fieldValue
+     *
+     * @return mixed|null
+     */
+    protected function generateValueForIdentityField($fieldValue)
+    {
+        if (false === is_object($fieldValue)) {
+            return $fieldValue;
+        }
+
+        $identifier = $this->databaseHelper->getIdentifier($fieldValue);
+        if (null !== $identifier) {
+            return $identifier;
+        }
+
+        return null;
+    }
+
+    /**
+     * Additional search parameters to find only related entities
+     *
+     * @param object $entity
+     * @param string $entityName
+     * @param string $fieldName
+     * @param bool $isPersistRelation
+     *
+     * @return array
+     */
+    protected function generateSearchContextForRelationsUpdate($entity, $entityName, $fieldName, $isPersistRelation)
+    {
+        if (!$isPersistRelation) {
+            return [];
+        }
+
+        if (!$this->databaseHelper->isSingleInversedRelation($entityName, $fieldName)) {
+            return [];
+        }
+
+        $inversedFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
+
+        if (!$inversedFieldName) {
+            return [];
+        }
+
+        return [$inversedFieldName => $entity];
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Parser;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -17,8 +18,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class ApiTestCase extends WebTestCase
 {
-    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -283,13 +282,7 @@ abstract class ApiTestCase extends WebTestCase
                 \PHPUnit_Framework_TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
             }
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            if ((is_array($statusCode) ? min($statusCode) : $statusCode) <= 400
-                && $response->getStatusCode() >= 400
-                && (
-                    $response->headers->contains('Content-Type', 'application/json')
-                    || $response->headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE)
-                )
-            ) {
+            if ($response->getStatusCode() >= 400 && static::isApplicableContentType($response->headers)) {
                 $e = new \PHPUnit_Framework_ExpectationFailedException(
                     $e->getMessage() . "\nResponse content: " . $response->getContent(),
                     $e->getComparisonFailure()
@@ -297,5 +290,15 @@ abstract class ApiTestCase extends WebTestCase
             }
             throw $e;
         }
+    }
+
+    /**
+     * @param ResponseHeaderBag $headers
+     *
+     * @return bool
+     */
+    protected static function isApplicableContentType(ResponseHeaderBag $headers)
+    {
+        return $headers->contains('Content-Type', 'application/json');
     }
 }

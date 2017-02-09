@@ -22,6 +22,56 @@ class QueryUtils
     const IN_BETWEEN = 'in_between';
 
     /**
+     * Makes full clone of the given query, including its parameters and hints
+     *
+     * @param Query $query
+     *
+     * @return Query
+     */
+    public static function cloneQuery(Query $query)
+    {
+        $cloneQuery = clone $query;
+
+        // clone parameters
+        $cloneQuery->setParameters(clone $query->getParameters());
+
+        // clone hints
+        $hints = $query->getHints();
+        foreach ($hints as $name => $value) {
+            $cloneQuery->setHint($name, $value);
+        }
+
+        return $cloneQuery;
+    }
+
+    /**
+     * Adds a custom tree walker to the given query.
+     * Do nothing if the query already has the given walker.
+     *
+     * @param Query  $query       The query
+     * @param string $walkerClass The FQCN of the tree walker
+     *
+     * @return bool TRUE if the walker was added; otherwise, FALSE
+     */
+    public static function addTreeWalker(Query $query, $walkerClass)
+    {
+        $walkers = $query->getHint(Query::HINT_CUSTOM_TREE_WALKERS);
+        if (false === $walkers) {
+            $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [$walkerClass]);
+
+            return true;
+        }
+        if (!in_array($walkerClass, $walkers, true)) {
+            $walkers[] = $walkerClass;
+            $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param Query $query
      * @param array $paramMappings
      *

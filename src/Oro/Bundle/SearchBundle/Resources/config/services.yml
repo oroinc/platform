@@ -186,12 +186,13 @@ services:
 
     oro_search.entity.repository.search_index:
         class: %oro_search.entity.repository.search_index.class%
-        factory: ["@doctrine", getRepository]
+        parent: oro_entity.abstract_repository
         arguments:
             - %oro_search.entity.item.class%
             - 'search'
         calls:
             - [setRegistry,  ['@doctrine']]
+            - [setDriversClasses, [%oro_search.drivers%]]
         lazy: true
 
     oro_search.cache.search_mapping_cache:
@@ -250,6 +251,7 @@ services:
 
     oro_search.async.indexer:
         class: 'Oro\Bundle\SearchBundle\Async\Indexer'
+        public: false
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_entity.doctrine_helper'

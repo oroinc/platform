@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Command\Cron;
 
-use Oro\Bundle\EmailBundle\DependencyInjection\Configuration;
+use Oro\Bundle\EmailBundle\Tests\Functional\EmailFeatureTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class EmailBodySyncCommandTest extends WebTestCase
 {
+    use EmailFeatureTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -23,7 +22,7 @@ class EmailBodySyncCommandTest extends WebTestCase
 
     protected function tearDown()
     {
-        $this->toggleEmailFeatureValue(true);
+        $this->resetEmailFeature();
     }
 
     /**
@@ -45,27 +44,10 @@ class EmailBodySyncCommandTest extends WebTestCase
 
     public function testCommandOutputWithEmailFeatureDisabled()
     {
-        $this->toggleEmailFeatureValue(false);
+        $this->disableEmailFeature();
         $result = $this->runCommand('oro:cron:email-body-sync', []);
 
         $this->assertContains('The email feature is disabled. The command will not run.', $result);
-    }
-
-    /**
-     * Disable email feature toggle
-     *
-     * @param bool $value
-     */
-    protected function toggleEmailFeatureValue($value)
-    {
-        $key = Configuration::getConfigKeyByName('feature_enabled');
-
-        $configManager = $this->getContainer()->get('oro_config.manager');
-        $configManager->set($key, (bool) $value);
-        $configManager->flush();
-
-        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
-        $featureChecker->resetCache();
     }
 
     /**

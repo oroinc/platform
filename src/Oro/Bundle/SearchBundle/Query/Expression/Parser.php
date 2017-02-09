@@ -50,6 +50,7 @@ class Parser
         Query::OPERATOR_CONTAINS,
         Query::OPERATOR_NOT_CONTAINS,
         Query::OPERATOR_STARTS_WITH,
+        Query::OPERATOR_LIKE,
     ];
 
     /** @var array */
@@ -72,6 +73,7 @@ class Parser
             Query::OPERATOR_STARTS_WITH,
             Query::OPERATOR_EXISTS,
             Query::OPERATOR_NOT_EXISTS,
+            Query::OPERATOR_LIKE,
         ],
         Query::TYPE_INTEGER  => [
             Query::OPERATOR_GREATER_THAN,
@@ -580,6 +582,10 @@ class Parser
                 break;
             case Query::OPERATOR_NOT_CONTAINS:
                 $expr = $expr->notContains($fieldName, $this->stream->current->value);
+                break;
+
+            case Query::OPERATOR_LIKE:
+                $expr = $expr->like($fieldName, $this->stream->current->value);
                 break;
 
             case Query::OPERATOR_EQUALS:

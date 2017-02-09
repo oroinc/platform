@@ -1,4 +1,29 @@
 services:
+    oro_user.api.rest.route_options_resolver.user_profile:
+        class: Oro\Bundle\UserBundle\Api\Routing\UserProfileRestRouteOptionsResolver
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: routing.options_resolver }
+
+    oro_user.api.rest.api_doc.route_options_resolver.user_profile:
+        class: Oro\Bundle\UserBundle\Api\ApiDoc\UserProfileRestRouteOptionsResolver
+        public: false
+        arguments:
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro_api.routing_options_resolver, priority: -10 }
+
+    oro_user.api.get.set_user_profile_entity_id:
+        class: Oro\Bundle\UserBundle\Api\Processor\Get\SetUserProfileEntityId
+        arguments:
+            - '@security.token_storage'
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\UserBundle\Api\Model\UserProfile }
+
     oro_user.api.create.save_entity:
         class: Oro\Bundle\UserBundle\Api\Processor\Create\SaveEntity
         arguments:

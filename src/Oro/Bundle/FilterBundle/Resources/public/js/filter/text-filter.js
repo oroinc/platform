@@ -3,8 +3,9 @@ define([
     'underscore',
     'orotranslation/js/translator',
     './empty-filter',
-    'oroui/js/tools'
-], function($, _, __, EmptyFilter, tools) {
+    'oroui/js/tools',
+    'oroui/js/mediator'
+], function($, _, __, EmptyFilter, tools, mediator) {
     'use strict';
 
     var TextFilter;
@@ -111,9 +112,16 @@ define([
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
-            if (e.which === 13) {
-                this._applyValueAndHideCriteria();
+            if (e.which !== 13) {
+                return;
             }
+
+            if (!this._hasMinimumLength()) {
+                this._showMinLengthWarning();
+                return;
+            }
+
+            this._applyValueAndHideCriteria();
         },
 
         /**
@@ -123,8 +131,44 @@ define([
          * @private
          */
         _onClickUpdateCriteria: function(e) {
+
+            if (!this._hasMinimumLength()) {
+                this._showMinLengthWarning();
+                e.stopImmediatePropagation();
+                return;
+            }
+
             this.trigger('updateCriteriaClick', this);
             this._applyValueAndHideCriteria();
+        },
+
+        /**
+         * Handles min_length text filter option.
+         * 0 is default value which means any length is fine.
+         *
+         * @returns {boolean}
+         * @private
+         */
+        _hasMinimumLength: function() {
+            if (typeof this.min_length === 'undefined') {
+                return true;
+            }
+
+            var enoughCharacters =  this._readDOMValue().value.length >= this.min_length;
+            var noCharacters = this._readDOMValue().value.length === 0;
+
+            return this.min_length === 0 || enoughCharacters || noCharacters;
+        },
+
+        /**
+         * @private
+         */
+        _showMinLengthWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('oro.filter.warning.min_length', {min_length: this.min_length})
+            );
         },
 
         /**
@@ -172,7 +216,9 @@ define([
          */
         _applyValueAndHideCriteria: function() {
             this._hideCriteria();
-            this.applyValue();
+            if (this._hasMinimumLength()) {
+                this.applyValue();
+            }
         },
 
         /**

@@ -67,5 +67,7 @@ oro:
         choice-tree:
             all: All
             selected: Selected
+        warning:
+            min_length: Please enter at least {{ min_length }} characters
         datagrid-toolbar:
             filters: Filters

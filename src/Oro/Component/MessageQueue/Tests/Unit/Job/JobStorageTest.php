@@ -119,6 +119,11 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('transactional')
         ;
+        $em
+            ->expects($this->once())
+            ->method('isOpen')
+            ->will($this->returnValue(true))
+        ;
 
         $doctrine = $this->createDoctrineMock();
         $doctrine
@@ -373,6 +378,11 @@ class JobStorageTest extends \PHPUnit_Framework_TestCase
         $em
             ->expects($this->once())
             ->method('flush')
+        ;
+        $em
+            ->expects($this->once())
+            ->method('isOpen')
+            ->will($this->returnValue(true))
         ;
 
         $doctrine = $this->createDoctrineMock();

@@ -16,6 +16,10 @@ services:
             - '@oro_entity.entity_hierarchy_provider'
             - '@translator'
 
+    oro_query_designer.query_designer.manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_query_designer.query_designer.manager }
+
     oro_query_designer.query_designer.restriction_builder:
         class: %oro_query_designer.query_designer.restriction_builder.class%
         arguments:
