@@ -1,0 +1,52 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% block stats %}
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
+
+{% block navButtons %}
+    {{ UI.saveActionButton([path('oro_workflow_definition_configure', {'name': entity.name})]) }}
+    {{ parent() }}
+{% endblock navButtons %}
+
+{% block breadcrumbs %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_workflow_definition_index'),
+        'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+        'entityTitle': entity.label
+    } %}
+
+    {{ parent() }}
+
+    <div class="pull-left">
+        {% if entity.isActive %}
+            <div class="badge badge-enabled status-enabled"><i
+                    class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
+        {% else %}
+            <div class="badge badge-disabled status-disabled"><i
+                    class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
+        {% endif %}
+    </div>
+{% endblock breadcrumbs %}
+
+{% block content_data %}
+    {% set dataBlocks = [{
+        'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+        'class': 'active',
+        'subblocks': [
+        {
+            'data': [
+                    form_row(form)
+                ]
+            }
+        ]
+    }] %}
+
+    {% set id = 'workflow-variables' %}
+    {% set data = {
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock content_data %}

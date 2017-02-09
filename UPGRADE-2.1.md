@@ -233,3 +233,9 @@ TestFrameworkBundle
     - removed method `getDbReindexSetting`
     - renamed method `setUpBeforeClass` to `beforeClass`
     - renamed method `tearDownAfterClass` to `afterClass`
+
+##LayoutBundle
+- Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
+####WorkflowBundle
+* Added `variable_definitions` to workflow definition

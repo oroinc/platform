@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -96,6 +97,40 @@ class WorkflowDefinitionController extends Controller
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
             'translateLinks' => $translateLinks,
+        ];
+    }
+
+    /**
+     * @Route(
+     *      "/configure/{name}",
+     *      name="oro_workflow_definition_configure"
+     * )
+     * @Template("OroWorkflowBundle:WorkflowDefinition:configure.html.twig")
+     * @Acl(
+     *      id="oro_workflow_definition_configure",
+     *      type="entity",
+     *      class="OroWorkflowBundle:WorkflowDefinition",
+     *      permission="CONFIGURE"
+     * )
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     *
+     * @return array
+     * @throws AccessDeniedHttpException
+     */
+    public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
+    {
+        $form = $this->createForm('oro_workflow_variables', null, [
+            'workflow_definition' => $workflowDefinition,
+        ]);
+
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+        }
+
+        return [
+            'form' => $form->createView(),
+            'entity' => $workflowDefinition,
         ];
     }
 

@@ -55,6 +55,25 @@ return [
                 ]
             ]
         ],
+        'variable_definitions' => [
+            'variables' => [
+                'var1' => [
+                    'type' => 'string',
+                    'value' => 'Var1Value',
+                    'options' => [],
+                ],
+                'var2' => [
+                    'type' => 'array',
+                    'value' => [1,2,3,4,5],
+                    'options' => [],
+                ],
+                'var3' => [
+                    'type' => 'string',
+                    'value' => null,
+                    'options' => [],
+                ]
+            ]
+        ],
         'disable_operations' => [
             'operation1' => ['entity1', 'entity2']
         ],

@@ -1,34 +1,27 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Model;
+namespace Oro\Bundle\WorkflowBundle\Model;
 
-class Attribute implements EntityParameterInterface
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
+
+class Variable implements ParameterInterface
 {
     /**
      * @var string
      */
     protected $name;
-
     /**
      * @var string
      */
     protected $type;
-
     /**
-     * @var array
+     * @var mixed
      */
-    protected $entityAcl = [];
-
+    protected $value;
     /**
      * @var string
      */
     protected $label;
-
-    /**
-     * @var string
-     */
-    protected $propertyPath;
-
     /**
      * @var array
      */
@@ -38,11 +31,13 @@ class Attribute implements EntityParameterInterface
      * Set attribute type
      *
      * @param string $type
-     * @return Attribute
+     *
+     * @return Variable
      */
     public function setType($type)
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -57,43 +52,41 @@ class Attribute implements EntityParameterInterface
     }
 
     /**
-     * @param array $entityAcl
+     * @param mixed $value
+     *
+     * @return Variable
      */
-    public function setEntityAcl(array $entityAcl)
+    public function setValue($value)
     {
-        $this->entityAcl = $entityAcl;
+        $this->value = $value;
+
+        return $this;
     }
 
     /**
-     * @return bool
+     * @return mixed
      */
-    public function isEntityUpdateAllowed()
+    public function getValue()
     {
-        return !array_key_exists('update', $this->entityAcl) || $this->entityAcl['update'];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEntityDeleteAllowed()
-    {
-        return !array_key_exists('delete', $this->entityAcl) || $this->entityAcl['delete'];
+        return $this->value;
     }
 
     /**
      * Set attribute label.
      *
      * @param string $label
-     * @return Attribute
+     *
+     * @return Variable
      */
     public function setLabel($label)
     {
         $this->label = $label;
+
         return $this;
     }
 
     /**
-     * Get attribute label.
+     * Get variable label.
      *
      * @return string
      */
@@ -103,19 +96,21 @@ class Attribute implements EntityParameterInterface
     }
 
     /**
-     * Set attribute name.
+     * Set variable name.
      *
      * @param string $name
-     * @return Attribute
+     *
+     * @return Variable
      */
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
     /**
-     * Get attribute name.
+     * Get variable name.
      *
      * @return string
      */
@@ -128,11 +123,13 @@ class Attribute implements EntityParameterInterface
      * Set options.
      *
      * @param array $options
-     * @return Attribute
+     *
+     * @return Variable
      */
     public function setOptions(array $options)
     {
         $this->options = $options;
+
         return $this;
     }
 
@@ -151,11 +148,13 @@ class Attribute implements EntityParameterInterface
      *
      * @param string $key
      * @param mixed $value
-     * @return Attribute
+     *
+     * @return Variable
      */
     public function setOption($key, $value)
     {
         $this->options[$key] = $value;
+
         return $this;
     }
 
@@ -163,6 +162,7 @@ class Attribute implements EntityParameterInterface
      * Get option by key.
      *
      * @param string $key
+     *
      * @return null|mixed
      */
     public function getOption($key)
@@ -174,6 +174,7 @@ class Attribute implements EntityParameterInterface
      * Check for option availability by key.
      *
      * @param string $key
+     *
      * @return bool
      */
     public function hasOption($key)
@@ -184,28 +185,9 @@ class Attribute implements EntityParameterInterface
     /**
      * @return string
      */
-    public function getPropertyPath()
-    {
-        return $this->propertyPath;
-    }
-
-    /**
-     * @param string $propertyPath
-     * @return Attribute
-     */
-    public function setPropertyPath($propertyPath)
-    {
-        $this->propertyPath = $propertyPath;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getInternalType()
     {
-        return ParameterInterface::INTERNAL_TYPE_ATTRIBUTE;
+        return ParameterInterface::INTERNAL_TYPE_VARIABLE;
     }
 
     /**
@@ -215,6 +197,6 @@ class Attribute implements EntityParameterInterface
      */
     public function isInternalType($type)
     {
-        return (ParameterInterface::INTERNAL_TYPE_ATTRIBUTE === $type);
+        return (ParameterInterface::INTERNAL_TYPE_VARIABLE === $type);
     }
 }

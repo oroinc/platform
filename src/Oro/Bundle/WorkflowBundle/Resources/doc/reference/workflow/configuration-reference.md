@@ -10,6 +10,8 @@ Table of Contents
    - [Example](#example)
  - [Attributes Configuration](#attributes-configuration)
    - [Example](#example-1)
+ - [Variables Configuration](#variables-configuration)
+   - [Example](#example-10)
  - [Steps configuration](#steps-configuration)
    - [Example](#example-2)
  - [Transitions Configuration](#transitions-configuration)
@@ -767,6 +769,45 @@ workflows:
                             call: $phone_call
 ```
 
+Variables Configuration
+========================
+
+Workflow can define configuration of variables. When Workflow Item is created it can manipulate it's own data
+(Workflow Data) that is mapped by Variables. Each variable must to have a type and a value.
+When Workflow Item is saved it's data is serialized according to configuration of variables.
+
+Single variable can be described with next configuration:
+
+* **unique name**
+    Workflow variables should have unique name in scope of Workflow that they belong to.
+    Step configuration references variables by this value.
+* **type**
+    The same as types supported by attributes
+* **label**
+    *translatable*: `oro.workflow.{workflow_name}.variable.{variable_name}.label`
+    Label can be shown in the UI
+
+**Notice**
+Variable configuration does not contain any information about how to render variable on step forms,
+it's responsibility of "Steps configuration". This make possible to render one variable in different ways on steps.
+Browse class *Oro\Bundle\WorkflowBundle\Model\VariableAssembler* for more details.
+
+Example
+-------
+
+```
+workflows:
+    b2b_flow_sales:
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    value: 'Var2Value'
+                var3: 'Var3Value' # short definition of variable with a string value
+```
+
 Example Workflow Configuration
 ==============================
 
@@ -819,6 +860,11 @@ workflows:
                 type: entity
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
         transitions:
             start_call:
                 is_start: true                         # this transition used to start new workflow

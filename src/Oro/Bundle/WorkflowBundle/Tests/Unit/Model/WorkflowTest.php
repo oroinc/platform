@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
@@ -874,13 +876,31 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $variableAssembler */
+        $variableAssembler = $this->getMockBuilder(VariableAssembler::class)
+            ->setMethods(['assemble'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $variableAssembler->expects($this->any())
+            ->method('assemble')
+            ->willReturn(new ArrayCollection());
+
+        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $variableManager */
+        $variableManager = $this->getMockBuilder(VariableManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $variableManager->expects($this->any())
+            ->method('getVariableAssembler')
+            ->willReturn($variableAssembler);
+
         $workflow = new Workflow(
             $this->doctrineHelper,
             $aclManager,
             $restrictionManager,
             null,
             $attributeManager,
-            $transitionManager
+            $transitionManager,
+            $variableManager
         );
 
         $definition = new WorkflowDefinition();

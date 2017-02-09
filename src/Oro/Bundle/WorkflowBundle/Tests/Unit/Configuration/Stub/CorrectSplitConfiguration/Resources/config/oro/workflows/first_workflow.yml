@@ -1,5 +1,6 @@
 imports:
     - {resource: 'first_workflow/attributes.yml'}
+    - {resource: 'first_workflow/variables.yml'}
 
 workflows:
     first_workflow:

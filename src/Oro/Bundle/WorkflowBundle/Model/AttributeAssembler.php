@@ -39,7 +39,7 @@ class AttributeAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param WorkflowDefinition $definition,
+     * @param WorkflowDefinition $definition
      * @param array $configuration
      * @param array $transitionConfigurations
      *
@@ -191,7 +191,8 @@ class AttributeAssembler extends BaseAbstractAssembler
     {
         $this->assertAttributeHasValidType($attribute);
 
-        if ($attribute->getType() == 'object' || $attribute->getType() == 'entity') {
+        $attributeType = $attribute->getType();
+        if ('object' === $attributeType || 'entity' === $attributeType) {
             $this->assertAttributeHasClassOption($attribute);
         } else {
             $this->assertAttributeHasNoOptions($attribute, 'class');
