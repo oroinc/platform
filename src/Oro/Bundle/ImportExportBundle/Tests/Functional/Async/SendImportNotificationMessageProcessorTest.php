@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
 
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -196,6 +197,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         array $resultOfImportJob2,
         array $notificationExpectedMessage
     ) {
+
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
             'oro:import:http:oro_test.add_or_replace:test_import_message'
@@ -211,15 +213,17 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
             'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.2',
             $rootJob
         );
-        $childJob2->setData($resultOfImportJob2);
-        $this->getJobStorage()->saveJob($childJob2);
 
+        $childJob1->setData($resultOfImportJob1);
+        $childJob2->setData($resultOfImportJob2);
+
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em->refresh($rootJob);
         $messageData = [
             'rootImportJobId' => $rootJob->getId(),
-            'filePath' => 'path/import.csv',
-            'originFileName' => 'import.csv',
+            'originFileName' => 'import.csv' ,
             'userId' => '1',
-            'subscribedTopic' => [Topics::IMPORT_HTTP_PREPARING,]
+            'process' => ProcessorRegistry::TYPE_IMPORT,
         ];
 
         $message = new NullMessage();
@@ -232,6 +236,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
             $rootJob->getId(),
             $notificationExpectedMessage['body']
         );
+
         $this->assertMessageSent(NotificationTopics::SEND_NOTIFICATION_EMAIL, $notificationExpectedMessage);
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }

@@ -271,7 +271,7 @@ services:
     oro_datagrid.handler.export:
         class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
         arguments:
-            - '@oro_importexport.file.file_system_operator'
+            - '@oro_importexport.file.file_manager'
         calls:
             - [setRouter, ['@router']]
             - [setLogger, ['@logger']]

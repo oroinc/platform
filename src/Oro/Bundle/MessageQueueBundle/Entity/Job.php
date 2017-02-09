@@ -2,8 +2,8 @@
 namespace Oro\Bundle\MessageQueueBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Component\MessageQueue\Job\Job as BaseJob;
 
 /**
@@ -111,25 +111,5 @@ class Job extends BaseJob
         parent::__construct();
 
         $this->childJobs = new ArrayCollection();
-    }
-
-    /**
-     * @return int
-     */
-    public function getCalculateRootJobProgress()
-    {
-        $children = $this->getChildJobs();
-        $processed = 0;
-
-        if (!$children instanceof Collection || !$children->count()) {
-            return 0;
-        }
-        foreach ($children as $child) {
-            if ($child->getStatus() != self::STATUS_NEW && $child->getStatus() != self::STATUS_RUNNING) {
-                $processed++;
-            }
-        }
-
-        return round($processed/$children->count()*100, 2);
     }
 }
