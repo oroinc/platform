@@ -138,7 +138,7 @@ services:
             - '@oro_datagrid.datagrid.manager.link'
             - '@oro_datagrid.datagrid.builder'
         tags:
-            - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad }
+            - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad, priority: 100 }
 
     oro_dashboard.event_listener.widget_items_load_data:
         class: %oro_dashboard.event_listener.widget_items_load_data.class%

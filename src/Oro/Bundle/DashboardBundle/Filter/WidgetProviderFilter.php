@@ -33,15 +33,15 @@ class WidgetProviderFilter
     protected function processOwners(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
         $owners = $this->ownerHelper->getOwnerIds($widgetOptions);
-
+        $alias = QueryUtils::getSingleRootAlias($queryBuilder, false);
         if ($owners) {
             // check if options are for opportunity_by_status
-            QueryUtils::applyOptimizedIn($queryBuilder, 'o.owner', $owners);
+            QueryUtils::applyOptimizedIn($queryBuilder, $alias.'.owner', $owners);
         }
     }
 
     protected function applyAcl(QueryBuilder $queryBuilder)
     {
-        return $this->aclHelper->apply($queryBuilder)->getArrayResult();
+        return $this->aclHelper->apply($queryBuilder);
     }
 }
