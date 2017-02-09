@@ -61,7 +61,8 @@ class JobStorage
             ->leftJoin('job.rootJob', 'rootJob')
             ->where('job = :id')
             ->setParameter('id', $id)
-            ->getQuery()->getOneOrNullResult();
+            ->getQuery()->getOneOrNullResult()
+        ;
     }
 
     /**
@@ -93,12 +94,13 @@ class JobStorage
                 'ownerId' => $ownerId,
                 'jobName' => $jobName,
             ])
-            ->getQuery()->getOneOrNullResult();
+            ->getQuery()->getOneOrNullResult()
+        ;
     }
 
     /**
-     * @param string $name
-     * @param Job    $rootJob
+     * @param string  $name
+     * @param Job     $rootJob
      *
      * @return Job
      */
@@ -112,7 +114,8 @@ class JobStorage
             ->where('rootJob = :rootJob AND job.name = :name')
             ->setParameter('rootJob', $rootJob)
             ->setParameter('name', $name)
-            ->getQuery()->getOneOrNullResult();
+            ->getQuery()->getOneOrNullResult()
+        ;
     }
 
     /**
