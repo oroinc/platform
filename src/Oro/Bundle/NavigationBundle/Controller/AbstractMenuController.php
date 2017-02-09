@@ -135,6 +135,7 @@ abstract class AbstractMenuController extends Controller
         $selected = $request->get('selected', []);
 
         $collection = new TreeCollection();
+        $collection->choices = $choices;
         $collection->source = array_intersect_key($choices, array_flip($selected));
 
         $form = $this->createForm(TreeMoveType::class, $collection, [

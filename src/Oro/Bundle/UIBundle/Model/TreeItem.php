@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Model;
 
-class TreeItem
+class TreeItem implements \JsonSerializable
 {
     /**
      * @param string $key
@@ -93,5 +93,14 @@ class TreeItem
     public function __toString()
     {
         return $this->label;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->key,
+            'label' => $this->label,
+            'children' => $this->children,
+        ];
     }
 }

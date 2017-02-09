@@ -35,8 +35,7 @@ define(function(require) {
                     modal: true,
                     allowMaximize: true,
                     width: 900,
-                    height: 400,
-                    close: _.bind(this.onDialogClose, this)
+                    height: 400
                 }
             });
 
@@ -49,10 +48,6 @@ define(function(require) {
             }, this));
 
             this.dialogWidget.render();
-        },
-
-        onDialogClose: function() {
-            this.$(this.inputSelector).off('.' + this.dialogWidget._wid);
         }
     });
 

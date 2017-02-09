@@ -87,6 +87,7 @@ oro:
             other: Other
         jstree:
             move_node_error: "You can not move node {{ nodeText }} here."
+            move_to_target_error: "Selected target is invalid."
             move_success: '{{ nodes }} was successfully moved'
             actions:
                 expand: 'Expand all'
