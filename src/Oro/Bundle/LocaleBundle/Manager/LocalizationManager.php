@@ -51,29 +51,36 @@ class LocalizationManager
 
     /**
      * @param int $id
+     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
+     *                       Cache should be enabled, only if you want to read from the Localization.
      *
      * @return null|Localization
      */
-    public function getLocalization($id)
+    public function getLocalization($id, $useCache = true)
     {
-        $localizations = $this->getLocalizations();
+        $localizations = $this->getLocalizations(null, $useCache);
 
         return isset($localizations[$id]) ? $localizations[$id] : null;
     }
 
     /**
      * @param array|null $ids
+     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
+     *                       Cache should be enabled, only if you want to read from the Localization.
      *
      * @return array|Localization[]
      */
-    public function getLocalizations(array $ids = null)
+    public function getLocalizations(array $ids = null, $useCache = true)
     {
-        $cache = $this->cacheProvider->fetch(static::CACHE_NAMESPACE);
+        $cache = $useCache ? $this->cacheProvider->fetch(static::CACHE_NAMESPACE) : false;
 
         if ($cache === false) {
             $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
             $cache = $this->associateLocalizationsArray($cache);
-            $this->cacheProvider->save(static::CACHE_NAMESPACE, $cache);
+
+            if ($useCache) {
+                $this->cacheProvider->save(static::CACHE_NAMESPACE, $cache);
+            }
         }
 
         if (null === $ids) {
@@ -86,13 +93,16 @@ class LocalizationManager
     }
 
     /**
+     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
+     *                       Cache should be enabled, only if you want to read from the Localization.
+     *
      * @return Localization
      */
-    public function getDefaultLocalization()
+    public function getDefaultLocalization($useCache = true)
     {
         $id = (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
 
-        $localizations = $this->getLocalizations();
+        $localizations = $this->getLocalizations(null, $useCache);
 
         if (isset($localizations[$id])) {
             return $localizations[$id];

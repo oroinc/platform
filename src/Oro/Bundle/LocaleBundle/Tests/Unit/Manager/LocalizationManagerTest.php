@@ -111,6 +111,22 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->entities, $result);
     }
 
+    public function testGetLocalizationsForcedCacheDisabled()
+    {
+        $this->assertGetEntityRepositoryForClassIsCalled();
+        $this->assertRepositoryCalls();
+
+        //Cache should not be accessed at all
+        $this->cacheProvider->expects($this->never())
+            ->method('fetch');
+        $this->cacheProvider->expects($this->never())
+            ->method('save');
+
+        $result = $this->manager->getLocalizations(null, false);
+
+        $this->assertEquals($this->entities, $result);
+    }
+
     public function testGetLocalizationsByIds()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();

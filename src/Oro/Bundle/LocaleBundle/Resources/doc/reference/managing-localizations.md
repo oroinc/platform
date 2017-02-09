@@ -9,7 +9,8 @@ Caching notice
 ==============
 
 Localization objects are cached to provide better performance.
-You will find more information later in that doc.
+You _MUST_ disable cache usage if you need to persist, delete or assign returned Localization
+(see *$useCache* parameter below).
 
 LocalizationManager
 ===================
@@ -20,7 +21,7 @@ You can easly access it from the controller:
 $this->get('oro_locale.manager.localization');
 ```
 
-**Oro\Bundle\LocaleBundle\Manager::getLocalization**
+**Oro\Bundle\LocaleBundle\Manager::getLocalization($id\[, $useCache = true\])**
 
 Gets single Localization object.
 
@@ -32,7 +33,7 @@ $localizationManager = $this->get('oro_locale.manager.localization');
 $localization = $localizationManager->getLocalization(1);
 ```
 
-**Oro\Bundle\LocaleBundle\Manager::getLocalizations**
+**Oro\Bundle\LocaleBundle\Manager::getLocalizations(array $ids\[, $useCache = true\])**
 
 Gets one or selected Localization objects.
 
@@ -48,7 +49,7 @@ $localizations = $localizationManager->getLocalizations();
 $localizations = $localizationManager->getLocalizations([1, 3, 5, 7]);
 ```
 
-**Oro\Bundle\LocaleBundle\Manager::getDefaultLocalization**
+**Oro\Bundle\LocaleBundle\Manager::getDefaultLocalization(\[$useCache = true\])**
 
 Gets default Localization. Default Localization is obtain from system configuration
 (see [OroConfigBundle](../../../../ConfigBundle/Resources/doc/system_configuration.md) for more informations).
