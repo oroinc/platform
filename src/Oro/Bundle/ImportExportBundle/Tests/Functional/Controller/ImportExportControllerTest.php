@@ -153,12 +153,10 @@ class ImportExportControllerTest extends WebTestCase
         $tmpDirName = 'import_export';
         $fileDir = __DIR__ . '/Import/fixtures';
         $file = $fileDir . '/testLineEndings.csv';
-        $testFile = $fileDir . '/tmpTestLineEndings.csv';
-        copy($file, $testFile);
 
         $csvFile = new UploadedFile(
-            $fileDir . '/tmpTestLineEndings.csv',
-            'tmpTestLineEndings.csv',
+            $fileDir . '/testLineEndings.csv',
+            'testLineEndings.csv',
             'text/csv'
         );
         $this->assertEquals(
@@ -211,7 +209,7 @@ class ImportExportControllerTest extends WebTestCase
             $files
         );
         $this->assertJsonResponseSuccess();
-        $tmpFiles = glob($cacheDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.tmp');
+        $tmpFiles = glob($cacheDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.csv');
         $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
         $this->assertEquals(
             substr_count(file_get_contents($file), "\n"),
