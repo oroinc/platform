@@ -98,11 +98,12 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
 
         $this->assertMessageSent(
-            Topics::IMPORT_HTTP_PREPARING,
+            Topics::PRE_HTTP_IMPORT,
             [
                 'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
+                'process' => 'import',
                 'processorAlias' => 'oro_account',
-                'filePath' => 'test_file',
+                'fileName' => 'test_file',
                 'originFileName' => 'test_file_original',
                 'options' => $options,
                 'userId' => $this->getCurrentUser()->getId(),
@@ -122,7 +123,7 @@ class ImportExportControllerTest extends WebTestCase
                 'oro_importexport_import_validate',
                 [
                     'processorAlias' => 'oro_account',
-                    'importValidateJob' => JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
+                    'importValidateJob' => JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV,
                     'fileName' => 'test_file',
                     'originFileName' => 'test_file_original',
                     'options' => $options,
@@ -133,11 +134,12 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccess();
 
         $this->assertMessageSent(
-            Topics::IMPORT_HTTP_VALIDATION_PREPARING,
+            Topics::PRE_HTTP_IMPORT,
             [
-                'jobName' => JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
+                'jobName' => JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV,
                 'processorAlias' => 'oro_account',
-                'filePath' => 'test_file',
+                'process' => 'import_validation',
+                'fileName' => 'test_file',
                 'originFileName' => 'test_file_original',
                 'options' => $options,
                 'userId' => $this->getCurrentUser()->getId(),

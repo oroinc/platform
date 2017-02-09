@@ -6,3 +6,6 @@ elements:
   Flash Message:
     selector: '.flash-messages-holder div.alert'
     class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  ControlGroup:
+    class: Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup

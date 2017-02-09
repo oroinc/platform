@@ -3,11 +3,13 @@
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
+
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Symfony\Component\HttpFoundation\File\File;
 
 class HttpImportHandler extends AbstractImportHandler
 {
+
     /**
      * {@inheritdoc}
      */
@@ -102,7 +104,6 @@ class HttpImportHandler extends AbstractImportHandler
             'counts'     => $counts,
         ];
     }
-
 
     /**
      * Saves the given file in a temporary directory and returns its name

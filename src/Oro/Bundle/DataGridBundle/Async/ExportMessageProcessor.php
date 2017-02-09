@@ -183,9 +183,10 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $body['parameters']['gridParameters'] = $contextParameters;
 
         $jobUniqueName = sprintf(
-            'datagrid_export_%s_%s',
+            'datagrid_export_%s_%s_%s',
             $body['parameters']['gridName'],
-            $body['format']
+            $body['format'],
+            $body['userId']
         );
 
         $result = $this->jobRunner->runUnique(
