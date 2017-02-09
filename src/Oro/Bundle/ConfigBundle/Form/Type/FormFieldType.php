@@ -91,8 +91,7 @@ class FormFieldType extends AbstractType
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
                 $form = $event->getForm()->getParent();
-                $data = $event->getForm()->getData();
-                $disabled = isset($data['use_parent_scope_value']) ? $data['use_parent_scope_value'] : false;
+                $disabled = $event->getForm()->getData();
                 FormUtils::replaceField($form, 'value', ['disabled' => $disabled]);
             }
         );
