@@ -4,9 +4,13 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Voter;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -375,6 +379,182 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
                     'resource',
                     'resource2',
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * Check that feature strategies and related options taken into account.
+     *
+     * @dataProvider featureStrategyDataProvider
+     *
+     * @param int $strategy
+     * @param $featureStrategy
+     * @param array $voters
+     * @param bool $allowIfAllAbstainDecisions
+     * @param bool $allowIfEqualGrantedDeniedDecisions
+     * @param $featureAllowIfAllAbstainDecisions
+     * @param $featureAllowIfEqualGrantedDeniedDecisions
+     * @param bool $expected
+     */
+    public function testFeatureStrategies(
+        $strategy,
+        $featureStrategy,
+        array $voters,
+        $allowIfAllAbstainDecisions,
+        $allowIfEqualGrantedDeniedDecisions,
+        $featureAllowIfAllAbstainDecisions,
+        $featureAllowIfEqualGrantedDeniedDecisions,
+        $expected
+    ) {
+        /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $configurationProvider */
+        $configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $configurationProvider->expects($this->any())
+            ->method('getFeaturesConfiguration')
+            ->willReturnCallback(
+                function () use (
+                    $featureStrategy,
+                    $featureAllowIfAllAbstainDecisions,
+                    $featureAllowIfEqualGrantedDeniedDecisions
+                ) {
+                    $result = ['feature1' => []];
+                    if ($featureStrategy) {
+                        $result['feature1']['strategy'] = $featureStrategy;
+                    }
+                    if ($featureAllowIfAllAbstainDecisions) {
+                        $result['feature1']['allowIfAllAbstainDecisions'] = $featureAllowIfAllAbstainDecisions;
+                    }
+                    if ($featureAllowIfEqualGrantedDeniedDecisions) {
+                        $result['feature1']['allowIfEqualGrantedDeniedDecisions'] =
+                            $featureAllowIfEqualGrantedDeniedDecisions;
+                    }
+
+                    return $result;
+                }
+            );
+        $configurationProvider->expects($this->any())
+            ->method('getDependenciesConfiguration')
+            ->willReturn([]);
+        $configManager = new ConfigurationManager($configurationProvider);
+
+        $checker = new FeatureChecker(
+            $configManager,
+            $voters,
+            $strategy,
+            $allowIfAllAbstainDecisions,
+            $allowIfEqualGrantedDeniedDecisions
+        );
+
+        $this->assertSame($expected, $checker->isFeatureEnabled('feature1'));
+    }
+
+    /**
+     * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function featureStrategyDataProvider()
+    {
+        return [
+            'feature strategy specified' => [
+                'strategy' => FeatureChecker::STRATEGY_AFFIRMATIVE,
+                'featureStrategy' => FeatureChecker::STRATEGY_UNANIMOUS,
+                'voters' => $this->getVoters(1, 1, 0),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => false,
+                'featureAllowIfEqualGrantedDeniedDecisions' => false,
+                'expected' => false
+            ],
+            'no feature strategy use default' => [
+                'strategy' => FeatureChecker::STRATEGY_AFFIRMATIVE,
+                'featureStrategy' => FeatureChecker::STRATEGY_UNANIMOUS,
+                'voters' => $this->getVoters(1, 0, 0),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => false,
+                'featureAllowIfEqualGrantedDeniedDecisions' => false,
+                'expected' => true
+            ],
+            'if allowIfAllAbstainDecisions specified for feature, use it in affirmative strategy' => [
+                'strategy' => FeatureChecker::STRATEGY_AFFIRMATIVE,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(0, 0, 1),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => true,
+                'featureAllowIfEqualGrantedDeniedDecisions' => null,
+                'expected' => true
+            ],
+            'if allowIfAllAbstainDecisions not specified for feature, use default in affirmative strategy' => [
+                'strategy' => FeatureChecker::STRATEGY_AFFIRMATIVE,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(0, 0, 1),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => null,
+                'featureAllowIfEqualGrantedDeniedDecisions' => null,
+                'expected' => false
+            ],
+            'if allowIfAllAbstainDecisions specified for feature, use it in consensus strategy' => [
+                'strategy' => FeatureChecker::STRATEGY_CONSENSUS,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(0, 0, 1),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => true,
+                'featureAllowIfEqualGrantedDeniedDecisions' => null,
+                'expected' => true
+            ],
+            'if allowIfAllAbstainDecisions not specified for feature, use default in consensus consensus' => [
+                'strategy' => FeatureChecker::STRATEGY_CONSENSUS,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(0, 0, 1),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => null,
+                'featureAllowIfEqualGrantedDeniedDecisions' => null,
+                'expected' => false
+            ],
+            'if allowIfEqualGrantedDeniedDecisions specified for feature, use it in consensus strategy' => [
+                'strategy' => FeatureChecker::STRATEGY_CONSENSUS,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(1, 1, 0),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => null,
+                'featureAllowIfEqualGrantedDeniedDecisions' => true,
+                'expected' => true
+            ],
+            'if allowIfEqualGrantedDeniedDecisions not specified for feature, use default in consensus consensus' => [
+                'strategy' => FeatureChecker::STRATEGY_CONSENSUS,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(1, 1, 0),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => null,
+                'featureAllowIfEqualGrantedDeniedDecisions' => null,
+                'expected' => false
+            ],
+
+            'if allowIfAllAbstainDecisions specified for feature, use it in unanimous strategy' => [
+                'strategy' => FeatureChecker::STRATEGY_UNANIMOUS,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(0, 0, 1),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => true,
+                'featureAllowIfEqualGrantedDeniedDecisions' => null,
+                'expected' => true
+            ],
+            'if allowIfAllAbstainDecisions not specified for feature, use default in unanimous consensus' => [
+                'strategy' => FeatureChecker::STRATEGY_CONSENSUS,
+                'featureStrategy' => null,
+                'voters' => $this->getVoters(0, 0, 1),
+                'allowIfAllAbstainDecisions' => false,
+                'allowIfEqualGrantedDeniedDecisions' => false,
+                'featureAllowIfAllAbstainDecisions' => null,
+                'featureAllowIfEqualGrantedDeniedDecisions' => null,
+                'expected' => false
             ],
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -26,14 +27,12 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $inputData = [
             'feature1' => [
-                'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label'
             ],
         ];
 
         $expected = [
             'feature1' => [
-                'toggle' => 'oro_feature.test.feature_enabled',
                 'label' => 'Feature 1 Label',
                 'dependencies' => [],
                 'routes' => [],
@@ -57,6 +56,9 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
                 'field_configs' => [],
+                'strategy' => 'affirmative',
+                'allowIfAllAbstainDecisions' => true,
+                'allowIfEqualGrantedDeniedDecisions' => true
             ],
         ];
 
@@ -69,6 +71,9 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
                 'field_configs' => [],
+                'strategy' => 'affirmative',
+                'allowIfAllAbstainDecisions' => true,
+                'allowIfEqualGrantedDeniedDecisions' => true
             ]
         ];
 
@@ -101,12 +106,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                     'feature1' => 'not array value'
                 ],
                 'message' => 'Invalid type for path "features.feature1". Expected array, but got string'
-            ],
-            'incorrect toggle' => [
-                'input' => [
-                    'feature1' => []
-                ],
-                'message' => 'The child node "toggle" at path "features.feature1" must be configured'
             ],
             'incorrect label' => [
                 'input' => [
@@ -159,7 +158,39 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'Invalid type for path "features.feature1.configuration". ' .
                     'Expected array, but got integer'
-            ]
+            ],
+            'incorrect strategy' => [
+                'input' => [
+                    'feature1' => [
+                        'label' => 'Feature 1 Label',
+                        'strategy' => 'not supported'
+                    ]
+                ],
+                'message' => 'The "strategy" can be "'
+                    . FeatureChecker::STRATEGY_AFFIRMATIVE
+                    . '", "' . FeatureChecker::STRATEGY_CONSENSUS. '" or "'
+                    . FeatureChecker::STRATEGY_CONSENSUS. '.'
+            ],
+            'incorrect allowIfAllAbstainDecisions' => [
+                'input' => [
+                    'feature1' => [
+                        'label' => 'Feature 1 Label',
+                        'allowIfAllAbstainDecisions' => 'not_bool'
+                    ]
+                ],
+                'message' => 'Invalid type for path "features.feature1.allowIfAllAbstainDecisions". ' .
+                             'Expected boolean, but got string'
+            ],
+            'incorrect allowIfEqualGrantedDeniedDecisions' => [
+                'input' => [
+                    'feature1' => [
+                        'label' => 'Feature 1 Label',
+                        'allowIfEqualGrantedDeniedDecisions' => 'not_bool'
+                    ]
+                ],
+                'message' => 'Invalid type for path "features.feature1.allowIfEqualGrantedDeniedDecisions". ' .
+                             'Expected boolean, but got string'
+            ],
         ];
     }
 

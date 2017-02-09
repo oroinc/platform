@@ -7,8 +7,8 @@ How to define new feature
 -------------------------
 
 Features are defined with configuration files place in Resources/oro/features.yml.
-Each feature consists of required options: title and toggle. Out of the box feature may be configured with next sections:
- - title - feature title
+Each feature consists of one required option - the label. Out of the box feature may be configured with next sections:
+ - label - feature title
  - description - feature description
  - toggle - system configuration option key that will be used as feature toggle
  - dependencies - list of feature names that current feature depends on
@@ -24,7 +24,7 @@ Example of features.yml configuration
 ```yml
 features:
     acme:
-        title: acme.feature.label
+        label: acme.feature.label
         description: acme.feature.description
         toggle: acme.feature_enabled
         dependencies:
