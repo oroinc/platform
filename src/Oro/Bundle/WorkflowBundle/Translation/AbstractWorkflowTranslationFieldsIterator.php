@@ -90,14 +90,9 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
             if ($this->hasArrayNode(WorkflowConfiguration::NODE_VARIABLES, $definitions)) {
                 foreach ($definitions[WorkflowConfiguration::NODE_VARIABLES] as $variableKey => &$rawVariable) {
                     $context['variable_name'] = $this->resolveName($rawVariable, $variableKey);
+                    yield $this->makeKey(WorkflowVariableLabelTemplate::class, $context) => $rawVariable['label'];
 
-                    $translationKey = $this->makeKey(WorkflowVariableLabelTemplate::class, $context);
-                    if (!isset($rawVariable['label']) || !$rawVariable['label']) {
-                        $rawVariable['label'] = $translationKey;
-                    }
-
-                    yield $translationKey => $rawVariable['label'];
-                    unset($context['variable_name'], $translationKey);
+                    unset($context['variable_name']);
                 }
                 unset($rawVariable);
             }
