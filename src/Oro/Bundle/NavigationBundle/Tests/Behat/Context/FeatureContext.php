@@ -194,15 +194,32 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $pages = $table->getColumn(0);
 
         $firstPage = array_shift($pages);
-        $menu->openAndClick($firstPage);
+        $clicked = $menu->openAndClick($firstPage);
+
         $this->waitForAjax();
+
+        $actualPage = $this->getLastPersistedPage($em);
+
+        $clickedUrl = $clicked->getAttribute('href');
+        $actualUrl = $actualPage->getUrl();
+
+        self::assertEquals(
+            $clickedUrl,
+            $actualUrl,
+            sprintf(
+                "Clicked (%s) and persisted (%s) to the db links are different",
+                $clickedUrl,
+                $actualUrl
+            )
+        );
+
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
             $actualTitle = $crawler->filter('head title')->first()->text();
 
-            $menu->openAndClick($page);
+            $clickedElement = $menu->openAndClick($page);
             $this->waitForAjax();
             $actualCount++;
 
@@ -210,7 +227,30 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
                 return $actualCount === $context->getPageTransitionCount($em);
             });
 
-            self::assertNotFalse($result, 'New page was not persisted in the database');
+            self::assertNotFalse(
+                $result,
+                "New page '$actualTitle' was not persisted in the database"
+            );
+
+            $clickedUrl = $clickedElement->getAttribute('href');
+            $actualUrl = '';
+
+            $pageEquals = $this->spin(
+                function (FeatureContext $context) use ($em, $clickedUrl, &$actualUrl) {
+                    $actualUrl = $context->getLastPersistedPage($em)->getUrl();
+
+                    return $clickedUrl === $actualUrl;
+                }
+            );
+
+            self::assertNotFalse(
+                $pageEquals,
+                sprintf(
+                    "Clicked (%s) and persisted (%s) to the db links are different",
+                    $clickedUrl,
+                    $actualUrl
+                )
+            );
 
             $result = $this->spin(function (FeatureContext $context) use ($actualTitle) {
                 $lastHistoryLink = $context->getLastHistoryLink();
@@ -247,6 +287,21 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
 
             return $item->getVisitCount();
         }, $repository->findAll()));
+    }
+
+    /**
+     * Get last visited page (last updated item from history table)
+     *
+     * @param EntityManager $em
+     * @return NavigationHistoryItem
+     */
+    protected function getLastPersistedPage(EntityManager $em)
+    {
+        /** @var HistoryItemRepository $repository */
+        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+        $lastAddedPage = $repository->findOneBy([], ['visitedAt' => 'DESC']);
+
+        return $lastAddedPage;
     }
 
     /**
