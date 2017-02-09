@@ -5,7 +5,6 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
-
     ColumnManagerView = BaseView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager.html'),
         autoRender: true,
@@ -21,9 +20,12 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            if(options.templateSelector){
-                this.template = _.template($(options.templateSelector).html());
+            if(_.isObject(options.templateSelectors)) {
+                var $tpl = $(options.templateSelectors.columnManagerTpl);
+
+                this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
             }
+
             ColumnManagerView.__super__.initialize.call(this, options);
             this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
             // to handle renderable change at once for multiple changes

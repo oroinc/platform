@@ -22,6 +22,16 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
+        /**
+         * @inheritDoc
+         */
+        initialize: function(options) {
+            ColumnManagerItemView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
         render: function() {
             ColumnManagerItemView.__super__.render.apply(this, arguments);
             this.$el.toggleClass('renderable', this.model.get('renderable'));
@@ -30,6 +40,17 @@ define(function(require) {
 
         setFilterModel: function(filterModel) {
             this.filterModel = filterModel;
+
+            if(this.filterModel.get('columnManagerItemTpl')) {
+                var $tpl = $(this.filterModel.get('columnManagerItemTpl'));
+
+                if ($tpl.length) {
+                    this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
+
+
+                }
+            }
+
             this.listenTo(this.filterModel, 'change:search', this.render);
         },
 

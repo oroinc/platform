@@ -24,12 +24,12 @@ define(function(require) {
         },
         onBeforeToolbarInit: function(toolbarOptions) {
             var options = {};
-            this.main.collection.trigger('get:module', 'columnManagerView', options);
+            this.main.collection.trigger('get:module', 'CustomColumnManagerComponent', options);
             this._createManagedCollection();
             var options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
-                    componentConstructor: options['columnManagerView'] || ColumnManagerComponent,
+                    componentConstructor: options.CustomColumnManagerComponent || ColumnManagerComponent,
                     columns: this.main.columns,
                     managedColumns: this.managedColumns,
                     addSorting: true

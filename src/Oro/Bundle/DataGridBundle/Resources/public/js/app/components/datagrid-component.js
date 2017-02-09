@@ -208,8 +208,8 @@ define(function(require) {
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
 
-            var customComponents = _.extend(config.customComponents, options.customComponents);
-            _.mapObject(customComponents, function (val, key) {
+            var loadModules = _.extend(config.loadModules, options.loadModules);
+            _.mapObject(loadModules, function (val, key) {
                 modules[key] = val;
             });
         },

@@ -66,8 +66,6 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['columns', 'grid']));
 
-            this.templateSelector = options.templateSelector;
-
             this.managedColumns = options.managedColumns;
 
             this.addSorting = options.addSorting;
@@ -93,6 +91,7 @@ define(function(require) {
             delete this.columns;
             delete this.grid;
             delete this.enableFilters;
+            delete this.templateSelectors;
 
             ColumnManagerComponent.__super__.dispose.apply(this, arguments);
         },
@@ -123,7 +122,7 @@ define(function(require) {
                 el: options._sourceElement,
                 collection: this.managedColumns,
                 columnFilterModel: this.columnFilterModel,
-                templateSelector: this.templateSelector
+                templateSelectors: options.templateSelectors || {}
             });
 
             if (this.enableFilters) {
@@ -138,7 +137,8 @@ define(function(require) {
                 collection: this.managedColumns,
                 filterModel: this.columnFilterModel,
                 addSorting: this.addSorting,
-                orderShift: orderShift
+                orderShift: orderShift,
+                templateSelectors: options.templateSelectors || {}
             });
             this.listenTo(this.columnManagerCollectionView, 'reordered', this._pushState);
         },
