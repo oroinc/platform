@@ -1,5 +1,4 @@
 {% set job = record.rootEntity %}
-{% set percent = job.calculateRootJobProgress|default(0) %}
 
 {% if job.status == constant('STATUS_FAILED', job) %}
     {% set classOfBar = 'label-warning'%}

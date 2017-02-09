@@ -10,7 +10,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
@@ -68,7 +68,7 @@ class UpdateActivityListOwner extends AbstractFixture implements DependentFixtur
                 ->getRepository('OroActivityListBundle:ActivityList')
                 ->createQueryBuilder('e');
 
-            $iterator = new BufferedQueryResultIterator($queryBuilder);
+            $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
             $iterator->setBufferSize(self::BATCH_SIZE);
             $itemsCount = 0;
             $entities = [];

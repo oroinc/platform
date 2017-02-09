@@ -4,17 +4,17 @@ namespace Oro\Bundle\BatchBundle\Command;
 
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 
 /**
  * Command to clean up old batch job records
@@ -71,10 +71,10 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     {
         $interval = $input->getOption('interval');
 
-        $jobInstances       = $this->getObsoleteJobInstancesQueryBuilder($this->prepareDateInterval($interval));
-        $jobInstanceIterator = new DeletionQueryResultIterator($jobInstances);
+        $jobInstances = $this->getObsoleteJobInstancesQueryBuilder($this->prepareDateInterval($interval));
+        $jobInstanceIterator = new BufferedIdentityQueryResultIterator($jobInstances);
         $jobInstanceIterator->setBufferSize(self::FLUSH_BATCH_SIZE);
-        $jobInstanceIterator->setHydrationMode(AbstractQuery::HYDRATE_SCALAR);
+        $jobInstanceIterator->setHydrationMode(Query::HYDRATE_SCALAR);
 
         if (!count($jobInstanceIterator)) {
             $output->writeln('<info>There are no jobs eligible for clean up</info>');
@@ -107,13 +107,13 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     /**
      * Delete records using iterator
      *
-     * @param DeletionQueryResultIterator $iterator
+     * @param BufferedIdentityQueryResultIterator $iterator
      *
      * @param string                      $className Entity FQCN
      *
      * @throws \Exception
      */
-    protected function deleteRecords(DeletionQueryResultIterator $iterator, $className)
+    protected function deleteRecords(BufferedIdentityQueryResultIterator $iterator, $className)
     {
         $iteration = 0;
 
