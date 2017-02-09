@@ -329,3 +329,9 @@ services:
         class: 'Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension'
         tags:
             - { name: oro_feature.config_extension }
+
+    oro_dashboard.filter.widget_provider_filter:
+        class: 'Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilter'
+        arguments:
+            - '@oro_security.acl_helper'
+            - '@oro_user.dashboard.owner_helper'
