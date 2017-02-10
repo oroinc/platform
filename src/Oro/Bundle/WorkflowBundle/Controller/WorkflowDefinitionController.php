@@ -82,12 +82,6 @@ class WorkflowDefinitionController extends Controller
      */
     public function updateAction(WorkflowDefinition $workflowDefinition)
     {
-        $workflowName = $workflowDefinition->getName();
-        $registry = $this->get('oro_workflow.registry');
-        $workflow = $registry->getWorkflow($workflowName);
-
-        $variables = $workflow->getVariables();
-
         if ($workflowDefinition->isSystem()) {
             throw new AccessDeniedHttpException('System workflow definitions are not editable');
         }

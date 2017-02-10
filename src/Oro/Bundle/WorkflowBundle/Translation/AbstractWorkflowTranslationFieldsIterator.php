@@ -113,7 +113,7 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
     private function &variableFormFields(array &$variableConfig, \ArrayObject $context)
     {
         if ($this->hasArrayNode('form_options', $variableConfig)) {
-            if ($this->hasArrayNode('tooltip', $variableConfig['form_options'])) {
+            if (isset($variableConfig['form_options']['tooltip'])) {
                 $context['option_name'] = 'tooltip';
                 $key = $this->makeKey(WorkflowVariableFormOptionTemplate::class, $context);
 
