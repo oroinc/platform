@@ -7,7 +7,6 @@ use Knp\Menu\ItemInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
@@ -21,7 +20,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 abstract class AbstractMenuController extends Controller
 {
     /**
-     * @throws AccessDeniedException
+     * @param array $context
      */
     protected function checkAcl(array $context)
     {

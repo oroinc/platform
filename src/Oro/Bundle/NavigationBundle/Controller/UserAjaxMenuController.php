@@ -27,12 +27,16 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     /**
      * {@inheritDoc}
      */
-    protected function checkAcl()
+    protected function checkAcl(array $context)
     {
-        if (!$this->get('oro_security.security_facade')->isGranted('oro_user_user_update')) {
+        if (!$this->get('oro_security.security_facade')->isGranted(
+            'oro_user_user_update',
+            $context[ScopeUserCriteriaProvider::SCOPE_KEY]
+        )
+        ) {
             throw $this->createAccessDeniedException();
         }
-        parent::checkAcl();
+        parent::checkAcl($context);
     }
 
     /**
@@ -48,6 +52,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
 
         return parent::getMenu($menuName, $context);
     }
+
     /**
      * @Route("/reset/{menuName}", name="oro_navigation_user_menu_reset")
      * @Method({"DELETE"})

@@ -9,7 +9,6 @@ use Knp\Menu\ItemInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
@@ -28,9 +27,9 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     public function resetAction($menuName, Request $request)
     {
-        $this->checkAcl();
-        $manager = $this->getMenuUpdateManager();
         $context = $this->getContextFromRequest($request);
+        $this->checkAcl($context);
+        $manager = $this->getMenuUpdateManager();
         $scope = $this->get('oro_scope.scope_manager')->find($manager->getScopeType(), $context);
         if (null === $scope) {
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
@@ -60,9 +59,9 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     public function createAction(Request $request, $menuName, $parentKey)
     {
-        $this->checkAcl();
-        $manager = $this->getMenuUpdateManager();
         $context = $this->getContextFromRequest($request);
+        $this->checkAcl($context);
+        $manager = $this->getMenuUpdateManager();
         $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $manager->createMenuUpdate(
             $menu,
@@ -100,10 +99,9 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     public function deleteAction($menuName, $key, Request $request)
     {
-        $this->checkAcl();
-        $manager = $this->getMenuUpdateManager();
-
         $context = $this->getContextFromRequest($request);
+        $this->checkAcl($context);
+        $manager = $this->getMenuUpdateManager();
 
         $scope = $this->get('oro_scope.scope_manager')->find($manager->getScopeType(), $context);
 
@@ -142,8 +140,8 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     public function showAction($menuName, $key, Request $request)
     {
-        $this->checkAcl();
         $context = $this->getContextFromRequest($request);
+        $this->checkAcl($context);
         $manager = $this->getMenuUpdateManager();
 
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
@@ -164,10 +162,10 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     public function hideAction($menuName, $key, Request $request)
     {
-        $this->checkAcl();
+        $context = $this->getContextFromRequest($request);
+        $this->checkAcl($context);
         $manager = $this->getMenuUpdateManager();
 
-        $context = $this->getContextFromRequest($request);
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
         $menu = $this->getMenu($menuName, $context);
         $manager->hideMenuItem($menu, $key, $scope);
@@ -185,7 +183,8 @@ abstract class AbstractAjaxMenuController extends Controller
      */
     public function moveAction(Request $request, $menuName)
     {
-        $this->checkAcl();
+        $context = $this->getContextFromRequest($request);
+        $this->checkAcl($context);
         $manager = $this->getMenuUpdateManager();
 
         $key = $request->get('key');
@@ -195,7 +194,6 @@ abstract class AbstractAjaxMenuController extends Controller
         /** @var EntityManager $entityManager */
         $entityManager = $this->getDoctrine()->getManagerForClass($manager->getEntityClass());
 
-        $context = $this->getContextFromRequest($request);
         $scope = $this->findOrCreateScope($context, $manager->getScopeType());
         $menu = $this->getMenu($menuName, $context);
         $updates = $manager->moveMenuItem(
@@ -291,9 +289,9 @@ abstract class AbstractAjaxMenuController extends Controller
     }
 
     /**
-     * @throws AccessDeniedException
+     * @param array $context
      */
-    protected function checkAcl()
+    protected function checkAcl(array $context)
     {
         if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
             throw $this->createAccessDeniedException();

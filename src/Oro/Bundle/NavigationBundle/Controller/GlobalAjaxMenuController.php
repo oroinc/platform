@@ -14,12 +14,12 @@ class GlobalAjaxMenuController extends AbstractAjaxMenuController
     /**
      * {@inheritDoc}
      */
-    protected function checkAcl()
+    protected function checkAcl(array $context)
     {
         if (!$this->get('oro_security.security_facade')->isGranted('oro_config_system')) {
             throw $this->createAccessDeniedException();
         }
-        parent::checkAcl();
+        parent::checkAcl($context);
     }
 
     /**
