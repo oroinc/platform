@@ -248,7 +248,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         $rootNode
             ->children()
                 ->arrayNode(self::NODE_VARIABLES)
-                    ->requiresAtLeastOneElement()
                     ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->children()

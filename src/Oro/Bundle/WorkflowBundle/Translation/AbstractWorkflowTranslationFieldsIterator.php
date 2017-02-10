@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTe
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableLabelTemplate;
 
 abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationFieldsIteratorInterface
 {
@@ -72,6 +73,29 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
                 unset($attrValue, $context['transition_name']);
             }
             unset($transition);
+        }
+    }
+
+    /**
+     * @param array $configuration
+     * @param \ArrayObject $context
+     * @return \Generator
+     * @throws \InvalidArgumentException
+     */
+    protected function &variableFields(array &$configuration, \ArrayObject $context)
+    {
+        if ($this->hasArrayNode(WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS, $configuration)) {
+            $definitions = &$configuration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+
+            if ($this->hasArrayNode(WorkflowConfiguration::NODE_VARIABLES, $definitions)) {
+                foreach ($definitions[WorkflowConfiguration::NODE_VARIABLES] as $variableKey => &$rawVariable) {
+                    $context['variable_name'] = $this->resolveName($rawVariable, $variableKey);
+                    yield $this->makeKey(WorkflowVariableLabelTemplate::class, $context) => $rawVariable['label'];
+
+                    unset($context['variable_name']);
+                }
+                unset($rawVariable);
+            }
         }
     }
 
