@@ -431,12 +431,12 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider featureStrategyDataProvider
      *
      * @param int $strategy
-     * @param $featureStrategy
+     * @param int $featureStrategy
      * @param array $voters
      * @param bool $allowIfAllAbstainDecisions
      * @param bool $allowIfEqualGrantedDeniedDecisions
-     * @param $featureAllowIfAllAbstainDecisions
-     * @param $featureAllowIfEqualGrantedDeniedDecisions
+     * @param bool $featureAllowIfAllAbstainDecisions
+     * @param bool $featureAllowIfEqualGrantedDeniedDecisions
      * @param bool $expected
      */
     public function testFeatureStrategies(
