@@ -100,7 +100,6 @@ class BuilderChainProvider implements MenuProviderInterface
     public function get($alias, array $options = [])
     {
         $this->assertAlias($alias);
-// todo do check do we really need ignore cache option
         $ignoreCache = array_key_exists(self::IGNORE_CACHE_OPTION, $options);
 
         if (!array_key_exists($alias, $this->menus)) {
