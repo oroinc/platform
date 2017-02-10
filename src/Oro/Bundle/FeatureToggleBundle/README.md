@@ -217,7 +217,7 @@ Feature state checking
 ----------------------
 
 Feature state is checked by feature voters. All voters are called each time you use the `isFeatureEnabled()` or `isResourceEnabled()` method on feature checker.
-Feature checker makes the decision based on configured strategy defined in system configuration, which can be: affirmative, consensus or unanimous.
+Feature checker makes the decision based on configured strategy defined in system configuration or per feature, which can be: affirmative, consensus or unanimous.
 
 By default `ConfigVoter` is registered to check features availability.
 It checks feature state based on value of toggle option, defined in features.yml configuration.
@@ -298,4 +298,13 @@ oro_featuretoggle:
     strategy: affirmative
     allow_if_all_abstain: true
     allow_if_equal_granted_denied: false
+```
+or in feature definition
+```yml
+features:
+    acme:
+        label: acme.feature.label
+        strategy: affirmative
+        allow_if_all_abstain: true
+        allow_if_equal_granted_denied: false
 ```

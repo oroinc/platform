@@ -59,9 +59,16 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
         $allowIfEqualGrantedDeniedDecisions,
         $expected
     ) {
+        /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $configurationProvider */
+        $configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $configurationProvider->expects($this->any())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([]);
+
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$configurationProvider])
+            ->setMethods(['getFeatureDependencies'])
             ->getMock();
 
         $configManager->expects($this->any())
@@ -98,9 +105,16 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
         $allowIfEqualGrantedDeniedDecisions,
         $expected
     ) {
+        /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $configurationProvider */
+        $configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $configurationProvider->expects($this->any())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([]);
+
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$configurationProvider])
+            ->setMethods(['getFeatureDependencies', 'getFeaturesByResource'])
             ->getMock();
 
         $configManager->expects($this->once())
@@ -165,9 +179,16 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testResetCache()
     {
+        /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $configurationProvider */
+        $configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $configurationProvider->expects($this->any())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([]);
+
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$configurationProvider])
+            ->setMethods(null)
             ->getMock();
 
         $checker = new FeatureChecker($configManager);
@@ -223,9 +244,16 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsFeatureEnabledWithDependencies(array $featuredEnabled, $expected)
     {
+        /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $configurationProvider */
+        $configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $configurationProvider->expects($this->any())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([]);
+
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$configurationProvider])
+            ->setMethods(['getFeatureDependencies'])
             ->getMock();
 
         $configManager->expects($this->any())
@@ -259,9 +287,16 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
     {
         $scopeIdentifier = new \stdClass();
 
+        /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $configurationProvider */
+        $configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $configurationProvider->expects($this->any())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([]);
+
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$configurationProvider])
+            ->setMethods(['getFeatureDependencies', 'getFeaturesByResource'])
             ->getMock();
 
         $configManager->expects($this->any())
@@ -307,9 +342,16 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDisabledResourcesByType($resourceType, array $resources, Voter $voter, $expectedResources)
     {
+        /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject $configurationProvider */
+        $configurationProvider = $this->createMock(ConfigurationProvider::class);
+        $configurationProvider->expects($this->any())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([]);
+
         /** @var ConfigurationManager|\PHPUnit_Framework_MockObject_MockObject $configManager */
         $configManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$configurationProvider])
+            ->setMethods(['getFeatureDependencies', 'getResourcesByType'])
             ->getMock();
 
         $configManager->expects($this->any())
