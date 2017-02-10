@@ -171,24 +171,24 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                     . '", "' . FeatureChecker::STRATEGY_CONSENSUS. '" or "'
                     . FeatureChecker::STRATEGY_UNANIMOUS. '.'
             ],
-            'incorrect allowIfAllAbstainDecisions' => [
+            'incorrect allow_if_all_abstain' => [
                 'input' => [
                     'feature1' => [
                         'label' => 'Feature 1 Label',
-                        'allowIfAllAbstainDecisions' => 'not_bool'
+                        'allow_if_all_abstain' => 'not_bool'
                     ]
                 ],
-                'message' => 'Invalid type for path "features.feature1.allowIfAllAbstainDecisions". ' .
+                'message' => 'Invalid type for path "features.feature1.allow_if_all_abstain". ' .
                              'Expected boolean, but got string'
             ],
-            'incorrect allowIfEqualGrantedDeniedDecisions' => [
+            'incorrect allow_if_equal_granted_denied' => [
                 'input' => [
                     'feature1' => [
                         'label' => 'Feature 1 Label',
-                        'allowIfEqualGrantedDeniedDecisions' => 'not_bool'
+                        'allow_if_equal_granted_denied' => 'not_bool'
                     ]
                 ],
-                'message' => 'Invalid type for path "features.feature1.allowIfEqualGrantedDeniedDecisions". ' .
+                'message' => 'Invalid type for path "features.feature1.allow_if_equal_granted_denied". ' .
                              'Expected boolean, but got string'
             ],
         ];
