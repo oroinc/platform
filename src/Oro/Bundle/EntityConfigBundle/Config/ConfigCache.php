@@ -15,11 +15,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
  */
 class ConfigCache
 {
-    const FLAG_KEY = 0;
-    const FIELDS_KEY = 1;
-    const VALUES_KEY = 0;
-    const FIELD_TYPE_KEY = 1;
-
     const ENTITY_CLASSES_KEY = '_entities';
     const FIELD_NAMES_KEY = '_fields_';
 
@@ -36,7 +31,10 @@ class ConfigCache
     private $localCache = [];
 
     /** @var array */
-    private $localModelCache = [];
+    private $localEntityCache = [];
+
+    /** @var array */
+    private $localFieldCache = [];
 
     /**
      * @param CacheProvider $cache
@@ -299,7 +297,7 @@ class ConfigCache
 
         return $this->cache->save(
             $className . '.' . $fieldName,
-            [self::VALUES_KEY => $values, self::FIELD_TYPE_KEY => $fieldType]
+            [$values, $fieldType]
         );
     }
 
@@ -343,27 +341,18 @@ class ConfigCache
      */
     public function getConfigurable($className, $fieldName = null)
     {
-        /** @var array $cacheEntry */
-        if (isset($this->localModelCache[$className])) {
-            $cacheEntry = $this->localModelCache[$className];
-        } else {
-            $cacheEntry = $this->modelCache->fetch($className);
-            if (false === $cacheEntry) {
-                $cacheEntry = [];
-            }
-            // put to a local cache
-            $this->localModelCache[$className] = $cacheEntry;
-        }
+        $this->ensureModelCacheLoaded($className);
 
         if ($fieldName) {
-            if (isset($cacheEntry[self::FIELDS_KEY][$fieldName])) {
-                return $cacheEntry[self::FIELDS_KEY][$fieldName];
+            $fields = $this->localFieldCache[$className];
+            if (array_key_exists($fieldName, $fields)) {
+                return $fields[$fieldName];
             }
-        } elseif (isset($cacheEntry[self::FLAG_KEY])) {
-            return $cacheEntry[self::FLAG_KEY];
+
+            return null;
         }
 
-        return null;
+        return $this->localEntityCache[$className];
     }
 
     /**
@@ -378,50 +367,42 @@ class ConfigCache
      */
     public function saveConfigurable($flag, $className, $fieldName = null, $localCacheOnly = false)
     {
-        /** @var array $cacheEntry */
-        if (isset($this->localModelCache[$className])) {
-            $cacheEntry = $this->localModelCache[$className];
-        } else {
-            $cacheEntry = $this->modelCache->fetch($className);
-            if (false === $cacheEntry) {
-                $cacheEntry = [];
-            }
-        }
+        $this->ensureModelCacheLoaded($className);
 
         if ($fieldName) {
-            $cacheEntry[self::FIELDS_KEY][$fieldName] = $flag;
+            $this->localFieldCache[$className][$fieldName] = $flag;
         } else {
-            $cacheEntry[self::FLAG_KEY] = $flag;
+            $this->localEntityCache[$className] = $flag;
         }
 
-        $this->localModelCache[$className] = $cacheEntry;
+        if ($localCacheOnly) {
+            return true;
+        }
 
-        return $localCacheOnly
-            ? true
-            : $this->modelCache->save($className, $cacheEntry);
+        return $this->saveModelCache(
+            $className,
+            $this->localEntityCache[$className],
+            $this->localFieldCache[$className]
+        );
     }
 
     /**
      * Sets flags for entity and all its fields indicates whether they are configurable or not.
      * Be careful using this method because it completely replaces existing flags
      *
-     * @param string      $className
-     * @param bool        $classFlag  TRUE if an entity is configurable; otherwise, FALSE
-     * @param string|null $fieldFlags [field_name => flag, ...]
-     *                                flag = TRUE if a field is configurable; otherwise, FALSE
+     * @param string $className
+     * @param bool   $classFlag  TRUE if an entity is configurable; otherwise, FALSE
+     * @param array  $fieldFlags [field_name => flag, ...]
+     *                           flag = TRUE if a field is configurable; otherwise, FALSE
      *
      * @return boolean TRUE if the entry was successfully stored in the cache; otherwise, FALSE.
      */
     public function saveConfigurableValues($className, $classFlag, $fieldFlags)
     {
-        $cacheEntry = [
-            self::FLAG_KEY   => $classFlag,
-            self::FIELDS_KEY => $fieldFlags
-        ];
+        $this->localEntityCache[$className] = $classFlag;
+        $this->localFieldCache[$className] = $fieldFlags;
 
-        $this->localModelCache[$className] = $cacheEntry;
-
-        return $this->modelCache->save($className, $cacheEntry);
+        return $this->saveModelCache($className, $classFlag, $fieldFlags);
     }
 
     /**
@@ -433,7 +414,8 @@ class ConfigCache
      */
     public function deleteAllConfigurable($localCacheOnly = false)
     {
-        $this->localModelCache = [];
+        $this->localEntityCache = [];
+        $this->localFieldCache = [];
 
         return $localCacheOnly
             ? true
@@ -447,7 +429,8 @@ class ConfigCache
      */
     public function flushAllConfigurable()
     {
-        $this->localModelCache = [];
+        $this->localEntityCache = [];
+        $this->localFieldCache = [];
 
         return $this->modelCache->flushAll();
     }
@@ -552,8 +535,8 @@ class ConfigCache
             $cacheEntry = [];
         } elseif (!empty($cacheEntry)) {
             $unpacked  = [];
-            $fieldType = $cacheEntry[self::FIELD_TYPE_KEY];
-            foreach ($cacheEntry[self::VALUES_KEY] as $scope => $values) {
+            $fieldType = $cacheEntry[1];
+            foreach ($cacheEntry[0] as $scope => $values) {
                 $unpacked[$scope] = new Config(
                     new FieldConfigId($scope, $className, $fieldName, $fieldType),
                     $values
@@ -586,9 +569,49 @@ class ConfigCache
             $packed[$scope] = $config->getValues();
         }
         if ($fieldType) {
-            $packed = [self::VALUES_KEY => $packed, self::FIELD_TYPE_KEY => $fieldType];
+            $packed = [$packed, $fieldType];
         }
 
         return $this->cache->save($cacheKey, $packed);
+    }
+
+    /**
+     * @param string $className
+     */
+    private function ensureModelCacheLoaded($className)
+    {
+        if (!array_key_exists($className, $this->localEntityCache)) {
+            $cacheEntry = $this->modelCache->fetch($className);
+            // put to a local cache
+            if (empty($cacheEntry)) {
+                $this->localEntityCache[$className] = null;
+                $this->localFieldCache[$className] = [];
+            } else {
+                $this->localEntityCache[$className] = $cacheEntry[0];
+                $this->localFieldCache[$className] = isset($cacheEntry[1])
+                    ? $cacheEntry[1]
+                    : [];
+            }
+        }
+    }
+
+    /**
+     * @param string    $className
+     * @param bool|null $classFlag
+     * @param array     $fieldFlags
+     *
+     * @return bool
+     */
+    private function saveModelCache($className, $classFlag, $fieldFlags)
+    {
+        if (empty($fieldFlags)) {
+            $cacheEntry = null !== $classFlag
+                ? [$classFlag]
+                : [];
+        } else {
+            $cacheEntry = [$classFlag, $fieldFlags];
+        }
+
+        return $this->modelCache->save($className, $cacheEntry);
     }
 }
