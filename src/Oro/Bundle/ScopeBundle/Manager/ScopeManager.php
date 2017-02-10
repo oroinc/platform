@@ -77,8 +77,8 @@ class ScopeManager
     }
 
     /**
-     * @param      $scopeType
-     * @param null $context
+     * @param string            $scopeType
+     * @param array|object|null $context
      * @return Scope
      */
     public function findMostSuitable($scopeType, $context = null)
@@ -89,8 +89,8 @@ class ScopeManager
     }
 
     /**
-     * @param      $scopeType
-     * @param null $context
+     * @param string            $scopeType
+     * @param array|object|null $context
      * @return BufferedQueryResultIterator|\Oro\Bundle\ScopeBundle\Entity\Scope[]
      */
     public function findBy($scopeType, $context = null)
@@ -109,7 +109,7 @@ class ScopeManager
     }
 
     /**
-     * @param                   $scopeType
+     * @param string            $scopeType
      * @param array|object|null $context
      * @return BufferedQueryResultIterator|Scope[]
      */
@@ -121,8 +121,8 @@ class ScopeManager
     }
 
     /**
-     * @param      $scopeType
-     * @param null $context
+     * @param string            $scopeType
+     * @param array|object|null $context
      * @return array
      */
     public function findRelatedScopeIds($scopeType, $context = null)
@@ -133,8 +133,8 @@ class ScopeManager
     }
 
     /**
-     * @param string     $scopeType
-     * @param array|null $context
+     * @param string            $scopeType
+     * @param array|object|null $context
      *
      * @return array
      */
@@ -146,9 +146,9 @@ class ScopeManager
     }
 
     /**
-     * @param string       $scopeType
-     * @param array|object $context
-     * @param bool         $flush
+     * @param string            $scopeType
+     * @param array|object|null $context
+     * @param bool              $flush
      * @return Scope
      */
     public function findOrCreate($scopeType, $context = null, $flush = true)
@@ -232,8 +232,8 @@ class ScopeManager
     }
 
     /**
-     * @param string $scopeType
-     * @param array  $context
+     * @param string            $scopeType
+     * @param array|object|null $context
      * @return ScopeCriteria
      */
     public function getCriteria($scopeType, $context = null)
@@ -242,7 +242,6 @@ class ScopeManager
         if (self::BASE_SCOPE === $scopeType && is_array($context)) {
             $criteria = $context;
         } else {
-            /** @var ScopeCriteriaProviderInterface[] $providers */
             $providers = $this->getProviders($scopeType);
             foreach ($providers as $provider) {
                 if (null === $context) {
@@ -289,7 +288,7 @@ class ScopeManager
     }
 
     /**
-     * @param $scopeType
+     * @param string $scopeType
      * @return ScopeCriteriaProviderInterface[]
      */
     protected function getProviders($scopeType)
@@ -315,8 +314,8 @@ class ScopeManager
     }
 
     /**
-     * @param $scopeType
-     * @param $context
+     * @param string            $scopeType
+     * @param array|object|null $context
      * @return ScopeCriteria
      */
     public function getCriteriaForRelatedScopes($scopeType, $context)

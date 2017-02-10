@@ -4,12 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
@@ -20,14 +20,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 
 abstract class AbstractMenuController extends Controller
 {
-    /**
-     * @return mixed
-     */
-    protected function getFormTypeClass()
-    {
-        return MenuUpdateType::class;
-    }
-
     /**
      * @throws AccessDeniedException
      */
@@ -160,7 +152,7 @@ abstract class AbstractMenuController extends Controller
             $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
         }
 
-        $form = $this->createForm($this->getFormTypeClass(), $menuUpdate, ['menu_item' => $menuItem]);
+        $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
 
         $response = $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,

@@ -482,4 +482,4 @@ services:
     oro_navigation.event_listener.scope_grid_listener:
         class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBuild }

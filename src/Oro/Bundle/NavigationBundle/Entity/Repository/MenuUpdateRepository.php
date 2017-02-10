@@ -66,9 +66,9 @@ class MenuUpdateRepository extends EntityRepository
                 'scope' => $scope
             ])
             ->getQuery()
-//            ->useResultCache(true)
-//            ->setResultCacheDriver($this->getQueryResultCache())
-//            ->setResultCacheId(MenuUpdateUtils::generateKey($menuName, $scope))
+            ->useResultCache(true)
+            ->setResultCacheDriver($this->getQueryResultCache())
+            ->setResultCacheId(MenuUpdateUtils::generateKey($menuName, $scope))
             ->getResult();
     }
 
