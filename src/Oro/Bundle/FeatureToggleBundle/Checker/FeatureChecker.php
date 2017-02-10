@@ -219,7 +219,7 @@ class FeatureChecker
             return false;
         }
 
-        return $this->configManager->get($feature, 'allowIfAllAbstainDecisions', $this->allowIfAllAbstainDecisions);
+        return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
 
     /**
@@ -258,12 +258,12 @@ class FeatureChecker
         if ($enabled > 0) {
             return $this->configManager->get(
                 $feature,
-                'allowIfEqualGrantedDeniedDecisions',
+                'allow_if_equal_granted_denied',
                 $this->allowIfEqualGrantedDeniedDecisions
             );
         }
 
-        return $this->configManager->get($feature, 'allowIfAllAbstainDecisions', $this->allowIfAllAbstainDecisions);
+        return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
     
     /**
@@ -295,7 +295,7 @@ class FeatureChecker
             return true;
         }
 
-        return $this->configManager->get($feature, 'allowIfAllAbstainDecisions', $this->allowIfAllAbstainDecisions);
+        return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
 
     /**

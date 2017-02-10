@@ -98,9 +98,9 @@ class FeatureToggleConfiguration implements ConfigurationInterface
                     )
                 ->end()
             ->end()
-            ->booleanNode('allowIfAllAbstainDecisions')
+            ->booleanNode('allow_if_all_abstain')
             ->end()
-            ->booleanNode('allowIfEqualGrantedDeniedDecisions')
+            ->booleanNode('allow_if_equal_granted_denied')
             ->end();
     }
 

@@ -57,8 +57,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'entities' => [],
                 'field_configs' => [],
                 'strategy' => 'affirmative',
-                'allowIfAllAbstainDecisions' => true,
-                'allowIfEqualGrantedDeniedDecisions' => true
+                'allow_if_all_abstain' => true,
+                'allow_if_equal_granted_denied' => true
             ],
         ];
 
@@ -72,8 +72,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'entities' => [],
                 'field_configs' => [],
                 'strategy' => 'affirmative',
-                'allowIfAllAbstainDecisions' => true,
-                'allowIfEqualGrantedDeniedDecisions' => true
+                'allow_if_all_abstain' => true,
+                'allow_if_equal_granted_denied' => true
             ]
         ];
 

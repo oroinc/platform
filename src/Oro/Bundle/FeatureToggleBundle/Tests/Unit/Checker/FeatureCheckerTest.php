@@ -464,10 +464,10 @@ class FeatureCheckerTest extends \PHPUnit_Framework_TestCase
                         $result['feature1']['strategy'] = $featureStrategy;
                     }
                     if ($featureAllowIfAllAbstainDecisions) {
-                        $result['feature1']['allowIfAllAbstainDecisions'] = $featureAllowIfAllAbstainDecisions;
+                        $result['feature1']['allow_if_all_abstain'] = $featureAllowIfAllAbstainDecisions;
                     }
                     if ($featureAllowIfEqualGrantedDeniedDecisions) {
-                        $result['feature1']['allowIfEqualGrantedDeniedDecisions'] =
+                        $result['feature1']['allow_if_equal_granted_denied'] =
                             $featureAllowIfEqualGrantedDeniedDecisions;
                     }
 
