@@ -96,7 +96,7 @@ class EntityRelationGridListener
                     );
                 $whenExpr = sprintf(
                     '(e.%s IS NOT NULL OR o.%s IN (:data_in)) AND o.%s NOT IN (:data_not_in)',
-                    $extendEntityConfig->get('pk_columns')[0],
+                    $extendEntityConfig->get('pk_columns', false, ['id'])[0],
                     $targetIdField,
                     $targetIdField
                 );
