@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -62,7 +63,14 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
             $buttonSearchContext->getEntityId()
         );
 
-        return $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
+        try {
+            $isAvailable = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
+        } catch (\Exception $e) {
+            $isAvailable = false;
+            $this->addError($button, $e, $errors);
+        }
+
+        return $isAvailable;
     }
 
     /**
@@ -81,5 +89,13 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
         }
 
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getApplication()
+    {
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
     }
 }
