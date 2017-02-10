@@ -87,14 +87,14 @@ class FeatureToggleConfiguration implements ConfigurationInterface
                         [
                             FeatureChecker::STRATEGY_AFFIRMATIVE,
                             FeatureChecker::STRATEGY_CONSENSUS,
-                            FeatureChecker::STRATEGY_CONSENSUS
+                            FeatureChecker::STRATEGY_UNANIMOUS
                         ]
                     )
                     ->thenInvalid(
                         'The "strategy" can be "'
                         . FeatureChecker::STRATEGY_AFFIRMATIVE
                         . '", "' . FeatureChecker::STRATEGY_CONSENSUS. '" or "'
-                        . FeatureChecker::STRATEGY_CONSENSUS. '.'
+                        . FeatureChecker::STRATEGY_UNANIMOUS. '.'
                     )
                 ->end()
             ->end()
