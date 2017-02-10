@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
-/**
- * @dbIsolation
- */
 class WidgetControllerTest extends WebTestCase
 {
     const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';

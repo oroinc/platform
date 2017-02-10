@@ -162,9 +162,7 @@ class Grid extends Element
             $link = $row->find('named', ['link', $action]);
         }
 
-        if (!$link) {
-            throw new ElementNotFoundException($this->getDriver(), 'link', 'id|title|alt|text', $action);
-        }
+        self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $row->getText(), $action));
 
         return $link;
     }

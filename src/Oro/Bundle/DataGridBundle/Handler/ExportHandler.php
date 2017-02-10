@@ -13,17 +13,17 @@ use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\Context;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 
 class ExportHandler implements StepExecutionWarningHandlerInterface
 {
     /**
-     * @var FileSystemOperator
+     * @var FileManager
      */
-    protected $fileSystemOperator;
+    protected $fileManager;
 
     /**
      * @var RouterInterface
@@ -46,11 +46,11 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
     protected $exportFailed = false;
 
     /**
-     * @param FileSystemOperator $fileSystemOperator
+     * @param FileManager $fileManager
      */
-    public function __construct(FileSystemOperator $fileSystemOperator)
+    public function __construct(FileManager $fileManager)
     {
-        $this->fileSystemOperator = $fileSystemOperator;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -100,9 +100,8 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
             throw new InvalidArgumentException('Parameter "gridName" must be provided.');
         }
 
-        $filePath = $this
-            ->fileSystemOperator
-            ->generateTemporaryFileName(sprintf('datagrid_%s', $contextParameters['gridName']), $format);
+        $fileName = FileManager::generateFileName(sprintf('datagrid_%s', $contextParameters['gridName']), $format);
+        $filePath = FileManager::generateTmpFilePath($fileName);
 
         $contextParameters['filePath'] = $filePath;
 
@@ -122,10 +121,13 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         $executor->execute($this);
 
         $url = null;
+        $this->fileManager->writeFileToStorage($filePath, $fileName);
+        unlink($filePath);
+
         if (! $this->exportFailed) {
             $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
                 'oro_importexport_export_download',
-                ['fileName' => basename($filePath)]
+                ['fileName' => $fileName]
             );
         }
 

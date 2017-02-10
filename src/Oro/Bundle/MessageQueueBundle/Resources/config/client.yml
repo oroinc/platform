@@ -11,6 +11,7 @@ services:
 
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
+        public: false
         factory: ['@oro_message_queue.client.driver_factory', 'create']
         arguments:
             - '@oro_message_queue.transport.connection'
@@ -33,7 +34,6 @@ services:
 
     oro_message_queue.client.route_message_processor:
         class: 'Oro\Component\MessageQueue\Router\RouteRecipientListProcessor'
-        public: true
         arguments:
             - '@oro_message_queue.client.router'
         tags:
@@ -47,12 +47,12 @@ services:
 
     oro_message_queue.client.meta.topic_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry'
-        public: true
+        public: false
         arguments: [[]]
 
     oro_message_queue.client.meta.destination_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
-        public: true
+        public: false
         arguments: ['@oro_message_queue.client.config', [], 'default']
 
     oro_message_queue.client.delegate_message_processor:
@@ -87,7 +87,6 @@ services:
 
     oro_message_queue.client.consume_messages_command:
         class: 'Oro\Component\MessageQueue\Client\ConsumeMessagesCommand'
-        public: true
         arguments:
             - '@oro_message_queue.client.queue_consumer'
             - '@oro_message_queue.client.delegate_message_processor'
@@ -112,7 +111,6 @@ services:
 
     oro_message_queue.client.create_queues_command:
         class: 'Oro\Component\MessageQueue\Client\CreateQueuesCommand'
-        public: true
         arguments:
             - '@oro_message_queue.client.meta.destination_meta_registry'
             - '@oro_message_queue.client.driver'
