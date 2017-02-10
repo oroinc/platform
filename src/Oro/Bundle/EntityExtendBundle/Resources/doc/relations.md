@@ -1,11 +1,11 @@
-Relations
-======================
+Entity Relationships
+====================
 
 This chapter shows how to create different kind of relationships between entities.
 
 Table of Contents
 -----------------
-- [Relations notice](#relations-notice)
+- [Limitations](#limitations)
 - [Many-To-One, Unidirectional](#many-to-one-unidirectional)
 - [Many-To-One, Bidirectional](#many-to-one-bidirectional)
 - [Many-To-Many, Unidirectional](#many-to-many-unidirectional)
@@ -15,16 +15,15 @@ Table of Contents
 - [One-To-Many, Bidirectional](#one-to-many-bidirectional)
 - [One-To-Many, Bidirectional, Without Default Entity](#one-to-many-bidirectional-without-default-entity)
 
-Relations notice
----------------------------
+Limitations
+-----------
 
-Relations can be created between entities where at least _owning_ side of relation is extendable.
-According to this following relations are possible:
+A new relationship may be created between two entities when at least the entity on the _owning_ side of the relationship (the one that owns the foreign key in the database) is extendable. This rule enables creating a relationship for the following combinations of entities:
 
 |                           | Extendable entity | Non-extendable entity                 |
-| -------------             |:-------------:    | :-----:                               |
-| **Extendable entity**     | all relations     | many-to-many (uni), many-to-one (uni) |
-| **Non-extendable entity** | none              | none                                  |
+| --------------------------|:-----------------:|:-------------------------------------:|
+| **Extendable entity**     | Any relationship (many-to-many, many-to-one, one-to-many), either bidirectional or unidirectional     | Many-to-many and many-to-one relationships, unidirectional only |
+| **Non-extendable entity** | None              | None                                  |
 
 
 Many-To-One, Unidirectional
@@ -299,9 +298,8 @@ class OroSalesBundle implements Migration, ExtendExtensionAwareInterface
 One-To-Many, Bidirectional
 --------------------------
 
-According to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional), 
-one-to-many relations always has to be bidirectional when not using an additional join-table. Our implementation of
-ExtendExtension defines association on the "many" side, so it implicates bidirectional type of relation.
+According to the Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional), 
+the one-to-many relationship has to be implemented as bidirectional unless it uses an additional join-table. Oro implementation of the ExtendExtension defines association on the "many" side, so it implicates a bidirectional type of relationship.
 
 ``` php
 <?php
