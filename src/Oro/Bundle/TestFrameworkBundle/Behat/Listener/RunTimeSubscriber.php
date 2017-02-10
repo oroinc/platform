@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
+use Behat\Behat\EventDispatcher\Event\AfterOutlineTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
 use Behat\Mink\Mink;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class RunTimeSubscriber implements EventSubscriberInterface
+class RunTimeSubscriber implements EventSubscriberInterface, MessageQueueIsolatorAwareInterface
 {
     /**
      * @var Mink
@@ -20,6 +23,11 @@ class RunTimeSubscriber implements EventSubscriberInterface
      * @var KernelInterface
      */
     protected $kernel;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
 
     /**
      * @param Mink $mink
@@ -38,6 +46,7 @@ class RunTimeSubscriber implements EventSubscriberInterface
         return [
 //            BeforeStepTested::BEFORE  => ['beforeStep', 50],
             AfterScenarioTested::AFTER => ['afterScenario', 50],
+            AfterOutlineTested::AFTER => ['afterOutline', 50],
         ];
     }
 
@@ -47,6 +56,7 @@ class RunTimeSubscriber implements EventSubscriberInterface
     public function beforeStep(BeforeStepTested $scope)
     {
         $this->waitForAjaxBeforeStep($scope);
+        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     public function afterScenario(AfterScenarioTested $scope)
@@ -63,6 +73,31 @@ class RunTimeSubscriber implements EventSubscriberInterface
         );
 
         file_put_contents($screenshot, $this->mink->getSession()->getScreenshot());
+    }
+
+    public function afterOutline(AfterOutlineTested $scope)
+    {
+        if ($scope->getTestResult()->isPassed()) {
+            return;
+        }
+
+        $screenshot = sprintf(
+            '%s/%s-%s-%s-line.png',
+            $this->kernel->getLogDir(),
+            $scope->getFeature()->getTitle(),
+            $scope->getOutline()->getTitle(),
+            $scope->getOutline()->getLine()
+        );
+
+        file_put_contents($screenshot, $this->mink->getSession()->getScreenshot());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 
     /**

@@ -32,6 +32,7 @@ services:
             - '@symfony2_extension.kernel'
         tags:
             - { name: event_dispatcher.subscriber, priority: 10 }
+            - { name: 'message_queue_isolator_aware' }
 
     oro_test.listener.step_duration_measure_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\StepDurationMeasureSubscriber'
@@ -111,9 +112,9 @@ services:
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
-            - ~
         tags:
             - { name: 'suite_aware' }
+            - { name: 'message_queue_isolator_aware' }
 
     oro_test.entity_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
