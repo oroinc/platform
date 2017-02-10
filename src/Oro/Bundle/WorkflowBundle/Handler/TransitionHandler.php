@@ -51,17 +51,22 @@ class TransitionHandler
         }
 
         $responseCode = null;
+        $responseMessage = null;
 
         try {
             $this->workflowManager->transit($workflowItem, $transition);
         } catch (WorkflowNotFoundException $e) {
             $responseCode = 404;
+            $responseMessage = $e->getMessage();
         } catch (InvalidTransitionException $e) {
             $responseCode = 400;
+            $responseMessage = $e->getMessage();
         } catch (ForbiddenTransitionException $e) {
             $responseCode = 403;
+            $responseMessage = $e->getMessage();
         } catch (\Exception $e) {
             $responseCode = 500;
+            $responseMessage = $e->getMessage();
         }
 
         if (isset($e)) {
@@ -75,6 +80,6 @@ class TransitionHandler
             );
         }
 
-        return $this->transitionHelper->createCompleteResponse($workflowItem, $responseCode);
+        return $this->transitionHelper->createCompleteResponse($workflowItem, $responseCode, $responseMessage);
     }
 }

@@ -7,6 +7,7 @@ ActionBundle
     - work with `RouteCollection` is performance consuming
     - it was used to check bundle presence, which could be done with `service_exists`
 - Added aware interface `Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareInterface` and trait `ApplicationProviderAwareTrait`
+- Added new action with alias `resolve_destination_page` and class `Oro\Bundle\ActionBundle\Action\ResolveDestinationPage`
 
 ActivityListBundle
 ------------------
@@ -73,6 +74,9 @@ EntityBundle
 - Class `Oro\Bundle\EntityBundle\Twig\EntityFallbackExtension`
     - construction signature was changed now it takes next arguments:
         - `ServiceLink` $fallbackResolverLink
+- Class `Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider`
+    - added third argument for constructor `Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper $configHelper`
+    - added sixth argument for method `public funtion getFields()` `$withRoutes = false`
 
 EntityConfigBundle
 ------------------
@@ -248,7 +252,7 @@ UserBundle
 
 WorkflowBundle
 --------------
-- `Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader`:
+- Class `Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader`:
     - replaced parameter `ServiceLink $emLink` with `ConfigDatabaseChecker $databaseChecker` in the constructor
     - removed property `protected $emLink`
     - removed property `protected $dbCheck`
@@ -267,6 +271,8 @@ WorkflowBundle
     - signature of constructor changed, second argument `WorkflowRegistry $workflowRegistry` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry`
     - signature of constructor changed, added third argument `Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters $definitionFilters`
+- Added third argument `string $responseMessage = null` to method `Oro\Bundle\WorkflowBundle\Handle\Helper\TransitionHelper::createCompleteResponse()`
+- Added third argument `Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver $destinationPageResolver` to constructor of `Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension`
 
 TestFrameworkBundle
 -------------------

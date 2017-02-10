@@ -68,3 +68,14 @@ operations:
             attribute_fields:
                 entity:
                     form_type: form
+        form_init:
+            - '@assign_value': [$.entityFields, []]
+            - '@call_service_method':
+                conditions:
+                    '@not_blank': $.data.relatedEntity
+                parameters:
+                    service: oro_entity.entity_field_list_provider
+                    method: getFields
+                    method_parameters: [false, false, true, false, true, true]
+                    attribute: $.entityFields
+            - '@assign_constant_value': [$.availableDestinations, Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver::AVAILABLE_DESTINATIONS]

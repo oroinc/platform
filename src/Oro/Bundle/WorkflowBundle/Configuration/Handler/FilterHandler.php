@@ -34,6 +34,7 @@ class FilterHandler implements ConfigurationHandlerInterface
         'frontend_options',
         'form_type',
         'display_type',
+        'destination_page',
         'form_options'
     ];
 

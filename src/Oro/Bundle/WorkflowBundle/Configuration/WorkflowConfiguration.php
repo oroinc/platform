@@ -12,6 +12,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
+
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -38,6 +40,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
+
+    const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
+    const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
 
     /**
      * @param array $configs
@@ -242,6 +247,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return NodeDefinition
      */
     protected function getTransitionsNode()
@@ -286,8 +293,17 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultValue(WorkflowTransitionType::NAME)
                     ->end()
                     ->enumNode('display_type')
-                        ->values(array('dialog', 'page'))
+                        ->values([self::TRANSITION_DISPLAY_TYPE_DIALOG, self::TRANSITION_DISPLAY_TYPE_PAGE])
                         ->defaultValue(self::DEFAULT_TRANSITION_DISPLAY_TYPE)
+                    ->end()
+                    ->enumNode('destination_page')
+                        ->defaultValue(DestinationPageResolver::DEFAULT_DESTINATION)
+                        ->values(DestinationPageResolver::AVAILABLE_DESTINATIONS)
+                        ->beforeNormalization()
+                            ->always(function ($value) {
+                                return str_replace('index', 'name', $value);
+                            })
+                        ->end()
                     ->end()
                     ->arrayNode('form_options')
                         ->prototype('variable')
