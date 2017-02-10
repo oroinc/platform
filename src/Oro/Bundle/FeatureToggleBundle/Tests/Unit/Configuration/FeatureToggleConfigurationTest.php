@@ -169,7 +169,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'The "strategy" can be "'
                     . FeatureChecker::STRATEGY_AFFIRMATIVE
                     . '", "' . FeatureChecker::STRATEGY_CONSENSUS. '" or "'
-                    . FeatureChecker::STRATEGY_CONSENSUS. '.'
+                    . FeatureChecker::STRATEGY_UNANIMOUS. '.'
             ],
             'incorrect allowIfAllAbstainDecisions' => [
                 'input' => [
