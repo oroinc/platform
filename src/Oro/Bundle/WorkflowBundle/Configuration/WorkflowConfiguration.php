@@ -250,6 +250,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->arrayNode(self::NODE_VARIABLES)
                     ->useAttributeAsKey('name')
                     ->prototype('array')
+                        ->ignoreExtraKeys()
                         ->children()
                             ->scalarNode('name')
                                 ->cannotBeEmpty()

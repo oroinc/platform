@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTe
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableFormOptionTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableLabelTemplate;
 
 abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationFieldsIteratorInterface
@@ -92,9 +93,32 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
                     $context['variable_name'] = $this->resolveName($rawVariable, $variableKey);
                     yield $this->makeKey(WorkflowVariableLabelTemplate::class, $context) => $rawVariable['label'];
 
-                    unset($context['variable_name']);
+                    $formFields = $this->variableFormFields($rawVariable['options'], $context);
+                    foreach ($formFields as $key => &$formField) {
+                        yield $key => $formField;
+                    }
+
+                    unset($context['variable_name'], $formField);
                 }
                 unset($rawVariable);
+            }
+        }
+    }
+
+    /**
+     * @param array $variableConfig
+     * @param \ArrayObject $context
+     * @return \Generator
+     */
+    private function &variableFormFields(array &$variableConfig, \ArrayObject $context)
+    {
+        if ($this->hasArrayNode('form_options', $variableConfig)) {
+            if ($this->hasArrayNode('tooltip', $variableConfig['form_options'])) {
+                $context['option_name'] = 'tooltip';
+                $key = $this->makeKey(WorkflowVariableFormOptionTemplate::class, $context);
+
+                yield $key => $variableConfig['form_options']['tooltip'];
+                unset($context['option_name']);
             }
         }
     }
