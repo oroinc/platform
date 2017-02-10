@@ -56,8 +56,7 @@ class BigNumberProcessor
         $getter           = $this->getGetter($providerAlias, $getterName);
         $lessIsBetter     = (bool)$lessIsBetter;
         $dateRange        = $lastWeek ? $this->dateHelper->getLastWeekPeriod() : $widgetOptions->get('dateRange');
-        $owners           = $this->ownerHelper->getOwnerIds($widgetOptions);
-        $value            = call_user_func($getter, $dateRange, $owners);
+        $value            = call_user_func($getter, $dateRange, $widgetOptions);
         $previousInterval = $widgetOptions->get('usePreviousInterval', []);
         $previousData     = [];
         $comparable       = $comparable == 'true' ? true : false;
@@ -68,7 +67,7 @@ class BigNumberProcessor
                     $previousInterval = $this->dateHelper->getLastWeekPeriod(-1);
                 }
 
-                $previousData['value']        = call_user_func($getter, $previousInterval, $owners);
+                $previousData['value']        = call_user_func($getter, $previousInterval, $widgetOptions);
                 $previousData['dateRange']    = $previousInterval;
                 $previousData['lessIsBetter'] = $lessIsBetter;
             }
