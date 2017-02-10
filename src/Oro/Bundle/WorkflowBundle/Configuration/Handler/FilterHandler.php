@@ -63,6 +63,7 @@ class FilterHandler implements ConfigurationHandlerInterface
         'entity_attribute',
         'steps_display_ordered',
         'priority',
+        WorkflowDefinition::CONFIG_FORCE_AUTOSTART,
         WorkflowDefinition::CONFIG_SCOPES,
         WorkflowConfiguration::NODE_STEPS,
         WorkflowConfiguration::NODE_ATTRIBUTES,
@@ -70,7 +71,8 @@ class FilterHandler implements ConfigurationHandlerInterface
         WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
         WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
         WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
-        WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS
+        WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
+        WorkflowConfiguration::NODE_APPLICATIONS,
     ];
 
     /**

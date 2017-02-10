@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
+use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -81,6 +83,38 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($config->getSorters());
     }
 
+    public function testActions()
+    {
+        $config = new Config();
+        $this->assertFalse($config->hasActions());
+        $this->assertNull($config->getActions());
+
+        $actions = new ActionsConfig();
+        $config->setActions($actions);
+        $this->assertTrue($config->hasActions());
+        $this->assertSame($actions, $config->getActions());
+
+        $config->setActions();
+        $this->assertFalse($config->hasActions());
+        $this->assertNull($config->getActions());
+    }
+
+    public function testSubresources()
+    {
+        $config = new Config();
+        $this->assertFalse($config->hasSubresources());
+        $this->assertNull($config->getSubresources());
+
+        $subresources = new SubresourcesConfig();
+        $config->setSubresources($subresources);
+        $this->assertTrue($config->hasSubresources());
+        $this->assertSame($subresources, $config->getSubresources());
+
+        $config->setSubresources();
+        $this->assertFalse($config->hasSubresources());
+        $this->assertNull($config->getSubresources());
+    }
+
     public function testToArrayAndGetIterator()
     {
         $config = new Config();
@@ -124,5 +158,40 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             ],
             iterator_to_array($config->getIterator())
         );
+    }
+
+    public function testClone()
+    {
+        $config = new Config();
+        $config->set('key', 'val');
+        $definition = new EntityDefinitionConfig();
+        $definition->setExcludeAll();
+        $config->setDefinition($definition);
+        $filters = new FiltersConfig();
+        $filters->setExcludeAll();
+        $config->setFilters($filters);
+        $sorters = new SortersConfig();
+        $sorters->setExcludeAll();
+        $config->setSorters($sorters);
+        $actions = new ActionsConfig();
+        $actions->addAction('test');
+        $config->setActions($actions);
+        $subresources = new SubresourcesConfig();
+        $subresources->addSubresource('test');
+        $config->setSubresources($subresources);
+
+        $configClone = clone $config;
+        self::assertNotSame($config, $configClone);
+        self::assertEquals($config, $configClone);
+        self::assertNotSame($config->getDefinition(), $configClone->getDefinition());
+        self::assertEquals($config->getDefinition(), $configClone->getDefinition());
+        self::assertNotSame($config->getFilters(), $configClone->getFilters());
+        self::assertEquals($config->getFilters(), $configClone->getFilters());
+        self::assertNotSame($config->getSorters(), $configClone->getSorters());
+        self::assertEquals($config->getSorters(), $configClone->getSorters());
+        self::assertNotSame($config->getActions(), $configClone->getActions());
+        self::assertEquals($config->getActions(), $configClone->getActions());
+        self::assertNotSame($config->getSubresources(), $configClone->getSubresources());
+        self::assertEquals($config->getSubresources(), $configClone->getSubresources());
     }
 }

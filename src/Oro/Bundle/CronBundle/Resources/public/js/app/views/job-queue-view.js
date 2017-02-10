@@ -5,7 +5,6 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
 
     JobQueueView = BaseView.extend({
@@ -56,9 +55,7 @@ define(function(require) {
             $loader.show();
 
             $.getJSON($link.attr('href'), _.bind(function(data) {
-                if (data.error) {
-                    mediator.execute('showErrorMessage', data.message, data);
-                } else {
+                if (!data.error) {
                     $link.closest('div')
                             .find('span:first')
                                 .toggleClass('label-success label-important')

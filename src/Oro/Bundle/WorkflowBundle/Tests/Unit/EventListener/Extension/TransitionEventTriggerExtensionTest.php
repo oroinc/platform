@@ -88,13 +88,18 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
 
         $this->helper->expects($this->exactly(count($triggers)))
             ->method('isRequirePass')
-            ->willReturnMap(
-                array_map(
-                    function (EventTriggerInterface $trigger) use ($entity) {
-                        return [$trigger, $entity, true];
-                    },
-                    $triggers
-                )
+            ->willReturnCallback(
+                function ($trigger, $mainEntity, $prevEntity) use ($entity, $changeSet, $triggers) {
+                    $expectedPrevEntity = $changeSet ?
+                        $this->getMainEntity(self::ENTITY_ID, [self::FIELD => $changeSet[self::FIELD]['old']]) :
+                        clone $entity;
+
+                    $this->assertEquals($expectedPrevEntity, $prevEntity);
+                    $this->assertSame($entity, $mainEntity);
+                    $this->assertTrue(in_array($trigger, $triggers));
+
+                    return true;
+                }
             );
 
         $this->callPreFunctionByEventName($event, $entity, $changeSet);

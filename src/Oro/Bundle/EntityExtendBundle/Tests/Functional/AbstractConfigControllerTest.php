@@ -8,9 +8,6 @@ use Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 abstract class AbstractConfigControllerTest extends WebTestCase
 {
     /**
@@ -33,7 +30,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
         // Internal Server Error: A model for "Extend\Entity\testExtendedEntity" was not found.
         /** @var EntityCacheWarmer $entityCacheWarmup */
         $entityCacheWarmup = $this->getContainer()->get('oro_entity_extend.entity.cache.warmer');
-        $cacheDir = $this->getClient()->getKernel()->getCacheDir();
+        $cacheDir = $this->client->getKernel()->getCacheDir();
         self::$warmupCache = function () use ($entityCacheWarmup, $cacheDir) {
             $entityCacheWarmup->warmUp($cacheDir);
         };

@@ -525,3 +525,11 @@ services:
         decoration_inner_name: cache_warmer.inner
         arguments:
             - '@cache_warmer.inner'
+            - '@oro_entity.database_checker.state_manager'
+
+    oro_entity_extend.console_command_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\ConsoleCommandListener
+        arguments:
+            - '@oro_entity.database_checker.state_manager'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }

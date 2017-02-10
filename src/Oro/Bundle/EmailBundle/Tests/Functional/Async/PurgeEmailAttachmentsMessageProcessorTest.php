@@ -10,9 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
-/**
- * @dbIsolation
- */
 class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
