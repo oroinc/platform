@@ -129,6 +129,11 @@ class LocalizedValueExtension extends AbstractExtension
                 $joinType
             );
 
+            // in case of left join , use only default localization
+            if ($shouldAllowEmpty) {
+                $queryBuilder->andWhere(sprintf('%s.id IS NOT NULL', Inflector::pluralize($name)));
+            }
+
             if ($queryBuilder->getDQLPart('groupBy')) {
                 $queryBuilder->addGroupBy($name);
             }

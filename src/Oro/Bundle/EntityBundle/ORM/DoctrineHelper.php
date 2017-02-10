@@ -262,7 +262,7 @@ class DoctrineHelper
      */
     public function isManageableEntityClass($entityClass)
     {
-        return null !== $this->getEntityManagerForClass($entityClass, false);
+        return null !== $this->registry->getManagerForClass($entityClass);
     }
 
     /**

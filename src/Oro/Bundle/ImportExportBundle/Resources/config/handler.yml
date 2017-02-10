@@ -12,7 +12,6 @@ services:
         arguments:
             - '@oro_importexport.job_executor'
             - '@oro_importexport.processor.registry'
-            - '@oro_importexport.file.file_system_operator'
             - '@oro_entity_config.provider.entity'
             - '@translator'
 
@@ -33,6 +32,7 @@ services:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
             - [setRouter, ['@router']]
             - [setConfigManager, ['@oro_config.global']]
+            - [setFileManager, ['@oro_importexport.file.file_manager']]
         lazy: true
 
     oro_importexport.handler.import.cli:
