@@ -19,6 +19,7 @@ oro:
             organization.label: Organization
             sorters_data.label: Sorters
             type.label: Type
+            discr_type.label: Discriminator Type
             shared_by: %name% (Shared by %owner%)
             columns_data.label: Columns data
             appearance_type.label: Appearance type

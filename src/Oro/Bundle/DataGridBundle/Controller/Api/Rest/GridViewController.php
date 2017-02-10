@@ -10,9 +10,11 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -24,6 +26,8 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 class GridViewController extends RestController
 {
     /**
+     * @param Request $request
+     *
      * @return Response
      * @Post("/gridviews")
      * @ApiDoc(
@@ -37,14 +41,15 @@ class GridViewController extends RestController
      *     permission="CREATE"
      * )
      */
-    public function postAction()
+    public function postAction(Request $request)
     {
-        $this->checkCreatePublicAccess();
+        $this->checkCreatePublicAccess($request);
 
         return $this->handleCreateRequest();
     }
 
     /**
+     * @param Request $request
      * @param int $id
      *
      * @return Response
@@ -63,13 +68,13 @@ class GridViewController extends RestController
      *     permission="EDIT"
      * )
      */
-    public function putAction($id)
+    public function putAction(Request $request, $id)
     {
         $gridView = $this->getManager()->find($id);
         if ($gridView->getType() === GridView::TYPE_PUBLIC) {
             $this->checkEditPublicAccess($gridView);
         } else {
-            $this->checkCreatePublicAccess();
+            $this->checkCreatePublicAccess($request);
         }
 
         return $this->handleUpdateRequest($id);
@@ -98,7 +103,6 @@ class GridViewController extends RestController
     {
         return $this->handleDeleteRequest($id);
     }
-
 
     /**
      * Set/unset grid view as default for current user.
@@ -146,11 +150,11 @@ class GridViewController extends RestController
     }
 
     /**
-     * @param GridView $gridView
+     * @param AbstractGridView $gridView
      *
      * @throws AccessDeniedException
      */
-    protected function checkEditPublicAccess(GridView $gridView)
+    protected function checkEditPublicAccess(AbstractGridView $gridView)
     {
         if ($gridView->getType() !== GridView::TYPE_PUBLIC) {
             return;
@@ -164,11 +168,13 @@ class GridViewController extends RestController
     }
 
     /**
+     * @param Request $request
+     *
      * @throws AccessDeniedException
      */
-    protected function checkCreatePublicAccess()
+    protected function checkCreatePublicAccess(Request $request)
     {
-        if ($this->getRequest()->request->get('type') !== GridView::TYPE_PUBLIC) {
+        if ($request->request->get('type') !== GridView::TYPE_PUBLIC) {
             return;
         }
 

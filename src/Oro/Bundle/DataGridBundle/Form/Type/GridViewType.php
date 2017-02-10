@@ -77,7 +77,7 @@ class GridViewType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class'      => 'Oro\Bundle\DataGridBundle\Entity\GridView',
+            'data_class' => 'Oro\Bundle\DataGridBundle\Entity\AbstractGridView',
             'csrf_protection' => false,
         ]);
     }
