@@ -14,7 +14,7 @@ You _MUST_ disable cache usage if you need to persist, delete or assign returned
 
 LocalizationManager
 ===================
-LocalizationManager provides all necessary methods for accessing localizations.
+LocalizationManager provides all the necessary methods for accessing localizations.
 You can easly access it from the controller:
 
 ```php
@@ -23,9 +23,9 @@ $this->get('oro_locale.manager.localization');
 
 **Oro\Bundle\LocaleBundle\Manager::getLocalization($id\[, $useCache = true\])**
 
-Gets single Localization object.
+Gets a single Localization object.
 
-Example of usage:
+An example of usage:
 
 ```php
 // Will get single Localization object
@@ -37,7 +37,7 @@ $localization = $localizationManager->getLocalization(1);
 
 Gets one or selected Localization objects.
 
-Example of usage:
+An example of usage:
 ```php
 $localizationManager = $this->get('oro_locale.manager.localization');
 
@@ -51,10 +51,10 @@ $localizations = $localizationManager->getLocalizations([1, 3, 5, 7]);
 
 **Oro\Bundle\LocaleBundle\Manager::getDefaultLocalization(\[$useCache = true\])**
 
-Gets default Localization. Default Localization is obtain from system configuration
+Gets the default Localization. Default Localization is obtained from the system configuration
 (see [OroConfigBundle](../../../../ConfigBundle/Resources/doc/system_configuration.md) for more informations).
 
-Example of usage:
+An example of usage:
 ```php
 $localizationManager = $this->get('oro_locale.manager.localization');
 $defaultLocalization = $localizationManager->getDefaultLocalization();
@@ -62,16 +62,16 @@ $defaultLocalization = $localizationManager->getDefaultLocalization();
 
 **Oro\Bundle\LocaleBundle\Manager::clearCache**
 
-Removes Localization objects from cache. Next time user will call getLocalization,
+Removes Localization objects from cache. The next time a user calls getLocalization,
 getLocalizations, getDefaultLocalization or warmUpCache, cache will be recreated.
 
-Example of usage:
+An example of usage:
 ```php
 $localizationManager = $this->get('oro_locale.manager.localization');
 $defaultLocalization = $localizationManager->clearCache();
 ```
 
-_NOTICE:_ Keep in mind, that cache is cleared also when you run
+_NOTICE:_ Keep in mind that cache is also cleared when you run
 
 ```text
 php app/console cache:clear
@@ -79,15 +79,15 @@ php app/console cache:clear
 
 **Oro\Bundle\LocaleBundle\Manager::warmUpCache**
 
-Gets all Localization objects from database and stores them into cache.
+Gets all Localization objects from the database and stores them into cache.
 
-Example of usage:
+An example of usage:
 ```php
 $localizationManager = $this->get('oro_locale.manager.localization');
 $defaultLocalization = $localizationManager->warmUpCache();
 ```
 
-_NOTICE:_ Keep in mind, that cache is warmed up also when you run
+_NOTICE:_ Keep in mind that cache is also warmed up when you run
 
 ```text
 php app/console cache:clear
