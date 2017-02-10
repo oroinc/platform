@@ -23,7 +23,7 @@ abstract class AbstractMenuController extends Controller
     /**
      * @throws AccessDeniedException
      */
-    protected function checkAcl()
+    protected function checkAcl(array $context)
     {
         if (!$this->get('oro_security.security_facade')->isGranted('oro_navigation_manage_menus')) {
             throw $this->createAccessDeniedException();
@@ -60,7 +60,7 @@ abstract class AbstractMenuController extends Controller
      */
     protected function index(array $context = [])
     {
-        $this->checkAcl();
+        $this->checkAcl($context);
 
         return array_merge(
             [
@@ -78,7 +78,7 @@ abstract class AbstractMenuController extends Controller
      */
     protected function view($menuName, array $context = [])
     {
-        $this->checkAcl();
+        $this->checkAcl($context);
         $denormalizedContext = $this->denormalizeContext($context);
         $menu = $this->getMenu($menuName, $denormalizedContext);
 
@@ -100,7 +100,7 @@ abstract class AbstractMenuController extends Controller
      */
     protected function create($menuName, $parentKey, array $context = [])
     {
-        $this->checkAcl();
+        $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
         $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
@@ -124,7 +124,7 @@ abstract class AbstractMenuController extends Controller
      */
     protected function update($menuName, $key, array $context = [])
     {
-        $this->checkAcl();
+        $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
         $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);

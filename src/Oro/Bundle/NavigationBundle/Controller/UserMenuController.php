@@ -44,7 +44,7 @@ class UserMenuController extends AbstractMenuController
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_user_menu_create")
      * @Template("OroNavigationBundle:UserMenu:update.html.twig")
      *
-     * @param string      $menuName
+     * @param string $menuName
      * @param string|null $parentKey
      *
      * @return array|RedirectResponse
@@ -79,11 +79,16 @@ class UserMenuController extends AbstractMenuController
     /**
      * {@inheritDoc}
      */
-    protected function checkAcl()
+    protected function checkAcl(array $context)
     {
-        if (!$this->get('oro_security.security_facade')->isGranted('oro_user_user_update')) {
+        if (!$this->get('oro_security.security_facade')->isGranted(
+            'oro_user_user_update',
+            $context[ScopeUserCriteriaProvider::SCOPE_KEY]
+        )
+        ) {
             throw $this->createAccessDeniedException();
         }
+        parent::checkAcl($context);
     }
 
     /**
