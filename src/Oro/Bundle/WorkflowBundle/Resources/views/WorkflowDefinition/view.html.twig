@@ -83,7 +83,7 @@
         </span>
     {% endif %}
 
-    {% if resource_granted('CONFIGURE', entity) %}
+    {% if resource_granted('CONFIGURE', entity) and hasVariables is defined and hasVariables %}
         {{ UI.button({
             'path' : path('oro_workflow_definition_configure', { 'name': entity.name }),
             'label': 'oro.workflow.workflowdefinition.configuration.label'|trans,

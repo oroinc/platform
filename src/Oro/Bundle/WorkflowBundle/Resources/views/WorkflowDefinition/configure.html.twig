@@ -6,8 +6,8 @@
 {% endblock stats %}
 
 {% block navButtons %}
+    {{ UI.cancelButton(path('oro_workflow_definition_view', {'name': entity.name})) }}
     {{ UI.saveActionButton([path('oro_workflow_definition_configure', {'name': entity.name})]) }}
-    {{ parent() }}
 {% endblock navButtons %}
 
 {% block breadcrumbs %}
@@ -32,21 +32,24 @@
 {% endblock breadcrumbs %}
 
 {% block content_data %}
-    {% set dataBlocks = [{
-        'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
-        'class': 'active',
-        'subblocks': [
-        {
-            'data': [
-                    form_row(form)
-                ]
-            }
-        ]
-    }] %}
+    {% set data = [] %}
+    {% for child in form %}
+        {% if child.children %}
+            {% set data = data|merge([
+                UI.collectionField(child, child.vars.label, 'Add'|trans, {raw: child.vars.tooltip})])
+            %}
+        {% else %}
+            {% set data = data|merge([form_row(child)]) %}
+        {% endif %}
+    {% endfor %}
 
     {% set id = 'workflow-variables' %}
     {% set data = {
-        'dataBlocks': dataBlocks,
+        'dataBlocks': [{
+            'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+            'class': 'active',
+            'subblocks': [{'data': data}]
+        }],
     } %}
     {{ parent() }}
 {% endblock content_data %}

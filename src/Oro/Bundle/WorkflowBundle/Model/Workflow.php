@@ -583,11 +583,13 @@ class Workflow
     }
 
     /**
+     * @param bool $refresh
+     *
      * @return Collection|Variable[]
      */
-    public function getVariables()
+    public function getVariables($refresh = false)
     {
-        if (!$this->variables) {
+        if (!$this->variables || $refresh) {
             $manager = $this->getVariableManager();
             $definition = $this->getDefinition();
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -120,12 +121,14 @@ class WorkflowDefinitionController extends Controller
      */
     public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
+        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
         $form = $this->createForm('oro_workflow_variables', null, [
             'workflow_definition' => $workflowDefinition,
         ]);
-
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
+            $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
+            $workflowVarHandler->updateWorkflowVariableValues($workflowDefinition, $form->getData());
         }
 
         return [
@@ -149,11 +152,14 @@ class WorkflowDefinitionController extends Controller
     {
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
         $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
+        $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
+        $hasVariables = $workflowVarHandler->hasVariables($workflowDefinition);
 
         return [
             'entity' => $workflowDefinition,
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'translateLinks' => $translateLinks,
+            'hasVariables' => $hasVariables,
         ];
     }
 

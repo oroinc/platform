@@ -16,12 +16,12 @@ class VariableGuesser
      * @param string $formType
      * @param array $formOptions
      */
-    public function addFormTypeMapping($attributeType, $formType, array $formOptions = array())
+    public function addFormTypeMapping($attributeType, $formType, array $formOptions = [])
     {
-        $this->formTypeMapping[$attributeType] = array(
+        $this->formTypeMapping[$attributeType] = [
             'type' => $formType,
             'options' => $formOptions,
-        );
+        ];
     }
 
     /**
