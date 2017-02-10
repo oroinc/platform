@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
@@ -14,28 +15,19 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EmailGridListener
 {
-    /**
-     * @var EmailQueryFactory
-     */
+    /** @var EmailQueryFactory */
     protected $factory;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @var GridViewManager
-     */
+    /** @var GridViewManager */
     protected $gridViewManager;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
     /**
@@ -47,8 +39,8 @@ class EmailGridListener
 
     /**
      * @param EmailQueryFactory $factory
-     * @param SecurityFacade $securityFacade
-     * @param GridViewManager $gridViewManager
+     * @param SecurityFacade    $securityFacade
+     * @param GridViewManager   $gridViewManager
      */
     public function __construct(
         EmailQueryFactory $factory,
@@ -93,9 +85,20 @@ class EmailGridListener
         $countQb       = $ormDataSource->getCountQb();
         $parameters    = $event->getDatagrid()->getParameters();
 
-        $this->factory->applyAcl($queryBuilder);
-        if ($countQb) {
-            $this->factory->applyAcl($countQb);
+        $isThreadGroupingEnabled = $this->configManager && $this->configManager->get('oro_email.threads_grouping');
+
+        $this->factory->addEmailsCount($queryBuilder, $isThreadGroupingEnabled);
+
+        if ($isThreadGroupingEnabled) {
+            $this->factory->applyAclThreadsGrouping($queryBuilder);
+            if ($countQb) {
+                $this->factory->applyAclThreadsGrouping($countQb);
+            }
+        } else {
+            $this->factory->applyAcl($queryBuilder);
+            if ($countQb) {
+                $this->factory->applyAcl($countQb);
+            }
         }
 
         if ($parameters->has('emailIds')) {
@@ -104,11 +107,6 @@ class EmailGridListener
                 $emailIds = explode(',', $emailIds);
             }
             $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
-        }
-
-        if ($this->configManager && $this->configManager->get('oro_email.threads_grouping')) {
-            $queryBuilder->andWhere('e.head = :enabled')->setParameter('enabled', true);
-            $countQb->andWhere('e.head = :enabled')->setParameter('enabled', true);
         }
 
         $this->prepareQueryToFilter($parameters, $queryBuilder, $countQb);
@@ -195,9 +193,9 @@ class EmailGridListener
         $groupByParts = $qb->getDQLPart('groupBy');
         $qb->resetDQLPart('groupBy');
         /** @var GroupBy $groupByPart */
-        foreach ($groupByParts as $i => $groupByPart) {
+        foreach ($groupByParts as $groupByPart) {
             $newGroupByPart = [];
-            foreach ($groupByPart->getParts() as $j => $val) {
+            foreach ($groupByPart->getParts() as $val) {
                 if ($val !== $part) {
                     $newGroupByPart[] = $val;
                 }
