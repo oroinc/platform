@@ -31,13 +31,15 @@ define(function(require) {
             translateLinkLabel: null,
             priority: 0,
             exclusive_active_groups: [],
-            exclusive_record_groups: []
+            exclusive_record_groups: [],
+            applications: []
         },
 
         MAX_HISTORY_LENGTH: 50,
 
         observedAttributes: ['steps', 'transitions'],
         entityFieldUtil: null,
+        entityFields: null,
         entityFieldsInitialized: false,
 
         positionIncrementPx: 35,
@@ -159,6 +161,7 @@ define(function(require) {
         setEntityFieldsData: function(fields) {
             this.entityFieldsInitialized = true;
             this.entityFieldUtil = new EntityFieldsUtil(this.get('entity'), fields);
+            this.entityFields = fields[this.get('entity')];
             this.trigger('entityFieldsInitialize');
         },
 
@@ -171,6 +174,14 @@ define(function(require) {
             } else {
                 return null;
             }
+        },
+
+        /**
+         * @param {string} propertyPath
+         * @returns {boolean}
+         */
+        hasEntityField: function(propertyPath) {
+            return typeof this.entityFields.fieldsIndex[propertyPath] !== 'undefined';
         },
 
         getPropertyPathByFieldId: function(fieldId) {

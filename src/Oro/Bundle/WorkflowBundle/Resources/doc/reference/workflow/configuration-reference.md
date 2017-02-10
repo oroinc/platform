@@ -149,6 +149,7 @@ Single workflow configuration has next properties:
     Contains configuration for Workflow Restrictions
 * **defaults** - node for default workflow configuration values that can be changed in UI later. 
     * **active** - determine if workflow should be active right after first load of configuration.
+* **applications** - list of web application names for which workflow should be available (default: all applications match)  
 * **scopes** - list of scopes configurations used for filtering workflow by scopes
 * **datagrids** - list of datagrid names on which rows currently available transitions should be displayed as buttons.
 * **disable_operations** - an array of [operation](../../../../../ActionBundle/Resources/doc/operations.md) names (as keys) and related entities for which the operation should be disabled. 
@@ -171,6 +172,7 @@ workflows:                                                    # Root elements
         exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
         exclusive_record_groups:
             - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
+        applications: [webshop]                               # list of application names to make the workflow available for
         scopes:
             -                                                 # Definition of configuration for one scope
                 scope_field: 42
@@ -472,9 +474,10 @@ Event trigger configuration has next options.
 * **queue**
     [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
 * **require**
-    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
-    * `entity` - Entity object, that dispatched event,
-    * `mainEntity` - Entity object of triggers' workflow,
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases in context are available:
+    * `entity` - Entity object that dispatches an event,
+    * `prevEntity` - `entity` copy with fields state before update (like the 'old' in lifecycle `changeset`)
+    * `mainEntity` - Entity object of the workflow,
     * `wd` - Workflow Definition object,
     * `wi` - Workflow Item object.
 * **relation**

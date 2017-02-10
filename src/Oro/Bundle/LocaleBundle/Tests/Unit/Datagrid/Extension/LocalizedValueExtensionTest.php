@@ -264,11 +264,15 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->at(2))
+            ->method('andWhere')
+            ->willReturn(true);
+
+        $this->queryBuilder->expects($this->at(3))
             ->method('getDQLPart')
             ->with('groupBy')
             ->willReturn(true);
 
-        $this->queryBuilder->expects($this->at(3))
+        $this->queryBuilder->expects($this->at(4))
             ->method('addGroupBy')
             ->with('columnName');
 

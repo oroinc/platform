@@ -16,6 +16,7 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -31,6 +32,9 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
+    /** @var UserManager */
+    protected $userManager;
+
     /**
      * {@inheritdoc}
      */
@@ -38,6 +42,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
     {
         $this->emailEntityBuilder = $container->get('oro_email.email.entity.builder');
         $this->emailOriginHelper = $container->get('oro_email.tools.email_origin_helper');
+        $this->userManager = $container->get('oro_user.manager');
     }
 
     /**
@@ -141,7 +146,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
         $user->setPassword(strtolower($firstName . '.' . $lastName));
         $user->setEmail(strtolower($firstName . '_' . $lastName . '@example.com'));
 
-        $this->em->persist($user);
+        $this->userManager->updateUser($user);
 
         return $user;
     }
