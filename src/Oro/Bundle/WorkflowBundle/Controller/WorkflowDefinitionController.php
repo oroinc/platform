@@ -147,7 +147,7 @@ class WorkflowDefinitionController extends Controller
         $response['workflowsToDeactivation'] = $workflowsToDeactivation->getValues();
 
         if ($form->isValid()) {
-            $workflowManager = $this->get('oro_workflow.manager');
+            $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
             $workflowNames = array_merge(
                 $form->getData(),
                 $workflowsToDeactivation->map(
@@ -194,7 +194,7 @@ class WorkflowDefinitionController extends Controller
      */
     protected function getWorkflowsToDeactivation(WorkflowDefinition $workflowDefinition)
     {
-        $workflows = $this->get('oro_workflow.registry')
+        $workflows = $this->get('oro_workflow.registry.system')
             ->getActiveWorkflowsByActiveGroups($workflowDefinition->getExclusiveActiveGroups());
 
         return $workflows->filter(
