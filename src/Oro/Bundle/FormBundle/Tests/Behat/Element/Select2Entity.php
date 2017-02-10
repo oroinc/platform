@@ -150,7 +150,10 @@ class Select2Entity extends Element
     {
         $parent = $this->getParent()->getParent();
         $parent->find('css', '.entity-create-dropdown button')->click();
-        $parent->pressButton($buttonName);
+
+        // Get element again cause dom updated after dropdown is pressed
+        $parent = $this->getPage()->find('xpath', $parent->getXpath());
+        $parent->findButton($buttonName)->press();
     }
 
     /**
