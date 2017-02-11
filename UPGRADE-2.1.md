@@ -87,6 +87,12 @@ EntityConfigBundle
 - Class `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider`
     - removed property `protected $propertyConfig`
     - construction signature was changed. The parameter `array $config` was replaced with `PropertyConfigBag $configBag`
+- Class `Oro\Bundle\EntityConfigBundle\Config\ConfigCache`
+    - removed property `protected $isDebug`
+    - construction signature was changed. The optional parameter `$isDebug` was removed
+    - changed the visibility of `cache` property from `protected` to `private`
+    - changed the visibility of `modelCache` property from `protected` to `private`
+    - the implementation was changed significantly, by performance reasons. The most of `protected` methods were removed or marked as `private`
 
 EntityPaginationBundle
 ----------------------
