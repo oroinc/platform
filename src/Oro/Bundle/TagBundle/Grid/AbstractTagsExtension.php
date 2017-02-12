@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractTagsExtension extends AbstractExtension
 {
@@ -25,6 +26,12 @@ abstract class AbstractTagsExtension extends AbstractExtension
 
     /** @var string|null */
     protected $entityClassName;
+
+    /** @var string */
+    protected $reportOrSegmentPrefixes = [
+        'oro_report',
+        'oro_segment',
+    ];
 
     /**
      * @param TagManager          $tagManager
@@ -47,6 +54,14 @@ abstract class AbstractTagsExtension extends AbstractExtension
     }
 
     /**
+     * @param string $prefix
+     */
+    public function addReportOrSegmentGridPrefix($prefix)
+    {
+        $this->reportOrSegmentPrefixes[] = $prefix;
+    }
+
+    /**
      * Checks if configuration is for report or segment grid
      *
      * @param DatagridConfiguration $config
@@ -57,9 +72,12 @@ abstract class AbstractTagsExtension extends AbstractExtension
     {
         $gridName = $config->getName();
 
-        return
-            strpos($gridName, 'oro_report') === 0 ||
-            strpos($gridName, 'oro_segment') === 0;
+        return ArrayUtil::some(
+            function ($prefix) use ($gridName) {
+                return strpos($gridName, $prefix) === 0;
+            },
+            $this->reportOrSegmentPrefixes
+        );
     }
 
     /**

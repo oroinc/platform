@@ -299,3 +299,20 @@ TestFrameworkBundle
     - removed method `getDbReindexSetting`
     - renamed method `setUpBeforeClass` to `beforeClass`
     - renamed method `tearDownAfterClass` to `afterClass`
+
+QueryDesignerBundle
+-------------------
+- Class `Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationQueryConverter`
+    - construction signature was changed now it takes next arguments:
+        `FunctionProviderInterface` $functionProvider,
+        `VirtualFieldProviderInterface` $virtualFieldProvider,
+        `ManagerRegistry` $doctrine,
+        `DatagridGuesser` $datagridGuesser,
+        `EntityNameResolver` $entityNameResolver
+- Class `Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder`
+    - construction signature was changed now it takes next arguments:
+        `FunctionProviderInterface` $functionProvider,
+        `VirtualFieldProviderInterface` $virtualFieldProvider,
+        `ManagerRegistry` $doctrine,
+        `DatagridGuesser` $datagridGuesser,
+        `EntityNameResolver` $entityNameResolver

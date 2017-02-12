@@ -74,6 +74,7 @@ services:
             - '@oro_entity.virtual_field_provider.chain'
             - '@doctrine'
             - '@oro_datagrid.datagrid.guesser'
+            - '@oro_entity.entity_name_resolver'
         calls:
             - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
 
