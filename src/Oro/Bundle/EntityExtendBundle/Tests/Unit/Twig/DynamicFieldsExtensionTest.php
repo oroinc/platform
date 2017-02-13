@@ -6,17 +6,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Component\Testing\Unit\EntityTrait;
-use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
-use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 
 class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,6 +54,11 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $securityFacade;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FeatureChecker
+     */
+    protected $featureChecker;
+
     protected function setUp()
     {
         $this->configManager = $this->getMockBuilder(ConfigManager::class)
@@ -79,11 +86,20 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
 
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
+
         $this->extension = new DynamicFieldsExtension(
             $this->configManager,
             $this->fieldTypeHelper,
             $this->dispatcher,
-            $this->securityFacade
+            $this->securityFacade,
+            $this->featureChecker
         );
     }
 
