@@ -326,3 +326,8 @@ services:
         class: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration
         arguments:
             - '@oro_integration.manager.types_registry'
+
+    oro_integration.generator.prefixed_identifier_generator:
+        class: 'Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator'
+        abstract: true
+        public: false
