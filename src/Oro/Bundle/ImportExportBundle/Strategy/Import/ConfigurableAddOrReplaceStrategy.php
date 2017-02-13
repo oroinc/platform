@@ -13,8 +13,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class ConfigurableAddOrReplaceStrategy
- * @package Oro\Bundle\ImportExportBundle\Strategy\Import
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
@@ -441,8 +439,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         }
 
         $identifier = $this->databaseHelper->getIdentifier($fieldValue);
-        if (null !== $identifier) {
+        if ($identifier) {
             return $identifier;
+        }
+
+        $existingEntity = $this->findExistingEntity($fieldValue);
+        if ($existingEntity) {
+            return $this->databaseHelper->getIdentifier($existingEntity);
         }
 
         return null;

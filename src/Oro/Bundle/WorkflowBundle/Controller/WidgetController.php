@@ -72,7 +72,8 @@ class WidgetController extends Controller
                         ->getWorkflowData($entity, $workflow, $showDisabled);
                 },
                 $applicableWorkflows
-            )
+            ),
+            'originalUrl' => $this->get('oro_action.resolver.destination_page_resolver')->getOriginalUrl(),
         ];
     }
 

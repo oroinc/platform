@@ -19,7 +19,8 @@ class JobControllerTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_message_queue_root_jobs'));
 
         $response = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+
+        $this->assertHtmlResponseStatusCodeEquals($response, 200, $response->getContent());
     }
 
     public function testShouldRenderListOfChildJobs()
