@@ -47,3 +47,20 @@ services:
             - '@oro_user.manager'
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
+
+    oro_test.alice_reference_processor:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor
+        arguments:
+            - '@kernel'
+
+    oro_test.alice_to_string_processor:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceToStringProcessor
+        arguments:
+            - '@kernel'
+
+    oro_test.alice_fixture_loader:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader
+        calls:
+            - [setFileLocator, ['@file_locator']]
+            - [addProcessor, ['@oro_test.alice_reference_processor']]
+            - [addProcessor, ['@oro_test.alice_to_string_processor']]

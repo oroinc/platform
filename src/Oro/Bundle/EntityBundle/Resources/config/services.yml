@@ -464,3 +464,8 @@ services:
         class: Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer
         arguments:
             - '@oro_entity.doctrine_helper'
+
+    oro_entity.database_checker.state_manager:
+        class: Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager
+        arguments:
+            - [] # database checkers. filled by DatabaseCheckerCompilerPass

@@ -5,17 +5,19 @@
     <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
-{% block pageHeader %}
+{% block navButtons %}
+    {{ UI.saveActionButton([path('oro_workflow_definition_configure', {'name': entity.name})]) }}
+    {{ parent() }}
+{% endblock navButtons %}
+
+{% block breadcrumbs %}
     {% set breadcrumbs = {
         'entity': entity,
         'indexPath': path('oro_workflow_definition_index'),
         'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
         'entityTitle': entity.label
     } %}
-    {{ parent() }}
-{% endblock pageHeader %}
 
-{% block breadcrumbs %}
     {{ parent() }}
 
     <div class="pull-left">
@@ -30,4 +32,21 @@
 {% endblock breadcrumbs %}
 
 {% block content_data %}
-{% endblock %}
+    {% set dataBlocks = [{
+        'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+        'class': 'active',
+        'subblocks': [
+        {
+            'data': [
+                    form_row(form)
+                ]
+            }
+        ]
+    }] %}
+
+    {% set id = 'workflow-variables' %}
+    {% set data = {
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock content_data %}

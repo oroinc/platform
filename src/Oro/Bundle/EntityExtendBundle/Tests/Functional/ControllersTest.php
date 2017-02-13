@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 use Oro\Bundle\UIBundle\Route\Router;
 
 /**
- * @dbIsolation
  * @group dist
  */
 class ControllersTest extends AbstractConfigControllerTest

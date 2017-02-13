@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -117,10 +118,15 @@ class WorkflowDefinitionController extends Controller
      * @return array
      * @throws AccessDeniedHttpException
      */
-    public function configureAction(WorkflowDefinition $workflowDefinition)
+    public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
-        $form = $this->get('oro_workflow.form.workflow_definition');
-        $form->setData($workflowDefinition);
+        $form = $this->createForm('oro_workflow_variables', null, [
+            'workflow_definition' => $workflowDefinition,
+        ]);
+
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+        }
 
         return [
             'form' => $form->createView(),

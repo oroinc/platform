@@ -59,6 +59,16 @@ trait ConfigTrait
     }
 
     /**
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
+     */
+    public function keys()
+    {
+        return array_keys($this->items);
+    }
+
+    /**
      * @param array  $config
      * @param string $key
      * @param mixed  $defaultValue
