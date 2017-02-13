@@ -93,7 +93,7 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
                     $context['variable_name'] = $this->resolveName($rawVariable, $variableKey);
                     yield $this->makeKey(WorkflowVariableLabelTemplate::class, $context) => $rawVariable['label'];
 
-                    $formFields = $this->variableFormFields($rawVariable['options'], $context);
+                    $formFields = $this->variableFormFields($rawVariable, $context);
                     foreach ($formFields as $key => &$formField) {
                         yield $key => $formField;
                     }
@@ -112,14 +112,18 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
      */
     private function &variableFormFields(array &$variableConfig, \ArrayObject $context)
     {
-        if ($this->hasArrayNode('form_options', $variableConfig)) {
-            if (isset($variableConfig['form_options']['tooltip'])) {
-                $context['option_name'] = 'tooltip';
-                $key = $this->makeKey(WorkflowVariableFormOptionTemplate::class, $context);
+        if ($this->hasArrayNode('options', $variableConfig)) {
+            $options = &$variableConfig['options'];
+            if ($this->hasArrayNode('form_options', $options)) {
+                if (isset($options['form_options']['tooltip'])) {
+                    $context['option_name'] = 'tooltip';
+                    $key = $this->makeKey(WorkflowVariableFormOptionTemplate::class, $context);
 
-                yield $key => $variableConfig['form_options']['tooltip'];
-                unset($context['option_name']);
+                    yield $key => $options['form_options']['tooltip'];
+                    unset($context['option_name']);
+                }
             }
+            unset($options);
         }
     }
 

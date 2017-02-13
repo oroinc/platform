@@ -227,7 +227,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $preConditions          = [];
 
         $fullConfiguration = $configuration;
-        $configuration = $configuration['transitions']['configuration'];
+        $configuration = reset($configuration['transitions']);
         if (isset($configuration['acl_resource'])) {
             $defaultAclPrecondition = [
                 '@acl_granted' => [
@@ -402,7 +402,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'empty_definition' => [
                 'configuration' => [
                     'transitions' => [
-                        'configuration' => [
+                        'test_transition' => [
                             'transition_definition' => 'empty_definition',
                             'label' => 'label',
                             'step_to' => 'target_step',
@@ -424,7 +424,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_condition' => [
                 'configuration' => [
                     'transitions' => [
-                        'configuration' => [
+                        'test_transition' => [
                             'transition_definition' => 'with_condition',
                             'step_to' => 'target_step',
                         ]
@@ -437,7 +437,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_preactions' => [
                 'configuration' => [
                     'transitions' => [
-                        'configuration' => [
+                        'test_transition' => [
                             'transition_definition' => 'with_preactions',
                             'step_to' => 'target_step',
                         ],
@@ -450,7 +450,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with_actions' => [
                 'configuration' => [
                     'transitions' => [
-                        'configuration' => [
+                        'test_transition' => [
                             'transition_definition' => 'with_actions',
                             'step_to' => 'target_step',
                         ],
@@ -463,7 +463,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'with init context' => [
                 'configuration' => [
                     'transitions' => [
-                        'configuration' => [
+                        'test_transition' => [
                             'transition_definition' => 'empty_definition',
                             'init_entities' => ['entity1', 'entity2'],
                             'init_routes' => ['route1', 'route2'],
@@ -489,7 +489,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $steps      = ['target_step' => $this->createStep()];
         $attributes = ['attribute' => $this->createAttribute()];
 
-        $expectedCondition = $expectedPreCondition   = $this->createCondition();
+        $expectedCondition = $expectedPreCondition = $this->createCondition();
 
         $this->conditionFactory->expects($this->at(0))->method('create')
             ->with(
@@ -507,8 +507,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            ['test_transition' => $configuration],
-            self::$transitionDefinitions,
+            [
+                'transitions' => [
+                    'test_transition' => $configuration,
+                ],
+                'transition_definitions' => self::$transitionDefinitions
+            ],
             $steps,
             $attributes
         );
@@ -608,8 +612,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            ['test_transition' => $configuration],
-            self::$transitionDefinitions,
+            [
+                'transitions' => [
+                    'test_transition' => $configuration,
+                ],
+                'transition_definitions' => self::$transitionDefinitions
+            ],
             $steps,
             $attributes
         );
@@ -680,8 +688,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnArgument(0));
 
         $transitions = $this->assembler->assemble(
-            ['test_transition' => $configuration],
-            self::$transitionDefinitions,
+            [
+                'transitions' => [
+                    'test_transition' => $configuration,
+                ],
+                'transition_definitions' => self::$transitionDefinitions
+            ],
             $steps,
             $attributes
         );
