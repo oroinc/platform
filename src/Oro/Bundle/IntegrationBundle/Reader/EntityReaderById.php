@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Reader;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader as BaseReader;
@@ -64,7 +64,7 @@ class EntityReaderById extends BaseReader
                 $this->qb->setParameter('id', $optionValue);
             }
 
-            $this->setSourceIterator(new BufferedQueryResultIterator($this->qb));
+            $this->setSourceIterator(new BufferedIdentityQueryResultIterator($this->qb));
         }
     }
 }

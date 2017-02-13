@@ -12,7 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
@@ -95,7 +95,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
                 $qb->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
 
-            $iterator = new BufferedQueryResultIterator($qb);
+            $iterator = new BufferedIdentityQueryResultIterator($qb);
             $iterator->setBufferSize($limit);
 
             foreach ($iterator as $entity) {

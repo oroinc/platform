@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
@@ -35,7 +35,7 @@ class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implemen
 
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
         $usersQB      = $manager->getRepository('OroUserBundle:User')->createQueryBuilder('u');
-        $users        = new BufferedQueryResultIterator($usersQB);
+        $users        = new BufferedIdentityQueryResultIterator($usersQB);
 
         $iteration = 0;
         /** @var User $user */
