@@ -80,6 +80,7 @@ define([
         setPageSize: function(pagesize) {
             this.pager.pagesize = pagesize;
         },
+
         setSortingField: function(sortingField) {
             this.pager.sortingField = sortingField;
         },
