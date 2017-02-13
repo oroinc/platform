@@ -59,7 +59,7 @@
     {% set metadata = oro_datagrid_metadata(datagrid) %}
     {% set perPage = metadata.state.pageSize %}
     {% set pageSize = metadata.options.toolbarOptions.pageSize %}
-    {% set toolbarPosition = attr['data-grid-toolbar'] %}
+    {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
 
     {% if pageSize.hide == false and pageSize.items|length > 0 and toolbarPosition != 'bottom' %}
         <div{{ block('block_attributes') }}>
@@ -81,7 +81,7 @@
 {% endblock %}
 
 {% block __oro_datagrid_server_render__datagrid_toolbar_actions_widget %}
-    {% set toolbarPosition = attr['data-grid-toolbar'] %}
+    {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
     {% if toolbarPosition != 'bottom' %}
         <div{{ block('block_attributes') }}>
             {{ block_widget(block) }}
