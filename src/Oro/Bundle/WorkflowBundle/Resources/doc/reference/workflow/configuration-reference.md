@@ -386,6 +386,12 @@ Transition configuration has next options:
     *string*
     Frontend transition form display type. Possible options are: dialog, page.
     Display type "page" require "form_options" to be set.
+* **destination_page**
+    *string*
+    (optional) Parameter used only when `display_type` equals `page`.
+    Specified value will be converted to url by entity configuration (see action `@resolve_destination_page`).
+    In case when `@redirect` action used in `actions` of transition definition, effect from taht option will be ignored.
+    Allowed values: `name` or `index` (`index` - will be converted to `name`) , 'view' or `~`. Default value `~`.
 * **page_template**
     *string*
     Custom transition template for transition pages. Should be extended from OroWorkflowBundle:Workflow:transitionForm.html.twig.
@@ -435,6 +441,8 @@ workflows:
                             form_type: integer
                             options:
                                 required: false
+                display_type: page
+                destination_page: index
             not_answered:
                 step_to: end_call
                 transition_definition: not_answered_definition

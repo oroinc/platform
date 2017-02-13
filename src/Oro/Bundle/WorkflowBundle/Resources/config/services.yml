@@ -405,6 +405,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -415,6 +416,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -425,6 +427,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:

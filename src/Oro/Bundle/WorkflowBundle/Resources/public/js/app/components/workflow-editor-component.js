@@ -36,7 +36,8 @@ define(function(require) {
             this.workflowManagementView = new WorkflowManagementView({
                 el: $el,
                 stepsEl: '.workflow-definition-steps-list-container',
-                model: this.model
+                model: this.model,
+                entityFields: this.options.entityFields
             });
             this.historyManager = new HistoryNavigationComponent({
                 observedModel: this.model,

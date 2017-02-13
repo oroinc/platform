@@ -48,6 +48,46 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper = new EntityConfigHelper($this->configProvider, $this->groupProvider);
     }
 
+    public function testGetAvailableRoutes()
+    {
+        $this->configProvider->expects($this->once())
+            ->method('getClassName')
+            ->with('TestClass')
+            ->willReturn('TestClass');
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfigManager')
+            ->willReturn($this->configManager);
+
+        $metadata = $this->createMock(EntityMetadata::class);
+
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->with('TestClass')
+            ->willReturn($metadata);
+
+        $metadata->expects($this->once())
+            ->method('getRoutes')
+            ->willReturn(['route1' => 'value1']);
+
+        $this->assertEquals(
+            [
+                'route1' => 'value1',
+            ],
+            $this->helper->getAvailableRoutes('TestClass')
+        );
+    }
+
+    public function testGetAvailableRoutesWithoutMetadata()
+    {
+        $this->configProvider->expects($this->once())->method('getClassName')->willReturnArgument(0);
+        $this->configProvider->expects($this->once())->method('getConfigManager')->willReturn($this->configManager);
+
+        $this->configManager->expects($this->once())->method('getEntityMetadata')->with('TestClass')->willReturn(null);
+
+        $this->assertEquals([], $this->helper->getAvailableRoutes('TestClass'));
+    }
+
     /**
      * @param array $inputData
      * @param array $expectedData
