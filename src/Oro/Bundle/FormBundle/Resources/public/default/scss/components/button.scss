@@ -16,6 +16,7 @@
 
     @include element-state('disabled') {
         opacity: .75;
+        pointer-events: none;
     }
 
     //

@@ -31,5 +31,6 @@
 
     @include element-state('disabled') {
         cursor: default;
+        pointer-events: none;
     }
 }
