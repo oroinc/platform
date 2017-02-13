@@ -30,6 +30,11 @@ class WidgetProviderFilter
         return $this->applyAcl($queryBuilder);
     }
 
+    public function getOwnerIds(WidgetOptionBag $widgetOptions)
+    {
+        return $this->ownerHelper->getOwnerIds($widgetOptions);
+    }
+
     protected function processOwners(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
         $owners = $this->ownerHelper->getOwnerIds($widgetOptions);
@@ -40,7 +45,7 @@ class WidgetProviderFilter
         }
     }
 
-    protected function applyAcl(QueryBuilder $queryBuilder)
+    public function applyAcl(QueryBuilder $queryBuilder)
     {
         return $this->aclHelper->apply($queryBuilder);
     }
