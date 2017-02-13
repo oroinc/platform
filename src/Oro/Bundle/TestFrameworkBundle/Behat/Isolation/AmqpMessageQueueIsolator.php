@@ -132,7 +132,8 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
             $messageQueueParameters['host'],
             $messageQueueParameters['port'],
             $messageQueueParameters['user'],
-            $messageQueueParameters['password']
+            $messageQueueParameters['password'],
+            $messageQueueParameters['vhost']
         );
     }
 

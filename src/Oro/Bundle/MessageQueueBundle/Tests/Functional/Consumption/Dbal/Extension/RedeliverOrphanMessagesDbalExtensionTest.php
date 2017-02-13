@@ -8,6 +8,9 @@ use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessage
 use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
 use Psr\Log\NullLogger;
 
+/**
+ * @dbIsolationPerTest
+ */
 class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
 {
     use DbalSchemaExtensionTrait;
@@ -17,16 +20,10 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $this->initClient();
 
         $this->ensureTableExists('message_queue');
-
-        $this->startTransaction();
     }
 
     protected function tearDown()
     {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
-
         $this->dropTable('message_queue');
     }
 

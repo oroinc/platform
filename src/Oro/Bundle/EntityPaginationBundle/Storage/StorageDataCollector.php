@@ -2,28 +2,27 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Storage;
 
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
-use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Symfony\Component\HttpFoundation\Request;
 
 class StorageDataCollector
 {
     const PAGINGATION_PARAM = 'entity_pagination';
-    
+
     /**
-     * @var DataGridManager
+     * @var ServiceLink
      */
-    protected $datagridManager;
+    protected $datagridManagerLink;
 
     /**
      * @var DoctrineHelper
@@ -46,20 +45,20 @@ class StorageDataCollector
     protected $paginationManager;
 
     /**
-     * @param DataGridManager $dataGridManager
+     * @param ServiceLink $dataGridManagerLink Link Used instead of manager because of performance reasons
      * @param DoctrineHelper $doctrineHelper
      * @param AclHelper $aclHelper
      * @param EntityPaginationStorage $storage
      * @param EntityPaginationManager $paginationManager
      */
     public function __construct(
-        DataGridManager $dataGridManager,
+        ServiceLink $dataGridManagerLink,
         DoctrineHelper $doctrineHelper,
         AclHelper $aclHelper,
         EntityPaginationStorage $storage,
         EntityPaginationManager $paginationManager
     ) {
-        $this->datagridManager   = $dataGridManager;
+        $this->datagridManagerLink = $dataGridManagerLink;
         $this->doctrineHelper    = $doctrineHelper;
         $this->aclHelper         = $aclHelper;
         $this->storage           = $storage;
@@ -82,7 +81,8 @@ class StorageDataCollector
         foreach ($this->getGridNames($request) as $gridName) {
             try {
                 // datagrid manager automatically extracts all required parameters from request
-                $dataGrid = $this->datagridManager
+                $dataGrid = $this->datagridManagerLink
+                    ->getService()
                     ->getDatagridByRequestParams(
                         $gridName,
                         [

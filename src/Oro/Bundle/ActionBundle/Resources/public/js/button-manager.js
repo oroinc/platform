@@ -82,14 +82,15 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doExecute: function(e) {
+            var self = this;
             if (this.options.hasDialog) {
                 var options = this._getDialogOptions(this.options);
                 if (this.options.showDialog) {
                     tools.loadModules(this.options.jsDialogWidget, function(Widget) {
                         var _widget = new Widget(options);
                         Backbone.listenTo(_widget, 'formSave', _.bind(function(response) {
-                            _widget.remove();
-                            this.doResponse(response, e);
+                            _widget.hide();
+                            self.doResponse(response, e);
                         }, this));
 
                         _widget.render();

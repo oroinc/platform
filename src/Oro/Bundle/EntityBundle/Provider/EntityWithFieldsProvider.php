@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
+
 /**
  * TODO: passing parameter $applyExclusions into getFields method should be refactored
  */
@@ -13,14 +15,22 @@ class EntityWithFieldsProvider
     /** @var EntityProvider */
     protected $entityProvider;
 
+    /** @var EntityConfigHelper */
+    protected $configHelper;
+
     /**
      * @param EntityFieldProvider $fieldProvider
      * @param EntityProvider      $entityProvider
+     * @param EntityConfigHelper  $configHelper
      */
-    public function __construct(EntityFieldProvider $fieldProvider, EntityProvider $entityProvider)
-    {
+    public function __construct(
+        EntityFieldProvider $fieldProvider,
+        EntityProvider $entityProvider,
+        EntityConfigHelper $configHelper
+    ) {
         $this->fieldProvider  = $fieldProvider;
         $this->entityProvider = $entityProvider;
+        $this->configHelper = $configHelper;
     }
 
     /**
@@ -29,6 +39,7 @@ class EntityWithFieldsProvider
      * @param bool $withRelations
      * @param bool $applyExclusions
      * @param bool $translate
+     * @param bool $withRoutes
      *
      * @return array
      */
@@ -37,7 +48,8 @@ class EntityWithFieldsProvider
         $withUnidirectional = false,
         $withRelations = true,
         $applyExclusions = true,
-        $translate = true
+        $translate = true,
+        $withRoutes = false
     ) {
         $result   = [];
         $entities = $this->entityProvider->getEntities(true, $applyExclusions, $translate);
@@ -53,6 +65,10 @@ class EntityWithFieldsProvider
                 $applyExclusions,
                 $translate
             );
+
+            if ($withRoutes) {
+                $entityData['routes'] = $this->configHelper->getAvailableRoutes($currentClassName);
+            }
 
             $entityData['fields']      = $fields;
             $result[$currentClassName] = $entityData;

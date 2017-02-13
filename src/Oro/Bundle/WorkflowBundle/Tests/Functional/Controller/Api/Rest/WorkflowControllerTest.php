@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
-/**
- * @dbIsolation
- */
 class WorkflowControllerTest extends WebTestCase
 {
     /** @var string */
@@ -139,7 +136,7 @@ class WorkflowControllerTest extends WebTestCase
      */
     protected function getWorkflowManager()
     {
-        return $this->client->getContainer()->get('oro_workflow.manager');
+        return $this->client->getContainer()->get('oro_workflow.manager.system');
     }
 
     /**

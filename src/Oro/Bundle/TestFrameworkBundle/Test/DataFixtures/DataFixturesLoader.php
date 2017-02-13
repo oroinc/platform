@@ -25,6 +25,7 @@ class DataFixturesLoader extends Loader
     ) {
         parent::__construct($factory, $identifierResolver);
         $this->container = $container;
+        $this->aliceFixtureLoader = $container->get('oro_test.alice_fixture_loader');
     }
 
     /**
@@ -32,18 +33,24 @@ class DataFixturesLoader extends Loader
      */
     public function addFixture($fixture)
     {
-        $fixture = parent::addFixture($fixture);
+        $fixtureId = $this->identifierResolver->resolveId($fixture);
+        if (isset($this->fixtures[$fixtureId])) {
+            return null;
+        }
+
+        if (!is_object($fixture)) {
+            $fixture = $this->factory->createFixture($fixtureId);
+        }
+
         if (null !== $fixture) {
             if ($fixture instanceof AliceFixtureLoaderAwareInterface) {
-                if (null === $this->aliceFixtureLoader) {
-                    $this->aliceFixtureLoader = new AliceFixtureLoader();
-                }
                 $fixture->setLoader($this->aliceFixtureLoader);
             }
             if ($fixture instanceof ContainerAwareInterface) {
                 $fixture->setContainer($this->container);
             }
         }
+        $fixture = parent::addFixture($fixture);
 
         return $fixture;
     }

@@ -4,9 +4,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class DashboardControllerTest extends WebTestCase
 {
     protected function setUp()

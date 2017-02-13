@@ -5,9 +5,6 @@ namespace Oro\Bundle\LoggerBundle\Tests\Functional\Command;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LoggerLevelCommandTest extends WebTestCase
 {
     /**

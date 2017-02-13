@@ -11,9 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class InsertFromSelectQueryExecutorTest extends WebTestCase
 {
     /**
