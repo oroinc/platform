@@ -593,10 +593,12 @@ class Workflow
             $manager = $this->getVariableManager();
             $definition = $this->getDefinition();
 
-            $this->variables = $manager->getVariableAssembler()->assemble(
-                $this,
-                $definition->getConfiguration()
-            );
+            if (null !== $assembler = $manager->getVariableAssembler()) {
+                $this->variables = $assembler->assemble(
+                    $this,
+                    $definition->getConfiguration()
+                );
+            }
         }
 
         return $this->variables;
