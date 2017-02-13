@@ -242,6 +242,7 @@ define(function(require) {
 
             _.extend(this, this.defaults, opts);
             this._initToolbars(opts);
+            this._initActions(opts);
             this.exportOptions = {};
             _.extend(this.exportOptions, opts.exportOptions);
 
@@ -428,6 +429,14 @@ define(function(require) {
             this.toolbars = {};
             this.toolbarOptions = {};
             _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
+        },
+
+        /**
+         * @param {Object} opts
+         * @private
+         */
+        _initActions: function(opts) {
+            _.extend(this.actionOptions, opts.themeOptions.actionOptions);
         },
 
         /**
