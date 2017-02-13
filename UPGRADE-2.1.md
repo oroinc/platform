@@ -202,6 +202,7 @@ UserBundle
 - Class `Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator`
     - replaced parameter `EntityManager $em` with `ManagerRegistry $doctrine` in the constructor
     - removed property `protected $em`
+- Added Configurable Permission `default` for View and Edit pages of User Role (see [configurable-permissions.md](./src/Oro/Bundle/SecurityBundle/Resources/doc/configurable-permissions.md))
 
 WorkflowBundle
 --------------
