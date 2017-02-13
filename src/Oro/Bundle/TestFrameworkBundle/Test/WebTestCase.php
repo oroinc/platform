@@ -4,24 +4,27 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 
-use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
-use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
-use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Yaml\Yaml;
+
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
-use Oro\Component\Testing\DbIsolationExtension;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\Testing\DbIsolationExtension;
 
 /**
  * Abstract class for functional and integration tests
@@ -228,6 +231,17 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$clientInstance->setServerParameters([]);
             self::$clientInstance->getCookieJar()->clear();
         }
+    }
+
+    /**
+     * @param string $email
+     */
+    protected function updateUserSecurityToken($email)
+    {
+        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['email' => $email]);
+
+        $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
+        $this->getContainer()->get('security.token_storage')->setToken($token);
     }
 
     /**

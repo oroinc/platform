@@ -439,8 +439,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         }
 
         $identifier = $this->databaseHelper->getIdentifier($fieldValue);
-        if (null !== $identifier) {
+        if ($identifier) {
             return $identifier;
+        }
+
+        $existingEntity = $this->findExistingEntity($fieldValue);
+        if ($existingEntity) {
+            return $this->databaseHelper->getIdentifier($existingEntity);
         }
 
         return null;

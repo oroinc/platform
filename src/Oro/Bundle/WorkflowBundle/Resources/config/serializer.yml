@@ -23,7 +23,7 @@ services:
           - ['@oro_workflow.serializer.data.normalizer']
           - ['@serializer.encoder.json']
         calls:
-          - [setWorkflowRegistry,  ['@oro_workflow.registry']]
+          - [setWorkflowRegistry,  ['@oro_workflow.registry.system']]
 
     oro_workflow.serializer.data.normalizer:
         class: %oro_workflow.serializer.data.normalizer.class%
