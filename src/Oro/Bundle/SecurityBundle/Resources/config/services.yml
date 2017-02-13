@@ -238,6 +238,23 @@ services:
             - '@oro_security.configuration.provider.configurable_permission_configuration'
             - '@oro_security.cache.provider.configurable_permission'
 
+    oro_security.filter.privilege_capability_filter:
+        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeCapabilityFilter'
+        public: false
+        tags:
+            - { name: oro.security.filter.acl_privilege }
+
+    oro_security.filter.privilege_entity_filter:
+        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeEntityFilter'
+        public: false
+        tags:
+            - { name: oro.security.filter.acl_privilege }
+
+    oro_security.filter.configurable_permission_filter:
+        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter'
+        arguments:
+            - '@oro_security.acl.configurable_permission_provider'
+
     oro_security.acl.object_identity_factory:
         class: %oro_security.acl.object_identity_factory.class%
         arguments:

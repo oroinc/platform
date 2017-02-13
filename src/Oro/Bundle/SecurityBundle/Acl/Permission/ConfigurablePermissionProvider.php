@@ -11,6 +11,8 @@ class ConfigurablePermissionProvider
 {
     const CACHE_ID = 'configurable_permissions';
 
+    const DEFAULT_CONFIGURABLE_NAME = 'default';
+
     /** @var ConfigurablePermissionConfigurationProvider */
     private $configurationProvider;
 
