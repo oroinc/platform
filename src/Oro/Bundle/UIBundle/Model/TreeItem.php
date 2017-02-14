@@ -68,6 +68,29 @@ class TreeItem implements \JsonSerializable
     }
 
     /**
+     * Finds all parents recursively
+     *
+     * @param bool $includeRoot
+     * @return array
+     */
+    public function getParents($includeRoot = false)
+    {
+        $parents = [];
+        $currentParent = $this->parent;
+
+        while ($currentParent !== null) {
+            array_unshift($parents, $currentParent);
+            $currentParent = $currentParent->getParent();
+        }
+
+        if (!$includeRoot && count($parents) > 0) {
+            array_shift($parents);
+        }
+
+        return $parents;
+    }
+
+    /**
      * @return TreeItem[]
      */
     public function getChildren()

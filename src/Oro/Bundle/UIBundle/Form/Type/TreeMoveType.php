@@ -6,8 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\UIBundle\Form\DataTransformer\TreeItemIdTransformer;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
-use Oro\Bundle\UIBundle\Form\DataTransformer\TreeItemToStringTransformer;
 
 class TreeMoveType extends AbstractType
 {
@@ -16,24 +16,17 @@ class TreeMoveType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('source', 'genemu_jqueryselect2_choice', array_merge(
-            $options['source_config'],
+        $builder->add(
+            'target',
+            TreeSelectType::class,
             [
-                'multiple' => true,
+                'tree_data' => $options['tree_data'],
+                'tree_key' => 'move',
+                'label' => 'oro.ui.jstree.move.target.label',
             ]
-        ));
-        $builder->add('target', 'genemu_jqueryselect2_choice', array_merge(
-            $options['target_config'],
-            [
-                'placeholder' => 'Choose target',
-                'empty_data' => null,
-            ]
-        ));
+        );
 
-        $builder->get('source')
-            ->addModelTransformer(new TreeItemToStringTransformer($options['source_config']['choices']));
-        $builder->get('target')
-            ->addModelTransformer(new TreeItemToStringTransformer($options['target_config']['choices']));
+        $builder->get('target')->addModelTransformer(new TreeItemIdTransformer($options['tree_items']));
     }
 
     /**
@@ -41,14 +34,13 @@ class TreeMoveType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setRequired(['tree_items', 'tree_data']);
+
         $resolver->setDefaults([
             'data_class' => TreeCollection::class,
-            'source_config' => [
-                'choices' => []
-            ],
-            'target_config' => [
-                'choices' => []
-            ],
         ]);
+
+        $resolver->setAllowedTypes('tree_items', ['array']);
+        $resolver->setAllowedTypes('tree_data', ['array']);
     }
 }

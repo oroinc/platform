@@ -26,7 +26,7 @@
                       module: 'oroui/js/app/components/view-component',
                       options: {
                           view: 'oroui/js/app/views/jstree/move-form-view',
-                          choices: form.vars.value.choices
+                          choices: treeItems
                       }
                   }) }}>
                 <fieldset class="form form-horizontal">
@@ -39,6 +39,18 @@
                         </div>
                     {% endif %}
                     <div class="span6">
+                        <div class="control-group control-group-hidden">
+                            <div class="control-label wrap">{{ 'oro.ui.jstree.move.source.label'|trans }}</div>
+                            <div class="controls">
+                                {% for source in form.vars.value.source %}
+                                    {% for parent in source.parents %}
+                                        {{ parent.label }}&nbsp;&gt;&nbsp;
+                                    {% endfor %}
+                                    {{ source.label }}
+                                    <br />
+                                {% endfor %}
+                            </div>
+                        </div>
                         {{ form_rest(form) }}
                     </div>
 

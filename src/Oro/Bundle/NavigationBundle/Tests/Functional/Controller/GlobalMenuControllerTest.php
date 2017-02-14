@@ -173,14 +173,6 @@ class GlobalMenuControllerTest extends WebTestCase
         );
 
         $form = $crawler->selectButton('Save')->form();
-        $values = $form->getValues();
-
-        $this->assertEquals(
-            [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_1_1)->getKey()],
-            $values['tree_move[source]']
-        );
-
-        $form['tree_move[source]'] = [$this->getReference(LoadMenuUpdateData::MENU_UPDATE_2_1_1)->getKey()];
         $form['tree_move[target]'] = $this->getReference(LoadMenuUpdateData::MENU_UPDATE_1)->getKey();
 
         $this->client->followRedirects(true);
@@ -200,7 +192,7 @@ class GlobalMenuControllerTest extends WebTestCase
         $repository = $this->getContainer()->get('doctrine')
             ->getManagerForClass('OroNavigationBundle:MenuUpdate')
             ->getRepository('OroNavigationBundle:MenuUpdate');
-        $menuUpdate = $repository->findOneBy(['key' => LoadMenuUpdateData::MENU_UPDATE_2_1_1]);
+        $menuUpdate = $repository->findOneBy(['key' => LoadMenuUpdateData::MENU_UPDATE_1_1]);
         $this->assertEquals($menuUpdate->getParentKey(), LoadMenuUpdateData::MENU_UPDATE_1);
     }
 }
