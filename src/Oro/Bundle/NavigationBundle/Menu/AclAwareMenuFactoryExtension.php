@@ -213,11 +213,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
         }
         if (!$hasInCache) {
-            $absolute = false;
-            if (isset($options['routeAbsolute'])) {
-                $absolute = $options['routeAbsolute'];
-            }
-            $uri = $this->router->generate($options['route'], $params, $absolute);
+            $uri = $this->router->generate($options['route'], $params, !empty($options['routeAbsolute']));
             if ($this->cache) {
                 $this->cache->save($cacheKey, $uri);
             }
