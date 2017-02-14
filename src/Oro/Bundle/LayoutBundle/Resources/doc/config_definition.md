@@ -1,8 +1,16 @@
 # Config definition
 
+Table of content
+----------------
+
+* [Assets](#assets)
+* [Images](#images)
+* [RequireJS definition](#requirejs-definition)
+* [Page Templates](#page-templates)
+
 ## Overview
 
-If you want to use different configuration for your **theme**, such as **assets**, **images** or **requirejs**, you need to put it to `layout/{theme_name}/config` folder.
+If you want to use different configuration for your **theme**, such as **assets**, **images**, **requirejs** or **page_templates**, you need to put it to `layout/{theme_name}/config` folder.
 
 ## Assets
 
@@ -103,3 +111,51 @@ requirejs_scripts:
 ```
 
 `oro_layout_requirejs_config_provider` is alias of `oro_layout.provider.requirejs_config`
+
+## Page Templates
+A **page_template** is a collection of files that expand the visual presentation for one or more route names.
+
+### Configuration
+Page templates configuration file should be placed in `layout/{theme_name}/config` folder and named `page_templates.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/config/page_templates.yml`.
+All page template **layout updates** stored in `layout/{theme_name}/{route_name}/{page_template_KEY}/` folder, for example `DemoBundle/Resources/views/layouts/first_theme/demo_first_route_name/custom/layout.yml`.
+
+#### Additional configuration reference
+| Option | Description | Required |
+|------- |-------------|----------|
+| `label` | Label will be displayed in the page template management UI. | yes |
+| `route_name` | Route name identifier, used in the path where **layout updates** stored. | yes |
+| `key` | Key used in the path where **layout updates** stored. | yes |
+| `description` | Description will be displayed in the page template management UI. | no |
+| `screenshot` | Screenshot for preview. This will be displayed in the page template management UI. | no |
+| `enabled` | Enable/Disable page template | no |
+
+**Example:**
+
+```yaml
+#DemoBundle/Resources/views/layouts/first_theme/config/page_templates.yml
+templates:
+    -
+        label: Custom page template
+        description: Custom page template description
+        route_name: demo_first_route_name
+        key: custom
+    -
+        label: Additional page template
+        description: Additional page template description
+        route_name: demo_first_route_name
+        key: additional
+    -
+        label: Additional page template
+        description: Additional page template description
+        route_name: demo_second_route_name
+        key: additional
+titles:
+    demo_first_route_name: First route name title
+    demo_second_route_name: Second route name title
+```
+
+_NOTICE:_ Pay attention that page templates inherit parent themes. 
+You can simple override existing page template, just add **layout update** file to page template path in your child theme, 
+for example if `first_theme` is parent theme of `second_theme` you need to put page template to `DemoBundle/Resources/views/layouts/second_theme/demo_first_route_name/custom/layout.yml`.
+
+Also you can disable some page templates adding `enabled: false`.
