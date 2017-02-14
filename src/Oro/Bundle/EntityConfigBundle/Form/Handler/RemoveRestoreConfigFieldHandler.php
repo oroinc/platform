@@ -6,8 +6,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityConfigBundle\Event\BeforeRemoveFieldEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 
@@ -60,12 +60,11 @@ class RemoveRestoreConfigFieldHandler
      */
     public function handleRemove(FieldConfigModel $field, $successMessage)
     {
-        $event = new BeforeRemoveFieldEvent($field->getEntity()->getClassName(), $field->getFieldName());
-        $this->eventDispatcher->dispatch(Events::BEFORE_REMOVE_FIELD, $event);
+        $validationMessages = $this->validationHelper->getRemoveFieldValidationErrors($field);
 
-        if ($validationMessages = $event->getValidationMessages()) {
-            foreach ($validationMessages as $validationMessage) {
-                $this->session->getFlashBag()->add('error', $validationMessage);
+        if ($validationMessages) {
+            foreach ($validationMessages as $message) {
+                $this->session->getFlashBag()->add('error', $message);
             }
 
             return new JsonResponse(
@@ -102,6 +101,9 @@ class RemoveRestoreConfigFieldHandler
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
 
+        $afterRemoveEvent = new AfterRemoveFieldEvent($field);
+        $this->eventDispatcher->dispatch(Events::AFTER_REMOVE_FIELD, $afterRemoveEvent);
+
         $this->session->getFlashBag()->add('success', $successMessage);
 
         return new JsonResponse(['message' => $successMessage, 'successful' => true], JsonResponse::HTTP_OK);
@@ -116,6 +118,8 @@ class RemoveRestoreConfigFieldHandler
     public function handleRestore(FieldConfigModel $field, $errorMessage, $successMessage)
     {
         if (!$this->validationHelper->canFieldBeRestored($field)) {
+            $this->session->getFlashBag()->add('error', $errorMessage);
+
             return new JsonResponse(
                 [
                     'message'    => $errorMessage,

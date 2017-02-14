@@ -7,7 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Event\BeforeRemoveFieldEvent;
+use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
@@ -145,7 +146,10 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleRemove($fields, $isUpgradeable)
     {
-        $entityClassName = TestActivityTarget::class;
+        $this->validationHelper->expects($this->once())
+            ->method('getRemoveFieldValidationErrors')
+            ->with($this->fieldConfigModel)
+            ->willReturn([]);
 
         $this->configHelper
             ->expects($this->once())
@@ -198,16 +202,9 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
-        $entity = $this->createMock(EntityConfigModel::class);
-        $entity
-            ->expects($this->once())
-            ->method('getClassName')
-            ->willReturn($entityClassName);
-
-        $this->fieldConfigModel
-            ->expects($this->once())
-            ->method('getEntity')
-            ->willReturn($entity);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::AFTER_REMOVE_FIELD, new AfterRemoveFieldEvent($this->fieldConfigModel));
 
         $expectedContent = [
             'message' => self::SAMPLE_SUCCESS_MESSAGE,
@@ -221,14 +218,13 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleRemoveValidationError()
     {
-        $entityClassName = TestActivityTarget::class;
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->willReturnCallback(function ($eventName, BeforeRemoveFieldEvent $event) {
-                $event->addValidationMessage(self::SAMPLE_VALIDATION_ERROR_MESSAGE1);
-                $event->addValidationMessage(self::SAMPLE_VALIDATION_ERROR_MESSAGE2);
-            });
+        $this->validationHelper->expects($this->once())
+            ->method('getRemoveFieldValidationErrors')
+            ->with($this->fieldConfigModel)
+            ->willReturn([
+                self::SAMPLE_VALIDATION_ERROR_MESSAGE1,
+                self::SAMPLE_VALIDATION_ERROR_MESSAGE2
+            ]);
 
         $fieldConfig = $this->createMock(ConfigInterface::class);
 
@@ -255,17 +251,6 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
-        $entity = $this->createMock(EntityConfigModel::class);
-        $entity
-            ->expects($this->once())
-            ->method('getClassName')
-            ->willReturn($entityClassName);
-
-        $this->fieldConfigModel
-            ->expects($this->once())
-            ->method('getEntity')
-            ->willReturn($entity);
-
         $expectedContent = [
             'message' => sprintf(
                 '%s. %s',
@@ -287,6 +272,17 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('canFieldBeRestored')
             ->with($this->fieldConfigModel)
             ->willReturn(false);
+
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        $flashBag
+            ->expects($this->once())
+            ->method('add')
+            ->with('error', self::SAMPLE_ERROR_MESSAGE);
+
+        $this->session
+            ->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($flashBag);
 
         $this->configManager
             ->expects($this->never())
