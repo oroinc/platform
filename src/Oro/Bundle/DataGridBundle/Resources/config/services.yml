@@ -346,9 +346,3 @@ services:
             - '@oro_email.email_renderer'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
-
-    oro_datagrid.helper.filtered_grid_route:
-        class: 'Oro\Bundle\TranslationBundle\Helper\FilteredDatagridRouteHelper'
-        arguments:
-            - '@oro_datagrid.helper.route'
-

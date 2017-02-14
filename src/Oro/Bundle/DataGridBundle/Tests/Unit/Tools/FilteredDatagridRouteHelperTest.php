@@ -29,9 +29,7 @@ class FilteredDatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->datagridRouteHelper = $this->getMockBuilder(DatagridRouteHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->datagridRouteHelper = $this->createMock(DatagridRouteHelper::class);
 
         $this->gridRouteName = 'route_name';
         $this->gridName = 'grid_name';
