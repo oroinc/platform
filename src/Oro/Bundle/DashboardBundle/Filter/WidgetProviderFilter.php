@@ -37,7 +37,7 @@ class WidgetProviderFilter
 
     protected function processOwners(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
-        $owners = $this->ownerHelper->getOwnerIds($widgetOptions);
+        $owners = $this->getOwnerIds($widgetOptions);
         $alias = QueryUtils::getSingleRootAlias($queryBuilder, false);
         if ($owners) {
             // check if options are for opportunity_by_status
