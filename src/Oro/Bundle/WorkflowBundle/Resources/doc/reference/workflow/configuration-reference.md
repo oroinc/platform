@@ -386,6 +386,12 @@ Transition configuration has next options:
     *string*
     Frontend transition form display type. Possible options are: dialog, page.
     Display type "page" require "form_options" to be set.
+* **destination_page**
+    *string*
+    (optional) Parameter used only when `display_type` equals `page`.
+    Specified value will be converted to url by entity configuration (see action `@resolve_destination_page`).
+    In case when `@redirect` action used in `actions` of transition definition, effect from taht option will be ignored.
+    Allowed values: `name` or `index` (`index` - will be converted to `name`) , 'view' or `~`. Default value `~`.
 * **page_template**
     *string*
     Custom transition template for transition pages. Should be extended from OroWorkflowBundle:Workflow:transitionForm.html.twig.
@@ -435,6 +441,8 @@ workflows:
                             form_type: integer
                             options:
                                 required: false
+                display_type: page
+                destination_page: index
             not_answered:
                 step_to: end_call
                 transition_definition: not_answered_definition
@@ -471,7 +479,7 @@ Event trigger configuration has next options.
     Type of the event, can have the following values: `create`, `update`, `delete`.
 * **field**
     Only for `update` event - field name that should be updated to handle trigger.
-* **queue**
+* **queued**
     [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
 * **require**
     String of Symfony Language Expression that should much to handle the trigger. Following aliases in context are available:

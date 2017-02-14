@@ -53,6 +53,9 @@ class ControllersTest extends WebTestCase
     /**
      * @depends testCreate
      * @dataProvider reportDataProvider
+     *
+     * @param array $report
+     * @param array $reportResult
      */
     public function testView(array $report, array $reportResult)
     {
