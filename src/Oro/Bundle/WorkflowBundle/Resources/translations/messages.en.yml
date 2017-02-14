@@ -162,6 +162,10 @@ oro:
             time_shift.label:     Time shift
             cron.label:           Cron Expression
 
+        variable:
+            save:
+                success_message: "Workflow configuration successfully updated."
+
         transition:
             start: "Start %workflow%"
 

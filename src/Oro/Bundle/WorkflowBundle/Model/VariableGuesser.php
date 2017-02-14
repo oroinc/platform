@@ -31,14 +31,17 @@ class VariableGuesser
     public function guessVariableForm(Variable $variable)
     {
         $type = $variable->getType();
-        if (isset($this->formTypeMapping[$type])) {
-            $formType = $this->formTypeMapping[$type]['type'];
-            $formOptions = array_merge($this->formTypeMapping[$type]['options'], $variable->getOptions());
-            if (!is_null($variable->getValue())) {
-                $formOptions['data'] = $variable->getValue();
-            }
-        } else {
+        if (!isset($this->formTypeMapping[$type])) {
             return null;
+        }
+
+        $formType = $this->formTypeMapping[$type]['type'];
+        $formOptions = array_merge($this->formTypeMapping[$type]['options'], $variable->getFormOptions());
+        if (!is_null($variable->getLabel())) {
+            $formOptions['label'] = $variable->getLabel();
+        }
+        if (!is_null($variable->getValue())) {
+            $formOptions['data'] = $variable->getValue();
         }
 
         return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);

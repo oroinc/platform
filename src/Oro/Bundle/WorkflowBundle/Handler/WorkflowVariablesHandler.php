@@ -28,22 +28,4 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
         $definition->setConfiguration($workflowCfg);
         $this->process($definition);
     }
-
-    /**
-     * @param WorkflowDefinition $definition
-     *
-     * @return bool
-     */
-    public function hasVariables(WorkflowDefinition $definition)
-    {
-        $workflowCfg = $definition->getConfiguration();
-        if (!isset($workflowCfg[WC::NODE_VARIABLE_DEFINITIONS]) ||
-            !isset($workflowCfg[WC::NODE_VARIABLE_DEFINITIONS][WC::NODE_VARIABLES])
-        ) {
-            return false;
-        }
-        $workflowVarConfig = $workflowCfg[WC::NODE_VARIABLE_DEFINITIONS][WC::NODE_VARIABLES];
-
-        return count($workflowVarConfig) ? true : false;
-    }
 }

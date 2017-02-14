@@ -1031,10 +1031,10 @@
         buttonCaption - Caption of add entity button
         tooltipText (optional) - text to render a tooltip for the collection field
 #}
-{% macro collectionField(field, label, buttonCaption, tooltipText = false) %}
+{% macro collectionField(field, label, buttonCaption, tooltipText = null) %}
     <div class="control-group">
         <div class="control-label wrap">
-            {% if tooltipText is defined %}
+            {% if tooltipText is not null %}
                 {{ _self.tooltip(tooltipText) }}
             {% endif %}
             <label>{{ label }}</label>

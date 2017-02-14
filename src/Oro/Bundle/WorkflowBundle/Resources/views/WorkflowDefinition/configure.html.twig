@@ -1,5 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
+{% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
+
 {% block stats %}
     <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
     <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
@@ -15,9 +17,13 @@
         'entity': entity,
         'indexPath': path('oro_workflow_definition_index'),
         'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
-        'entityTitle': entity.label
+        'additional': [{
+            'indexPath': path('oro_workflow_definition_view', {name: entity.name}),
+            'indexLabel': entity.label
+        }],
+        'entityTitle': 'oro.workflow.workflowdefinition.configuration.label'|trans
     } %}
-    
+
     {{ parent() }}
 
     <div class="pull-left">
@@ -35,8 +41,12 @@
     {% set data = [] %}
     {% for child in form %}
         {% if child.children %}
+            {% set tooltip = null %}
+            {% if child.vars.tooltip is defined %}
+                {% set tooltip = child.vars.tooltip %}
+            {% endif %}
             {% set data = data|merge([
-                UI.collectionField(child, child.vars.label, 'Add'|trans, {raw: child.vars.tooltip})])
+                UI.collectionField(child, child.vars.label, 'Add'|trans, tooltip)])
             %}
         {% else %}
             {% set data = data|merge([form_row(child)]) %}

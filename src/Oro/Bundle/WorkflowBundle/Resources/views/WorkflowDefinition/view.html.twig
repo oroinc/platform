@@ -83,7 +83,7 @@
         </span>
     {% endif %}
 
-    {% if resource_granted('CONFIGURE', entity) and hasVariables is defined and hasVariables %}
+    {% if resource_granted('CONFIGURE', entity) and variables is defined and variables|length %}
         {{ UI.button({
             'path' : path('oro_workflow_definition_configure', { 'name': entity.name }),
             'label': 'oro.workflow.workflowdefinition.configuration.label'|trans,
@@ -325,6 +325,31 @@
             ]
         },
     ] %}
+
+    {% if variables is defined and variables|length %}
+        {% set variablesInfo %}
+            <div class="widget-content">
+                <div class="row-fluid form-horizontal">
+                    <div class="responsive-block">
+                        {% for variable in variables %}
+                            {{ UI.renderProperty(
+                                variable.label,
+                                variable.value
+                            ) }}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+            'subblocks': [
+                {'data':  [variablesInfo]},
+            ]
+        }]) %}
+
+    {% endif %}
 
     {% set id = 'workflowDefinitionView' %}
     {% set data = {'dataBlocks': dataBlocks} %}

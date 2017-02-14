@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -72,17 +73,27 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
             $definition->getLabel(),
         ];
 
-        foreach ($config['steps'] as $item) {
+        foreach ($config[WorkflowConfiguration::NODE_STEPS] as $item) {
             $keys[] = $item['label'];
         }
 
-        foreach ($config['attributes'] as $item) {
+        foreach ($config[WorkflowConfiguration::NODE_ATTRIBUTES] as $item) {
             $keys[] = $item['label'];
         }
 
-        foreach ($config['transitions'] as $item) {
+        foreach ($config[WorkflowConfiguration::NODE_TRANSITIONS] as $item) {
             $keys[] = $item['label'];
             $keys[] = $item['message'];
+        }
+
+        if (isset($config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS])) {
+            $variableDefinitions = $config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+            foreach ($variableDefinitions[WorkflowConfiguration::NODE_VARIABLES] as $item) {
+                $keys[] = $item['label'];
+                if (isset($item['options']['form_options']['tooltip'])) {
+                    $keys[] = $item['options']['form_options']['tooltip'];
+                }
+            }
         }
 
         return $keys;

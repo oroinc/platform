@@ -69,7 +69,7 @@ class WorkflowVariablesType extends AbstractType
         foreach ($variables as $variable) {
             /** @var TypeGuess $typeGuess */
             $typeGuess = $this->variableGuesser->guessVariableForm($variable);
-            $builder->add($variable->getLabel(), $typeGuess->getType(), $typeGuess->getOptions());
+            $builder->add($variable->getName(), $typeGuess->getType(), $typeGuess->getOptions());
         }
     }
 
@@ -82,9 +82,7 @@ class WorkflowVariablesType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['workflow_definition']);
-
-        $resolver->setDefined(['workflow']);
+        $resolver->setDefined(['workflow', 'workflow_definition']);
 
         $resolver->setDefaults(
             [
