@@ -28,6 +28,7 @@ define(function(require) {
             stepsEl: null,
             model: null,
             entities: [],
+            entityFields: {},
             templateTranslateLink: null,
             selectorTranslateLinkContainer: '#workflow_translate_link_label'
         },
@@ -48,7 +49,7 @@ define(function(require) {
             var template = this.options.templateTranslateLink || $('#workflow-translate-link-template').html();
             this.templateTranslateLink = _.template(template);
 
-            this.initEntityFieldsLoader();
+            this.initEntityFieldsLoader(this.options.entityFields);
             this.listenTo(this.model.get('steps'), 'destroy ', this.onStepRemove);
         },
 
@@ -111,7 +112,10 @@ define(function(require) {
             this.$startStepEl.inputWidget('create', 'select2', {initializeOptions: select2Options});
         },
 
-        initEntityFieldsLoader: function() {
+        /**
+         * @param {Object} entityFields
+         */
+        initEntityFieldsLoader: function(entityFields) {
             var confirm = new Confirmation({
                 title: __('Change Entity Confirmation'),
                 okText: __('Yes'),
@@ -130,6 +134,7 @@ define(function(require) {
                 confirm: confirm,
                 requireConfirm: _.bind(this._requireConfirm, this)
             });
+            this.$entitySelectEl.fieldsLoader('setFieldsData', entityFields);
 
             this.$entitySelectEl.on('change', _.bind(function() {
                 if (!this._requireConfirm()) {
@@ -154,7 +159,7 @@ define(function(require) {
         _preloadEntityFieldsData: function() {
             if (this.$entitySelectEl.val()) {
                 var fieldsData = this.$entitySelectEl.fieldsLoader('getFieldsData');
-                if (!fieldsData.length) {
+                if (_.isEmpty(fieldsData)) {
                     this.$entitySelectEl.fieldsLoader('loadFields');
                 } else {
                     this.initEntityFieldsData(fieldsData);

@@ -11,7 +11,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow'
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@oro_workflow.manager'
+            - '@oro_workflow.manager.system'
         tags:
             - { name: oro_action.action, alias: start_workflow }
 
@@ -19,6 +19,14 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow'
         arguments:
             - '@oro_action.expression.context_accessor'
-            - '@oro_workflow.manager'
+            - '@oro_workflow.manager.system'
         tags:
             - { name: oro_action.action, alias: transit_workflow }
+
+    oro_workflow.action.get_available_workflow_by_record_group:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Action\GetAvailableWorkflowByRecordGroup'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_workflow.manager'
+        tags:
+            - { name: oro_action.action, alias: get_available_workflow_by_record_group }

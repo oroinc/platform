@@ -123,7 +123,7 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->method('getLoggedUser')
             ->will($this->returnValue($user));
 
-        $this->securityFacade->expects($this->once())
+        $this->securityFacade->expects($this->exactly(2))
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 
@@ -156,7 +156,7 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->method('getLoggedUser')
             ->will($this->returnValue($user));
 
-        $this->securityFacade->expects($this->once())
+        $this->securityFacade->expects($this->exactly(2))
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 

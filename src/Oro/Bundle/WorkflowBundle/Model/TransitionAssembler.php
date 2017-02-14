@@ -173,6 +173,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
+            ->setDestinationPage($this->getOption($options, 'destination_page'))
             ->setPageTemplate($this->getOption($options, 'page_template'))
             ->setDialogTemplate($this->getOption($options, 'dialog_template'))
             ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
@@ -197,10 +198,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setCondition($condition);
         }
 
-        if (!empty($definition['actions'])) {
-            $action = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['actions']);
-            $transition->setAction($action);
-        }
+        $this->processActions($transition, $definition['actions']);
 
         if (!empty($options['schedule'])) {
             $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
@@ -211,6 +209,27 @@ class TransitionAssembler extends BaseAbstractAssembler
         }
 
         return $transition;
+    }
+
+    /**
+     * @param ransition $transition
+     * @param array $actions
+     */
+    protected function processActions(Transition $transition, array $actions)
+    {
+        if ($transition->getDisplayType() === WorkflowConfiguration::TRANSITION_DISPLAY_TYPE_PAGE) {
+            $actions = array_merge([
+                [
+                    '@resolve_destination_page' => $transition->getDestinationPage(),
+                ],
+            ], $actions);
+        }
+
+        if (empty($actions)) {
+            return;
+        }
+
+        $transition->setAction($this->actionFactory->create(ConfigurableAction::ALIAS, $actions));
     }
 
     /**
