@@ -1,4 +1,3 @@
-{% import "OroUIBundle::macros.html.twig" as UI %}
 <div class="widget-content">
     {% if saved is defined and saved %}
         <script type="text/javascript">
@@ -21,14 +20,7 @@
 
         <div class="form-container">
             {% set formAction = app.request.uri %}
-            <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post"
-                  {{ UI.renderPageComponentAttributes({
-                      module: 'oroui/js/app/components/view-component',
-                      options: {
-                          view: 'oroui/js/app/views/jstree/move-form-view',
-                          choices: treeItems
-                      }
-                  }) }}>
+            <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post">
                 <fieldset class="form form-horizontal">
                     {% set formErrors = form_errors(form) %}
 

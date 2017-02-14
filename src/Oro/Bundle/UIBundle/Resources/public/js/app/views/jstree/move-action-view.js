@@ -40,8 +40,8 @@ define(function(require) {
                 dialogOptions: {
                     modal: true,
                     allowMaximize: true,
-                    width: 900,
-                    height: 400
+                    width: 650,
+                    minHeight: 100
                 }
             });
 

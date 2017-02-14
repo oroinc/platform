@@ -270,7 +270,6 @@ config:
         'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
         'oroui/js/app/views/jstree/subcategories-action-view': 'bundles/oroui/js/app/views/jstree/subcategories-action-view.js'
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
-        'oroui/js/app/views/jstree/move-form-view': 'bundles/oroui/js/app/views/jstree/move-form-view.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module

@@ -138,9 +138,11 @@ abstract class AbstractMenuController extends Controller
         $collection = new TreeCollection();
         $collection->source = array_intersect_key($treeItems, array_flip($selected));
 
+        $treeData = $handler->createTree($menu, true);
+        $handler->disableTreeItems($collection->source, $treeData);
         $form = $this->createForm(TreeMoveType::class, $collection, [
             'tree_items' => $treeItems,
-            'tree_data' => $handler->createTree($menu, true),
+            'tree_data' => $treeData,
         ]);
 
         $responseData = [

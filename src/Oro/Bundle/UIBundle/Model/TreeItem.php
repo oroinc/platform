@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Model;
 
-class TreeItem implements \JsonSerializable
+class TreeItem
 {
     /**
      * @param string $key
@@ -111,19 +111,30 @@ class TreeItem implements \JsonSerializable
     }
 
     /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasChildRecursive($key)
+    {
+        if (array_key_exists($key, $this->children)) {
+            return true;
+        }
+
+        foreach ($this->children as $child) {
+            if ($child->hasChildRecursive($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function __toString()
     {
         return $this->label;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->key,
-            'label' => $this->label,
-            'children' => $this->children,
-        ];
     }
 }
