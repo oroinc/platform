@@ -32,7 +32,7 @@ define(function(require) {
                 this.select2Config.allowClear = true;
             }
             if (this.select2Config.allowClear && !this.select2Config.placeholderOption && $placeholder.length) {
-                this.select2Config.placeholderOption = function () {
+                this.select2Config.placeholderOption = function() {
                     return $placeholder;
                 };
             }

@@ -143,7 +143,7 @@ abstract class AbstractMenuController extends Controller
             'tree_data' => $treeData,
         ]);
 
-        $response = [
+        $responseData = [
             'scope' => $scope,
             'menuName' => $menu->getName(),
             'treeItems' => $treeItems,
@@ -162,7 +162,7 @@ abstract class AbstractMenuController extends Controller
                 $collection->source,
                 $scope,
                 $collection->target->getKey(),
-                0
+                count($collection->target->getChildren())
             );
 
             foreach ($updates as $update) {
@@ -171,10 +171,10 @@ abstract class AbstractMenuController extends Controller
                     $form->addError(new FormError(
                         $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message')
                     ));
-                    return array_merge($response, ['form' => $form->createView()]);
+                    return array_merge($responseData, ['form' => $form->createView()]);
                 }
                 $entityManager->persist($update);
-                $response['changed'][] = [
+                $responseData['changed'][] = [
                     'id' => $update->getKey(),
                     'parent' => $collection->target->getKey(),
                     'position' => $update->getPriority()
@@ -184,10 +184,10 @@ abstract class AbstractMenuController extends Controller
             $entityManager->flush();
             $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
 
-            $response['saved'] = true;
+            $responseData['saved'] = true;
         }
 
-        return array_merge($response, ['form' => $form->createView()]);
+        return array_merge($responseData, ['form' => $form->createView()]);
     }
 
     /**
