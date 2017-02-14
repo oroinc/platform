@@ -331,11 +331,13 @@ class MenuUpdateManager
         }
 
         $order = [];
-        $i = $position + count($treeItems);
+        $i = 0;
 
         /** @var ItemInterface $child */
         foreach ($parent->getChildren() as $child) {
-                $order[$i++] = $child;
+            $newPosition = $i < $position ? $i : $i + count($treeItems);
+            $order[$newPosition] = $child;
+            $i++;
         }
 
         return array_merge(

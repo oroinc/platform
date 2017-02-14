@@ -136,7 +136,7 @@ abstract class AbstractMenuController extends Controller
         $selected = $request->get('selected', []);
 
         $collection = new TreeCollection();
-        $collection->source = array_intersect_key($treeItems, array_flip($selected));
+        $collection->source = array_intersect_key($treeItems, array_flip($request->get('selected', [])));
 
         $treeData = $handler->createTree($menu, true);
         $handler->disableTreeItems($collection->source, $treeData);
@@ -164,7 +164,7 @@ abstract class AbstractMenuController extends Controller
                 $collection->source,
                 $scope,
                 $collection->target->getKey(),
-                0
+                count($collection->target->getChildren())
             );
 
             $changed = [];
