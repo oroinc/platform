@@ -193,6 +193,6 @@ class UserMenuControllerTest extends WebTestCase
             ->getManagerForClass('OroNavigationBundle:MenuUpdate')
             ->getRepository('OroNavigationBundle:MenuUpdate');
         $menuUpdate = $repository->findOneBy(['key' => LoadMenuUpdateData::MENU_UPDATE_1_1]);
-        $this->assertEquals($menuUpdate->getParentKey(), LoadMenuUpdateData::MENU_UPDATE_1);
+        $this->assertEquals(LoadMenuUpdateData::MENU_UPDATE_1, $menuUpdate->getParentKey());
     }
 }

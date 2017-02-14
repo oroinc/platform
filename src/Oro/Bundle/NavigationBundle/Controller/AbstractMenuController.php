@@ -147,6 +147,7 @@ abstract class AbstractMenuController extends Controller
             'scope' => $scope,
             'menuName' => $menu->getName(),
             'treeItems' => $treeItems,
+            'changed' => [],
         ];
 
         $manager = $this->get('oro_navigation.manager.menu_update');
