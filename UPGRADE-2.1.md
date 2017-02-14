@@ -285,6 +285,8 @@ WorkflowBundle
 - Added third argument `Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver $destinationPageResolver` to constructor of `Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension`
 - Added `variable_definitions` to workflow definition
 - `Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader`:
+- Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
+    - first argument argument `WorkflowManager $workflowManager` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
 
 TestFrameworkBundle
 -------------------
