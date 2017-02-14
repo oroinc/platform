@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\EntityConfigBundle\Config\DebugConfigCache;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
@@ -20,6 +21,7 @@ class EntityConfigPass implements CompilerPassInterface
     const CONFIG_BAG_SERVICE             = 'oro_entity_config.provider_config_bag';
     const CONFIG_PROVIDER_BAG_SERVICE    = 'oro_entity_config.provider_bag';
     const CONFIG_PROVIDER_SERVICE_PREFIX = 'oro_entity_config.provider.';
+    const CONFIG_CACHE_SERVICE           = 'oro_entity_config.cache';
 
     const ENTITY_CONFIG_ROOT_NODE = 'entity_config';
 
@@ -65,6 +67,12 @@ class EntityConfigPass implements CompilerPassInterface
             $provider = new Definition(ConfigProvider::class, [$scope]);
             $provider->setFactory([$providerBagRef, 'getProvider']);
             $container->setDefinition(self::CONFIG_PROVIDER_SERVICE_PREFIX . $scope, $provider);
+        }
+
+        // use a special implementation of the config cache in the debug mode
+        if ($container->getParameter('kernel.debug')) {
+            $container->getDefinition(self::CONFIG_CACHE_SERVICE)
+                ->setClass(DebugConfigCache::class);
         }
     }
 

@@ -18,6 +18,7 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowApplicabilityFilterInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
@@ -78,7 +79,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $this->workflowRegistry,
             $this->doctrineHelper,
             $this->eventDispatcher,
-            $this->entityConnector
+            $this->entityConnector,
+            new StartedWorkflowsBag()
         );
         $this->workflowManager->setLogger($this->logger);
     }

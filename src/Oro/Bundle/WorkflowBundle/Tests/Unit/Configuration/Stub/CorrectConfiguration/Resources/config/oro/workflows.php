@@ -1,5 +1,7 @@
 <?php
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 
 return [
@@ -91,6 +93,7 @@ return [
                 ],
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
+                'destination_page' => 'name',
                 'page_template' => 'Workflow:Test:pageTemplate.html.twig',
                 'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
                 'form_options' => [
@@ -187,6 +190,8 @@ return [
         'entity_restrictions' => [],
         'exclusive_active_groups' => ['active_group1'],
         'exclusive_record_groups' => ['record_group1'],
+        WorkflowConfiguration::NODE_APPLICATIONS => [CurrentApplicationProviderInterface::DEFAULT_APPLICATION],
+        'force_autostart' => false,
     ],
     'second_workflow' => [
         'entity' => 'Second\Entity',
@@ -222,6 +227,7 @@ return [
                 'acl_message' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'display_type' => 'dialog',
+                'destination_page' => '',
                 'form_options' => [],
                 'page_template' => null,
                 'dialog_template' => null,
@@ -246,5 +252,7 @@ return [
         'entity_restrictions' => [],
         'exclusive_active_groups' => [],
         'exclusive_record_groups' => [],
+        WorkflowConfiguration::NODE_APPLICATIONS => ['other_application'],
+        'force_autostart' => true,
     ]
 ];

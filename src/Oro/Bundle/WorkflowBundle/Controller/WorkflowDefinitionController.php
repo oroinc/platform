@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -91,12 +93,21 @@ class WorkflowDefinitionController extends Controller
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
+        $entityFields = [];
+        if (null !== $workflowDefinition->getRelatedEntity()) {
+            /* @var $provider EntityWithFieldsProvider */
+            $provider = $this->get('oro_entity.entity_field_list_provider');
+            $entityFields = $provider->getFields(false, false, true, false, true, true);
+        }
+
         return [
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
             'translateLinks' => $translateLinks,
+            'entityFields' => $entityFields,
+            'availableDestinations' => DestinationPageResolver::AVAILABLE_DESTINATIONS,
         ];
     }
 
@@ -182,7 +193,7 @@ class WorkflowDefinitionController extends Controller
         $response['workflowsToDeactivation'] = $workflowsToDeactivation->getValues();
 
         if ($form->isValid()) {
-            $workflowManager = $this->get('oro_workflow.manager');
+            $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
             $workflowNames = array_merge(
                 $form->getData(),
                 $workflowsToDeactivation->map(
@@ -229,7 +240,7 @@ class WorkflowDefinitionController extends Controller
      */
     protected function getWorkflowsToDeactivation(WorkflowDefinition $workflowDefinition)
     {
-        $workflows = $this->get('oro_workflow.registry')
+        $workflows = $this->get('oro_workflow.registry.system')
             ->getActiveWorkflowsByActiveGroups($workflowDefinition->getExclusiveActiveGroups());
 
         return $workflows->filter(
