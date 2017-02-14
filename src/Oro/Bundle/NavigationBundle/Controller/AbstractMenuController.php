@@ -131,19 +131,22 @@ abstract class AbstractMenuController extends Controller
         $scope = $this->getScope($context);
 
         $handler = $this->get('oro_navigation.tree.menu_update_tree_handler');
-        $choices = $handler->getTreeItemList($menu, true);
+        $treeItems = $handler->getTreeItemList($menu, true);
 
         $collection = new TreeCollection();
-        $collection->source = array_intersect_key($choices, array_flip($request->get('selected', [])));
+        $collection->source = array_intersect_key($treeItems, array_flip($request->get('selected', [])));
 
+        $treeData = $handler->createTree($menu, true);
+        $handler->disableTreeItems($collection->source, $treeData);
         $form = $this->createForm(TreeMoveType::class, $collection, [
-            'source_config' => ['choices' => $choices],
-            'target_config' => ['choices' => $choices],
+            'tree_items' => $treeItems,
+            'tree_data' => $treeData,
         ]);
 
         $response = [
             'scope' => $scope,
-            'menuName' => $menu->getName()
+            'menuName' => $menu->getName(),
+            'treeItems' => $treeItems,
         ];
 
         $manager = $this->get('oro_navigation.manager.menu_update');

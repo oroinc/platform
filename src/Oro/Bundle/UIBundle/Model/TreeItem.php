@@ -68,6 +68,29 @@ class TreeItem
     }
 
     /**
+     * Finds all parents recursively
+     *
+     * @param bool $includeRoot
+     * @return array
+     */
+    public function getParents($includeRoot = false)
+    {
+        $parents = [];
+        $currentParent = $this->parent;
+
+        while ($currentParent !== null) {
+            array_unshift($parents, $currentParent);
+            $currentParent = $currentParent->getParent();
+        }
+
+        if (!$includeRoot && count($parents) > 0) {
+            array_shift($parents);
+        }
+
+        return $parents;
+    }
+
+    /**
      * @return TreeItem[]
      */
     public function getChildren()
@@ -85,6 +108,26 @@ class TreeItem
         $this->children[$child->key] = $child;
 
         return $this;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasChildRecursive($key)
+    {
+        if (array_key_exists($key, $this->children)) {
+            return true;
+        }
+
+        foreach ($this->children as $child) {
+            if ($child->hasChildRecursive($key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

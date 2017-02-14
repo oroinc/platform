@@ -6,6 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var DialogWidget = require('oro/dialog-widget');
     var routing = require('routing');
+    var messenger = require('oroui/js/messenger');
 
     MoveActionView = AbstractActionView.extend({
         options: _.extend({}, AbstractActionView.prototype.options, {
@@ -18,6 +19,11 @@ define(function(require) {
         onClick: function() {
             var $tree = this.options.$tree;
             var selectedIds = $tree.jstree('get_checked');
+
+            if (!selectedIds.length) {
+                messenger.notificationFlashMessage('warning', _.__('oro.ui.jstree.no_node_selected_error'));
+                return;
+            }
 
             var url = false;
             if (this.options.routeName) {
@@ -34,24 +40,19 @@ define(function(require) {
                 dialogOptions: {
                     modal: true,
                     allowMaximize: true,
-                    width: 900,
-                    height: 400,
-                    close: _.bind(this.onDialogClose, this)
+                    width: 650,
+                    minHeight: 100
                 }
             });
 
             this.dialogWidget.once('formSave', _.bind(function(changed) {
                 _.each(changed, function(data) {
                     $tree.jstree('move_node', data.id, data.parent, data.position);
-                    $tree.jstree('uncheck_node', "#"+data.id);
+                    $tree.jstree('uncheck_node', '#' + data.id);
                 });
             }, this));
 
             this.dialogWidget.render();
-        },
-
-        onDialogClose: function() {
-            this.$(this.inputSelector).off('.' + this.dialogWidget._wid);
         }
     });
 

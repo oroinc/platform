@@ -28,6 +28,47 @@ class TreeItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($parentTreeItem, $treeItem->getParent());
     }
 
+    /**
+     * @dataProvider getParentsProvider
+     *
+     * @param TreeItem $item
+     * @param bool $includeRoot
+     * @param TreeItem[] $expectedParents
+     */
+    public function testGetParents($item, $includeRoot, array $expectedParents)
+    {
+        $this->assertEquals($expectedParents, $item->getParents($includeRoot));
+    }
+
+    public function getParentsProvider()
+    {
+        $bazItem = new TreeItem('baz');
+
+        $barItem = new TreeItem('bar');
+        $barItem->setParent($bazItem);
+
+        $fooItem = new TreeItem('foo');
+        $fooItem->setParent($barItem);
+
+        return [
+            'with no parents' => [
+                'item' => new TreeItem('foo'),
+                'includeRoot' => false,
+                'expectedParents' => [],
+            ],
+            'without root' => [
+                'item' => $fooItem,
+                'includeRoot' => false,
+                'expectedParents' => [$barItem],
+            ],
+            'with root' => [
+                'item' => $fooItem,
+                'includeRoot' => true,
+                'expectedParents' => [$bazItem, $barItem],
+            ],
+        ];
+    }
+
     public function testChildren()
     {
         $parentTreeItem = new Treeitem('parent', 'Parent');

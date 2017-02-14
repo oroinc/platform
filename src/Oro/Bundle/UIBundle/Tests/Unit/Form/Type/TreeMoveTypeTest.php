@@ -46,18 +46,20 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
      */
     public function testSubmit(TreeCollection $defaultData, array $submittedData, TreeCollection $expectedData)
     {
-        $choices = [
+        $treeItems = [
             'child' => new TreeItem('child', 'Child'),
             'parent' => new TreeItem('parent', 'Parent'),
         ];
+        $treeItems['child']->setParent($treeItems['parent']);
+
+        $treeData = [
+            ['id' => 'child', 'text' => 'Child'],
+            ['id' => 'parent', 'text' => 'Parent'],
+        ];
 
         $form = $this->factory->create($this->type, $defaultData, [
-            'source_config' => [
-                'choices' => $choices
-            ],
-            'target_config' => [
-                'choices' => $choices
-            ]
+            'tree_items' => $treeItems,
+            'tree_data' => $treeData,
         ]);
 
         $form->submit($submittedData);
@@ -71,20 +73,18 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
      */
     public function submitProvider()
     {
-        $child = new TreeItem('child', 'Child');
         $parent = new TreeItem('parent', 'Parent');
 
+        $child = new TreeItem('child', 'Child');
+        $child->setParent($parent);
+
         $collection = new TreeCollection();
-        $collection->source = [$child];
         $collection->target = $parent;
 
         return [
             'with data' => [
                 'defaultData' => new TreeCollection(),
                 'submittedData' => [
-                    'source' => [
-                        'child'
-                    ],
                     'target' => 'parent'
                 ],
                 'expectedData' => $collection,
@@ -97,38 +97,13 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    public function testConfigureOptions()
-    {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
-        $resolver = $this->createMock(OptionsResolver::class);
-
-        $resolver->expects($this->once())
-            ->method('setDefaults')
-            ->with($this->isType('array'))
-            ->willReturnCallback(
-                function (array $options) {
-                    $this->assertArrayHasKey('data_class', $options);
-                    $this->assertEquals(TreeCollection::class, $options['data_class']);
-                    $this->assertArrayHasKey('source_config', $options);
-                    $this->assertArrayHasKey('target_config', $options);
-                }
-            );
-
-        $this->type->configureOptions($resolver);
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function getExtensions()
     {
         return [
-            new PreloadedExtension(
-                [
-                    'genemu_jqueryselect2_choice' => new Select2Type('choice'),
-                ],
-                ['form' => [new AdditionalAttrExtension()]]
-            )
+            new PreloadedExtension([], ['form' => [new AdditionalAttrExtension()]])
         ];
     }
 }
