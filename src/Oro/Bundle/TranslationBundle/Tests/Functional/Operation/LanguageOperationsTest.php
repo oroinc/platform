@@ -136,7 +136,8 @@ class LanguageOperationsTest extends ActionTestCase
      */
     private function mockLanguageHelper(LanguageHelper $languageHelper)
     {
-        $client = self::createClient([], $this->generateBasicAuthHeader());
+        self::resetClient();
+        $client = $this->initClient([], $this->generateBasicAuthHeader());
         self::$kernel->getContainer()->set('oro_translation.helper.language', $languageHelper);
 
         return $client;
