@@ -390,8 +390,8 @@ Transition configuration has next options:
     *string*
     (optional) Parameter used only when `display_type` equals `page`.
     Specified value will be converted to url by entity configuration (see action `@resolve_destination_page`).
-    In case when `@redirect` action used in `actions` of transition definition, effect from taht option will be ignored.
-    Allowed values: `name` or `index` (`index` - will be converted to `name`) , 'view' or `~`. Default value `~`.
+    In case when `@redirect` action used in `actions` of transition definition, effect from that option will be ignored.
+    Allowed values: `name` or `index` (`index` - will be converted to `name`) , `view` or `~`. Default value `~`.
 * **page_template**
     *string*
     Custom transition template for transition pages. Should be extended from OroWorkflowBundle:Workflow:transitionForm.html.twig.
@@ -559,14 +559,6 @@ Transition definition configuration has next options.
     Configuration of Conditions that must satisfy to allow transition.
 * **actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
-* **form_init**
-    Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
-* **pre_conditions**
-    Deprecated, use `preconditions` instead.
-* **init_actions**
-    Deprecated, use `form_init` instead.
-* **post_actions**
-    Deprecated, use `actions` instead.
 
 Example
 -------
