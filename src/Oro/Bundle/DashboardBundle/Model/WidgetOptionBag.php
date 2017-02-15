@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-class WidgetOptionBag
+class WidgetOptionBag implements \Serializable
 {
     /**
      * @var array
@@ -48,5 +48,21 @@ class WidgetOptionBag
     public function all()
     {
         return $this->options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize($this->options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($data)
+    {
+        $this->options = unserialize($data);
     }
 }
