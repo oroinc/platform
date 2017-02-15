@@ -40,7 +40,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
-    const DEFAULT_PAGE_FORM_DATA_ATTRIBUTE = 'form_data';
 
     const NODE_PAGE_FORM_CONFIGURATION = 'page_form_configuration';
 
@@ -574,7 +573,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->isRequired()
                     ->end()
                     ->scalarNode('data_attribute')
-                        ->defaultValue(self::DEFAULT_PAGE_FORM_DATA_ATTRIBUTE)
+                        ->isRequired()
                     ->end()
                     ->scalarNode('template')
                         ->isRequired()

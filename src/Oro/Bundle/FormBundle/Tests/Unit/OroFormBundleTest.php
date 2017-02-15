@@ -1,14 +1,13 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit;
+namespace Oro\Bundle\FormBundle\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler as Compiler;
-use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
+use Oro\Bundle\FormBundle\DependencyInjection\Compiler as Compiler;
+use Oro\Bundle\FormBundle\OroFormBundle;
 
-
-class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
+class OroFormBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testBuild()
     {
@@ -22,7 +21,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    Compiler\AddAttributeNormalizerCompilerPass::class
+                    Compiler\AutocompleteCompilerPass::class
                 )
             );
 
@@ -30,7 +29,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    Compiler\AddWorkflowValidationLoaderCompilerPass::class
+                    Compiler\FormCompilerPass::class
                 )
             );
 
@@ -38,7 +37,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    Compiler\WorkflowChangesEventsCompilerPass::class
+                    Compiler\FormGuesserCompilerPass::class
                 )
             );
 
@@ -46,7 +45,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    Compiler\EventTriggerExtensionCompilerPass::class
+                    Compiler\FormTemplateDataProviderCompilerPass::class
                 )
             );
 
@@ -54,19 +53,11 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    Compiler\WorkflowConfigurationHandlerCompilerPass::class
+                    Compiler\FormHandlerCompilerPass::class
                 )
             );
 
-        $containerBuilder->expects($this->at(5))
-            ->method('addCompilerPass')
-            ->with(
-                $this->isInstanceOf(
-                    Compiler\WorkflowDefinitionBuilderExtensionCompilerPass::class
-                )
-            );
-
-        $bundle = new OroWorkflowBundle();
+        $bundle = new OroFormBundle();
         $bundle->build($containerBuilder);
     }
 }

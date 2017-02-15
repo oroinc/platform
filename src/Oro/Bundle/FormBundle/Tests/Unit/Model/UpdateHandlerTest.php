@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
+use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -59,6 +60,11 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     protected $resultCallbackInvoked;
 
     /**
+     * @var FormHandler
+     */
+    protected $formHandler;
+
+    /**
      * @var FormTemplateDataProviderRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
     private $formTemplateDataProviderRegistry;
@@ -82,6 +88,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
         $this->formTemplateDataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);
+        $this->formHandler = new FormHandler($this->eventDispatcher, $this->doctrineHelper);
 
         $this->resultCallbackInvoked = false;
 
@@ -90,7 +97,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             $this->session,
             $this->router,
             $this->doctrineHelper,
-            $this->eventDispatcher,
+            $this->formHandler,
             $this->formTemplateDataProviderRegistry
         );
     }

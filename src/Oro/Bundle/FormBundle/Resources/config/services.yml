@@ -2,7 +2,6 @@ parameters:
     oro_form.validator.constraint_factory.class: Oro\Bundle\FormBundle\Validator\ConstraintFactory
     oro_form.twig.form.class:                    Oro\Bundle\FormBundle\Twig\FormExtension
     oro_form.twig.js_validation_extension.class: Oro\Bundle\FormBundle\Twig\JsValidationExtension
-    oro_form.model.update_handler.class:         Oro\Bundle\FormBundle\Model\UpdateHandler
     oro_form.provider.html_tag_provider.class:   Oro\Bundle\FormBundle\Provider\HtmlTagProvider
     oro_form.event.event_dispatcher.class:       Oro\Bundle\FormBundle\Event\EventDispatcher
 
@@ -21,14 +20,14 @@ services:
             - { name: twig.extension }
 
     oro_form.model.update_handler:
-        class: %oro_form.model.update_handler.class%
+        class: 'Oro\Bundle\FormBundle\Model\UpdateHandler'
         scope: request
         arguments:
             - '@request_stack'
             - '@session'
             - '@oro_ui.router'
             - '@oro_entity.doctrine_helper'
-            - '@oro_form.event.event_dispatcher'
+            - '@oro_form.form.handler.default'
             - '@oro_form.registry.form_template_data_provider'
 
     oro_form.provider.html_tag_provider:
@@ -52,4 +51,18 @@ services:
             - '@oro_form.doctrine.orm.validator_initializer.inner'
 
     oro_form.registry.form_template_data_provider:
+        public: false
         class: 'Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry'
+
+    oro_form.registry.form_handler:
+        public: false
+        class: 'Oro\Bundle\FormBundle\Model\FormHandlerRegistry'
+
+    oro_form.form.handler.default:
+        public: false
+        class: 'Oro\Bundle\FormBundle\Form\Handler\FormHandler'
+        arguments:
+            - '@oro_form.event.event_dispatcher'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_form.form.handler }

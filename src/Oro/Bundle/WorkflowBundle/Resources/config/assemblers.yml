@@ -21,6 +21,7 @@ services:
             - '@oro_workflow.form_options_assembler'
             - '@oro_action.expression.factory'
             - '@oro_action.action_factory'
+            - '@oro_workflow.page_form_configuration_assembler'
 
     oro_workflow.workflow_assembler:
         class: %oro_workflow.workflow_assembler.class%
@@ -59,3 +60,10 @@ services:
 
     oro_workflow.restriction_assembler:
         class: 'Oro\Bundle\WorkflowBundle\Model\RestrictionAssembler'
+
+    oro_workflow.page_form_configuration_assembler:
+        class: 'Oro\Bundle\WorkflowBundle\Model\PageFormConfigurationAssembler'
+        arguments:
+            - '@form.registry'
+            - '@oro_form.registry.form_handler'
+            - '@oro_form.registry.form_template_data_provider'
