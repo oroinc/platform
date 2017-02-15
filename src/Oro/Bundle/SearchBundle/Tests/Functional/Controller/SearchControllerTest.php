@@ -9,37 +9,30 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @group search
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class SearchControllerTest extends WebTestCase
 {
     use SearchExtensionTrait;
 
-    /**
-     * @var bool
-     */
-    protected static $hasLoaded = false;
-
     protected function setUp()
     {
         parent::setUp();
 
-        $this->initClient([], $this->generateBasicAuthHeader(), true);
+        $this->initClient([], $this->generateBasicAuthHeader());
 
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
         $this->getSearchIndexer()->resetIndex(Item::class);
         $this->ensureItemsLoaded($alias, 0);
 
-        $this->loadFixtures([LoadSearchItemData::class], true);
+        $this->loadFixtures([LoadSearchItemData::class]);
         $this->getSearchIndexer()->reindex(Item::class);
         $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
     }
 
     protected function tearDown()
     {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
+        $this->clearIndexTextTable();
     }
 
     /**

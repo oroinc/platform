@@ -59,7 +59,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      * Example: And user have "User" permissions for "View" "Business Customer" entity
      * Example: And I set administrator permissions on Delete Cases to None
      *
-     * @Given /^(?P<user>(administrator|user)) have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entity$/
+     * @Given /^(?P<user>(administrator|user)) have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entit(y|ies)$/
      * @Given /^(?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) is set to (?P<accessLevel>(?:[^"]|\\")*)$/
      * @When /^(?:|I )set (?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) to (?P<accessLevel>(?:[^"]|\\")*)$/
      */
@@ -70,11 +70,18 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $this->getMink()->setDefaultSessionName('second_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
-        $singularizedEntity = ucfirst(Inflector::singularize($entity));
+        $singularizedEntities = array_map(function ($element) {
+            return trim(ucfirst(Inflector::singularize($element)));
+        }, explode(',', $entity));
+
         $this->loginAsAdmin();
 
         $userRoleForm = $this->openRoleEditForm($role);
-        $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
+
+        foreach ($singularizedEntities as $singularizedEntity) {
+            $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
+        }
+
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
