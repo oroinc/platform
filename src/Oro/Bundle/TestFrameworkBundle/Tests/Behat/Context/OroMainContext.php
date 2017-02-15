@@ -210,7 +210,6 @@ class OroMainContext extends MinkContext implements
      *            | Subject         | This value should not be blank.  |
      *
      * @Then /^(?:|I )should see validation errors:$/
-     * @param TableNode $table
      */
     public function iShouldSeeValidationErrors(TableNode $table)
     {

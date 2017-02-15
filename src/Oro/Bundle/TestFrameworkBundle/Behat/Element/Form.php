@@ -226,7 +226,7 @@ class Form extends Element
     /**
      * Retrieves validation error message text for provided field name
      *
-     * @param $fieldName
+     * @param string $fieldName
      * @return string
      */
     public function getFieldValidationErrors($fieldName)
