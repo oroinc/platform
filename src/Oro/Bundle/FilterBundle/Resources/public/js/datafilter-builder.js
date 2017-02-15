@@ -46,9 +46,15 @@ define(function(require) {
             }
 
             var filtersList;
+            var $filterContainer;
             var options = methods.combineOptions.call(this);
-            var $filterContainer = this.$el.find('[data-datafilter-container]').length ?
-                                        this.$el.find('[data-datafilter-container]') : this.$el;
+
+            if (this.filterContainerSelector && this.$el.find(this.filterContainerSelector).length) {
+                $filterContainer = this.$el.find(this.filterContainerSelector);
+            }
+            else {
+                $filterContainer = this.$el;
+            }
 
             options.collection = this.collection;
             options.el = $('<div/>').prependTo($filterContainer);
@@ -172,7 +178,7 @@ define(function(require) {
                 modules: null
             };
 
-            _.extend(self, _.pick(options, 'filtersStateElement', 'enableToggleFilters'));
+            _.extend(self, _.pick(options, 'filtersStateElement', 'filterContainerSelector', 'enableToggleFilters'));
 
             methods.initBuilder.call(self);
 
