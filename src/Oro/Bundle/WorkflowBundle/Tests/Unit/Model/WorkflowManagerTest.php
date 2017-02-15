@@ -1190,8 +1190,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                     $attributeManager,
                     $transitionManager,
                     $variableManager
-                ]
-            )
+                ])
             ->setMethods(
                 [
                     'isTransitionAllowed',
