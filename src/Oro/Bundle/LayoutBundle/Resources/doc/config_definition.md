@@ -116,8 +116,10 @@ requirejs_scripts:
 A **page_template** is a collection of files that expand the visual presentation for one or more route names.
 
 ### Configuration
-Page templates configuration file should be placed in `layout/{theme_name}/config` folder and named `page_templates.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/config/page_templates.yml`.
-All page template **layout updates** stored in `layout/{theme_name}/{route_name}/{page_template_KEY}/` folder, for example `DemoBundle/Resources/views/layouts/first_theme/demo_first_route_name/custom/layout.yml`.
+Page templates configuration file should be placed in `layout/{theme_name}/config` folder and named `page_templates.yml`, 
+for example `DemoBundle/Resources/views/layouts/first_theme/config/page_templates.yml`.
+All page template **layout updates** stored in `layout/{theme_name}/{route_name}/page_template/{page_template_KEY}/` folder, 
+for example `DemoBundle/Resources/views/layouts/first_theme/demo_first_route_name/page_template/custom/layout.yml`.
 
 #### Additional configuration reference
 | Option | Description | Required |
@@ -156,6 +158,7 @@ titles:
 
 _NOTICE:_ Pay attention that page templates inherit parent themes. 
 You can simple override existing page template, just add **layout update** file to page template path in your child theme, 
-for example if `first_theme` is parent theme of `second_theme` you need to put page template to `DemoBundle/Resources/views/layouts/second_theme/demo_first_route_name/custom/layout.yml`.
+for example if `first_theme` is parent theme of `second_theme` you need to put page template to 
+`DemoBundle/Resources/views/layouts/second_theme/demo_first_route_name/page_template/custom/layout.yml`.
 
 Also you can disable some page templates adding `enabled: false`.
