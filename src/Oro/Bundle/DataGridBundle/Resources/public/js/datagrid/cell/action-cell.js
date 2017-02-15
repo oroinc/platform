@@ -115,8 +115,9 @@ define([
                 this.actionsDropdown = opts.themeOptions.actionsDropdown;
             }
 
-            this.launcherMode = _.isObject(opts.themeOptions.launcherOptions) ?
-                                    opts.themeOptions.launcherOptions.launcherMode : false;
+            if (_.isObject(opts.themeOptions.launcherOptions)) {
+                this.launcherMode = opts.themeOptions.launcherOptions.launcherMode;
+            }
 
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();

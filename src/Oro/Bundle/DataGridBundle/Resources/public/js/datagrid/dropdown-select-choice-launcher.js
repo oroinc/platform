@@ -50,8 +50,8 @@ define(function(require) {
         /** @property {Boolean} */
         iconHideText: config.iconHideText,
 
-        /** @property {String} */
-        launcherMode: config.launcherMode,
+        /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
+        launcherMode: '',
 
         /** @property {String} */
         className: undefined,
@@ -131,7 +131,23 @@ define(function(require) {
             this.items = opts.items;
 
             this.action = opts.action;
+
             SelectChoiceLauncher.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @return {String}
+         */
+        _convertToLauncherMode: function() {
+            var old = '';
+
+            if (this.icon) {
+                old = this.iconHideText ? 'icon-only'  : 'icon-text';
+            } else {
+                old = 'text-only';
+            }
+
+            return old;
         },
 
         /**
@@ -150,6 +166,7 @@ define(function(require) {
         getTemplateData: function() {
             var label = this.label || this.action.label;
 
+            this.launcherMode = this.launcherMode || this._convertToLauncherMode();
             return {
                 label: label,
                 icon: this.selectedItem.icon,

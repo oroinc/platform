@@ -10,8 +10,7 @@ define(function(require) {
 
     var config = module.config();
     config = _.extend({
-        iconHideText: true,
-        launcherMode: false
+        iconHideText: true
     }, config);
 
     /**
@@ -50,10 +49,11 @@ define(function(require) {
         iconClassName: undefined,
 
         /** @property {Boolean} */
+        /** @deprecated use options.launcherMode */
         iconHideText: config.iconHideText,
 
-        /** @property {String} */
-        launcherMode: config.launcherMode,
+        /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
+        launcherMode: '',
 
         /** @property {String} */
         className: undefined,
@@ -125,6 +125,21 @@ define(function(require) {
         },
 
         /**
+         * @return {String}
+         */
+        _convertToLauncherMode: function() {
+            var old = '';
+
+            if (this.icon) {
+                old = this.iconHideText ? 'icon-only'  : 'icon-text';
+            } else {
+                old = 'text-only';
+            }
+
+            return old;
+        },
+
+        /**
          * @inheritDoc
          */
         dispose: function() {
@@ -140,13 +155,13 @@ define(function(require) {
         getTemplateData: function() {
             var label = this.label || this.action.label;
 
+            this.launcherMode = this.launcherMode || this._convertToLauncherMode();
             return {
                 label: label,
                 icon: this.icon,
                 title: this.title || label,
                 className: this.className,
                 iconClassName: this.iconClassName,
-                iconHideText: this.iconHideText,
                 launcherMode: this.launcherMode,
                 link: this.link,
                 links: this.links,
