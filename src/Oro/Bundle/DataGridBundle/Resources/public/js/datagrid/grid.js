@@ -436,7 +436,9 @@ define(function(require) {
          * @private
          */
         _initActions: function(opts) {
-            _.extend(this.actionOptions, opts.themeOptions.actionOptions);
+            if (_.isObject(opts.themeOptions)) {
+                _.extend(this.actionOptions, opts.themeOptions.actionOptions);
+            }
         },
 
         /**

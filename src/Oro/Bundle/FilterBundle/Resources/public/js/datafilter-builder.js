@@ -51,8 +51,7 @@ define(function(require) {
 
             if (this.filterContainerSelector && this.$el.find(this.filterContainerSelector).length) {
                 $filterContainer = this.$el.find(this.filterContainerSelector);
-            }
-            else {
+            } else {
                 $filterContainer = this.$el;
             }
 
