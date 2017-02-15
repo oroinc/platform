@@ -19,6 +19,7 @@ workflows:
             - 'active_group1'
         exclusive_record_groups:
             - 'record_group1'
+        applications: ['default']
         steps:
             first_step:
                 order: 1
@@ -55,6 +56,7 @@ workflows:
                     class: foo
                 form_type: custom_workflow_transition
                 display_type: page
+                destination_page: index
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
                 init_entities:
@@ -133,3 +135,5 @@ workflows:
         transition_definitions:
             -
                 name: second_transition_definition
+        applications: ['other_application']
+        force_autostart: true

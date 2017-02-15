@@ -38,4 +38,16 @@ class ConfigValueRepository extends EntityRepository
         }
         $this->getEntityManager()->commit();
     }
+
+    /**
+     * @param string $section
+     */
+    public function removeBySection($section)
+    {
+        $qb = $this->createQueryBuilder('configValue');
+        $qb->delete()
+            ->where($qb->expr()->eq('configValue.section', ':section'))
+            ->setParameter('section', $section)
+            ->getQuery()->execute();
+    }
 }

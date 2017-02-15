@@ -3,22 +3,22 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService;
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Bundle\ImportExportBundle\Async\ExportMessageProcessor;
+
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,7 +64,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createSecurityFacadeMock(),
             $this->createTokenStorageInterfaceMock(),
             $logger,
-            $this->createImportExportJobSummaryResultServiceMock()
+            $this->createImportExportResultSummarizerMock()
         );
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
@@ -113,7 +113,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createSecurityFacadeMock(),
             $this->createTokenStorageInterfaceMock(),
             $logger,
-            $this->createImportExportJobSummaryResultServiceMock()
+            $this->createImportExportResultSummarizerMock()
         );
 
         $result = $processor->process($message, $this->createSessionInterfaceMock());
@@ -202,10 +202,10 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ImportExportJobSummaryResultService
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImportExportResultSummarizer
      */
-    protected function createImportExportJobSummaryResultServiceMock()
+    protected function createImportExportResultSummarizerMock()
     {
-        return $this->createMock(ImportExportJobSummaryResultService::class);
+        return $this->createMock(ImportExportResultSummarizer::class);
     }
 }

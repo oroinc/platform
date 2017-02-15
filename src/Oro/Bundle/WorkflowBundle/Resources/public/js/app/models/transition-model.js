@@ -10,6 +10,7 @@ define(function(require) {
             name: null,
             label: null,
             display_type: 'dialog',
+            destination_page: '',
             step_to: null,
             is_start: false,
             form_options: null,

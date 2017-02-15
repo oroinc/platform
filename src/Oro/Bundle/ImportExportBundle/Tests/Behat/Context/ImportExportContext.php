@@ -183,8 +183,8 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     public function iImportFile()
     {
         $this->tryImportFile();
-        $this->getSession()->getPage()->pressButton('Import');
-        $this->waitForAjax();
+        // todo: CRM-7599 Replace sleep to appropriate logic
+        sleep(5);
     }
 
     /**
@@ -195,7 +195,7 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
     public function tryImportFile()
     {
         $page = $this->getSession()->getPage();
-        $page->clickLink('Import');
+        $page->clickLink('Import file');
         $this->waitForAjax();
         $this->createElement('ImportFileField')->attachFile($this->importFile);
         $page->pressButton('Submit');
