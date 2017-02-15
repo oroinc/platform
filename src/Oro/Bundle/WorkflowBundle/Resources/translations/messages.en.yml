@@ -76,6 +76,8 @@ Show Transition Labels: Show Transition Labels
 oro:
     workflow:
         permission:
+            update_configuration:
+                label: Configure
             VIEW_WORKFLOW: View Workflow
             PERFORM_TRANSITIONS: Perform transitions
             PERFORM_TRANSITION: Perform transition
