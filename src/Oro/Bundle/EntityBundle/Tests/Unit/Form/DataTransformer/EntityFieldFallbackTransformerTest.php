@@ -22,15 +22,6 @@ class EntityFieldFallbackTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testValue', $this->entityFieldFallbackTransformer->transform('testValue'));
     }
 
-    public function testTransformSetsScalarValueIfArray()
-    {
-        $value = new EntityFieldFallbackValue();
-        $testValue = ['test' => 'test'];
-        $value->setArrayValue($testValue);
-        $value = $this->entityFieldFallbackTransformer->transform($value);
-        $this->assertSame($testValue, $value->getScalarValue());
-    }
-
     public function testTransformSetsScalarValueIfScalar()
     {
         $value = new EntityFieldFallbackValue();
