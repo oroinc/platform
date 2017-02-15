@@ -59,6 +59,9 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $resultCallbackInvoked;
 
+    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
+    protected $requestStack;
+
     /**
      * @var FormHandler
      */
@@ -67,7 +70,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var FormTemplateDataProviderRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $formTemplateDataProviderRegistry;
+    protected $formTemplateDataProviderRegistry;
 
     /**
      * @var UpdateHandler
@@ -78,9 +81,8 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
 
-        /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
 
         $this->session = $this->createMock('Symfony\Component\HttpFoundation\Session\Session');
         $this->router = $this->createMock('Oro\Bundle\UIBundle\Route\Router');
@@ -93,7 +95,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->resultCallbackInvoked = false;
 
         $this->handler = new UpdateHandler(
-            $requestStack,
+            $this->requestStack,
             $this->session,
             $this->router,
             $this->doctrineHelper,

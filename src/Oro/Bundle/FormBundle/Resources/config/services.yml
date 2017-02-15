@@ -21,7 +21,6 @@ services:
 
     oro_form.model.update_handler:
         class: 'Oro\Bundle\FormBundle\Model\UpdateHandler'
-        scope: request
         arguments:
             - '@request_stack'
             - '@session'
