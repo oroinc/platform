@@ -225,14 +225,9 @@ class AttributeController extends Controller
 
         $successMessage = $this->get('translator')->trans('oro.entity_config.attribute.successfully_deleted');
 
-        $id = $field->getId();
         $response = $this
             ->get('oro_entity_config.form.handler.remove_restore_field_handler')
             ->handleRemove($field, $successMessage);
-
-        $this->get('oro_entity.doctrine_helper')
-            ->getEntityRepository(AttributeGroupRelation::class)
-            ->removeByFieldId($id);
 
         return $response;
     }
