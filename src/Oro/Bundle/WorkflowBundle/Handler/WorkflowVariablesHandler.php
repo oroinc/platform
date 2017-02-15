@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration as WC;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
@@ -10,22 +10,23 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
 {
     /**
      * @param WorkflowDefinition $definition
-     * @param WorkflowData       $variableVal
+     * @param WorkflowData       $data
      */
-    public function updateWorkflowVariableValues(WorkflowDefinition $definition, WorkflowData $variableVal)
+    public function updateWorkflowVariables(WorkflowDefinition $definition, WorkflowData $data)
     {
-        $workflowCfg = $definition->getConfiguration();
-        $workflowVarConfig = $workflowCfg[WC::NODE_VARIABLE_DEFINITIONS][WC::NODE_VARIABLES];
+        $workflowConfig = $definition->getConfiguration();
+        $variableDefinitionsConfig = &$workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+        $variablesConfig = &$variableDefinitionsConfig[WorkflowConfiguration::NODE_VARIABLES];
 
-        foreach ($variableVal as $variable => $variableValue) {
-            foreach ($workflowVarConfig as $variableName => $variableDefinitions) {
-                if ($variableName != $variable) {
-                    continue;
-                }
-                $workflowCfg[WC::NODE_VARIABLE_DEFINITIONS][WC::NODE_VARIABLES][$variable]['value'] = $variableValue;
+        foreach ($data as $name => $value) {
+            if (!isset($variablesConfig[$name])) {
+                continue;
             }
+            $variablesConfig[$name]['value'] = $value;
         }
-        $definition->setConfiguration($workflowCfg);
+
+        $workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS] = $variableDefinitionsConfig;
+        $definition->setConfiguration($workflowConfig);
         $this->process($definition);
     }
 }

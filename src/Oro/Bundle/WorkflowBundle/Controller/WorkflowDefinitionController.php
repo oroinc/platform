@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -141,7 +140,7 @@ class WorkflowDefinitionController extends Controller
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
-            $workflowVarHandler->updateWorkflowVariableValues($workflowDefinition, $form->getData());
+            $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
             $this->addFlash('success', $this->get('translator')->trans('oro.workflow.variable.save.success_message'));
         }
 
