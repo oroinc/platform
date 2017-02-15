@@ -53,8 +53,11 @@ class ControllersTest extends WebTestCase
     /**
      * @depends testCreate
      * @dataProvider reportDataProvider
+     *
+     * @param array $report
+     * @param array $reportResult
      */
-    public function stestView(array $report, array $reportResult)
+    public function testView(array $report, array $reportResult)
     {
         $response = $this->client->requestGrid(
             'reports-grid',

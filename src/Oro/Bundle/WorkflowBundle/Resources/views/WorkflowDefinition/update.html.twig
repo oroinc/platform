@@ -16,8 +16,11 @@
                     stepsDisplayOrdered: entity.stepsDisplayOrdered,
                     priority: entity.priority,
                     exclusive_active_groups: entity.exclusiveActiveGroups,
-                    exclusive_record_groups: entity.exclusiveRecordGroups
+                    exclusive_record_groups: entity.exclusiveRecordGroups,
+                    applications: entity.applications
                 },
+                entityFields: entityFields,
+                availableDestinations: availableDestinations,
                 system_entities: system_entities,
                 chartOptions: {},
                 connectionOptions: {
@@ -193,6 +196,17 @@
                                         <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
                                             <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
                                             <option value="page" <% if (display_type == 'page') { %>selected="selected"<% } %>>{{ "Separate page"|trans }}</value>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="control-group destination-page-controls">
+                                    {{ _self.render_label("oro.workflow.form.destination_page.label"|trans, false) }}
+                                    <div class="controls">
+                                        <select name="destination_page">
+                                            {% for destination in availableDestinations %}
+                                                <option value="{{ destination }}" <% if (destination_page == '{{ destination }}') { %>selected="selected"<% } %>>{{ ('oro.workflow.workflowdefinition.transition.destination_page.' ~ (destination|default('default')) ~ '.label')|trans }}</value>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>

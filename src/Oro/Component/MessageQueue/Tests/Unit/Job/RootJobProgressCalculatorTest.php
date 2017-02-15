@@ -1,13 +1,12 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Oro\Component\MessageQueue\Job\RootJobProgressCalculator;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\RootJobProgressCalculator;
 
 class RootJobProgressCalculatorTest extends \PHPUnit_Framework_TestCase
 {
-
     public function calculateProgressProvider()
     {
         return [

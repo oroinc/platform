@@ -9,3 +9,13 @@ elements:
 
   ControlGroup:
     class: Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup
+
+  UiDialog:
+    selector: 'div.ui-dialog'
+    class: Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog
+
+  ContextSelector:
+    selector:
+      type: xpath
+      locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "btn-group")]'
+    class: Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector

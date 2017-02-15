@@ -63,6 +63,9 @@ class Transition
     protected $unavailableHidden = false;
 
     /** @var string */
+    protected $destinationPage;
+
+    /** @var string */
     protected $pageTemplate;
 
     /** @var string */
@@ -494,6 +497,25 @@ class Transition
         $this->displayType = $displayType;
 
         return $this;
+    }
+
+    /**
+     * @param string $destinationPage
+     * @return Transition
+     */
+    public function setDestinationPage($destinationPage)
+    {
+        $this->destinationPage = $destinationPage;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDestinationPage()
+    {
+        return $this->destinationPage;
     }
 
     /**

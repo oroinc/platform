@@ -11,6 +11,9 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
+
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -32,6 +35,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_INIT_DATAGRIDS = 'init_datagrids';
     const NODE_INIT_CONTEXT_ATTRIBUTE = 'init_context_attribute';
     const NODE_DISABLE_OPERATIONS = 'disable_operations';
+    const NODE_APPLICATIONS = 'applications';
 
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
@@ -39,6 +43,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_PAGE_FORM_DATA_ATTRIBUTE = 'form_data';
 
     const NODE_PAGE_FORM_CONFIGURATION = 'page_form_configuration';
+
+    const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
+    const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
 
     /**
      * @param array $configs
@@ -85,6 +92,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->scalarNode('start_step')
                 ->defaultNull()
             ->end()
+            ->booleanNode(WorkflowDefinition::CONFIG_FORCE_AUTOSTART)
+                ->defaultFalse()
+            ->end()
             ->scalarNode('entity_attribute')
                 ->defaultValue(self::DEFAULT_ENTITY_ATTRIBUTE)
             ->end()
@@ -109,6 +119,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                 ->prototype('scalar')->end()
             ->end()
             ->append($this->getDisableOperationsNode())
+            ->append($this->getApplicationsNode())
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
@@ -239,6 +250,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return NodeDefinition
      */
     protected function getTransitionsNode()
@@ -283,8 +296,17 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultValue(WorkflowTransitionType::NAME)
                     ->end()
                     ->enumNode('display_type')
-                        ->values(array('dialog', 'page'))
+                        ->values([self::TRANSITION_DISPLAY_TYPE_DIALOG, self::TRANSITION_DISPLAY_TYPE_PAGE])
                         ->defaultValue(self::DEFAULT_TRANSITION_DISPLAY_TYPE)
+                    ->end()
+                    ->enumNode('destination_page')
+                        ->defaultValue(DestinationPageResolver::DEFAULT_DESTINATION)
+                        ->values(DestinationPageResolver::AVAILABLE_DESTINATIONS)
+                        ->beforeNormalization()
+                            ->always(function ($value) {
+                                return str_replace('index', 'name', $value);
+                            })
+                        ->end()
                     ->end()
                     ->arrayNode('form_options')
                         ->prototype('variable')
@@ -526,6 +548,9 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         $rootNode
             ->beforeNormalization()
                 ->always()
+                ->ifTrue(function ($v) {
+                    return is_array($v);
+                })
                 ->then(function ($v) {
                     return array_map('strtolower', $v);
                 })
@@ -558,6 +583,30 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->isRequired()
                     ->end()
                 ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
+    protected function getApplicationsNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::NODE_APPLICATIONS);
+        $rootNode
+            ->beforeNormalization()
+                ->always()
+                ->ifTrue(function ($v) {
+                    return is_array($v);
+                })
+                ->then(function ($v) {
+                    return array_map('strtolower', $v);
+                })
+            ->end()
+            ->prototype('scalar')->end()
+            ->defaultValue([CurrentApplicationProviderInterface::DEFAULT_APPLICATION])
+        ;
 
         return $rootNode;
     }

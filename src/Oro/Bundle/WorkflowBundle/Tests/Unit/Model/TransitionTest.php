@@ -30,6 +30,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ['frontendOptions', ['key' => 'value']],
                 ['formType', 'custom_workflow_transition'],
                 ['displayType', 'page'],
+                ['destinationPage', 'destination'],
                 ['formOptions', ['one', 'two']],
                 ['pageTemplate', 'Workflow:Test:page_template.html.twig'],
                 ['dialogTemplate', 'Workflow:Test:dialog_template.html.twig'],
