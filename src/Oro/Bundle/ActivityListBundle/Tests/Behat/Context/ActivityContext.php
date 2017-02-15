@@ -4,11 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector;
 
 class ActivityContext extends OroFeatureContext implements OroPageObjectAware, SnippetAcceptingContext
 {
@@ -278,21 +278,9 @@ class ActivityContext extends OroFeatureContext implements OroPageObjectAware, S
      */
     public function selectUserInActivityContextSelector($needle)
     {
+        /** @var ContextSelector $contextSelector */
         $contextSelector = $this->createElement('ContextSelector');
-        $contextSelector->find('css', 'span.fa-caret-down')->click();
-        $contexts = $contextSelector->findAll('css', 'ul.context-items-dropdown li');
-
-        /** @var NodeElement $context */
-        foreach ($contexts as $context) {
-            if ($needle === $context->getText()) {
-                $context->click();
-                $this->getSession()->getDriver()->waitForAjax();
-
-                return;
-            }
-        }
-
-        self::fail(sprintf('Can\'t find "%s" context in context selector', $needle));
+        $contextSelector->select($needle);
     }
 
     /**

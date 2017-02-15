@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
-use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class DatagridConfigurationBuilder
 {
@@ -41,6 +41,7 @@ class DatagridConfigurationBuilder
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
      * @param DatagridGuesser               $datagridGuesser
+     * @param EntityNameResolver            $entityNameResolver
      *
      * @throws InvalidConfigurationException
      */
@@ -48,7 +49,8 @@ class DatagridConfigurationBuilder
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         ManagerRegistry $doctrine,
-        DatagridGuesser $datagridGuesser
+        DatagridGuesser $datagridGuesser,
+        EntityNameResolver $entityNameResolver
     ) {
         $this->doctrine = $doctrine;
 
@@ -56,7 +58,8 @@ class DatagridConfigurationBuilder
             $functionProvider,
             $virtualFieldProvider,
             $doctrine,
-            $datagridGuesser
+            $datagridGuesser,
+            $entityNameResolver
         );
     }
 
