@@ -279,6 +279,8 @@ WorkflowBundle
     - signature of constructor changed, added third argument `Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters $definitionFilters`
 - Added third argument `string $responseMessage = null` to method `Oro\Bundle\WorkflowBundle\Handle\Helper\TransitionHelper::createCompleteResponse()`
 - Added third argument `Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver $destinationPageResolver` to constructor of `Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension`
+- Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
+    - first argument argument `WorkflowManager $workflowManager` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
 
 TestFrameworkBundle
 -------------------
