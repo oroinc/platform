@@ -174,7 +174,7 @@ Oro\Bundle\ImportExportBundle\Reader\EntityReader
 
 **Description:**
 Reads entities using Doctrine. To allow handling large amounts of data without memory lack errors  reading is performed
-using Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator which loads data partially using internal batch.
+using Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator which loads data partially using internal batch.
 
 **Configuration Options**
 

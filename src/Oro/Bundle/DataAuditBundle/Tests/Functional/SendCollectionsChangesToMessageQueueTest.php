@@ -5,23 +5,16 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataChild;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestAuditDataOwner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+/**
+ * @dbIsolationPerTest
+ */
 class SendCollectionsChangesToMessageQueueTest extends WebTestCase
 {
     use SendChangedEntitiesToMessageQueueExtensionTrait;
     
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->initClient([], [], true);
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
+        $this->initClient();
     }
 
     public function testShouldSendCollectionUpdateWhenNewChildAddedToNewOwner()

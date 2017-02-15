@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 class FilterHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider handleData
+     * @dataProvider handleProvider
      * @param array $config
      * @param array $expected
      */
@@ -25,7 +25,7 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    public function handleData()
+    public function handleProvider()
     {
         return [
             [
@@ -54,6 +54,8 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'label' => 'Test Transition',
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
+                            'display_type' => 'type',
+                            'destination_page' => 'dest',
                             'form_options' => [
                                 'attribute_fields' => [
                                     'test_attribute' => [
@@ -113,6 +115,8 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'name' => 'test_transition',
                             'step_to' => 'test_step',
                             'transition_definition' => 'test_transition_definition',
+                            'display_type' => 'type',
+                            'destination_page' => 'dest',
                             'form_options' => [
                                 'attribute_fields' => [
                                     'test_attribute' => [

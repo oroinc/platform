@@ -231,7 +231,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             $insertions[$entity] = $uow->getEntityChangeSet($entity);
         }
 
-        /** it made for issue with ImportExportTagsSubscriber::postFlush (in this method run flush) */
         if (! $this->allInsertions->contains($em)) {
             $this->allInsertions[$em] = $insertions;
         } else {

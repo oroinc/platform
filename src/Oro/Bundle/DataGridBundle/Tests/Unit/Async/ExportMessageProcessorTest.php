@@ -2,15 +2,18 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+
 use Doctrine\ORM\EntityRepository;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Async\ExportMessageProcessor;
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
-
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
-
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
@@ -21,8 +24,6 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +68,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($loggerMessage)
         ;
 
-        $processor = $this->createExportMessageProcessorStab(['logger' => $logger]);
+        $processor = $this->createExportMessageProcessorStub(['logger' => $logger]);
 
         $message = new NullMessage();
         $message->setBody(json_encode($messageBody));
@@ -110,7 +111,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->createCsvWriterMock())
         ;
 
-        $processor = $this->createExportMessageProcessorStab([
+        $processor = $this->createExportMessageProcessorStub([
             'doctrineHelper' => $doctrineHelper,
             'logger' => $logger,
             'writerChain' => $writerChain,
@@ -147,7 +148,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null)
         ;
 
-        $processor = $this->createExportMessageProcessorStab([
+        $processor = $this->createExportMessageProcessorStub([
             'doctrineHelper' => $doctrineHelper,
             'logger' => $logger,
             'writerChain' => $writerChain,
@@ -184,7 +185,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->createMock(ItemWriterInterface::class))
         ;
 
-        $processor = $this->createExportMessageProcessorStab([
+        $processor = $this->createExportMessageProcessorStub([
             'doctrineHelper' => $doctrineHelper,
             'logger' => $logger,
             'writerChain' => $writerChain,
@@ -205,7 +206,7 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ExportMessageProcessor
      */
-    private function createExportMessageProcessorStab(array $arguments = [])
+    private function createExportMessageProcessorStub(array $arguments = [])
     {
         $arguments = array_merge(
             [

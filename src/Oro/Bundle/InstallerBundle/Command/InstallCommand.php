@@ -4,6 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Console\Helper\Table as TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -82,15 +83,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $this->validate($input);
         }
 
-        $forceInstall = $input->getOption('force');
         $skipAssets = $input->getOption('skip-assets');
         $commandExecutor = $this->getCommandExecutor($input, $output);
 
-        // if there is application is not installed or no --force option
-        $isInstalled = $this->getContainer()->hasParameter('installed')
-            && $this->getContainer()->getParameter('installed');
-
-        if ($isInstalled && !$forceInstall) {
+        if ($this->isInstalled() && !$input->getOption('force')) {
             $output->writeln('<comment>ATTENTION</comment>: Oro Application already installed.');
             $output->writeln(
                 'To proceed with install - run command with <info>--force</info> option:'
@@ -109,34 +105,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             return;
         }
 
-        if ($forceInstall) {
-            // if --force option we have to clear cache and set installed to false
-            $this->updateInstalledFlag(false);
-            $this->clearCheckDatabaseState();
-            $commandExecutor->runCommand(
-                'cache:clear',
-                [
-                    '--no-optional-warmers' => true,
-                    '--process-isolation'   => true
-                ]
-            );
-        }
-
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
-        $dropDatabase = 'none';
-        if ($forceInstall) {
-            if ($input->getOption('drop-database')) {
-                $dropDatabase = 'full';
-            } elseif ($isInstalled) {
-                $dropDatabase = 'app';
-            }
-        }
-
         $this
             ->checkStep($output)
-            ->prepareStep($commandExecutor, $dropDatabase)
+            ->prepareStep($commandExecutor, $input, $output)
             ->loadDataStep($commandExecutor, $output)
             ->finalStep($commandExecutor, $output, $input, $skipAssets);
 
@@ -225,22 +199,34 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      * Drop schema, clear entity config and extend caches
      *
      * @param CommandExecutor $commandExecutor
-     * @param string          $dropDatabase Can be 'none', 'app' or 'full'
-     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
      * @return InstallCommand
      */
-    protected function prepareStep(CommandExecutor $commandExecutor, $dropDatabase = 'none')
+    protected function prepareStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
     {
-        if ($dropDatabase !== 'none') {
-            $schemaDropOptions = [
-                '--force'             => true,
-                '--process-isolation' => true
-            ];
-            if ($dropDatabase === 'full') {
-                $schemaDropOptions['--full-database'] = true;
-                $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
-            } else {
-                $managers = $this->getContainer()->get('doctrine')->getManagers();
+        if ($input->getOption('force')) {
+            $commandExecutor->runCommand(
+                'cache:clear',
+                [
+                    '--no-warmup' => true,
+                ]
+            );
+            $managers = $this->getContainer()->get('doctrine')->getManagers();
+
+            if ($input->getOption('drop-database')) {
+                $output->writeln('<info>Drop schema, clear entity config and extend caches.</info>');
+                foreach ($managers as $name => $manager) {
+                    if ($manager instanceof EntityManager) {
+                        $tool = new SchemaTool($manager);
+                        $tool->dropDatabase();
+                    }
+                }
+            } elseif ($this->isInstalled()) {
+                $schemaDropOptions = [
+                    '--force'             => true,
+                    '--process-isolation' => true
+                ];
                 foreach ($managers as $name => $manager) {
                     if ($manager instanceof EntityManager) {
                         $schemaDropOptions['--em'] = $name;
@@ -248,6 +234,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     }
                 }
             }
+            // if --force option we have to clear cache and set installed to false
+            $this->updateInstalledFlag(false);
+            $this->clearCheckDatabaseState();
             $commandExecutor
                 ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
                 ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
@@ -671,5 +660,16 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
 
         $table->render($output);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isInstalled()
+    {
+        $isInstalled = $this->getContainer()->hasParameter('installed')
+            && $this->getContainer()->getParameter('installed');
+
+        return $isInstalled;
     }
 }

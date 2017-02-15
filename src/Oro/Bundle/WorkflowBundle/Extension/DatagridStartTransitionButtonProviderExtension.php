@@ -6,7 +6,10 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Helper\DestinationPageHelper;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -24,13 +27,15 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
      * @param DoctrineHelper $doctrineHelper
      * @param WorkflowRegistry $workflowRegistry
      * @param RouteProviderInterface $routeProvider
+     * @param DestinationPageResolver $destinationPageResolver
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         WorkflowRegistry $workflowRegistry,
-        RouteProviderInterface $routeProvider
+        RouteProviderInterface $routeProvider,
+        DestinationPageResolver $destinationPageResolver
     ) {
-        parent::__construct($workflowRegistry, $routeProvider);
+        parent::__construct($workflowRegistry, $routeProvider, $destinationPageResolver);
 
         $this->doctrineHelper = $doctrineHelper;
     }
@@ -62,7 +67,14 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
             $buttonSearchContext->getEntityId()
         );
 
-        return $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
+        try {
+            $isAvailable = $workflow->isStartTransitionAvailable($transition, $entity, [], $errors);
+        } catch (\Exception $e) {
+            $isAvailable = false;
+            $this->addError($button, $e, $errors);
+        }
+
+        return $isAvailable;
     }
 
     /**
@@ -81,5 +93,13 @@ class DatagridStartTransitionButtonProviderExtension extends AbstractStartTransi
         }
 
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getApplication()
+    {
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
     }
 }
