@@ -3,6 +3,7 @@ parameters:
     oro_assetic.configuration.class: Oro\Bundle\AsseticBundle\AssetsConfiguration
     oro_assetic.twig_extension.class: Oro\Bundle\AsseticBundle\Twig\AsseticExtension
 
+    assetic.config_cache.class: Oro\Bundle\AsseticBundle\Cache\ConfigCache
 services:
     oro_assetic.configuration:
           class: %oro_assetic.configuration.class%
