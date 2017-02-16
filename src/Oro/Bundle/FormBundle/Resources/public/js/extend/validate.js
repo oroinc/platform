@@ -109,7 +109,7 @@ define([
         _.each(validationsOf(element), function(param, method) {
             if ($.validator.methods[method]) {
                 rules[method] = {param: param};
-            } else {
+            } else if ($(element.form).data('validator').settings.debug) {
                 error.showErrorInConsole('Validation method "' + method + '" does not exist');
             }
         });
