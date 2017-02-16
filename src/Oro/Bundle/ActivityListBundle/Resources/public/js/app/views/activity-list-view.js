@@ -20,7 +20,7 @@ define(function(require) {
             listSelector: '.items.list-box',
             fallbackSelector: '.no-data',
             loadingSelector: '.loading-mask',
-            listWidgetSelector: '.activity-list-widget',
+            listWidgetSelector: '.activities-container .activity-list-widget',
             activityListSelector: '.activity-list',
             collection: null,
             urls: {
