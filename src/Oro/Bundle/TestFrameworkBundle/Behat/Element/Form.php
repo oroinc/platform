@@ -222,4 +222,22 @@ class Form extends Element
 
         return $field;
     }
+
+    /**
+     * Retrieves validation error message text for provided field name
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function getFieldValidationErrors($fieldName)
+    {
+        $field = $this->findFieldByLabel($fieldName);
+
+        self::assertTrue($field->hasClass("error"), "Field $fieldName has no validation errors");
+
+        $fieldId = $field->getAttribute('id');
+        $errorSpan = $field->getParent()->find('css', "span.validation-failed[for='$fieldId']");
+
+        return $errorSpan->getText();
+    }
 }

@@ -85,7 +85,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->post('oro_rest_api_post', ['entity' => $entityType], $data);
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -153,7 +153,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->patch('oro_rest_api_patch', ['entity' => $entityType, 'id' => $userId], $data);
+        $response = $this->patch(['entity' => $entityType, 'id' => $userId], $data);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -283,7 +283,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->post('oro_rest_api_post', ['entity' => $entityType], $data);
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -353,7 +353,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->post('oro_rest_api_post', ['entity' => $entityType], $data);
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
 
