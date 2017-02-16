@@ -21,6 +21,7 @@ abstract class AbstractMenuController extends Controller
 {
     /**
      * @param array $context
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     protected function checkAcl(array $context)
     {
@@ -103,7 +104,8 @@ abstract class AbstractMenuController extends Controller
         $context = $this->denormalizeContext($context);
         $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
-        $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate($menu,
+        $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
+            $menu,
             [
                 'menu' => $menuName,
                 'parentKey' => $parentKey,
@@ -170,7 +172,6 @@ abstract class AbstractMenuController extends Controller
         }
 
         return $response;
-
     }
 
     /**

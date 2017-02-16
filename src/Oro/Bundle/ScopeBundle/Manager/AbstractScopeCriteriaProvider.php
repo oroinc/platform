@@ -17,6 +17,7 @@ abstract class AbstractScopeCriteriaProvider implements ScopeCriteriaProviderInt
 
     /**
      * @param array|object $context
+     *
      * @return array
      * @throws \Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException
      */

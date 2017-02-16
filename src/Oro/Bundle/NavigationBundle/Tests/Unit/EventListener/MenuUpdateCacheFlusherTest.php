@@ -34,14 +34,16 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit_Framework_TestCase
         $this->cache = $this->createMock(CacheProvider::class);
         $this->scopeManager = $this->createMock(ScopeManager::class);
         $this->flusher = new MenuUpdateCacheFlusher(
-            $this->repository, $this->cache, $this->scopeManager,
+            $this->repository,
+            $this->cache,
+            $this->scopeManager,
             self::SCOPE_TYPE
         );
     }
 
     public function testOnMenuUpdateScopeChange()
     {
-        $context = ['foo'=> 'bar'];
+        $context = ['foo' => 'bar'];
 
         /** @var MenuUpdateChangeEvent|\PHPUnit_Framework_MockObject_MockObject $event */
         $event = $this->createMock(MenuUpdateChangeEvent::class);

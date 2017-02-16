@@ -93,13 +93,11 @@ class ContextNormalizerTest extends \PHPUnit_Framework_TestCase
             ->with($scopeType)
             ->willReturn($entities);
 
-
         $expectedContext = ['entity' => $entity];
         $this->assertEquals(
             $expectedContext,
             $this->contextNormalizer->denormalizeContext($scopeType, $context)
         );
-
     }
 
     /**

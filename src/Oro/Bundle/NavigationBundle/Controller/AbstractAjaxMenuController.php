@@ -96,6 +96,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param Request $request
      *
      * @return Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function deleteAction($menuName, $key, Request $request)
     {
@@ -179,7 +180,7 @@ abstract class AbstractAjaxMenuController extends Controller
      * @param Request $request
      * @param string  $menuName
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function moveAction(Request $request, $menuName)
     {
@@ -205,6 +206,7 @@ abstract class AbstractAjaxMenuController extends Controller
         );
         foreach ($updates as $update) {
             $errors = $this->get('validator')->validate($update);
+
             if (count($errors)) {
                 $message = $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message');
 
@@ -264,6 +266,7 @@ abstract class AbstractAjaxMenuController extends Controller
     /**
      * @param string $menuName
      * @param array  $context
+     *
      * @return ItemInterface
      */
     protected function getMenu($menuName, array $context)
@@ -273,6 +276,7 @@ abstract class AbstractAjaxMenuController extends Controller
             BuilderChainProvider::IGNORE_CACHE_OPTION => true
         ];
         $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
+
         if (!count($menu->getChildren())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
         }
@@ -290,6 +294,7 @@ abstract class AbstractAjaxMenuController extends Controller
 
     /**
      * @param array $context
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     protected function checkAcl(array $context)
     {

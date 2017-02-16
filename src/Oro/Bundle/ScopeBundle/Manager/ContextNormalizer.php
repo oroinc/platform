@@ -59,6 +59,7 @@ class ContextNormalizer
             $entity = $this->registry
                 ->getManagerForClass($entities[$identifier])
                 ->find($entities[$identifier], $entityId);
+
             if (null === $entity) {
                 throw new \LogicException(
                     sprintf('Entity %s with identifier %s does not exist.', $identifier, $entityId)
