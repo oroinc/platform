@@ -22,12 +22,15 @@ class GridRow extends Element
         return $columns[$number];
     }
 
-    public function checkMassActionCheckbox()
+    /**
+     * @param int $cellNumber
+     */
+    public function checkMassActionCheckbox($cellNumber = 0)
     {
-        $rowCheckbox = $this->find('css', '[type="checkbox"]');
+        $rowCheckbox = $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
         self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $this->getText()));
 
-        $rowCheckbox->click();
+        $rowCheckbox->check();
     }
 
     /**
