@@ -1029,10 +1029,16 @@
         field - form collection field
         label - label of block
         buttonCaption - Caption of add entity button
+        tooltipText (optional) - text to render a tooltip for the collection field
 #}
-{% macro collectionField(field, label, buttonCaption) %}
+{% macro collectionField(field, label, buttonCaption, tooltipText = null) %}
     <div class="control-group">
-        <label class="control-label">{{ label }}</label>
+        <div class="control-label wrap">
+            {% if tooltipText is not null %}
+                {{ _self.tooltip(tooltipText) }}
+            {% endif %}
+            <label>{{ label }}</label>
+        </div>
         <div class="controls">
             <div class="row-oro">
                 <div class="oro-item-collection collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">

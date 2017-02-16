@@ -65,8 +65,7 @@ class WorkflowVariablesType extends AbstractType
     {
         /** @var Workflow $workflow */
         $workflow = $options['workflow'];
-        $variables = $workflow->getVariables();
-
+        $variables = $workflow->getVariables(true);
         foreach ($variables as $variable) {
             /** @var TypeGuess $typeGuess */
             $typeGuess = $this->variableGuesser->guessVariableForm($variable);
@@ -83,7 +82,7 @@ class WorkflowVariablesType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['workflow_definition']);
+        $resolver->setDefined(['workflow', 'workflow_definition']);
 
         $resolver->setDefaults(
             [
@@ -94,17 +93,7 @@ class WorkflowVariablesType extends AbstractType
                     }
 
                     return $workflow;
-                }
-            ]
-        );
-        $resolver->setDefined(
-            [
-                'workflow'
-            ]
-        );
-
-        $resolver->setDefaults(
-            [
+                },
                 'data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
             ]
         );

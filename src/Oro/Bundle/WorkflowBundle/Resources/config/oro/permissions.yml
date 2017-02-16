@@ -1,6 +1,6 @@
 oro_permissions:
     CONFIGURE:
-        label: oro.workflow.workflowdefinition.update_configuration.label
+        label: oro.workflow.permission.update_configuration.label
         group_names: ""
         apply_to_all: false
         apply_to_entities:

@@ -241,6 +241,13 @@ services:
             - '@doctrine'
             - '@oro_workflow.manager'
 
+    oro_workflow.handler.workflow_variables:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler'
+        arguments:
+            - '@oro_workflow.changes.event.dispatcher'
+            - '@doctrine'
+            - '@oro_workflow.manager'
+
     oro_workflow.process.cron_scheduler:
         class: 'Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler'
         arguments:
@@ -520,5 +527,5 @@ services:
                 - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
                 - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
                 - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
-                - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType']]
+                - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', {allow_add: true, allow_delete: true, prototype: true}]]
 

@@ -182,6 +182,15 @@ class Variable implements ParameterInterface
         return isset($this->options[$key]);
     }
 
+    public function getFormOptions()
+    {
+        if (!$this->hasOption('form_options')) {
+            return [];
+        }
+
+        return $this->options['form_options'];
+    }
+
     /**
      * @return string
      */

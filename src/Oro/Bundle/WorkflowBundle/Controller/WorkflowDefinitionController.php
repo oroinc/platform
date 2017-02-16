@@ -131,12 +131,17 @@ class WorkflowDefinitionController extends Controller
      */
     public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
+        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
+        $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
         $form = $this->createForm('oro_workflow_variables', null, [
-            'workflow_definition' => $workflowDefinition,
+            'workflow' => $workflow,
         ]);
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
+            $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
+            $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
+            $this->addFlash('success', $this->get('translator')->trans('oro.workflow.variable.save.success_message'));
         }
 
         return [
@@ -160,11 +165,13 @@ class WorkflowDefinitionController extends Controller
     {
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
         $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
+        $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
 
         return [
             'entity' => $workflowDefinition,
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'translateLinks' => $translateLinks,
+            'variables' => $workflow->getVariables($workflowDefinition),
         ];
     }
 
