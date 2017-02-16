@@ -45,9 +45,14 @@ define(function(require) {
         updateView: function() {
             var models = this._getFilteredModels();
             var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable');}));
-            this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
             var hasRenderable = Boolean(_.find(models, function(model) {return model.get('renderable');}));
+            var hasChanged = Boolean(_.find(models, function(model) {
+                return model.get('renderable') !== model.get('metadata').renderable;
+            }));
+
+            this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
             this.$('[data-role="column-manager-unselect-all"]').toggleClass('disabled', !hasRenderable);
+            this.$('[data-role="column-manager-reset"]').toggleClass('disabled', !hasChanged);
         },
 
         /**
