@@ -37,55 +37,53 @@ define([
         /** @property Boolean */
         showCloseButton: config.showCloseButton,
 
-        /** @property String */
-        actionsDropdown: 'hide',
+        /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
+        launcherMode: '',
+
+        /** @property {String}: 'show' | 'hide' */
+        actionsState: '',
 
         /** @property */
-        cellMarkup: '<div class="more-bar-holder action-row"></div>',
-
-        /** @property */
-        dropdownContainer: '<div class="dropdown"></div>',
-
-        /** @property */
-        dropdownList: '<div class="dropdown-menu dropdown-menu__action-cell" ' +
-            'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}">' +
+        baseMarkup:
+        '<div class="more-bar-holder">' +
+        '<div class="dropdown">' +
+        '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
+        '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
+        'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
+        '</div>' +
         '</div>',
 
         /** @property */
-        closeButton: '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>',
-
-        /** @property */
-        simpleLaunchersListTemplate: _.template(
-            '<% if (withIcons) { %>' +
-                '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
-            '<% } else { %>' +
-                '<ul class="unstyled launchers-list"></ul>' +
-            '<% } %>'
-        ),
-
-        /** @property */
-        launchersContainerSelector: '.more-bar-holder',
-
-        /** @property */
-        launchersListSelector: '.launchers-list',
-
+        simpleBaseMarkup: '<div class="more-bar-holder action-row"></div>',
         /** @property */
         closeButtonTemplate: _.template(
             '<li class="dropdown-close"><i class="fa-close hide-text">' + _.__('Close') + '</i></li>'
         ),
 
         /** @property */
+        launchersContainerSelector: '.launchers-dropdown-menu',
+
+        /** @property */
         launchersListTemplate: _.template(
             '<% if (withIcons) { %>' +
-                '<li><ul class="nav nav-pills icons-holder launchers-list"></ul></li>' +
+            '<li><ul class="nav nav-pills icons-holder launchers-list"></ul></li>' +
             '<% } else { %>' +
-                '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+            '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+            '<% } %>'
+        ),
+
+        /** @property */
+        simpleLaunchersListTemplate: _.template(
+            '<% if (withIcons) { %>' +
+            '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
+            '<% } else { %>' +
+            '<ul class="unstyled launchers-list"></ul>' +
             '<% } %>'
         ),
 
         /** @property */
         launcherItemTemplate: _.template(
-            '<li class="launcher-item <%= className %>"></li>'
+            '<li class="launcher-item <% if (className) { %> <%= \'mode-\' + className %> <% } %>"></li>'
         ),
 
         /** @property */
@@ -111,12 +109,9 @@ define([
                 this.actionsHideCount = opts.themeOptions.actionsHideCount;
             }
 
-            if (!_.isUndefined(opts.themeOptions.actionsDropdown)) {
-                this.actionsDropdown = opts.themeOptions.actionsDropdown;
-            }
-
             if (_.isObject(opts.themeOptions.launcherOptions)) {
-                this.launcherMode = opts.themeOptions.launcherOptions.launcherMode;
+                this.launcherMode = opts.themeOptions.launcherOptions.launcherMode || this.launcherMode;
+                this.actionsState = opts.themeOptions.launcherOptions.actionsState || this.actionsState;
             }
 
             ActionCell.__super__.initialize.apply(this, arguments);
@@ -138,6 +133,8 @@ define([
             delete this.actions;
             delete this.column;
             delete this.launcherMode;
+            delete this.actionsState;
+
             this.$('.dropdown-toggle').dropdown('destroy');
             ActionCell.__super__.dispose.apply(this, arguments);
         },
@@ -201,6 +198,7 @@ define([
          * Render cell with actions
          */
         render: function() {
+            var isSimplifiedMarkupApplied = false;
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.actions)) {
                 this.$el.empty();
@@ -208,48 +206,31 @@ define([
                 return this;
             }
 
-            var wrapDropdown = _.bind(this.wrapDropdown, this);
+            var switchToSimpleMode = this.actions.length < this.actionsHideCount;
 
-            this.$el.css({visibility: 'hidden'});
+            if (this.actionsState === 'show') {
+                switchToSimpleMode = true;
+            }
 
-            this.launchersListTemplate = this.simpleLaunchersListTemplate;
+            if (this.actionsState === 'hide') {
+                switchToSimpleMode = false;
+            }
 
-            this.$el.html(this.cellMarkup);
-            this.fillLauncherList();
+            if (switchToSimpleMode) {
+                isSimplifiedMarkupApplied = true;
+                this.baseMarkup = this.simpleBaseMarkup;
+                this.launchersListTemplate = this.simpleLaunchersListTemplate;
+                this.launchersContainerSelector = '.more-bar-holder';
+            }
 
-            switch (this.actionsDropdown) {
-                case 'hide':
-                    wrapDropdown();
-                    this.$el.css({visibility: ''});
-                    break;
-                case 'show':
-                    this.$el.css({visibility: ''});
-                    break;
-                default:
-                    setTimeout(_.bind(function() {
-                        var $list = this.$(this.launchersListSelector);
-                        var listHeight = $list.height();
-                        var testListItemHeight = $list.find('.launcher-item').height() * 1.5;
+            this.$el.html(this.baseMarkup);
+            this.isLauncherListFilled = false;
 
-                        if (listHeight > testListItemHeight) {
-                            wrapDropdown();
-                        }
-
-                        this.$el.css({visibility: ''});
-                    }, this), 0);
+            if (isSimplifiedMarkupApplied) {
+                this.fillLauncherList();
             }
 
             return this;
-        },
-
-        wrapDropdown: function() {
-            var $dropDownContainer;
-            var $dropDownPopup;
-            var $list = this.$(this.launchersListSelector);
-
-            $dropDownPopup = $list.wrap(this.dropdownList).parent();
-            $dropDownContainer = $dropDownPopup.wrap(this.dropdownContainer).parent();
-            $dropDownContainer.append(this.closeButton);
         },
 
         fillLauncherList: function() {
@@ -307,7 +288,7 @@ define([
          * @return {jQuery} Rendered element wrapped with jQuery
          */
         renderLauncherItem: function(launcher, params) {
-            params = _.extend(params || {}, {className: launcher.launcherMode || ''});
+            params = _.extend(params || {}, {className: launcher.launcherMode});
             var result = $(this.launcherItemTemplate(params));
             var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);

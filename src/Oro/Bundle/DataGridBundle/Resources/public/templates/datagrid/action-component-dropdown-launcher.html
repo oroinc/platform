@@ -13,10 +13,10 @@ _.each(attributes, function(attribute, name) { %>
         title="<%= title %>"
         data-toggle="dropdown">
         <% if (launcherMode == 'icon-text') { %>
-            <i class="fa-<%= icon %> hide-text"><%= label %></i>
+            <i class="fa-<%= icon %> hide-text"></i>
             <%= label %>
         <% } else if (launcherMode == 'icon-only') { %>
-            <i class="fa-<%= icon %> hide-text"><%= label %></i>
+            <i class="fa-<%= icon %> hide-text"></i>
         <% } else if (launcherMode == 'text-only') { %>
             <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
             <%= label %>

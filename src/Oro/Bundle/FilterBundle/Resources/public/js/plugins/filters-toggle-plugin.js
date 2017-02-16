@@ -8,10 +8,11 @@ define(function(require) {
     var ToggleFiltersAction = require('orofilter/js/actions/toggle-filters-action');
 
     var config = require('module').config();
-    config.launcherOptions = _.extend({
+    var launcherOptions = _.extend({
+        className: 'btn',
         icon: 'filter',
         label: __('oro.filter.datagrid-toolbar.filters')
-    }, config.launcherOptions);
+    }, config.launcherOptions || {});
 
     FiltersTogglePlugin = BasePlugin.extend({
         enable: function() {
@@ -22,9 +23,7 @@ define(function(require) {
         onBeforeToolbarInit: function(toolbarOptions) {
             var options = {
                 datagrid: this.main,
-                launcherOptions: _.extend({
-                    className: 'btn'
-                }, config.launcherOptions),
+                launcherOptions: launcherOptions,
                 order: config.order || 50
             };
 

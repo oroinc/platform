@@ -190,8 +190,10 @@
   }
 }
 .dropdown-menu__action-cell {
-  min-width: 0;
   padding: 0;
+  > li {
+    display: table-cell;
+  }
 }
 .grid {
   overflow: visible;
@@ -204,10 +206,10 @@
   }
   .action-cell {
     vertical-align: top;
-    text-align: right;
+    width: 50px;
 
     .dropdown-menu {
-      margin-right: -10px;
+      margin-right: -5px;
     }
     .horizontal-icon-menu;
   }
@@ -217,7 +219,7 @@
     [class^="fa-"],
     [class*=" fa-"] {
       font-size: @baseFontSize;
-      margin: 0 2px 0 0
+      margin:0 2px 0 0;
     }
     .dropdown-menu {
       right: 0;
