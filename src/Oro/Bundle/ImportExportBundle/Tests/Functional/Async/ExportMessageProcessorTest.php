@@ -84,7 +84,7 @@ class ExportMessageProcessorTest extends WebTestCase
             'fromEmail' => $this->getConfigManager()->get('oro_notification.email_notification_sender_email'),
             'fromName' => $this->getConfigManager()->get('oro_notification.email_notification_sender_name'),
             'toEmail' => $user->getEmail(),
-            'subject' => 'Export result for job oro.importexport.export_alias',
+            'subject' => 'Export result for job importexport_export_alias_1',
             'body' => $expectedEmailBody,
             'contentType' => $expectedContentType,
         ]);

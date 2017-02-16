@@ -18,7 +18,7 @@
 {% if pageParams.parent_route is defined %}
     {% set indexPath = path(pageParams.parent_route, pageParams.parent_route_parameters is defined ? pageParams.parent_route_parameters : []) %}
 {% else %}
-    {% set indexPath = null %}
+    {% set indexPath = app.request.query.get('originalUrl') %}
 {% endif %}
 
 {% oro_title_set({params : {"%workflow_title%": pageTitle ~ ' - ' ~ indexLabel} }) %}

@@ -19,34 +19,37 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclExtension;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowMaskBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ObjectIdAccessor|\PHPUnit_Framework_MockObject_MockObject */
     protected $objectIdAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var MetadataProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityOwnerAccessor|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityOwnerAccessor;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var AccessLevelOwnershipDecisionMakerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $decisionMaker;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $workflowRegistry;
+    /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowAclMetadataProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowMetadataProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var WorkflowTransitionAclExtension|\PHPUnit_Framework_MockObject_MockObject */
     protected $transitionAclExtension;
 
     /** @var WorkflowAclExtension */
     protected $extension;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->objectIdAccessor = $this->getMockBuilder(ObjectIdAccessor::class)
@@ -57,7 +60,7 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->decisionMaker = $this->createMock(AccessLevelOwnershipDecisionMakerInterface::class);
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
+        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->workflowMetadataProvider = $this->getMockBuilder(WorkflowAclMetadataProvider::class)
@@ -72,7 +75,7 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
             $this->metadataProvider,
             $this->entityOwnerAccessor,
             $this->decisionMaker,
-            $this->workflowRegistry,
+            $this->workflowManager,
             $this->workflowMetadataProvider,
             $this->transitionAclExtension
         );
@@ -260,9 +263,8 @@ class WorkflowAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadata')
             ->with(self::identicalTo($relatedEntity))
             ->willReturn(new OwnershipMetadata());
-        $this->workflowRegistry->expects(self::once())
+        $this->workflowManager->expects(self::once())
             ->method('getWorkflow')
-            ->willReturn('workflow1')
             ->willReturn($workflow);
 
         self::assertTrue(

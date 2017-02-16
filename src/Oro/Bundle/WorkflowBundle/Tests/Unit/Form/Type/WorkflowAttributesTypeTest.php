@@ -390,7 +390,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     public function testNotEditableAttributes()
     {
-        $entity = new \stdClass();
+        $entity = (object)['first' => null, 'second' => null];
         $formData = $this->createWorkflowData(array('entity' => $entity));
         $workflow = $this->createWorkflow(
             'test_workflow_with_attributes',
@@ -424,6 +424,35 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->assertFalse($form->has('second'));
     }
 
+    public function testEditableVirtualAttributes()
+    {
+        $entity = new \stdClass();
+        $formData = $this->createWorkflowData(['entity' => $entity]);
+        $workflow = $this->createWorkflow(
+            'test_workflow_with_attributes',
+            [
+                'first' => $this->createAttribute('first', 'string', 'First'),
+                'second' => $this->createAttribute('second', 'string', 'Second'),
+            ]
+        );
+        $workflow->getDefinition()->setEntityAttributeName('entity');
+        $formOptions = [
+            'workflow' => $workflow,
+            'workflow_item' => $this->createWorkflowItem($workflow),
+            'attribute_fields' => [
+                'first'  => ['form_type' => 'text'],
+                'second' => ['form_type' => 'text'],
+            ],
+        ];
+
+        $this->propertyPathSecurityHelper->expects($this->never())->method('isGrantedByPropertyPath');
+
+        $form = $this->factory->create($this->type, $formData, $formOptions);
+
+        $this->assertTrue($form->has('first'));
+        $this->assertTrue($form->has('second'));
+    }
+
     public function testNormalizers()
     {
         $expectedWorkflow = $this->createWorkflow('test_workflow');
@@ -436,9 +465,5 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->with($expectedWorkflow->getName())->will($this->returnValue($expectedWorkflow));
 
         $this->factory->create($this->type, null, $options);
-    }
-
-    protected function setFormTypeGuesser(array $guessedData)
-    {
     }
 }

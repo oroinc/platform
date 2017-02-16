@@ -130,6 +130,11 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
      */
     public function next()
     {
+        if (null === $this->identifiers) {
+            $this->rewind();
+            return;
+        }
+
         $this->offset++;
 
         if (!isset($this->rows[$this->offset])) {

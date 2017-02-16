@@ -51,7 +51,8 @@
                         {
                             workflowName: data.workflow.name,
                             transitionName: data.transition.name,
-                            entityId: entity_id
+                            entityId: entity_id,
+                            originalUrl: originalUrl
                         })
                     }) %}
                 {% else %}
@@ -59,7 +60,8 @@
                         'oro_workflow_transition_form',
                         {
                             transitionName: data.transition.name,
-                            workflowItemId: data.workflowItem.id
+                            workflowItemId: data.workflowItem.id,
+                            originalUrl: originalUrl
                         })
                     }) %}
                 {% endif %}
