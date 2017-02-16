@@ -8,9 +8,7 @@ use Oro\Bundle\IntegrationBundle\Event\Action\ChannelDisableEvent;
 class ChannelDisableEventFactory implements ChannelActionEventFactoryInterface
 {
     /**
-     * @param Channel $channel
-     *
-     * @return ChannelDisableEvent
+     * {@inheritdoc}
      */
     public function create(Channel $channel)
     {

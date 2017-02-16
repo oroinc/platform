@@ -20,7 +20,7 @@ class ChannelActionErrorHandler implements ChannelActionErrorHandlerInterface
     }
 
     /**
-     * @param string[] $errors
+     * {@inheritdoc}
      */
     public function handleErrors($errors)
     {

@@ -21,9 +21,7 @@ class ChannelDeleteActionHandler implements ChannelActionHandlerInterface
     }
 
     /**
-     * @param Channel $channel
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function handleAction(Channel $channel)
     {

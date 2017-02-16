@@ -8,9 +8,7 @@ use Oro\Bundle\IntegrationBundle\Event\Action\ChannelDeleteEvent;
 class ChannelDeleteEventFactory implements ChannelActionEventFactoryInterface
 {
     /**
-     * @param Channel $channel
-     *
-     * @return ChannelDeleteEvent
+     * {@inheritdoc}
      */
     public function create(Channel $channel)
     {

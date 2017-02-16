@@ -11,10 +11,14 @@ abstract class ChannelActionEvent extends Event
 {
     const NAME = '';
 
-    /** @var Collection|string[] */
+    /**
+     * @var Collection|string[]
+     */
     private $errors;
 
-    /** @var Channel */
+    /**
+     * @var Channel
+     */
     private $channel;
 
     /**

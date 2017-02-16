@@ -55,9 +55,7 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
     }
 
     /**
-     * @param Channel $channel
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function handleAction(Channel $channel)
     {

@@ -31,9 +31,7 @@ class ChannelActionHandlerTransactionDecorator implements ChannelActionHandlerIn
     }
 
     /**
-     * @param Channel $channel
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function handleAction(Channel $channel)
     {
