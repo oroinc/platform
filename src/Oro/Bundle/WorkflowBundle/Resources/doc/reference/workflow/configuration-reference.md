@@ -479,7 +479,7 @@ Event trigger configuration has next options.
     Type of the event, can have the following values: `create`, `update`, `delete`.
 * **field**
     Only for `update` event - field name that should be updated to handle trigger.
-* **queue**
+* **queued**
     [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
 * **require**
     String of Symfony Language Expression that should much to handle the trigger. Following aliases in context are available:

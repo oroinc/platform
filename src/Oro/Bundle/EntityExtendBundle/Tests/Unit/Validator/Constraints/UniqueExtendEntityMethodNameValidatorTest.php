@@ -13,6 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldV
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValidatorTest
 {
@@ -42,8 +43,11 @@ class UniqueExtendEntityMethodNameValidatorTest extends AbstractConstraintValida
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
         return new UniqueExtendEntityMethodNameValidator(
-            new FieldNameValidationHelper(new ConfigProviderMock($configManager, 'extend')),
+            new FieldNameValidationHelper(new ConfigProviderMock($configManager, 'extend'), $eventDispatcher),
             $this->classMethodNameChecker
         );
     }

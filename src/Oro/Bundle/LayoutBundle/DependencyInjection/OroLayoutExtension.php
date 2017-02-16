@@ -127,7 +127,8 @@ class OroLayoutExtension extends Extension
             self::RESOURCES_FOLDER_PATTERN,
             [
                 new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/assets.yml'),
-                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/images.yml')
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/images.yml'),
+                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/page_templates.yml'),
             ]
         );
 
