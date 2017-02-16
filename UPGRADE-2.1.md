@@ -53,6 +53,10 @@ DataGridBundle
 --------------
 - `Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult` is deprecated. Use `Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator` instead
 
+DistributionBundle
+------------------
+- The method `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handle` is deprecated. Use `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handleErrors` instead.
+
 EmailBundle
 -----------
 - Added `Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface` and implemented it in `Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer`

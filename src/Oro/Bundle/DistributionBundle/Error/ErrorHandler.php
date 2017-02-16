@@ -87,4 +87,14 @@ class ErrorHandler extends BaseErrorHandler
 
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated Use handleErrors() instead, to prevent confusion with Symfony\Component\Debug\ErrorHandler::handle
+     */
+    public function handle($level, $message, $file = 'unknown', $line = 0, $context = [])
+    {
+        return $this->handleErrors($level, $message, $file, $line);
+    }
 }
