@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\DistributionBundle\Error;
 
-class ErrorHandler
+use Symfony\Component\Debug\ErrorHandler as BaseErrorHandler;
+
+class ErrorHandler extends BaseErrorHandler
 {
     /**
      * @var array
      */
-    private $errorTypes = array(
+    private $errorTypes = [
         E_WARNING => 'Warning',
         E_NOTICE => 'Notice',
         E_USER_ERROR => 'User Error',
@@ -21,7 +23,7 @@ class ErrorHandler
         E_CORE_ERROR => 'Core Error',
         E_COMPILE_ERROR => 'Compile Error',
         E_PARSE => 'Parse',
-    );
+    ];
 
     /**
      * Register all custom application error handlers
@@ -29,9 +31,10 @@ class ErrorHandler
     public function registerHandlers()
     {
         $errorTypes = E_RECOVERABLE_ERROR | E_ERROR | E_USER_ERROR | E_WARNING | E_USER_WARNING;
-        set_error_handler(array($this, 'handle'), $errorTypes);
-    }
+        set_error_handler([$this, 'handleErrors'], $errorTypes);
 
+        self::register($this, true);
+    }
 
     /**
      * @param int    $code
@@ -42,7 +45,7 @@ class ErrorHandler
      * @return bool
      * @throws \ErrorException
      */
-    public function handle($code, $message, $file, $line)
+    public function handleErrors($code, $message, $file, $line)
     {
         /**
          * Check if suppress warnings used
@@ -59,7 +62,9 @@ class ErrorHandler
             case E_ERROR:
             case E_USER_ERROR:
             case E_RECOVERABLE_ERROR:
-                $this->handleError($code, $message, $file, $line);
+                $errorType = isset($this->errorTypes[$code]) ? $this->errorTypes[$code] : "Unknown error ({$code})";
+                $message = "{$errorType}: {$message} in {$file} on line {$line}";
+                throw new \ErrorException($message, 0, $code, $file, $line);
                 break;
         }
 
@@ -81,19 +86,5 @@ class ErrorHandler
         }
 
         return false;
-    }
-
-    /**
-     * @param int    $code
-     * @param string $message
-     * @param string $file
-     * @param int    $line
-     *
-     * @throws \ErrorException
-     */
-    protected function handleError($code, $message, $file, $line)
-    {
-        $errorType = isset($this->errorTypes[$code]) ? $this->errorTypes[$code] : "Unknown error ({$code})";
-        throw new \ErrorException("{$errorType}: {$message} in {$file} on line {$line}", 0, $code, $file, $line);
     }
 }
