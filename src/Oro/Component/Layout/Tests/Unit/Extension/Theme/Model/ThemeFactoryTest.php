@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
+use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 
@@ -49,7 +50,43 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
         $fullDefinition->setDirectory('OroBlack');
         $fullDefinition->setGroups(['main', 'frontend']);
         $fullDefinition->setDescription('description');
-        $fullDefinition->setConfig(['key' => 'value']);
+
+        $config = [
+            'key' => 'value',
+            'page_templates' => [
+                'templates' => [
+                    [
+                        'label' => 'Some label',
+                        'key' => 'some_key',
+                        'route_name' => 'some_route_name',
+                        'screenshot' => 'some_screenshot',
+                        'description' => 'Some description'
+                    ],
+                    [
+                        'label' => 'Some label (disabled)',
+                        'key' => 'some_key_disabled',
+                        'route_name' => 'some_route_name_disabled',
+                        'enabled' => false,
+                    ]
+                ],
+                'titles' => [
+                    'some_route_name' => 'Title for some route name'
+                ]
+            ]
+        ];
+
+        $fullDefinition->setConfig($config);
+
+        $fullDefinition->addPageTemplateTitle('some_route_name', 'Title for some route name');
+
+        $pageTemplate = new PageTemplate('Some label', 'some_key', 'some_route_name');
+        $pageTemplate->setDescription('Some description')
+            ->setScreenshot('some_screenshot');
+        $fullDefinition->addPageTemplate($pageTemplate);
+
+        $pageTemplate = new PageTemplate('Some label (disabled)', 'some_key_disabled', 'some_route_name_disabled');
+        $pageTemplate->setEnabled(false);
+        $fullDefinition->addPageTemplate($pageTemplate);
 
         return [
             'minimal definition given' => [
@@ -68,7 +105,7 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
                     'logo'       => 'oro-black-logo.png',
                     'directory'  => 'OroBlack',
                     'description' => 'description',
-                    'config' => ['key' => 'value']
+                    'config' => $config
                 ],
                 '$expectedResult' => $fullDefinition,
             ]

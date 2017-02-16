@@ -3,7 +3,9 @@
 namespace Oro\Bundle\BatchBundle\Tests\Functional\ORM;
 
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\BatchBundle\Tests\Functional\ORM\Constraint\IsEqualById;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
@@ -11,7 +13,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 {
-
     /**
      * {@inheritdoc}
      */
@@ -31,7 +32,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
      * @param $queryBuilder
      * @return array
      */
-    protected function getResults(QueryBuilder $queryBuilder)
+    protected function getResultsWithForeachLoop(QueryBuilder $queryBuilder)
     {
         $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(3);
@@ -48,16 +49,74 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
     }
 
     /**
+     * @param $queryBuilder
+     * @return array
+     */
+    protected function getResultsWithWhileLoopRewindFirst(QueryBuilder $queryBuilder)
+    {
+        $iteratorResult = [];
+
+        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(3);
+
+        $iterator->rewind();
+        while ($iterator->valid()) {
+            $data = $iterator->current();
+            $iteratorResult[] = $data;
+
+            $iterator->next();
+        }
+
+        $query = $queryBuilder->getQuery();
+        $result = $query->execute();
+
+        return array($result, $iteratorResult);
+    }
+
+    /**
+     * @param $queryBuilder
+     * @return array
+     */
+    protected function getResultsWithWhileLoopNextFirst(QueryBuilder $queryBuilder)
+    {
+        $iteratorResult = [];
+
+        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
+        $iterator->setBufferSize(3);
+
+        /**
+         * typically $iterator->rewind() should be called before loop
+         * but in case $iterator->next() called first all should be fine too
+         */
+        $iterator->next();
+        while ($iterator->valid()) {
+            $data = $iterator->current();
+            $iteratorResult[] = $data;
+
+            $iterator->next();
+        }
+
+        $query = $queryBuilder->getQuery();
+        $result = $query->execute();
+
+        return array($result, $iteratorResult);
+    }
+
+    /**
      * Asserts that 2 arrays has equal Root Entity IDs and Order. Joined fields may have different order
      *
      * @param QueryBuilder $queryBuilder
      */
     protected function assertSameById(QueryBuilder $queryBuilder)
     {
-        list ($expected, $actual) = $this->getResults($queryBuilder);
+        list ($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
+        static::assertThat($actual, new IsEqualById($expected));
 
-        $constraint = new IsEqualById($expected);
-        static::assertThat($actual, $constraint);
+        list ($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
+        static::assertThat($actual, new IsEqualById($expected));
+
+        list ($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
+        static::assertThat($actual, new IsEqualById($expected));
     }
 
     /**
@@ -67,10 +126,15 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
      */
     protected function assertSameResult(QueryBuilder $queryBuilder)
     {
-        list ($expected, $actual) = $this->getResults($queryBuilder);
+        list ($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
+        $this->assertEquals($expected, $actual);
+
+        list ($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
+        $this->assertEquals($expected, $actual);
+
+        list ($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
         $this->assertEquals($expected, $actual);
     }
-
 
     public function testSimpleQuery()
     {
@@ -78,8 +142,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
         }
 
@@ -98,8 +162,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->leftJoin('item.values', 'value')
             ->groupBy('item.id');
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
         }
 
@@ -109,7 +173,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
     /**
      * @expectedException \LogicException
      */
-    public function testInconsistatKey()
+    public function testInconsistentKey()
     {
         $em = $this->getContainer()->get('doctrine');
 
@@ -139,8 +203,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->select('item.id, item.stringValue, value.id as vid')
             ->leftJoin('item.values', 'value');
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
             $this->assertSameById($queryBuilder);
         } else {
@@ -159,8 +223,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->select('item, value')
             ->leftJoin('item.values', 'value');
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
         }
 
@@ -180,8 +244,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->where('value.id > 15 and item.stringValue != :stringValue')
             ->setParameter('stringValue', 'String Value 3');
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
             $this->assertSameById($queryBuilder);
         } else {
@@ -202,8 +266,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->where('value.id > 15 and item.stringValue != :stringValue')
             ->setParameter('stringValue', 'String Value 3');
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
         }
 
@@ -212,6 +276,9 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
     /**
      * @dataProvider limitOffsetProvider
+     *
+     * @param integer $offset
+     * @param integer $limit
      */
     public function testLimitOffset($offset, $limit)
     {
@@ -222,8 +289,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $queryBuilder->setFirstResult($offset);
         $queryBuilder->setMaxResults($limit);
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
         }
 
@@ -268,8 +335,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             $iteratorResult[] = $item;
         }
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
         }
 
@@ -301,8 +368,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $queryBuilder = $em->getRepository('OroTestFrameworkBundle:ItemValue')->createQueryBuilder('value');
         $afterDelete = count($queryBuilder->getQuery()->execute());
 
-        if ($this->isPostgre()) {
-            // Iterator adds sorting automatically, on Postgre SQL results order may bedifferent without sorting
+        if ($this->isPostgreSql()) {
+            // Iterator adds sorting automatically, on PostgreSQL results order may be different without sorting
             $queryBuilder->orderBy('item.id');
         }
 
@@ -326,7 +393,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->where('MOD(value.id, 2) = 0')
             ->orderBy('value.id');
 
-        if ($this->isPostgre()) {
+        if ($this->isPostgreSql()) {
             $this->expectException(\LogicException::class);
         }
 
@@ -349,7 +416,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->where('MOD(value.id, 2) = 0')
             ->orderBy('value.id');
 
-        if ($this->isPostgre()) {
+        if ($this->isPostgreSql()) {
             $this->expectException(\LogicException::class);
         }
 
@@ -357,13 +424,15 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
     }
 
     /**
-     * Checks if current DB adapter is Postgre SQL
+     * Checks if current DB adapter is PostgreSQL
      *
      * @return bool
      */
-    private function isPostgre()
+    private function isPostgreSql()
     {
+        /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManager();
+
         return $em->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
     }
 }
