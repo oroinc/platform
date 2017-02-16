@@ -20,7 +20,8 @@ define(function(require) {
         events: {
             'change [name=label]': 'updateExampleView',
             'change [name$="[transition_prototype_icon]"]': 'updateExampleView',
-            'change [name=button_color]': 'updateExampleView'
+            'change [name=button_color]': 'updateExampleView',
+            'change [name=display_type]': 'updateDestinationPageView'
         },
 
         options: {
@@ -80,6 +81,26 @@ define(function(require) {
             this.widget = null;
         },
 
+        initDestinationPageView: function(form) {
+            var availableDestinations = this.options.workflow.getAvailableDestinations();
+            var entityRoutes = _.keys(this.options.workflow.getEntityRoutes());
+            entityRoutes.push('');
+
+            var enabledRedirects = _.intersection(availableDestinations, entityRoutes);
+
+            var currentRedirects = $(form).find('[name=destination_page] option');
+            _.each(currentRedirects, function(item) {
+                $(item).toggle(_.indexOf(enabledRedirects, $(item).val()) >= 0);
+            });
+        },
+
+        updateDestinationPageView: function() {
+            var $displayType = $(this.widget.form).find('[name=display_type]');
+            var $pageRedirectRow = $(this.widget.form).find('.destination-page-controls');
+
+            $pageRedirectRow.toggle($displayType.val() === 'page');
+        },
+
         updateExampleView: function() {
             var formData = helper.getFormData(this.widget.form);
             formData.transition_prototype_icon = formData.transition_prototype_icon ||
@@ -99,6 +120,7 @@ define(function(require) {
             this.model.set('label', formData.label);
             this.model.set('step_to', formData.step_to);
             this.model.set('display_type', formData.display_type);
+            this.model.set('destination_page', formData.destination_page);
             this.model.set('message', formData.message);
 
             var frontendOptions = this.model.get('frontend_options');
@@ -283,6 +305,7 @@ define(function(require) {
 
             var form = $(this.template(data));
 
+            this.initDestinationPageView(form);
             this.renderAddAttributeForm(form);
             if (this.options.workflow.entityFieldsInitialized) {
                 this.renderAttributesList(form);
@@ -299,6 +322,7 @@ define(function(require) {
             this.$exampleContainer = this.$('.transition-example-container');
             this.$exampleBtnContainer = this.$exampleContainer.find('.transition-btn-example');
             this.updateExampleView();
+            this.updateDestinationPageView();
 
             return this;
         }

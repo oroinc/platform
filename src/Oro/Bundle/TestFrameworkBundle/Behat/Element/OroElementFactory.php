@@ -60,11 +60,11 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param string $name Element name
-     * @param Element $context
+     * @param NodeElement $context
      *
      * @return Element
      */
-    public function createElement($name, Element $context = null)
+    public function createElement($name, NodeElement $context = null)
     {
         if (!$this->hasElement($name)) {
             throw new \InvalidArgumentException(sprintf(
@@ -87,11 +87,11 @@ class OroElementFactory implements SuiteAwareInterface
 
     /**
      * @param $selector String or array
-     * @param Element $element Context element xpath of which will prepend before given selector
+     * @param NodeElement $element Context element xpath of which will prepend before given selector
      *
      * @return array Xpath selector ['type' => 'xpath', 'locator' => '//']
      */
-    protected function prepend($selector, Element $element)
+    protected function prepend($selector, NodeElement $element)
     {
         $xpath = $this->selectorManipulator->prepend(
             $this->selectorManipulator->getSelectorAsXpath($this->selectorsHandler, $selector),

@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog;
 
 class Select2Entity extends Element
 {
@@ -140,5 +141,29 @@ class Select2Entity extends Element
                 return $element->isVisible();
             }
         ));
+    }
+
+    /**
+     * @param string $buttonName
+     */
+    public function openFromPlusButtonDropDown($buttonName)
+    {
+        $parent = $this->getParent()->getParent();
+        $parent->find('css', '.entity-create-dropdown button')->click();
+
+        // Get element again cause dom updated after dropdown is pressed
+        $parent = $this->getPage()->find('xpath', $parent->getXpath());
+        $parent->findButton($buttonName)->press();
+    }
+
+    /**
+     * @return UiDialog
+     */
+    public function openSelectEntityPopup()
+    {
+        $this->getParent()->getParent()->find('css', '.entity-select-btn')->click();
+        $this->getDriver()->waitForAjax();
+
+        return $this->elementFactory->createElement('UiDialog');
     }
 }
