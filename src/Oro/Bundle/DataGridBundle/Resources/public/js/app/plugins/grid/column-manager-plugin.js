@@ -26,7 +26,7 @@ define(function(require) {
             var options = {};
             this.main.collection.trigger('get:module', 'CustomColumnManagerComponent', options);
             this._createManagedCollection();
-            var options = {
+            options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
                     componentConstructor: options.CustomColumnManagerComponent || ColumnManagerComponent,

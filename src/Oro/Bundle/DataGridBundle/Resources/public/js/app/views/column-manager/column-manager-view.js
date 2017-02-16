@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var ColumnManagerView;
+    var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
