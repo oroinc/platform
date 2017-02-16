@@ -130,10 +130,7 @@ class ConfigurationBuilder implements BuilderInterface
                     $itemOptions['name'] = $itemCode;
                 }
 
-                if (!empty($itemData['position'])) {
-                    $itemOptions['extras']['position'] = $itemData['position'];
-                }
-
+                $this->moveToExtras($itemOptions, 'position', true);
                 $this->moveToExtras($itemOptions, 'translateDomain');
                 $this->moveToExtras($itemOptions, 'translateParameters');
                 $this->moveToExtras($itemOptions, 'translate_disabled');
@@ -157,13 +154,16 @@ class ConfigurationBuilder implements BuilderInterface
     /**
      * @param array  $menuItem
      * @param string $optionName
+     * @param bool $preferValueFromExtras
      *
      * @return void
      */
-    private function moveToExtras(array &$menuItem, $optionName)
+    private function moveToExtras(array &$menuItem, $optionName, $preferValueFromExtras = false)
     {
         if (isset($menuItem[$optionName])) {
-            $menuItem['extras'][$optionName] = $menuItem[$optionName];
+            if (!isset($menuItem['extras'][$optionName]) || !$preferValueFromExtras) {
+                $menuItem['extras'][$optionName] = $menuItem[$optionName];
+            }
             unset($menuItem[$optionName]);
         }
     }
