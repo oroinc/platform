@@ -119,6 +119,7 @@ operations:
                     '@equal': [$.actionSuccess, true]
                 message: oro.integration.notification.channel.deleted
                 type: 'success'
+            - '@redirect': {route: oro_integration_index}
 
     DELETE:
         exclude_entities:
