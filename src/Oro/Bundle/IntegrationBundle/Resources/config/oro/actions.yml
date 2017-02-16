@@ -1,0 +1,20 @@
+operations:
+    oro_integration_activate:
+        label: oro.integration.activate
+        applications: [default]
+        button_options:
+            icon: fa-check
+        preconditions:
+            - '@call_service_method':
+                service:
+
+
+    oro_integration_deactivate:
+        label: oro.integration.deactivate
+        button_options:
+            icon: fa-close
+
+    oro_integration_delete:
+        label: oro.integration.delete
+        button_options:
+            icon: fa-close

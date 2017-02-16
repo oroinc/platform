@@ -86,6 +86,7 @@ oro:
         progress: Check progress.
         activate: Activate
         deactivate: Deactivate
+        delete: Delete
         button:
             force_sync: Full Re-sync
             sync: Schedule sync
