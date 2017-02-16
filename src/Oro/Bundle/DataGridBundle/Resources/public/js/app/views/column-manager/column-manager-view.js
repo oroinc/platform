@@ -46,6 +46,8 @@ define(function(require) {
             var models = this._getFilteredModels();
             var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable');}));
             this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
+            var hasRenderable = Boolean(_.find(models, function(model) {return model.get('renderable');}));
+            this.$('[data-role="column-manager-unselect-all"]').toggleClass('disabled', !hasRenderable);
         },
 
         /**
