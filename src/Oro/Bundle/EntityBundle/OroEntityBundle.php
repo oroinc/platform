@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFallbackCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DatabaseCheckerCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
@@ -48,6 +49,7 @@ class OroEntityBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
+        $container->addCompilerPass(new DatabaseCheckerCompilerPass());
         $container->addCompilerPass(new EntityAliasProviderPass());
         $container->addCompilerPass(new EntityNameProviderPass());
         $container->addCompilerPass(new EntityClassNameProviderPass());

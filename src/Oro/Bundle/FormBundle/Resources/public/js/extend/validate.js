@@ -5,11 +5,10 @@ define([
     'oroui/js/tools',
     'oroui/js/tools/logger',
     'oroform/js/optional-validation-groups-handler',
+    'oroui/js/error',
     'jquery.validate'
-], function($, _, __, tools, logger, validationHandler) {
+], function($, _, __, tools, logger, validationHandler, error) {
     'use strict';
-
-    var console = window.console;
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -110,8 +109,8 @@ define([
         _.each(validationsOf(element), function(param, method) {
             if ($.validator.methods[method]) {
                 rules[method] = {param: param};
-            } else if ($(element.form).data('validator').settings.debug && console) {
-                console.error('Validation method "' + method + '" does not exist');
+            } else if ($(element.form).data('validator').settings.debug) {
+                error.showErrorInConsole('Validation method "' + method + '" does not exist');
             }
         });
         // make sure required validators are at front
@@ -351,8 +350,8 @@ define([
         },
         unhighlight: function(element) {
             var $el = $(element);
-            $el.closest('.error').removeClass('error')
-                .closest('.controls').removeClass('validation-error');
+            $el.closest('.controls').removeClass('validation-error')
+                .find('.error').removeClass('error');
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
@@ -360,7 +359,8 @@ define([
         onfocusout: function(element, event) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
-                    var realField = $(element).closest('.select2-container').parent().find('.select2[type=hidden]')[0];
+                    var realField = $(element).closest('.select2-container').parent()
+                        .find('.select2[type=hidden], select.select2')[0];
                     this.element(realField ? realField : element);
                 } else {
                     this.element(element);
@@ -390,7 +390,8 @@ define([
         'oroform/js/validator/repeated',
         'oroform/js/validator/time',
         'oroform/js/validator/url',
-        'oroform/js/validator/type'
+        'oroform/js/validator/type',
+        'oroform/js/validator/callback'
     ];
     $.validator.loadMethod(methods);
 

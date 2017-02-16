@@ -324,7 +324,7 @@ services:
 
     oro_security.action_metadata_provider.cache:
         public: false
-        parent: oro.file_cache.abstract
+        parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_acl_actions' ] ]
 
@@ -519,6 +519,8 @@ services:
             - '@doctrine'
             - ['oro_user']
             - '%installed%'
+        tags:
+            - { name: oro_entity.database_checker }
 
     # deprecated 1.8:2.1 use @oro_security.ownership_tree_provider.chain instead
     oro_security.link.ownership_tree_provider:
@@ -708,7 +710,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
         arguments:
             - '@oro_security.security_facade'
-            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.provider.security'
             - '@logger'

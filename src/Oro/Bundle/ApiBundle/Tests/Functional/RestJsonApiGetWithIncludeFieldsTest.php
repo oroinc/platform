@@ -18,14 +18,7 @@ class RestJsonApiGetWithIncludeFieldsTest extends RestJsonApiTestCase
     public function testGetEntityWithIncludeParameter($params, $expects)
     {
         $entityType = $this->getEntityType(self::ENTITY_CLASS);
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1]),
-            $params
-        );
-
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
+        $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
         $this->assertEquals($expects, json_decode($response->getContent(), true));
     }
 

@@ -27,25 +27,10 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
         $entity = $this->getReference('test_entity');
         $entityType = $this->getEntityType(TestEntity::class);
 
-        /** @var TestRelatedEntity $relatedEntity */
-        $relatedEntity = $this->getReference('test_related_entity1');
-        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
-
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityType, 'id' => (string)$entity->getId()])
-        );
-
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals((string)$entity->getId(), $result['data']['id']);
-        self::assertEquals(
-            [
-                'type' => $relatedEntityType,
-                'id'   => (string)$relatedEntity->id
-            ],
-            $result['data']['relationships']['relatedEntity']['data']
+        $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
+        $this->assertResponseContains(
+            '@OroApiBundle/Tests/Functional/responses/rest_json_nested_association/test_get.yml',
+            $response
         );
     }
 
@@ -71,14 +56,8 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
+        $response = $this->post(['entity' => $entityType], $data);
 
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
@@ -105,14 +84,8 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
+        $response = $this->post(['entity' => $entityType], $data);
 
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertNull(
             $result['data']['relationships']['relatedEntity']['data']
@@ -150,14 +123,11 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => (string)$entity->getId()]),
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
@@ -192,14 +162,11 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => (string)$entity->getId()]),
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertNull(
             $result['data']['relationships']['relatedEntity']['data']
@@ -222,20 +189,12 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
         $relatedEntity = $this->getReference('test_related_entity1');
         $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl(
-                'oro_rest_api_get_subresource',
-                [
-                    'entity'      => $entityType,
-                    'id'          => (string)$entity->getId(),
-                    'association' => 'relatedEntity'
-                ]
-            )
-        );
+        $response = $this->getSubresource([
+            'entity'      => $entityType,
+            'id'          => (string)$entity->getId(),
+            'association' => 'relatedEntity'
+        ]);
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
@@ -256,21 +215,13 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
         $relatedEntity = $this->getReference('test_related_entity1');
         $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl(
-                'oro_rest_api_get_subresource',
-                [
-                    'entity'      => $entityType,
-                    'id'          => (string)$entity->getId(),
-                    'association' => 'relatedEntity',
-                    'meta'        => 'title'
-                ]
-            )
-        );
+        $response = $this->getSubresource([
+            'entity'      => $entityType,
+            'id'          => (string)$entity->getId(),
+            'association' => 'relatedEntity',
+            'meta'        => 'title'
+        ]);
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
@@ -294,20 +245,12 @@ class RestJsonApiNestedAssociationTest extends RestJsonApiTestCase
         $relatedEntity = $this->getReference('test_related_entity1');
         $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
 
-        $response = $this->request(
-            'GET',
-            $this->getUrl(
-                'oro_rest_api_get_relationship',
-                [
-                    'entity'      => $entityType,
-                    'id'          => (string)$entity->getId(),
-                    'association' => 'relatedEntity'
-                ]
-            )
-        );
+        $response = $this->getRelationship([
+            'entity'      => $entityType,
+            'id'          => (string)$entity->getId(),
+            'association' => 'relatedEntity'
+        ]);
 
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [

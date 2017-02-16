@@ -4,9 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestDepartment;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
 {
     /**
@@ -46,13 +43,8 @@ class RestJsonApiGetWithTableInheritanceTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(self::ENTITY_CLASS);
 
         // test get list request
-        $response = $this->request(
-            'GET',
-            $this->getUrl('oro_rest_api_cget', ['entity' => $entityType, 'page[size]' => 1]),
-            $params
-        );
+        $response = $this->cget(['entity' => $entityType, 'page[size]' => 1], $params);
 
-        $this->assertApiResponseStatusCodeEquals($response, 200, $entityType, 'get list');
         $this->assertEquals($expects, json_decode($response->getContent(), true));
     }
 

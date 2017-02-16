@@ -28,6 +28,9 @@ class ButtonContext
     /** @var string */
     protected $formPageRoute;
 
+    /** @var string */
+    protected $originalUrl;
+
     /** @var bool */
     protected $enabled = true;
 
@@ -183,6 +186,26 @@ class ButtonContext
     public function setFormPageRoute($formPageRoute)
     {
         $this->formPageRoute = $formPageRoute;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOriginalUrl()
+    {
+        return $this->originalUrl;
+    }
+
+    /**
+     * @param string $originalUrl
+     *
+     * @return $this
+     */
+    public function setOriginalUrl($originalUrl)
+    {
+        $this->originalUrl = $originalUrl;
 
         return $this;
     }

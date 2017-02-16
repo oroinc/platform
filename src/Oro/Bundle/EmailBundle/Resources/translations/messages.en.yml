@@ -12,6 +12,7 @@ oro:
 
     email:
         imap.folder.checkAll: All
+        mailbox_name.personal: Personal
         autocomplete:
             recently_used: Recently used
             contexts: Contexts

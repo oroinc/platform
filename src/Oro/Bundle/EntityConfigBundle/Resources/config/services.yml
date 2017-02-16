@@ -51,6 +51,8 @@ services:
             - '@doctrine'
             - ['oro_entity_config', 'oro_entity_config_field', 'oro_entity_config_index_value']
             - '%installed%'
+        tags:
+            - { name: oro_entity.database_checker }
 
     oro_entity_config.config_model_manager:
         public: false
@@ -95,7 +97,6 @@ services:
         arguments:
             - '@oro_entity_config.config_cache_impl'
             - '@oro_entity_config.model_cache_impl'
-            - %kernel.debug%
 
     oro_entity_config.config_cache_impl:
         public: false
@@ -250,6 +251,7 @@ services:
             - '@oro_entity_extend.extend.field_name_validation_helper'
             - '@oro_entity_config.config.config_helper'
             - '@session'
+            - '@event_dispatcher'
 
     oro_entity_config.config.config_helper:
         class: 'Oro\Bundle\EntityConfigBundle\Config\ConfigHelper'
@@ -412,3 +414,9 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
+    oro_entity_config.event_listener.attribute_after_remove_field:
+        class: Oro\Bundle\EntityConfigBundle\EventListener\AfterRemoveFieldListener
+        arguments:
+          - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.field.after_remove, method: onAfterRemove }

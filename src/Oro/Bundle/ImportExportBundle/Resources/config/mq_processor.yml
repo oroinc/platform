@@ -10,7 +10,19 @@ services:
             - '@oro_security.security_facade'
             - '@security.token_storage'
             - '@logger'
-            - '@oro_importexport.async.import_export_job_summary_result_service'
+            - '@oro_importexport.async.import_export_result_summarizer'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_importexport.async.pre_cli_import:
+        class: Oro\Bundle\ImportExportBundle\Async\Import\PreCliImportMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+            - '@oro_message_queue.job.dependent_job_service'
+            - '@oro_importexport.splitter.splitter_chain'
+            - '@oro_importexport.file.file_manager'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -19,68 +31,37 @@ services:
         arguments:
             - '@oro_importexport.handler.import.cli'
             - '@oro_message_queue.job.runner'
-            - '@oro_message_queue.client.message_producer'
-            - '@oro_config.user'
+            - '@oro_importexport.async.import_export_result_summarizer'
+            - '@oro_message_queue.job.storage'
             - '@logger'
+            - '@oro_importexport.file.file_manager'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_importexport.async.cli_import_validation:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\CliImportValidationMessageProcessor
+    oro_importexport.async.pre_http_import:
+        class: Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor
         arguments:
-            - '@oro_importexport.handler.import.cli'
             - '@oro_message_queue.job.runner'
             - '@oro_message_queue.client.message_producer'
-            - '@oro_config.user'
             - '@logger'
+            - '@oro_importexport.splitter.splitter_chain'
+            - '@oro_message_queue.job.dependent_job_service'
+            - '@oro_importexport.file.file_manager'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_importexport.async.abstract_chunk_http_import:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\AbstractChunkImportMessageProcessor
-        abstract:  true
+    oro_importexport.async.http_import:
+        class: Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor
         arguments:
             - '@oro_importexport.handler.import.http'
             - '@oro_message_queue.job.runner'
             - '@oro_message_queue.client.message_producer'
             - '@doctrine'
             - '@security.token_storage'
-            - '@logger'
+            - '@oro_importexport.async.import_export_result_summarizer'
             - '@oro_message_queue.job.storage'
-
-    oro_importexport.async.chunck_http_import:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportMessageProcessor
-        parent: oro_importexport.async.abstract_chunk_http_import
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
-    oro_importexport.async.chunck_http_import_validation:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportValidationMessageProcessor
-        parent: oro_importexport.async.abstract_chunk_http_import
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
-    oro_importexport.async.abstract_preparing_http_import:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor
-        abstract:  true
-        arguments:
-            - '@oro_importexport.handler.import.http'
-            - '@oro_message_queue.job.runner'
-            - '@oro_message_queue.client.message_producer'
             - '@logger'
-            - '@oro_importexport.file.split_csv_file'
-            - '@doctrine'
-            - '@oro_message_queue.job.dependent_job_service'
-
-    oro_importexport.async.preparing_http_import_validation:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor
-        parent: oro_importexport.async.abstract_preparing_http_import
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
-    oro_importexport.async.preparing_http_import:
-        class: Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor
-        parent: oro_importexport.async.abstract_preparing_http_import
+            - '@oro_importexport.file.file_manager'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -90,7 +71,17 @@ services:
             - '@oro_message_queue.client.message_producer'
             - '@logger'
             - '@oro_message_queue.job.storage'
-            - '@oro_importexport.async.import_export_job_summary_result_service'
+            - '@oro_importexport.async.import_export_result_summarizer'
+            - '@oro_config.user'
+            - '@doctrine'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_importexport.async.send_import_error_notification:
+        class: Oro\Bundle\ImportExportBundle\Async\SendImportErrorNotificationMessageProcessor
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
             - '@oro_config.user'
             - '@doctrine'
         tags:

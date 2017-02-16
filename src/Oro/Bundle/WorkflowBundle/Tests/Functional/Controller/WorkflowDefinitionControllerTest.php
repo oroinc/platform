@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
-/**
- * @dbIsolation
- */
 class WorkflowDefinitionControllerTest extends WebTestCase
 {
     const ENTITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity';
@@ -57,6 +56,26 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         );
         $response = $this->client->getResponse();
         $this->assertEquals(403, $response->getStatusCode());
+    }
+
+    public function testUpdateAction()
+    {
+        $definition = $this->getWorkflowDefinition(LoadWorkflowDefinitions::WITH_DATAGRIDS);
+        $definition->setSystem(false);
+
+        $manager = $this->getObjectManager('OroWorkflowBundle:WorkflowDefinition');
+        $manager->flush();
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_workflow_definition_update', ['name' => LoadWorkflowDefinitions::WITH_DATAGRIDS]),
+            [],
+            [],
+            $this->generateBasicAuthHeader()
+        );
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $this->assertContains('"availableDestinations":', $crawler->html());
     }
 
     public function testViewAction()
@@ -127,5 +146,25 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertContains('active_group2', $content);
         $this->assertContains('record_group1', $content);
         $this->assertContains('record_group2', $content);
+    }
+
+    /**
+     * @param string $name
+     * @return WorkflowDefinition
+     */
+    private function getWorkflowDefinition($name)
+    {
+        return $this->getObjectManager('OroWorkflowBundle:WorkflowDefinition')
+            ->getRepository('OroWorkflowBundle:WorkflowDefinition')
+            ->find($name);
+    }
+
+    /**
+     * @param string $className
+     * @return ObjectManager
+     */
+    private function getObjectManager($className)
+    {
+        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
     }
 }

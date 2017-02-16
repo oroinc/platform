@@ -27,3 +27,4 @@ oro:
             label: Capabilities
             select_all: Select All
             no_capabilities_available: This group has no capabilities
+        content_outdated: "The current role has been updated. Please, <a href=\"#\" onclick=\"window.location.reload(false);return false;\">refresh the page</a> to view new changes"

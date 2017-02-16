@@ -141,6 +141,9 @@ parameters:
     oro_email.model.email_activity_updates.class: Oro\Bundle\EmailBundle\Model\EmailActivityUpdates
     oro_email.event_listener.smtp_settings_change.class: Oro\Bundle\EmailBundle\EventListener\SmtpSettingsChangeListener
 
+    #decorate swiftmailer class
+    swiftmailer.class:  Oro\Bundle\EmailBundle\Util\MailerWrapper
+
 services:
     oro_email.entity.cache.warmer:
         class: %oro_email.entity.cache.warmer.class%
@@ -307,6 +310,7 @@ services:
 
     oro_email.listener.auto_response_listener:
         class: %oro_email.listener.auto_response_listener.class%
+        public: false
         arguments:
             - '@oro_email.link.autoresponserule_manager'
             - '@oro_message_queue.client.message_producer'
@@ -447,6 +451,8 @@ services:
         arguments:
             - '@mailer'
             - '@service_container'
+        calls:
+            - [setLogger, ['@oro_email.logger.link']]
 
     # Email template API
     oro_email.manager.emailtemplate.api:
@@ -1191,6 +1197,10 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_email.migrate_email_body' }
+
+    oro_email.logger.link:
+        tags:
+            - { name: oro_service_link, service: logger }
 
     oro_email.provider.smtp_settings:
         class: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider

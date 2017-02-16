@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Cache;
 
-use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as BaseCacheWarmerAggregate;
+
+use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class CacheWarmerAggregate implements CacheWarmerInterface
 {
@@ -15,11 +17,15 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     private $warmers;
 
     /**
-     * @param BaseCacheWarmerAggregate $baseCacheWarmerAggregate
+     * @param BaseCacheWarmerAggregate  $baseCacheWarmerAggregate
+     * @param CheckDatabaseStateManager $checkDatabaseStateManager
      */
-    public function __construct(BaseCacheWarmerAggregate $baseCacheWarmerAggregate)
-    {
+    public function __construct(
+        BaseCacheWarmerAggregate $baseCacheWarmerAggregate,
+        CheckDatabaseStateManager $checkDatabaseStateManager
+    ) {
         $this->baseCacheWarmerAggregate = $baseCacheWarmerAggregate;
+        $checkDatabaseStateManager->clearState();
     }
 
     /** {@inheritdoc} */
@@ -42,7 +48,9 @@ class CacheWarmerAggregate implements CacheWarmerInterface
     public function warmUp($cacheDir)
     {
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
-            || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)) {
+            || CommandExecutor::isCurrentCommand('oro:install', true)
+            || CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)
+        ) {
             foreach ($this->warmers as $warmer) {
                 $warmer->warmUp($cacheDir);
             }
