@@ -1,27 +1,23 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Action;
+namespace Oro\Bundle\IntegrationBundle\ActionHandler;
 
-use Doctrine\DBAL\DBALException;
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Psr\Log\LoggerAwareTrait;
+use Oro\Bundle\IntegrationBundle\Manager\DeleteManager;
 
 class ChannelDeleteActionHandler implements ChannelActionHandlerInterface
 {
-    use LoggerAwareTrait;
+    /**
+     * @var DeleteManager
+     */
+    private $deleteManager;
 
     /**
-     * @var EntityManagerInterface
+     * @param DeleteManager $deleteManager
      */
-    private $entityManager;
-
-    /**
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(DeleteManager $deleteManager)
     {
-        $this->entityManager = $entityManager;
+        $this->deleteManager = $deleteManager;
     }
 
     /**
@@ -31,17 +27,6 @@ class ChannelDeleteActionHandler implements ChannelActionHandlerInterface
      */
     public function handleAction(Channel $channel)
     {
-        try {
-            $this->entityManager->remove($channel);
-            $this->entityManager->flush();
-
-            return true;
-        } catch (DBALException $e) {
-            if ($this->logger) {
-                $this->logger->error($e->getMessage(), $e->getTrace());
-            }
-
-            return false;
-        }
+        return $this->deleteManager->delete($channel);
     }
 }

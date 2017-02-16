@@ -48,13 +48,6 @@ parameters:
     oro_integration.twig.integration.class:                                Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
 
 services:
-    oro_integration.manager.api:
-        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-        parent: oro_soap.manager.entity_manager.abstract
-        arguments:
-            - %oro_integration.entity.class%
-            - '@doctrine.orm.entity_manager'
-
     oro_integration.form.channel:
         class:                        Symfony\Component\Form\Form
         factory_method:               createNamed

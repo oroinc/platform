@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Action;
+namespace Oro\Bundle\IntegrationBundle\ActionHandler;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
@@ -27,7 +27,9 @@ class ChannelDisableActionHandler implements ChannelActionHandlerInterface
      */
     public function handleAction(Channel $channel)
     {
+        $channel->setPreviouslyEnabled($channel->isEnabled());
         $channel->setEnabled(false);
+
         $this->entityManager->flush();
 
         return true;

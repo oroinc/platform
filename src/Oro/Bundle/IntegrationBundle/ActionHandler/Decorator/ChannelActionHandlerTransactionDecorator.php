@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\ActionHandler\Decorator;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\IntegrationBundle\Action\ChannelActionHandlerInterface;
+use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelActionHandlerInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelActionHandlerTransactionDecorator implements ChannelActionHandlerInterface

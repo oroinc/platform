@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Error\ActionHandler;
+namespace Oro\Bundle\IntegrationBundle\ActionHandler\Error;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 

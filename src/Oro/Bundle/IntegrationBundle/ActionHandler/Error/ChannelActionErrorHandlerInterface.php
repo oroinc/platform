@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Error\ActionHandler;
+namespace Oro\Bundle\IntegrationBundle\ActionHandler\Error;
 
 interface ChannelActionErrorHandlerInterface
 {

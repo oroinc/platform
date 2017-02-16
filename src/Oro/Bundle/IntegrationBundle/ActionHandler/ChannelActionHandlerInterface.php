@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Action;
+namespace Oro\Bundle\IntegrationBundle\ActionHandler;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 

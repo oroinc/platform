@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\ActionHandler\Decorator;
 
-use Oro\Bundle\IntegrationBundle\Action\ChannelActionHandlerInterface;
+use Oro\Bundle\IntegrationBundle\ActionHandler\ChannelActionHandlerInterface;
+use Oro\Bundle\IntegrationBundle\ActionHandler\Error\ChannelActionErrorHandlerInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Error\ActionHandler\ChannelActionErrorHandlerInterface;
 use Oro\Bundle\IntegrationBundle\Event\Action\ChannelActionEvent;
 use Oro\Bundle\IntegrationBundle\Factory\Event\ChannelActionEventFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -82,7 +82,7 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
     private function handleEventErrors(ChannelActionEvent $event)
     {
         $errors = $event->getErrors();
-        if (empty($errors)) {
+        if ($errors->count() === 0) {
             return true;
         }
 
