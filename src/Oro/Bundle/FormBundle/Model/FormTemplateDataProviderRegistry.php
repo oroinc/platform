@@ -31,4 +31,14 @@ class FormTemplateDataProviderRegistry
     {
         $this->formDataProviders[$alias] = $dataProvider;
     }
+
+    /**
+     * @param $alias
+     *
+     * @return bool
+     */
+    public function has($alias)
+    {
+        return isset($this->formDataProviders[$alias]);
+    }
 }

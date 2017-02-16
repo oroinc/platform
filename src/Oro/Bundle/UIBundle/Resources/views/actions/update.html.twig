@@ -12,17 +12,19 @@
 
 {% block content %}
     {% if isWidgetContext and savedId is defined and savedId %}
-        <script type="text/javascript">
-            require(['oroui/js/widget-manager'],
-            function(widgetManager) {
-                widgetManager.getWidgetInstance(
-                    {{ app.request.get('_wid')|json_encode|raw }},
-                    function (widget) {
-                        widget.trigger('formSave', {{ savedId|json_encode|raw }});
-                    }
-                );
-            });
-        </script>
+        {% block widget_context %}
+            <script type="text/javascript">
+                require(['oroui/js/widget-manager'],
+                function(widgetManager) {
+                    widgetManager.getWidgetInstance(
+                        {{ app.request.get('_wid')|json_encode|raw }},
+                        function (widget) {
+                            widget.trigger('formSave', {{ savedId|json_encode|raw }});
+                        }
+                    );
+                });
+            </script>
+        {% endblock widget_context %}
     {% else %}
     {% set formAction = formAction|default() %}
     {% if addQueryParameters is not defined or addQueryParameters == true %}

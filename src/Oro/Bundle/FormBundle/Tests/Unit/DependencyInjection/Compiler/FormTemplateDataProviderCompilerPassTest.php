@@ -7,9 +7,6 @@ use Oro\Component\DependencyInjection\Tests\Unit\Compiler\TaggedServicesCompiler
 
 class FormTemplateDataProviderCompilerPassTest extends TaggedServicesCompilerPassCase
 {
-    /** @var FormTemplateDataProviderCompilerPass */
-    protected $pass;
-
     public function testProcess()
     {
         $this->assertTaggedServicesRegistered(

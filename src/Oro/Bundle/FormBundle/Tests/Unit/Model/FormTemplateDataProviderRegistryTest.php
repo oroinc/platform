@@ -48,4 +48,47 @@ class FormTemplateDataProviderRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $this->registry->get('test');
     }
+
+    /**
+     * @dataProvider hasDataProvider
+     *
+     * @param bool $expected
+     * @param string $alias
+     * @param FormTemplateDataProviderInterface|null $provider
+     */
+    public function testHas($expected, $alias, FormTemplateDataProviderInterface $provider = null)
+    {
+        if ($provider) {
+            $this->registry->addProvider($provider, $alias);
+        }
+        $this->assertEquals($expected, $this->registry->has($alias));
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function hasDataProvider()
+    {
+        yield 'valid' => [
+            'expected' => true,
+            'alias' => 'test',
+            'provider' => $this->getMockBuilder(FormTemplateDataProviderInterface::class)->getMock()
+        ];
+        yield 'invalid' => ['expected' => false, 'alias' => 'test', 'provider' => null];
+    }
+
+    public function testAll()
+    {
+        $providers = [
+            'a' => $this->getMockBuilder(FormTemplateDataProviderInterface::class)->getMock(),
+            'b' => $this->getMockBuilder(FormTemplateDataProviderInterface::class)->getMock(),
+            'c' => $this->getMockBuilder(FormTemplateDataProviderInterface::class)->getMock(),
+        ];
+
+        foreach ($providers as $alias => $provider) {
+            $this->registry->addProvider($provider, $alias);
+        }
+
+        $this->assertSame($providers, $this->registry->all());
+    }
 }

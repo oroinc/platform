@@ -387,7 +387,8 @@ class Transition
      */
     public function hasForm()
     {
-        return !empty($this->formOptions) && !empty($this->formOptions['attribute_fields']);
+        return (!empty($this->formOptions) && !empty($this->formOptions['attribute_fields']))
+            || $this->hasPageFormConfiguration();
     }
 
     /**

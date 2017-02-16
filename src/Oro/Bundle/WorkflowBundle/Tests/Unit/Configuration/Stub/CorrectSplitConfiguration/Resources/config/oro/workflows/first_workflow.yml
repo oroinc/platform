@@ -89,6 +89,7 @@ workflows:
                     handler: 'handler'
                     template: 'template'
                     data_provider: 'data_provider'
+                    data_attribute: 'form_data'
 
         transition_definitions:
             first_transition_definition:

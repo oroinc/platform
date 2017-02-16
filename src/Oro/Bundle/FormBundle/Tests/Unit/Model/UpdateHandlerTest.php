@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
+use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -58,10 +59,18 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $resultCallbackInvoked;
 
+    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
+    protected $requestStack;
+
+    /**
+     * @var FormHandler
+     */
+    protected $formHandler;
+
     /**
      * @var FormTemplateDataProviderRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $formTemplateDataProviderRegistry;
+    protected $formTemplateDataProviderRegistry;
 
     /**
      * @var UpdateHandler
@@ -72,9 +81,8 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
 
-        /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
-        $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
+        $this->requestStack = $this->createMock(RequestStack::class);
+        $this->requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
 
         $this->session = $this->createMock('Symfony\Component\HttpFoundation\Session\Session');
         $this->router = $this->createMock('Oro\Bundle\UIBundle\Route\Router');
@@ -82,15 +90,16 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
         $this->formTemplateDataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);
+        $this->formHandler = new FormHandler($this->eventDispatcher, $this->doctrineHelper);
 
         $this->resultCallbackInvoked = false;
 
         $this->handler = new UpdateHandler(
-            $requestStack,
+            $this->requestStack,
             $this->session,
             $this->router,
             $this->doctrineHelper,
-            $this->eventDispatcher,
+            $this->formHandler,
             $this->formTemplateDataProviderRegistry
         );
     }

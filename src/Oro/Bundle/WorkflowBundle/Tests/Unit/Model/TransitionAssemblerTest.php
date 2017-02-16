@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
+use Oro\Bundle\WorkflowBundle\Model\PageFormConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
@@ -85,6 +86,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
+    /** @var PageFormConfigurationAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    protected $pageFormConfigurationAssembler;
+
     protected function setUp()
     {
         $this->formOptionsAssembler = $this->getMockBuilder(FormOptionsAssembler::class)
@@ -96,10 +100,17 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+
+        $this->pageFormConfigurationAssembler = $this->getMockBuilder(PageFormConfigurationAssembler::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['assemble'])
+            ->getMock();
+
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
-            $this->actionFactory
+            $this->actionFactory,
+            $this->pageFormConfigurationAssembler
         );
     }
 

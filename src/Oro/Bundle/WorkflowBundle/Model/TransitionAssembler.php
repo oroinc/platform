@@ -34,18 +34,26 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected $actionFactory;
 
     /**
+     * @var PageFormConfigurationAssembler
+     */
+    protected $pageFormConfigurationAssembler;
+
+    /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
      * @param ActionFactoryInterface $actionFactory
+     * @param PageFormConfigurationAssembler $pageFormConfigurationAssembler
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
-        ActionFactoryInterface $actionFactory
+        ActionFactoryInterface $actionFactory,
+        PageFormConfigurationAssembler $pageFormConfigurationAssembler
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
         $this->actionFactory = $actionFactory;
+        $this->pageFormConfigurationAssembler = $pageFormConfigurationAssembler;
     }
 
     /**
@@ -166,8 +174,9 @@ class TransitionAssembler extends BaseAbstractAssembler
             );
         }
 
-        $transition = $this->assemblePageFormConfiguration($transition, $options);
-
+        if (!empty($options[WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION])) {
+            $this->pageFormConfigurationAssembler->assemble($options, $transition);
+        }
         return $transition;
     }
 
