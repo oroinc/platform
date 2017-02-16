@@ -57,7 +57,7 @@ define(function(require) {
                 throw new TypeError('Invalid required option "filterModel"');
             }
 
-            if(_.isObject(options.templateSelectors)) {
+            if (_.isObject(options.templateSelectors)) {
                 var $tpl = $(options.templateSelectors.columnManagerCollectionsTpl);
                 this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
 

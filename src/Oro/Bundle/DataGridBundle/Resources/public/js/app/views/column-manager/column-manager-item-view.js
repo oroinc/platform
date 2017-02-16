@@ -41,13 +41,11 @@ define(function(require) {
         setFilterModel: function(filterModel) {
             this.filterModel = filterModel;
 
-            if(this.filterModel.get('columnManagerItemTpl')) {
+            if (this.filterModel.get('columnManagerItemTpl')) {
                 var $tpl = $(this.filterModel.get('columnManagerItemTpl'));
 
                 if ($tpl.length) {
                     this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
-
-
                 }
             }
 

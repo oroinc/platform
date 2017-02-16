@@ -20,7 +20,7 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            if(_.isObject(options.templateSelectors)) {
+            if (_.isObject(options.templateSelectors)) {
                 var $tpl = $(options.templateSelectors.columnManagerTpl);
 
                 this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
@@ -65,13 +65,13 @@ define(function(require) {
         onunselectAll: function(e) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
-                if(!model.get('disabledVisibilityChange')) {
+                if (!model.get('disabledVisibilityChange')) {
                     model.set('renderable', false);
                 }
             });
         },
 
-        reset: function (e) {
+        reset: function(e) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
                 model.set('renderable', model.get('metadata').renderable);
