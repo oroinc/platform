@@ -52,6 +52,7 @@ services:
     oro_form.registry.form_template_data_provider:
         public: false
         class: 'Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry'
+        arguments: ['@service_container']
 
     oro_form.registry.form_handler:
         public: false

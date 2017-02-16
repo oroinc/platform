@@ -1,0 +1,71 @@
+{% set pageParams = transition.frontendOptions.page is defined ? transition.frontendOptions.page : null  %}
+{% if pageParams.title is defined %}
+    {% set pageTitle = pageParams.title|trans %}
+{% else %}
+    {% set pageTitle = transition.label|trans({},'workflows') %}
+{% endif %}
+
+{% if pageParams.parent_label is defined %}
+    {% set indexLabel = pageParams.parent_label|trans %}
+{% else %}
+    {% set indexLabel = workflow.label|trans({},'workflows') %}
+{% endif %}
+
+{% if pageParams.parent_route is defined %}
+    {% set indexPath = path(pageParams.parent_route, pageParams.parent_route_parameters is defined ? pageParams.parent_route_parameters : []) %}
+{% else %}
+    {% set indexPath = null %}
+{% endif %}
+
+{% oro_title_set({params : {"%workflow_title%": pageTitle ~ ' - ' ~ indexLabel} }) %}
+
+{% set formAction = transitionFormUrl  %}
+
+{% embed transition.getPageFormTemplate() with {'formAction': formAction}%}
+    {% block pin_button %}
+    {% endblock pin_button %}
+    {% block navButtons %}
+        {% if indexPath %}
+            {{ UI.cancelButton(indexPath) }}
+        {% endif %}
+        
+        <div class="btn-group">
+            <button
+                    type="button"
+                    class="btn btn-success"
+                    id="save-and-transit"
+                    {#data-transition-url="{{ transitionUrl }}"#}
+            >{{ 'Submit'|trans }}</button>
+        </div>
+    
+        <script type="text/javascript">
+            require(['jquery'],
+                    function($) {
+                        var saveAndTransitBtn = $('#save-and-transit');
+                    
+                        saveAndTransitBtn.on('click', function(e) {
+                            e.preventDefault();
+                            $('form#{{ form.vars.id }}').submit();
+                        });
+                    });
+        </script>
+    {% endblock navButtons %}
+    
+    {% block pageHeader %}
+        {% set breadcrumbs = {
+            'indexPath': indexPath,
+            'indexLabel': indexLabel|trans,
+            'entityTitle': pageTitle|trans
+        } %}
+        
+        {% block stats %}{% endblock %}
+    
+        {{ include('OroNavigationBundle:menuUpdate:pageHeader.html.twig') }}
+    {% endblock pageHeader %}
+    
+    {% block breadcrumb %}
+        <ul class="breadcrumb">
+            <li>{{ indexLabel|trans }}</li>
+        </ul>
+    {% endblock %}
+{% endembed %}

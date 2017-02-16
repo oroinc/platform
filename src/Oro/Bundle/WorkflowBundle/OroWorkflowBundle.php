@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle;
 
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\TransitionFormHandlerCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
