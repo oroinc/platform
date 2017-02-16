@@ -27,6 +27,9 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $handler;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->config = $this->getMockBuilder(ConfigManager::class)
@@ -52,9 +55,34 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->setContainer($container);
     }
 
-    public function testIsHandling()
+    public function testIsHandlingTrue()
     {
-        $this->assertTrue($this->handler->isHandling([]));
+        $this->config->expects($this->at(0))
+            ->method('get')
+            ->with('oro_logger.detailed_logs_end_timestamp')
+            ->willReturn(time() + 3600);
+
+        $this->config->expects($this->at(1))
+            ->method('get')
+            ->with('oro_logger.detailed_logs_level')
+            ->willReturn('warning');
+
+        $this->assertTrue($this->handler->isHandling(['level' => Logger::WARNING]));
+    }
+
+    public function testIsHandlingFalse()
+    {
+        $this->config->expects($this->at(0))
+            ->method('get')
+            ->with('oro_logger.detailed_logs_end_timestamp')
+            ->willReturn(time() + 3600);
+
+        $this->config->expects($this->at(1))
+            ->method('get')
+            ->with('oro_logger.detailed_logs_level')
+            ->willReturn('warning');
+
+        $this->assertFalse($this->handler->isHandling(['level' => Logger::DEBUG]));
     }
 
     public function testNoRecordsArePassedToNestedHandlerWhenEndTimestampCheckFails()
@@ -83,6 +111,8 @@ class DetailedLogsHandlerTest extends \PHPUnit_Framework_TestCase
                 3 => ['level' => Logger::ERROR],
                 4 => ['level' => Logger::CRITICAL],
             ]);
+
+        $this->handler->isHandling(['level' => Logger::DEBUG]);
 
         $this->handler->handle(['level' => Logger::DEBUG]);
         $this->handler->handle(['level' => Logger::INFO]);

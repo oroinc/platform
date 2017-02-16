@@ -43,7 +43,8 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
      */
     public function isHandling(array $record)
     {
-        return true;
+        $this->level = $this->getLogLevel();
+        return parent::isHandling($record);
     }
 
     /**
@@ -64,15 +65,17 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
 
     public function close()
     {
-        if (empty($this->buffer)) {
+        if (count($this->buffer) === 0) {
             return;
         }
-        $monologLevel = $this->getLogLevel();
+
+        $level = $this->level;
+
         $this->handler->handleBatch(
             array_filter(
                 $this->buffer,
-                function ($record) use ($monologLevel) {
-                    return $record['level'] >= $monologLevel;
+                function ($record) use ($level) {
+                    return $record['level'] >= $level;
                 }
             )
         );
