@@ -65,7 +65,9 @@ define(function(require) {
         onunselectAll: function(e) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
-                model.set('renderable', false);
+                if(!model.get('disabledVisibilityChange')) {
+                    model.set('renderable', false);
+                }
             });
         },
 
