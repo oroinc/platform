@@ -169,4 +169,5 @@ To use your custom form type that replaces default transition form you must set 
 Here we have `oro_sale_quote` from type. But for proper handling of that complex form type, we need to specify additional options in
 `page_form_configuration` node. Those are:
 
+- `handler` - an alias of registered 
 
