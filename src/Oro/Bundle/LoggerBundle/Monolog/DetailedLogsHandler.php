@@ -43,7 +43,8 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
      */
     public function isHandling(array $record)
     {
-        return true;
+        $this->level = $this->getLogLevel();
+        return parent::isHandling($record);
     }
 
     /**
@@ -64,15 +65,17 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
 
     public function close()
     {
-        if (empty($this->buffer)) {
+        if (count($this->buffer) === 0) {
             return;
         }
-        $monologLevel = $this->getLogLevel();
+
+        $level = $this->level;
+
         $this->handler->handleBatch(
             array_filter(
                 $this->buffer,
-                function ($record) use ($monologLevel) {
-                    return $record['level'] >= $monologLevel;
+                function ($record) use ($level) {
+                    return $record['level'] >= $level;
                 }
             )
         );
@@ -84,7 +87,7 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
     private function getLogLevel()
     {
         $logLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
-        if ($this->container->has('oro_config.user')) {
+        if ($this->isInstalled() && $this->container->has('oro_config.user')) {
             /** @var ConfigManager $config */
             $config = $this->container->get('oro_config.user');
             $endTimestamp = $config->get('oro_logger.detailed_logs_end_timestamp');
@@ -94,5 +97,13 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
         }
 
         return Logger::toMonologLevel($logLevel);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isInstalled()
+    {
+        return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
     }
 }
