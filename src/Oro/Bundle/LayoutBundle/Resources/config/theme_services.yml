@@ -175,3 +175,9 @@ services:
         arguments:
             - '@oro_layout.layout_block_view.cache'
             - '@oro_layout.block_view_serializer'
+
+    oro_layout.page_templates_manager:
+        class:  'Oro\Component\Layout\Extension\Theme\Manager\PageTemplatesManager'
+        public: false
+        arguments:
+            - '@oro_layout.theme_manager'

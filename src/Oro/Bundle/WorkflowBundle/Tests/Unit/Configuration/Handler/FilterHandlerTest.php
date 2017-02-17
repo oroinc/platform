@@ -64,7 +64,10 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                                         ],
                                     ]
                                 ]
-                            ]
+                            ],
+                            'init_entities' => ['entity1'],
+                            'init_routes' => ['route1'],
+                            'init_datagrids' => ['datagrid1'],
                         ]
                     ],
                     WorkflowConfiguration::NODE_STEPS => [
@@ -135,7 +138,10 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                                         ],
                                     ]
                                 ]
-                            ]
+                            ],
+                            'init_entities' => ['entity1'],
+                            'init_routes' => ['route1'],
+                            'init_datagrids' => ['datagrid1'],
                         ]
                     ],
                     WorkflowConfiguration::NODE_STEPS => [

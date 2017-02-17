@@ -25,6 +25,8 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getIterator()
     {

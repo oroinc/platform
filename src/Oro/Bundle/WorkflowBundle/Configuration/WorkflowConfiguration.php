@@ -375,16 +375,14 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                     ->append($this->getTransitionTriggers())
                 ->end()
                 ->validate()
-                    ->always(
-                        function ($value) {
-                            if ($value['display_type'] == 'page' && empty($value['form_options'])) {
-                                throw new WorkflowException(
-                                    'Display type "page" require "form_options" to be set.'
-                                );
-                            }
-                            return $value;
+                    ->always(function ($value) {
+                        if ($value['display_type'] == 'page' && empty($value['form_options'])) {
+                            throw new WorkflowException(
+                                'Display type "page" require "form_options" to be set.'
+                            );
                         }
-                    )
+                        return $value;
+                    })
                 ->end()
             ->end();
 

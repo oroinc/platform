@@ -121,6 +121,7 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function iterateWriteCases()
