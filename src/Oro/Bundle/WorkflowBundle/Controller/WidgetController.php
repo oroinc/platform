@@ -129,6 +129,7 @@ class WidgetController extends Controller
             'saved' => $saved,
             'workflowItem' => $workflowItem,
             'form' => $transitionForm->createView(),
+            'formErrors' => $transitionForm->getErrors(true),
         ];
 
         return $this->render(
@@ -173,6 +174,7 @@ class WidgetController extends Controller
             'saved' => $saved,
             'workflowItem' => $workflowItem,
             'form' => $transitionForm->createView(),
+            'formErrors' => $transitionForm->getErrors(true),
         ];
 
         return $this->render(

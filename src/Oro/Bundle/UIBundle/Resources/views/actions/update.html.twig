@@ -13,17 +13,14 @@
 {% block content %}
     {% if isWidgetContext and savedId is defined and savedId %}
         {% block widget_context %}
-            <script type="text/javascript">
-                require(['oroui/js/widget-manager'],
-                function(widgetManager) {
-                    widgetManager.getWidgetInstance(
-                        {{ app.request.get('_wid')|json_encode|raw }},
-                        function (widget) {
-                            widget.trigger('formSave', {{ savedId|json_encode|raw }});
-                        }
-                    );
-                });
-            </script>
+            <div {{ UI.renderPageComponentAttributes({
+                module: 'oroui/js/app/components/widget-form-component',
+                options: {
+                    _sourceElement: '#' ~ form.vars.id,
+                    _wid: app.request.get('_wid'),
+                    data: savedId|default(null)
+                }
+            }) }}></div>
         {% endblock widget_context %}
     {% else %}
     {% set formAction = formAction|default() %}

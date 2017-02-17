@@ -6,7 +6,6 @@ class UnknownProviderException extends \LogicException
 {
     public function __construct($alias)
     {
-        $message = sprintf('Unknown provider with alias `%s`.', $alias);
-        parent::__construct($message);
+        parent::__construct(sprintf('Unknown provider with alias `%s`.', $alias));
     }
 }

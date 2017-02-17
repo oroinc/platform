@@ -76,7 +76,7 @@ return array(
                             'handler' => 'handler',
                             'template' => 'template',
                             'data_provider' => 'data_provider',
-                            'data_attribute' => 'data_attribute',
+                            'data_attribute' => 'form_data',
                         ),
                     'is_start' => false,
                     'is_hidden' => false,
