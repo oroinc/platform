@@ -783,40 +783,70 @@ workflows:
 Variables Configuration
 ========================
 
-Workflow can define configuration of variables. When Workflow Item is created it can manipulate it's own data
-(Workflow Data) that is mapped by Variables. Each variable must to have a type and a value.
-When Workflow Item is saved it's data is serialized according to configuration of variables.
+A workflow can define configuration for variables. Despite their name and unlike attributes, variables can have values set when defining them, in fact it's required.
+When Workflow Item is created it can manipulate it's own data (Workflow Data) that is mapped by Variables.
+Each variable must to have a type and a value. When Workflow Item is saved it's data is serialized according to configuration of variables.
 
-Single variable can be described with next configuration:
+A single variable can be described with the following configuration:
 
 * **unique name**
     Workflow variables should have unique name in scope of Workflow that they belong to.
-    Step configuration references variables by this value.
-* **type**
-    The same as types supported by attributes
+    Transition definitions reference variables by this value.
+* **type** *string* Types of variables. The following types are supported:
+    * **boolean**
+    * **bool**
+        *alias for boolean*
+    * **integer**
+    * **int**
+        *alias for integer*
+    * **float**
+    * **string**
+    * **array**
+        elements of array should be scalars or objects that supports serialize/deserialize
+    * **object**
+        object should support serialize/deserialize, option "class" is required for this type
 * **label**
     *translatable*: `oro.workflow.{workflow_name}.variable.{variable_name}.label`
     Label can be shown in the UI
+* **options**
+    Options of a variable. Currently the following options are supported
+    * **class**
+        *string*
+        Fully qualified class name. Allowed only when type is object.
+    * **form_options**
+        *array*
+        Options defined here are passed to the `WorkflowVariablesType` form type.
+        Browse class *Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType* for more details.
 
 **Notice**
-Variable configuration does not contain any information about how to render variable on step forms,
-it's responsibility of "Steps configuration". This make possible to render one variable in different ways on steps.
+Unlike attributes, variable configuration does contain information about how to render variables in the configuration form, with the `form_options` node under `options`.
 Browse class *Oro\Bundle\WorkflowBundle\Model\VariableAssembler* for more details.
 
 Example
 -------
 
+Defining a variable:
 ```
 workflows:
-    b2b_flow_sales:
+    b2b_flow_alternative_checkout:
         variable_definitions:
             variables:
-                var1:
-                    type: 'string'
-                    value: 'Var1Value'
-                var2:
-                    value: 'Var2Value'
-                var3: 'Var3Value' # short definition of variable with a string value
+                order_approval_threshold:
+                    type: 'float'
+                    value: 5000
+                    options:
+                        form_options:
+                            tooltip: true
+```
+
+Using a variable:
+```
+...
+    preconditions:
+        '@and':
+            ...
+            - '@not':
+                - '@less_order_total_limit': [$checkout, $.data.order_approval_threshold.value]
 ```
 
 Example Workflow Configuration
