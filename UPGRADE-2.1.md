@@ -180,6 +180,11 @@ LocaleBundle
         - `NameFormatter` $nameFormatter,
         - `PropertyAccessor` $propertyAccessor
 
+NavigationBundle
+----------------
+- `Oro\Bundle\NavigationBundle\Manager`:
+    - added method `moveMenuItems`
+
 SearchBundle
 ------------
 - `DbalStorer` is deprecated. If you need its functionality, please compose your class with `DBALPersistenceDriverTrait`
@@ -302,6 +307,10 @@ TestFrameworkBundle
     - removed method `getDbReindexSetting`
     - renamed method `setUpBeforeClass` to `beforeClass`
     - renamed method `tearDownAfterClass` to `afterClass`
+
+Tree Component
+- `Oro\Component\Tree\Handler\AbstractTreeHandler`:
+    - added method `getTreeItemList`
 
 QueryDesignerBundle
 -------------------

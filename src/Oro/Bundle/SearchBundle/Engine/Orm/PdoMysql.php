@@ -134,7 +134,7 @@ class PdoMysql extends BaseDriver
      */
     protected function getWords($value, $searchCondition)
     {
-        $results = array_filter(explode(' ', $value));
+        $results = array_filter(explode(' ', $value), 'strlen');
         $results = array_map(
             function ($word) use ($searchCondition) {
                 if ($searchCondition === Query::OPERATOR_CONTAINS && filter_var($word, FILTER_VALIDATE_EMAIL)) {
