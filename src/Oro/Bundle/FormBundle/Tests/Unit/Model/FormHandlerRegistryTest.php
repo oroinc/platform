@@ -71,21 +71,6 @@ class FormHandlerRegistryTest extends \PHPUnit_Framework_TestCase
         yield 'incorrect' => ['expected' => false, 'alias' => 'test', 'handler' => null];
     }
 
-    public function testAll()
-    {
-        $handlers = [
-            'a' => $this->getHandlerMock('a'),
-            'b' => $this->getHandlerMock('b'),
-            'c' => $this->getHandlerMock('c'),
-        ];
-
-        foreach ($handlers as $handler) {
-            $this->registry->addHandler($handler);
-        }
-
-        $this->assertSame($handlers, $this->registry->all());
-    }
-
     /**
      * @param string $alias
      *
