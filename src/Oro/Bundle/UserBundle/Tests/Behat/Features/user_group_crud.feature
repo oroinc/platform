@@ -58,14 +58,12 @@ Feature: Users groups
       | Alice1  |
       | Alice2  |
       | Alice3  |
+    And I should not see "Alice4"
     And I save and close form
 
-    Then I should see Edited test group in grid
-    When I click Edit Edited test group in grid
-    And I check "Yes" in Has Group filter
-    And I should not see "Alice4"
-    Then I should see following records in grid:
-      | John    |
-      | Alice1  |
-      | Alice2  |
-      | Alice3  |
+    Scenario: Case deletion
+    Given I click Delete Edited test group in grid
+    When I confirm deletion
+    Then I should see "Item deleted" flash message
+    And there is 3 records in grid
+    And I should not see "Edited test group"
