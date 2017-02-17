@@ -45,27 +45,27 @@ workflows:
                     
 ```
 On above is a simple working example of cycled workflow with one step and one transition.
-On the transition `congratulate_with` we should enter a text input `the_message` that corresponds to our configured 
-workflow `attribute` and that field is required by `constraints` in form `attribute_fields` `options`. 
+On the transition `congratulate_with` we should force user to fill a text input `the_message` field that corresponds to 
+our configured workflow `attribute`. Also the field is required by `constraints` in form `attribute_fields` `options`. 
 Then we can submit it as a transition payload.
 After form send we should see a `@flash_message` with the text we prompt on the dialog (the default for transition 
 `display_type`) that is flashed on the entity view page.
 
-Reach Example - filling complex form and types:
+
 ----------------------------------------------
 ```YML
 workflows:
-    reach_greeting_flow:
+    user_update_flow:
         entity: Oro\Bundle\UserBundle\Entity\User
         entity_attribute: user
         defaults: { active: true }
         attributes:
             my_message:
                 type: string
-            the_note:
-                type: string
-            the_date:
-                type: datetime
+            my_dote:
+                type: object
+                options:
+                    class: DateTime
         steps:
             congratulated:
                 allowed_transitions: [ congratulate_with ]
@@ -77,8 +77,8 @@ workflows:
                     form_init:
                         - '@create_object':
                             class: \DateTime
-                            attribute: $.data.the_date
-                            parameters: ['now']
+                            attribute: $.data.my_date
+                            parameters: ['tomorrow']
                     attribute_fields:
                         my_message:
                             options:
@@ -86,8 +86,6 @@ workflows:
                                     - NotBlank: ~
                         my_date:
                             form_type: my_date_picker
-                            
-                        
                 destination_page: view
                 transition_definition: message_definition
         transition_definitions:
@@ -99,8 +97,18 @@ workflows:
 Now lets pretend that we need more complex form to be filled by a user who performing a transition.
 So we need to specify fields for the data that we need. But before that, lets prepare some of data to be show for a user.
 
+**The `form_init`:**
+
 Focus on the `form_init` node that is under `form_options`. It is an 
 [oro action](../../../../../../Component/Action/Resources/doc/actions.md) that will be performed before form render.
+Here you can prepare your data before form render. At sample configuration we are creating new `\DateTime` object that is pre configured to tomorrow time.
+So that on our 
+
+
+
+
+
+
 
 Custom Form Type Example:
 ------------------------
@@ -161,8 +169,8 @@ workflows:
                         type: 'success'
                     - '@redirect': {route: 'oro_sale_quote_index'}
 ```
-Here, above, workflow configured which creates a new Quote from the start and perform updates for it circularly in 
-each transition, because it brings us back to the same step.
+Here, above, workflow configured which creates a new Quote from the start on Customer User page and perform updates for 
+the Quote it circularly in each transition, because it brings us back to the same step.
 
 Now lets look at configuration specific moments.
 To use your custom form type that replaces default transition form you must set the type in `form_type` option of `form_options` node.
