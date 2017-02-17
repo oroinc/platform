@@ -87,7 +87,7 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
     private function getLogLevel()
     {
         $logLevel = $this->container->getParameter('oro_logger.detailed_logs_default_level');
-        if ($this->container->has('oro_config.user')) {
+        if ($this->isInstalled() && $this->container->has('oro_config.user')) {
             /** @var ConfigManager $config */
             $config = $this->container->get('oro_config.user');
             $endTimestamp = $config->get('oro_logger.detailed_logs_end_timestamp');
@@ -97,5 +97,13 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
         }
 
         return Logger::toMonologLevel($logLevel);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isInstalled()
+    {
+        return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
     }
 }
