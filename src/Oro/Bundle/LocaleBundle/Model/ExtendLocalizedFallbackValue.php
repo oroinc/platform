@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
+/**
+ * @deprecated since 2.1 and will be removed in 2.3 release
+ */
 class ExtendLocalizedFallbackValue
 {
     /**

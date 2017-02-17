@@ -1,0 +1,6 @@
+Oro\Bundle\UIBundle\Model\TreeCollection:
+    constraints:
+        - Oro\Bundle\UIBundle\Validator\Constraints\MoveToChild: ~
+    properties:
+        target:
+            - NotBlank: ~
