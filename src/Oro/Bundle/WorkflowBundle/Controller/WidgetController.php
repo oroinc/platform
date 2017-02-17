@@ -129,6 +129,7 @@ class WidgetController extends Controller
             'saved' => $saved,
             'workflowItem' => $workflowItem,
             'form' => $transitionForm->createView(),
+            'formErrors' => $transitionForm->getErrors(true),
         ];
 
         return $this->render(
@@ -173,6 +174,7 @@ class WidgetController extends Controller
             'saved' => $saved,
             'workflowItem' => $workflowItem,
             'form' => $transitionForm->createView(),
+            'formErrors' => $transitionForm->getErrors(true),
         ];
 
         return $this->render(
@@ -249,7 +251,7 @@ class WidgetController extends Controller
     protected function getTransitionFormHandler(Transition $transition)
     {
         $handlerName = 'oro_workflow.handler.transition.form';
-        if ($transition->hasPageFormConfiguration()) {
+        if ($transition->hasFormConfiguration()) {
             $handlerName = 'oro_workflow.handler.transition.form.page_form';
         }
 
@@ -289,10 +291,10 @@ class WidgetController extends Controller
         FormInterface $transitionForm,
         Request $request
     ) {
-        if ($transition->hasPageFormConfiguration()) {
-            return $this->getFormTemplateDataProvider($transition->getPageFormDataProvider())
+        if ($transition->hasFormConfiguration()) {
+            return $this->getFormTemplateDataProvider($transition->getFormDataProvider())
                 ->getData(
-                    $workflowItem->getData()->get($transition->getPageFormDataAttribute()),
+                    $workflowItem->getData()->get($transition->getFormDataAttribute()),
                     $transitionForm,
                     $request
                 );

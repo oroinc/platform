@@ -82,14 +82,15 @@ workflows:
                     -
                         cron: 1 * * * *
                         filter: e.text = "string"
-            transition_with_page_form_configuration:
+            transition_with_form_options_configuration:
                 step_to: first_step
                 transition_definition: first_transition_definition
-                page_form_configuration:
-                    handler: 'handler'
-                    template: 'template'
-                    data_provider: 'data_provider'
-                    data_attribute: 'form_data'
+                form_options:
+                    configuration:
+                        handler: 'handler'
+                        template: 'template'
+                        data_provider: 'data_provider'
+                        data_attribute: 'form_data'
 
         transition_definitions:
             first_transition_definition:

@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
@@ -92,20 +93,8 @@ class Transition
     /** @var string */
     protected $initContextAttribute;
 
-    /** @var string */
-    protected $pageFormHandler;
-
-    /** @var string */
-    protected $pageFormDataAttribute;
-
-    /** @var string */
-    protected $pageFormTemplate;
-
-    /** @var string */
-    protected $pageFormDataProvider;
-
     /** @var bool */
-    protected $hasPageFormConfiguration = false;
+    protected $hasFormConfiguration = false;
 
     /**
      * Set label.
@@ -388,7 +377,7 @@ class Transition
     public function hasForm()
     {
         return (!empty($this->formOptions) && !empty($this->formOptions['attribute_fields']))
-            || $this->hasPageFormConfiguration();
+            || $this->hasFormConfiguration();
     }
 
     /**
@@ -713,100 +702,40 @@ class Transition
     /**
      * @return string
      */
-    public function getPageFormHandler()
+    public function getFormHandler()
     {
-        return $this->pageFormHandler;
-    }
-
-    /**
-     * @param string $pageFormHandler
-     *
-     * @return $this
-     */
-    public function setPageFormHandler($pageFormHandler)
-    {
-        $this->pageFormHandler = $pageFormHandler;
-
-        return $this;
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['handler'];
     }
 
     /**
      * @return string
      */
-    public function getPageFormDataAttribute()
+    public function getFormDataAttribute()
     {
-        return $this->pageFormDataAttribute;
-    }
-
-    /**
-     * @param string $pageFormDataAttribute
-     *
-     * @return $this
-     */
-    public function setPageFormDataAttribute($pageFormDataAttribute)
-    {
-        $this->pageFormDataAttribute = $pageFormDataAttribute;
-
-        return $this;
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['data_attribute'];
     }
 
     /**
      * @return string
      */
-    public function getPageFormTemplate()
+    public function getFormTemplate()
     {
-        return $this->pageFormTemplate;
-    }
-
-    /**
-     * @param string $pageFormTemplate
-     *
-     * @return $this
-     */
-    public function setPageFormTemplate($pageFormTemplate)
-    {
-        $this->pageFormTemplate = $pageFormTemplate;
-
-        return $this;
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['template'];
     }
 
     /**
      * @return string
      */
-    public function getPageFormDataProvider()
+    public function getFormDataProvider()
     {
-        return $this->pageFormDataProvider;
-    }
-
-    /**
-     * @param string $pageFormDataProvider
-     *
-     * @return $this
-     */
-    public function setPageFormDataProvider($pageFormDataProvider)
-    {
-        $this->pageFormDataProvider = $pageFormDataProvider;
-
-        return $this;
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['data_provider'];
     }
 
     /**
      * @return boolean
      */
-    public function hasPageFormConfiguration()
+    public function hasFormConfiguration()
     {
-        return $this->hasPageFormConfiguration;
-    }
-
-    /**
-     * @param boolean $hasPageFormConfiguration
-     *
-     * @return $this
-     */
-    public function setHasPageFormConfiguration($hasPageFormConfiguration)
-    {
-        $this->hasPageFormConfiguration = $hasPageFormConfiguration;
-
-        return $this;
+        return !empty($this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]);
     }
 }

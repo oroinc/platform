@@ -110,8 +110,8 @@ class TransitionCustomFormHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertFormHandlerRegistryCalled($result = false)
     {
-        $this->transition->expects($this->once())->method('getPageFormHandler')->willReturn('handler');
-        $this->transition->expects($this->once())->method('getPageFormDataAttribute')->willReturn('data_attribute');
+        $this->transition->expects($this->once())->method('getFormHandler')->willReturn('handler');
+        $this->transition->expects($this->once())->method('getFormDataAttribute')->willReturn('data_attribute');
         $this->workflowItemData->expects($this->once())
             ->method('get')
             ->with('data_attribute')

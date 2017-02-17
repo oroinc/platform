@@ -60,8 +60,8 @@ class TransitionCustomFormHandler implements TransitionFormHandlerInterface
         Transition $transition,
         Request $request
     ) {
-        return $this->formHandlerRegistry->get($transition->getPageFormHandler())->process(
-            $workflowItem->getData()->get($transition->getPageFormDataAttribute()),
+        return $this->formHandlerRegistry->get($transition->getFormHandler())->process(
+            $workflowItem->getData()->get($transition->getFormDataAttribute()),
             $form,
             $request
         );

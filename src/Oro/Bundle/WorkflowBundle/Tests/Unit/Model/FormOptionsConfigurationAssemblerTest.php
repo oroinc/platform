@@ -7,12 +7,12 @@ use Symfony\Component\Form\FormRegistryInterface;
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Model\PageFormConfigurationAssembler;
+use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 
-class PageFormConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
+class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  PageFormConfigurationAssembler */
+    /** @var  FormOptionsConfigurationAssembler */
     protected $assembler;
 
     /** @var  FormRegistryInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -27,11 +27,13 @@ class PageFormConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
     /** @var array */
     protected static $transitionConfiguration = [
         'form_type' => 'CustomFormType',
-        WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION => [
-            'handler' => 'CustomFormHandler',
-            'data_provider' => 'CustomFormDataProvider',
-            'data_attribute' => 'CustomFormDataAttribute',
-            'template' => 'CustomTemplate'
+        'form_options' => [
+            WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                'handler' => 'CustomFormHandler',
+                'data_provider' => 'CustomFormDataProvider',
+                'data_attribute' => 'CustomFormDataAttribute',
+                'template' => 'CustomTemplate'
+            ],
         ],
     ];
 
@@ -48,7 +50,7 @@ class PageFormConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assembler = new PageFormConfigurationAssembler(
+        $this->assembler = new FormOptionsConfigurationAssembler(
             $this->formRegistry,
             $this->formHandlerRegistry,
             $this->formTemplateDataProviderRegistry
@@ -64,21 +66,20 @@ class PageFormConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
         $this->expectExceptionMessage($expectedExceptionMessage);
         $transition = $this->createMock(Transition::class);
-        $this->assertTransitionMethodsCalled($transition, false);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(false);
         $this->assembler->assemble(self::$transitionConfiguration, $transition);
     }
 
     public function testAssembleRequiredHandlerException()
     {
+        $formOptions = self::$transitionConfiguration['form_options'];
         $expectedExceptionMessage = sprintf(
             'Unable to resolve form handler with alias "%s"',
-            self::$transitionConfiguration[WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION]['handler']
+            $formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['handler']
         );
         $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
         $this->expectExceptionMessage($expectedExceptionMessage);
         $transition = $this->createMock(Transition::class);
-        $this->assertTransitionMethodsCalled($transition, false);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(false);
         $this->assembler->assemble(self::$transitionConfiguration, $transition);
@@ -86,14 +87,14 @@ class PageFormConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testAssembleRequiredDataProviderException()
     {
+        $formOptions = self::$transitionConfiguration['form_options'];
         $expectedExceptionMessage = sprintf(
             'Unable to resolve form data provider with alias "%s"',
-            self::$transitionConfiguration[WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION]['data_provider']
+            $formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['data_provider']
         );
         $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
         $this->expectExceptionMessage($expectedExceptionMessage);
         $transition = $this->createMock(Transition::class);
-        $this->assertTransitionMethodsCalled($transition, false);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(true);
         $this->formTemplateDataProviderRegistry->expects($this->once())->method('has')->willReturn(false);
@@ -103,24 +104,9 @@ class PageFormConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
     public function testAssemble()
     {
         $transition = $this->createMock(Transition::class);
-        $this->assertTransitionMethodsCalled($transition, true);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(true);
         $this->formTemplateDataProviderRegistry->expects($this->once())->method('has')->willReturn(true);
         $this->assembler->assemble(self::$transitionConfiguration, $transition);
-    }
-
-    /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $transition
-     * @param bool $called
-     */
-    protected function assertTransitionMethodsCalled(\PHPUnit_Framework_MockObject_MockObject $transition, $called)
-    {
-        $expects = $called ? $this->any() : $this->never();
-        $transition->expects($expects)->method('setPageFormHandler')->willReturn($transition);
-        $transition->expects($expects)->method('setPageFormDataAttribute')->willReturn($transition);
-        $transition->expects($expects)->method('setPageFormTemplate')->willReturn($transition);
-        $transition->expects($expects)->method('setPageFormDataProvider')->willReturn($transition);
-        $transition->expects($expects)->method('setHasPageFormConfiguration')->willReturn($transition);
     }
 }

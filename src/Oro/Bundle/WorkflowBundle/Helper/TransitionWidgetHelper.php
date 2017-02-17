@@ -92,13 +92,13 @@ class TransitionWidgetHelper
     {
         $formType = $transition->getFormType();
 
-        if ($transition->hasPageFormConfiguration()) {
+        if ($transition->hasFormConfiguration()) {
             if (array_key_exists('form_init', $transition->getFormOptions())) {
                 /** @var ActionInterface $action */
                 $action = $transition->getFormOptions()['form_init'];
                 $action->execute($workflowItem);
             }
-            $formData = $workflowItem->getData()->get($transition->getPageFormDataAttribute());
+            $formData = $workflowItem->getData()->get($transition->getFormDataAttribute());
             $formOptions = [];
         } else {
             $formData = $workflowItem->getData();
@@ -125,7 +125,7 @@ class TransitionWidgetHelper
      */
     public function getTransitionFormTemplate(Transition $transition)
     {
-        if ($transition->hasPageFormConfiguration()) {
+        if ($transition->hasFormConfiguration()) {
             return $transition->getDialogTemplate() ?: self::DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE;
         } else {
             return $transition->getDialogTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE;
@@ -148,8 +148,8 @@ class TransitionWidgetHelper
     ) {
 
         $this->workflowDataSerializer->setWorkflowName($workflow->getName());
-        if ($transition->hasPageFormConfiguration()) {
-            $data = [$transition->getPageFormDataAttribute() => $transitionForm->getData()];
+        if ($transition->hasFormConfiguration()) {
+            $data = [$transition->getFormDataAttribute() => $transitionForm->getData()];
         } else {
             $formOptions = $transition->getFormOptions();
             $attributeNames = array_keys($formOptions['attribute_fields']);
