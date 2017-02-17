@@ -391,7 +391,11 @@ define(function(require) {
             }
 
             var data = this.$(this.elementSelector).inputWidget('data');
-            _.each(data, function(elem){
+            _.each(data, function(elem) {
+                if (!('id' in elem)) {
+                    return;
+                }
+
                 if (this.selectedData[elem.id]) {
                     return;
                 }
