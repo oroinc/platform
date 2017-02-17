@@ -32,7 +32,8 @@ define(function(require) {
             ignoreHead: false,
             doNotFetch: false,
             reloadOnAdd: true,
-            reloadOnUpdate: true
+            reloadOnUpdate: true,
+            triggerRefreshEvent: true
         },
 
         listen: {
@@ -134,7 +135,9 @@ define(function(require) {
 
             this._reload();
 
-            mediator.trigger('widget_success:activity_list:refresh');
+            if (this.options.triggerRefreshEvent) {
+                mediator.trigger('widget_success:activity_list:refresh');
+            }
         },
 
         _initPager: function() {
