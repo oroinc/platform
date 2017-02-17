@@ -34,26 +34,26 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected $actionFactory;
 
     /**
-     * @var PageFormConfigurationAssembler
+     * @var FormOptionsConfigurationAssembler
      */
-    protected $pageFormConfigurationAssembler;
+    protected $formOptionsConfigurationAssembler;
 
     /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
      * @param ActionFactoryInterface $actionFactory
-     * @param PageFormConfigurationAssembler $pageFormConfigurationAssembler
+     * @param FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
         ActionFactoryInterface $actionFactory,
-        PageFormConfigurationAssembler $pageFormConfigurationAssembler
+        FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
         $this->actionFactory = $actionFactory;
-        $this->pageFormConfigurationAssembler = $pageFormConfigurationAssembler;
+        $this->formOptionsConfigurationAssembler = $formOptionsConfigurationAssembler;
     }
 
     /**
@@ -174,14 +174,14 @@ class TransitionAssembler extends BaseAbstractAssembler
             );
         }
 
-        if (!empty($options[WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION])) {
-            $this->pageFormConfigurationAssembler->assemble($options, $transition);
+        if (!empty($options['form_options'][WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION])) {
+            $this->formOptionsConfigurationAssembler->assemble($options, $transition);
         }
         return $transition;
     }
 
     /**
-     * @param ransition $transition
+     * @param Transition $transition
      * @param array $actions
      */
     protected function processActions(Transition $transition, array $actions)
@@ -270,30 +270,5 @@ class TransitionAssembler extends BaseAbstractAssembler
     {
         $formOptions = $this->getOption($options, 'form_options', array());
         return $this->formOptionsAssembler->assemble($formOptions, $attributes, 'transition', $transitionName);
-    }
-
-    /**
-     * @param Transition $transition
-     * @param array $options
-     *
-     * @return Transition
-     */
-    protected function assemblePageFormConfiguration(Transition $transition, array $options)
-    {
-        $pageFormConfiguration = $this->getOption(
-            $options,
-            WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION,
-            array()
-        );
-
-        if (!empty($pageFormConfiguration)) {
-            $transition->setPageFormHandler($pageFormConfiguration['handler']);
-            $transition->setPageFormDataAttribute($pageFormConfiguration['data_attribute']);
-            $transition->setPageFormTemplate($pageFormConfiguration['template']);
-            $transition->setPageFormDataProvider($pageFormConfiguration['data_provider']);
-            $transition->setHasPageFormConfiguration(true);
-        }
-
-        return $transition;
     }
 }

@@ -137,7 +137,7 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())->method('getFormType')->willReturn($formType);
-        $transition->expects($this->any())->method('hasPageFormConfiguration')->willReturn(false);
+        $transition->expects($this->any())->method('hasFormConfiguration')->willReturn(false);
         $transition->expects($this->any())->method('getName')->willReturn($transitionName);
         $transition->expects($this->any())->method('getFormOptions')->willReturn($formOptions);
 
@@ -169,7 +169,7 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
     {
         $formType = 'formType';
         $formData = 'formData';
-        $pageFormDataAttribute = 'pageFormDataAttribute';
+        $pageFormDataAttribute = 'formDataAttribute';
         $action = $this->getMockBuilder(ActionInterface::class)->getMockForAbstractClass();
         $formOptions = ['form_init' => $action];
 
@@ -183,8 +183,8 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())->method('getFormType')->willReturn($formType);
-        $transition->expects($this->any())->method('hasPageFormConfiguration')->willReturn(true);
-        $transition->expects($this->any())->method('getPageFormDataAttribute')->willReturn($pageFormDataAttribute);
+        $transition->expects($this->any())->method('hasFormConfiguration')->willReturn(true);
+        $transition->expects($this->any())->method('getFormDataAttribute')->willReturn($pageFormDataAttribute);
         $transition->expects($this->any())->method('getFormOptions')->willReturn($formOptions);
 
         if ($throwException) {
@@ -221,7 +221,7 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
     {
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('hasPageFormConfiguration')->willReturn($hasPageConfiguration);
+        $transition->expects($this->once())->method('hasFormConfiguration')->willReturn($hasPageConfiguration);
         $transition->expects($this->once())->method('getDialogTemplate')->willReturn($dialogTemplate);
         $this->assertEquals($expected, $this->helper->getTransitionFormTemplate($transition));
     }
@@ -264,7 +264,7 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
 
         /** @var Transition|\PHPUnit_Framework_MockObject_MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('hasPageFormConfiguration')->willReturn($hasPageConfiguration);
+        $transition->expects($this->once())->method('hasFormConfiguration')->willReturn($hasPageConfiguration);
 
         $transitionFormData = $this->createMock(WorkflowData::class);
 
@@ -273,8 +273,8 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
         $transitionForm->expects($this->once())->method('getData')->willReturn($transitionFormData);
 
         if ($hasPageConfiguration) {
-            $pageFormDataAttribute = 'pageFormDataAttribute';
-            $transition->expects($this->once())->method('getPageFormDataAttribute')->willReturn($pageFormDataAttribute);
+            $pageFormDataAttribute = 'formDataAttribute';
+            $transition->expects($this->once())->method('getFormDataAttribute')->willReturn($pageFormDataAttribute);
         } else {
             $attributeFields = ['one' => 1, 'two' => 2];
             $transition->expects($this->once())

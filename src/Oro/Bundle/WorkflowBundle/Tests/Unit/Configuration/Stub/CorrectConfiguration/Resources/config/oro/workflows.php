@@ -135,16 +135,10 @@ return [
                     ]
                 ]
             ],
-            'transition_with_page_form_configuration' =>
+            'transition_with_form_options_configuration' =>
                 [
                     'step_to' => 'first_step',
                     'transition_definition' => 'first_transition_definition',
-                    \Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION => [
-                        'handler' => 'handler',
-                        'template' => 'template',
-                        'data_provider' => 'data_provider',
-                        'data_attribute' => 'form_data',
-                    ],
                     'is_start' => false,
                     'is_hidden' => false,
                     'is_unavailable_hidden' => false,
@@ -152,7 +146,14 @@ return [
                     'frontend_options' => [],
                     'form_type' => 'oro_workflow_transition',
                     'display_type' => 'dialog',
-                    'form_options' => [],
+                    'form_options' => [
+                        WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                            'handler' => 'handler',
+                            'template' => 'template',
+                            'data_provider' => 'data_provider',
+                            'data_attribute' => 'form_data',
+                        ],
+                    ],
                     'page_template' => null,
                     'dialog_template' => null,
                     'init_entities' => [],

@@ -2,13 +2,13 @@
 /*global define*/
 define(
     ['oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator', 'orotranslation/js/translator'],
-    function (widgetManager, messenger, mediator, __) {
+    function(widgetManager, messenger, mediator, __) {
         'use strict';
 
-        return function (options) {
+        return function(options) {
             widgetManager.getWidgetInstance(
                 options._wid,
-                function (widget) {
+                function(widget) {
                     if (options.data) {
                         if (!options.message) {
                             options.message = __('oro.ui.widget_form_component.save_flash_success');

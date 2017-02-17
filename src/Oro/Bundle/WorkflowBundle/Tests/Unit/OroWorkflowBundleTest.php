@@ -7,7 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler as Compiler;
 use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
 
-
 class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testBuild()

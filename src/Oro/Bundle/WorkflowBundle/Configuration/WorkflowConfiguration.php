@@ -41,7 +41,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
 
-    const NODE_PAGE_FORM_CONFIGURATION = 'page_form_configuration';
+    const NODE_FORM_OPTIONS_CONFIGURATION = 'configuration';
 
     const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
     const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
@@ -317,6 +317,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                                 ], $config);
                             })
                         ->end()
+                        ->append($this->getTransitionFormOptionsConfiguration())
                     ->end()
                     ->scalarNode('page_template')
                         ->defaultNull()
@@ -337,14 +338,11 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
-                    ->append($this->getTransitionPageFormConfiguration())
                  ->end()
                 ->validate()
                     ->always(
                         function ($value) {
-                            if ($value['display_type'] == 'page' &&
-                                (empty($value['form_options']) && empty($value[self::NODE_PAGE_FORM_CONFIGURATION]))
-                            ) {
+                            if ($value['display_type'] == 'page' && empty($value['form_options'])) {
                                 throw new WorkflowException(
                                     'Display type "page" require "form_options" to be set.'
                                 );
@@ -563,10 +561,10 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     /**
      * @return ArrayNodeDefinition|NodeDefinition
      */
-    protected function getTransitionPageFormConfiguration()
+    protected function getTransitionFormOptionsConfiguration()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_PAGE_FORM_CONFIGURATION);
+        $rootNode = $treeBuilder->root(self::NODE_FORM_OPTIONS_CONFIGURATION);
         $rootNode
                 ->children()
                     ->scalarNode('handler')

@@ -9,7 +9,7 @@ use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
 
-class PageFormConfigurationAssembler
+class FormOptionsConfigurationAssembler
 {
     /** @var FormRegistryInterface */
     protected $formRegistry;
@@ -49,24 +49,19 @@ class PageFormConfigurationAssembler
             );
         }
 
-        $pageFormConfiguration = $transitionConfiguration[WorkflowConfiguration::NODE_PAGE_FORM_CONFIGURATION];
+        $formOptions = $transitionConfiguration['form_options'];
+        $formConfiguration = $formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION];
 
-        if (!$this->formHandlerRegistry->has($pageFormConfiguration['handler'])) {
+        if (!$this->formHandlerRegistry->has($formConfiguration['handler'])) {
             throw new AssemblerException(
-                sprintf('Unable to resolve form handler with alias "%s"', $pageFormConfiguration['handler'])
+                sprintf('Unable to resolve form handler with alias "%s"', $formConfiguration['handler'])
             );
         }
 
-        if (!$this->templateDataProviderRegistry->has($pageFormConfiguration['data_provider'])) {
+        if (!$this->templateDataProviderRegistry->has($formConfiguration['data_provider'])) {
             throw new AssemblerException(
-                sprintf('Unable to resolve form data provider with alias "%s"', $pageFormConfiguration['data_provider'])
+                sprintf('Unable to resolve form data provider with alias "%s"', $formConfiguration['data_provider'])
             );
         }
-
-        $transition->setPageFormHandler($pageFormConfiguration['handler'])
-            ->setPageFormDataAttribute($pageFormConfiguration['data_attribute'])
-            ->setPageFormTemplate($pageFormConfiguration['template'])
-            ->setPageFormDataProvider($pageFormConfiguration['data_provider'])
-            ->setHasPageFormConfiguration(true);
     }
 }

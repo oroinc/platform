@@ -107,7 +107,7 @@
         </script>
         </div>
     {% endset %}
-    {% if transition.hasPageFormConfiguration() %}
+    {% if transition.hasFormConfiguration() %}
         {{ transitionFormWidget }}
     {% else %}
         {% set dataBlocks = [
