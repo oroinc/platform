@@ -587,6 +587,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'owner'         => ExtendScope::OWNER_SYSTEM,
                                     'target_entity' => $enumClassName,
                                     'target_field'  => 'name',
+                                    'bidirectional' => false,
                                     'relation_key'  =>
                                         'manyToOne|Acme\AcmeBundle\Entity\Entity1|' . $enumClassName . '|enum1',
                                 ],
@@ -664,6 +665,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => false,
                                     'relation_key'    =>
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|' . $enumClassName . '|enum1',
                                 ],
@@ -854,6 +856,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => true,
                                     'relation_key'    =>
                                         'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -929,6 +932,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => true,
                                     'relation_key'    =>
                                         'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -997,6 +1001,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => true,
                                     'relation_key'    =>
                                         'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity1|relation_column1',
@@ -1069,6 +1074,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => true,
                                     'relation_key'    =>
                                         'oneToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -1178,6 +1184,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'column_name'   => 'entity1_rooms_id',
                                     'target_entity' => 'Acme\AcmeBundle\Entity\Entity1',
                                     'relation_key'  => $relationKey,
+                                    'bidirectional' => false,
                                     'target_field'  => 'name'
                                 ]
                             ],
@@ -1243,7 +1250,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'column_name'   => 'entity1_selfRel_id',
                                     'target_entity' => 'Acme\AcmeBundle\Entity\Entity1',
                                     'relation_key'  => $targetRelationKey,
-                                    'target_field'  => 'name'
+                                    'target_field'  => 'name',
+                                    'bidirectional' => false,
                                 ]
                             ],
                             'type'    => 'manyToOne',
@@ -1492,6 +1500,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => false,
                                     'relation_key'    =>
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -1571,6 +1580,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => false,
                                     'relation_key'    =>
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -1649,6 +1659,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => false,
                                     'relation_key'    =>
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -1721,6 +1732,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name'],
+                                    'bidirectional' => false,
                                     'relation_key'    =>
                                         'manyToMany|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity1|relation_column1',
@@ -1884,7 +1896,16 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'manyToMany'
                             )
                         ]
-                    ]
+                    ],
+                    'fields' => [
+                        'rooms' => [
+                            'configs' => [
+                                'extend' => [
+                                    'bidirectional' => true
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'Acme\AcmeBundle\Entity\Entity2' => [
                     'configs' => [
@@ -1905,6 +1926,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'owner'           => ExtendScope::OWNER_CUSTOM,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity1',
                                     'relation_key'    => $relationKey,
+                                    'bidirectional' => false,
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name']
@@ -1963,7 +1985,14 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             )
                         ]
                     ],
-                    'fields'  => [
+                    'fields' => [
+                        'selfRel' => [
+                            'configs' => [
+                                'extend' => [
+                                    'bidirectional' => true
+                                ],
+                            ],
+                        ],
                         'users' => [
                             'configs' => [
                                 'extend' => [
@@ -1971,6 +2000,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'owner'           => ExtendScope::OWNER_CUSTOM,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity1',
                                     'relation_key'    => $targetRelationKey,
+                                    'bidirectional' => false,
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name']
@@ -2086,6 +2116,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'owner'         => ExtendScope::OWNER_SYSTEM,
                                     'target_entity' => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_field'  => 'name',
+                                    'bidirectional' => false,
                                     'relation_key'  =>
                                         'manyToOne|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -2153,6 +2184,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'owner'         => ExtendScope::OWNER_CUSTOM,
                                     'target_entity' => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_field'  => 'name',
+                                    'bidirectional' => false,
                                     'relation_key'  =>
                                         'manyToOne|Acme\AcmeBundle\Entity\Entity1|'
                                         . 'Acme\AcmeBundle\Entity\Entity2|relation_column1',
@@ -2314,7 +2346,16 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 'oneToMany'
                             )
                         ]
-                    ]
+                    ],
+                    'fields' => [
+                        'room' => [
+                            'configs' => [
+                                'extend' => [
+                                    'bidirectional' => true
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'Acme\AcmeBundle\Entity\Entity2' => [
                     'configs' => [
@@ -2335,6 +2376,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'owner'           => ExtendScope::OWNER_CUSTOM,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity1',
                                     'relation_key'    => $relationKey,
+                                    'bidirectional' => false,
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name']
@@ -2394,6 +2436,13 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         ]
                     ],
                     'fields'  => [
+                        'selfRel' => [
+                            'configs' => [
+                                'extend' => [
+                                    'bidirectional' => true
+                                ],
+                            ],
+                        ],
                         'users' => [
                             'configs' => [
                                 'extend' => [
@@ -2401,6 +2450,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'owner'           => ExtendScope::OWNER_CUSTOM,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity1',
                                     'relation_key'    => $targetRelationKey,
+                                    'bidirectional' => false,
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
                                     'target_grid'     => ['name']
