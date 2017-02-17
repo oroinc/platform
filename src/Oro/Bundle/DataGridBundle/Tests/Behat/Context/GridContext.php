@@ -115,11 +115,22 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Checks first records in provided column number
      * Example: And I check first 5 records in 1 column
      *
-     * @When /^(?:|I )check first (?P<amount>(?:[^"]|\\")*) records in (?P<number>(?:[^"]|\\")*) column/
+     * @When /^(?:|I )check first (?P<amount>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
      */
-    public function iCheckRecordsInColumn($amount, $number)
+    public function iCheckRecordsInColumn($amount, $column)
     {
-        $this->getGrid()->checkFirstRecords($amount, $number);
+        $this->getGrid()->checkFirstRecords($amount, $column);
+    }
+
+    /**
+     * Unchecks first records in provided column number
+     * Example: And I uncheck first 2 records in 1 column
+     *
+     * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
+     */
+    public function iUncheckFirstRecordsInColumn($number, $column)
+    {
+        $this->getGrid()->checkFirstRecords($number, $column);
     }
 
     /**

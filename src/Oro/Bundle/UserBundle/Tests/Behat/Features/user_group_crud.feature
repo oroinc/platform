@@ -25,3 +25,47 @@ Feature: Users groups
       | Alice2  |
       | Alice3  |
       | Alice4  |
+    Then I save and close form
+
+  Scenario: Edit users group
+    Given I click Edit First test group in grid
+    And I fill in "Name" with ""
+    And I save and close form
+    Then I should see validation errors:
+      | Name     | This value should not be blank.  |
+    When I fill in "Name" with "Edited test group"
+    And I save and close form
+
+    Then I should see Edited test group in grid
+    When I click Edit Edited test group in grid
+    And I uncheck first 5 records in 1 column
+    And I save and close form
+    Then I should see Edited test group in grid
+    When I click Edit Edited test group in grid
+    And I check "Yes" in Has Group filter
+    And I should not see "Alice4"
+    And I save and close form
+
+    Then I should see Edited test group in grid
+    When I click Edit Edited test group in grid
+    And I check first 4 records in 1 column
+    And I save and close form
+    Then I should see Edited test group in grid
+    When I click Edit Edited test group in grid
+    And I check "Yes" in Has Group filter
+    Then I should see following records in grid:
+      | John    |
+      | Alice1  |
+      | Alice2  |
+      | Alice3  |
+    And I save and close form
+
+    Then I should see Edited test group in grid
+    When I click Edit Edited test group in grid
+    And I check "Yes" in Has Group filter
+    And I should not see "Alice4"
+    Then I should see following records in grid:
+      | John    |
+      | Alice1  |
+      | Alice2  |
+      | Alice3  |

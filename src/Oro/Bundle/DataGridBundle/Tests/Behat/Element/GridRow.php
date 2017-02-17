@@ -30,7 +30,7 @@ class GridRow extends Element
         $rowCheckbox = $this->getCellByNumber($cellNumber)->find('css', '[type="checkbox"]');
         self::assertNotNull($rowCheckbox, sprintf('No mass action checkbox found for "%s"', $this->getText()));
 
-        $rowCheckbox->check();
+        $rowCheckbox->click();
     }
 
     /**
