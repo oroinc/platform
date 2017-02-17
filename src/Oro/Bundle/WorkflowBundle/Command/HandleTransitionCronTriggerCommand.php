@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,7 +17,7 @@ use Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
+class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const NAME = 'oro:workflow:handle-transition-cron-trigger';
 
@@ -112,5 +113,21 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
     protected function getProducer()
     {
         return $this->getContainer()->get('oro_message_queue.client.message_producer');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isActive()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition()
+    {
+        return '*/5 * * * *';
     }
 }
