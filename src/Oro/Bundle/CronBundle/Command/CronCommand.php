@@ -45,6 +45,18 @@ class CronCommand extends ContainerAwareCommand
             if ($cronExpression->isDue()) {
                 /** @var CronCommandInterface $command */
                 $command = $this->getApplication()->get($schedule->getCommand());
+
+                if (!$command instanceof CronCommandInterface) {
+                    $output->writeln(
+                        sprintf(
+                            '<error>The cron command %s must be implements CronCommandInterface</error>',
+                            $schedule->getCommand()
+                        )
+                    );
+
+                    continue;
+                }
+
                 if ($command->isActive()) {
                     $output->writeln(
                         'Scheduling run for command ' . $schedule->getCommand(),
