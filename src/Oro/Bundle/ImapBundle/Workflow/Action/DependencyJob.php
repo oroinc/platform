@@ -51,10 +51,8 @@ class DependencyJob extends AbstractAction
         $dependency = $this->contextAccessor->getValue($context, $this->dependency);
 
         $job->addDependency($dependency);
-        $job->setState(Job::STATE_PENDING);
 
-        $this->doctrine->getManager()->persist($job);
-        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->flush(); // flush is required to allow following processes track this job
     }
 
     /**
