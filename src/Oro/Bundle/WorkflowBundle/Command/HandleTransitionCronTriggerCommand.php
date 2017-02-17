@@ -4,12 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
