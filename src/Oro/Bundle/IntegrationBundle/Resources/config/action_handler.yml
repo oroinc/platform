@@ -15,7 +15,7 @@ services:
             - '@doctrine.orm.entity_manager'
 
     oro_integration.action_handler.channel_error:
-        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Error\ChannelActionErrorHandler'
+        class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Error\FlashBagChannelActionErrorHandler'
         public: false
         arguments:
             - '@session'
@@ -29,8 +29,7 @@ services:
             - '@event_dispatcher'
             - '@oro_integration.factory.event.channel_delete'
             - '@oro_integration.action_handler.decorator.channel_delete_dispatcher.inner'
-        calls:
-            - [setErrorHandler, ['@oro_integration.action_handler.channel_error']]
+            - '@oro_integration.action_handler.channel_error'
 
     oro_integration.action_handler.decorator.channel_disable_dispatcher:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerDispatcherDecorator'
@@ -41,8 +40,7 @@ services:
             - '@event_dispatcher'
             - '@oro_integration.factory.event.channel_disable'
             - '@oro_integration.action_handler.decorator.channel_disable_dispatcher.inner'
-        calls:
-            - [setErrorHandler, ['@oro_integration.action_handler.channel_error']]
+            - '@oro_integration.action_handler.channel_error'
 
     oro_integration.action_handler.decorator.channel_enable_dispatcher:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerDispatcherDecorator'
@@ -53,8 +51,7 @@ services:
             - '@event_dispatcher'
             - '@oro_integration.factory.event.channel_enable'
             - '@oro_integration.action_handler.decorator.channel_enable_dispatcher.inner'
-        calls:
-            - [setErrorHandler, ['@oro_integration.action_handler.channel_error']]
+            - '@oro_integration.action_handler.channel_error'
 
     oro_integration.action_handler.decorator.channel_delete_transaction:
         class: 'Oro\Bundle\IntegrationBundle\ActionHandler\Decorator\ChannelActionHandlerTransactionDecorator'

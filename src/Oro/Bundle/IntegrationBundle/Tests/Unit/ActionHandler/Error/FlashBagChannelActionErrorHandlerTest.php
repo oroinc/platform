@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ActionHandler\Error;
 
-use Oro\Bundle\IntegrationBundle\ActionHandler\Error\ChannelActionErrorHandler;
+use Oro\Bundle\IntegrationBundle\ActionHandler\Error\FlashBagChannelActionErrorHandler;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class ChannelActionErrorHandlerTest extends \PHPUnit_Framework_TestCase
+class FlashBagChannelActionErrorHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Session|\PHPUnit_Framework_MockObject_MockObject
@@ -14,7 +14,7 @@ class ChannelActionErrorHandlerTest extends \PHPUnit_Framework_TestCase
     private $session;
 
     /**
-     * @var ChannelActionErrorHandler
+     * @var FlashBagChannelActionErrorHandler
      */
     private $errorHandler;
 
@@ -22,7 +22,7 @@ class ChannelActionErrorHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->session = $this->createMock(Session::class);
 
-        $this->errorHandler = new ChannelActionErrorHandler($this->session);
+        $this->errorHandler = new FlashBagChannelActionErrorHandler($this->session);
     }
 
     public function testHandleErrors()

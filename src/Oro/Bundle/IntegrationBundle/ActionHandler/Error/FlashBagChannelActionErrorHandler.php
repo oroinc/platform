@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\ActionHandler\Error;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class ChannelActionErrorHandler implements ChannelActionErrorHandlerInterface
+class FlashBagChannelActionErrorHandler implements ChannelActionErrorHandlerInterface
 {
     /**
      * @var Session

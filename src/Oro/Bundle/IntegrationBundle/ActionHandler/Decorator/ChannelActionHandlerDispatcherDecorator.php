@@ -27,7 +27,7 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
     private $actionHandler;
 
     /**
-     * @var ChannelActionErrorHandlerInterface|null
+     * @var ChannelActionErrorHandlerInterface
      */
     private $errorHandler;
 
@@ -35,22 +35,17 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
      * @param EventDispatcherInterface           $dispatcher
      * @param ChannelActionEventFactoryInterface $eventFactory
      * @param ChannelActionHandlerInterface      $actionHandler
+     * @param ChannelActionErrorHandlerInterface $errorHandler
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         ChannelActionEventFactoryInterface $eventFactory,
-        ChannelActionHandlerInterface $actionHandler
+        ChannelActionHandlerInterface $actionHandler,
+        ChannelActionErrorHandlerInterface $errorHandler
     ) {
         $this->dispatcher = $dispatcher;
         $this->eventFactory = $eventFactory;
         $this->actionHandler = $actionHandler;
-    }
-
-    /**
-     * @param ChannelActionErrorHandlerInterface $errorHandler
-     */
-    public function setErrorHandler(ChannelActionErrorHandlerInterface $errorHandler)
-    {
         $this->errorHandler = $errorHandler;
     }
 
@@ -84,9 +79,7 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
             return true;
         }
 
-        if ($this->errorHandler) {
-            $this->errorHandler->handleErrors($errors);
-        }
+        $this->errorHandler->handleErrors($errors);
 
         return false;
     }

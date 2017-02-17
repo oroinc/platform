@@ -29,6 +29,11 @@ class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit_Framework_Tes
     private $actionHandler;
 
     /**
+     * @var ChannelActionErrorHandlerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $errorHandler;
+
+    /**
      * @var ChannelActionHandlerDispatcherDecorator
      */
     private $decorator;
@@ -40,11 +45,13 @@ class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit_Framework_Tes
 
         $this->eventFactory = $this->createMock(ChannelActionEventFactoryInterface::class);
         $this->actionHandler = $this->createMock(ChannelActionHandlerInterface::class);
+        $this->errorHandler = $this->createMock(ChannelActionErrorHandlerInterface::class);
 
         $this->decorator = new ChannelActionHandlerDispatcherDecorator(
             $this->dispatcher,
             $this->eventFactory,
-            $this->actionHandler
+            $this->actionHandler,
+            $this->errorHandler
         );
     }
 
@@ -60,11 +67,6 @@ class ChannelActionHandlerDispatcherDecoratorTest extends \PHPUnit_Framework_Tes
             ->willReturn($event);
 
         $this->actionHandler->expects(static::never())->method('handleAction');
-
-        $errorHandler = $this->createMock(ChannelActionErrorHandlerInterface::class);
-        $errorHandler->expects(static::once())->method('handleErrors');
-
-        $this->decorator->setErrorHandler($errorHandler);
 
         static::assertFalse($this->decorator->handleAction(new Channel()));
     }
