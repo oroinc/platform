@@ -116,7 +116,7 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
             } elseif ($translator->hasTrans($key, $domain, Translator::DEFAULT_LOCALE)) {
                 $translation = $translator->trans($key, [], $domain, Translator::DEFAULT_LOCALE);
             } else {
-                $translation = '';
+                $translation = $keys;
             }
 
             $translations[$key] = $translation;
