@@ -36,21 +36,25 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     public function getContent()
     {
-        // TODO set const
-        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
-        $elementConfiguration = $menuConfig['oro_navigation_elements'];
+        $navigationElements = $this->configurationProvider
+            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
 
-        $elements      = array_keys($elementConfiguration);
+        $elements = array_keys($navigationElements);
         $defaultValues = $values = array_map(
             function ($item) {
                 return $item['default'];
             },
-            $elementConfiguration
+            $navigationElements
         );
 
         if (null !== $this->request) {
             $attributes = $this->request->attributes;
-            $routeName  = $attributes->get('_route') ?: $attributes->get('_master_request_route') ?: '' ;
+
+            $routeName  = $attributes->get('_route');
+            if (!$routeName) {
+                $routeName = $attributes->get('_master_request_route') ?: '' ;
+            }
+
             $hasErrors  = $attributes->get('exception');
 
             foreach ($elements as $elementName) {
@@ -82,10 +86,10 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     protected function hasConfigValue($element, $route)
     {
-        // TODO set const
-        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
-        $elementConfiguration = $menuConfig['oro_navigation_elements'];
-        return isset($elementConfiguration[$element], $elementConfiguration[$element]['routes'][$route]);
+        $navigationElements = $this->configurationProvider
+            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+
+        return isset($navigationElements[$element], $navigationElements[$element]['routes'][$route]);
     }
 
     /**
@@ -96,9 +100,9 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     protected function getConfigValue($element, $route)
     {
-        // TODO set const
-        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
-        $elementConfiguration = $menuConfig['oro_navigation_elements'];
-        return $this->hasConfigValue($element, $route) ? (bool)$elementConfiguration[$element]['routes'][$route] : null;
+        $navigationElements = $this->configurationProvider
+            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+
+        return $this->hasConfigValue($element, $route) ? (bool)$navigationElements[$element]['routes'][$route] : null;
     }
 }

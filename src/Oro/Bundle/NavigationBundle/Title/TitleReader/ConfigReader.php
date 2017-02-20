@@ -29,8 +29,7 @@ class ConfigReader implements ReaderInterface
     {
         $data = [];
 
-        // TODO set const
-        $titles = $this->configurationProvider->getConfiguration('oro_navigation_titles');
+        $titles = $this->configurationProvider->getConfiguration(ConfigurationProvider::TITLES_KEY);
 
         foreach ($titles as $route => $title) {
             if (array_key_exists($route, $routes)) {

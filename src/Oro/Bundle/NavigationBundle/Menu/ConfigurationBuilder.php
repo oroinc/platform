@@ -55,8 +55,7 @@ class ConfigurationBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        // TODO set const
-        $menuConfig = $this->configurationProvider->getConfiguration('oro_menu_config');
+        $menuConfig = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
 
         if (!empty($menuConfig['items']) && !empty($menuConfig['tree'])) {
             foreach ($menuConfig['tree'] as $menuTreeName => $menuTreeElement) {

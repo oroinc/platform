@@ -52,7 +52,7 @@ class TitleProvider
                 'short_title' => $title->getShortTitle()
             ];
         } else {
-            $titles = $this->configurationProvider->getConfiguration('oro_navigation_titles');
+            $titles = $this->configurationProvider->getConfiguration(ConfigurationProvider::TITLES_KEY);
 
             if (array_key_exists($routeName, $titles)) {
                 $result = [

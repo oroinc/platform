@@ -11,11 +11,4 @@ interface ReaderInterface
      * @return array
      */
     public function getData(array $routes);
-
-    /**
-     * Check if data is fresh
-     *
-     * @return boolean
-     */
-//    public function isFresh();
 }

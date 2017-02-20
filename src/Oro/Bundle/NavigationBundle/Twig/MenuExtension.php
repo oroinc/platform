@@ -101,8 +101,7 @@ class MenuExtension extends \Twig_Extension
             $menu = $this->getMenu($menu, $path, $options);
         }
 
-        // TODO set const
-        $menuConfiguration = $this->configurationProvider->getConfiguration('oro_menu_config');
+        $menuConfiguration = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
 
         $menu = $this->filterUnallowedItems($menu);
         $menuType = $menu->getExtra('type');

@@ -28,7 +28,7 @@ class MenuUpdateDatasource implements DatasourceInterface
      * @param BuilderChainProvider  $chainProvider
      * @param MenuManipulator       $menuManipulator
      * @param ConfigurationProvider $configurationProvider
-     * @param string $scopeType
+     * @param string                $scopeType
      */
     public function __construct(
         BuilderChainProvider $chainProvider,
@@ -55,17 +55,14 @@ class MenuUpdateDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        // TODO set const
-        $menuConfiguration = $this->configurationProvider->getConfiguration('oro_menu_config');
+        $menuConfiguration = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
 
         $rows = [];
 
-        if (array_key_exists('tree', $menuConfiguration)) {
-            foreach ($menuConfiguration['tree'] as $name => $item) {
-                $menuItem = $this->chainProvider->get($name);
-                if ($menuItem->getExtra('scope_type') === $this->scopeType && !$menuItem->getExtra('read_only')) {
-                    $rows[] = new ResultRecord($this->menuManipulator->toArray($menuItem));
-                }
+        foreach ($menuConfiguration['tree'] as $name => $item) {
+            $menuItem = $this->chainProvider->get($name);
+            if ($menuItem->getExtra('scope_type') === $this->scopeType && !$menuItem->getExtra('read_only')) {
+                $rows[] = new ResultRecord($this->menuManipulator->toArray($menuItem));
             }
         }
 

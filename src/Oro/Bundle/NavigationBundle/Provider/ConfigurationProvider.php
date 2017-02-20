@@ -15,11 +15,13 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class ConfigurationProvider
 {
-    const ROOT_PARAMETER     = 'navigation';
     const COMPILER_PASS_NAME = 'oro_navigation';
-    const CACHE_KEY          = 'oro_navigation.configuration_data';
+    const CACHE_KEY = 'oro_navigation.configuration_data';
+    const NAVIGATION_CONFIG_ROOT = 'navigation';
 
-    const MENU_CONFIG_KEY    = 'menu_config';
+    const NAVIGATION_ELEMENTS_KEY = 'navigation_elements';
+    const MENU_CONFIG_KEY = 'menu_config';
+    const TITLES_KEY = 'titles';
 
     /** @var Cache */
     private $cache;
@@ -81,29 +83,22 @@ class ConfigurationProvider
         $configLoader = self::getConfigurationLoader();
         $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
-            if (array_key_exists(self::ROOT_PARAMETER, $resource->data)
-                && is_array($resource->data[self::ROOT_PARAMETER])
-            ) {
-                $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $resource->data[self::ROOT_PARAMETER]);
+            if (array_key_exists(self::NAVIGATION_CONFIG_ROOT, $resource->data)) {
+                $resourceConfig = $resource->data[self::NAVIGATION_CONFIG_ROOT];
+                $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $resourceConfig);
             }
         }
 
-        // TODO fix const and names
-        $this->rawConfiguration[Configuration::ROOT_NODE] = $config[self::MENU_CONFIG_KEY];
-        $this->rawConfiguration[Configuration::ROOT_NODE]['oro_navigation_elements'] = $config['navigation_elements'];
+        $rawConfiguration = &$config[self::MENU_CONFIG_KEY];
+        if (array_key_exists('tree', $rawConfiguration)) {
+            $this->reorganizeTree($rawConfiguration['tree']);
+        }
 
-        $this->rawConfiguration[Configuration::ROOT_NODE] = $this->processConfiguration($this->rawConfiguration);
-        unset($this->rawConfiguration[Configuration::ROOT_NODE]['settings']);
+        // validate configuration
+        $this->rawConfiguration = $this->processConfiguration($config);
+        unset($this->rawConfiguration['settings']);
 
-        $this->rawConfiguration['oro_navigation_titles'] = $config['titles'];
-
-        $this->normalizeOptionNames($this->rawConfiguration[Configuration::ROOT_NODE]);
-
-        // TODO add merge_strategy
-//        if (array_key_exists(self::MENU_CONFIG_KEY, $config)
-//            && array_key_exists('tree', $config[self::MENU_CONFIG_KEY])) {
-//            $this->reorganizeTree($config[self::MENU_CONFIG_KEY]['tree']);
-//        }
+        $this->normalizeOptionNames($this->rawConfiguration[self::MENU_CONFIG_KEY]);
 
         if ($this->cache instanceof Cache) {
             $this->cache->save(self::CACHE_KEY, $this->rawConfiguration);
@@ -172,6 +167,26 @@ class ConfigurationProvider
     }
 
     /**
+     * @param string $childName
+     * @param array  $childConfig
+     *
+     * @return ConfigurationProvider
+     */
+    private function moveItem($childName, array &$childConfig)
+    {
+        $config = $this->rawConfiguration[self::MENU_CONFIG_KEY]['tree'];
+        $existingItem = $this->getMenuItemByName($config, $childName);
+        if (!empty($existingItem['children'])) {
+            $childChildren = array_key_exists('children', $childConfig) ? $childConfig['children'] : [];
+            $childConfig['children'] = array_merge($existingItem['children'], $childChildren);
+
+            $this->removeItem($config, $childName);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param array  $config
      * @param string $childName
      *
@@ -190,26 +205,6 @@ class ConfigurationProvider
         }
 
         return null;
-    }
-
-    /**
-     * @param string $childName
-     * @param array  $childConfig
-     *
-     * @return ConfigurationProvider
-     */
-    private function moveItem($childName, array &$childConfig)
-    {
-        $config = $this->rawConfiguration[self::MENU_CONFIG_KEY]['tree'];
-        $existingItem = $this->getMenuItemByName($config, $childName);
-        if (!empty($existingItem['children'])) {
-            $childChildren = array_key_exists('children', $childConfig) ? $childConfig['children'] : [];
-            $childConfig['children'] = array_merge($existingItem['children'], $childChildren);
-
-            $this->removeItem($config, $childName);
-        }
-
-        return $this;
     }
 
     /**
@@ -245,7 +240,7 @@ class ConfigurationProvider
         $processor = new Processor();
         $configuration = new Configuration();
 
-        return $processor->processConfiguration($configuration, $config);
+        return $processor->processConfiguration($configuration, [Configuration::ROOT_NODE => $config]);
     }
 
     /**
