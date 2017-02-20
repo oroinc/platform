@@ -30,6 +30,7 @@ services:
         arguments:
             - '@oro_layout.layout_factory_builder'
             - '@oro_layout.layout_context_holder'
+            - '@oro_layout.profiler.layout_data_collector'
 
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper

@@ -60,6 +60,23 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** @var RawLayoutBuilderInterface */
     protected $rawLayoutBuilder;
 
+    /** @var array */
+    protected $actionArgumentsMapper = [
+        self::ADD => ['id', 'parentId', 'blockType', 'options', 'siblingId', 'prepend'],
+        self::REMOVE => ['id'],
+        self::MOVE => ['id', 'parentId', 'siblingId', 'prepend'],
+        self::ADD_ALIAS => ['alias', 'id'],
+        self::REMOVE_ALIAS => ['alias'],
+        self::SET_OPTION => ['id', 'optionName', 'optionValue'],
+        self::APPEND_OPTION => ['id', 'optionName', 'optionValue'],
+        self::SUBTRACT_OPTION => ['id', 'optionName', 'optionValue'],
+        self::REPLACE_OPTION => ['id', 'optionName', 'oldOptionValue', 'newOptionValue'],
+        self::REMOVE_OPTION => ['id', 'optionName'],
+        self::CHANGE_BLOCK_TYPE => ['id', 'blockType', 'optionsCallback'],
+        self::SET_BLOCK_THEME => ['themes', 'id', 'optionsCallback'],
+        self::SET_FORM_THEME => ['themes']
+    ];
+
     /**
      * The list of all scheduled actions to be executed by applyChanges method
      *
@@ -343,11 +360,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                 $this->executeAllActions($finalize);
                 if ($finalize) {
                     $this->removeNotImportantRemainingActions();
-                    // check that all scheduled actions have been performed
-                    if ($this->calculateActionCount()) {
-                        //TODO: BAP-10043
-                        //throw $this->createFailureException();
-                    }
                 }
             }
 
@@ -752,28 +764,38 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     }
 
     /**
-     * @return Exception\DeferredUpdateFailureException
+     * @return array
      */
-    protected function createFailureException()
+    public function getNotAppliedActions()
     {
         $exActions = [];
         foreach ($this->actions as $actions) {
             foreach ($actions as $action) {
                 $exActions[] = [
                     'name' => $action[1],
-                    'args' => isset($action[2]) ? $action[2] : []
+                    'args' => $this->getMappedArguments($action)
                 ];
             }
         }
 
-        return new Exception\DeferredUpdateFailureException(
-            sprintf(
-                'Failed to apply scheduled changes. %d action(s) cannot be applied.',
-                count($exActions)
-            ),
-            $exActions,
-            [$this, 'convertActionArgsToString']
-        );
+        return $exActions;
+    }
+
+    /**
+     * @param array $action
+     * @return array
+     */
+    private function getMappedArguments($action)
+    {
+        if (!isset($action[2])) {
+            return [];
+        }
+
+        $argumentKeys = $this->actionArgumentsMapper[$action[0]];
+
+        $mappedArguments = array_combine($argumentKeys, $action[2]);
+
+        return array_filter($mappedArguments);
     }
 
     /**

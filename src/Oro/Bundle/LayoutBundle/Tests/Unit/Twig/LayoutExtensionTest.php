@@ -65,7 +65,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $functions = $this->extension->getFunctions();
 
-        $this->assertCount(6, $functions);
+        $this->assertCount(7, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $this->assertInstanceOf('Twig_SimpleFunction', $functions[0]);
@@ -93,6 +93,11 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('set_class_prefix_to_form', $function->getName());
         $this->assertNotNull($function->getCallable());
         $this->assertEquals([$this->extension, 'setClassPrefixToForm'], $function->getCallable());
+
+        $function = $functions[6];
+        $this->assertEquals('convert_value_to_string', $function->getName());
+        $this->assertNotNull($function->getCallable());
+        $this->assertEquals([$this->extension, 'convertValueToString'], $function->getCallable());
     }
 
     public function testGetFilters()
@@ -255,5 +260,41 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formView->vars['class_prefix'], 'foo');
         $this->assertEquals($childView->vars['class_prefix'], 'foo');
         $this->assertEquals($prototypeView->vars['class_prefix'], 'foo');
+    }
+
+    /**
+     * @dataProvider convertValueToStringDataProvider
+     * @param $value
+     * @param $expectedConvertedValue
+     */
+    public function testConvertValueToString($value, $expectedConvertedValue)
+    {
+        $this->assertSame($expectedConvertedValue, $this->extension->convertValueToString($value));
+    }
+
+    /**
+     * @return array
+     */
+    public function convertValueToStringDataProvider()
+    {
+        return [
+            'object conversion' => [
+                new \stdClass(),
+                'stdClass'
+            ],
+            'array conversion'  => [
+                ['Foo', 'Bar'],
+                '["Foo","Bar"]'
+            ],
+            'null conversion' => [
+                null,
+                'NULL'
+            ],
+            'string' => [
+                'some string',
+                'some string'
+            ]
+
+        ];
     }
 }

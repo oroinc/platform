@@ -1,16 +1,19 @@
 {% extends '@WebProfiler/Collector/form.html.twig' %}
 
-{% from _self import view_tree_entry, view_tree_details, view_block_details %}
+{% from _self import view_tree_entry, view_tree_details, view_block_details, not_applied_actions_tab %}
 
 {% block toolbar %}
     {% if collector.data.views|length %}
+        {% set status_color = collector.data.not_applied_actions_count ? 'yellow' : '' %}
         {% set icon %}
             <span class="icon">
                 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAYAAACOGPReAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbElEQVRIx2NgGAXUBowMDAwMaWlp/6ll4KxZsxhZYJy0tDRqGMjAwMDAwEQL77OgCxSXlJBsSG9PDwqfJi6lj/fRvTJ4XYocUTBXE4q8oRtRRBnKwsw8RFw6fA0lKkd1dnYOIpfCCthRMIIAAI0IFu9Hxh7ZAAAAAElFTkSuQmCC"/>
             </span>
-            <span class="sf-toolbar-value">
-                {{ collector.data.count }}
-            </span>
+            {% if collector.data.not_applied_actions_count %}
+                <span class="sf-toolbar-value">
+                    {{ collector.data.not_applied_actions_count }}
+                </span>
+            {% endif %}
         {% endset %}
 
         {% set text %}
@@ -18,34 +21,42 @@
                 <b>Number of views</b>
                 <span class="sf-toolbar-status">{{ collector.data.count }}</span>
             </div>
+            {% if collector.data.not_applied_actions_count %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Not applied actions</b>
+                    <span class="sf-toolbar-status sf-toolbar-status-yellow">
+                        {{ collector.data.not_applied_actions_count }}
+                    </span>
+                </div>
+            {% endif %}
             {% for key, value in collector.data.context.items %}
                 <div class="sf-toolbar-info-piece">
                     <b class="oro-layout-toolbar-info-piece-title">{{ key }}</b>
                     <span class="sf-toolbar-info-class oro-layout-toolbar-info-piece-value">
-                        {% if value is same as(true) %}
-                            true
-                        {% elseif value is same as(false) %}
-                            false
-                        {% elseif value is same as(null) %}
-                            NULL
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
+                       {{ convert_value_to_string(value) }}
                     </span>
                 </div>
             {% endfor %}
         {% endset %}
 
-        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
     {% endif %}
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.data.views is empty ? 'disabled' }}">
+    <span class="label
+                {{ collector.data.not_applied_actions_count ? 'label-status-error' : '' }}
+                {{ collector.data.views is empty ? 'disabled' }}"
+    >
         <span class="icon">
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAgCAYAAAABtRhCAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAbklEQVRIx2NgGAVDHTDCGGlpaf9pZcmsWbPg9rAgS6SlpdHCMhQ+E72DlAWbYHFJCcUG9/b0YBWnuw9HLaRPosEV4cPHh9iyBczXxGaZ0WxBfBwwM4/mw1ELRy0c4MK7s7NzCPsQvYU1CkYBNgAAV5UW+fU+ZL4AAAAASUVORK5CYII="/>
         </span>
         <strong>Layouts</strong>
+        {% if collector.data.not_applied_actions_count %}
+            <span class="count">
+                <span>{{ collector.data.not_applied_actions_count }}</span>
+            </span>
+        {% endif %}
     </span>
 {% endblock %}
 
@@ -115,6 +126,8 @@
         <div id="tree-details-container">
             {% for viewId, viewData in collector.data.views %}
                 {% set viewData = viewData|merge({
+                    not_applied_actions_count: collector.data.not_applied_actions_count,
+                    not_applied_actions: collector.data.not_applied_actions,
                     context: {
                         data: collector.data.context.data,
                         items: collector.data.context.items
@@ -371,13 +384,13 @@
                 clickHandler(target, toggleAll);
             })();
 
-            window.onscroll = function (e) {
+          /*  window.onscroll = function (e) {
                 if (window.scrollY > 130) {
                     Sfjs.addClass(document.getElementById('tree-details-container'), 'fixed');
                 } else {
                     Sfjs.removeClass(document.getElementById('tree-details-container'), 'fixed');
                 }
-            };
+            };*/
         }());
     </script>
 {% endblock %}
@@ -434,11 +447,17 @@
             {% if data.view_vars is defined %}
                 {{ tree.view_block_details(data.id, 'Variables', {'Variables': data.view_vars}, 'view_vars') }}
             {% endif %}
+
+            {% if data.not_applied_actions_count is defined and data.not_applied_actions_count %}
+                {{ tree.not_applied_actions_tab(data.not_applied_actions_count, data.not_applied_actions) }}
+            {% endif %}
         </div>
     </div>
 
     {% for childName, childData in data.children %}
         {% set childData = childData|merge({
+            not_applied_actions_count: data.not_applied_actions_count,
+            not_applied_actions: data.not_applied_actions,
             context: {
                 data: data.context.data,
                 items: data.context.items
@@ -467,15 +486,7 @@
                             <tr>
                                 <th scope="row">{{ option }}</th>
                                 <td>
-                                    {% if value is same as(true) %}
-                                        true
-                                    {% elseif value is same as(false) %}
-                                        false
-                                    {% elseif value is same as(null) %}
-                                        NULL
-                                    {% else %}
-                                        {{ value }}
-                                    {% endif %}
+                                    {{ convert_value_to_string(value) }}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -483,6 +494,44 @@
                     </table>
                 {% endif %}
             {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro not_applied_actions_tab(count, actions) %}
+    <div class="tab">
+        <h3 class="tab-title">
+            Not applied actions
+            <span class="badge">{{ count }}</span>
+        </h3>
+        <div class="tab-content">
+            <table>
+                <thead>
+                <tr>
+                    <th width="180">Action name</th>
+                    <th>Arguments</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for action in actions %}
+                        <tr>
+                            <td>
+                                <strong>
+                                    @{{ action.name }}
+                                </strong>
+                            </td>
+                            <td>
+                                {% for argName, argValue in action.args %}
+                                    <div>
+                                        <strong>{{ argName }}:</strong>
+                                        {{ convert_value_to_string(argValue) }}
+                                    </div>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 {% endmacro %}

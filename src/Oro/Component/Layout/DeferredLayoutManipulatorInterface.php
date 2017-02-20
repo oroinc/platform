@@ -26,4 +26,9 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
      * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
      */
     public function applyChanges(ContextInterface $context, $finalize = false);
+
+    /**
+     * @return array
+     */
+    public function getNotAppliedActions();
 }
