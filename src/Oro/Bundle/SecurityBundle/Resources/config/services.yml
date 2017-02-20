@@ -352,7 +352,7 @@ services:
 
     oro_security.action_metadata_provider.cache:
         public: false
-        parent: oro.file_cache.abstract
+        parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_acl_actions' ] ]
 

@@ -12,6 +12,10 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
     const SIMPLE_USER = 'simple_user';
     const SIMPLE_USER_2 = 'simple_user2';
+    const USER_WITH_CONFIRMATION_TOKEN = 'user_with_confirmation_token';
+
+    const CONFIRMATION_TOKEN = 'confirmation_token';
+
     /**
      * @var ContainerInterface
      */
@@ -57,7 +61,21 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $userManager->updateUser($user2);
 
+        $userWithToken = $userManager->createUser();
+        $userWithToken->setUsername(self::USER_WITH_CONFIRMATION_TOKEN)
+            ->setPlainPassword('simple_password3')
+            ->setFirstName('Forgot')
+            ->setLastName('Password')
+            ->setEmail('user_with_confirmation_token@example.com')
+            ->setOrganization($organization)
+            ->setConfirmationToken(self::CONFIRMATION_TOKEN)
+            ->addOrganization($organization)
+            ->setEnabled(true);
+
+        $userManager->updateUser($userWithToken);
+
         $this->setReference(self::SIMPLE_USER, $user);
         $this->setReference(self::SIMPLE_USER_2, $user2);
+        $this->setReference(self::USER_WITH_CONFIRMATION_TOKEN, $userWithToken);
     }
 }

@@ -233,6 +233,7 @@ workflows:
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
         entity_attribute: user                    # attribute name of current entity that can be used in configuration
         start_step: started                       # step that will be assigned automatically to new entities
+        force_autostart: false                    # if `start_step` is defined: force start workflow on entity creation like from cli, message queue (without any filters like applications, scopes, features)
         steps_display_ordered: true               # defines whether all steps will be shown on view page in steps widget
         defaults:
             active: true                          # active by default
@@ -240,6 +241,7 @@ workflows:
         exclusive_record_groups:
             - unique_run                          # only one started workflow for the `entity` from specified groups can exist at time
         priority: 100                             # has priority of 100
+        applications: [ commerce ]                # web application availability level 
         scopes:
             -                                     # definition of configuration for one scope
                 scopeField1: 42                   # context for scope will have field `scopeField1` and entity with id `42`
@@ -288,6 +290,8 @@ workflows:
                                 required: true              # define this field as required
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
+                display_type: page                          # form will be opened in separate page
+                destination_page: index                     # after submitting form will be opened index page of workflow`s related entity 
             add_email:                                      # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions

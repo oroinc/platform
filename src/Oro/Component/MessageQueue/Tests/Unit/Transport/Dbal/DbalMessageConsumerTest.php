@@ -486,7 +486,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
-        $consumer->setPollingInterval(100);
+        $consumer->setPollingInterval(1000);
         $result = $consumer->receive(1);
 
         $this->assertEmpty($result);

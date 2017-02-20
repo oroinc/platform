@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -68,6 +69,21 @@ class GlobalMenuController extends AbstractMenuController
     public function updateAction($menuName, $key)
     {
         return parent::update($menuName, $key);
+    }
+
+    /**
+     * @Route("/{menuName}/move", name="oro_navigation_global_menu_move")
+     * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
+     *
+     * @param Request $request
+     * @param string  $menuName
+     *
+     * @return array|RedirectResponse
+     */
+    public function moveAction(Request $request, $menuName)
+    {
+        return parent::move($request, $menuName);
     }
 
     /**
