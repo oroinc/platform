@@ -116,6 +116,10 @@ menu_config:
             show_non_authorized: <boolean>      # show for non-authorized users
             display: <boolean>                  # disable showing of menu item
             display_children: <boolean>         # disable showing of menu item children
+            position: <integer>                 # menu item position
+            extras:                             # extra parameters for container renderer
+                brand: <string>
+                brandLink: <string>
 
     tree:
         <menu_alias>                            # menu alias
@@ -124,12 +128,8 @@ menu_config:
             read_only: <boolean>                # disable ability to edit menu in UI
             max_nesting_level: <integer>        # menu max nesting level
             merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
-            extras:                             # extra parameters for container renderer
-                brand: <string>
-                brandLink: <string>
             children:                           # submenu items
                 <links to items hierarchy>
-                position: <integer>             # menu item posiotion
 ```
 
 To change merge strategy of tree node there are 3 possible options:
@@ -182,3 +182,15 @@ arguments and call KmpMenu renderer with the resulting options.
 {% endblock content %}
 ```
 
+## Disabling menu items as part of a feature
+
+The NavigationBundle offers a FeatureConfigurationExtension which introduces the ``navigation_items`` feature configuration
+option, which, if a menu item is defined in the feature definition in ``features.yml``, gives the possibility to disable a
+menu item as in the example below.
+The option supports 2 separators for the menu path: ``.`` and `` > ``.
+
+```yaml
+navigation_items:
+    - 'menu.submenu.child'
+    - 'menu > submenu > child'
+```

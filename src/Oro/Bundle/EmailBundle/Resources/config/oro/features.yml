@@ -61,6 +61,9 @@ features:
             - 'mailboxes'
             - 'user_mailbox'
             - 'user_bar_settings'
+            - 'integration_email_settings'
+            - 'oro_hangouts_call.enable_google_hangouts_for_email'
+            - 'google_imap_settings'
         sidebar_widgets:
             - 'recent_emails'
         dashboard_widgets:
@@ -68,3 +71,7 @@ features:
         entities:
             - 'Oro\Bundle\EmailBundle\Entity\Email'
             - 'Oro\Bundle\EmailBundle\Entity\EmailUser'
+        cron_jobs:
+            - 'oro:cron:imap-sync'
+            - 'oro:cron:ews-sync'
+            - 'oro:cron:email-body-sync'

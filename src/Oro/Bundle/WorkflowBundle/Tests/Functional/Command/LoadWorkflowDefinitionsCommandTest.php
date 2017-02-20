@@ -12,9 +12,6 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-/**
- * @dbIsolation
- */
 class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 {
     const NAME = 'oro:workflow:definitions:load';
@@ -125,32 +122,46 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         ];
     }
 
-    public function testExecuteErrors()
+    /**
+     * @dataProvider invalidExecuteDataProvider
+     *
+     * @param $expectedMessages $messages
+     * @param string $configDirectory
+     */
+    public function testExecuteErrors(array $expectedMessages, $configDirectory)
     {
         $this->reflectionProperty->setValue(
             $this->provider,
-            '/Tests/Functional/Command/DataFixtures/InvalidCronExpression'
+            $configDirectory
         );
 
-        $expectedMessages = [
-            'InvalidConfigurationException',
-            'Invalid configuration for path "workflows.first_workflow',
-            'invalid cron expression is not a valid',
-            'CRON expression'
+        $this->assertCommandExecuted($expectedMessages);
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function invalidExecuteDataProvider()
+    {
+        yield 'invalid cron expression' => [
+            'expectedMessages' => [
+                'InvalidConfigurationException',
+                'Invalid configuration for path "workflows.first_workflow',
+                'invalid cron expression is not a valid',
+                'CRON expression'
+            ],
+            'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidCronExpression'
         ];
 
-        $this->assertCommandExecuted($expectedMessages);
-
-        $this->reflectionProperty->setValue(
-            $this->provider,
-            '/Tests/Functional/Command/DataFixtures/InvalidFilterExpression'
-        );
-
-        $expectedMessages = [
-            'Expected =, <, <=, <>, >, >=, !=, got end of string'
+        yield 'invalid filter expression' => [
+            'expectedMessages' => ['Expected =, <, <=, <>, >, >=, !=, got end of string'],
+            'configDirectory' => '/Tests/Functional/Command/DataFixtures/InvalidFilterExpression'
         ];
 
-        $this->assertCommandExecuted($expectedMessages);
+        yield 'empty start step' => [
+            'expectedMessages' => ['does not contains neither start step nor start transitions'],
+            'configDirectory' => '/Tests/Functional/Command/DataFixtures/WithoutStartStep'
+        ];
     }
 
     /**
@@ -159,6 +170,8 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     protected function assertCommandExecuted(array $messages)
     {
         $result = $this->runCommand(self::NAME, ['--no-ansi']);
+
+        $result = str_replace(["\r\n", "\t", "\n", '  '], "", $result);
 
         $this->assertNotEmpty($result);
         foreach ($messages as $message) {

@@ -1,6 +1,7 @@
 .button,
 .btn {
     cursor: pointer;
+    white-space: nowrap;
 
     @include base-ui-element($use-base-style-for-button,
                              $button-padding,

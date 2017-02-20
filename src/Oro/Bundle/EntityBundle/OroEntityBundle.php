@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFallbackCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DatabaseCheckerCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
@@ -21,6 +22,7 @@ use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCo
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\CustomGridFieldValidatorCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DataCollectorCompilerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\SqlWalkerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityRepositoryCompilerPass;
 
 class OroEntityBundle extends Bundle
@@ -47,6 +49,7 @@ class OroEntityBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
+        $container->addCompilerPass(new DatabaseCheckerCompilerPass());
         $container->addCompilerPass(new EntityAliasProviderPass());
         $container->addCompilerPass(new EntityNameProviderPass());
         $container->addCompilerPass(new EntityClassNameProviderPass());
@@ -59,6 +62,7 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new CustomGridFieldValidatorCompilerPass());
         $container->addCompilerPass(new DataCollectorCompilerPass());
         $container->addCompilerPass(new EntityFallbackCompilerPass());
+        $container->addCompilerPass(new SqlWalkerPass());
         $container->addCompilerPass(new EntityRepositoryCompilerPass());
 
         if ($container instanceof ExtendedContainerBuilder) {

@@ -5,19 +5,20 @@ namespace Oro\Bundle\NoteBundle\Migration;
 use Psr\Log\LoggerInterface;
 
 use Doctrine\DBAL\Schema\Comparator;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
 {
+    const NOTE_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
+    const NOTE_TABLE = 'oro_note';
+
     /**
      * @var Schema
      */
@@ -69,12 +70,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
     public function getDescription()
     {
         $logger = new ArrayLogger();
-        $logger->info(
-            sprintf(
-                'Update activity association kind for entity %s.',
-                Note::class
-            )
-        );
+        $logger->info('Update note associations.');
         $this->doExecute($logger, true);
 
         return $logger->getMessages();
@@ -99,6 +95,7 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
         $noteEntityConfig = $this->getNoteEntityConfig($logger);
 
         $entitiesForDataMigration = [];
+        $noteTable = $this->schema->getTable(self::NOTE_TABLE);
         $entityConfigs = $this->getApplicableEntityConfigs($logger);
         foreach ($entityConfigs as $entityConfigurationRow) {
             $targetEntityClassName = $entityConfigurationRow['class_name'];
@@ -106,14 +103,15 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
             $noteAssociationColumnName = $this->getNoteAssociationColumnName($targetEntityClassName);
             if (!$targetTableName
                 || !$this->schema->hasTable($targetTableName)
-                || !$this->schema->getTable('oro_note')->hasColumn($noteAssociationColumnName)) {
+                || !$noteTable->hasColumn($noteAssociationColumnName)
+            ) {
                 continue;
             }
             $entitiesForDataMigration[$targetEntityClassName] = $targetTableName;
 
-            $associationTableName = $this->activityExtension->getAssociationTableName('oro_note', $targetTableName);
+            $associationTableName = $this->getNoteActivityAssociationTableName($targetTableName);
             if (!$this->schema->hasTable($associationTableName)) {
-                $this->activityExtension->addActivityAssociation($this->schema, 'oro_note', $targetTableName);
+                $this->activityExtension->addActivityAssociation($this->schema, self::NOTE_TABLE, $targetTableName);
             }
 
             $this->removeOldNoteAssociation($logger, $targetEntityClassName, $noteEntityConfig, $dryRun);
@@ -126,57 +124,49 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
         $this->applyActivityAssociationSchemaChanges($logger, $fromSchema, $dryRun);
 
         foreach ($entitiesForDataMigration as $targetEntityClassName => $targetTableName) {
-            $this->migrateNoteRelationDataToActivityRelationKind(
-                $logger,
-                $targetTableName,
-                $targetEntityClassName,
-                $dryRun
-            );
+            $this->migrateNoteData($logger, $targetTableName, $targetEntityClassName, $dryRun);
         }
     }
 
     /**
      * @param LoggerInterface $logger
      *
-     * @return array
+     * @return array [['id' => entity config id, 'class_name' => entity class, 'data' => entity config], ...]
      */
     protected function getApplicableEntityConfigs(LoggerInterface $logger)
     {
         $sql = 'SELECT id, class_name, data FROM oro_entity_config';
-        $this->logQuery($logger, $sql);
 
+        $this->logQuery($logger, $sql);
         $entityConfigs = $this->connection->fetchAll($sql);
 
-        $targetEntitiesConfigs = [];
+        $result = [];
         foreach ($entityConfigs as $entityConfig) {
-            $entityConfig['data'] = empty($entityConfig['data'])
-                ? []
-                : $this->connection->convertToPHPValue($entityConfig['data'], Type::TARRAY);
-
+            $entityConfig['data'] = $this->connection->convertToPHPValue($entityConfig['data'], 'array');
             if (!empty($entityConfig['data']['note']['enabled'])) {
-                $targetEntitiesConfigs[] = $entityConfig;
+                $result[] = $entityConfig;
             }
         }
 
-        return $targetEntitiesConfigs;
+        return $result;
     }
 
     /**
      * @param LoggerInterface $logger
      *
-     * @return array
+     * @return array ['id' => entity config id, 'data' => entity config]
      */
     protected function getNoteEntityConfig(LoggerInterface $logger)
     {
-        $sql = 'SELECT id, class_name, data FROM oro_entity_config WHERE class_name = ?';
-        $parameters = ['Oro\Bundle\NoteBundle\Entity\Note'];
+        $sql = 'SELECT id, data FROM oro_entity_config WHERE class_name = :class LIMIT 1';
+        $params = ['class' => self::NOTE_CLASS];
+        $types = ['class' => 'string'];
 
-        $this->logQuery($logger, $sql, $parameters);
+        $this->logQuery($logger, $sql, $params, $types);
+        $result = $this->connection->fetchAssoc($sql, $params, $types);
+        $result['data'] = $this->connection->convertToPHPValue($result['data'], 'array');
 
-        $noteEntityConfig = $this->connection->fetchAssoc($sql, $parameters);
-        $noteEntityConfig['data'] = $this->connection->convertToPHPValue($noteEntityConfig['data'], Type::TARRAY);
-
-        return $noteEntityConfig;
+        return $result;
     }
 
     /**
@@ -193,24 +183,24 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
     ) {
         $noteAssociationName = $this->getNoteAssociationName($targetEntityClassName);
 
-        $sql = 'DELETE FROM oro_entity_config_field WHERE field_name = ? AND entity_id= ?';
-        $parameters = [$noteAssociationName, $noteEntityConfig['id']];
+        $sql = 'DELETE FROM oro_entity_config_field WHERE field_name = :fieldName AND entity_id = :entityId';
+        $params = ['fieldName' => $noteAssociationName, 'entityId' => $noteEntityConfig['id']];
+        $types = ['fieldName' => 'string', 'entityId' => 'integer'];
 
-        $this->logQuery($logger, $sql, $parameters);
-
+        $this->logQuery($logger, $sql, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql, $parameters);
+            $this->connection->executeUpdate($sql, $params, $types);
         }
 
         unset($noteEntityConfig['data']['extend']['schema']['relation'][$noteAssociationName]);
 
-        $relationKeyName = ExtendHelper::buildRelationKey(
-            'Oro\Bundle\NoteBundle\Entity\Note',
+        $relationKey = ExtendHelper::buildRelationKey(
+            self::NOTE_CLASS,
             $noteAssociationName,
             'manyToOne',
             $targetEntityClassName
         );
-        unset($noteEntityConfig['data']['extend']['relation'][$relationKeyName]);
+        unset($noteEntityConfig['data']['extend']['relation'][$relationKey]);
     }
 
     /**
@@ -220,16 +210,13 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
      */
     protected function saveEntityConfig(LoggerInterface $logger, array $entityConfig, $dryRun)
     {
-        $sql = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
-        $parameters = [
-            $this->connection->convertToDatabaseValue($entityConfig['data'], Type::TARRAY),
-            $entityConfig['id']
-        ];
+        $sql = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
+        $params = ['data' => $entityConfig['data'], 'id' => $entityConfig['id']];
+        $types = ['data' => 'array', 'id' => 'integer'];
 
-        $this->logQuery($logger, $sql, $parameters);
-
+        $this->logQuery($logger, $sql, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql, $parameters);
+            $this->connection->executeUpdate($sql, $params, $types);
         }
     }
 
@@ -258,42 +245,46 @@ class UpdateNoteAssociationKindQuery extends ParametrizedMigrationQuery
      * @param string $targetClass
      * @param boolean $dryRun
      */
-    protected function migrateNoteRelationDataToActivityRelationKind(
-        LoggerInterface $logger,
-        $targetTable,
-        $targetClass,
-        $dryRun
-    ) {
-        $associationTableName = $this->activityExtension->getAssociationTableName('oro_note', $targetTable);
-
+    protected function migrateNoteData(LoggerInterface $logger, $targetTable, $targetClass, $dryRun)
+    {
+        $associationTableName = $this->getNoteActivityAssociationTableName($targetTable);
         $associationColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName($targetClass);
-
         $noteAssociationColumnName = $this->getNoteAssociationColumnName($targetClass);
-        $sql = <<<SQL
-          INSERT INTO $associationTableName (note_id, $associationColumnName)
-          SELECT id, $noteAssociationColumnName
-          FROM oro_note WHERE $noteAssociationColumnName IS NOT NULL
-SQL;
+        $sql = sprintf(
+            'INSERT INTO %1$s (note_id, %2$s) SELECT id, %3$s FROM %4$s WHERE %3$s IS NOT NULL',
+            $associationTableName,
+            $associationColumnName,
+            $noteAssociationColumnName,
+            self::NOTE_TABLE
+        );
 
         $this->logQuery($logger, $sql);
-
         if (!$dryRun) {
             $this->connection->executeUpdate($sql);
         }
 
         $schemaManager = $this->connection->getSchemaManager();
-        foreach ($schemaManager->listTableForeignKeys('oro_note') as $foreignKey) {
-            if (in_array($noteAssociationColumnName, $foreignKey->getColumns())) {
-                $schemaManager->dropForeignKey($foreignKey, 'oro_note');
+        foreach ($schemaManager->listTableForeignKeys(self::NOTE_TABLE) as $foreignKey) {
+            if (in_array($noteAssociationColumnName, $foreignKey->getColumns(), true)) {
+                $schemaManager->dropForeignKey($foreignKey, self::NOTE_TABLE);
             }
         }
 
-        $sql = "ALTER TABLE oro_note DROP COLUMN {$noteAssociationColumnName}";
+        $sql = sprintf('ALTER TABLE %s DROP COLUMN %s', self::NOTE_TABLE, $noteAssociationColumnName);
         $this->logQuery($logger, $sql);
-
         if (!$dryRun) {
             $this->connection->executeUpdate($sql);
         }
+    }
+
+    /**
+     * @param string $targetTableName
+     *
+     * @return string
+     */
+    protected function getNoteActivityAssociationTableName($targetTableName)
+    {
+        return $this->activityExtension->getAssociationTableName(self::NOTE_TABLE, $targetTableName);
     }
 
     /**
@@ -324,7 +315,7 @@ SQL;
     }
 
     /**
-     * @param array $classNamesMapping ['current class name' => 'old class name']
+     * @param array $classNamesMapping [current class name => old class name, ...]
      */
     public function registerOldClassNames(array $classNamesMapping)
     {

@@ -204,13 +204,9 @@ class Processor
      */
     public function processSend($message, $emailOrigin)
     {
-        if ($emailOrigin && $emailOrigin instanceof UserEmailOrigin) {
-            /* Modify transport smtp settings */
-            if ($emailOrigin->isSmtpConfigured()) {
-                $this->mailer->prepareSmtpTransport($emailOrigin);
-            }
-        }
+        $this->mailer->prepareSmtpTransport($emailOrigin);
         $messageId = $message->getId();
+
         if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
         }

@@ -458,6 +458,18 @@ define([
          */
         _isDifferentFromInitialState: function(state) {
             var initialState = this._initialState;
+
+            if (_.isArray(state)) {
+                $.each(state, function(index, item) {
+                    if (_.isArray(item)) {
+                        item = $.grep(item, function(field) {
+                            return _.isObject(field) && field.name.indexOf('temp-validation-name-') === -1;
+                        });
+                        state[index] = item;
+                    }
+                });
+            }
+
             var isSame = initialState && _.every(initialState, function(form, i) {
                 return _.isArray(state[i]) && _.every(form, function(field, j) {
                     return _.isObject(state[i][j]) &&

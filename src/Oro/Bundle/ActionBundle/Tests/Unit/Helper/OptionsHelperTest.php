@@ -2,360 +2,116 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
-use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-
-use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 
 class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $contextHelper;
-
-    /** @var ApplicationsUrlHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $applicationsUrlHelper;
-
-    /** @var OptionsAssembler|\PHPUnit_Framework_MockObject_MockObject */
-    protected $optionsAssembler;
+    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    protected $router;
 
     /** @var OptionsHelper */
     protected $helper;
-
-    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $mockTranslator;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+        $this->router = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->applicationsUrlHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->optionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OptionsAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->mockTranslator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
+        $this->router->expects($this->any())->method('generate')->willReturn('generated-url');
 
         $this->helper = new OptionsHelper(
-            $this->contextHelper,
-            $this->optionsAssembler,
-            new ContextAccessor(),
-            $this->applicationsUrlHelper,
-            $this->mockTranslator
+            $this->router,
+            new StubTranslator()
         );
     }
 
     /**
-     * @param array $inputData
+     * @param ButtonInterface $button
      * @param array $expectedData
      *
      * @dataProvider getFrontendOptionsProvider
      */
-    public function testGetFrontendOptions(array $inputData, array $expectedData)
+    public function testGetFrontendOptions(ButtonInterface $button, array $expectedData)
     {
-        $args = $inputData['args'];
-
-        $this->contextHelper->expects($this->once())
-            ->method('getContext')
-            ->with($args['context'])
-            ->willReturn($args['context']);
-
-        $callGetActionDataTimes = (int)!isset($args['actionData']);
-
-        $methodCalls = $this->contextHelper->expects($this->exactly($callGetActionDataTimes))
-            ->method('getActionData');
-
-        if ($callGetActionDataTimes) {
-            $methodCalls->with($args['context'])
-                ->willReturn($inputData['actionData']);
-        }
-
-        $this->optionsAssembler->expects($this->at(0))
-            ->method('assemble')
-            ->willReturn($inputData['frontendOptions']);
-
-        $this->optionsAssembler->expects($this->at(1))
-            ->method('assemble')
-            ->willReturn($inputData['buttonOptions']);
-
-        $this->applicationsUrlHelper->expects($this->once())
-            ->method('getExecutionUrl')
-            ->with($inputData['routerContext'])
-            ->willReturn($inputData['executionUrl']);
-
-        $this->applicationsUrlHelper->expects($this->once())
-            ->method('getDialogUrl')
-            ->with($inputData['routerContext'])
-            ->willReturn($inputData['dialogUrl']);
-
-        $this->mockTranslator->expects($this->once())
-            ->method('trans')
-            ->willReturnCallback(
-                function ($label, $params) {
-                    if (strpos($label, '3')) {
-                        return $label;
-                    }
-
-                    foreach ($params as $name => $value) {
-                        $label = str_replace($name, $value, $label);
-                    }
-
-                    return strtoupper($label);
-                }
-            );
-
-        $this->assertEquals(
-            $expectedData,
-            $this->helper->getFrontendOptions(
-                $args['operation'],
-                $args['context'],
-                isset($args['actionData']) ? $args['actionData'] : null
-            )
-        );
+        $this->assertEquals($expectedData, $this->helper->getFrontendOptions($button));
     }
 
     /**
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getFrontendOptionsProvider()
     {
+        $defaultData = [
+            'options' => [
+                'hasDialog' => null,
+                'showDialog' => false,
+                'executionUrl' => 'generated-url',
+                'url' => 'generated-url',
+                'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
+            ],
+            'data' => [],
+        ];
+
         return [
-            'empty context and parameters' => [
-                'input' => [
-                    'args' => [
-                        'context' => [],
-                        'operation' => $this->getOperation('operation1'),
-                    ],
-                    'actionData' => new ActionData(),
-                    'buttonOptions' => [],
-                    'frontendOptions' => [],
-                    'formOptions' => [],
-                    'routerContext' => [
-                        'operationName' => 'operation1',
-                    ],
-                    'executionUrl' => 'execution-url',
-                    'dialogUrl' => 'dialog-url',
-                ],
-                'expected' => [
-                    'options' => [
-                        'hasDialog' => false,
-                        'showDialog' => false,
-                        'dialogOptions' => [
-                            'title' => 'OPERATION1', //translated
-                            'dialogOptions' => [],
-                        ],
-                        'executionUrl' => 'execution-url',
-                        'dialogUrl' => 'dialog-url',
-                        'url' => 'execution-url',
-                    ],
-                    'data' => [],
-                ],
+            'empty options' => [
+                'button' => $this->getButton('test label', []),
+                'expectedData' => $defaultData,
             ],
-            'optional parameters' => [
-                'input' => [
-                    'args' => [
-                        'context' => [],
-                        'operation' => $this->getOperation('operation2'),
-                    ],
-                    'actionData' => new ActionData(['key1' => 'value1']),
+            'filled options' => [
+                'button' => $this->getButton('test label', [
+                    'hasForm' => true,
+                    'hasDialog' => true,
+                    'showDialog' => true,
                     'frontendOptions' => [
-                        'confirmation' => [
-                            'option1' => 'value1',
-                            'key1' => new PropertyPath('key1')
-                        ],
+                        'title' => 'custom title',
                     ],
                     'buttonOptions' => [
-                        'page_component_module' => 'module1',
-                        'page_component_options' => ['option2' => 'value2'],
-                        'data' => ['key1' => 'value1'],
-                    ],
-                    'formOptions' => [],
-                    'routerContext' => [
-                        'operationName' => 'operation2',
-                    ],
-                    'executionUrl' => 'execution-url2',
-                    'dialogUrl' => 'dialog-url2',
-                ],
-                'expected' => [
-                    'options' => [
-                        'hasDialog' => false,
-                        'showDialog' => false,
-                        'dialogOptions' => [
-                            'title' => 'OPERATION2', //translated
-                            'dialogOptions' => [],
-                        ],
-                        'executionUrl' => 'execution-url2',
-                        'dialogUrl' => 'dialog-url2',
-                        'url' => 'execution-url2',
-                        'confirmation' => [
-                            'option1' => 'value1',
-                            'key1' => 'value1',
+                        'data' => [
+                            'some' => 'data',
                         ],
                     ],
-                    'data' => [
-                        'page-component-module' => 'module1',
-                        'page-component-options' => ['option2' => 'value2'],
-                        'key1' => 'value1',
-                    ],
-                ],
-            ],
-            'use action data from argument' => [
-                'input' => [
-                    'args' => [
-                        'context' => [],
-                        'operation' => $this->getOperation('operation2'),
-                        'actionData' => new ActionData(['key1' => 'value1']),
-                    ],
-                    'frontendOptions' => [
-                        'confirmation' => [
-                            'option1' => 'value1',
-                            'key1' => new PropertyPath('key1')
-                        ],
-                    ],
-                    'buttonOptions' => [
-                        'page_component_module' => 'module1',
-                        'page_component_options' => ['option2' => 'value2'],
-                        'data' => ['key1' => 'value1'],
-                    ],
-                    'formOptions' => [],
-                    'routerContext' => [
-                        'operationName' => 'operation2',
-                    ],
-                    'executionUrl' => 'execution-url2',
-                    'dialogUrl' => 'dialog-url2',
-                ],
-                'expected' => [
-                    'options' => [
-                        'hasDialog' => false,
-                        'showDialog' => false,
-                        'dialogOptions' => [
-                            'title' => 'OPERATION2', //translated
-                            'dialogOptions' => [],
-                        ],
-                        'executionUrl' => 'execution-url2',
-                        'dialogUrl' => 'dialog-url2',
-                        'url' => 'execution-url2',
-                        'confirmation' => [
-                            'option1' => 'value1',
-                            'key1' => 'value1',
-                        ],
-                    ],
-                    'data' => [
-                        'page-component-module' => 'module1',
-                        'page-component-options' => ['option2' => 'value2'],
-                        'key1' => 'value1',
-                    ],
-                ],
-            ],
-            'not translated title' => [
-                'input' => [
-                    'args' => [
-                        'context' => [
-                            'param1' => 'value1',
-                        ],
-                        'operation' => $this->getOperation('operation3', true),
-                    ],
-                    'actionData' => new ActionData(),
-                    'buttonOptions' => [],
-                    'frontendOptions' => [],
-                    'routerContext' => [
-                        'param1' => 'value1',
-                        'operationName' => 'operation3',
-                    ],
-                    'executionUrl' => 'execution-url3',
-                    'dialogUrl' => 'dialog-url3',
-                ],
-                'expected' => [
-                    'options' => [
-                        'hasDialog' => true,
-                        'showDialog' => false,
-                        'dialogOptions' => [
-                            'title' => 'operation3', //NOT TRANSLATED (see closure for translator mock return)
-                            'dialogOptions' => [],
-                        ],
-                        'executionUrl' => 'execution-url3',
-                        'dialogUrl' => 'dialog-url3',
-                        'url' => 'dialog-url3',
-                    ],
-                    'data' => [],
-                ],
-            ],
-            'full context and parameters' => [
-                'input' => [
-                    'args' => [
-                        'context' => [
-                            'param1' => 'value1',
-                        ],
-                        'operation' => $this->getOperation('operation3', true),
-                    ],
-                    'actionData' => new ActionData(),
-                    'buttonOptions' => [],
-                    'frontendOptions' => [
-                        'show_dialog' => true,
-                        'title' => 'Custom dialog title',
-                        'title_parameters' => ['title' => 't_i_t_l_e'],
-                        'options' => ['option1' => 'value1'],
-                    ],
-                    'routerContext' => [
-                        'param1' => 'value1',
-                        'operationName' => 'operation3',
-                    ],
-                    'executionUrl' => 'execution-url3',
-                    'dialogUrl' => 'dialog-url3',
-                ],
-                'expected' => [
+                ]),
+                'expectedData' => [
                     'options' => [
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => 'CUSTOM DIALOG T_I_T_L_E',
-                            'dialogOptions' => ['option1' => 'value1'],
+                            'title' => '[trans]custom title[/trans]',
+                            'dialogOptions' => [],
                         ],
-                        'executionUrl' => 'execution-url3',
-                        'dialogUrl' => 'dialog-url3',
-                        'url' => 'dialog-url3',
+                        'dialogUrl' => 'generated-url',
+                        'executionUrl' => 'generated-url',
+                        'url' => 'generated-url',
+                        'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
                     ],
-                    'data' => [],
+                    'data' => [
+                        'some' => 'data',
+                    ],
                 ],
             ],
         ];
     }
 
     /**
-     * @param string $operationName
-     * @param bool $hasForm
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     * @param string $label
+     * @param array $templateData
+     *
+     * @return ButtonInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getOperation($operationName, $hasForm = false)
+    protected function getButton($label, array $templateData)
     {
-        $definition = new OperationDefinition();
-        $definition->setName($operationName)->setLabel($operationName);
+        $button = $this->createMock(ButtonInterface::class);
+        $button->expects($this->any())->method('getTemplateData')->willReturn($templateData);
+        $button->expects($this->any())->method('getLabel')->willReturn($label);
 
-        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
-            ->disableOriginalConstructor()
-            ->setMethods(['getDefinition', 'hasForm'])
-            ->getMock();
-
-        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
-        $operation->expects($this->any())->method('hasForm')->willReturn($hasForm);
-
-        return $operation;
+        return $button;
     }
 }

@@ -401,6 +401,26 @@ body .select2-container {
 .label-info,
 .badge-info { background:#92b2d6; }
 
+.job-progress {
+  background-image: linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -moz-linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -webkit-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -webkit-linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  background-image: -o-linear-gradient(to bottom, @progressBarGradientStart, @progressBarGradientEnd)!important;
+  position: relative;
+  .label {
+    height: 100%;
+    span {
+      width: 100%;
+      text-align: center;
+      z-index: 2;
+      display: block;
+      position: absolute;
+      top: 3px;
+    }
+  }
+}
+
 .widget-content > .label-info:first-child {
   margin-bottom: 10px;
 }
@@ -2328,6 +2348,10 @@ div.selector.active:hover {
   background-position: -483px -208px;
 }
 
+div.selector.disabled {
+  background-position: left top !important;
+}
+
 div.selector.disabled span {
   color:#aaa;
   &:after {
@@ -2454,6 +2478,10 @@ div.uploader.focus,
   }
   .input-append.error > *, .input-prepend.error > * {
     border: 1px solid #e9322d;
+  }
+  .entity-create-dropdown > .dropdown-toggle {
+    border-width: 0;
+    height: 28px;
   }
   div.selector {
     display: inline-block;
@@ -2642,7 +2670,7 @@ label.radio.error {
 
 .form-horizontal .control-group {
   margin: 0;
-  max-width:800px;
+  max-width: 800px;
 }
 .form-container .control-group {
   margin: 0 0 10px;
@@ -2932,13 +2960,6 @@ span.validation-failed {
 .create-select-entity.create .entity-create-btn,
 .create-select-entity.grid .entity-select-btn {
   display: none;
-}
-.fa-bars:before {
-  content: "\f0c9";
-  font-size: 14px;
-  font-family: 'FontAwesome';
-  line-height: 21px;
-  font-style: normal;
 }
 .oro-tabs {
   .nav-tabs {
@@ -3292,9 +3313,10 @@ label .popover-content {
   .btn-group.entity-create-dropdown {
     display: inline-block;
     vertical-align: top;
+    margin-left: 3px;
+    border-radius: 0 4px 4px 0;
     & > .btn {
       font-size: 14px;
-      margin-left: 3px;
     }
   }
 }
@@ -3371,5 +3393,27 @@ label .popover-content {
 .float-holder {
   label.add-on {
     margin-bottom: 0;
+  }
+}
+
+.collapse-block {
+  [data-collapse-container] {
+    overflow: hidden;
+    max-height: 69.4px; // 4 (lines) * 13px (font-size) * 1.2 (line-height) + 7px (padding)
+  }
+
+  &.expanded [data-collapse-container] {
+    overflow: scroll;
+    max-height: none;
+  }
+
+  .toggle-more, .toggle-less, .toggle-collapse {
+    display: none;
+  }
+  &.expanded .toggle-less,
+  &.expanded .toggle-collapse,
+  &.overflows .toggle-more,
+  &.overflows .toggle-collapse {
+    display: block;
   }
 }

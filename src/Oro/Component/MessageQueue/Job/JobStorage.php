@@ -66,6 +66,19 @@ class JobStorage
     }
 
     /**
+     * @param Job $job
+     * @param float $progress
+     * @return Job
+     */
+    public function updateJobProgress(Job $job, $progress)
+    {
+        $job->setJobProgress($progress);
+        $this->forceSaveJob($job);
+
+        return $job;
+    }
+
+    /**
      * @param string $ownerId
      * @param string $jobName
      *
@@ -178,14 +191,29 @@ class JobStorage
                             $job->getName()
                         ));
                     }
-
-                    $this->getEntityManager()->persist($job);
-                    $this->getEntityManager()->flush();
+                    $this->forceSaveJob($job);
                 });
             } else {
-                $this->getEntityManager()->persist($job);
-                $this->getEntityManager()->flush();
+                $this->forceSaveJob($job);
             }
+        }
+    }
+
+    /**
+     * @param Job $job
+     */
+    private function forceSaveJob(Job $job)
+    {
+        if (! $this->getEntityManager()->isOpen()) {
+            $em = $this->getEntityManager()->create(
+                $this->getEntityManager()->getConnection(),
+                $this->getEntityManager()->getConfiguration()
+            );
+            $em->merge($job);
+            $em->flush();
+        } else {
+            $this->getEntityManager()->persist($job);
+            $this->getEntityManager()->flush();
         }
     }
 

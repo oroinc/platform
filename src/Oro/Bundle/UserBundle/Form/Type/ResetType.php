@@ -34,13 +34,16 @@ class ResetType extends AbstractType
         $builder->add('plainPassword', 'repeated', [
             'type'            => 'password',
             'required'        => true,
-            'invalid_message' => 'oro.user.password.password_mismatch',
+            'invalid_message' => 'oro.user.message.password_mismatch',
             'first_options' => [
                 'label' => 'oro.user.password.enter_new_password.label',
                 'hint' => $this->optionsProvider->getTooltip(),
             ],
             'second_options'  => [
                 'label' => 'oro.user.password.enter_new_password_again.label',
+            ],
+            'error_mapping' => [
+                '.' => 'second',
             ],
         ]);
     }

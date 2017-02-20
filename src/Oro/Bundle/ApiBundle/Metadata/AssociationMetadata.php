@@ -12,6 +12,9 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
     /** @var string[] */
     private $acceptableTargetClasses = [];
 
+    /** @var bool */
+    private $allowEmptyAcceptableTargets = true;
+
     /** @var string */
     private $associationType;
 
@@ -58,6 +61,8 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
         }
         if ($this->acceptableTargetClasses) {
             $result['acceptable_target_classes'] = $this->acceptableTargetClasses;
+        } elseif (!$this->allowEmptyAcceptableTargets) {
+            $result['reject_empty_acceptable_targets'] = true;
         }
         if (null !== $this->targetMetadata) {
             $result['target_metadata'] = $this->targetMetadata->toArray();
@@ -150,6 +155,30 @@ class AssociationMetadata extends PropertyMetadata implements ToArrayInterface
             unset($this->acceptableTargetClasses[$key]);
             $this->acceptableTargetClasses = array_values($this->acceptableTargetClasses);
         }
+    }
+
+    /**
+     * Gets a flag indicates how to treat empty acceptable target classes.
+     * TRUE means that any entity type should be accepted.
+     * FALSE means that any entity type should be rejected.
+     *
+     * @return bool
+     */
+    public function isEmptyAcceptableTargetsAllowed()
+    {
+        return $this->allowEmptyAcceptableTargets;
+    }
+
+    /**
+     * Sets a flag indicates how to treat empty acceptable target classes.
+     * TRUE means that any entity type should be accepted.
+     * FALSE means that any entity type should be rejected.
+     *
+     * @param bool $value
+     */
+    public function setEmptyAcceptableTargetsAllowed($value)
+    {
+        $this->allowEmptyAcceptableTargets = $value;
     }
 
     /**

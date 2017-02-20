@@ -131,10 +131,12 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
+            ->setDestinationPage($this->getOption($options, 'destination_page'))
             ->setPageTemplate($this->getOption($options, 'page_template'))
             ->setDialogTemplate($this->getOption($options, 'dialog_template'))
             ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
             ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
+            ->setInitDatagrids($this->getOption($options, WorkflowConfiguration::NODE_INIT_DATAGRIDS, []))
             ->setInitContextAttribute($this->getOption($options, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE));
 
         if (!empty($definition['preactions'])) {
@@ -154,10 +156,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setCondition($condition);
         }
 
-        if (!empty($definition['actions'])) {
-            $action = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['actions']);
-            $transition->setAction($action);
-        }
+        $this->processActions($transition, $definition['actions']);
 
         if (!empty($options['schedule'])) {
             $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
@@ -171,6 +170,27 @@ class TransitionAssembler extends BaseAbstractAssembler
     }
 
     /**
+     * @param ransition $transition
+     * @param array $actions
+     */
+    protected function processActions(Transition $transition, array $actions)
+    {
+        if ($transition->getDisplayType() === WorkflowConfiguration::TRANSITION_DISPLAY_TYPE_PAGE) {
+            $actions = array_merge([
+                [
+                    '@resolve_destination_page' => $transition->getDestinationPage(),
+                ],
+            ], $actions);
+        }
+
+        if (empty($actions)) {
+            return;
+        }
+
+        $transition->setAction($this->actionFactory->create(ConfigurableAction::ALIAS, $actions));
+    }
+
+    /**
      * @param array  $options
      * @param array  $definition
      * @param string $transitionName
@@ -181,7 +201,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         $aclResource = $this->getOption($options, 'acl_resource');
 
         if ($aclResource) {
-            $aclPreConditionDefinition = ['parameters' => [$aclResource]];
+            $aclPreConditionDefinition = ['parameters' => $aclResource];
             $aclMessage = $this->getOption($options, 'acl_message');
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;

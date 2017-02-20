@@ -2,181 +2,128 @@
 
 namespace Oro\Bundle\WorkflowBundle\Extension;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonContext;
-use Oro\Bundle\ActionBundle\Model\ButtonInterface;
-use Oro\Bundle\ActionBundle\Model\ButtonSearchContext;
-use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonContext;
+use Oro\Bundle\ActionBundle\Button\ButtonInterface;
+use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\TransitionButton;
+use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
-class TransitionButtonProviderExtension implements ButtonProviderExtensionInterface
+class TransitionButtonProviderExtension extends AbstractButtonProviderExtension
 {
-    /** @var WorkflowRegistry */
-    protected $workflowRegistry;
-
-    /** @var RouteProviderInterface */
-    protected $routeProvider;
-
-    /** @var ButtonContext */
-    private $baseButtonContext;
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(ButtonInterface $button)
+    {
+        return $button instanceof TransitionButton && !$button->getTransition()->isStart();
+    }
 
     /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param RouteProviderInterface $routeProvider
+     * {@inheritdoc}
+     * @param TransitionButton $button
      */
-    public function __construct(WorkflowRegistry $workflowRegistry, RouteProviderInterface $routeProvider)
-    {
-        $this->workflowRegistry = $workflowRegistry;
-        $this->routeProvider = $routeProvider;
+    public function isAvailable(
+        ButtonInterface $button,
+        ButtonSearchContext $buttonSearchContext,
+        Collection $errors = null
+    ) {
+        if (!$this->supports($button)) {
+            throw $this->createUnsupportedButtonException($button);
+        }
+
+        $workflowItem = $button->getWorkflow()->getWorkflowItemByEntityId($buttonSearchContext->getEntityId());
+
+        if ($workflowItem === null) {
+            return false;
+        }
+
+        $transition = $button->getTransition();
+        $workflow = $button->getWorkflow();
+        try {
+            $isAvailable = !$transition->isHidden() &&
+                $workflow->isTransitionAvailable($workflowItem, $transition, $errors) &&
+                $this->validateTransitionStep($workflow, $transition, $workflowItem);
+        } catch (\Exception $e) {
+            $isAvailable = false;
+            $this->addError($button, $e, $errors);
+        }
+
+        return $isAvailable;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find(ButtonSearchContext $buttonSearchContext)
+    protected function getTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
     {
-        $buttons = [];
+        $transitions = $this->findByDatagrids($workflow, $searchContext);
 
-        $group = $buttonSearchContext->getGroup();
-
-        // Skip if custom buttons group defined
-        if ($group && ($group !== ButtonInterface::DEFAULT_GROUP)) {
-            return $buttons;
-        }
-
-        // Skip if DataGrid defined
-        if ($buttonSearchContext->getGridName()) {
-            return $buttons;
-        }
-
-        foreach ($this->getActiveWorkflows() as $workflow) {
-            $transitions = $this->getInitTransitions($workflow, $buttonSearchContext);
-
-            foreach ($transitions as $transition) {
-                $workflowItem = $this->buildWorkflowItem($transition, $workflow, $buttonSearchContext);
-                $errors = new ArrayCollection();
-                try {
-                    $isAvailable = $transition->isAvailable(clone $workflowItem, $errors);
-                } catch (\Exception $e) {
-                    $isAvailable = false;
-                    $errors->add(['message' => $e->getMessage(), 'parameters' => []]);
-                }
-                if ($isAvailable || !$transition->isUnavailableHidden()) {
-                    $buttonContext = $this->generateButtonContext($transition, $buttonSearchContext);
-                    $buttonContext->setEnabled($isAvailable);
-                    $buttonContext->setErrors($errors->toArray());
-                    $buttons[] = new TransitionButton($transition, $workflow, $buttonContext);
-                }
-            }
-        }
-
-        $this->baseButtonContext = null;
-
-        return $buttons;
-    }
-
-    /**
-     * @return Workflow[]
-     */
-    protected function getActiveWorkflows()
-    {
-        $exclusiveGroups = [];
-        return $this->workflowRegistry->getActiveWorkflows()->filter(
-            function (Workflow $workflow) use (&$exclusiveGroups) {
-                $currentGroups = $workflow->getDefinition()->getExclusiveRecordGroups();
-
-                if (array_intersect($exclusiveGroups, $currentGroups)) {
-                    return false;
-                }
-
-                $exclusiveGroups += $currentGroups;
-
-                return true;
-            }
-        );
-    }
-
-    /**
-     * @param Transition $transition
-     * @param Workflow $workflow
-     * @param ButtonSearchContext $searchContext
-     *
-     * @return WorkflowItem
-     */
-    protected function buildWorkflowItem(Transition $transition, Workflow $workflow, ButtonSearchContext $searchContext)
-    {
-        $workflowData = new WorkflowData([$transition->getInitContextAttribute() => $searchContext]);
-        $workflowItem = new WorkflowItem();
-
-        return $workflowItem->setEntityClass($workflow->getDefinition()->getRelatedEntity())
-            ->setDefinition($workflow->getDefinition())
-            ->setWorkflowName($workflow->getName())
-            ->setData($workflowData);
-    }
-
-    /**
-     * @param Transition $transition
-     * @param ButtonSearchContext $searchContext
-     *
-     * @return ButtonContext
-     */
-    protected function generateButtonContext(Transition $transition, ButtonSearchContext $searchContext)
-    {
-        if (!$this->baseButtonContext) {
-            $this->baseButtonContext = new ButtonContext();
-            $this->baseButtonContext->setDatagridName($searchContext->getGridName())
-                ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
-                ->setRouteName($searchContext->getRouteName())
-                ->setGroup($searchContext->getGroup())
-                ->setExecutionRoute($this->routeProvider->getExecutionRoute());
-        }
-
-        $context = clone $this->baseButtonContext;
-        $context->setUnavailableHidden($transition->isUnavailableHidden());
-
-        if ($transition->hasForm()) {
-            $context->setFormDialogRoute($this->routeProvider->getFormDialogRoute());
-            $context->setFormPageRoute($this->routeProvider->getFormPageRoute());
-        }
-
-        return $context;
+        return array_filter($transitions, function (Transition $transition) {
+            return !$transition->isStart();
+        });
     }
 
     /**
      * @param Workflow $workflow
      * @param ButtonSearchContext $searchContext
      *
-     * @return Transition[]
+     * @return array
      */
-    protected function getInitTransitions(Workflow $workflow, ButtonSearchContext $searchContext)
+    protected function findByDatagrids(Workflow $workflow, ButtonSearchContext $searchContext)
     {
-        $transitionNames = [];
-        if ($searchContext->getEntityClass()) {
-            $entities = $workflow->getInitEntities();
-            if (array_key_exists($searchContext->getEntityClass(), $entities)) {
-                $transitionNames = $entities[$searchContext->getEntityClass()];
-            }
-        }
-        if ($searchContext->getRouteName()) {
-            $routes = $workflow->getInitRoutes();
-            if (array_key_exists($searchContext->getRouteName(), $routes)) {
-                $transitionNames = array_merge($transitionNames, $routes[$searchContext->getRouteName()]);
-            }
+        if ($searchContext->getDatagrid() &&
+            in_array($searchContext->getDatagrid(), $workflow->getDefinition()->getDatagrids(), true) &&
+            $workflow->getDefinition()->getRelatedEntity() === $searchContext->getEntityClass()
+        ) {
+            return $workflow->getTransitionManager()->getTransitions()->toArray();
         }
 
-        return array_filter(
-            $workflow->getTransitionManager()->getStartTransitions()->toArray(),
-            function (Transition $transition) use ($transitionNames) {
-                return in_array($transition->getName(), $transitionNames, true);
-            }
-        );
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createTransitionButton(
+        Transition $transition,
+        Workflow $workflow,
+        ButtonContext $buttonContext
+    ) {
+        return new TransitionButton($transition, $workflow, $buttonContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getApplication()
+    {
+        return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param Transition $transition
+     * @param WorkflowItem $workflowItem
+     *
+     * @return bool
+     */
+    protected function validateTransitionStep(Workflow $workflow, Transition $transition, WorkflowItem $workflowItem)
+    {
+        $currentStep = null;
+        if ($workflowItem->getCurrentStep() && $currentStepName = $workflowItem->getCurrentStep()->getName()) {
+            $currentStep = $workflow->getStepManager()->getStep($currentStepName);
+        }
+
+        if ($currentStep && $currentStep->isAllowedTransition($transition->getName())) {
+            return true;
+        }
+
+        return false;
     }
 }

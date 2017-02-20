@@ -45,9 +45,10 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $filterType
      * @param string $comparisonOperator
+     * @param array  $filterParams
      * @dataProvider applyDataProvider
      */
-    public function testApply($filterType, $comparisonOperator)
+    public function testApply($filterType, $comparisonOperator, array $filterParams = [])
     {
         $fieldName = 'field';
         $fieldValue = 'value';
@@ -66,7 +67,34 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
+        $this->filter->init('test', array_merge([
+            FilterUtility::FORCE_LIKE_KEY => false,
+            FilterUtility::MIN_LENGTH_KEY => 0,
+            FilterUtility::DATA_NAME_KEY => $fieldName
+        ], $filterParams));
+        $this->filter->apply($ds, ['type' => $filterType, 'value' => $fieldValue]);
+    }
+
+    /**
+     * @param string $fieldValue
+     * @param array  $filterParams
+     * @dataProvider applyWithMinLengthViolatedDataProvider
+     */
+    public function testApplyWithMinLengthViolated($fieldValue, array $filterParams = [])
+    {
+        $filterType = 'anyCustomFilterType';
+        $fieldName = 'field';
+
+        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $ds->expects($this->never())->method('addRestriction');
+
+        $this->filter->init('test', array_merge([
+            FilterUtility::FORCE_LIKE_KEY => false,
+            FilterUtility::MIN_LENGTH_KEY => 0,
+            FilterUtility::DATA_NAME_KEY => $fieldName
+        ], $filterParams));
         $this->filter->apply($ds, ['type' => $filterType, 'value' => $fieldValue]);
     }
 
@@ -79,6 +107,24 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
             'contains' => [
                 'filterType' => TextFilterType::TYPE_CONTAINS,
                 'comparisonOperator' => Comparison::CONTAINS,
+                [
+                    FilterUtility::FORCE_LIKE_KEY => false,
+                ]
+            ],
+            'contains force like' => [
+                'filterType' => TextFilterType::TYPE_CONTAINS,
+                'comparisonOperator' => Comparison::LIKE,
+                [
+                    FilterUtility::FORCE_LIKE_KEY => true,
+                ]
+            ],
+            'contains like min_length' => [
+                'filterType' => TextFilterType::TYPE_CONTAINS,
+                'comparisonOperator' => Comparison::LIKE,
+                [
+                    FilterUtility::FORCE_LIKE_KEY => true,
+                    FilterUtility::MIN_LENGTH_KEY => 5,
+                ]
             ],
             'not contains' => [
                 'filterType' => TextFilterType::TYPE_NOT_CONTAINS,
@@ -88,6 +134,16 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
                 'filterType' => TextFilterType::TYPE_EQUAL,
                 'comparisonOperator' => Comparison::EQ,
             ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function applyWithMinLengthViolatedDataProvider()
+    {
+        return [
+            ['abc', [FilterUtility::MIN_LENGTH_KEY => 4]],
         ];
     }
 }

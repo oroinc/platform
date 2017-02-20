@@ -4,9 +4,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class RestGroupsTest extends WebTestCase
 {
     protected function setUp()

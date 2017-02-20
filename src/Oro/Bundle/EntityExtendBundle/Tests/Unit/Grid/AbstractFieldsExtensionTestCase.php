@@ -409,13 +409,13 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             'frontend_type' => 'manyToOne',
                             'renderable' => true,
                             'required' => false,
-                            'data_name' => 'testField_data',
+                            'data_name' => 'testField_target_field',
                         ],
                     ],
                     'sorters' => [
                         'columns' => [
                             self::FIELD_NAME => [
-                                'data_name' => 'testField_data',
+                                'data_name' => 'testField_target_field',
                             ],
                         ],
                     ],
@@ -440,19 +440,22 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                     'source' => [
                         'query' => [
                             'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
-                            'select' => ['testField.name as testField_data'],
+                            'select' => [
+                                'IDENTITY(o.testField) as testField_identity',
+                                'auto_rel_1.name as testField_target_field',
+                            ],
                             'join' => [
                                 'left' => [
                                     [
                                         'join' => 'o.testField',
-                                        'alias' => 'testField',
+                                        'alias' => 'auto_rel_1',
                                     ],
                                 ],
                             ],
-                            'groupBy' => 'o.someField,testField.name'
+                            'groupBy' => 'o.someField,auto_rel_1.name'
                         ],
                     ],
-                    'fields_acl' => ['columns' => ['testField_data' => ['data_name' => 'o.testField']]],
+                    'fields_acl' => ['columns' => ['testField_target_field' => ['data_name' => 'o.testField']]],
                 ]
             ),
             $config->toArray()

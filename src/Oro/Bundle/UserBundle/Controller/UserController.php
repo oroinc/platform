@@ -31,7 +31,9 @@ class UserController extends Controller
      */
     public function viewAction(User $user)
     {
-        return $this->view($user);
+        $securityFacade = $this->get('oro_security.security_facade');
+
+        return $this->view($user, $securityFacade->getLoggedUserId() === $user->getId());
     }
 
     /**
@@ -59,7 +61,9 @@ class UserController extends Controller
     public function apigenAction(User $user)
     {
         $securityFacade = $this->get('oro_security.security_facade');
-        if ($securityFacade->getLoggedUserId() !== $user->getId() && !$securityFacade->isGranted('EDIT', $user)) {
+        if ($securityFacade->getLoggedUserId() !== $user->getId()
+            && !$securityFacade->isGranted('MANAGE_API_KEY', $user)
+        ) {
             throw $this->createAccessDeniedException();
         }
 
@@ -183,6 +187,7 @@ class UserController extends Controller
     /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
      * @Template
+     * @AclAncestor("oro_user_user_view")
      */
     public function infoAction(User $user)
     {

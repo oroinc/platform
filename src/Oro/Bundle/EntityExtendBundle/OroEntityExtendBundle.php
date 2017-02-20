@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -13,10 +14,10 @@ use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityMetadataBuilderPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
-use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class OroEntityExtendBundle extends Bundle
@@ -82,12 +83,13 @@ class OroEntityExtendBundle extends Bundle
             )
         );
         $container->addCompilerPass(new ExtensionPass());
-        $container->addCompilerPass(new WarmerPass());
+        $container->addCompilerPass(new WarmerPass(), PassConfig::TYPE_BEFORE_REMOVING);
     }
 
     private function ensureInitialized()
     {
         if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
+            && !CommandExecutor::isCurrentCommand('oro:install', true)
             && !CommandExecutor::isCurrentCommand('oro:platform:upgrade20', true)) {
             ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
             if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))) {

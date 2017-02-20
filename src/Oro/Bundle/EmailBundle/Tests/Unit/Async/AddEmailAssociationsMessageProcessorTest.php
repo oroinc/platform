@@ -1,20 +1,26 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Async\AddEmailAssociationsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AddEmailAssociationsMessageProcessor($this->createMessageProducerMock(), $this->createLoggerMock());
+        new AddEmailAssociationsMessageProcessor(
+            $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
+            $this->createLoggerMock()
+        );
     }
 
     public function testShouldRejectMessageIfEmailIdsIsMissing()
@@ -35,6 +41,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -60,6 +67,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -86,6 +94,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $this->createMessageProducerMock(),
+            $this->createJobRunnerMock(),
             $logger
         );
 
@@ -111,23 +120,73 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
         $producer
             ->expects($this->at(0))
             ->method('send')
-            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, ['emailId' => 1,'targetClass' => 'class','targetId' => 123])
+            ->with('oro.email.add_association_to_email', [
+                'emailId' => 1,
+                'targetClass' => 'class',
+                'targetId' => 123,
+                'jobId' => 12345
+            ])
         ;
         $producer
             ->expects($this->at(1))
             ->method('send')
-            ->with(Topics::ADD_ASSOCIATION_TO_EMAIL, ['emailId' => 2,'targetClass' => 'class','targetId' => 123])
+            ->with('oro.email.add_association_to_email', [
+                'emailId' => 2,
+                'targetClass' => 'class',
+                'targetId' => 123,
+                'jobId' => 54321
+            ])
         ;
 
-        $message = new NullMessage();
-        $message->setBody(json_encode([
+        $body = [
             'emailIds' => [1,2],
             'targetClass' => 'class',
-            'targetId' => 123,
-        ]));
+            'targetId' => 123
+        ];
+
+        $message = new NullMessage();
+        $message->setBody(json_encode($body));
+        $message->setMessageId('message-id');
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runUnique')
+            ->with('message-id', 'oro.email.add_association_to_emails' . ':class:123:'.md5('1,2'))
+            ->will($this->returnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+                $callback($jobRunner);
+
+                return true;
+            }))
+        ;
+
+        $jobRunner
+            ->expects($this->at(0))
+            ->method('createDelayed')
+            ->with('oro.email.add_association_to_email'.':class:123:1')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(12345);
+
+                $callback($jobRunner, $job);
+            }))
+        ;
+
+        $jobRunner
+            ->expects($this->at(1))
+            ->method('createDelayed')
+            ->with('oro.email.add_association_to_email'.':class:123:2')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
+                $job = new Job();
+                $job->setId(54321);
+
+                $callback($jobRunner, $job);
+            }))
+        ;
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $producer,
+            $jobRunner,
             $logger
         );
 
@@ -159,6 +218,15 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit_Framework_TestCa
     {
         return $this->createMock(LoggerInterface::class);
     }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobRunner
+     */
+    private function createJobRunnerMock()
+    {
+        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
+    }
+
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|MessageProducerInterface

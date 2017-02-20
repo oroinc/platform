@@ -3,42 +3,46 @@
 namespace Oro\Bundle\TagBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractTagsExtension extends AbstractExtension
 {
-    const GRID_FROM_PATH          = '[source][query][from]';
-    const GRID_COLUMN_ALIAS_PATH  = '[source][query_config][column_aliases]';
-    const GRID_FILTERS_PATH       = '[filters][columns]';
-    const GRID_SORTERS_PATH       = '[sorters][columns]';
+    const GRID_FILTERS_PATH = '[filters][columns]';
+    const GRID_SORTERS_PATH = '[sorters][columns]';
     /** @deprecated since 1.10. Use config->getName() instead */
-    const GRID_NAME_PATH          = 'name';
-    const FILTER_COLUMN_NAME      = 'tagname';
-    const PROPERTY_ID_PATH        = '[properties][id]';
+    const GRID_NAME_PATH     = 'name';
+    const FILTER_COLUMN_NAME = 'tagname';
+    const PROPERTY_ID_PATH   = '[properties][id]';
 
     /** @var TagManager */
     protected $tagManager;
 
-    /** @var GridConfigurationHelper */
-    protected $gridConfigurationHelper;
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
 
     /** @var string|null */
     protected $entityClassName;
 
+    /** @var string */
+    protected $reportOrSegmentPrefixes = [
+        'oro_report',
+        'oro_segment',
+    ];
+
     /**
-     * @param TagManager              $tagManager
-     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param TagManager          $tagManager
+     * @param EntityClassResolver $entityClassResolver
      */
     public function __construct(
         TagManager $tagManager,
-        GridConfigurationHelper $gridConfigurationHelper
+        EntityClassResolver $entityClassResolver
     ) {
-        $this->tagManager              = $tagManager;
-        $this->gridConfigurationHelper = $gridConfigurationHelper;
+        $this->tagManager = $tagManager;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
@@ -46,7 +50,15 @@ abstract class AbstractTagsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->getDatasourceType() === OrmDatasource::TYPE;
+        return $config->isOrmDatasource();
+    }
+
+    /**
+     * @param string $prefix
+     */
+    public function addReportOrSegmentGridPrefix($prefix)
+    {
+        $this->reportOrSegmentPrefixes[] = $prefix;
     }
 
     /**
@@ -60,9 +72,12 @@ abstract class AbstractTagsExtension extends AbstractExtension
     {
         $gridName = $config->getName();
 
-        return
-            strpos($gridName, 'oro_report') === 0 ||
-            strpos($gridName, 'oro_segment') === 0;
+        return ArrayUtil::some(
+            function ($prefix) use ($gridName) {
+                return strpos($gridName, $prefix) === 0;
+            },
+            $this->reportOrSegmentPrefixes
+        );
     }
 
     /**
@@ -73,7 +88,7 @@ abstract class AbstractTagsExtension extends AbstractExtension
     protected function getEntity(DatagridConfiguration $config)
     {
         if ($this->entityClassName === null) {
-            $this->entityClassName = $this->gridConfigurationHelper->getEntity($config);
+            $this->entityClassName = $config->getOrmQuery()->getRootEntity($this->entityClassResolver, true);
         }
 
         return $this->entityClassName;

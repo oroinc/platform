@@ -7,6 +7,7 @@ class Job
     const STATUS_RUNNING = 'oro.message_queue_job.status.running';
     const STATUS_SUCCESS = 'oro.message_queue_job.status.success';
     const STATUS_FAILED = 'oro.message_queue_job.status.failed';
+    const STATUS_FAILED_REDELIVERED = 'oro.message_queue_job.status.failed_redelivered';
     const STATUS_CANCELLED = 'oro.message_queue_job.status.cancelled';
 
     /**
@@ -68,6 +69,11 @@ class Job
      * @var array
      */
     protected $data;
+
+    /**
+     * @var float
+     */
+    protected $jobProgress;
 
     public function __construct()
     {
@@ -316,6 +322,14 @@ class Job
     }
 
     /**
+     * @param Job $childJob
+     */
+    public function addChildJob(Job $childJob)
+    {
+        $this->childJobs[] = $childJob;
+    }
+
+    /**
      * @return array
      */
     public function getData()
@@ -329,5 +343,21 @@ class Job
     public function setData(array $data)
     {
         $this->data = $data;
+    }
+
+    /**
+     * @return float
+     */
+    public function getJobProgress()
+    {
+        return $this->jobProgress;
+    }
+
+    /**
+     * @param float $jobProgress
+     */
+    public function setJobProgress($jobProgress)
+    {
+        $this->jobProgress = $jobProgress;
     }
 }

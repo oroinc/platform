@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="oro_entity_config_field")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository")
  */
 class FieldConfigModel extends ConfigModel
 {

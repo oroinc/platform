@@ -1,9 +1,11 @@
 You must select at least {{ limit }} role:  You must select at least {{ limit }} role.|You must select at least {{ limit }} roles.
 "The password fields must match.": "The password fields must match."
+"This value cannot be in the future.": "This value cannot be in the future."
 
 oro:
     user:
         message:
+            password_mismatch: The passwords must match.
             invalid_username: This email is already registered by another user. Please provide unique email address.
             invalid_password:
                 min_length: The password must be at least {{ length }} characters long

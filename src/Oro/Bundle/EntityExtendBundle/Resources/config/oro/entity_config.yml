@@ -1,7 +1,7 @@
 entity_config:
     extend:
         entity:
-            require_js:                     ['oroentityextend/js/init-entity-extend-apply', 'oroentityextend/js/init-entity-extend-relation']
+            require_js:                     ['oroentityextend/js/init-entity-extend-relation']
             grid_action:
                 -
                     name:                   oro.entity_extend.entity_config.extend.entity.grid_action.remove
@@ -143,14 +143,15 @@ entity_config:
         field:
             grid_action:
                 -
-                    name:                   oro.entity_extend.entity_config.extend.attribute.grid_action.remove
+                    name:                   oro.entity_config.entity_config.attribute.grid_action.remove
                     route:                  'oro_attribute_remove'
                     type:                   'ajaxdeletefield'
                     icon:                   'trash-o'
+                    acl_resource:           oro_attribute_remove
                     filter:                 { extend_owner: 'Custom', mode: 'default', extend_state: ['New', 'Requires update', 'Active', 'Restored'], attribute_is_attribute: true }
                     args:                   ['id']
                     defaultMessages:
-                        confirm_content:    'oro.entity_extend.delete_attribute.confirm_content'
+                        confirm_content:    'oro.entity_config.attributes_grid.delete_attribute.confirm_content'
                 -
                     name:                   oro.entity_extend.entity_config.extend.field.grid_action.remove
                     route:                  'oro_entityextend_field_remove'
@@ -159,10 +160,11 @@ entity_config:
                     filter:                 { extend_owner: 'Custom', mode: 'default', extend_state: ['New', 'Requires update', 'Active', 'Restored'], attribute_is_attribute: false }
                     args:                   ['id']
                 -
-                    name:                   oro.entity_extend.entity_config.extend.attribute.grid_action.restore
+                    name:                   oro.entity_config.entity_config.attribute.grid_action.restore
                     route:                  'oro_attribute_unremove'
                     type:                   'ajaxrestorefield'
                     icon:                   'backward'
+                    acl_resource:           oro_attribute_remove
                     filter:                 { extend_owner: 'Custom', extend_state: ['Deleted'], attribute_is_attribute: true }
                     args:                   ['id']
                 -
@@ -189,13 +191,26 @@ entity_config:
                     entity_id:              true
                     aCss:                   'btn-danger entity-extend-apply'
                     void:                   true
-                    filter:                 { upgradeable: true, state: ['New', 'Requires update', 'Deleted', 'Restored'] }
+                    filter:                  { upgradeable: true, state: ['New', 'Requires update', 'Deleted', 'Restored'] }
+                    page_component_module:  'oroentityextend/js/schema-update-action-component'
+                    page_component_options:  { redirectRoute: 'oro_entityconfig_index', route: 'oro_entityextend_update' }
+                -
+                    name:                   oro.entity_extend.entity_config.extend.field.layout_action.update_schema
+                    route:                  'oro_entityextend_attribute_schema_update'
+                    aCss:                   'btn-danger entity-extend-apply'
+                    void:                   true
+                    filter:                  { upgradeable: true, state: ['New', 'Requires update', 'Deleted', 'Restored'] }
+                    display_only:           'attribute'
+                    page_component_module:   'oroentityextend/js/schema-update-action-component'
+                    page_component_options:  { route: 'oro_entityextend_attribute_schema_update' }
+
             items:
                 owner:
                     options:
                         priority:           20
                         default_value:      'System'
                         auditable:          false
+                        indexed:            true
                     grid:
                         type:               string
                         label:              oro.entity_extend.entity_config.extend.field.items.owner
@@ -206,6 +221,7 @@ entity_config:
                     options:
                         priority:           25
                         default_value:      'Active'
+                        indexed:            true
                     grid:
                         type:               string
                         label:              oro.entity_extend.entity_config.extend.field.items.state
@@ -546,75 +562,3 @@ entity_config:
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field
                             tooltip:        oro.entity_extend.entity_config.search.field.items.title_field.tooltip
-
-    attribute:
-        entity:
-            items:
-                has_attributes:
-                    options:
-                        require_schema_update: false
-                        value_type: boolean
-                        default_value: false
-        field:
-            items:
-                is_attribute:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                        indexed: true
-                    grid:
-                        type: boolean
-                        label: oro.entity_extend.entity_config.attribute.field.items.is_attribute
-                        renderable: false
-                is_system:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                searchable:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                    form:
-                        type: choice
-                        options:
-                            choices: ['No', 'Yes']
-                            empty_value: false
-                            block: other
-                            subblock: frontend
-                            label: oro.entity_extend.entity_config.attribute.field.items.searchable
-                filterable:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                    form:
-                        type: choice
-                        options:
-                            choices: ['No', 'Yes']
-                            empty_value: false
-                            block: other
-                            subblock: frontend
-                            label: oro.entity_extend.entity_config.attribute.field.items.filterable
-                sortable:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                    form:
-                        type: choice
-                        options:
-                            choices: ['No', 'Yes']
-                            empty_value: false
-                            block: other
-                            subblock: frontend
-                            label: oro.entity_extend.entity_config.attribute.field.items.sortable
-                enabled:
-                    options:
-                        value_type: boolean
-                        default_value: false
-                    form:
-                        type: choice
-                        options:
-                            choices: ['No', 'Yes']
-                            empty_value: false
-                            block: other
-                            subblock: frontend
-                            label: oro.entity_extend.entity_config.attribute.field.items.enabled

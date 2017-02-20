@@ -14,6 +14,11 @@ class ViewTypeConfigProvider implements ViewTypeProviderInterface
     protected $configManager;
 
     /**
+     * @var string
+     */
+    protected $viewType;
+
+    /**
      * @param ConfigManager $configManager
      */
     public function __construct(ConfigManager $configManager)
@@ -21,9 +26,16 @@ class ViewTypeConfigProvider implements ViewTypeProviderInterface
         $this->configManager = $configManager;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function getViewType()
     {
-        return $this->configManager->get(CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_CURRENCY_DISPLAY));
+        if (!$this->viewType) {
+            $this->viewType = $this->configManager
+                ->get(CurrencyConfig::getConfigKeyByName(CurrencyConfig::KEY_CURRENCY_DISPLAY));
+        }
+
+        return $this->viewType;
     }
 }

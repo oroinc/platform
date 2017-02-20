@@ -59,6 +59,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.async.indexer'
+            - '@property_accessor'
         calls:
             - [setEntitiesConfig, [%oro_search.entities_config%]]
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
@@ -115,7 +116,6 @@ services:
         class: %oro_search.extension.search_results.class%
         arguments:
             - '@oro_search.formatter.result_formatter'
-            - '@doctrine.orm.entity_manager'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         tags:
@@ -160,8 +160,8 @@ services:
     oro_search.event_listener.orm.fulltext_index_listener:
         class: %oro_search.event_listener.orm.fulltext_index_listener.class%
         arguments:
-            - %database_driver%
             - 'oro_search_index_text'
+            - '@doctrine.dbal.default_connection'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
@@ -186,12 +186,13 @@ services:
 
     oro_search.entity.repository.search_index:
         class: %oro_search.entity.repository.search_index.class%
-        factory: ["@doctrine", getRepository]
+        parent: oro_entity.abstract_repository
         arguments:
             - %oro_search.entity.item.class%
             - 'search'
         calls:
             - [setRegistry,  ['@doctrine']]
+            - [setDriversClasses, [%oro_search.drivers%]]
         lazy: true
 
     oro_search.cache.search_mapping_cache:
@@ -250,6 +251,7 @@ services:
 
     oro_search.async.indexer:
         class: 'Oro\Bundle\SearchBundle\Async\Indexer'
+        public: false
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_entity.doctrine_helper'

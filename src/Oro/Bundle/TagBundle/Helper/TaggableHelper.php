@@ -29,9 +29,24 @@ class TaggableHelper
         return
             self::isImplementsTaggable($entity) ||
             (
+                $entity &&
                 $this->tagConfigProvider->hasConfig($entity) &&
                 $this->tagConfigProvider->getConfig($entity)->is('enabled')
             );
+    }
+
+    /**
+     * Checks if tags should be automatically rendered in the entity view
+     *
+     * @param $entity
+     *
+     * @return bool
+     */
+    public function shouldRenderDefault($entity)
+    {
+        return $this->isTaggable($entity) &&
+               $this->tagConfigProvider->hasConfig($entity) &&
+               $this->tagConfigProvider->getConfig($entity)->is('enableDefaultRendering');
     }
 
     /**

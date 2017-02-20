@@ -1,6 +1,6 @@
 <script type="text/template" id="filter-wrapper-template">
     <div class="filter-item oro-drop">
-        <div class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>">
+        <div class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle <% if (isEmpty) { %>filter-default-value<% } %>" data-zoom-disable>
             <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
             <span class="caret"></span>
         </div>
@@ -105,7 +105,7 @@
 <script type="text/template" id="select-field-template">
     <div class="horizontal clearfix">
         <span class="filter-select-oro-wrapper">
-            <select name="<%= name %>" class="filter-select-oro">
+            <select name="<%= name %>" <% if (typeof(dataName) !== "undefined") { %>data-name="<%= dataName %>"<% } %> class="filter-select-oro">
                 <% _.each(choices, function (option) { %>
                 <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
                 <% }); %>

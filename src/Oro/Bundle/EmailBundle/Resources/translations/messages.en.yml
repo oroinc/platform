@@ -12,6 +12,7 @@ oro:
 
     email:
         imap.folder.checkAll: All
+        mailbox_name.personal: Personal
         autocomplete:
             recently_used: Recently used
             contexts: Contexts
@@ -45,6 +46,27 @@ oro:
             feature_enabled:
                 label: Enable User Emails
 
+            smtp_settings:
+                label: SMTP Settings
+                host:
+                    label: Host
+                port:
+                    label: Port
+                encryption:
+                    label: Encryption
+                    none:
+                        label: None
+                    ssl:
+                        label: SSL
+                    tls:
+                        label: TLS
+                username:
+                    label: Username
+                password:
+                    label: Password
+                check_connection:
+                  label: Check SMTP Connection
+
             signature_configuration:
                 label: Signature
                 signature.label: Signature Content
@@ -56,6 +78,11 @@ oro:
 
             email_threads:
                 label: Email Threads
+                use_threads:
+                  label: Display email conversations as
+                  choices:
+                    non_threaded.label: Non-Threaded
+                    threaded.label: Threaded
 
             attachment_configuration:
                 label: Attachments
@@ -96,6 +123,18 @@ oro:
             sanitize_html:
                 label: Enable HTML purifier
                 tooltip: Disabling HTML purifier will allow users to paste any HTML code into template or email body editor without tag stripping.
+
+            smtp_settings:
+                host:
+                    label: Host
+                port:
+                    label: Port
+                encryption:
+                    label: Encryption
+                username:
+                    label: Username
+                password:
+                    label: Password
 
         emailtemplate:
             entity_label:        Email Template
@@ -153,7 +192,7 @@ oro:
             emailtemplate_list.description: List of email templates
             user_emails: My Emails
             compose: Compose
-            shortcut_compose_email.label: Compose email
+            shortcut_compose_email.label: Compose Email
             shortcut_compose_email.description: Compose email
             mark_read.label: Mark read
             mark_unread.label: Mark unread
@@ -346,7 +385,7 @@ oro:
             message:
                 success: Email sync completed.
                 error: Email sync failed.
-                processing: Email sync started, please wait, grid will updated on done...
+                processing: Email sync has started. Please wait, the grid will be updated after it is complete...
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

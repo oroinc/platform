@@ -82,6 +82,14 @@ class ConnectorContextMediator
     }
 
     /**
+     * Reset cached transports
+     */
+    public function resetInitializedTransport()
+    {
+        $this->transportByIntegration = null;
+    }
+
+    /**
      * Get channel instance
      *
      * @param ContextInterface $context

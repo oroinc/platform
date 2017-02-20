@@ -9,9 +9,6 @@ use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class LocalizationProviderTest extends WebTestCase
 {
     /**
@@ -32,13 +29,9 @@ class LocalizationProviderTest extends WebTestCase
         $this->repository = $this->em->getRepository('OroLocaleBundle:Localization');
     }
 
-    public function tearDown()
-    {
-        unset($this->em, $this->repository);
-    }
-
     public function testCache()
     {
+        $this->markTestSkipped('Memory cache has been disabled due to BAP-12888. @todo BB-6952');
         $manager = $this->getContainer()->get('oro_locale.manager.localization');
 
         $queryAnalyzer = new QueryAnalyzer($this->em->getConnection()->getDatabasePlatform());

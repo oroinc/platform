@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Oro\Bundle\UIBundle\Formatter\FormatterManager;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class FormatExtension extends \Twig_Extension
 {
-    /** @var FormatterManager */
-    protected $formatterManager;
+    /** @var ServiceLink */
+    protected $formatterManagerLink;
 
     /**
-     * @param FormatterManager $formatterManager
+     * @param ServiceLink $formatterManagerLink Link is used because of performance reasons
      */
-    public function __construct(FormatterManager $formatterManager)
+    public function __construct(ServiceLink $formatterManagerLink)
     {
-        $this->formatterManager = $formatterManager;
+        $this->formatterManagerLink = $formatterManagerLink;
     }
 
     /**
@@ -44,6 +44,6 @@ class FormatExtension extends \Twig_Extension
      */
     public function format($parameter, $formatterName, array $formatterArguments = [])
     {
-        return $this->formatterManager->format($parameter, $formatterName, $formatterArguments);
+        return $this->formatterManagerLink->getService()->format($parameter, $formatterName, $formatterArguments);
     }
 }

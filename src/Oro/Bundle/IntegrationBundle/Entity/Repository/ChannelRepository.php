@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 
@@ -41,7 +41,7 @@ class ChannelRepository extends EntityRepository
      */
     public function getConnectorStatuses(Integration $integration, $connector, $code = null)
     {
-        $iterator = new BufferedQueryResultIterator(
+        $iterator = new BufferedIdentityQueryResultIterator(
             $this->getConnectorStatusesQueryBuilder($integration, $connector, $code)
         );
         $iterator->setBufferSize(self::BUFFER_SIZE);
@@ -157,5 +157,40 @@ class ChannelRepository extends EntityRepository
 
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @param  $type
+     *
+     * @return int
+     */
+    public function countActiveIntegrations($type = null)
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.enabled = :enabled')
+            ->setParameter('enabled', true)
+        ;
+
+        if ($type) {
+            $qb
+                ->andWhere('c.type = :type')
+                ->setParameter('type', $type)
+            ;
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return array|Integration[]
+     */
+    public function findByType($type)
+    {
+        return $this->findBy([
+            'type' => $type
+        ]);
     }
 }

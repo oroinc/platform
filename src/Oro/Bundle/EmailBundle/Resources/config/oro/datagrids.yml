@@ -102,10 +102,11 @@ datagrids:
                     - e
                     - eu.receivedAt as receivedAt
                     - eb.textBody AS body_content
-                    - >
-                        (SELECT COUNT(_ec.id)
-                        FROM OroEmailBundle:Email _ec
-                        WHERE _ec.thread = e.thread) AS thread_email_count
+# counting logic moved to EmailQueryFactory:addEmailsCount
+#                    - >
+#                        (SELECT COUNT(_ec.id)
+#                        FROM OroEmailBundle:Email _ec
+#                        WHERE _ec.thread = e.thread) AS thread_email_count
                     - >
                         CASE
                             WHEN e.thread IS NULL THEN eb.hasAttachments
@@ -130,6 +131,9 @@ datagrids:
                         -
                             join: e.emailBody
                             alias: eb
+                        -
+                            join: e.recipients
+                            alias: r
 # The next join is performed in EmailGridListener, when any of grid filters are applied: folder, folders, mailbox.
 #                        -
 #                            join: eu.folders
@@ -144,10 +148,16 @@ datagrids:
                                 JOIN act_f.origin act_o
                                 WHERE act_o.isActive = true AND eu.id = act_eu.id
                             )
-
         columns:
+            mailbox:
+                data_name: origin
+                label: oro.email.mailbox.entity_label
+                type: twig
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/mailbox.html.twig
+                renderable: false
             contacts:
-                data_name: email.contacts
+                data_name: ~
                 type: twig
                 label: oro.email.contact.label
                 frontend_type: html
@@ -164,6 +174,7 @@ datagrids:
                 label:
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
+                manageable: false
             receivedAt:
                 data_name: receivedAt
                 type: twig
@@ -174,8 +185,9 @@ datagrids:
             id: ~
         sorters:
             columns:
-                subject:  { data_name: e.subject }
-                receivedAt:   { data_name: receivedAt }
+                subject: { data_name: e.subject }
+                receivedAt: { data_name: receivedAt }
+                mailbox: { data_name: eu.origin }
             default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
@@ -189,15 +201,6 @@ datagrids:
 
     email-grid:
         extends: base-email-grid
-        source:
-            count_query:
-                where:
-                    and:
-                        - e.head = true
-            query:
-                where:
-                    and:
-                        - e.head = true
         # joins for filters to, cc, bcc, folders, folder and mailbox processes dynamically in
         # Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailGridListener for performance reasons
         filters:
@@ -252,13 +255,15 @@ datagrids:
 
     user-email-grid:
         extends: email-grid
+        source:
+            skip_acl_apply: true
 
         properties:
             id: ~
             email.id: ~
             view_thread_link:
                 type: url
-                route: oro_email_thread_view
+                route: oro_email_user_thread_view
                 params: { id: email.id }
             toggle_seen_link:
                 type: url
@@ -307,8 +312,6 @@ datagrids:
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 icon: minus
         options:
-            toolbarOptions:
-                addColumnManager: false
             entity_pagination: true
             entity_pagination_target: Oro\Bundle\EmailBundle\Entity\Email
 

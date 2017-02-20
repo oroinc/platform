@@ -57,6 +57,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
         $loader->load('processors.customize_loaded_data.yml');
+        $loader->load('processors.shared.yml');
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
         $loader->load('processors.delete.yml');
@@ -191,7 +192,9 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
 
         $config = [];
         foreach ($resources as $resource) {
-            $config[] = $resource->data[ApiConfiguration::ROOT_NODE];
+            if (array_key_exists(ApiConfiguration::ROOT_NODE, $resource->data)) {
+                $config[] = $resource->data[ApiConfiguration::ROOT_NODE];
+            }
         }
         $config = $this->processConfiguration(
             new ApiConfiguration($container->get(self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID)),

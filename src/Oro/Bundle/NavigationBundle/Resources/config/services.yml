@@ -63,6 +63,7 @@ services:
             - '@oro_security.security_facade.link'
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: oro_navigation.menu_extension, priority: 100 }
 
@@ -262,6 +263,7 @@ services:
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager.link'
           - '@oro_navigation.title_provider'
+        lazy: true
 
     oro_navigation.title_provider:
         class: %oro_navigation.title_provider.class%
@@ -446,6 +448,27 @@ services:
         arguments:
             - '@translator'
             - '@oro_locale.helper.localization'
+
+    oro_navigation.event_listener.menu_update_cache_flusher:
+        class: Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher
+        arguments:
+            - '@oro_navigation.repository.menu_update'
+            - '@oro_navigation.menu_update.cache'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.menu_update_scope_change, method: onMenuUpdateScopeChange }
+
+    oro_navigation.repository.menu_update:
+        class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_navigation.entity.menu_update.class%'
+        calls:
+            - [ setQueryResultCache, [ '@oro_navigation.menu_update.cache' ] ]
+
+    oro_navigation.menu_update.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_menu_updates' ] ]
 
     oro_navigation.data_provider.title:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider

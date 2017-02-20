@@ -26,6 +26,24 @@ class DataTypeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider nestedAssociationProvider
+     */
+    public function testIsNestedAssociation($dataType, $expected)
+    {
+        self::assertSame($expected, DataType::isNestedAssociation($dataType));
+    }
+
+    public function nestedAssociationProvider()
+    {
+        return [
+            ['nestedAssociation', true],
+            ['string', false],
+            [null, false],
+            ['', false],
+        ];
+    }
+
+    /**
      * @dataProvider associationAsFieldProvider
      */
     public function testIsAssociationAsField($dataType, $expected)

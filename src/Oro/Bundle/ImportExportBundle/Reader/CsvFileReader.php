@@ -4,10 +4,10 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 
+use Akeneo\Bundle\BatchBundle\Item\ParseException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 class CsvFileReader extends AbstractReader
 {
@@ -49,7 +49,7 @@ class CsvFileReader extends AbstractReader
     /**
      * {@inheritdoc}
      */
-    public function read()
+    public function read($context = null)
     {
         if ($this->getFile()->eof()) {
             $this->getFile()->rewind();
@@ -59,7 +59,9 @@ class CsvFileReader extends AbstractReader
 
         $data = $this->getFile()->fgetcsv();
         if (false !== $data) {
-            $context = $this->getContext();
+            if (! $context instanceof ContextInterface) {
+                $context = $this->getContext();
+            }
             $context->incrementReadOffset();
             if (null === $data || [null] === $data) {
                 if ($this->getFile()->eof()) {
@@ -87,7 +89,7 @@ class CsvFileReader extends AbstractReader
                 $data = array_combine($this->header, $data);
             }
         } else {
-            throw new RuntimeException('An error occurred while reading the csv.');
+            throw new ParseException('An error occurred while reading the csv.');
         }
 
         return $data;
@@ -98,6 +100,10 @@ class CsvFileReader extends AbstractReader
      */
     protected function getFile()
     {
+        if ($this->file instanceof \SplFileObject && $this->file->getFilename() != $this->fileInfo->getFilename()) {
+            $this->file = null;
+            $this->header = null;
+        }
         if (!$this->file instanceof \SplFileObject) {
             $this->file = $this->fileInfo->openFile();
             $this->file->setFlags(
@@ -166,5 +172,13 @@ class CsvFileReader extends AbstractReader
         } elseif (!$this->fileInfo->isReadable()) {
             throw new InvalidArgumentException(sprintf('File "%s" is not readable.', $this->fileInfo->getRealPath()));
         }
+    }
+
+    /**
+     * @param ContextInterface $context
+     */
+    public function initializeByContext(ContextInterface $context)
+    {
+        $this->initializeFromContext($context);
     }
 }

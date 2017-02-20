@@ -24,7 +24,9 @@ class SearchSorterExtension extends AbstractSorterExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return parent::isApplicable($config) && $config->getDatasourceType() === SearchDatasource::TYPE;
+        return
+            SearchDatasource::TYPE === $config->getDatasourceType()
+            && parent::isApplicable($config);
     }
 
     /**

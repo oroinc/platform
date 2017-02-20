@@ -4,9 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class CleanupCommandTest extends WebTestCase
 {
     protected function setUp()

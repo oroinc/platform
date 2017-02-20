@@ -35,6 +35,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var array|null */
     protected $queryHints;
 
+    /** @var array */
+    protected $countQueryHints = [];
+
     /** @var ConfigProcessorInterface */
     protected $configProcessor;
 
@@ -79,6 +82,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     }
 
     /**
+     * You must avoid to make changes of QueryBuilder here
+     * because query was already used as is in datagrid extensions for example "PaginatorExtension"
+     *
      * @return ResultRecordInterface[]
      */
     public function getResults()
@@ -117,6 +123,14 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     public function getCountQb()
     {
         return $this->countQb;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCountQueryHints()
+    {
+        return $this->countQueryHints;
     }
 
     /**
@@ -179,6 +193,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $this->countQb   = $this->configProcessor->processCountQuery($config);
         if (isset($config['hints'])) {
             $this->queryHints = $config['hints'];
+        }
+        if (isset($config['count_hints'])) {
+            $this->countQueryHints = $config['count_hints'];
         }
     }
 }

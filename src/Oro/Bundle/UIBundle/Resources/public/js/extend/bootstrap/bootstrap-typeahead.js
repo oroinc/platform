@@ -16,6 +16,8 @@ define(function(require) {
         this.click = opts.click || this.click;
         this.render = opts.render || this.render;
         this.show = opts.show || this.show;
+        this.hide = opts.hide || this.hide;
+        this.$holder = $(opts.holder || '');
         origTypeahead.apply(this, arguments);
     };
 

@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class CompleteDefinitionTest extends ConfigProcessorTestCase
 {
@@ -2565,6 +2566,92 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testProcessExtendedAssociationWithEmptyTargets()
+    {
+        $config = [
+            'fields' => [
+                'association1' => [
+                    'data_type' => 'association:manyToOne'
+                ],
+            ]
+        ];
+
+        $this->associationManager->expects($this->once())
+            ->method('getAssociationTargets')
+            ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
+            ->willReturn([]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                EntityIdentifier::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'data_type'              => 'association:manyToOne',
+                        'target_class'           => EntityIdentifier::class,
+                        'target_type'            => 'to-one',
+                        'identifier_field_names' => ['id'],
+                        'collapse'               => true,
+                        'form_options'           => [
+                            'mapped' => false
+                        ],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testProcessNestedObjectForNotManageableEntity()
     {
         $config = [
@@ -2864,6 +2951,290 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
                         'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
                         'exclusion_policy' => 'all',
                         'depends_on'       => ['field3', 'field2']
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessNestedAssociationForNotManageableEntity()
+    {
+        $config = [
+            'fields' => [
+                'source'            => [
+                    'data_type' => 'nestedAssociation',
+                    'fields'    => [
+                        '__class__' => [
+                            'property_path' => 'sourceEntityClass'
+                        ],
+                        'id'        => [
+                            'property_path' => 'sourceEntityId'
+                        ]
+                    ]
+                ],
+                'sourceEntityClass' => [
+                    'exclude' => true
+                ],
+                'sourceEntityId'    => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                EntityIdentifier::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'source'            => [
+                        'data_type'              => 'nestedAssociation',
+                        'property_path'          => '_',
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => EntityIdentifier::class,
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'depends_on'             => ['sourceEntityClass', 'sourceEntityId'],
+                        'fields'                 => [
+                            '__class__' => [
+                                'property_path' => 'sourceEntityClass'
+                            ],
+                            'id'        => [
+                                'property_path' => 'sourceEntityId'
+                            ]
+                        ]
+                    ],
+                    'sourceEntityClass' => [
+                        'exclude' => true
+                    ],
+                    'sourceEntityId'    => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testProcessNestedAssociationForManageableEntity()
+    {
+        $config = [
+            'fields' => [
+                'source'            => [
+                    'data_type' => 'nestedAssociation',
+                    'fields'    => [
+                        '__class__' => [
+                            'property_path' => 'sourceEntityClass'
+                        ],
+                        'id'        => [
+                            'property_path' => 'sourceEntityId'
+                        ]
+                    ]
+                ],
+                'sourceEntityClass' => [
+                    'exclude' => true
+                ],
+                'sourceEntityId'    => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id', 'sourceEntityClass', 'sourceEntityId']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                EntityIdentifier::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'                => null,
+                    'source'            => [
+                        'data_type'              => 'nestedAssociation',
+                        'property_path'          => '_',
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => EntityIdentifier::class,
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'depends_on'             => ['sourceEntityClass', 'sourceEntityId'],
+                        'fields'                 => [
+                            '__class__' => [
+                                'property_path' => 'sourceEntityClass'
+                            ],
+                            'id'        => [
+                                'property_path' => 'sourceEntityId'
+                            ]
+                        ]
+                    ],
+                    'sourceEntityClass' => [
+                        'exclude' => true
+                    ],
+                    'sourceEntityId'    => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessNestedAssociationWhenDependsOnIsPartiallySet()
+    {
+        $config = [
+            'fields' => [
+                'source'            => [
+                    'data_type'  => 'nestedAssociation',
+                    'depends_on' => ['otherField'],
+                    'fields'     => [
+                        '__class__' => [
+                            'property_path' => 'sourceEntityClass'
+                        ],
+                        'id'        => [
+                            'property_path' => 'sourceEntityId'
+                        ]
+                    ]
+                ],
+                'sourceEntityClass' => [
+                    'exclude' => true
+                ],
+                'sourceEntityId'    => [
+                    'exclude' => true
+                ]
+            ]
+        ];
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('getEntityMetadataForClass');
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                EntityIdentifier::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'source'            => [
+                        'data_type'              => 'nestedAssociation',
+                        'property_path'          => '_',
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => EntityIdentifier::class,
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'depends_on'             => ['otherField', 'sourceEntityClass', 'sourceEntityId'],
+                        'fields'                 => [
+                            '__class__' => [
+                                'property_path' => 'sourceEntityClass'
+                            ],
+                            'id'        => [
+                                'property_path' => 'sourceEntityId'
+                            ]
+                        ]
+                    ],
+                    'sourceEntityClass' => [
+                        'exclude' => true
+                    ],
+                    'sourceEntityId'    => [
+                        'exclude' => true
                     ]
                 ]
             ],

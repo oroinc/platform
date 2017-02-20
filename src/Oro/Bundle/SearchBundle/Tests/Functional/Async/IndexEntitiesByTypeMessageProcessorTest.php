@@ -14,7 +14,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
 /**
- * @dbIsolationPerTest
+ * @nestTransactionsWithSavepoints
  * @group search
  */
 class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
@@ -27,13 +27,6 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         parent::setUp();
 
         $this->initClient();
-    }
-
-    public function testCouldBeConstructedByContainer()
-    {
-        $instance = $this->getContainer()->get('oro_search.async.message_processor.index_entities_by_type');
-
-        $this->assertInstanceOf(IndexEntitiesByTypeMessageProcessor::class, $instance);
     }
 
     public function testShouldBreakOnBatchesAndSendMessageToProducer()
@@ -69,17 +62,20 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 
         $messages = self::getSentMessages();
 
-        $this->assertCount(4, $messages);
+        $this->assertCount(6, $messages);
         $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[0]['topic']);
         $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[1]['topic']);
-        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[3]['topic']);
+        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_STATUS, $messages[4]['topic']);
 
-        $this->assertEquals(Topics::INDEX_ENTITY_BY_RANGE, $messages[2]['topic']);
+        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_PROGRESS, $messages[2]['topic']);
+        $this->assertEquals(JobTopics::CALCULATE_ROOT_JOB_PROGRESS, $messages[5]['topic']);
 
-        $this->assertEquals(Item::class, $messages[2]['message']['entityClass']);
-        $this->assertEquals(0, $messages[2]['message']['offset']);
-        $this->assertEquals(1000, $messages[2]['message']['limit']);
-        $this->assertInternalType('integer', $messages[2]['message']['jobId']);
+        $this->assertEquals(Topics::INDEX_ENTITY_BY_RANGE, $messages[3]['topic']);
+
+        $this->assertEquals(Item::class, $messages[3]['message']['entityClass']);
+        $this->assertEquals(0, $messages[3]['message']['offset']);
+        $this->assertEquals(1000, $messages[3]['message']['limit']);
+        $this->assertInternalType('integer', $messages[3]['message']['jobId']);
     }
 
     /**

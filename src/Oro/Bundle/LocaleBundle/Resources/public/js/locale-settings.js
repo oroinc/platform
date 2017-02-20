@@ -1,6 +1,7 @@
-define(['underscore', 'orolocale/js/locale-settings/data'
-    ], function(_, settings) {
+define(['underscore', 'orolocale/js/locale-settings/data', 'module'], function(_, settings, moduleInst) {
     'use strict';
+
+    var moduleConfig = moduleInst.config();
 
     /**
      * Locale settings
@@ -390,6 +391,8 @@ define(['underscore', 'orolocale/js/locale-settings/data'
     };
 
     localeSettings.extendSettings(settings);
+    localeSettings.extendDefaults(moduleConfig.defaults);
+    localeSettings.extendSettings(moduleConfig.settings);
 
     return localeSettings;
 });

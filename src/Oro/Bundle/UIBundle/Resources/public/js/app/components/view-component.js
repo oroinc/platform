@@ -28,10 +28,14 @@ define(function(require) {
             options._sourceElement.attr('data-bound-view', options.view);
 
             this._deferredInit();
-            // ensure that all nested components are already initialized
-            $.when.apply($, subPromises).then(function() {
+            if (subPromises.length) {
+                // ensure that all nested components are already initialized
+                $.when.apply($, subPromises).then(function() {
+                    tools.loadModules(options.view, initializeView);
+                });
+            } else {
                 tools.loadModules(options.view, initializeView);
-            });
+            }
         },
 
         /**
@@ -41,6 +45,10 @@ define(function(require) {
          * @protected
          */
         _initializeView: function(options, View) {
+            if (this.disposed) {
+                this._resolveDeferredInit();
+                return;
+            }
             this.view = new View(options);
 
             // pass all component events to view

@@ -5,41 +5,88 @@ namespace Oro\Bundle\DataGridBundle\Handler;
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
+use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
-use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\Context;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
+use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 
-class ExportHandler
+class ExportHandler implements StepExecutionWarningHandlerInterface
 {
     /**
-     * @var MimeTypeGuesser
+     * @var FileManager
      */
-    protected $guesser;
+    protected $fileManager;
 
     /**
-     * @param MimeTypeGuesser $guesser
+     * @var RouterInterface
      */
-    public function __construct(MimeTypeGuesser $guesser)
+    protected $router;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
+     * @var bool
+     */
+    protected $exportFailed = false;
+
+    /**
+     * @param FileManager $fileManager
+     */
+    public function __construct(FileManager $fileManager)
     {
-        $this->guesser = $guesser;
+        $this->fileManager = $fileManager;
+    }
+
+    /**
+     * @param RouterInterface $router
+     */
+    public function setRouter(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
      * @param ItemReaderInterface $reader
-     * @param ExportProcessor     $processor
+     * @param ExportProcessor $processor
      * @param ItemWriterInterface $writer
-     * @param array               $contextParameters
-     * @param int                 $batchSize
-     * @param string              $format
+     * @param array $contextParameters
+     * @param int $batchSize
+     * @param string $format
      *
-     * @return StreamedResponse
+     * @return array
+     * @throws InvalidArgumentException
      */
     public function handle(
         ItemReaderInterface $reader,
@@ -52,6 +99,12 @@ class ExportHandler
         if (!isset($contextParameters['gridName'])) {
             throw new InvalidArgumentException('Parameter "gridName" must be provided.');
         }
+
+        $fileName = FileManager::generateFileName(sprintf('datagrid_%s', $contextParameters['gridName']), $format);
+        $filePath = FileManager::generateTmpFilePath($fileName);
+
+        $contextParameters['filePath'] = $filePath;
+
         $context  = new Context($contextParameters);
         $executor = new StepExecutor();
         $executor->setBatchSize($batchSize);
@@ -65,40 +118,36 @@ class ExportHandler
             }
         }
 
-        $contentType = $this->guesser->guessByFileExtension($format);
-        if (!$contentType) {
-            $contentType = 'application/octet-stream';
+        $executor->execute($this);
+
+        $url = null;
+        $this->fileManager->writeFileToStorage($filePath, $fileName);
+        unlink($filePath);
+
+        if (! $this->exportFailed) {
+            $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
+                'oro_importexport_export_download',
+                ['fileName' => $fileName]
+            );
         }
 
-        // prepare response
-        $response = new StreamedResponse($this->exportCallback($context, $executor));
-        $response->headers->set('Content-Type', $contentType);
-        $response->headers->set('Content-Transfer-Encoding', 'binary');
-        $outputFileName = sprintf(
-            'datagrid_%s_%s.%s',
-            str_replace('-', '_', $contextParameters['gridName']),
-            date('Y_m_d_H_i_s'),
-            $format
-        );
-        $response->headers->set(
-            'Content-Disposition',
-            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $outputFileName)
-        );
-
-        return $response;
+        return [
+            'success' => !$this->exportFailed,
+            'url' => $url,
+         ];
     }
 
     /**
-     * @param ContextInterface $context
-     * @param StepExecutor     $executor
-     *
-     * @return \Closure
+     * @param object $element
+     * @param string $name
+     * @param string $reason
+     * @param array $reasonParameters
+     * @param mixed $item
      */
-    protected function exportCallback(ContextInterface $context, StepExecutor $executor)
+    public function handleWarning($element, $name, $reason, array $reasonParameters, $item)
     {
-        return function () use ($executor) {
-            flush();
-            $executor->execute();
-        };
+        $this->exportFailed = true;
+
+        $this->logger->error(sprintf('[DataGridExportHandle] Error message: %s', $reason), ['element' => $element]);
     }
 }

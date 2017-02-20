@@ -40,11 +40,11 @@
 
         touch-action: manipulation;
 
-        white-space: nowrap;
-
         user-select: none;
 
         box-sizing: border-box;
+
+        -webkit-appearance: none;
 
         &--full,
         &.full {

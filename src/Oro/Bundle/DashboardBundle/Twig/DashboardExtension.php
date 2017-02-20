@@ -2,30 +2,32 @@
 
 namespace Oro\Bundle\DashboardBundle\Twig;
 
-use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class DashboardExtension extends \Twig_Extension
 {
-    /** @var FilterDateRangeConverter */
+    /** @var ServiceLink */
     protected $converter;
 
-    /** @var Manager */
-    protected $manager;
+    /** @var ServiceLink */
+    protected $managerLink;
 
     /** @var EntityProvider */
     protected $entityProvider;
 
     /**
-     * @param FilterDateRangeConverter $converter
-     * @param Manager                  $manager
-     * @param EntityProvider           $entityProvider
+     * @param ServiceLink    $converterLink
+     * @param ServiceLink    $managerLink Link Used instead of manager because of performance reasons
+     * @param EntityProvider $entityProvider
      */
-    public function __construct(FilterDateRangeConverter $converter, Manager $manager, EntityProvider $entityProvider)
-    {
-        $this->converter = $converter;
-        $this->manager = $manager;
+    public function __construct(
+        ServiceLink $converterLink,
+        ServiceLink $managerLink,
+        EntityProvider $entityProvider
+    ) {
+        $this->converterLink = $converterLink;
+        $this->managerLink = $managerLink;
         $this->entityProvider = $entityProvider;
     }
 
@@ -48,7 +50,7 @@ class DashboardExtension extends \Twig_Extension
      */
     public function getViewValue($value)
     {
-        return $this->converter->getViewValue($value);
+        return $this->converterLink->getService()->getViewValue($value);
     }
 
     /**
@@ -61,7 +63,7 @@ class DashboardExtension extends \Twig_Extension
 
     public function getQueryFilterMetadata()
     {
-        return $this->manager->getMetadata('segment');
+        return $this->managerLink->getService()->getMetadata('segment');
     }
 
     public function getQueryFilterEntities()

@@ -2,24 +2,21 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-
-use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
-use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
-use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
-use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeActionConfigHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeParentResourceHelper;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeSubresourceConfigHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 /**
  * Loads configuration from "Resources/config/oro/api.yml".
@@ -27,22 +24,82 @@ use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 class LoadFromConfigBag extends BaseLoadFromConfigBag
 {
     /** @var ConfigBag */
-    protected $configBag;
+    private $configBag;
+
+    /** @var ResourcesProvider */
+    private $resourcesProvider;
+
+    /** @var MergeParentResourceHelper */
+    private $mergeParentResourceHelper;
+
+    /** @var MergeActionConfigHelper */
+    private $mergeActionConfigHelper;
+
+    /** @var MergeSubresourceConfigHelper */
+    private $mergeSubresourceConfigHelper;
+
+    /** @var string|null */
+    private $entityClass;
+
+    /** @var string|null */
+    private $parentResourceClass;
 
     /**
-     * @param ConfigExtensionRegistry          $configExtensionRegistry
-     * @param ConfigLoaderFactory              $configLoaderFactory
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param ConfigBag                        $configBag
+     * @param ConfigExtensionRegistry      $configExtensionRegistry
+     * @param ConfigLoaderFactory          $configLoaderFactory
+     * @param ResourceHierarchyProvider    $resourceHierarchyProvider
+     * @param ConfigBag                    $configBag
+     * @param ResourcesProvider            $resourcesProvider
+     * @param MergeParentResourceHelper    $mergeParentResourceHelper
+     * @param MergeEntityConfigHelper      $mergeEntityConfigHelper
+     * @param MergeActionConfigHelper      $mergeActionConfigHelper
+     * @param MergeSubresourceConfigHelper $mergeSubresourceConfigHelper
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        EntityHierarchyProviderInterface $entityHierarchyProvider,
-        ConfigBag $configBag
+        ResourceHierarchyProvider $resourceHierarchyProvider,
+        ConfigBag $configBag,
+        ResourcesProvider $resourcesProvider,
+        MergeParentResourceHelper $mergeParentResourceHelper,
+        MergeEntityConfigHelper $mergeEntityConfigHelper,
+        MergeActionConfigHelper $mergeActionConfigHelper,
+        MergeSubresourceConfigHelper $mergeSubresourceConfigHelper
     ) {
-        parent::__construct($configExtensionRegistry, $configLoaderFactory, $entityHierarchyProvider);
+        parent::__construct(
+            $configExtensionRegistry,
+            $configLoaderFactory,
+            $resourceHierarchyProvider,
+            $mergeEntityConfigHelper
+        );
         $this->configBag = $configBag;
+        $this->resourcesProvider = $resourcesProvider;
+        $this->mergeParentResourceHelper = $mergeParentResourceHelper;
+        $this->mergeActionConfigHelper = $mergeActionConfigHelper;
+        $this->mergeSubresourceConfigHelper = $mergeSubresourceConfigHelper;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function processConfig(ConfigContext $context)
+    {
+        $this->entityClass = $context->getClassName();
+        $config = null;
+        $parentResourceClass = null;
+        try {
+            $config = $this->loadConfig($this->entityClass, $context->getVersion(), $context->getRequestType());
+            $parentResourceClass = $this->parentResourceClass;
+        } finally {
+            $this->entityClass = null;
+            $this->parentResourceClass = null;
+        }
+        if (null !== $config) {
+            $this->saveConfig($context, $config);
+            if (null !== $parentResourceClass) {
+                $this->mergeParentResourceHelper->mergeParentResourceConfig($context, $parentResourceClass);
+            }
+        }
     }
 
     /**
@@ -53,29 +110,27 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
         $action = $context->getTargetAction();
         if ($action) {
             if (!empty($config[ConfigUtil::ACTIONS][$action])) {
-                $config = $this->mergeActionConfig(
+                $config = $this->mergeActionConfigHelper->mergeActionConfig(
                     $config,
                     $config[ConfigUtil::ACTIONS][$action],
-                    $context
+                    $context->hasExtra(DescriptionsConfigExtra::NAME)
                 );
             }
             $association = $context->getAssociationName();
             if ($association) {
-                $parentConfig = $this->loadConfig($context->getParentClassName(), $context->getVersion());
+                $parentConfig = $this->loadConfig(
+                    $context->getParentClassName(),
+                    $context->getVersion(),
+                    $context->getRequestType()
+                );
                 if (!empty($parentConfig[ConfigUtil::SUBRESOURCES][$association])) {
-                    $subresourceConfig = $parentConfig[ConfigUtil::SUBRESOURCES][$association];
-                    if (!empty($subresourceConfig[ConfigUtil::ACTIONS][$action])) {
-                        $config = $this->mergeActionConfig(
-                            $config,
-                            $subresourceConfig[ConfigUtil::ACTIONS][$action],
-                            $context
-                        );
-                    }
-                    if ($context->hasExtra(FiltersConfigExtra::NAME)
-                        && !empty($subresourceConfig[ConfigUtil::FILTERS])
-                    ) {
-                        $config = $this->mergeFiltersConfig($config, $subresourceConfig[ConfigUtil::FILTERS]);
-                    }
+                    $config = $this->mergeSubresourceConfigHelper->mergeSubresourcesConfig(
+                        $config,
+                        $parentConfig[ConfigUtil::SUBRESOURCES][$association],
+                        $action,
+                        $context->hasExtra(DescriptionsConfigExtra::NAME),
+                        $context->hasExtra(FiltersConfigExtra::NAME)
+                    );
                 }
             }
         }
@@ -84,141 +139,24 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     }
 
     /**
-     * @param array $statusCodesConfig
-     *
-     * @return StatusCodesConfig
+     * {@inheritdoc}
      */
-    protected function loadStatusCodes(array $statusCodesConfig)
+    protected function getConfig($entityClass, $version, RequestType $requestType)
     {
-        $statusCodesLoader = new StatusCodesConfigLoader();
-
-        return $statusCodesLoader->load($statusCodesConfig);
-    }
-
-    /**
-     * @param array         $config
-     * @param array         $actionConfig
-     * @param ConfigContext $context
-     *
-     * @return array
-     */
-    protected function mergeActionConfig(array $config, array $actionConfig, ConfigContext $context)
-    {
-        if (!empty($actionConfig[ActionConfig::STATUS_CODES])
-            && $context->hasExtra(DescriptionsConfigExtra::NAME)
+        if ($this->entityClass
+            && $entityClass !== $this->entityClass
+            && !$this->parentResourceClass
+            && $this->resourcesProvider->isResourceKnown($entityClass, $version, $requestType)
         ) {
-            $config = $this->mergeStatusCodes(
-                $config,
-                $this->loadStatusCodes($actionConfig[ActionConfig::STATUS_CODES])
-            );
-        }
-        unset($actionConfig[ActionConfig::STATUS_CODES]);
+            /**
+             * remember the class name of parent API resource and stop processing of other parents
+             * @see processConfig
+             */
+            $this->parentResourceClass = $entityClass;
 
-        unset($actionConfig[ActionConfig::EXCLUDE]);
-        $actionFields = null;
-        if (array_key_exists(ActionConfig::FIELDS, $actionConfig)) {
-            $actionFields = $actionConfig[ActionConfig::FIELDS];
-            unset($actionConfig[ActionConfig::FIELDS]);
-        }
-        $config = array_merge($config, $actionConfig);
-        if (!empty($actionFields)) {
-            $config[EntityDefinitionConfig::FIELDS] = !empty($config[EntityDefinitionConfig::FIELDS])
-                ? $this->mergeActionFields($config[EntityDefinitionConfig::FIELDS], $actionFields)
-                : $actionFields;
+            return false;
         }
 
-        return $config;
-    }
-
-    /**
-     * @param array             $config
-     * @param StatusCodesConfig $statusCodes
-     *
-     * @return array
-     */
-    protected function mergeStatusCodes(array $config, StatusCodesConfig $statusCodes)
-    {
-        if (!array_key_exists(ActionConfig::STATUS_CODES, $config)) {
-            $config[ActionConfig::STATUS_CODES] = $statusCodes;
-        } else {
-            /** @var StatusCodesConfig $existingStatusCodes */
-            $existingStatusCodes = $config[ActionConfig::STATUS_CODES];
-            $codes = $statusCodes->getCodes();
-            foreach ($codes as $code => $statusCode) {
-                $existingStatusCodes->addCode($code, $statusCode);
-            }
-        }
-
-        return $config;
-    }
-
-    /**
-     * @param array $fields
-     * @param array $actionFields
-     *
-     * @return array
-     */
-    protected function mergeActionFields(array $fields, array $actionFields)
-    {
-        foreach ($actionFields as $key => $value) {
-            if (!empty($fields[$key])) {
-                if (!empty($value)) {
-                    $fields[$key] = array_merge($fields[$key], $value);
-                }
-            } else {
-                $fields[$key] = $value;
-            }
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @param array $config
-     * @param array $filtersConfig
-     *
-     * @return array
-     */
-    protected function mergeFiltersConfig(array $config, array $filtersConfig)
-    {
-        if (ConfigUtil::isExcludeAll($filtersConfig) || !array_key_exists(ConfigUtil::FILTERS, $config)) {
-            $config[ConfigUtil::FILTERS] = $filtersConfig;
-        } elseif (!empty($filtersConfig[ConfigUtil::FIELDS])) {
-            if (!array_key_exists(ConfigUtil::FIELDS, $config[ConfigUtil::FILTERS])) {
-                $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS] = $filtersConfig[ConfigUtil::FIELDS];
-            } else {
-                $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS] = array_merge(
-                    $config[ConfigUtil::FILTERS][ConfigUtil::FIELDS],
-                    $filtersConfig[ConfigUtil::FIELDS]
-                );
-            }
-        }
-
-        return $config;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getConfig($entityClass, $version)
-    {
         return $this->configBag->getConfig($entityClass, $version);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createConfigurationTree()
-    {
-        $configTreeBuilder = new TreeBuilder();
-        $configuration     = new EntityConfiguration(
-            ApiConfiguration::ENTITIES_SECTION,
-            new EntityDefinitionConfiguration(),
-            $this->configExtensionRegistry->getConfigurationSettings(),
-            $this->configExtensionRegistry->getMaxNestingLevel()
-        );
-        $configuration->configure($configTreeBuilder->root('entity')->children());
-
-        return $configTreeBuilder->buildTree();
     }
 }

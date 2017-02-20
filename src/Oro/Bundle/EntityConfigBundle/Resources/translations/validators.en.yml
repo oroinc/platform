@@ -1,0 +1,13 @@
+"This value should start with a symbol and contain only alphabetic symbols, underscore and numbers.": "This value should start with a symbol and contain only alphabetic symbols, underscore and numbers."
+"The '{{ value }}' cannot be used as a code value.": "The '{{ value }}' cannot be used as a code value."
+oro:
+    entity_config:
+        validator:
+            attribute_family:
+                labels.blank: Labels are blank
+                empty_groups: Attribute Family should contain at least one group.
+                same_labels: Several groups can not have same default label
+                many_default_groups: Attribute Family should contain only one default group.
+                default_group_is_not_exist: Attribute Family should contain a default group.
+                duplicate_attributes: Attribute Family should not contain same attributes.
+                missing_system_attributes: Attribute Family should contain all system attributes.

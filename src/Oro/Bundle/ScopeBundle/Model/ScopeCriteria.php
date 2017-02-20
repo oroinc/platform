@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ScopeBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -17,11 +16,18 @@ class ScopeCriteria implements \IteratorAggregate
     protected $context = [];
 
     /**
-     * @param array $context
+     * @var array
      */
-    public function __construct(array $context)
+    protected $fieldsInfo = [];
+
+    /**
+     * @param array $context
+     * @param array $fieldsInfo
+     */
+    public function __construct(array $context, array $fieldsInfo)
     {
         $this->context = $context;
+        $this->fieldsInfo = $fieldsInfo;
     }
 
     /**
@@ -37,8 +43,15 @@ class ScopeCriteria implements \IteratorAggregate
             if (in_array($field, $ignoreFields, true)) {
                 continue;
             }
-
-            $qb->andWhere($this->resolveBasicCondition($qb, $alias, $field, $value, true));
+            $condition = null;
+            if ($this->isAdditionalJoinNeeds($field)) {
+                $localAlias = $alias.'_'.$field;
+                $condition = $this->resolveBasicCondition($qb, $localAlias, 'id', $value, true);
+                $qb->leftJoin($alias.'.'.$field, $alias.'_'.$field, Join::WITH, $condition);
+            } else {
+                $condition = $this->resolveBasicCondition($qb, $alias, $field, $value, true);
+            }
+            $qb->andWhere($condition);
         }
 
         return $qb;
@@ -56,20 +69,15 @@ class ScopeCriteria implements \IteratorAggregate
             if (in_array($field, $ignoreFields, true)) {
                 continue;
             }
-            $aliasedField = $alias.'.'.$field;
-            if ($value === null) {
-                $qb->andWhere($qb->expr()->isNull($aliasedField));
-            } elseif ($value === self::IS_NOT_NULL) {
-                $qb->andWhere($qb->expr()->isNotNull($aliasedField));
+            $condition = null;
+            if ($this->isAdditionalJoinNeeds($field)) {
+                $localAlias = $alias.'_'.$field;
+                $condition = $this->resolveBasicCondition($qb, $localAlias, 'id', $value, false);
+                $qb->leftJoin($alias.'.'.$field, $localAlias, Join::WITH, $condition);
             } else {
-                $paramName = $alias.'_param_'.$field;
-                if (is_array($value)) {
-                    $qb->andWhere($qb->expr()->in($aliasedField, ':'.$paramName));
-                } else {
-                    $qb->andWhere($qb->expr()->eq($aliasedField, ':'.$paramName));
-                }
-                $qb->setParameter($paramName, $value);
+                $condition = $this->resolveBasicCondition($qb, $alias, $field, $value, false);
             }
+            $qb->andWhere($condition);
         }
 
         return $qb;
@@ -119,19 +127,40 @@ class ScopeCriteria implements \IteratorAggregate
             $condition = $join->getCondition();
             $usedFields = $this->getUsedFields($condition, $alias);
             $parts = [$condition];
-
+            $additionalJoins = [];
             if ($join->getAlias() === $alias) {
                 foreach ($this->context as $field => $value) {
                     if (in_array($field, $ignoreFields, true) || in_array($field, $usedFields, true)) {
                         continue;
                     }
-                    $parts[] = $this->resolveBasicCondition($qb, $alias, $field, $value, $withPriority);
+                    if ($this->isAdditionalJoinNeeds($field)) {
+                        $localAlias = $alias.'_'.$field;
+                        $additionalJoins[$field] = $this->resolveBasicCondition(
+                            $qb,
+                            $localAlias,
+                            'id',
+                            $value,
+                            $withPriority
+                        );
+                    } else {
+                        $parts[] = $this->resolveBasicCondition($qb, $alias, $field, $value, $withPriority);
+                    }
                 }
             }
 
             $parts = array_filter($parts);
             $condition = $this->getConditionFromParts($parts, $withPriority);
             $this->applyJoinWithModifiedCondition($qb, $condition, $join);
+            if (!empty($additionalJoins)) {
+                $additionalJoins = array_filter($additionalJoins);
+                foreach ($additionalJoins as $field => $condition) {
+                    $localAlias = $alias.'_'.$field;
+                    $qb->leftJoin($alias.'.'.$field, $localAlias, Join::WITH, $condition);
+                    if (!$withPriority) {
+                        $qb->andWhere($condition);
+                    }
+                }
+            }
         }
     }
 
@@ -152,23 +181,22 @@ class ScopeCriteria implements \IteratorAggregate
             $part = $qb->expr()->isNotNull($aliasedField);
         } else {
             $paramName = $alias . '_param_' . $field;
+            if (is_array($value)) {
+                $comparisonCondition = $qb->expr()->in($aliasedField, ':' . $paramName);
+            } else {
+                $comparisonCondition = $qb->expr()->eq($aliasedField, ':' . $paramName);
+            }
             if ($withPriority) {
                 $part = $qb->expr()->orX(
-                    $qb->expr()->eq($aliasedField, ':'.$paramName),
+                    $comparisonCondition,
                     $qb->expr()->isNull($aliasedField)
                 );
             } else {
-                $part = $qb->expr()->eq($aliasedField, ':'.$paramName);
+                $part = $comparisonCondition;
             }
             $qb->setParameter($paramName, $value);
             if ($withPriority) {
-                // TODO: Make this code platform independent. BB-6090
-                // NULLs are sorted to end on mysql for DESC and to top on PostgreSQL
-                $sortOrder = Criteria::DESC;
-                if ($qb->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform) {
-                    $sortOrder = Criteria::ASC;
-                }
-                $qb->addOrderBy($aliasedField, $sortOrder);
+                $qb->addOrderBy($aliasedField, Criteria::DESC);
             }
         }
 
@@ -255,5 +283,17 @@ class ScopeCriteria implements \IteratorAggregate
         }
 
         return $fields;
+    }
+
+    /**
+     * @param string $field
+     * @return bool
+     */
+    private function isAdditionalJoinNeeds($field)
+    {
+        if (isset($this->fieldsInfo[$field])) {
+            return in_array($this->fieldsInfo[$field]['relation_type'], ['manyToMany', 'oneToMany']);
+        }
+        return false;
     }
 }

@@ -134,6 +134,38 @@
 {% endmacro %}
 
 {#
+    Render collapsible html property block
+    Parameters:
+        title - property title
+        data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+#}
+{% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName) %}
+    {% if resource_granted('VIEW', entity, fieldName) %}
+        {% set collapseView = {
+                component: 'oroui/js/app/components/jquery-widget-component',
+                widgetModule: 'oroui/js/widget/collapse-widget',
+                storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
+                uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
+                toggleClassesOnly: true,
+                open: false
+            } %}
+        <div class="collapse-block"
+             data-page-component-module="oroui/js/app/components/viewport-component"
+             data-page-component-options="{{ collapseView|json_encode }}">
+            {{ _self.renderAttribute(title,
+                '<div class="control-label" data-collapse-container>' ~
+                    data|default('oro.ui.empty'|trans) ~
+                '</div>' ~
+                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ 'Show more'|trans ~ '</a>' ~
+                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ 'Show less'|trans ~ '</a>'
+            ) }}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{#
     Render html property block. HTML rendering may be switched off with system config.
     Parameters:
         title - property title
@@ -198,7 +230,7 @@
         {% endif %}
         class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
         {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
-        {{ parameters.label|trim }}
+        {{- parameters.label|trim }}
     </a>
     {% endspaceless %}
 {% endmacro %}
@@ -1207,6 +1239,9 @@
         },
         'subcategories': {
             'view': 'oroui/js/app/views/jstree/subcategories-action-view'
+        },
+        'move': {
+            'view': 'oroui/js/app/views/jstree/move-action-view'
         }
     } %}
 
@@ -1269,7 +1304,7 @@
         <div data-page-component-module="{{ data.module }}"
              data-page-component-options="{{ data.treeOptions|json_encode }}"
              data-collapse-container>
-            {% if data.treeOptions.data|default([]) %}
+            {% if not data.disableSearch|default(false) and data.treeOptions.data|default([]) %}
             <div class="jstree-search-component">
                 <input type="search" placeholder="Quick Search" class="jstree-search-component__input" data-name="search"/>
             </div>

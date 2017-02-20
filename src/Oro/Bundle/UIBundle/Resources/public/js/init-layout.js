@@ -186,7 +186,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             if ($target.is('.dropdown, .dropup, .oro-drop')) {
                 clickingTarget = $target;
             } else {
-                clickingTarget = $target.closest('.dropdown, .dropup, .oro-drop');
+                clickingTarget = $target.parents('.dropdown, .dropup, .oro-drop');
             }
             $(openDropdownsSelector).filter(function() {
                 return !$(this).has(document.activeElement).length;
@@ -274,6 +274,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                     content = $('.scrollable-container').filter(':parents(.ui-widget)');
                     if (!tools.isMobile()) {
                         content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
+                        content.filter('.overflow-y').css('overflow-y', 'auto');
                     } else {
                         content.css('overflow', 'hidden');
                         content.last().css('overflow-y', 'auto');
@@ -395,16 +396,14 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                                     mediator.execute('redirectTo', {url: redirectTo});
                                 }
                             } else {
-                                mediator.execute('hideLoading');
                                 mediator.execute('showFlashMessage', 'success', el.data('success-message'));
                             }
                         },
-                        error: function() {
-                            var message;
-                            message = el.data('error-message') ||
-                                __('Unexpected error occurred. Please contact system administrator.');
+                        errorHandlerMessage: function() {
+                            return el.data('error-message') || true;
+                        },
+                        complete: function() {
                             mediator.execute('hideLoading');
-                            mediator.execute('showMessage', 'error', message);
                         }
                     });
                 });

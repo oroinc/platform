@@ -3,6 +3,7 @@ namespace Oro\Bundle\MessageQueueBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Component\MessageQueue\Job\Job as BaseJob;
 
 /**
@@ -97,6 +98,13 @@ class Job extends BaseJob
      * @ORM\Column(name="data", type="json_array", nullable=true)
      */
     protected $data;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="job_progress", type="percent", nullable=true)
+     */
+    protected $jobProgress;
 
     public function __construct()
     {

@@ -18,11 +18,20 @@
   font-size: 11px;
 }
 
+.cell-context-item,
+.context-item {
+  .context-label {
+    max-width: 180px;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+}
 .context-item {
   list-style: none;
   cursor: pointer;
   white-space: nowrap;
-
   &.active,
   .dropdown-menu &:hover {
     background: #f3f3f3;

@@ -21,11 +21,20 @@ class LayoutContext implements ContextInterface
     protected $resolved = false;
 
     /**
-     * Constructor
+     * @param array         $parameters Context items
+     * @param null|string[] $vars Array of allowed layout context variables
      */
-    public function __construct()
+    public function __construct(array $parameters = [], array $vars = [])
     {
         $this->dataCollection = new ContextDataCollection($this);
+
+        if (!empty($vars)) {
+            $this->getResolver()->setRequired($vars);
+        }
+
+        foreach ($parameters as $key => $value) {
+            $this->set($key, $value);
+        }
     }
 
     /**
@@ -206,7 +215,7 @@ class LayoutContext implements ContextInterface
         $items = $this->items;
         foreach ($items as &$item) {
             if ($item instanceof ContextItemInterface) {
-                $item = $item->toString();
+                $item = $item->getHash();
             }
         }
 

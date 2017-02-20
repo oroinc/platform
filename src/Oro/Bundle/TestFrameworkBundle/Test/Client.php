@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
-use Doctrine\DBAL\Driver\PDOConnection;
-
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
 use Symfony\Component\BrowserKit\Request as InternalRequest;
 use Symfony\Component\BrowserKit\Response as InternalResponse;
@@ -20,26 +17,6 @@ use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 class Client extends BaseClient
 {
     const LOCAL_URL = 'http://localhost';
-
-    /**
-     * @var PDOConnection
-     */
-    protected $pdoConnection;
-
-    /**
-     * @var KernelInterface
-     */
-    protected $kernel;
-
-    /**
-     * @var boolean
-     */
-    protected $hasPerformedRequest;
-
-    /**
-     * @var boolean[]
-     */
-    protected $loadedFixtures;
 
     /**
      * @var bool
@@ -71,6 +48,10 @@ class Client extends BaseClient
         if ($this->isHashNavigationRequest($uri, $parameters, $server)) {
             $server[$hashNavigationHeader] = 1;
         }
+
+        // set the session cookie
+        $sessionOptions = $this->kernel->getContainer()->getParameter('session.storage.options');
+        $this->getCookieJar()->set(new Cookie($sessionOptions['name'], 'test'));
 
         parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
 
@@ -215,36 +196,6 @@ class Client extends BaseClient
     protected function getUrl($name, $parameters = array(), $absolute = false)
     {
         return $this->getContainer()->get('router')->generate($name, $parameters, $absolute);
-    }
-
-    /**
-     * @param bool|true $hasPerformedRequest
-     */
-    public function reboot($hasPerformedRequest = true)
-    {
-        $this->kernel->shutdown();
-        $this->kernel->boot();
-
-        $this->hasPerformedRequest = $hasPerformedRequest;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function doRequest($request)
-    {
-        if ($this->hasPerformedRequest) {
-            $this->reboot();
-        } else {
-            $this->hasPerformedRequest = true;
-        }
-
-        $response = $this->kernel->handle($request);
-
-        if ($this->kernel instanceof TerminableInterface) {
-            $this->kernel->terminate($request, $response);
-        }
-        return $response;
     }
 
     /**
