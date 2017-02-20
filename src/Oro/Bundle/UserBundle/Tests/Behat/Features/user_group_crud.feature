@@ -27,7 +27,7 @@ Feature: Users groups
       | Alice4  |
     Then I save and close form
 
-  Scenario: Edit users group
+  Scenario: Edit users group name
     Given I click Edit First test group in grid
     And I fill in "Name" with ""
     And I save and close form
@@ -36,6 +36,7 @@ Feature: Users groups
     When I fill in "Name" with "Edited test group"
     And I save and close form
 
+  Scenario: Remove users from user group
     Then I should see Edited test group in grid
     When I click Edit Edited test group in grid
     And I uncheck first 5 records in 1 column
@@ -43,9 +44,10 @@ Feature: Users groups
     Then I should see Edited test group in grid
     When I click Edit Edited test group in grid
     And I check "Yes" in Has Group filter
-    And I should not see "Alice4"
+    And there is no records in grid
     And I save and close form
 
+  Scenario: Add users to group
     Then I should see Edited test group in grid
     When I click Edit Edited test group in grid
     And I check first 4 records in 1 column
@@ -61,8 +63,9 @@ Feature: Users groups
     And I should not see "Alice4"
     And I save and close form
 
-    Scenario: Case deletion
-    Given I click Delete Edited test group in grid
+  Scenario: Case deletion
+    Given there is 4 records in grid
+    When I click Delete Edited test group in grid
     When I confirm deletion
     Then I should see "Item deleted" flash message
     And there is 3 records in grid
