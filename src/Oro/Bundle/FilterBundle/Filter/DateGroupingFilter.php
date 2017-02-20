@@ -8,9 +8,12 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
+use Oro\Bundle\FilterBundle\Utils\ArrayTrait;
 
 class DateGroupingFilter extends ChoiceFilter
 {
+    use ArrayTrait;
+
     const COLUMN_NAME_SUFFIX = 'DateGroupingFilter';
     const CALENDAR_TABLE = 'calendarDate';
     const CALENDAR_COLUMN = 'date';
@@ -162,9 +165,8 @@ class DateGroupingFilter extends ChoiceFilter
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
         $whereClauseParameters = $qb->getParameters();
-        $extraWhereClauses = $qb->getDQLPart('where') ?
-            $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts()) :
-            '';
+        $extraWhereClauses = !$qb->getDQLPart('where') ?:
+            $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts());
         $usedDates = $this->getUsedDates(
             $filterType,
             $this->config['calendar_table_for_grouping'],
@@ -399,25 +401,5 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return $firstMonthsOfQuarters;
-    }
-
-    /**
-     * @param $array
-     * @return array|bool
-     */
-    public function arrayFlatten($array)
-    {
-        if (!is_array($array)) {
-            return false;
-        }
-        $result = array();
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $result = array_merge($result, $this->arrayFlatten($value));
-            } else {
-                $result[$key] = $value;
-            }
-        }
-        return $result;
     }
 }
