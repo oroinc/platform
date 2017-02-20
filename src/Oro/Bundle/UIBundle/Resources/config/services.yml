@@ -156,3 +156,10 @@ services:
         class: 'Oro\Bundle\UIBundle\Configuration\FeatureConfigurationExtension'
         tags:
             - { name: oro_feature.config_extension }
+
+    oro_ui.validator.move_to_child:
+        class: 'Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator'
+        arguments:
+            - '@translator'
+        tags:
+            - { name: validator.constraint_validator }

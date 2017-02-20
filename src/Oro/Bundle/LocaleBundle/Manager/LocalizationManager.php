@@ -58,9 +58,24 @@ class LocalizationManager
      */
     public function getLocalization($id, $useCache = true)
     {
-        $localizations = $this->getLocalizations(null, $useCache);
+        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey($id)) : false;
 
-        return isset($localizations[$id]) ? $localizations[$id] : null;
+        if ($cache !== false && array_key_exists($id, $cache)) {
+            return $cache[$id];
+        }
+
+        /** @var Localization $cache */
+        $cache = $this->getRepository()->findOneBy(['id' => $id]);
+
+        if ($cache === null) {
+            return null;
+        }
+
+        if ($useCache) {
+            $this->cacheProvider->save(static::getCacheKey($id), [$id => $cache]);
+        }
+
+        return $cache;
     }
 
     /**
@@ -72,14 +87,18 @@ class LocalizationManager
      */
     public function getLocalizations(array $ids = null, $useCache = true)
     {
-        $cache = $useCache ? $this->cacheProvider->fetch(static::CACHE_NAMESPACE) : false;
+        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey()) : false;
 
         if ($cache === false) {
             $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
             $cache = $this->associateLocalizationsArray($cache);
 
             if ($useCache) {
-                $this->cacheProvider->save(static::CACHE_NAMESPACE, $cache);
+                $this->cacheProvider->save(static::getCacheKey(), $cache);
+
+                foreach ($cache as $id => $localization) {
+                    $this->cacheProvider->save(static::getCacheKey($id), [$id => $localization]);
+                }
             }
         }
 
@@ -120,13 +139,24 @@ class LocalizationManager
      */
     public function clearCache()
     {
-        return $this->cacheProvider->delete(static::CACHE_NAMESPACE);
+        return $this->cacheProvider->deleteAll();
     }
 
     public function warmUpCache()
     {
         $this->clearCache();
         $this->getLocalizations();
+    }
+
+    /**
+     * @param int $localizationId
+     * @return string
+     */
+    public static function getCacheKey($localizationId = null)
+    {
+        return $localizationId !== null
+            ? sprintf('%s_%s', static::CACHE_NAMESPACE, $localizationId)
+            : static::CACHE_NAMESPACE;
     }
 
     /**
