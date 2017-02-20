@@ -5,15 +5,16 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Model\ProcessData;
-use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class HandleProcessTriggerCommand extends ContainerAwareCommand
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
+
+class HandleProcessTriggerCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const NAME = 'oro:process:handle-trigger';
 
@@ -128,5 +129,13 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand
     public function isActive()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultDefinition()
+    {
+        return '*/5 * * * *';
     }
 }

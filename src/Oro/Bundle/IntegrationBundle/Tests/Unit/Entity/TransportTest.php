@@ -24,5 +24,6 @@ class TransportTest extends \PHPUnit_Framework_TestCase
     public function testEntityMethods()
     {
         $this->assertNull($this->entity->getId());
+        $this->assertNull($this->entity->getChannel());
     }
 }

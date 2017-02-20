@@ -19,10 +19,21 @@ define(function(require) {
      */
     WorkflowViewerComponent = BaseComponent.extend(/** @lends WorkflowViewerComponent.prototype */{
 
+        options: {
+            entity: {},
+            system_entities: {},
+            chartOptions: {},
+            connectionOptions: {},
+            entityFields: {},
+            availableDestinations: {},
+        },
+
         /**
          * @inheritDoc
          */
         initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
+
             this.flowchartEnabled = !tools.isMobile();
             var flowchartOptions = this.flowchartEnabled ? {} : _.pick(options, ['connectionOptions', 'chartOptions']);
             WorkflowViewerComponent.__super__.initialize.apply(this, arguments);

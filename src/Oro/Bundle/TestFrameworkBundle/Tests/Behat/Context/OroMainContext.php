@@ -205,6 +205,28 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert that provided validation errors for given fields appeared
+     * Example: Then I should see validation errors:
+     *            | Subject         | This value should not be blank.  |
+     *
+     * @Then /^(?:|I )should see validation errors:$/
+     */
+    public function iShouldSeeValidationErrors(TableNode $table)
+    {
+        $form = $this->createOroForm();
+
+        foreach ($table->getRows() as $row) {
+            list($label, $value) = $row;
+            $error = $form->getFieldValidationErrors($label);
+            self::assertEquals(
+                $value,
+                $error,
+                "Failed asserting that $label has error $value"
+            );
+        }
+    }
+
+    /**
      * Assert form fields values
      * Example: And "User" form must contains values:
      *            | Username          | charlie           |

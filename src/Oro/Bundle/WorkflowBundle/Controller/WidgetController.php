@@ -48,7 +48,7 @@ class WidgetController extends Controller
             );
         }
 
-        $workflowManager = $this->get('oro_workflow.manager');
+        $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
         $applicableWorkflows = array_filter(
             $workflowManager->getApplicableWorkflows($entity),
             function (Workflow $workflow) use ($entity) {
@@ -72,7 +72,8 @@ class WidgetController extends Controller
                         ->getWorkflowData($entity, $workflow, $showDisabled);
                 },
                 $applicableWorkflows
-            )
+            ),
+            'originalUrl' => $this->get('oro_action.resolver.destination_page_resolver')->getOriginalUrl(),
         ];
     }
 

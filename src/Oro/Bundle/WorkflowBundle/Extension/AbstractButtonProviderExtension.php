@@ -13,6 +13,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareInterface;
 use Oro\Bundle\ActionBundle\Provider\ApplicationProviderAwareTrait;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -30,17 +31,25 @@ abstract class AbstractButtonProviderExtension implements
     /** @var RouteProviderInterface */
     protected $routeProvider;
 
+    /** @var DestinationPageResolver */
+    protected $destinationPageResolver;
+
     /** @var ButtonContext */
     private $baseButtonContext;
 
     /**
      * @param WorkflowRegistry $workflowRegistry
      * @param RouteProviderInterface $routeProvider
+     * @param DestinationPageResolver $destinationPageResolver
      */
-    public function __construct(WorkflowRegistry $workflowRegistry, RouteProviderInterface $routeProvider)
-    {
+    public function __construct(
+        WorkflowRegistry $workflowRegistry,
+        RouteProviderInterface $routeProvider,
+        DestinationPageResolver $destinationPageResolver
+    ) {
         $this->workflowRegistry = $workflowRegistry;
         $this->routeProvider = $routeProvider;
+        $this->destinationPageResolver = $destinationPageResolver;
     }
 
     /**
@@ -92,6 +101,7 @@ abstract class AbstractButtonProviderExtension implements
                 ->setEntity($searchContext->getEntityClass(), $searchContext->getEntityId())
                 ->setRouteName($searchContext->getRouteName())
                 ->setGroup($searchContext->getGroup())
+                ->setOriginalUrl($this->destinationPageResolver->getOriginalUrl())
                 ->setExecutionRoute($this->routeProvider->getExecutionRoute());
         }
 
