@@ -101,6 +101,27 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         }
     }
 
+    public function testConfigurationAction()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_workflow_definition_view', ['name' => LoadWorkflowDefinitions::MULTISTEP]),
+            [],
+            [],
+            $this->generateBasicAuthHeader()
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+
+        $this->assertNotEmpty($crawler->html());
+
+        $workflow = $this->workflowManager->getWorkflow(LoadWorkflowDefinitions::MULTISTEP);
+
+        $this->assertContains($workflow->getLabel(), $crawler->html());
+        $this->assertContains('Var1Value', $crawler->html());
+    }
+
     public function testActivateFormAction()
     {
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_GROUPS1);
