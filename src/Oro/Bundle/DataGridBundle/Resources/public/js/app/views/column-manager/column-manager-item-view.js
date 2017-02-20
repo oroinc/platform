@@ -39,7 +39,7 @@ define(function(require) {
 
         setFilterModel: function(filterModel) {
             this.filterModel = filterModel;
-            this.listenTo(this.filterModel, 'change:search', this.render)
+            this.listenTo(this.filterModel, 'change:search', this.render);
         },
 
         /**
