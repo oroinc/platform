@@ -136,6 +136,6 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand implements CronC
      */
     public function getDefaultDefinition()
     {
-        return '*/5 * * * *';
+        return '*/1 * * * *';
     }
 }

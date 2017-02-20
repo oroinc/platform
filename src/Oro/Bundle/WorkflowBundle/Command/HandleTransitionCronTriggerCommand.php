@@ -128,6 +128,6 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implement
      */
     public function getDefaultDefinition()
     {
-        return '*/5 * * * *';
+        return '*/1 * * * *';
     }
 }
