@@ -47,7 +47,7 @@ class PhpFileCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testObjectNotImplementsSetState()
     {
-        $cacheData = [1,2,3];
+        $cacheData = new \stdClass();
         $cacheId = 'test';
 
         $this->provider->save($cacheId, $cacheData);
