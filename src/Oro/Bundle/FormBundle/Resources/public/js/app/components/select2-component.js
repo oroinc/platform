@@ -27,9 +27,6 @@ define(function(require) {
             this.excluded = _.result(options, 'excluded') || this.excluded;
             config = this.preConfig(config);
             config = this.setConfig(config);
-            if (config.allowClear === undefined && !options._sourceElement[0].required) {
-                config.allowClear = true;
-            }
             if (options._sourceElement.is('select') || config.query || config.ajax || config.data || config.tags) {
                 this.view = new this.ViewType(this.prepareViewOptions(options, config));
             }

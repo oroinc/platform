@@ -33,14 +33,15 @@ class ThemeProvider
 
     /**
      * @param string $themeName
+     * @param string $sectionName
      *
      * @return string|null
      */
-    public function getStylesOutput($themeName)
+    public function getStylesOutput($themeName, $sectionName = 'styles')
     {
         $assets = $this->getTheme($themeName)->getConfigByKey('assets');
-        if ($assets && array_key_exists('styles', $assets)) {
-            return array_key_exists('output', $assets['styles']) ? $assets['styles']['output'] : null;
+        if ($assets && array_key_exists($sectionName, $assets)) {
+            return array_key_exists('output', $assets[$sectionName]) ? $assets[$sectionName]['output'] : null;
         }
 
         return null;
