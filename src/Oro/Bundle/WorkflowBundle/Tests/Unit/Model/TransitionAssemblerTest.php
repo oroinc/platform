@@ -70,7 +70,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'preactions' => [['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]],
             'preconditions' => ['@true' => null],
             'conditions' => ['@true' => null],
-            'actions' => [['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]],
+            'actions' => [
+                ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]
+            ],
         ]
     ];
 
@@ -489,7 +491,10 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     ],
                     'transition_definitions' => [
                         'empty_definition' => self::$transitionDefinitions['empty_definition']
-                    ]
+                    ],
+                    'variable_definitions' => [
+                        'variables' => []
+                    ],
                 ]
             ],
             'with_condition' => [
@@ -528,7 +533,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     ],
                     'transition_definitions' => [
                         'with_actions' => self::$transitionDefinitions['with_actions']
-                    ]
+                    ],
                 ]
             ],
             'with init context' => [
@@ -722,6 +727,60 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedPostAction, $actualTransition->getAction(), 'Incorrect action');
     }
 
+    public function testAssembleWithFullDefinitionAndVariables()
+    {
+        $configuration = [
+            'transition_definition' => 'full_definition',
+            'acl_resource' => 'test_acl',
+            'acl_message' => 'test acl message',
+            'step_to' => 'target_step',
+            'schedule' => ['cron' => '1 * * * *', 'filter' => 'e.field < 1']
+        ];
+        $steps = ['target_step' => $this->createStep()];
+        $attributes = ['attribute' => $this->createAttribute()];
+
+        $this->actionFactory->expects($this->exactly(2))
+            ->method('create')
+            ->with(ConfigurableAction::ALIAS, self::isType('array'))
+            ->willReturnCallback(function () {
+                return $this->createAction();
+            });
+
+        $this->formOptionsAssembler->expects($this->once())->method('assemble')
+            ->with([], $attributes, 'transition', 'test_transition')
+            ->will($this->returnArgument(0));
+
+        $transitions = $this->assembler->assemble(
+            [
+                'transitions' => [
+                    'test_transition' => $configuration,
+                ],
+                'transition_definitions' => self::$transitionDefinitions,
+                'variable_definitions' => [
+                    'variables' => [
+                        'test_var' => [
+                            'label' => 'test_label',
+                            'value' => 'test_value'
+                        ]
+                    ]
+                ],
+            ],
+            $steps,
+            $attributes
+        );
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $transitions);
+        $this->assertCount(1, $transitions);
+        $this->assertTrue($transitions->containsKey('test_transition'));
+
+        /** @var Transition $actualTransition */
+        $actualTransition = $transitions->get('test_transition');
+        $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+
+        $this->assertInstanceOf(ActionInterface::class, $actualTransition->getAction(), 'Incorrect action');
+    }
+
     public function testAssembleWithEmptyDefinition()
     {
         $configuration = [
@@ -763,7 +822,10 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 'transitions' => [
                     'test_transition' => $configuration,
                 ],
-                'transition_definitions' => self::$transitionDefinitions
+                'transition_definitions' => self::$transitionDefinitions,
+                'variable_definitions' => [
+                    'variables' => []
+                ],
             ],
             $steps,
             $attributes
