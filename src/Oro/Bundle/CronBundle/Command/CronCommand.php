@@ -44,12 +44,27 @@ class CronCommand extends ContainerAwareCommand
             if ($cronExpression->isDue()) {
                 /** @var CronCommandInterface $command */
                 $command = $this->getApplication()->get($schedule->getCommand());
+
+                if (!$command instanceof CronCommandInterface) {
+                    $output->writeln(
+                        sprintf(
+                            '<error>The cron command %s must be implements CronCommandInterface</error>',
+                            $schedule->getCommand()
+                        )
+                    );
+
+                    continue;
+                }
+
                 if ($command->isActive()) {
                     $output->writeln(
                         'Scheduling run for command ' . $schedule->getCommand(),
                         OutputInterface::VERBOSITY_DEBUG
                     );
-                    $this->getCommandRunner()->run($schedule->getCommand(), $schedule->getArguments());
+                    $this->getCommandRunner()->run(
+                        $schedule->getCommand(),
+                        $this->resolveOptions($schedule->getArguments())
+                    );
                 } else {
                     $output->writeln(
                         'Skipping not enabled command '.$schedule->getCommand(),
@@ -62,6 +77,27 @@ class CronCommand extends ContainerAwareCommand
         }
 
         $output->writeln('All commands scheduled', OutputInterface::VERBOSITY_DEBUG);
+    }
+
+    /**
+     * Convert command arguments to options. It needed for correctly pass this arguments into ArrayInput:
+     * new ArrayInput(['name' => 'foo', '--bar' => 'foobar']);
+     *
+     * @param array $commandOptions
+     * @return array
+     */
+    protected function resolveOptions(array $commandOptions)
+    {
+        $options = [];
+        foreach ($commandOptions as $key => $option) {
+            $params = explode('=', $option, 2);
+            if (is_array($params) && count($params) === 2) {
+                $options[$params[0]] = $params[1];
+            } else {
+                $options[$key] = $option;
+            }
+        }
+        return $options;
     }
 
     /**
