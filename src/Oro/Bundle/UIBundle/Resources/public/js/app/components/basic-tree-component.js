@@ -135,7 +135,8 @@ define(function(require) {
                 config.plugins.push('checkbox');
                 config.checkbox = {
                     whole_node: false,
-                    tie_selection: false
+                    tie_selection: false,
+                    three_state: false
                 };
 
                 $('[data-role="jstree-checkall"]').show();

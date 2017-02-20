@@ -42,7 +42,7 @@ class EntityControllerTest extends WebTestCase
 
                 return $data;
             },
-            $this->provider->getFields(false, false, true, false)
+            $this->provider->getFields(false, false, true, false, true, true)
         );
     }
 }

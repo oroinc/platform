@@ -71,12 +71,44 @@ class RestAdvancedSearchApiTest extends WebTestCase
     }
 
     /**
+     * @param array $request
+     * @param array $response
+     *
+     * @dataProvider advancedSearchBadRequestDataProvider
+     */
+    public function testAdvancedSearchBadRequest(array $request, array $response)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_search_advanced'),
+            ['query' => $request['query']]
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertJsonResponseStatusCodeEquals($result, 400);
+        $result = json_decode($result->getContent(), true);
+        $this->assertEquals($response['code'], $result['code']);
+        $this->assertEquals($response['message'], $result['message']);
+    }
+
+    /**
      * @return array
      */
     public function advancedSearchDataProvider()
     {
         return $this->getApiRequestsData(
             __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'advanced_requests'
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function advancedSearchBadRequestDataProvider()
+    {
+        return $this->getApiRequestsData(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'advanced_search_bad_requests'
         );
     }
 }

@@ -5,4 +5,4 @@ Oro\Bundle\TestFrameworkBundle\Entity\Item:
 
 Oro\Bundle\TestFrameworkBundle\Entity\ItemValue:
     TestValue{1..100}:
-        entity: @TestItem<numberBetween(1, 10)>
+        entity: '@TestItem<numberBetween(1, 10)>'

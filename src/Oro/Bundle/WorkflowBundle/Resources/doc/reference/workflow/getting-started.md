@@ -290,6 +290,8 @@ workflows:
                                 required: true              # define this field as required
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
+                display_type: page                          # form will be opened in separate page
+                destination_page: index                     # after submitting form will be opened index page of workflow`s related entity 
             add_email:                                      # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions

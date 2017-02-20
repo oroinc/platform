@@ -39,6 +39,7 @@ class ButtonContextTest extends \PHPUnit_Framework_TestCase
                 ['executionRoute', 'test_url1'],
                 ['formDialogRoute', 'test_url2'],
                 ['formPageRoute', 'test_url3'],
+                ['originalUrl', 'test_url4'],
                 ['enabled', true],
                 ['unavailableHidden', true],
                 ['errors', ['test_error'], []],

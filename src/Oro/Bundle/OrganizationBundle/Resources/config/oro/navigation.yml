@@ -2,18 +2,18 @@ navigation:
     menu_config:
         items:
             oro_business_unit_list:
-                label: 'oro.organization.businessunit.entity_plural_label'
-                route: 'oro_business_unit_index'
+                label:    'oro.organization.businessunit.entity_plural_label'
+                route:    'oro_business_unit_index'
+                position: 40
                 extras:
-                    position: 40
                     routes: ['oro_business_unit_*']
                     description: 'oro.business_unit.menu.list.description'
 
             oro_organization_list:
-                label: 'oro.organization.entity_label'
-                route: 'oro_organization_update_current'
+                label:    'oro.organization.entity_label'
+                route:    'oro_organization_update_current'
+                position: 50
                 extras:
-                    position: 50
                     routes: ['oro_organization_*']
                     description: 'oro.organization.menu.list.description'
 

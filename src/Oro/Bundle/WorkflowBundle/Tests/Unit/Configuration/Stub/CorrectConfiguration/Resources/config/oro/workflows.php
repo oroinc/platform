@@ -74,6 +74,7 @@ return [
                 ],
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
+                'destination_page' => 'name',
                 'page_template' => 'Workflow:Test:pageTemplate.html.twig',
                 'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
                 'form_options' => [
@@ -207,6 +208,7 @@ return [
                 'acl_message' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'display_type' => 'dialog',
+                'destination_page' => '',
                 'form_options' => [],
                 'page_template' => null,
                 'dialog_template' => null,

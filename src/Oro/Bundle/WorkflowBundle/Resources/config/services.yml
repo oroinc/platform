@@ -150,7 +150,6 @@ services:
 
     oro_workflow.registry.workflow_manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry'
-        public: false
         arguments:
             - '@oro_action.provider.current_application'
         calls:
@@ -405,6 +404,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -415,6 +415,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -425,6 +426,7 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
         calls:
             - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
@@ -504,5 +506,5 @@ services:
     oro_workflow.workflow_data.provider:
         class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider'
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.transition_data.provider'

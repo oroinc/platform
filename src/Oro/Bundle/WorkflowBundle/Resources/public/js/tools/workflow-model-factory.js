@@ -67,6 +67,7 @@ define(function(require) {
 
             var workflowModel = new WorkflowModel(configuration);
             workflowModel.setSystemEntities(options.system_entities);
+            workflowModel.setAvailableDestinations(options.availableDestinations);
 
             workflowModel.url = options._sourceElement.attr('action');
             if (translateLinks && 'label' in translateLinks) {
