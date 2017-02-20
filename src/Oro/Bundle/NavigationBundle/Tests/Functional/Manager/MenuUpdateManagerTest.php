@@ -5,8 +5,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Manager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Knp\Menu\MenuItem;
-
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
@@ -47,19 +45,6 @@ class MenuUpdateManagerTest extends WebTestCase
         $this->manager = $this->getContainer()->get('oro_navigation.manager.menu_update');
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass('OroNavigationBundle:MenuUpdate');
         $this->repository = $this->em->getRepository('OroNavigationBundle:MenuUpdate');
-    }
-
-    public function testGetMenu()
-    {
-        $menu = $this->manager->getMenu('application_menu');
-        $this->assertInstanceOf(MenuItem::class, $menu);
-        $this->assertGreaterThan(0, $menu->getChildren());
-        $this->assertEquals('application_menu', $menu->getName());
-
-        $menu = $this->manager->getMenu('not_existing_menu');
-        $this->assertInstanceOf(MenuItem::class, $menu);
-        $this->assertCount(0, $menu->getChildren());
-        $this->assertEquals('not_existing_menu', $menu->getName());
     }
 
     public function testCreateMenuUpdate()

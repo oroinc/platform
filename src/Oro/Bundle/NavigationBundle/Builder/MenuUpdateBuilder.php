@@ -34,9 +34,9 @@ class MenuUpdateBuilder implements BuilderInterface
     private $className;
 
     /**
-     * @param LocalizationHelper        $localizationHelper
-     * @param ScopeManager              $scopeManager
-     * @param ManagerRegistry $registry
+     * @param LocalizationHelper $localizationHelper
+     * @param ScopeManager       $scopeManager
+     * @param ManagerRegistry    $registry
      */
     public function __construct(
         LocalizationHelper $localizationHelper,
