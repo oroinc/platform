@@ -11,6 +11,11 @@ define(function(require) {
     var ColumnManagerCollectionView = require('orodatagrid/js/app/views/column-manager/column-manager-collection-view');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
     var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        enableFilters: true
+    }, config);
 
     /**
      * @class ColumnManagerComponent
@@ -45,7 +50,7 @@ define(function(require) {
          * Check if filters enabled
          * @type {boolean}
          */
-        enableFilters: true,
+        enableFilters: config.enableFilters,
 
         /**
          * @inheritDoc
@@ -115,8 +120,7 @@ define(function(require) {
             this.columnManagerView = new ColumnManagerView({
                 el: options._sourceElement,
                 collection: this.managedColumns,
-                columnFilterModel: this.columnFilterModel,
-                templateSelectors: options.templateSelectors || {}
+                columnFilterModel: this.columnFilterModel
             });
 
             if (this.enableFilters) {
@@ -131,8 +135,7 @@ define(function(require) {
                 collection: this.managedColumns,
                 filterModel: this.columnFilterModel,
                 addSorting: this.addSorting,
-                orderShift: orderShift,
-                templateSelectors: options.templateSelectors || {}
+                orderShift: orderShift
             });
             this.listenTo(this.columnManagerCollectionView, 'reordered', this._pushState);
         },

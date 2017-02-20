@@ -52,22 +52,9 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['orderShift', 'filterModel', 'addSorting', 'templateSelectors']));
+            _.extend(this, _.pick(options, ['orderShift', 'filterModel', 'addSorting']));
             if (!(this.filterModel instanceof ColumnFilterModel)) {
                 throw new TypeError('Invalid required option "filterModel"');
-            }
-
-            if (_.isObject(options.templateSelectors)) {
-                var $tpl = $(options.templateSelectors.columnManagerCollectionsTpl);
-                var itemTpl = options.templateSelectors.columnManagerItemTpl;
-
-                if ($tpl.length) {
-                    this.template = _.template($tpl.html());
-                }
-
-                if (!_.isUndefined(itemTpl)) {
-                    this.filterModel.set('columnManagerItemTpl', itemTpl, false);
-                }
             }
 
             options.filterer = _.bind(this.filterModel.filterer, this.filterModel);

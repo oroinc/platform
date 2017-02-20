@@ -19,6 +19,7 @@ define([
             var templateFunc = null;
 
             if (typeof template === 'string') {
+                template = $(template).length ? $(template).html() : template;
                 templateFunc = _.template(template);
                 // share a compiled template with all instances built with same constructor
                 this.constructor.prototype.template = templateFunc;

@@ -5,9 +5,15 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        template: require('tpl!orodatagrid/templates/column-manager/column-manager.html')
+    }, config);
 
     ColumnManagerView = BaseView.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager.html'),
+        template: config.template,
         autoRender: true,
         className: 'dropdown-menu',
         events: {
@@ -21,14 +27,6 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            if (_.isObject(options.templateSelectors)) {
-                var $tpl = $(options.templateSelectors.columnManagerTpl);
-
-                if ($tpl.length) {
-                    this.template = _.template($tpl.html());
-                }
-            }
-
             ColumnManagerView.__super__.initialize.call(this, options);
             this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
             // to handle renderable change at once for multiple changes

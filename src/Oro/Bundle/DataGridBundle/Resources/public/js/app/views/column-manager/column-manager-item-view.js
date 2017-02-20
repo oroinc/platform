@@ -5,9 +5,15 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html')
+    }, config);
 
     ColumnManagerItemView = BaseView.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html'),
+        template: config.template,
         tagName: 'tr',
 
         events: {
@@ -22,7 +28,7 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
-         /**
+        /**
          * @inheritDoc
          */
         render: function() {
@@ -33,17 +39,18 @@ define(function(require) {
 
         setFilterModel: function(filterModel) {
             this.filterModel = filterModel;
-
-            if (this.filterModel.get('columnManagerItemTpl')) {
-                var $tpl = $(this.filterModel.get('columnManagerItemTpl'));
-
-                if ($tpl.length) {
-                    this.template = _.template($tpl.html());
-                }
-            }
-
-            this.listenTo(this.filterModel, 'change:search', this.render);
+            this.listenTo(this.filterModel, 'change:search', this.render)
         },
+
+        /**
+         * @inheritDoc
+         */
+        //initItemView: function() {
+        //    var view = WidgetPickerCollectionView.__super__.initItemView.apply(this, arguments);
+        //    this.listenTo(view, 'widget_add', this.processWidgetAdd);
+        //    view.setFilterModel(this.filterModel);
+        //    return view;
+        //},
 
         /**
          * @inheritDoc
