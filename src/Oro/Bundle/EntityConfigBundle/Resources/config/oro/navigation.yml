@@ -2,10 +2,9 @@ navigation:
     menu_config:
         items:
             entities_list:
-                label: 'oro.entity_config.menu.entities_list.label'
-                uri: '#'
-                extras:
-                    position:    80
+                label:    'oro.entity_config.menu.entities_list.label'
+                uri:      '#'
+                position: 80
 
             entity_management:
                 label: 'oro.entity_config.menu.entity_management.label'
