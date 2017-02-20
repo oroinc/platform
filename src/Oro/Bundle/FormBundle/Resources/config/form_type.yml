@@ -261,6 +261,13 @@ services:
         tags:
             - { name: form.type, alias: oro_encoded_password }
 
+    oro_form.type.encoded_placeholder_password:
+        class: %oro_form.type.encoded_password.class%
+        arguments:
+            - '@oro_security.encoder.mcrypt'
+        tags:
+            - { name: form.type, alias: oro_encoded_placeholder_password }
+
     oro_form.type.textlist:
         class: %oro_form.type.textlist.class%
         tags:
