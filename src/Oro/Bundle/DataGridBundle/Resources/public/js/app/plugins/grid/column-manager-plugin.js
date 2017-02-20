@@ -13,8 +13,7 @@ define(function(require) {
     config = _.extend({
         icon: 'cog',
         wrapperClassName: 'column-manager',
-        label: __('oro.datagrid.column_manager.title'),
-        columnManagerView: ''
+        label: __('oro.datagrid.column_manager.title')
     }, config);
 
     ColumnManagerPlugin = BasePlugin.extend({
@@ -22,14 +21,15 @@ define(function(require) {
             this.listenTo(this.main, 'beforeToolbarInit', this.onBeforeToolbarInit);
             ColumnManagerPlugin.__super__.enable.call(this);
         },
+
         onBeforeToolbarInit: function(toolbarOptions) {
             var options = {};
-            this.main.collection.trigger('get:module', 'CustomColumnManagerComponent', options);
+            this.main.collection.trigger('get:module', 'ColumnManagerComponent', options);
             this._createManagedCollection();
             options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
-                    componentConstructor: options.CustomColumnManagerComponent || ColumnManagerComponent,
+                    componentConstructor: options.ColumnManagerComponent || ColumnManagerComponent,
                     columns: this.main.columns,
                     managedColumns: this.managedColumns,
                     addSorting: true

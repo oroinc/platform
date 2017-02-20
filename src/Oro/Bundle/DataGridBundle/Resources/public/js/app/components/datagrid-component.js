@@ -209,7 +209,7 @@ define(function(require) {
             });
 
             var loadModules = _.extend(config.loadModules, options.loadModules);
-            _.mapObject(loadModules, function(val, key) {
+            _.each(loadModules, function(val, key) {
                 modules[key] = val;
             });
         },

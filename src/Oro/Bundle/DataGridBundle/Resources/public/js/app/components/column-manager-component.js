@@ -11,11 +11,6 @@ define(function(require) {
     var ColumnManagerCollectionView = require('orodatagrid/js/app/views/column-manager/column-manager-collection-view');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
     var module = require('module');
-    var config = module.config();
-
-    config = _.extend({
-        enableFilters: true
-    }, config);
 
     /**
      * @class ColumnManagerComponent
@@ -50,7 +45,7 @@ define(function(require) {
          * Check if filters enabled
          * @type {boolean}
          */
-        enableFilters: config.enableFilters,
+        enableFilters: true,
 
         /**
          * @inheritDoc
@@ -91,7 +86,6 @@ define(function(require) {
             delete this.columns;
             delete this.grid;
             delete this.enableFilters;
-            delete this.templateSelectors;
 
             ColumnManagerComponent.__super__.dispose.apply(this, arguments);
         },

@@ -10,7 +10,7 @@
     -webkit-appearance: none;
 }
 
-@mixin base-disabled-style($opacity) {
+@mixin base-disabled-style($opacity: .5) {
     opacity: $opacity;
 
     pointer-events: none;

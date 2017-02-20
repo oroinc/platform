@@ -10,6 +10,14 @@ define(function(require) {
      * @extends ColumnManagerComponent
      */
     CustomColumnManagerComponent = ColumnManagerComponent.extend({
+        /**
+         * @property {Boolean}
+         */
+        enableFilters: false,
+
+        /**
+         * @property {Object}
+         */
         templateSelectors: {
             'columnManagerTpl': '#commerce-column-manager-tpl',
             'columnManagerCollectionsTpl': '#commerce-column-manager-collection-tpl',

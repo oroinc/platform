@@ -72,6 +72,7 @@ define(function(require) {
                 model.set('renderable', true);
             });
         },
+
         onunselectAll: function(e) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
