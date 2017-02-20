@@ -59,11 +59,14 @@ define(function(require) {
 
             if (_.isObject(options.templateSelectors)) {
                 var $tpl = $(options.templateSelectors.columnManagerCollectionsTpl);
-                this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
-
                 var itemTpl = options.templateSelectors.columnManagerItemTpl;
+
+                if ($tpl.length) {
+                    this.template = _.template($tpl.html());
+                }
+
                 if (!_.isUndefined(itemTpl)) {
-                    this.filterModel = this.filterModel.set('columnManagerItemTpl', itemTpl, false);
+                    this.filterModel.set('columnManagerItemTpl', itemTpl, false);
                 }
             }
 

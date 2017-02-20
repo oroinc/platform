@@ -22,14 +22,7 @@ define(function(require) {
             'change:renderable model': 'updateView'
         },
 
-        /**
-         * @inheritDoc
-         */
-        initialize: function(options) {
-            ColumnManagerItemView.__super__.initialize.apply(this, arguments);
-        },
-
-        /**
+         /**
          * @inheritDoc
          */
         render: function() {
@@ -45,7 +38,7 @@ define(function(require) {
                 var $tpl = $(this.filterModel.get('columnManagerItemTpl'));
 
                 if ($tpl.length) {
-                    this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
+                    this.template = _.template($tpl.html());
                 }
             }
 

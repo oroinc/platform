@@ -14,7 +14,7 @@
                 @include fa-icon($checkbox-icon-checked);
             }
         }
-        @include element-state('disabled'){
+        @include element-state('disabled') {
             & ~ .custom-checkbox__icon{
                 @include base-disabled-style(.55);
             }

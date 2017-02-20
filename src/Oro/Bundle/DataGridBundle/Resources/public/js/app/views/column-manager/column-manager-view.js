@@ -24,7 +24,9 @@ define(function(require) {
             if (_.isObject(options.templateSelectors)) {
                 var $tpl = $(options.templateSelectors.columnManagerTpl);
 
-                this.template =  $tpl.length ? _.template($tpl.html()) : this.template;
+                if ($tpl.length) {
+                    this.template = _.template($tpl.html());
+                }
             }
 
             ColumnManagerView.__super__.initialize.call(this, options);
