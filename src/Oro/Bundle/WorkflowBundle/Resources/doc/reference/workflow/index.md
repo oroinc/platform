@@ -6,5 +6,4 @@ Workflow Documentation
 - [Translations wizard](./translations-wizard.md)
 - [Workflow Entities](./workflow-entities.md)
     - [Transition Conditions](./workflow-entities/transition-conditions.md)
-    - [Transition Forms](./transition-forms.md)
     - [Transition Actions](./workflow-entities/transition-actions.md)
