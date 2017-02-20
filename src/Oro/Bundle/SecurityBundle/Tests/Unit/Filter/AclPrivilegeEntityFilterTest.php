@@ -43,7 +43,7 @@ class AclPrivilegeEntityFilterTest extends AbstractAclPrivilegeFilterTestCase
         $aclPrivilege1->addPermission(new AclPermission('perm2'));
         $aclPrivilege2->addPermission(new AclPermission('perm2'));
 
-        /** @var ConfigurablePermission $configurablePermission */
+        /** @var ConfigurablePermission|\PHPUnit_Framework_MockObject_MockObject $configurablePermission */
         $configurablePermission = $this->createMock(ConfigurablePermission::class);
         $configurablePermission->expects($this->any())
             ->method('isEntityPermissionConfigurable')
@@ -57,6 +57,6 @@ class AclPrivilegeEntityFilterTest extends AbstractAclPrivilegeFilterTestCase
 
         $this->assertTrue($this->filter->filter($aclPrivilege1, $configurablePermission));
         $this->assertCount(1, $aclPrivilege1->getPermissions());
-        $this->assertFalse($this->filter->filter($aclPrivilege2, $configurablePermissions));
+        $this->assertFalse($this->filter->filter($aclPrivilege2, $configurablePermission));
     }
 }

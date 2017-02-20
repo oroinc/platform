@@ -9,14 +9,14 @@ class ConfigurablePermission
     /** @var string */
     private $name;
 
-    /** @var array[] */
-    private $entities = [];
+    /** @var array[]|bool */
+    private $entities;
 
     /** @var array */
     private $capabilities = [];
 
-    /** @var array */
-    private $workflows = [];
+    /** @var array[]|bool */
+    private $workflows;
 
     /** @var bool */
     private $default;
@@ -24,16 +24,16 @@ class ConfigurablePermission
     /**
      * @param string $name
      * @param bool $default
-     * @param array $entities
+     * @param array[]|bool $entities
      * @param array $capabilities
-     * @param array $workflows
+     * @param array[]|bool $workflows
      */
     public function __construct(
         $name,
-        $default = false,
-        array $entities = [],
+        $default = true,
+        $entities = [],
         array $capabilities = [],
-        array $workflows = []
+        $workflows = []
     ) {
         $this->name = $name;
         $this->default = (bool)$default;
@@ -57,7 +57,14 @@ class ConfigurablePermission
      */
     public function isEntityPermissionConfigurable($entityClass, $permission)
     {
-        $permissions = isset($this->entities[$entityClass]) ? $this->entities[$entityClass] : [];
+        if (!isset($this->entities[$entityClass])) {
+            return (bool) $this->default;
+        }
+        $permissions = $this->entities[$entityClass];
+        // if boolean value - it using for all permissions
+        if (is_bool($permissions)) {
+            return $permissions;
+        }
 
         return (bool) isset($permissions[$permission]) ? $permissions[$permission] : $this->default;
     }
@@ -80,7 +87,14 @@ class ConfigurablePermission
      */
     public function isWorkflowPermissionConfigurable($identity, $permission)
     {
-        $permissions = isset($this->workflows[$identity]) ? $this->workflows[$identity] : [];
+        if (!isset($this->workflows[$identity])) {
+            return (bool) $this->default;
+        }
+        $permissions = $this->workflows[$identity];
+        // if boolean value - it using for all permissions
+        if (is_bool($permissions)) {
+            return $permissions;
+        }
 
         return (bool) isset($permissions[$permission]) ? $permissions[$permission] : $this->default;
     }

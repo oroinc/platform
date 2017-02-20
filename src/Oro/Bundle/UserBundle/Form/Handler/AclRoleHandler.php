@@ -237,7 +237,7 @@ class AclRoleHandler
                 return true;
             }
         } else {
-            $formPrivileges = $this->prepareRolePrivilegies($role);
+            $formPrivileges = $this->prepareRolePrivileges($role);
             $this->form->get('privileges')->setData(json_encode($formPrivileges));
         }
 
@@ -280,7 +280,7 @@ class AclRoleHandler
      *
      * @return array
      */
-    protected function prepareRolePrivilegies(AbstractRole $role)
+    protected function prepareRolePrivileges(AbstractRole $role)
     {
         $allPrivileges = [];
         /**

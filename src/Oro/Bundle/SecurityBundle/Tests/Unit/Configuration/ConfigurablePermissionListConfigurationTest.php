@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionListConfiguration;
 
 class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -43,7 +45,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
             ],
             'expected' => [
                 'commerce' => [
-                    'default' => false,
+                    'default' => true,
                     'entities' => [],
                     'workflows' => [],
                     'capabilities' => [],
@@ -61,7 +63,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
             ],
             'expected' => [
                 'commerce' => [
-                    'default' => false,
+                    'default' => true,
                     'entities' => [
                         'Entity1' => ['CREATE' => false]
                     ],
@@ -74,7 +76,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
         yield 'configuration permissions list 3' => [
             'config' => [
                 'commerce' => [
-                    'default' => true,
+                    'default' => false,
                     'capabilities' => [
                         'test1' => false,
                         'test2' => false
@@ -89,7 +91,7 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
             ],
             'expected' => [
                 'commerce' => [
-                    'default' => true,
+                    'default' => false,
                     'entities' => [],
                     'capabilities' => [
                         'test1' => false,
@@ -103,6 +105,79 @@ class ConfigurablePermissionListConfigurationTest extends \PHPUnit_Framework_Tes
                     ],
                 ]
             ]
+        ];
+
+        yield 'boolean values' => [
+            'config' => [
+                'commerce' => [
+                    'default' => true,
+                    'entities' => ['Entity1' => true],
+                    'capabilities' => [],
+                    'workflows' => ['workflow1' => false],
+                ]
+            ],
+            'expected' => [
+                'commerce' => [
+                    'default' => true,
+                    'entities' => ['Entity1' => true],
+                    'capabilities' => [],
+                    'workflows' => ['workflow1' => false],
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider configurationExceptionProvider
+     *
+     * @param array $config
+     * @param string $exception
+     * @param string $exceptionMessage
+     */
+    public function testProcessConfigurationException(array $config, $exception, $exceptionMessage)
+    {
+        $config = [
+            ConfigurablePermissionListConfiguration::ROOT_NODE_NAME => $config
+        ];
+        $this->expectException($exception);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $this->configuration->processConfiguration($config);
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function configurationExceptionProvider()
+    {
+        yield 'not array or boolean value for entity item' => [
+            'config' => [
+                'commerce' => [
+                    'entities' => ['Entity1' => 1],
+                ]
+            ],
+            'exception' => InvalidConfigurationException::class,
+            'exceptionMessage' => 'For node "entities" allowed only array or boolean value',
+        ];
+
+        yield 'not boolean value for capability item' => [
+            'config' => [
+                'commerce' => [
+                    'capabilities' => ['capability1' => 1],
+                ]
+            ],
+            'exception' => InvalidConfigurationException::class,
+            'exceptionMessage' => 'For items of node "capabilities" allowed only boolean values',
+        ];
+
+        yield 'not boolean value for workflow permission' => [
+            'config' => [
+                'commerce' => [
+                    'workflows' => ['workflow1' => ['permission1' => 1]],
+                ]
+            ],
+            'exception' => InvalidConfigurationException::class,
+            'exceptionMessage' => 'For every permission of node "workflows" can be set only boolean value',
         ];
     }
 }

@@ -44,7 +44,7 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit_Framework
             'bundles' => [$bundle1],
             'expected' => [
                 'commerce' => [
-                    'default' => false,
+                    'default' => true,
                     'entities' => [
                         'TestEntity' => [
                             'UPDATE' => true

@@ -112,6 +112,11 @@ class ConfigurablePermissionTest extends \PHPUnit_Framework_TestCase
                 'entities' => [self::ENTITY_CLASS => [self::PERMISSION => true]],
                 'expected' => true,
             ],
+            'boolean' => [
+                'default' => false,
+                'entities' => [self::ENTITY_CLASS => true],
+                'expected' => true,
+            ],
         ];
     }
 
@@ -164,6 +169,11 @@ class ConfigurablePermissionTest extends \PHPUnit_Framework_TestCase
                 'default' => false,
                 'workflows' => [self::WORKFLOW => [self::PERMISSION => true]],
                 'expected' => true,
+            ],
+            'boolean' => [
+                'default' => true,
+                'workflows' => [self::WORKFLOW => false],
+                'expected' => false,
             ],
         ];
     }
