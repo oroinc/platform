@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
+use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 
@@ -31,12 +32,8 @@ class HandleTransitionCronTriggerCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testCommandImplementsProperInterface()
     {
-        $this->assertInstanceOf(CronCommandInterface::class, $this->command);
-    }
-
-    public function testGetDefaultDefinition()
-    {
-        $this->assertEquals('*/1 * * * *', $this->command->getDefaultDefinition());
+        $this->assertInstanceOf(ActiveCronCommandInterface::class, $this->command);
+        $this->assertNotInstanceOf(CronCommandInterface::class, $this->command);
     }
 
     public function testIsActive()

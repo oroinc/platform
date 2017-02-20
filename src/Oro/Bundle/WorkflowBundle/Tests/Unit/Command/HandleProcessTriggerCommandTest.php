@@ -5,10 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -263,12 +264,8 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testCommandImplementsProperInterface()
     {
-        $this->assertInstanceOf(CronCommandInterface::class, $this->command);
-    }
-
-    public function testGetDefaultDefinition()
-    {
-        $this->assertEquals('*/1 * * * *', $this->command->getDefaultDefinition());
+        $this->assertInstanceOf(ActiveCronCommandInterface::class, $this->command);
+        $this->assertNotInstanceOf(CronCommandInterface::class, $this->command);
     }
 
     public function testIsActive()
