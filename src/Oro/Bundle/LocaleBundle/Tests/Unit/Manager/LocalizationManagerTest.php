@@ -83,7 +83,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertGetEntityRepositoryForClassIsCalled();
         $this->assertCacheReads(false);
-        $this->assertRepositoryCalls();
+        $this->assertRepositoryCalls($entity);
 
         $result = $this->manager->getLocalization($entity->getId());
 
@@ -93,7 +93,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetLocalizations()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->assertRepositoryCalls();
+        $this->assertRepositoryCalls(null, $this->entities);
         $this->assertCacheReads(false);
 
         $result = $this->manager->getLocalizations();
@@ -114,7 +114,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetLocalizationsForcedCacheDisabled()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->assertRepositoryCalls();
+        $this->assertRepositoryCalls(null, $this->entities);
 
         //Cache should not be accessed at all
         $this->cacheProvider->expects($this->never())
@@ -130,7 +130,7 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetLocalizationsByIds()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->assertRepositoryCalls();
+        $this->assertRepositoryCalls(null, $this->entities);
         $this->assertCacheReads(false);
 
         /** @var Localization[] $entities */
@@ -229,10 +229,21 @@ class LocalizationManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->warmUpCache();
     }
 
-    protected function assertRepositoryCalls()
+    /**
+     * @param Localization   $entity
+     * @param Localization[] $entities
+     */
+    protected function assertRepositoryCalls(Localization $entity = null, array $entities = [])
     {
         $this->repository->expects($this->never())->method('find');
-        $this->repository->expects($this->once())->method('findBy')->willReturn($this->entities);
+
+        if (count($entities) > 0) {
+            $this->repository->expects($this->once())->method('findBy')->willReturn($entities);
+        }
+
+        if ($entity) {
+            $this->repository->expects($this->once())->method('findOneBy')->willReturn($entity);
+        }
     }
 
     /**

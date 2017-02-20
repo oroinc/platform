@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -69,6 +70,21 @@ class UserMenuController extends AbstractMenuController
     public function updateAction($menuName, $key)
     {
         return parent::update($menuName, $key, $this->getContext(), $this->getMenuTreeContext());
+    }
+
+    /**
+     * @Route("/{menuName}/move", name="oro_navigation_user_menu_move")
+     * @Template
+     * @AclAncestor("oro_navigation_manage_menus")
+     *
+     * @param Request $request
+     * @param string  $menuName
+     *
+     * @return array|RedirectResponse
+     */
+    public function moveAction(Request $request, $menuName)
+    {
+        return parent::move($request, $menuName);
     }
 
     /**

@@ -12,6 +12,9 @@ Localization objects are cached to provide better performance.
 You _MUST_ disable cache usage if you need to persist, delete or assign returned Localization
 (see *$useCache* parameter below).
 
+Also keep in mind, that cached objects will have *Localization::$childLocalizations* set to null.
+If you need to have children localizations, consider setting *$useCache* parameter to **false**.
+
 LocalizationManager
 ===================
 LocalizationManager provides all the necessary methods for accessing localizations.
