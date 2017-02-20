@@ -39,6 +39,8 @@ Oro\Bundle\UserBundle\Entity\User:
             - LessThanOrEqual:
                 value: now UTC
                 message: This value cannot be in the future.
+        emails:
+            - Valid: ~
 
 Oro\Bundle\UserBundle\Entity\Role:
     constraints:

@@ -249,7 +249,6 @@ class EmailTypeTest extends TypeTestCase
                     'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
                     'intention'          => 'email',
                     'csrf_protection'    => true,
-                    'cascade_validation' => true
                 ]
             );
 
