@@ -339,3 +339,10 @@ QueryDesignerBundle
         `ManagerRegistry` $doctrine,
         `DatagridGuesser` $datagridGuesser,
         `EntityNameResolver` $entityNameResolver
+
+TagBundle
+---------
+- Class `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+    - removed method `isReportOrSegmentGrid`
+    - removed method `addReportOrSegmentGridPrefix`
+    - added UnsupportedGridPrefixesTrait
