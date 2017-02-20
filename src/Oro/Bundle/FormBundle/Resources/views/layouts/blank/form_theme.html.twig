@@ -74,3 +74,10 @@
         {{- ' ' ~ attrname }}="{{ attrvalue }}"
     {% endfor %}
 {%- endblock attributes -%}
+
+{%- block number_widget -%}
+    {%- set attr = attr|merge({'pattern': '[0-9]*'}) -%}
+    {%- set type = type|default('number') -%}
+    {{ block('form_widget_simple') }}
+{%- endblock number_widget -%}
+
