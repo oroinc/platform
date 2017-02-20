@@ -45,16 +45,6 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        //initItemView: function() {
-        //    var view = WidgetPickerCollectionView.__super__.initItemView.apply(this, arguments);
-        //    this.listenTo(view, 'widget_add', this.processWidgetAdd);
-        //    view.setFilterModel(this.filterModel);
-        //    return view;
-        //},
-
-        /**
-         * @inheritDoc
-         */
         getTemplateData: function() {
             var searchString = this.filterModel.get('search');
             var data = ColumnManagerItemView.__super__.getTemplateData.call(this);
