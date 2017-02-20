@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 
 class AttributeGroupRelationRepository extends EntityRepository
@@ -78,5 +79,21 @@ class AttributeGroupRelationRepository extends EntityRepository
             ->setParameter('id', $fieldId);
 
         return $qb->getQuery()->execute();
+    }
+
+    /**
+     * @param AttributeFamily $attributeFamily
+     * @return AttributeGroupRelation[]
+     */
+    public function getAttributeGroupRelationsByFamily(AttributeFamily $attributeFamily)
+    {
+        $queryBuilder = $this->createQueryBuilder('attributeGroupRelation')
+            ->innerJoin('attributeGroupRelation.attributeGroup', 'attributeGroup');
+
+        return $queryBuilder
+            ->where($queryBuilder->expr()->eq('attributeGroup.attributeFamily', ':attributeFamily'))
+            ->setParameter('attributeFamily', $attributeFamily)
+            ->getQuery()
+            ->getResult();
     }
 }

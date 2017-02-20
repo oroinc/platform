@@ -2,13 +2,9 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class DashboardControllerAclTest extends WebTestCase
 {
     protected function setUp()

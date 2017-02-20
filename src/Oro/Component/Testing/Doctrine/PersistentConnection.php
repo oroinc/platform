@@ -2,6 +2,7 @@
 namespace Oro\Component\Testing\Doctrine;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ConnectionException;
 use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 
@@ -20,6 +21,7 @@ class PersistentConnection extends Connection
      * @var int[]
      */
     protected static $persistentTransactionNestingLevels;
+
     /**
      * {@inheritDoc}
      */
@@ -33,14 +35,22 @@ class PersistentConnection extends Connection
             $this->setConnected(true);
         } else {
             parent::connect();
+
             $this->setPersistentConnection($this->_conn);
+
+            if ($this->getTransactionIsolation() !== Connection::TRANSACTION_READ_COMMITTED) {
+                $this->setTransactionIsolation(Connection::TRANSACTION_READ_COMMITTED);
+            }
+
             if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
                 // force default value
                 $this->_conn->exec('SET SESSION wait_timeout=28800');
             }
         }
+
         return true;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -51,6 +61,7 @@ class PersistentConnection extends Connection
             $this->unsetPersistentConnection();
         }
     }
+
     /**
      * {@inheritDoc}
      */
@@ -58,6 +69,7 @@ class PersistentConnection extends Connection
     {
         $this->wrapTransactionNestingLevel('beginTransaction');
     }
+
     /**
      * {@inheritDoc}
      */
@@ -65,6 +77,7 @@ class PersistentConnection extends Connection
     {
         $this->wrapTransactionNestingLevel('commit');
     }
+
     /**
      * {@inheritDoc}
      */
@@ -72,6 +85,7 @@ class PersistentConnection extends Connection
     {
         $this->wrapTransactionNestingLevel('rollBack');
     }
+
     /**
      * {@inheritDoc}
      */
@@ -80,6 +94,7 @@ class PersistentConnection extends Connection
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());
         return parent::isTransactionActive();
     }
+
     /**
      * @param int $level
      */
@@ -93,6 +108,7 @@ class PersistentConnection extends Connection
 
         $rp->setValue($this, $level);
     }
+
     /**
      * @param string $method
      *
@@ -100,16 +116,11 @@ class PersistentConnection extends Connection
      */
     private function wrapTransactionNestingLevel($method)
     {
-        $exception = null;
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());
-        try {
-            call_user_func(array('parent', $method));
-            $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
-        } catch (\Exception $e) {
-            $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
-            throw $e;
-        }
+        call_user_func(array('parent', $method));
+        $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
     }
+
     /**
      * @param bool $connected
      */
@@ -123,6 +134,7 @@ class PersistentConnection extends Connection
 
         $rp->setValue($this, $connected);
     }
+
     /**
      * @return int
      */
@@ -133,6 +145,7 @@ class PersistentConnection extends Connection
         }
         return 0;
     }
+
     /**
      * @param int $level
      */
@@ -140,6 +153,7 @@ class PersistentConnection extends Connection
     {
         static::$persistentTransactionNestingLevels[$this->getConnectionId()] = $level;
     }
+
     /**
      * @param DriverConnection $connection
      */
@@ -147,6 +161,7 @@ class PersistentConnection extends Connection
     {
         static::$persistentConnections[$this->getConnectionId()] = $connection;
     }
+
     /**
      * @return bool
      */
@@ -154,6 +169,7 @@ class PersistentConnection extends Connection
     {
         return isset(static::$persistentConnections[$this->getConnectionId()]);
     }
+
     /**
      * @return DriverConnection
      */
@@ -161,6 +177,7 @@ class PersistentConnection extends Connection
     {
         return static::$persistentConnections[$this->getConnectionId()];
     }
+
     /**
      * @return DriverConnection
      */
@@ -169,6 +186,7 @@ class PersistentConnection extends Connection
         unset(static::$persistentConnections[$this->getConnectionId()]);
         unset(static::$persistentTransactionNestingLevels[$this->getConnectionId()]);
     }
+
     /**
      * @return string
      */

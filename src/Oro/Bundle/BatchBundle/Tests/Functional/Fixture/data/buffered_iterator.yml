@@ -1,0 +1,8 @@
+Oro\Bundle\TestFrameworkBundle\Entity\Item:
+    TestItem{1..10}:
+        stringValue: String Value <current()>
+        integerValue: <numberBetween(1, 100)>
+
+Oro\Bundle\TestFrameworkBundle\Entity\ItemValue:
+    TestValue{1..100}:
+        entity: '@TestItem<numberBetween(1, 10)>'

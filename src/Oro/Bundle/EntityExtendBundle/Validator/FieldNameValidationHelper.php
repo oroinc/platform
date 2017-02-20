@@ -4,23 +4,31 @@ namespace Oro\Bundle\EntityExtendBundle\Validator;
 
 use Doctrine\Common\Inflector\Inflector;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 
 class FieldNameValidationHelper
 {
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * @param ConfigProvider $extendConfigProvider
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ConfigProvider $extendConfigProvider)
+    public function __construct(ConfigProvider $extendConfigProvider, EventDispatcherInterface $eventDispatcher)
     {
         $this->extendConfigProvider = $extendConfigProvider;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -56,6 +64,22 @@ class FieldNameValidationHelper
         }
 
         return true;
+    }
+
+    /**
+     * Checks whether a field can be removed.
+     * Return empty array when can remove otherwise array with validation errors
+     *
+     * @param FieldConfigModel $field
+     *
+     * @return array
+     */
+    public function getRemoveFieldValidationErrors(FieldConfigModel $field)
+    {
+        $event = new ValidateBeforeRemoveFieldEvent($field);
+        $this->eventDispatcher->dispatch(ValidateBeforeRemoveFieldEvent::NAME, $event);
+
+        return $event->getValidationMessages();
     }
 
     /**

@@ -2,24 +2,21 @@
 
 namespace Oro\Bundle\DataGridBundle\Twig;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
-
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
-
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\DependencyInjection\ServiceLink;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 class DataGridExtension extends \Twig_Extension
 {
     const ROUTE = 'oro_datagrid_index';
 
-    /** @var ManagerInterface */
-    protected $manager;
+    /** @var ServiceLink */
+    protected $managerLink;
 
     /** @var NameStrategyInterface */
     protected $nameStrategy;
@@ -40,7 +37,7 @@ class DataGridExtension extends \Twig_Extension
     protected $logger;
 
     /**
-     * @param ManagerInterface $manager
+     * @param ServiceLink $managerLink Link Used instead of manager because of performance reasons
      * @param NameStrategyInterface $nameStrategy
      * @param RouterInterface $router
      * @param SecurityFacade $securityFacade
@@ -49,7 +46,7 @@ class DataGridExtension extends \Twig_Extension
      * @param LoggerInterface $logger
      */
     public function __construct(
-        ManagerInterface $manager,
+        ServiceLink $managerLink,
         NameStrategyInterface $nameStrategy,
         RouterInterface $router,
         SecurityFacade $securityFacade,
@@ -57,7 +54,7 @@ class DataGridExtension extends \Twig_Extension
         RequestStack $requestStack,
         LoggerInterface $logger = null
     ) {
-        $this->manager = $manager;
+        $this->managerLink = $managerLink;
         $this->nameStrategy = $nameStrategy;
         $this->router = $router;
         $this->securityFacade = $securityFacade;
@@ -100,7 +97,7 @@ class DataGridExtension extends \Twig_Extension
     public function getGrid($name, array $params = [])
     {
         if ($this->isAclGrantedForGridName($name)) {
-            return $this->manager->getDatagridByRequestParams($name, $params);
+            return $this->managerLink->getService()->getDatagridByRequestParams($name, $params);
         }
 
         return null;
@@ -268,7 +265,7 @@ class DataGridExtension extends \Twig_Extension
      */
     protected function isAclGrantedForGridName($gridName)
     {
-        $gridConfig = $this->manager->getConfigurationForGrid($gridName);
+        $gridConfig = $this->managerLink->getService()->getConfigurationForGrid($gridName);
 
         if ($gridConfig) {
             $aclResource = $gridConfig->getAclResource();

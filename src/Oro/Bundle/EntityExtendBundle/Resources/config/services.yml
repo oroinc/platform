@@ -228,6 +228,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper
         arguments:
             - "@oro_entity_config.provider.extend"
+            - "@event_dispatcher"
 
     oro_entity_extend.migration.cleanup_marketing_entity_config.post_up.listener:
         class: %oro_entity_extend.migration.cleanup_marketing.post_up.listener.class%
@@ -525,3 +526,11 @@ services:
         decoration_inner_name: cache_warmer.inner
         arguments:
             - '@cache_warmer.inner'
+            - '@oro_entity.database_checker.state_manager'
+
+    oro_entity_extend.console_command_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\ConsoleCommandListener
+        arguments:
+            - '@oro_entity.database_checker.state_manager'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }

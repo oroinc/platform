@@ -98,7 +98,7 @@ datagrids:
 
     workflow-definitions-grid:
         options:
-            entityHint: workflowssss
+            entityHint: workflow
             export:     false
         acl_resource: oro_workflow_definition_view
         source:
@@ -112,6 +112,7 @@ datagrids:
                     - w.relatedEntity as entityClass
                     - w.active
                     - w.label
+                    - w.applications
                     - w.system
                     - w.priority
                     - w.exclusiveActiveGroups
@@ -140,6 +141,11 @@ datagrids:
             priority:
                 label:         oro.workflow.workflowdefinition.priority.label
                 frontend_type: integer
+            applications:
+                label:         oro.workflow.workflowdefinition.applications.label
+                type:          twig
+                template:      OroWorkflowBundle:Datagrid:Column/applications.html.twig
+                frontend_type: html
             exclusiveActiveGroups:
                 label:         oro.workflow.workflowdefinition.exclusive_active_groups.label
                 type:          twig
@@ -232,6 +238,9 @@ datagrids:
                         field_options:
                             multiple: true
                             choices: "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
+                applications:
+                    type: string
+                    data_name: w.applications
                 active:
                     type: boolean
                     data_name: w.active

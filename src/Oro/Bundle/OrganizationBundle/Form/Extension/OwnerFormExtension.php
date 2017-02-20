@@ -3,6 +3,8 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -23,6 +25,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
@@ -31,6 +34,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 
 /**
@@ -233,7 +237,7 @@ class OwnerFormExtension extends AbstractTypeExtension
             || ($this->oldOwner && $newOwner->getId() && $this->oldOwner !== $newOwner->getId())
         ) {
             $metadata = $this->getMetadata($form->getNormData());
-            if ($metadata) {
+            if ($metadata instanceof OwnershipMetadata) {
                 $isCorrect = true;
                 if ($metadata->isBasicLevelOwned()) {
                     $isCorrect = $this->businessUnitManager->canUserBeSetAsOwner(
@@ -244,7 +248,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                         $this->getOrganization()
                     );
                 } elseif ($metadata->isLocalLevelOwned()) {
-                    $isCorrect = in_array($newOwner->getId(), $this->getBusinessUnitIds());
+                    $isCorrect = $this->isBusinessUnitAvailableForCurrentUser($newOwner);
                 }
 
                 if (!$isCorrect) {
@@ -388,24 +392,41 @@ class OwnerFormExtension extends AbstractTypeExtension
 
         if ($this->isAssignGranted) {
             /**
-             * If assign permission is granted, showing all available business units
+             * If assign permission is granted, and user able to see business units, showing all available.
+             * If not able to see, render default in hidden field.
              */
-            $builder->add(
-                $this->fieldName,
-                'oro_type_business_unit_select_autocomplete',
-                [
-                    'required' => false,
-                    'label' => $this->fieldLabel,
-                    'autocomplete_alias' => 'business_units_owner_search_handler',
-                    'empty_value' => $emptyValueLabel,
-                    'configs' => [
-                        'multiple' => false,
-                        'allowClear'  => false,
+            if ($this->securityFacade->isGranted('VIEW', 'entity:' . BusinessUnit::class)) {
+                $builder->add(
+                    $this->fieldName,
+                    'oro_type_business_unit_select_autocomplete',
+                    [
+                        'required' => false,
+                        'label' => $this->fieldLabel,
                         'autocomplete_alias' => 'business_units_owner_search_handler',
-                        'component'   => 'tree-autocomplete',
+                        'empty_value' => $emptyValueLabel,
+                        'configs' => [
+                            'multiple' => false,
+                            'allowClear'  => false,
+                            'autocomplete_alias' => 'business_units_owner_search_handler',
+                            'component'   => 'tree-autocomplete',
+                        ]
                     ]
-                ]
-            );
+                );
+            } else {
+                // Add hidden input with default owner only during creation process,
+                // current user not able to modify this
+                if ($builder instanceof FormBuilder) {
+                    $transformer  = new EntityToIdTransformer(
+                        $this->doctrineHelper->getEntityManager(BusinessUnit::class),
+                        BusinessUnit::class
+                    );
+                    $builder->add(
+                        $this->fieldName,
+                        HiddenType::class
+                    );
+                    $builder->get($this->fieldName)->addModelTransformer($transformer);
+                }
+            }
         } else {
             $businessUnits = $user->getBusinessUnits();
             if (count($businessUnits)) {
@@ -448,7 +469,16 @@ class OwnerFormExtension extends AbstractTypeExtension
                 ->first();
         }
 
-        return $this->businessUnitManager->getCurrentBusinessUnit($user, $organization);
+        if ($businessUnit = $this->businessUnitManager->getCurrentBusinessUnit($user, $organization)) {
+            return $businessUnit;
+        }
+
+        $owner = $user->getOwner();
+        if ($owner instanceof BusinessUnit && $this->isBusinessUnitAvailableForCurrentUser($owner)) {
+            return $user->getOwner();
+        }
+
+        return null;
     }
 
     /**
@@ -498,7 +528,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         $this->isAssignGranted = $this->securityFacade->isGranted($permission, $object);
-        $this->accessLevel     = $observer->getAccessLevel();
+        $this->accessLevel = $observer->getAccessLevel();
     }
 
     /**
@@ -550,6 +580,15 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         return [];
+    }
+
+    /**
+     * @param BusinessUnit $businessUnit
+     * @return bool
+     */
+    protected function isBusinessUnitAvailableForCurrentUser(BusinessUnit $businessUnit)
+    {
+        return in_array($businessUnit->getId(), $this->getBusinessUnitIds());
     }
 
     /**

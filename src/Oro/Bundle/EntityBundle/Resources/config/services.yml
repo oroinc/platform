@@ -228,6 +228,7 @@ services:
         arguments:
             - '@oro_entity.entity_field_provider'
             - '@oro_entity.entity_provider'
+            - '@oro_entity_config.helper.entity_config'
 
     oro_entity.twig.extension.entity:
         class: %oro_entity.twig.extension.entity.class%
@@ -464,3 +465,27 @@ services:
         class: Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer
         arguments:
             - '@oro_entity.doctrine_helper'
+
+    oro_entity.database_checker.state_manager:
+        class: Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager
+        arguments:
+            - [] # database checkers. filled by DatabaseCheckerCompilerPass
+
+    oro_entity.database.driver.mysql:
+        class: 'Oro\Bundle\EntityBundle\ORM\Driver\PdoMysql'
+        public: false
+        arguments:
+             - '@oro_entity.doctrine_helper'
+
+    oro_entity.database.driver.pgsql:
+        class: 'Oro\Bundle\EntityBundle\ORM\Driver\PdoPgsql'
+        public: false
+        arguments:
+             - '@oro_entity.doctrine_helper'
+
+    oro_entity.database_triggers.manager.abstract:
+        class: 'Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerManager'
+        abstract: true
+        calls:
+            - [addDriver, ['@oro_entity.database.driver.mysql']]
+            - [addDriver, ['@oro_entity.database.driver.pgsql']]
