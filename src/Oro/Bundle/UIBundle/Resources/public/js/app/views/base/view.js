@@ -14,12 +14,17 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend({
+        templateSelector: null,
+
         getTemplateFunction: function() {
             var template = this.template;
             var templateFunc = null;
 
-            if (typeof template === 'string') {
-                template = _.isElement($(template).get(0)) ? $(template).html() : template;
+            if (this.templateSelector) {
+                templateFunc = _.template($(this.templateSelector).html());
+                // share a compiled template with all instances built with same constructor
+                this.constructor.prototype.template = templateFunc;
+            } else if (typeof template === 'string') {
                 templateFunc = _.template(template);
                 // share a compiled template with all instances built with same constructor
                 this.constructor.prototype.template = templateFunc;

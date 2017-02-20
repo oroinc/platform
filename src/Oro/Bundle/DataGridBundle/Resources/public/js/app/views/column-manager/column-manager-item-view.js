@@ -9,11 +9,12 @@ define(function(require) {
     var config = module.config();
 
     config = _.extend({
-        template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html')
+        templateSelector: null
     }, config);
 
     ColumnManagerItemView = BaseView.extend({
-        template: config.template,
+        template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html'),
+        templateSelector: config.templateSelector,
         tagName: 'tr',
 
         events: {
