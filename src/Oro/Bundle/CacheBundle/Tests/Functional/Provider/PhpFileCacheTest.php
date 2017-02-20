@@ -7,10 +7,14 @@ use Oro\Bundle\CacheBundle\Tests\Functional\Stub\SetStateClassStub;
 
 class PhpFileCacheTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $directory;
 
-    /** @var PhpFileCache */
+    /**
+     * @var PhpFileCache
+     */
     private $provider;
 
     protected function setUp()
