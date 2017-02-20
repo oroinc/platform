@@ -27,19 +27,19 @@ class PhpFileCache extends BasePhpFileCache implements SyncCacheInterface, Direc
             $lifeTime = time() + $lifeTime;
         }
 
-        $filename  = $this->getFilename($id);
+        $filename = $this->getFilename($id);
 
         $value = [
-            'lifetime'  => $lifeTime,
-            'data'      => $data
+            'lifetime' => $lifeTime,
+            'data' => $data,
         ];
 
         if (is_object($data) && method_exists($data, '__set_state')) {
-            $value  = var_export($value, true);
-            $code   = sprintf('<?php return %s;', $value);
+            $value = var_export($value, true);
+            $code = sprintf('<?php return %s;', $value);
         } else {
-            $value  = var_export(serialize($value), true);
-            $code   = sprintf('<?php return unserialize(%s);', $value);
+            $value = var_export(serialize($value), true);
+            $code = sprintf('<?php return unserialize(%s);', $value);
         }
 
         return $this->writeFile($filename, $code);
