@@ -391,20 +391,16 @@ define(function(require) {
             }
 
             var data = this.$(this.elementSelector).inputWidget('data');
-            _.each(value.value, function(id) {
-                if (this.selectedData[id]) {
+            _.each(data, function(elem) {
+                if (!('id' in elem)) {
                     return;
                 }
 
-                var item = _.find(data, function(item) {
-                    return item.id === id;
-                });
-
-                if (!item) {
+                if (this.selectedData[elem.id]) {
                     return;
                 }
 
-                this.selectedData[item.id] = item;
+                this.selectedData[elem.id] = elem;
             }, this);
         },
 
