@@ -7,6 +7,9 @@ Feature: Managing users roles
     Given I login as administrator
     And go to System/User Management/Roles
     When I press "Create Role"
+    And I save and close form
+    Then I should see validation errors:
+      | Role      | This value should not be blank.  |
     And I fill form with:
       | Role        | Test role              |
       | Description | Hello it's description |
@@ -62,8 +65,8 @@ Feature: Managing users roles
   Scenario: Delete user role
     Given I go to System/User Management/Roles
     Then I should see Edited test role in grid
-    And there is 7 records in grid
+    And I keep in mind number of records in list
     When I click Delete Edited test role in grid
     And I confirm deletion
-    Then there is 6 records in grid
+    Then the number of records decreased by 1
     And I should not see "Edited test role"
