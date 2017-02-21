@@ -94,6 +94,14 @@ EntityConfigBundle
     - changed the visibility of `modelCache` property from `protected` to `private`
     - the implementation was changed significantly, by performance reasons. The most of `protected` methods were removed or marked as `private`
 
+EntityExtendBundle
+------------------
+- Class `Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension`
+    - calls to `addManyToManyRelation`, `addManyToOneRelation` methods now create unidirectional relations.
+    To create bidirectional relation you _MUST_ call `*InverseRelation` method respectively
+    - call to `addOneToManyRelation` creates bidirectional relation according to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional)
+    - deprecated `addOneToManyInverseRelation`
+
 EntityPaginationBundle
 ----------------------
 - Class `Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector`
@@ -170,6 +178,7 @@ ImportExportBundle
 LayoutBundle
 ------------
 - Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+- Changed default value option name for `page_title` block type, from `text` to `defaultValue`
 
 LocaleBundle
 ------------
@@ -178,6 +187,15 @@ LocaleBundle
         - `LocaleSettings` $localeSettings,
         - `NameFormatter` $nameFormatter,
         - `PropertyAccessor` $propertyAccessor
+- Class `Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue`
+    - will become not extended in 2.3 release
+- Class `Oro\Bundle\LocaleBundle\Model\ExtendLocalizedFallbackValue`
+    - deprecated and will be removed in 2.3 release
+
+NavigationBundle
+----------------
+- `Oro\Bundle\NavigationBundle\Manager`:
+    - added method `moveMenuItems`
 
 SearchBundle
 ------------
@@ -301,6 +319,10 @@ TestFrameworkBundle
     - removed method `getDbReindexSetting`
     - renamed method `setUpBeforeClass` to `beforeClass`
     - renamed method `tearDownAfterClass` to `afterClass`
+
+Tree Component
+- `Oro\Component\Tree\Handler\AbstractTreeHandler`:
+    - added method `getTreeItemList`
 
 QueryDesignerBundle
 -------------------
