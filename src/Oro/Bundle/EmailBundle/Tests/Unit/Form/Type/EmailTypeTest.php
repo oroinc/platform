@@ -3,28 +3,31 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
-use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
-use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailTypeTest extends TypeTestCase
 {
@@ -47,6 +50,21 @@ class EmailTypeTest extends TypeTestCase
      * @var EmailTemplate
      */
     protected $emailTemplate;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
+     * @var HtmlTagProvider
+     */
+    protected $htmlTagProvider;
+
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
 
     protected function setUp()
     {
@@ -164,9 +182,6 @@ class EmailTypeTest extends TypeTestCase
         $translator = $this->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
             ->disableOriginalConstructor()
             ->getMock();
-        $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
-            ->disableOriginalConstructor()
-            ->getMock();
         $securityTokenStorage =
             $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')
             ->disableOriginalConstructor()
@@ -177,6 +192,15 @@ class EmailTypeTest extends TypeTestCase
         $entityTitleResolver = $this->getMockBuilder(EntityNameResolver::class)
                     ->disableOriginalConstructor()
                     ->getMock();
+
+        $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->validator
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
+        $this->validator
+            ->method('getMetadataFor')
+            ->with('Symfony\Component\Form\Form')
+            ->willReturn($this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock());
 
         $contextsSelectType = new ContextsSelectType(
             $em,
@@ -204,7 +228,8 @@ class EmailTypeTest extends TypeTestCase
                     $emailAddressRecipientsType->getName() => $emailAddressRecipientsType,
                 ],
                 []
-            )
+            ),
+            new ValidatorExtension($this->validator),
         ];
     }
 
@@ -262,6 +287,9 @@ class EmailTypeTest extends TypeTestCase
         $this->assertEquals('oro_email_email', $type->getName());
     }
 
+    /**
+     * @return array
+     */
     public function messageDataProvider()
     {
         return [
