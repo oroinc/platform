@@ -20,8 +20,7 @@ class DateGroupingFilter extends ChoiceFilter
     const CALENDAR_COLUMN = 'date';
     const CALENDAR_TABLE_FOR_GROUPING = 'calendarDate1';
     const CALENDAR_COLUMN_FOR_GROUPING = 'date';
-    const FIRST_JOINED_TABLE = 'firstJoinedTableAlias';
-    const SECOND_JOINED_TABLE = 'secondJoinedTableAlias';
+    const JOINED_TABLE = 'joinedTableAlias';
     const TARGET_COLUMN = 'date';
     const QUARTER_LENGTH = 3;
 
@@ -303,8 +302,7 @@ class DateGroupingFilter extends ChoiceFilter
             ->getOr('calendar_table_for_grouping', self::CALENDAR_TABLE_FOR_GROUPING);
         $this->config['calendar_column_for_grouping'] = $this
             ->getOr('calendar_column_for_grouping', self::CALENDAR_COLUMN_FOR_GROUPING);
-        $this->config['first_joined_table'] = $this->getOr('first_joined_table', self::FIRST_JOINED_TABLE);
-        $this->config['second_joined_table'] = $this->getOr('second_joined_table', self::SECOND_JOINED_TABLE);
+        $this->config['joined_table'] = $this->getOr('joined_table', self::JOINED_TABLE);
         $this->config['joined_column'] = $this->get('joined_column');
         $this->config['target_column'] = $this->getOr('target_column', self::TARGET_COLUMN);
         $this->config['not_nullable_field'] = $this->get('not_nullable_field');

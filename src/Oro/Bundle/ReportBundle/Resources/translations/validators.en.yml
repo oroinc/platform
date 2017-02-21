@@ -4,4 +4,4 @@ oro:
             columns:
                 mandatory: You must specify at least one column for the report grid
         date_grouping:
-            group_by_mandatory: The date grouping filter requires to additionally make a column grouping. Please select an unique column (ex. id) for the entity you want to filter
+            group_by_mandatory: The date grouping filter requires to additionally make a column grouping. Please select an unique column (ex. id) in the "Grouping" section for the main entity

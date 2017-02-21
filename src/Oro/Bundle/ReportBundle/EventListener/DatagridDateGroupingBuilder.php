@@ -74,8 +74,8 @@ class DatagridDateGroupingBuilder
         $this->changeFiltersSection(
             $config,
             $report->getEntity(),
-            $dateFieldTableAlias,
             $dateFieldName,
+            $dateFieldTableAlias,
             $notNullableField
         );
         $this->changeSourceSection($config, $dateFieldTableAlias, $dateFieldName);
@@ -92,16 +92,17 @@ class DatagridDateGroupingBuilder
      * @param DatagridConfiguration $config
      * @param string $rootEntityClass
      * @param string $dateFieldName
-     * @param string $dateFieldTableAlias
+     * @param $dateFieldTableAlias
      * @param string $notNullableField
      * @param string $defaultFilterValue
+     * @internal param string $dateFieldTableAlias
      * @internal param string $dateGroupingWithAlias
      */
     protected function changeFiltersSection(
         DatagridConfiguration $config,
         $rootEntityClass,
-        $dateFieldTableAlias,
         $dateFieldName,
+        $dateFieldTableAlias,
         $notNullableField,
         $defaultFilterValue = DateGroupingFilterType::TYPE_DAY
     ) {
@@ -116,8 +117,7 @@ class DatagridDateGroupingBuilder
             'target_entity' => $rootEntityClass,
             'not_nullable_field' => $notNullableField,
             'joined_column' => $dateFieldName,
-            'first_joined_table' => $dateFieldTableAlias, // @todo: Refactor after best-selling-products refactored
-            'second_joined_table' => $dateFieldTableAlias, // @todo: Refactor after best-selling-products refactored
+            'joined_table' => $dateFieldTableAlias
         ];
         if (!array_key_exists(static::DATE_PERIOD_FILTER, $filters['columns'])) {
             $filters['columns'][static::DATE_PERIOD_FILTER] = [
@@ -186,12 +186,14 @@ class DatagridDateGroupingBuilder
         $sorters = $config->offsetGet(static::SORTERS_KEY_NAME);
         $sorters['columns'][static::CALENDAR_DATE_COLUMN_ALIAS] = [
             'data_name' => $this->getCalendarDateFieldReferenceString(),
-
+        ];
+        $sorters['columns'][static::CALENDAR_DATE_GRID_COLUMN_NAME] = [
+            'data_name' => $this->getCalendarDateFieldReferenceString()
         ];
         if (!array_key_exists('default', $sorters)) {
             $sorters['default'] = [];
         }
-        $sorters['default'][static::CALENDAR_DATE_COLUMN_ALIAS] = AbstractSorterExtension::DIRECTION_DESC;
+        $sorters['default'][static::CALENDAR_DATE_GRID_COLUMN_NAME] = AbstractSorterExtension::DIRECTION_DESC;
         $config->offsetSet(static::SORTERS_KEY_NAME, $sorters);
     }
 
