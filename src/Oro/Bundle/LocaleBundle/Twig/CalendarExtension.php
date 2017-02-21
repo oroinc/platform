@@ -2,21 +2,29 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class CalendarExtension extends \Twig_Extension
 {
-    /**
-     * @var LocaleSettings
-     */
-    protected $localeSettings;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param LocaleSettings $localeSettings
+     * @param ContainerInterface $container
      */
-    public function __construct(LocaleSettings $localeSettings)
+    public function __construct(ContainerInterface $container)
     {
-        $this->localeSettings = $localeSettings;
+        $this->container = $container;
+    }
+
+    /**
+     * @return LocaleSettings
+     */
+    protected function getLocaleSettings()
+    {
+        return $this->container->get('oro_locale.settings');
     }
 
     /**
@@ -24,58 +32,61 @@ class CalendarExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction(
                 'oro_calendar_month_names',
-                array($this, 'getMonthNames'),
-                array('is_safe' => array('html'))
+                [$this, 'getMonthNames'],
+                ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFunction(
                 'oro_calendar_day_of_week_names',
-                array($this, 'getDayOfWeekNames'),
-                array('is_safe' => array('html'))
+                [$this, 'getDayOfWeekNames'],
+                ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFunction(
                 'oro_calendar_first_day_of_week',
-                array($this, 'getFirstDayOfWeek'),
-                array('is_safe' => array('html'))
+                [$this, 'getFirstDayOfWeek'],
+                ['is_safe' => ['html']]
             ),
-        );
+        ];
     }
 
     /**
      * Gets list of months names using given width and locale.
      *
-     * @param string $width wide|abbreviation|short|narrow
+     * @param string      $width wide|abbreviation|short|narrow
      * @param string|null $locale
+     *
      * @return string
      */
     public function getMonthNames($width = null, $locale = null)
     {
-        return $this->localeSettings->getCalendar($locale)->getMonthNames($width);
+        return $this->getLocaleSettings()->getCalendar($locale)->getMonthNames($width);
     }
 
     /**
      * Gets list of week day names using given width and locale.
      *
-     * @param string $width wide|abbreviation|short|narrow
+     * @param string      $width wide|abbreviation|short|narrow
      * @param string|null $locale
+     *
      * @return string
      */
     public function getDayOfWeekNames($width = null, $locale = null)
     {
-        return $this->localeSettings->getCalendar($locale)->getDayOfWeekNames($width);
+        return $this->getLocaleSettings()->getCalendar($locale)->getDayOfWeekNames($width);
     }
 
     /**
      * Gets first day of week according to constants of Calendar.
      *
      * @param string|null $locale
+     *
      * @return string
      */
     public function getFirstDayOfWeek($locale = null)
     {
-        return $this->localeSettings->getCalendar($locale)->getFirstDayOfWeek();
+        return $this->getLocaleSettings()->getCalendar($locale)->getFirstDayOfWeek();
     }
 
     /**

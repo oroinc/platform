@@ -4,7 +4,6 @@ namespace Oro\Bundle\CurrencyBundle\Twig;
 
 class RateConverterExtension extends \Twig_Extension
 {
-
     /**
      * {@inheritdoc}
      */

@@ -1,6 +1,3 @@
-parameters:
-    oro_layout.layout_factory_builder.class:    Oro\Component\Layout\LayoutFactoryBuilder
-
 services:
     oro_layout.extension:
         public: false
@@ -15,7 +12,7 @@ services:
 
     oro_layout.layout_factory_builder:
         public: false
-        class: %oro_layout.layout_factory_builder.class%
+        class: Oro\Component\Layout\LayoutFactoryBuilder
         arguments:
             - '@oro_layout.processor.expression'
             - '@oro_layout.cache.block_view_cache'
@@ -150,7 +147,6 @@ services:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
             - '@request_stack'
-            - '@oro_config.user'
 
     oro_layout.imports_storage:
         class: Doctrine\Common\Collections\ArrayCollection
@@ -194,7 +190,7 @@ services:
     oro_layout.request.listener.imagine_filter_config:
         class: Oro\Bundle\LayoutBundle\EventListener\ImagineFilterConfigListener
         arguments:
-            - '@oro_layout.loader.image_filter'
+            - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.request }
 
