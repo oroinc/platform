@@ -57,8 +57,9 @@ class Grid extends Element
 
     /**
      * @param int $number
+     * @param int $cellNumber
      */
-    public function checkFirstRecords($number)
+    public function checkFirstRecords($number, $cellNumber = 0)
     {
         $rows = $this->getRows();
 
@@ -69,7 +70,7 @@ class Grid extends Element
         );
 
         for ($i = 0; $i < $number; $i++) {
-            $rows[$i]->checkMassActionCheckbox();
+            $rows[$i]->checkMassActionCheckbox($cellNumber);
         }
     }
 

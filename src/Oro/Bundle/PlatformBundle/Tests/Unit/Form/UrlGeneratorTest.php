@@ -97,7 +97,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
                 '//r.orocrm.com/a/p/1.10.0/f.js',
                 [
                     $this->getPackage('oro/platform', '1.10.0'),
-                    $this->getPackage('oro/doctrine-extensions', '1.10.0'),
+                    $this->getPackage('oro/doctrine-extensions', '1.1.0'),
                 ],
             ],
         ];
