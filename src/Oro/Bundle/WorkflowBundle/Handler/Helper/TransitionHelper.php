@@ -30,13 +30,17 @@ class TransitionHelper
     }
 
     /**
-     * @param WorkflowItem $workflowItem
+     * @param WorkflowItem|null $workflowItem
      * @param int $responseCode
+     * @param string|null $responseMessage
      *
      * @return Response
      */
-    public function createCompleteResponse(WorkflowItem $workflowItem, $responseCode = null)
-    {
+    public function createCompleteResponse(
+        WorkflowItem $workflowItem = null,
+        $responseCode = null,
+        $responseMessage = null
+    ) {
         $transitResponseContent = null;
         if (!$responseCode) {
             $view = View::create([
@@ -53,6 +57,7 @@ class TransitionHelper
             [
                 'response'          => $transitResponseContent,
                 'responseCode'      => $responseCode,
+                'responseMessage'   => $responseMessage,
                 'transitionSuccess' => $responseCode === 200,
             ]
         );

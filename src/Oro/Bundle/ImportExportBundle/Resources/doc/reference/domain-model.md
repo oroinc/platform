@@ -174,7 +174,7 @@ Oro\Bundle\ImportExportBundle\Reader\EntityReader
 
 **Description:**
 Reads entities using Doctrine. To allow handling large amounts of data without memory lack errors  reading is performed
-using Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator which loads data partially using internal batch.
+using Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator which loads data partially using internal batch.
 
 **Configuration Options**
 
@@ -248,13 +248,13 @@ read from CSV file or one of the entities queries from Doctrine.
 Oro\Bundle\ImportExportBundle\Processor\ImportProcessor
 
 **Classes:**
-* **Context** - to manage export configuration and results
+* **Context** - to manage import configuration and results
 * **Serializer** - to deserialize output of Data Converter to entity object
 * **Data Converter** - to convert array of reader format to array of serializer format.
 * **Strategy** - to perform main logic of import with deserialized entity (Add/Update/Replace/Delete entities)
 
 **Options:**
-* **Class Name** - exported entity class
+* **Class Name** - imported entity class
 
 ### Export Processor
 **Class:**

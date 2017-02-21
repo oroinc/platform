@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 
 class MenuUpdateDatasource implements DatasourceInterface
 {
@@ -20,31 +21,25 @@ class MenuUpdateDatasource implements DatasourceInterface
     /** @var string */
     protected $scopeType;
 
-    /** @var array */
-    protected $menuConfiguration;
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
 
     /**
-     * @param BuilderChainProvider $chainProvider
-     * @param MenuManipulator $menuManipulator
-     * @param string $scopeType
+     * @param BuilderChainProvider  $chainProvider
+     * @param MenuManipulator       $menuManipulator
+     * @param ConfigurationProvider $configurationProvider
+     * @param string                $scopeType
      */
-    public function __construct(BuilderChainProvider $chainProvider, MenuManipulator $menuManipulator, $scopeType)
-    {
+    public function __construct(
+        BuilderChainProvider $chainProvider,
+        MenuManipulator $menuManipulator,
+        ConfigurationProvider $configurationProvider,
+        $scopeType
+    ) {
         $this->chainProvider = $chainProvider;
         $this->menuManipulator = $menuManipulator;
+        $this->configurationProvider = $configurationProvider;
         $this->scopeType = $scopeType;
-    }
-
-    /**
-     * @param array $configuration
-     *
-     * @return MenuUpdateDatasource
-     */
-    public function setMenuConfiguration(array $configuration)
-    {
-        $this->menuConfiguration = $configuration;
-
-        return $this;
     }
 
     /**
@@ -60,9 +55,11 @@ class MenuUpdateDatasource implements DatasourceInterface
      */
     public function getResults()
     {
+        $menuConfiguration = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
+
         $rows = [];
 
-        foreach ($this->menuConfiguration['tree'] as $name => $item) {
+        foreach ($menuConfiguration['tree'] as $name => $item) {
             $menuItem = $this->chainProvider->get($name);
             if ($menuItem->getExtra('scope_type') === $this->scopeType && !$menuItem->getExtra('read_only')) {
                 $rows[] = new ResultRecord($this->menuManipulator->toArray($menuItem));

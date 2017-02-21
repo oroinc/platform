@@ -292,24 +292,20 @@ abstract class AbstractSorterExtension extends AbstractExtension
      */
     private function getSortBy($readParameters, array $defaultSorters, array $sorters, $disableDefaultSorting)
     {
+        $sortBy = [];
         if ($readParameters) {
-            $sortBy = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ?: $defaultSorters;
-        } else {
+            $sortBy = (array)$this->getParameters()->get(self::SORTERS_ROOT_PARAM);
+            $sortBy = array_filter(
+                $sortBy,
+                function ($sortColumn) use ($sorters) {
+                    return array_key_exists($sortColumn, $sorters);
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+        }
+
+        if (empty($sortBy) && !$disableDefaultSorting) {
             $sortBy = $defaultSorters;
-        }
-
-        // when disable sorting option is set up, do not use any sorters
-        if ($sortBy === $defaultSorters && $disableDefaultSorting) {
-            return [];
-        }
-
-        // if default sorter was not specified, just take first sortable column
-        if (!$sortBy && $sorters) {
-            $names           = array_keys($sorters);
-            $firstSorterName = reset($names);
-            $sortBy          = [$firstSorterName => self::DIRECTION_ASC];
-
-            return $sortBy;
         }
 
         return $sortBy;

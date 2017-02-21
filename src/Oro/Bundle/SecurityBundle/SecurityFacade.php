@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\SecurityBundle;
 
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\HttpFoundation\Request;
-
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
-use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SecurityFacade
 {
@@ -80,6 +80,7 @@ class SecurityFacade
             $this->logger->debug(
                 sprintf('Check an access using "%s" ACL annotation.', $annotation->getId())
             );
+//            TODO should use AuthorizationChecker
             $isGranted = $this->securityContext->isGranted(
                 $annotation->getPermission(),
                 $this->objectIdentityFactory->get($annotation)

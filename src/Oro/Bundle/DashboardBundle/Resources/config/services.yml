@@ -239,6 +239,10 @@ services:
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_datetime_range" }
 
+    oro_dashboard.widget_config_value.date_range.converter.link:
+        tags:
+            - { name: oro_service_link, service: oro_dashboard.widget_config_value.date_range.converter }
+
     oro_dashboard.widget_config_value.previous_date_range.converter:
           class: %oro_dashboard.widget_config_value.previous_date_range.converter.class%
           parent: oro_dashboard.widget_config_value.date_range.converter
@@ -309,13 +313,14 @@ services:
         arguments:
             - '@oro_dashboard.filter.date_range'
             - '@oro_filter.utils.date_filter_modifier'
+            - '@oro_locale.settings'
 
     # Twig extension
     oro_dashboard.twig.extension:
         class: Oro\Bundle\DashboardBundle\Twig\DashboardExtension
         arguments:
-            - '@oro_dashboard.widget_config_value.date_range.converter'
-            - '@oro_query_designer.query_designer.manager'
+            - '@oro_dashboard.widget_config_value.date_range.converter.link'
+            - '@oro_query_designer.query_designer.manager.link'
             - '@oro_report.entity_provider'
         tags:
             - { name: twig.extension }

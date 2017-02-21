@@ -2,20 +2,21 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
+use Doctrine\ORM\EntityRepository;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\HttpFoundation\Request;
 
-use Doctrine\ORM\EntityRepository;
-
+use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class UserType extends AbstractType
 {
@@ -113,7 +114,7 @@ class UserType extends AbstractType
                 'plainPassword',
                 'repeated',
                 [
-                    'invalid_message' => 'oro.user.password.password_mismatch',
+                    'invalid_message' => 'oro.user.message.password_mismatch',
                     'type'           => 'password',
                     'required'       => true,
                     'first_options' => [
@@ -208,7 +209,7 @@ class UserType extends AbstractType
             ->add('middleName', 'text', ['label' => 'oro.user.middle_name.label', 'required' => false])
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
-            ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false]);
+            ->add('birthday', OroBirthdayType::class, ['label' => 'oro.user.birthday.label', 'required' => false]);
     }
 
     /**

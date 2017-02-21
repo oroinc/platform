@@ -149,8 +149,10 @@ Single workflow configuration has next properties:
     Contains configuration for Workflow Restrictions
 * **defaults** - node for default workflow configuration values that can be changed in UI later. 
     * **active** - determine if workflow should be active right after first load of configuration.
+* **applications** - list of web application names for which workflow should be available (default: all applications match)  
 * **scopes** - list of scopes configurations used for filtering workflow by scopes
-* **disable_operations** - an array of [operation](../../../../../ActionBundle/Resources/doc/operations.md) names (as keys) and related entities for witch the operation should be disabled. 
+* **datagrids** - list of datagrid names on which rows currently available transitions should be displayed as buttons.
+* **disable_operations** - an array of [operation](../../../../../ActionBundle/Resources/doc/operations.md) names (as keys) and related entities for which the operation should be disabled. 
 
 Example
 -------
@@ -160,6 +162,8 @@ workflows:                                                    # Root elements
         defaults:
             active: true                                      # Active by default (when config is loaded)
         entity: Oro\Bundle\SalesBundle\Entity\Opportunity  # Workflow will be used for this entity
+        datagrids:                                            # datagrid names on which rows available transitions from currently started workflow should be displayed
+            - opportunity_grid
         entity_attribute: opportunity                         # Attribute name used to store root entity
         is_system: true                                       # Workflow is system, i.e. not editable and not deletable
         start_step: qualify                                   # Name of start step
@@ -168,6 +172,7 @@ workflows:                                                    # Root elements
         exclusive_active_groups: [b2b_sales]                  # Only one active workflow from 'b2b_sales' group can be active
         exclusive_record_groups:
             - sales                                           # Only one workflow from group 'sales' can be started at time for the entity
+        applications: [webshop]                               # list of application names to make the workflow available for
         scopes:
             -                                                 # Definition of configuration for one scope
                 scope_field: 42
@@ -370,6 +375,10 @@ Transition configuration has next options:
     *array*
     List of entities where will be displayed transition button. It's needed for start workflow from entities that not 
     directly related to that workflow.
+* **init_datagrids**
+    *array*
+    List of datagrid names for which rows transition button should be displayed. It's needed for start workflow from entities that not 
+    directly related to that workflow.
 * **init_context_attribute**
     *string*
     Name of attribute which contains init context: routeName, entityId, entityClass, referrer, group. Default value - `init_context`
@@ -377,10 +386,12 @@ Transition configuration has next options:
     *string*
     Frontend transition form display type. Possible options are: dialog, page.
     Display type "page" require "form_options" to be set.
-* **display_type**
+* **destination_page**
     *string*
-    Frontend transition form display type. Possible options are: dialog, page.
-    Display type "page" require "form_options" to be set.
+    (optional) Parameter used only when `display_type` equals `page`.
+    Specified value will be converted to url by entity configuration (see action `@resolve_destination_page`).
+    In case when `@redirect` action used in `actions` of transition definition, effect from taht option will be ignored.
+    Allowed values: `name` or `index` (`index` - will be converted to `name`) , 'view' or `~`. Default value `~`.
 * **page_template**
     *string*
     Custom transition template for transition pages. Should be extended from OroWorkflowBundle:Workflow:transitionForm.html.twig.
@@ -430,6 +441,8 @@ workflows:
                             form_type: integer
                             options:
                                 required: false
+                display_type: page
+                destination_page: index
             not_answered:
                 step_to: end_call
                 transition_definition: not_answered_definition
@@ -466,12 +479,13 @@ Event trigger configuration has next options.
     Type of the event, can have the following values: `create`, `update`, `delete`.
 * **field**
     Only for `update` event - field name that should be updated to handle trigger.
-* **queue**
+* **queued**
     [boolean, default = true] Handle trigger in queue (if `true`), or in realtime (if `false`) 
 * **require**
-    String of Symfony Language Expression that should much to handle the trigger. Following aliases are available:
-    * `entity` - Entity object, that dispatched event,
-    * `mainEntity` - Entity object of triggers' workflow,
+    String of Symfony Language Expression that should much to handle the trigger. Following aliases in context are available:
+    * `entity` - Entity object that dispatches an event,
+    * `prevEntity` - `entity` copy with fields state before update (like the 'old' in lifecycle `changeset`)
+    * `mainEntity` - Entity object of the workflow,
     * `wd` - Workflow Definition object,
     * `wi` - Workflow Item object.
 * **relation**
@@ -825,6 +839,9 @@ workflows:
                 init_entities:                         # list of view page entities where will be displayed transition button
                     - 'Oro\Bundle\UserBundle\Entity\User'
                     - 'Oro\Bundle\TaskBundle\Entity\Task'
+                init_datagrids:                        # list of datagrids on which rows start transition buttons should be shown for start transition from not related entity 
+                    - user_entity_grid
+                    - task_entity_grid
             connected:
                 step_to: start_conversation
                 transition_definition: connected_definition

@@ -58,3 +58,10 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\LoadAccessibleResources
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -200 }
+
+    oro_api.collect_resources.add_excluded_actions_for_not_accessible_resources:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActionsForNotAccessibleResources
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro.api.processor, action: collect_resources, priority: -220 }

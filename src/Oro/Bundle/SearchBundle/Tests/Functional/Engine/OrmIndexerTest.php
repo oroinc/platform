@@ -4,16 +4,19 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item2;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @group search
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class OrmIndexerTest extends WebTestCase
 {
+    use SearchExtensionTrait;
+
     protected function setUp()
     {
         $this->initClient();
@@ -21,6 +24,11 @@ class OrmIndexerTest extends WebTestCase
         if ($this->getContainer()->getParameter('oro_search.engine') != 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
+    }
+
+    protected function tearDown()
+    {
+        $this->clearIndexTextTable();
     }
 
     public function testShouldCreateIndexForEntity()
@@ -32,7 +40,7 @@ class OrmIndexerTest extends WebTestCase
         $indexTextRepository = $indexManager->getRepository(IndexText::class);
 
         $item = new Item();
-        $item->stringValue = 'value';
+        $item->stringValue = 'testShouldCreateIndexForEntity';
 
         $itemManager->persist($item);
         $itemManager->flush();
@@ -49,7 +57,7 @@ class OrmIndexerTest extends WebTestCase
 
         $itemTextIndex = $indexTextRepository->findOneBy(['item' => $itemIndex, 'field' => 'all_text']);
         $this->assertNotEmpty($itemTextIndex);
-        $this->assertEquals('value', $itemTextIndex->getValue());
+        $this->assertEquals('testShouldCreateIndexForEntity', $itemTextIndex->getValue());
     }
 
     public function testShouldUpdateIndexForEntity()
@@ -61,7 +69,7 @@ class OrmIndexerTest extends WebTestCase
         $indexTextRepository = $indexManager->getRepository(IndexText::class);
 
         $item = new Item();
-        $item->stringValue = 'value';
+        $item->stringValue = 'testShouldUpdateIndexForEntity';
 
         $itemManager->persist($item);
         $itemManager->flush();
@@ -74,10 +82,10 @@ class OrmIndexerTest extends WebTestCase
 
         $itemTextIndex = $indexTextRepository->findOneBy(['item' => $itemIndex, 'field' => 'all_text']);
         $this->assertNotEmpty($itemTextIndex);
-        $this->assertEquals('value', $itemTextIndex->getValue());
+        $this->assertEquals('testShouldUpdateIndexForEntity', $itemTextIndex->getValue());
 
         // update
-        $item->stringValue = 'newvalue';
+        $item->stringValue = 'testShouldUpdateIndexForEntity2';
 
         $itemManager->persist($item);
         $itemManager->flush();
@@ -86,7 +94,7 @@ class OrmIndexerTest extends WebTestCase
 
         $itemTextIndex = $indexTextRepository->findOneBy(['item' => $itemIndex, 'field' => 'all_text']);
         $this->assertNotEmpty($itemTextIndex);
-        $this->assertEquals('newvalue', $itemTextIndex->getValue());
+        $this->assertEquals('testShouldUpdateIndexForEntity2', $itemTextIndex->getValue());
     }
 
     public function testShouldDeleteIndexForEntity()
@@ -99,7 +107,7 @@ class OrmIndexerTest extends WebTestCase
         $indexTextRepository = $indexManager->getRepository(IndexText::class);
 
         $item = new Item();
-        $item->stringValue = 'value';
+        $item->stringValue = 'testShouldDeleteIndexForEntity';
 
         $itemManager->persist($item);
         $itemManager->flush();
@@ -155,6 +163,7 @@ class OrmIndexerTest extends WebTestCase
         $indexItemRepository = $indexManager->getRepository(IndexItem::class);
 
         $item = new Item();
+        $item->stringValue = 'testShouldReindexAllClasses';
 
         $itemManager->persist($item);
         $itemManager->flush();
@@ -177,6 +186,7 @@ class OrmIndexerTest extends WebTestCase
         $indexItemRepository = $indexManager->getRepository(IndexItem::class);
 
         $item = new Item();
+        $item->stringValue = 'testShouldReindexEntitiesOnlyOfSingleClass';
         $item2 = new Item2();
 
         $itemManager->persist($item);
@@ -225,6 +235,8 @@ class OrmIndexerTest extends WebTestCase
         $indexItemRepository = $indexManager->getRepository(IndexItem::class);
 
         $item = new Item();
+        $item->stringValue = 'testShouldResetIndexOnlyForSingleEntity';
+
         $itemManager->persist($item);
         $itemManager->flush();
 

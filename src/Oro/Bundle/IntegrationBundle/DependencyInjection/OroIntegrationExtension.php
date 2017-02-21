@@ -18,5 +18,6 @@ class OroIntegrationExtension extends Extension
         $loader->load('actions.yml');
         $loader->load('services.yml');
         $loader->load('rest_transport.yml');
+        $loader->load('repositories.yml');
     }
 }

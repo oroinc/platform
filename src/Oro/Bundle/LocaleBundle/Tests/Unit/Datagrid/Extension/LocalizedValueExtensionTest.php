@@ -3,7 +3,6 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Datagrid\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 
@@ -11,9 +10,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension;
 use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -27,14 +25,14 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
+    /** @var EntityClassResolver|\PHPUnit_Framework_MockObject_MockObject */
+    protected $entityClassResolver;
+
     /** @var LocalizationHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $localizationHelper;
 
     /** @var OrmDatasource|\PHPUnit_Framework_MockObject_MockObject */
     protected $datasource;
-
-    /** @var ClassMetadata|\PHPUnit_Framework_MockObject_MockObject */
-    protected $classMetadata;
 
     /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $queryBuilder;
@@ -51,6 +49,10 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -59,13 +61,15 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->classMetadata = $this->createMock(ClassMetadata::class);
-
         $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new LocalizedValueExtension($this->doctrineHelper, $this->localizationHelper);
+        $this->extension = new LocalizedValueExtension(
+            $this->doctrineHelper,
+            $this->entityClassResolver,
+            $this->localizationHelper
+        );
     }
 
     public function testApplicable()
@@ -193,14 +197,6 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getCurrentLocalization')
             ->willReturn(null);
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadata')
-            ->willReturn($this->classMetadata);
-
-        $this->classMetadata->expects($this->once())
-            ->method('getName')
-            ->willReturn('Table1');
-
         $this->datasource->expects($this->once())
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
@@ -221,6 +217,62 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->queryBuilder->expects($this->at(3))
+            ->method('addGroupBy')
+            ->with('columnName');
+
+        $this->extension->visitDatasource($config, $this->datasource);
+    }
+
+    public function testVisitDatasourceAllowingEmpty()
+    {
+        $config = DatagridConfiguration::create([
+            'properties' => [
+                'columnName' => [
+                    LocalizedValueProperty::TYPE_KEY => LocalizedValueProperty::NAME,
+                    LocalizedValueProperty::DATA_NAME_KEY => 'property',
+                    LocalizedValueProperty::ALLOW_EMPTY => 'true',
+                ],
+            ],
+            'source' => [
+                'query' => [
+                    'from' => [
+                        [
+                            'table' => 'Table1',
+                            'alias' => 'alias1',
+                        ],
+                    ],
+                ]
+            ],
+        ]);
+
+        $this->localizationHelper->expects($this->once())
+            ->method('getCurrentLocalization')
+            ->willReturn(null);
+
+        $this->datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->at(0))
+            ->method('addSelect')
+            ->with('columnNames.string as columnName')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->at(1))
+            ->method('leftJoin')
+            ->with('alias1.properties', 'columnNames', Expr\Join::WITH, 'columnNames.localization IS NULL')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->at(2))
+            ->method('andWhere')
+            ->willReturn(true);
+
+        $this->queryBuilder->expects($this->at(3))
+            ->method('getDQLPart')
+            ->with('groupBy')
+            ->willReturn(true);
+
+        $this->queryBuilder->expects($this->at(4))
             ->method('addGroupBy')
             ->with('columnName');
 
@@ -280,12 +332,9 @@ class LocalizedValueExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getCurrentLocalization')
             ->willReturn(new Localization());
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityMetadata')
-            ->willReturn($this->classMetadata);
-
-        $this->classMetadata->expects($this->once())
-            ->method('getName')
+        $this->entityClassResolver->expects($this->once())
+            ->method('getEntityClass')
+            ->with('Table1')
             ->willReturn('Entity1');
 
         $this->doctrineHelper->expects($this->once())

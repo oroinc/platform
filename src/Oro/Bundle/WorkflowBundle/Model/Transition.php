@@ -63,6 +63,9 @@ class Transition
     protected $unavailableHidden = false;
 
     /** @var string */
+    protected $destinationPage;
+
+    /** @var string */
     protected $pageTemplate;
 
     /** @var string */
@@ -82,6 +85,9 @@ class Transition
 
     /** @var array */
     protected $initRoutes = [];
+
+    /** @var array */
+    protected $initDatagrids = [];
 
     /** @var string */
     protected $initContextAttribute;
@@ -479,6 +485,25 @@ class Transition
     }
 
     /**
+     * @param string $destinationPage
+     * @return Transition
+     */
+    public function setDestinationPage($destinationPage)
+    {
+        $this->destinationPage = $destinationPage;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDestinationPage()
+    {
+        return $this->destinationPage;
+    }
+
+    /**
      * @param string $transitionTemplate
      * @return Transition
      */
@@ -622,11 +647,31 @@ class Transition
     }
 
     /**
+     * @return array
+     */
+    public function getInitDatagrids()
+    {
+        return $this->initDatagrids;
+    }
+
+    /**
+     * @param array $initDatagrids
+     *
+     * @return $this
+     */
+    public function setInitDatagrids(array $initDatagrids)
+    {
+        $this->initDatagrids = $initDatagrids;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function isEmptyInitOptions()
     {
-        return !count($this->getInitEntities()) && !count($this->getInitRoutes());
+        return !count($this->getInitEntities()) && !count($this->getInitRoutes()) && !count($this->getInitDatagrids());
     }
 
     /**

@@ -149,7 +149,7 @@ services:
     oro_user.impersonation_authenticator:
         class: Oro\Bundle\UserBundle\Security\ImpersonationAuthenticator
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_security.token.factory.username_password_organization'
             - '@event_dispatcher'
             - '@router'

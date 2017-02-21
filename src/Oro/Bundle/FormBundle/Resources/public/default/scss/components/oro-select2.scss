@@ -68,10 +68,8 @@
 
     .select2-search input {
         padding: 11px 9px;
-
         font-size: $base-font-size;
         line-height: 1;
-
         border: 1px solid get-color(additional, 'light');
         border-radius: 5px;
     }
@@ -82,9 +80,8 @@
 
     &__dropdown {
         margin-top: -4px;
-
+        width: auto;
         font-size: 13px;
-
         border: 0.1rem solid get-color(additional, 'light');
         border-top-color: transparent;
         box-shadow: 0 3px 5px rgba(0,0,0,.15);
@@ -92,25 +89,30 @@
         .select2-results {
             margin: 0;
             padding: 0;
-
             color: get-color('additional', 'dark');
         }
 
         .select2-no-results,
         .select2-searching {
             padding: 0 ($offset-x-m / 2) ($offset-y-m / 2);
-
             background: none;
         }
 
-        .select2-highlighted {
+        .select2-highlighted,
+        .active {
             background-color: get-color('ui', 'focus');
+            color: get-color('additional', 'ultra');
         }
 
         .select2-result-label {
+            display: block;
+
             padding: 5px 14px;
 
+            text-decoration: none;
             line-height: 24px;
+
+            color: inherit;
 
             white-space: nowrap;
         }
@@ -219,11 +221,11 @@
     }
 
     &.select2-container-multi .select2-choices {
-        padding: 4px 9px 4px 4px;
+        padding: 5px 9px 5px 4px;
 
         .select2-search-field {
             margin-left: 5px;
-            
+
             input {
                 margin: 3px 0;
                 padding: 3px 0;

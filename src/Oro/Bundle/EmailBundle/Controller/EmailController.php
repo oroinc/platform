@@ -26,6 +26,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
@@ -47,6 +48,19 @@ use Oro\Component\MessageQueue\Client\MessageProducer;
  */
 class EmailController extends Controller
 {
+    /**
+     * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection")
+     */
+    public function checkSmtpConnectionAction(Request $request)
+    {
+        $smtpSettings = SmtpSettingsFactory::createFromRequest($request);
+        $smtpSettingsChecker = $this->get('oro_email.mailer.checker.smtp_settings');
+
+        return new JsonResponse(
+            $smtpSettingsChecker->checkConnection($smtpSettings)
+        );
+    }
+
     /**
      * @Route("/purge-emails-attachments", name="oro_email_purge_emails_attachments")
      * @AclAncestor("oro_config_system")
@@ -193,6 +207,59 @@ class EmailController extends Controller
         $this->loadEmailBody($emails);
 
         $this->getEmailManager()->setSeenStatus($entity, true, true);
+
+        return [
+            'entity' => $entity,
+            'thread' => $emails,
+            'target' => $this->getTargetEntity(),
+            'hasGrantReattach' => $this->isAttachmentCreationGranted(),
+            'routeParameters' => $this->getTargetEntityConfig(),
+            'renderContexts' => $this->getRequest()->get('renderContexts', true),
+            'defaultReplyButton' => $this->get('oro_config.user')->get('oro_email.default_button_reply')
+        ];
+    }
+
+    /**
+     * Used on `My Emails` page to show emails thread with only emails being related to currently logged user.
+     *
+     * @Route("/view/user-thread/{id}", name="oro_email_user_thread_view", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_view")
+     * @Template("OroEmailBundle:Email/Thread:userEmails.html.twig")
+     */
+    public function viewUserThreadAction(Email $entity)
+    {
+        $this->getEmailManager()->setSeenStatus($entity, true, true);
+
+        return ['entity' => $entity];
+    }
+
+    /**
+     * Used on `My Emails` page to show emails thread with only emails being related to currently logged user.
+     *
+     * @Route("/widget/user-thread/{id}", name="oro_email_user_thread_widget", requirements={"id"="\d+"})
+     * @Template("OroEmailBundle:Email/widget:thread.html.twig")
+     */
+    public function userThreadWidgetAction(Email $entity)
+    {
+        $emails = [];
+        if ($this->getRequest()->get('showSingleEmail', false)) {
+            $emails[] = $entity;
+        } else {
+            $emails = $this->get('oro_email.email.thread.provider')->getUserThreadEmails(
+                $this->get('doctrine')->getManager(),
+                $entity,
+                $this->getUser(),
+                $this->get('oro_email.mailbox.manager')->findAvailableMailboxes(
+                    $this->getUser(),
+                    $this->get('security.token_storage')->getToken()->getOrganizationContext()
+                )
+            );
+        }
+
+        $emails = array_filter($emails, function ($email) {
+            return $this->get('security.context')->isGranted('VIEW', $email);
+        });
+        $this->loadEmailBody($emails);
 
         return [
             'entity' => $entity,

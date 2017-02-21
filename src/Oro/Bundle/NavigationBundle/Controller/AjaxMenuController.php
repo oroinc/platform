@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
@@ -41,6 +42,8 @@ class AjaxMenuController extends Controller
         }
 
         $em->flush($updates);
+
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -79,6 +82,8 @@ class AjaxMenuController extends Controller
         $em->persist($menuUpdate);
         $em->flush();
 
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
         return new JsonResponse(null, Response::HTTP_CREATED);
     }
 
@@ -114,6 +119,8 @@ class AjaxMenuController extends Controller
 
         $entityManager->flush($menuUpdate);
 
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
@@ -132,6 +139,8 @@ class AjaxMenuController extends Controller
     {
         $this->getMenuUpdateManager()->showMenuItem($menuName, $key, $scope);
 
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
@@ -149,6 +158,8 @@ class AjaxMenuController extends Controller
     public function hideAction($menuName, $key, Scope $scope)
     {
         $this->getMenuUpdateManager()->hideMenuItem($menuName, $key, $scope);
+
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
 
         return new JsonResponse(null, Response::HTTP_OK);
     }
@@ -189,6 +200,8 @@ class AjaxMenuController extends Controller
 
         $entityManager->flush();
 
+        $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
         return new JsonResponse(['status' => true], Response::HTTP_OK);
     }
 
@@ -198,5 +211,17 @@ class AjaxMenuController extends Controller
     protected function getMenuUpdateManager()
     {
         return $this->get('oro_navigation.manager.menu_update');
+    }
+
+    /**
+     * @param string $menuName
+     * @param Scope $scope
+     */
+    protected function dispatchMenuUpdateScopeChangeEvent($menuName, Scope $scope)
+    {
+        $this->get('event_dispatcher')->dispatch(
+            MenuUpdateScopeChangeEvent::NAME,
+            new MenuUpdateScopeChangeEvent($menuName, $scope)
+        );
     }
 }

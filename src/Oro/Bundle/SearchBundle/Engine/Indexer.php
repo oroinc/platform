@@ -29,7 +29,7 @@ class Indexer
 
     const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
-    /** @var EngineV2Interface */
+    /** @var EngineInterface */
     protected $engine;
 
     /** @var ObjectMapper */
@@ -45,14 +45,14 @@ class Indexer
     protected $isAllowedApplyAcl = true;
 
     /**
-     * @param EngineV2Interface   $engine
+     * @param EngineInterface   $engine
      * @param ObjectMapper        $mapper
      * @param SecurityProvider    $securityProvider
      * @param AclHelper           $searchAclHelper
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
-        EngineV2Interface        $engine,
+        EngineInterface        $engine,
         ObjectMapper             $mapper,
         SecurityProvider         $securityProvider,
         AclHelper                $searchAclHelper,

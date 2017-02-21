@@ -1,0 +1,41 @@
+{% extends 'OroEntityConfigBundle:Config:fieldUpdate.html.twig' %}
+
+{% if field.id %}
+    {% oro_title_set({params : {'%attributeName%': field.fieldName}}) %}
+{% else %}
+    {% oro_title_set({params : {'%entityName%': 'oro.entity_config.attribute.entity_label'|trans}})  %}
+{% endif %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(path('oro_attribute_index', {alias: entityAlias})) }}
+    {% if resource_granted('oro_attribute_create') %}
+        {% set html = UI.saveAndCloseButton({'route': 'oro_attribute_index', 'params': {alias: entityAlias}}) %}
+        {% set html = html ~ UI.saveAndNewButton({
+            'route': 'oro_attribute_create',
+            'params': {alias: entityAlias}
+        }) %}
+    {% endif %}
+    {% if resource_granted('oro_attribute_update') %}
+        {% set html = html ~ UI.saveAndStayButton({
+            'route': 'oro_attribute_update',
+            'params': {'id': '$id'}
+        }) %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set entityTitle = field.id ?
+        (field_config.get('label')|trans) | default(field.fieldName|capitalize) :
+        'oro.ui.create_entity'|trans({'%entityName%': 'oro.entity_config.attribute.entity_label'|trans})
+    %}
+
+    {% set breadcrumbs = {
+        'entity'      : 'entity',
+        'indexPath'   : path('oro_attribute_index', {alias: entityAlias}),
+        'indexLabel'  : attributesLabel|trans,
+        'entityTitle' : entityTitle
+    }%}
+
+    {{ parent() }}
+{% endblock pageHeader %}

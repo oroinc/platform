@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
@@ -10,12 +11,16 @@ use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
 use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
+use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -29,6 +34,21 @@ class OroTestFrameworkExtension implements TestworkExtension
     const PAGES_CONFIG_ROOT = 'pages';
 
     /**
+     * @var ServiceProcessor
+     */
+    private $processor;
+
+    /**
+     * Initializes compiler pass.
+     *
+     * @param null|ServiceProcessor $processor
+     */
+    public function __construct(ServiceProcessor $processor = null)
+    {
+        $this->processor = $processor ? : new ServiceProcessor();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
@@ -36,8 +56,10 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
         $this->processElements($container);
+        $this->injectMessageQueueIsolator($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
+        $this->processClassResolvers($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -74,8 +96,7 @@ class OroTestFrameworkExtension implements TestworkExtension
                     )
                     ->defaultValue([])
                 ->end()
-                ->arrayNode('shared_contexts')
-                    ->prototype('scalar')->end()
+                ->variableNode('shared_contexts')
                     ->info('Contexts that added to all autoload bundles suites')
                     ->defaultValue([])
                 ->end()
@@ -114,10 +135,16 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function processIsolationSubscribers(ContainerBuilder $container)
     {
         $dumpers = [];
+        $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
 
         foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $dumpers[$priority][] = new Reference($id);
+            /** @var IsolatorInterface $isolator */
+            $isolator = $container->get($id);
+
+            if ($isolator->isApplicable($applicationContainer)) {
+                $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+                $dumpers[$priority][] = new Reference($id);
+            }
         }
 
         // sort by priority and flatten
@@ -128,6 +155,32 @@ class OroTestFrameworkExtension implements TestworkExtension
             0,
             $dumpers
         );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function injectMessageQueueIsolator(ContainerBuilder $container)
+    {
+        $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
+
+        foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
+            /** @var IsolatorInterface $isolator */
+            $isolator = $container->get($id);
+
+            if ($isolator->isApplicable($applicationContainer) && $isolator instanceof MessageQueueIsolatorInterface) {
+                $container
+                    ->getDefinition('oro_test.context.fixture_loader')
+                    ->replaceArgument(4, new Reference($id));
+                $container
+                    ->getDefinition('oro_behat_extension.isolation.inital_massage_queue_isolator')
+                    ->replaceArgument(0, new Reference($id));
+
+                return;
+            }
+        }
+
+        throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
     }
 
     private function processSuiteAwareSubscriber(ContainerBuilder $container)
@@ -142,6 +195,21 @@ class OroTestFrameworkExtension implements TestworkExtension
             0,
             $services
         );
+    }
+
+    /**
+     * Processes all context initializers.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function processClassResolvers(ContainerBuilder $container)
+    {
+        $references = $this->processor->findAndSortTaggedServices($container, ContextExtension::CLASS_RESOLVER_TAG);
+        $definition = $container->getDefinition('oro_test.environment.handler.feature_environment_handler');
+
+        foreach ($references as $reference) {
+            $definition->addMethodCall('registerClassResolver', array($reference));
+        }
     }
 
     /**

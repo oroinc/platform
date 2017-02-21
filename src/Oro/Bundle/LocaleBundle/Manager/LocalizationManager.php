@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Manager;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -19,102 +17,116 @@ class LocalizationManager
     /**
      * @var DoctrineHelper
      */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /**
      * @var LocalizationRepository
      */
-    protected $repository;
+    private $repository;
 
     /**
      * @var ConfigManager
      */
-    protected $configManager;
+    private $configManager;
 
     /**
      * @var CacheProvider
      */
-    protected $cache;
+    private $cacheProvider;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager $configManager
+     * @param CacheProvider $cacheProvider
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager,
+        CacheProvider $cacheProvider
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager = $configManager;
-
-        /** used to minimize SQL Queries */
-        $this->cache = new ArrayCache();
+        $this->cacheProvider = $cacheProvider;
     }
 
     /**
      * @param int $id
+     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
+     *                       Cache should be enabled, only if you want to read from the Localization.
      *
      * @return null|Localization
      */
-    public function getLocalization($id)
+    public function getLocalization($id, $useCache = true)
     {
-        $cache = $this->getLocalizations();
+        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey($id)) : false;
 
-        return isset($cache[$id]) ? $cache[$id] : null;
+        if ($cache !== false && array_key_exists($id, $cache)) {
+            return $cache[$id];
+        }
+
+        /** @var Localization $cache */
+        $cache = $this->getRepository()->findOneBy(['id' => $id]);
+
+        if ($cache === null) {
+            return null;
+        }
+
+        if ($useCache) {
+            $this->cacheProvider->save(static::getCacheKey($id), [$id => $cache]);
+        }
+
+        return $cache;
     }
 
     /**
      * @param array|null $ids
+     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
+     *                       Cache should be enabled, only if you want to read from the Localization.
      *
      * @return array|Localization[]
      */
-    public function getLocalizations(array $ids = null)
+    public function getLocalizations(array $ids = null, $useCache = true)
     {
-        $cache = $this->cache ? $this->cache->fetch(self::CACHE_NAMESPACE) : false;
+        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey()) : false;
 
         if ($cache === false) {
             $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
-            $cache = array_combine(
-                array_map(
-                    function (Localization $element) {
-                        return $element->getId();
-                    },
-                    $cache
-                ),
-                array_values($cache)
-            );
-            if ($this->cache) {
-                $this->cache->save(self::CACHE_NAMESPACE, $cache);
+            $cache = $this->associateLocalizationsArray($cache);
+
+            if ($useCache) {
+                $this->cacheProvider->save(static::getCacheKey(), $cache);
+
+                foreach ($cache as $id => $localization) {
+                    $this->cacheProvider->save(static::getCacheKey($id), [$id => $localization]);
+                }
             }
         }
 
         if (null === $ids) {
             return $cache;
-        } else {
-            $keys = array_filter(
-                array_keys($cache),
-                function ($key) use ($ids) {
-                    // strict comparing is not allowed because ID might be represented by a string
-                    return in_array($key, $ids);
-                }
-            );
-
-            return array_intersect_key($cache, array_flip($keys));
         }
+
+        $keys = $this->filterOnlyExistingKeys($ids, $cache);
+
+        return array_intersect_key($cache, array_flip($keys));
     }
 
     /**
+     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
+     *                       Cache should be enabled, only if you want to read from the Localization.
+     *
      * @return Localization
      */
-    public function getDefaultLocalization()
+    public function getDefaultLocalization($useCache = true)
     {
         $id = (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
 
-        $localization = $this->getLocalization($id);
+        $localizations = $this->getLocalizations(null, $useCache);
 
-        if ($localization instanceof Localization) {
-            return $localization;
+        if (isset($localizations[$id])) {
+            return $localizations[$id];
         }
 
-        $localizations = $this->getLocalizations();
         if (count($localizations)) {
             return reset($localizations);
         }
@@ -123,24 +135,28 @@ class LocalizationManager
     }
 
     /**
-     * Warms up the cache
-     */
-    public function warmUpCache()
-    {
-        if ($this->cache) {
-            $this->clearCache();
-            $this->getLocalizations();
-        }
-    }
-
-    /**
-     * Clears the cache
+     * @return bool
      */
     public function clearCache()
     {
-        if ($this->cache) {
-            $this->cache->delete(self::CACHE_NAMESPACE);
-        }
+        return $this->cacheProvider->deleteAll();
+    }
+
+    public function warmUpCache()
+    {
+        $this->clearCache();
+        $this->getLocalizations();
+    }
+
+    /**
+     * @param int $localizationId
+     * @return string
+     */
+    public static function getCacheKey($localizationId = null)
+    {
+        return $localizationId !== null
+            ? sprintf('%s_%s', static::CACHE_NAMESPACE, $localizationId)
+            : static::CACHE_NAMESPACE;
     }
 
     /**
@@ -153,5 +169,44 @@ class LocalizationManager
         }
 
         return $this->repository;
+    }
+
+    /**
+     * Set ids of the localizations as keys
+     *
+     * @param Localization[] $localizations
+     * @return Localization[]
+     */
+    private function associateLocalizationsArray(array $localizations)
+    {
+        $localizations = array_combine(
+            array_map(
+                function (Localization $element) {
+                    return $element->getId();
+                },
+                $localizations
+            ),
+            $localizations
+        );
+
+        return $localizations;
+    }
+
+    /**
+     * @param array $ids
+     * @param Localization[] $localizations
+     * @return array
+     */
+    private function filterOnlyExistingKeys(array $ids, $localizations)
+    {
+        $keys = array_filter(
+            array_keys($localizations),
+            function ($key) use ($ids) {
+                // strict comparing is not allowed because ID might be represented by a string
+                return in_array($key, $ids);
+            }
+        );
+
+        return $keys;
     }
 }

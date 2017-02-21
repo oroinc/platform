@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -159,6 +160,7 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
     {
         $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
         $operation->expects($this->any())->method('getName')->willReturn($name);
+        $operation->expects($this->any())->method('getDefinition')->willReturn(new OperationDefinition());
 
         return $operation;
     }

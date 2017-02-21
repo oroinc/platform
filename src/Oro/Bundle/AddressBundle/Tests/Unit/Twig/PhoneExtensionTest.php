@@ -4,6 +4,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\AddressBundle\Twig\PhoneExtension;
 use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 
 class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +24,7 @@ class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new PhoneExtension($this->provider);
+        $this->extension = new PhoneExtension(new ServiceLink($this->provider));
     }
 
     public function testGetFunctions()

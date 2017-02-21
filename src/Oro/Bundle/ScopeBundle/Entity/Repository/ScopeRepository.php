@@ -5,7 +5,8 @@ namespace Oro\Bundle\ScopeBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 
@@ -13,19 +14,19 @@ class ScopeRepository extends EntityRepository
 {
     /**
      * @param ScopeCriteria $criteria
-     * @return BufferedQueryResultIterator|Scope[]
+     * @return BufferedQueryResultIteratorInterface|Scope[]
      */
     public function findByCriteria(ScopeCriteria $criteria)
     {
         $qb = $this->createQueryBuilder('scope');
         $criteria->applyWhere($qb, 'scope');
 
-        return new BufferedQueryResultIterator($qb);
+        return new BufferedIdentityQueryResultIterator($qb);
     }
 
     /**
      * @param ScopeCriteria $criteria
-     * @return BufferedQueryResultIterator|Scope[]
+     * @return BufferedQueryResultIteratorInterface|Scope[]
      */
     public function findIdentifiersByCriteria(ScopeCriteria $criteria)
     {
@@ -33,6 +34,21 @@ class ScopeRepository extends EntityRepository
         $criteria->applyWhere($qb, 'scope');
 
         return $this->findIdentifiers($qb);
+    }
+
+    /**
+     * Find most suitable scope from already existing scopes
+     *
+     * @param ScopeCriteria $criteria
+     * @return Scope|null
+     */
+    public function findMostSuitable(ScopeCriteria $criteria)
+    {
+        $qb = $this->createQueryBuilder('scope');
+        $criteria->applyWhereWithPriority($qb, 'scope');
+        $qb->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -46,6 +62,19 @@ class ScopeRepository extends EntityRepository
         $criteria->applyWhereWithPriority($qb, 'scope');
 
         return $this->findIdentifiers($qb);
+    }
+
+    /**
+     * @param ScopeCriteria $criteria
+     * @return Scope
+     */
+    public function findOneByCriteria(ScopeCriteria $criteria)
+    {
+        $qb = $this->createQueryBuilder('scope');
+        $criteria->applyWhere($qb, 'scope');
+        $qb->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -65,18 +94,5 @@ class ScopeRepository extends EntityRepository
         }
 
         return $ids;
-    }
-
-    /**
-     * @param ScopeCriteria $criteria
-     * @return Scope
-     */
-    public function findOneByCriteria(ScopeCriteria $criteria)
-    {
-        $qb = $this->createQueryBuilder('scope');
-        $criteria->applyWhere($qb, 'scope');
-        $qb->setMaxResults(1);
-
-        return $qb->getQuery()->getOneOrNullResult();
     }
 }

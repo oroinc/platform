@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\EventListener\ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 
 class LocalizationListener
@@ -12,18 +13,27 @@ class LocalizationListener
     /**
      * @var LocalizationFallbackStrategy
      */
-    protected $localizationFallbackStrategy;
+    private $localizationFallbackStrategy;
+
+    /**
+     * @var LocalizationManager
+     */
+    private $localizationManager;
 
     /**
      * @param LocalizationFallbackStrategy $localizationFallbackStrategy
+     * @param LocalizationManager $localizationManager
      */
-    public function __construct(LocalizationFallbackStrategy $localizationFallbackStrategy)
-    {
+    public function __construct(
+        LocalizationFallbackStrategy $localizationFallbackStrategy,
+        LocalizationManager $localizationManager
+    ) {
         $this->localizationFallbackStrategy = $localizationFallbackStrategy;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization       $localization
      * @param LifecycleEventArgs $event
      * @throws \Exception
      */
@@ -33,7 +43,7 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization       $localization
      * @param LifecycleEventArgs $event
      * @throws \Exception
      */
@@ -43,7 +53,7 @@ class LocalizationListener
     }
 
     /**
-     * @param Localization $localization
+     * @param Localization       $localization
      * @param LifecycleEventArgs $event
      * @throws \Exception
      */
@@ -52,8 +62,9 @@ class LocalizationListener
         $this->handleChanges();
     }
 
-    protected function handleChanges()
+    private function handleChanges()
     {
         $this->localizationFallbackStrategy->clearCache();
+        $this->localizationManager->clearCache();
     }
 }

@@ -1,0 +1,31 @@
+@name =  import_validation_result
+@subject = Result of import validation file {{ data['fileName'] }}
+@isSystem = 1
+@isEditable = 1
+{% spaceless %}
+<style>
+    @media (max-width: 480pt) {
+        .wrapper{
+            width: 100% !important;
+        }
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+<div class="wrapper">
+    <p>
+        Import validation of the file {{ data['fileName'] }} was completed.
+        Part(s) {{ data['successParts'] }} of {{ data['totalParts'] }} were validated.
+    </p>
+    <p>
+        Errors: {{ data['errors'] }}
+        processed: {{ data['process'] }},
+        read: {{ data['read'] }}
+    </p>
+
+    {% if data['hasError'] %}
+        <a href="{{ data['downloadLogUrl'] }}">Error log</a>
+    {% endif %}
+</div>
+{% endspaceless %}

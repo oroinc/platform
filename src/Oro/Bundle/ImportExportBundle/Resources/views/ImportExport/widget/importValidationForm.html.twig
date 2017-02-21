@@ -1,0 +1,66 @@
+<div class="widget-content import-widget-content">
+    <div class="alert alert-info import-notice">
+        <strong>{{ 'oro.importexport.import.importance'|trans }}</strong>:
+        {{ 'oro.importexport.import.columns_notice'|trans }}
+    </div>
+    <div class="form-container">
+        <form method="post"
+              data-nohash="true"
+              id="{{ form.vars.id }}"
+              name="{{ form.vars.name }}"
+              action="{{ path('oro_importexport_import_validation_form', {entity: entityName, importJob: importJob, importValidateJob: importValidateJob, options: options}) }}"
+              class="form-horizontal"
+              {{ form_enctype(form) }}>
+
+            <fieldset class="form">
+                <div class="import-file">
+                    {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
+                </div>
+                <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
+                    {{ form_row(form.processorAlias, {'label': 'oro.importexport.import.strategy'}) }}
+                </div>
+                {{ form_rest(form) }}
+            </fieldset>
+
+            <div class="widget-actions">
+                <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                <button class="btn btn-primary" type="submit">{{ 'Submit'|trans }}</button>
+            </div>
+        </form>
+        {{ oro_form_js_validation(form) }}
+    </div>
+
+    <script type="text/javascript">
+        require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger'],
+        function(_, __, WidgetManager, Messenger) {
+            WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                widget._onContentLoad = function (content) {
+                    if (_.has(content, 'success')) {
+                        if(content.success) {
+                            Messenger.notificationFlashMessage(
+                                    'success',
+                                    __('oro.importexport.import_validation.success.message')
+                            );
+                        } else {
+                            Messenger.notificationFlashMessage(
+                                    'error',
+                                    __('oro.importexport.import_validation.form_fail.message')
+                            );
+                        }
+                        this.remove();
+                    } else {
+                        delete this.loading;
+                        this.disposePageComponents();
+                        this.setContent(content, true);
+                        this._triggerContentLoadEvents();
+                    }
+                };
+                widget._onContentLoadFail = function() {
+                    Messenger.notificationFlashMessage('error', __('oro.importexport.import.fail.message'));
+                    this.remove();
+                }
+
+            });
+        });
+    </script>
+</div>

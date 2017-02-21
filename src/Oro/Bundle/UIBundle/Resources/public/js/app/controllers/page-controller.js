@@ -6,15 +6,15 @@ define([
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/models/page-model',
-    'module'
-], function(asap, $, _, Chaplin, __, BaseController, PageModel, module) {
+    'module',
+    'oroui/js/error'
+], function(asap, $, _, Chaplin, __, BaseController, PageModel, module, error) {
     'use strict';
 
     var PageController;
     var document = window.document;
     var location = window.location;
     var history = window.history;
-    var console = window.console;
     var utils = Chaplin.utils;
     var mediator = Chaplin.mediator;
 
@@ -248,15 +248,7 @@ define([
             if (_.isObject(data)) {
                 model.set(data, options);
             } else {
-                if (mediator.execute('retrieveOption', 'debug')) {
-                    // jshint -W060
-                    document.writeln(rawData);
-                    if (console) {
-                        console.error('Unexpected content format');
-                    }
-                } else {
-                    mediator.execute('showMessage', 'error', __('Sorry, page was not loaded correctly'));
-                }
+                error.showError(new Error(__('Unexpected content format')));
             }
 
             this.publishEvent('page:error', model.getAttributes(), options.actionArgs, jqXHR);
@@ -288,10 +280,10 @@ define([
                 // fetch from URL only pathname and query
                 parser = document.createElement('a');
                 parser.href = pathDesc.url;
-                pathname = parser.pathname;
-                query = parser.search.substr(1);
                 // IE removes starting slash
-                pathDesc.url = (pathname[0] === '/' ? '' : '/') + pathname + (query && ('?' + query));
+                pathname = (parser.pathname[0] === '/' ? '' : '/') + parser.pathname;
+                query = parser.search.substr(1);
+                pathDesc.url = pathname + (query && ('?' + query));
             }
             options = _.defaults(options, {
                 fullRedirect: this.fullRedirect

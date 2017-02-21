@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         events: {
-            change: 'updateFront'
+            change: 'onOriginChange'
         },
 
         /**
@@ -156,6 +156,10 @@ define(function(require) {
             return this.$frontDateField.datepicker('widget');
         },
 
+        setMinValue: function(minValue) {
+            this.$frontDateField.datepicker('option', 'minDate', minValue);
+        },
+
         /**
          * Destroys picker widget
          */
@@ -193,6 +197,15 @@ define(function(require) {
             }
         },
 
+        onOriginChange: function() {
+            this.updateFront();
+            var form = this.$el.closest('form');
+            if (form.length && form.data('validator')) {
+                form.validate()
+                    .element(this.$el);
+            }
+        },
+
         /**
          * Update front date field value
          */
@@ -213,7 +226,7 @@ define(function(require) {
             var momentInstance = this.getFrontendMoment();
             var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
-                value = momentInstance.format(format);
+                value = momentInstance.utc().format(format);
             }
             return value;
         },

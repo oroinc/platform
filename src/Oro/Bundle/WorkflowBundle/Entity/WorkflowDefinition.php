@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -50,9 +51,9 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  */
 class WorkflowDefinition implements DomainObjectInterface
 {
-    const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
-    const GROUP_TYPE_EXCLUSIVE_RECORD = 20;
     const CONFIG_SCOPES = 'scopes';
+    const CONFIG_DATAGRIDS = 'datagrids';
+    const CONFIG_FORCE_AUTOSTART = 'force_autostart';
 
     /**
      * @var string
@@ -180,12 +181,16 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var array
      *
-     * @ORM\Column(name="groups", type="array")
+     * @ORM\Column(name="exclusive_active_groups", type="simple_array", nullable=true)
      */
-    protected $groups = [
-        self::GROUP_TYPE_EXCLUSIVE_ACTIVE => [],
-        self::GROUP_TYPE_EXCLUSIVE_RECORD => [],
-    ];
+    protected $exclusiveActiveGroups = [];
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="exclusive_record_groups", type="simple_array", nullable=true)
+     */
+    protected $exclusiveRecordGroups = [];
 
     /**
      * @var \DateTime $created
@@ -216,6 +221,13 @@ class WorkflowDefinition implements DomainObjectInterface
     protected $updatedAt;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="applications", type="simple_array", nullable=false)
+     */
+    protected $applications = [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -240,6 +252,16 @@ class WorkflowDefinition implements DomainObjectInterface
     public function __toString()
     {
         return (string)$this->getLabel();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForceAutostart()
+    {
+        return array_key_exists(self::CONFIG_FORCE_AUTOSTART, $this->configuration)
+            ? (bool)$this->configuration[self::CONFIG_FORCE_AUTOSTART]
+            : false;
     }
 
     /**
@@ -851,7 +873,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function hasExclusiveActiveGroups()
     {
-        return !empty($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]);
+        return !empty($this->exclusiveActiveGroups);
     }
 
     /**
@@ -859,9 +881,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getExclusiveActiveGroups()
     {
-        return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE])
-            ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE]
-            : [];
+        return $this->exclusiveActiveGroups;
     }
 
     /**
@@ -870,7 +890,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function setExclusiveActiveGroups(array $groups)
     {
-        $this->groups[self::GROUP_TYPE_EXCLUSIVE_ACTIVE] = $groups;
+        $this->exclusiveActiveGroups = $groups;
 
         return $this;
     }
@@ -880,7 +900,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function hasExclusiveRecordGroups()
     {
-        return !empty($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]);
+        return !empty($this->exclusiveRecordGroups);
     }
 
     /**
@@ -888,9 +908,7 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function getExclusiveRecordGroups()
     {
-        return isset($this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD])
-            ? $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD]
-            : [];
+        return $this->exclusiveRecordGroups;
     }
 
     /**
@@ -899,7 +917,36 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function setExclusiveRecordGroups(array $groups)
     {
-        $this->groups[self::GROUP_TYPE_EXCLUSIVE_RECORD] = $groups;
+        $this->exclusiveRecordGroups = $groups;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDatagrids()
+    {
+        return array_key_exists(self::CONFIG_DATAGRIDS, $this->configuration)
+            ? (array)$this->configuration[self::CONFIG_DATAGRIDS]
+            : [];
+    }
+    /**
+     * @return array
+     */
+    public function getApplications()
+    {
+        return $this->applications;
+    }
+
+    /**
+     * @param array $applications
+     *
+     * @return $this
+     */
+    public function setApplications(array $applications)
+    {
+        $this->applications = array_map('strtolower', $applications);
 
         return $this;
     }

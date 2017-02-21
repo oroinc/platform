@@ -120,9 +120,15 @@ define(function(require) {
             });
 
             var options = $dropdownMenu.data('options');
+            var attachToParent = options.attachToParent || false;
+
             if (options && options.align === 'right') {
-                css.right = $(window).width() - css.left - $dropdownMenu.outerWidth();
+                css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
                 css.left = 'auto';
+
+                if (attachToParent) {
+                    css.width = $parent.outerWidth();
+                }
             }
 
             var containerOffset = $container.offset();
@@ -184,11 +190,19 @@ define(function(require) {
             top: dropdownMenuOriginalPosition.top + parentPosition.top - parentOriginalPosition.top,
             left: dropdownMenuOriginalPosition.left + parentPosition.left - parentOriginalPosition.left
         };
+
         var options = $dropdownMenu.data('options');
+        var attachToParent = options.attachToParent || false;
+
         if (options && options.align === 'right') {
-            css.right = $(window).width() - css.left - $dropdownMenu.outerWidth();
+            css.right = $(window).width() - css.left - ((attachToParent ? $parent : $dropdownMenu).outerWidth());
             css.left = 'auto';
+
+            if (attachToParent) {
+                css.width = $parent.outerWidth();
+            }
         }
+
         $dropdownMenu.css(css);
     };
 
@@ -377,7 +391,8 @@ define(function(require) {
             var $toggle = $(toggleDropdown, $dropdown);
             var $dropdownMenu = $('>.dropdown-menu', $dropdown);
             var dropdownMenuContainer = $toggle.closest('.ui-dialog-content')[0] ||
-                $toggle.closest('.scrollable-container')[0];
+                $toggle.closest('.scrollable-container')[0] ||
+                $toggle.closest('.grid-scrollable-container')[0];
             var scrollableRect = scrollHelper.getFinalVisibleRect(dropdownMenuContainer);
             var toggleRect = $toggle[0].getBoundingClientRect();
 

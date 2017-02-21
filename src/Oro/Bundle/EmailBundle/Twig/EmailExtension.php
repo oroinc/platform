@@ -15,10 +15,10 @@ use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
-use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class EmailExtension extends Twig_Extension
 {
@@ -42,8 +42,8 @@ class EmailExtension extends Twig_Extension
     /** @var SecurityFacade */
     private $securityFacade;
 
-    /** @var RelatedEmailsProvider */
-    protected $relatedEmailsProvider;
+    /** @var ServiceLink */
+    protected $relatedEmailsProviderLink;
 
     /**
      * @param EmailHolderHelper      $emailHolderHelper
@@ -52,7 +52,7 @@ class EmailExtension extends Twig_Extension
      * @param EntityManager          $em
      * @param MailboxProcessStorage  $mailboxProcessStorage
      * @param SecurityFacade         $securityFacade
-     * @param RelatedEmailsProvider  $relatedEmailsProvider
+     * @param ServiceLink            $relatedEmailsProviderLink Link is used because of performance reasons
      */
     public function __construct(
         EmailHolderHelper $emailHolderHelper,
@@ -61,7 +61,7 @@ class EmailExtension extends Twig_Extension
         EntityManager $em,
         MailboxProcessStorage $mailboxProcessStorage,
         SecurityFacade $securityFacade,
-        RelatedEmailsProvider $relatedEmailsProvider
+        ServiceLink $relatedEmailsProviderLink
     ) {
         $this->emailHolderHelper = $emailHolderHelper;
         $this->emailAddressHelper = $emailAddressHelper;
@@ -69,7 +69,7 @@ class EmailExtension extends Twig_Extension
         $this->em = $em;
         $this->mailboxProcessStorage = $mailboxProcessStorage;
         $this->securityFacade = $securityFacade;
-        $this->relatedEmailsProvider = $relatedEmailsProvider;
+        $this->relatedEmailsProviderLink = $relatedEmailsProviderLink;
     }
 
     /**
@@ -100,7 +100,7 @@ class EmailExtension extends Twig_Extension
     {
         $result = $this->emailHolderHelper->getEmail($object);
         if (!$result) {
-            $emails = $this->relatedEmailsProvider->getEmails($object);
+            $emails = $this->relatedEmailsProviderLink->getService()->getEmails($object);
             $result = reset($emails);
         }
 

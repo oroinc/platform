@@ -63,6 +63,7 @@ services:
             - '@oro_security.security_facade.link'
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: oro_navigation.menu_extension, priority: 100 }
 
@@ -99,6 +100,7 @@ services:
             - '@oro_menu.configuration_resolver'
             - '@oro_menu.factory'
             - '@event_dispatcher'
+            - '@oro_navigation.configuration.provider'
         tags:
             - { name: oro_menu.builder }
 
@@ -113,6 +115,7 @@ services:
             - '@knp_menu.helper'
             - '@oro_menu.builder_chain'
             - '@oro_navigation.breadcrumb_manager'
+            - '@oro_navigation.configuration.provider'
         calls:
           - [ setBreadcrumbManager, [ '@oro_navigation.chain_breadcrumb_manager' ]]
         tags:
@@ -260,12 +263,14 @@ services:
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager.link'
           - '@oro_navigation.title_provider'
+        lazy: true
 
     oro_navigation.title_provider:
         class: %oro_navigation.title_provider.class%
         public: false
         arguments:
           - '@oro_entity.doctrine_helper'
+          - '@oro_navigation.configuration.provider'
 
     oro_navigation.title_translator:
         class: %oro_navigation.title_translator.class%
@@ -279,7 +284,9 @@ services:
         arguments:                    ["@kernel", "@annotation_reader"]
 
     oro_navigation.title_config_reader:
-        class:                        %oro_navigation.title_service.config_reader.class%
+        class: '%oro_navigation.title_service.config_reader.class%'
+        arguments:
+            - '@oro_navigation.configuration.provider'
 
     oro_navigation.title_service.twig.extension:
         class: %oro_navigation.title_service.twig.extension.class%
@@ -384,6 +391,7 @@ services:
         arguments:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
+            - '@oro_navigation.configuration.provider'
             - '%oro_navigation.menu_update.scope_type%'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }
@@ -441,6 +449,27 @@ services:
             - '@translator'
             - '@oro_locale.helper.localization'
 
+    oro_navigation.event_listener.menu_update_cache_flusher:
+        class: Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher
+        arguments:
+            - '@oro_navigation.repository.menu_update'
+            - '@oro_navigation.menu_update.cache'
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.menu_update_scope_change, method: onMenuUpdateScopeChange }
+
+    oro_navigation.repository.menu_update:
+        class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'
+        parent: oro_entity.abstract_repository
+        arguments:
+            - '%oro_navigation.entity.menu_update.class%'
+        calls:
+            - [ setQueryResultCache, [ '@oro_navigation.menu_update.cache' ] ]
+
+    oro_navigation.menu_update.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_menu_updates' ] ]
+
     oro_navigation.data_provider.title:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider
         scope: request
@@ -454,3 +483,30 @@ services:
         parent: oro_user.scope_criteria_provider.user
         tags:
             - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}
+
+    oro_navigation.configuration.provider:
+        class: Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider
+        arguments:
+            - '@oro_navigation.configuration_provider.cache'
+
+    oro_navigation.configuration_provider.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_configuration' ] ]
+
+    oro_navigation.event_listener.container_listener:
+        class: Oro\Bundle\NavigationBundle\EventListener\ContainerListener
+        arguments:
+            - '@oro_navigation.configuration.provider'
+            - '@oro_navigation.config.dumper'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_navigation.config.dumper:
+        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
+        public: false
+        arguments:
+            - '%kernel.cache_dir%'
+            - '%kernel.debug%'
+            - 'oro_navigation'

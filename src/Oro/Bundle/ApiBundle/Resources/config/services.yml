@@ -1,3 +1,6 @@
+parameters:
+    nelmio_api_doc.twig.extension.extra_markdown.class: Oro\Bundle\ApiBundle\Twig\MarkdownExtension
+
 services:
     oro_api.action_processor_bag:
         class: Oro\Bundle\ApiBundle\Processor\ActionProcessorBag
@@ -148,6 +151,10 @@ services:
             - '@oro_api.resources_provider'
             - '@oro_api.resources_cache'
 
+    oro_api.resource_hierarchy_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider
+        public: false
+
     oro_api.resources_cache:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
         arguments:
@@ -248,6 +255,7 @@ services:
         lazy: true
         calls:
             - [ addEntityAliasProvider, [ '@oro_api.entity_alias_provider' ] ]
+            - [ addEntityClassProvider, [ '@oro_api.entity_alias_provider' ] ]
 
     oro_api.entity_alias_provider:
         class: Oro\Bundle\ApiBundle\Provider\EntityAliasProvider
@@ -272,6 +280,14 @@ services:
         tags:
             - { name: oro_entity.exclusion_provider.api, priority: 60 }
 
+    oro_api.entity_exclusion_provider.by_alias:
+        class: Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider
+        public: false
+        arguments:
+            - '@oro_api.entity_alias_resolver'
+        tags:
+            - { name: oro_entity.exclusion_provider.api, priority: 40 }
+
     oro_api.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
         public: false
@@ -283,6 +299,7 @@ services:
             - '@oro_api.entity_serializer.field_accessor'
             - '@oro_api.entity_serializer.config_normalizer'
             - '@oro_api.entity_serializer.data_normalizer'
+            - '@oro_api.entity_serializer.config_converter'
         calls:
             - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
 
@@ -310,6 +327,10 @@ services:
 
     oro_api.entity_serializer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Util\ConfigNormalizer
+        public: false
+
+    oro_api.entity_serializer.config_converter:
+        class: Oro\Bundle\ApiBundle\Util\ConfigConverter
         public: false
 
     oro_api.entity_serializer.data_normalizer:
@@ -342,9 +363,6 @@ services:
                 - '\InvalidArgumentException'
                 - '\UnexpectedValueException'
                 - '\OutOfBoundsException'
-                - 'Oro\Bundle\ApiBundle\Exception\ExceptionInterface'
-                - 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface'
-                - 'Symfony\Component\PropertyAccess\Exception\ExceptionInterface'
                 - 'Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException'
         tags:
             - { name: oro.api.exception_text_extractor, priority: -10 }

@@ -1,6 +1,8 @@
 // @theme: blank;
 
 .line-clamp {
+    overflow: hidden;
+
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -8,15 +10,14 @@
     &-polyfill {
         position: relative;
         display: inline-block;
-
-        &:after {
+        &::after {
             position: absolute;
-            bottom: 0;
+            top: 20px;
             right: 0;
-
-            background-color: inherit;
-
-            content: '\002026'; // symbol: '...'
+            width: 50%;
+            height: 20px;
+            content: '';
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
         }
     }
 }

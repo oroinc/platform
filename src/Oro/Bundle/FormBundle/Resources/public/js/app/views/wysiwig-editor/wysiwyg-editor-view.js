@@ -12,7 +12,7 @@ define(function(require) {
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 3,
         TEXTAREA_UI_HEIGHT: 22,
-        TINYMCE_TIMEOUT: 1000, //after this time view promise will be resolved anyway
+        TINYMCE_TIMEOUT: 30000, //after this time view promise will be resolved anyway
 
         autoRender: true,
         firstRender: true,
@@ -28,7 +28,8 @@ define(function(require) {
             menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
             statusbar: false,
-            browser_spellcheck: true
+            browser_spellcheck: true,
+            paste_data_images: true //to avoid of a paste plugin restriction
         },
 
         events: {
@@ -117,6 +118,10 @@ define(function(require) {
                                 }).join('; ');
                                 tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
                                 self.$el.after($('<div />', {class: 'mce-fullscreen-overlay'}));
+                                var DOM = editor.target.DOM;
+                                var iframe = editor.iframeElement;
+                                var iframeTop = iframe.getBoundingClientRect().top;
+                                DOM.setStyle(iframe, 'height', window.innerHeight - iframeTop);
                             } else {
                                 self.$el.siblings('.mce-fullscreen-overlay').remove();
                             }

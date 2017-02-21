@@ -5,8 +5,7 @@ define(function(require) {
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     var $ = require('jquery');
     var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var console = window.console;
+    var error = require('oroui/js/error');
 
     /**
      * InputWidgetManager used to register input widgets and create widget for applicable inputs.
@@ -170,10 +169,8 @@ define(function(require) {
             return $input.data('inputWidget') || null;
         },
 
-        error: function() {
-            if (tools.debug) {
-                console.error.apply(console, arguments);
-            }
+        error: function(errMsg) {
+            error.showErrorInConsole(new Error(errMsg));
         },
 
         getCompoundQuery: function() {
@@ -198,7 +195,10 @@ define(function(require) {
                 (this.noWidgetSelector ? (this.noWidgetSelector + ',') : '') +
                 '[data-bound-input-widget], [data-page-component-module], [data-bound-component]' +
                 ')'
-            );
+            ).filter(function() {
+                //add data-skip-input-widgets to any container to disable widgets inside this container(for example when container is hidden)
+                return $(this).closest('[data-skip-input-widgets]').length === 0;
+            });
             this.create(foundElements);
             $container.data('attachedWidgetsCount',
                 ($container.data('attachedWidgetsCount') || 0) + foundElements.length);
@@ -273,7 +273,7 @@ define(function(require) {
                     if (_.indexOf(overrideJqueryMethods, command) !== -1) {
                         result = $input[command].apply($input, args);
                     } else if (widget) {
-                        InputWidgetManager.error('Input widget doesn\'t support command "%s"', command);
+                        InputWidgetManager.error('Input widget doesn\'t support command ' + command);
                     }
                 } else {
                     result = widget[command].apply(widget, args);

@@ -5,11 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 use Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 abstract class AbstractConfigControllerTest extends WebTestCase
 {
     /**
@@ -32,7 +30,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
         // Internal Server Error: A model for "Extend\Entity\testExtendedEntity" was not found.
         /** @var EntityCacheWarmer $entityCacheWarmup */
         $entityCacheWarmup = $this->getContainer()->get('oro_entity_extend.entity.cache.warmer');
-        $cacheDir = $this->getClient()->getKernel()->getCacheDir();
+        $cacheDir = $this->client->getKernel()->getCacheDir();
         self::$warmupCache = function () use ($entityCacheWarmup, $cacheDir) {
             $entityCacheWarmup->warmUp($cacheDir);
         };
@@ -46,6 +44,16 @@ abstract class AbstractConfigControllerTest extends WebTestCase
             call_user_func(self::$warmupCache);
             self::$warmupCache = null;
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTestEntityAlias()
+    {
+        return $this->getContainer()
+            ->get('oro_entity.entity_alias_resolver')
+            ->getAlias(TestActivityTarget::class);
     }
 
     /**

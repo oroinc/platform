@@ -178,12 +178,10 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($dispatcher);
 
         $mailer = new DirectMailer($this->baseMailer, $this->container);
-        $mailer->prepareSmtpTransport($this->emailOrigin);
+        $mailer->prepareEmailOriginSmtpTransport($this->emailOrigin);
         $smtpTransport = $mailer->getTransport();
 
         $this->assertInstanceOf('\Swift_Transport_EsmtpTransport', $smtpTransport);
-
-        $mailer->prepareSmtpTransport($this->emailOrigin);
     }
 
     /**

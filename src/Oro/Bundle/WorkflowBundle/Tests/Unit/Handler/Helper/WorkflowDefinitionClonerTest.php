@@ -133,7 +133,12 @@ class WorkflowDefinitionClonerTest extends \PHPUnit_Framework_TestCase
         $restrictions = new ArrayCollection([$restriction1, $restriction2]);
 
         $definition = new WorkflowDefinition();
-        $definition->setSteps($steps)->setStartStep($step2)->setEntityAcls($entityAcls)->setRestrictions($restrictions);
+        $definition
+            ->setSteps($steps)
+            ->setStartStep($step2)
+            ->setEntityAcls($entityAcls)
+            ->setRestrictions($restrictions)
+            ->setApplications(['app1', 'app2']);
 
         return $definition;
     }

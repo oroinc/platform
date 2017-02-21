@@ -20,11 +20,6 @@ class LocalizationCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $this->warmer = new LocalizationCacheWarmer($this->manager);
     }
 
-    protected function tearDown()
-    {
-        unset($this->warmer, $this->manager);
-    }
-
     public function testClear()
     {
         $this->manager->expects($this->once())->method('warmUpCache');

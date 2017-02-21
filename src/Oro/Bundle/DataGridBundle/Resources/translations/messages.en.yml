@@ -23,10 +23,16 @@ oro:
             columns_data.label: Columns data
             appearance_type.label: Appearance type
             appearance_data.label: Appearance data
-            duplicate.label: Duplicate %entity%
+            duplicate.label: Duplicated %entity%
         appearance:
             grid: Grid
             board: Kanban Board
+        pagination:
+            label: Page
+            totalPages: of %totalPages%
+            totalRecords: Total of %totalRecords% records
+        pagesize:
+            label: View per page
     grid:
         mass_action:
             label: Mass Actions

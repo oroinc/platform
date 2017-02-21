@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
@@ -102,6 +103,7 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             ]);
 
         $processTrigger = $this->createProcessTrigger($id);
+        $processData = new ProcessData();
 
         $this->repo->expects($this->once())
             ->method('find')
@@ -110,8 +112,12 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->processHandler->expects($this->once())
             ->method('handleTrigger')
-            ->withAnyParameters()
+            ->with($processTrigger, $processData)
             ->will($exception ? $this->throwException($exception) : $this->returnSelf());
+
+        $this->processHandler->expects($this->once())
+            ->method('finishTrigger')
+            ->with($processTrigger, $processData);
 
         if ($exception) {
             $this->expectException(get_class($exception));

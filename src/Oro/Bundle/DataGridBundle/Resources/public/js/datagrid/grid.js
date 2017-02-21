@@ -24,6 +24,7 @@ define(function(require) {
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var PageableCollection =  require('../pageable-collection');
     var util = require('./util');
 
     /**
@@ -131,7 +132,7 @@ define(function(require) {
         template: require('tpl!orodatagrid/templates/datagrid/grid.html'),
 
         themeOptions: {
-            optionPrefix: 'grid',
+            optionPrefix: 'grid'
         },
 
         /**
@@ -269,8 +270,10 @@ define(function(require) {
             }
 
             // must construct body first so it listens to backgrid:sort first
-            this.body = new this.body(bodyOptions);
-            this.subview('body', this.body);
+            if (this.body) {
+                this.body = new this.body(bodyOptions);
+                this.subview('body', this.body);
+            }
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
@@ -292,7 +295,9 @@ define(function(require) {
                 if (this.header) {
                     this.header = new (this.header.remove().constructor)(headerOptions);
                 }
-                this.body = new (this.body.remove().constructor)(bodyOptions);
+                if (this.body) {
+                    this.body = new (this.body.remove().constructor)(bodyOptions);
+                }
                 if (this.footer) {
                     this.footer = new (this.footer.remove().constructor)(footerOptions);
                 }
@@ -455,8 +460,9 @@ define(function(require) {
                 $parents = $parents.add(document);
                 $parents.on('scroll' + this.eventNamespace(), _.bind(this.trigger, this, 'scroll'));
                 this._$boundScrollHandlerParents = $parents;
-            }
 
+                this.listenTo(this.collection, 'backgrid:sort', _.debounce(this.sort, 50), this);
+            }
             return this;
         },
 
@@ -470,6 +476,8 @@ define(function(require) {
                 this._$boundScrollHandlerParents.off(this.eventNamespace());
                 delete this._$boundScrollHandlerParents;
             }
+
+            this.stopListening(this.collection, 'backgrid:sort');
 
             return this;
         },
@@ -891,6 +899,25 @@ define(function(require) {
                     }
                 });
             });
+
+            this.listenTo(mediator, 'datagrid:changeColumnParam:' + this.name, function(columnName, option, value) {
+                this.changeColumnParam(columnName, option, value);
+            });
+        },
+
+        /**
+         * Changes column`s option  if such option exist
+         *
+         * @param columnName
+         * @param option
+         * @param value
+         */
+        changeColumnParam: function(columnName, option, value) {
+            this.columns.each(function(column) {
+                if (column.get('name') === columnName && option in column) {
+                    column.set(option, value);
+                }
+            });
         },
 
         /**
@@ -945,7 +972,9 @@ define(function(require) {
             if (this.footer) {
                 this.$grid.append(this.footer.render().$el);
             }
-            this.$grid.append(this.body.render().$el);
+            if (this.body) {
+                this.$grid.append(this.body.render().$el);
+            }
 
             mediator.trigger('grid_load:complete', this.collection, this.$grid);
         },
@@ -1199,6 +1228,109 @@ define(function(require) {
             } catch (e) {
                 return null;
             }
+        },
+
+        /**
+         * Create this function instead of original Body.__super__.refresh to customize options for subviews
+         */
+        backgridRefresh: function() {
+            this.render();
+            this.collection.trigger('backgrid:refresh', this);
+            return this;
+        },
+
+        makeComparator: function(attr, order, func) {
+
+            return function(left, right) {
+                // extract the values from the models
+                var t;
+                var l = func(left, attr);
+                var r = func(right, attr);
+                // if descending order, swap left and right
+                if (order === 1) {
+                    t = l;
+                    l = r;
+                    r = t;
+                }
+                // compare as usual
+                if (l === r) {
+                    return 0;
+                } else if (l < r) {
+                    return -1;
+                }
+                return 1;
+            };
+        },
+
+        /**
+         * @param {string} column
+         * @param {null|"ascending"|"descending"} direction
+         */
+        sort: function(column, direction) {
+            if (!_.contains(['ascending', 'descending', null], direction)) {
+                throw new RangeError('direction must be one of "ascending", "descending" or `null`');
+            }
+            if (_.isString(column) && column.length) {
+                column = this.columns.findWhere({name: column});
+            }
+
+            var columnName = null;
+            var columnSortValue = null;
+            if (_.isObject(column)) {
+                columnName = column.get('name');
+                columnSortValue = column.sortValue();
+            } else {
+                column = null;
+            }
+
+            var collection = this.collection;
+
+            var order;
+
+            if (direction === 'ascending') {
+                order = '-1';
+            } else if (direction === 'descending') {
+                order = '1';
+            } else {
+                order = null;
+            }
+
+            var extractorDelegate;
+            if (order) {
+                extractorDelegate = columnSortValue;
+            } else {
+                extractorDelegate = function(model) {
+                    return model.cid.replace('c', '') * 1;
+                };
+            }
+            var comparator = this.makeComparator(columnName, order, extractorDelegate);
+
+            if (collection instanceof PageableCollection) {
+                collection.setSorting(columnName, order, {sortValue: columnSortValue});
+
+                if (collection.fullCollection) {
+                    if (collection.fullCollection.comparator === null ||
+                        collection.fullCollection.comparator === undefined) {
+                        collection.fullCollection.comparator = comparator;
+                    }
+                    collection.fullCollection.sort();
+                    collection.trigger('backgrid:sorted', column, direction, collection);
+                } else {
+                    collection.fetch({reset: true, success: function() {
+                        collection.trigger('backgrid:sorted', column, direction, collection);
+                    }});
+                }
+            } else {
+                collection.comparator = comparator;
+                collection.sort();
+                collection.trigger('backgrid:sorted', column, direction, collection);
+            }
+
+            if (column) {
+                column.set('direction', direction);
+            }
+
+            return this;
         }
     });
 

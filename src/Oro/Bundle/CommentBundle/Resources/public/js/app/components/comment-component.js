@@ -5,7 +5,6 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var CommentFromView = require('orocomment/js/app/views/comment-form-view');
     var CommentsView = require('orocomment/js/app/views/comments-view');
@@ -125,9 +124,7 @@ define(function(require) {
             });
 
             confirm.on('ok', _.bind(function() {
-                model.destroy({error: function() {
-                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-                }});
+                model.destroy();
             }, this));
 
             confirm.open();

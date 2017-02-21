@@ -17,6 +17,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
  */
 class OroUIExtension extends Extension
 {
+    const ALIAS = 'oro_ui';
     const PLACEHOLDERS_CONFIG_ROOT_NODE = 'placeholders';
     const PLACEHOLDERS_NODE = 'placeholders';
     const PLACEHOLDERS_ITEMS_NODE = 'items';
@@ -40,6 +41,7 @@ class OroUIExtension extends Extension
         $loader->load('content_providers.yml');
         $loader->load('layouts.yml');
         $loader->load('block_types.yml');
+        $loader->load('form_types.yml');
 
         $container->setParameter(
             'oro_ui.placeholders',
@@ -52,6 +54,14 @@ class OroUIExtension extends Extension
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
 
         $this->addClassesToCompile(['Oro\Bundle\UIBundle\EventListener\ContentProviderListener']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return static::ALIAS;
     }
 
     /**

@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\UserType;
+use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 
 class UserTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -217,7 +218,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
             array('middleName', 'text'),
             array('lastName', 'text'),
             array('nameSuffix', 'text'),
-            array('birthday', 'oro_date')
+            array('birthday', OroBirthdayType::class)
         );
 
         foreach ($parameters as $param) {

@@ -19,8 +19,9 @@ Manage entities through UI
 
 To manage existing entities or create new ones through UI go to **System > Entities > Entity Management** page. On this page you can see a list of all entities, but please note that you can modify only entities marked as extendable. Check **IS EXTEND** column to see whether an entity can be modified or not. To create a new entity click **Create entity** button at the top right corner of the page, fill the form and click **Save And Close**. Next add necessary fields to your entity clicking **Create field** button. To add new field to existing entity go to a view page of this entity and click **Create field** button. When all changes are made do not forget to click **Update schema** button to apply your changes to a database.
 
-Modify existing entity
-----------------------
+Modify entities using migration scripts
+---------------------------------------
+
 The existing entity can be extended using migration scripts. To create new extended field you can use `addColumn` method with a special options named `oro_options`. The following example shows it:
 
 ``` php
@@ -181,8 +182,6 @@ Same principle applied to field name, in case above - it should be less than 27 
 To load a list of options you can use data fixtures, for example:
 
 ``` php
-<?php
-
 <?php
 
 namespace Oro\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;

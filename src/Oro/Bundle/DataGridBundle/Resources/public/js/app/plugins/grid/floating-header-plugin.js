@@ -281,7 +281,7 @@ define(function(require) {
                 default:
                     if (this.currentFloatTheadMode !== mode) {
                         this.$grid.find('.thead-sizing').remove();
-                        this.$el.removeClass('floatThead-relative floatThead-fixed');
+                        this.$el.removeClass('floatThead-relative floatThead-fixed floatThead');
                         // remove extra styles
                         this.domCache.thead.attr('style', '');
                         this.domCache.theadTr.attr('style', '');
@@ -430,6 +430,9 @@ define(function(require) {
          * Checks and performs required actions
          */
         checkLayout: function() {
+            if (!this.connected) {
+                return;
+            }
             var scrollContainerRect;
             var scrollLeft;
             if (this.currentFloatTheadMode === 'default') {

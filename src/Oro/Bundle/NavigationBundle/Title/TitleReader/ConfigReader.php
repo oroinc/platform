@@ -3,19 +3,19 @@ namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+
 class ConfigReader implements ReaderInterface
 {
-    /**
-     * @var array
-     */
-    private $configData = array();
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
 
     /**
-     * @param array $configData
+     * @param ConfigurationProvider $configurationProvider
      */
-    public function setConfigData(array $configData)
+    public function __construct(ConfigurationProvider $configurationProvider)
     {
-        $this->configData = $configData;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -27,9 +27,11 @@ class ConfigReader implements ReaderInterface
      */
     public function getData(array $routes)
     {
-        $data = array();
+        $data = [];
 
-        foreach ($this->configData as $route => $title) {
+        $titles = $this->configurationProvider->getConfiguration(ConfigurationProvider::TITLES_KEY);
+
+        foreach ($titles as $route => $title) {
             if (array_key_exists($route, $routes)) {
                 $data[$route] = $title;
             } else {

@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var ToggleFiltersAction;
-    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var AbstractAction = require('oro/datagrid/action/abstract-action');
     var FiltersManager = require('orofilter/js/filters-manager');
 
@@ -14,12 +14,10 @@ define(function(require) {
                 throw new TypeError('"datagrid" is required');
             }
 
-            opts.datagrid.on('filterManager:connected', _.bind(function() {
+            this.listenTo(opts.datagrid, 'filterManager:connected', function() {
                 this.onFilterManagerModeChange(this.datagrid.filterManager.getViewMode());
-                this.listenTo(this.datagrid.filterManager, 'changeViewMode',
-                    _.bind(this.onFilterManagerModeChange, this)
-                );
-            }, this));
+                this.listenTo(this.datagrid.filterManager, 'changeViewMode', this.onFilterManagerModeChange);
+            });
 
             ToggleFiltersAction.__super__.initialize.apply(this, arguments);
         },
@@ -32,6 +30,7 @@ define(function(require) {
 
         onFilterManagerModeChange: function(mode) {
             this.launcherInstanse.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_VIEW_MODE);
+            mediator.trigger('layout:adjustHeight');
         }
     });
 

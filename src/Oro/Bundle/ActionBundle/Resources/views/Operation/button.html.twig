@@ -3,29 +3,22 @@
 {% set isAjax = false %}
 
 {% block button %}
-    {% set context = {
-        entityClass: buttonContext.entityClass,
-        entityId: buttonContext.entityId,
-        route: buttonContext.routeName
-    } %}
-
-    {% if actionData is defined %}
-        {% set options = oro_action_frontend_options(operation, context, actionData) %}
-    {% else %}
-        {% set options = oro_action_frontend_options(operation, context) %}
-    {% endif %}
-
+    {% set options = oro_action_frontend_options(button) %}
     {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
         {% block link %}
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
-                href="{{ (options.options.url and not isAjax) ? options.options.url : 'javascript:void(0);' }}"
+                href="javascript:void(0);"
                 class="{{ params.buttonOptions.class|default('back icons-holder-text operation-button') }} {{ aClass|default('') }} {{ params.buttonOptions.aCss|default('') }}"
                 title="{{ linkTitle }}"
                 {% for name,value in options.data %}
                     data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
                 {% endfor %}
+                data-operation-url="{{ options.options.url }}"
                 data-options="{{ options.options|json_encode }}"
                 data-page-component-module="oroaction/js/app/components/button-component"
+                {% if not button.buttonContext.enabled %}
+                    disabled="disabled"
+                {% endif %}
             >
                 {% if not noIcon|default(false) %}
                     <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text"></i>

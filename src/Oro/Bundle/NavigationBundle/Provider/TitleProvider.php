@@ -11,17 +11,19 @@ class TitleProvider
     private $doctrineHelper;
 
     /** @var array */
-    private $titles;
-
-    /** @var array */
     private $cache = [];
 
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper        $doctrineHelper
+     * @param ConfigurationProvider $configurationProvider
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigurationProvider $configurationProvider)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -37,17 +39,17 @@ class TitleProvider
     public function getTitleTemplates($routeName)
     {
         //ToDo: update this method and test in BB-6555
+        $titles = $this->configurationProvider->getConfiguration(ConfigurationProvider::TITLES_KEY);
+
+        if (array_key_exists($routeName, $titles)) {
+            $result = [
+                'title'       => $titles[$routeName],
+                'short_title' => $titles[$routeName]
+            ];
+        } else {
+            $result = [];
+        }
 
         return [];
-    }
-
-    /**
-     * Inject titles from config
-     *
-     * @param $titles
-     */
-    public function setTitles($titles)
-    {
-        $this->titles = $titles;
     }
 }

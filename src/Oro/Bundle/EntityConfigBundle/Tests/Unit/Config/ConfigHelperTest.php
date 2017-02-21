@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -16,6 +18,14 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
 {
     const FIELD_NAME = 'someExtendFieldName';
     const ENTITY_CLASS_NAME = 'Oro\Bundle\SomeBundle\Entity\SomeEntity';
+
+    const DEFAULT_EXTEND_OPTIONS = [
+        'is_extend' => true,
+        'origin' => ExtendScope::ORIGIN_CUSTOM,
+        'owner' => ExtendScope::OWNER_CUSTOM,
+        'state' => ExtendScope::STATE_NEW,
+        'bidirectional' => false,
+    ];
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     private $configManager;
@@ -35,6 +45,20 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->fieldConfigModel = $this->createMock(FieldConfigModel::class);
 
         $this->configHelper = new ConfigHelper($this->configManager);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param array  $values
+     *
+     * @return Config
+     */
+    protected function getEntityConfig($entityClass, array $values)
+    {
+        $config = new Config(new EntityConfigId('extend', $entityClass));
+        $config->setValues($values);
+
+        return $config;
     }
 
     public function testGetExtendRequireJsModules()
@@ -193,98 +217,184 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function simpleFieldTypeDataProvider()
+    public function testCreateFieldOptionsForSimpleFieldType()
     {
-        return [
+        $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
+        $fieldType = 'string';
+        $additionalFieldOptions = [];
+
+        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+            $extendEntityConfig,
+            $fieldType,
+            $additionalFieldOptions
+        );
+        $this->assertEquals($fieldType, $resultFieldType);
+        $this->assertEquals(
             [
-                'fieldType' => 'bigint',
-                'additionalFieldOptions' => [],
-                'expectedFieldType' => 'bigint',
-                'expectedAdditionalFieldOptions' => [
-                    'extend' => [
-                        'is_extend' => true,
-                        'origin' => ExtendScope::ORIGIN_CUSTOM,
-                        'owner' => ExtendScope::OWNER_CUSTOM,
-                        'state' => ExtendScope::STATE_NEW
-                    ]
-                ],
+                'extend' => static::DEFAULT_EXTEND_OPTIONS
             ],
-            [
-                'fieldType' => 'boolean',
-                'additionalFieldOptions' => [
-                    'extend' => [
-                        'someOption' => 'SomeValue'
-                    ],
-                    'attribute' => [
-                        'is_attribute' => true
-                    ]
-                ],
-                'expectedFieldType' => 'boolean',
-                'expectedAdditionalFieldOptions' => [
-                    'extend' => [
-                        'is_extend' => true,
-                        'origin' => ExtendScope::ORIGIN_CUSTOM,
-                        'owner' => ExtendScope::OWNER_CUSTOM,
-                        'state' => ExtendScope::STATE_NEW,
-                        'someOption' => 'SomeValue'
-                    ],
-                    'attribute' => [
-                        'is_attribute' => true
-                    ]
-                ],
-            ],
-            [
-                'fieldType' => 'enum||some_enum_code',
-                'additionalFieldOptions' => [],
-                'expectedFieldType' => 'enum',
-                'expectedAdditionalFieldOptions' => [
-                    'extend' => [
-                        'is_extend' => true,
-                        'origin' => ExtendScope::ORIGIN_CUSTOM,
-                        'owner' => ExtendScope::OWNER_CUSTOM,
-                        'state' => ExtendScope::STATE_NEW
-                    ],
-                    'enum' => [
-                        'enum_code' => 'some_enum_code'
-                    ]
-                ],
-            ],
-            [
-                'fieldType' => 'oneToMany|owning_entity|target_entity|field_name_in_owning_entityenum||some',
-                'additionalFieldOptions' => [],
-                'expectedFieldType' => 'manyToOne',
-                'expectedAdditionalFieldOptions' => [
-                    'extend' => [
-                        'is_extend' => true,
-                        'origin' => ExtendScope::ORIGIN_CUSTOM,
-                        'owner' => ExtendScope::OWNER_CUSTOM,
-                        'state' => ExtendScope::STATE_NEW,
-                        'relation_key' => 'oneToMany|owning_entity|target_entity|field_name_in_owning_entityenum',
-                        'target_entity' => null
-                    ],
-                ],
+            $resultFieldOptions
+        );
+    }
+
+    public function testCreateFieldOptionsForSimpleFieldTypeWithAdditionalFieldOptions()
+    {
+        $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
+        $fieldType = 'string';
+        $additionalFieldOptions = [
+            'anotherScope' => [
+                'option1' => 'value1'
             ]
         ];
+
+        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+            $extendEntityConfig,
+            $fieldType,
+            $additionalFieldOptions
+        );
+        $this->assertEquals($fieldType, $resultFieldType);
+        $this->assertEquals(
+            [
+                'extend'       => static::DEFAULT_EXTEND_OPTIONS,
+                'anotherScope' => [
+                    'option1' => 'value1'
+                ]
+            ],
+            $resultFieldOptions
+        );
+    }
+
+    public function testCreateFieldOptionsForPublicEnumFieldType()
+    {
+        $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
+        $fieldType = 'enum||some_enum_code';
+        $additionalFieldOptions = [];
+
+        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+            $extendEntityConfig,
+            $fieldType,
+            $additionalFieldOptions
+        );
+        $this->assertEquals('enum', $resultFieldType);
+        $this->assertEquals(
+            [
+                'extend' => static::DEFAULT_EXTEND_OPTIONS,
+                'enum' => [
+                    'enum_code' => 'some_enum_code'
+                ]
+            ],
+            $resultFieldOptions
+        );
+    }
+
+    public function testCreateFieldOptionsForPublicMultiEnumFieldType()
+    {
+        $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
+        $fieldType = 'multiEnum||some_enum_code';
+        $additionalFieldOptions = [];
+
+        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+            $extendEntityConfig,
+            $fieldType,
+            $additionalFieldOptions
+        );
+        $this->assertEquals('multiEnum', $resultFieldType);
+        $this->assertEquals(
+            [
+                'extend' => static::DEFAULT_EXTEND_OPTIONS,
+                'enum' => [
+                    'enum_code' => 'some_enum_code'
+                ]
+            ],
+            $resultFieldOptions
+        );
+    }
+
+    public function testCreateFieldOptionsForOneToManyReverseRelationFieldType()
+    {
+        $extendEntityConfig = $this->getEntityConfig(
+            'Test\Entity',
+            [
+                'relation' => [
+                    'oneToMany|Test\Entity|Test\TargetEntity|owningSideField' => [
+                        'target_entity' => 'Test\TargetEntity'
+                    ]
+                ]
+            ]
+        );
+        $fieldType = 'oneToMany|Test\Entity|Test\TargetEntity|owningSideField||targetSideField';
+        $additionalFieldOptions = [];
+
+        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+            $extendEntityConfig,
+            $fieldType,
+            $additionalFieldOptions
+        );
+        $this->assertEquals('manyToOne', $resultFieldType);
+        $this->assertEquals(
+            [
+                'extend' => [
+                    'is_extend' => true,
+                    'origin'        => ExtendScope::ORIGIN_CUSTOM,
+                    'owner'         => ExtendScope::OWNER_CUSTOM,
+                    'state'         => ExtendScope::STATE_NEW,
+                    'relation_key'  => 'oneToMany|Test\Entity|Test\TargetEntity|owningSideField',
+                    'target_entity' => 'Test\TargetEntity',
+                    'bidirectional' => false,
+                ]
+            ],
+            $resultFieldOptions
+        );
+    }
+
+    public function testCreateFieldOptionsForManyToOneReverseRelationFieldType()
+    {
+        $extendEntityConfig = $this->getEntityConfig(
+            'Test\Entity',
+            [
+                'relation' => [
+                    'manyToOne|Test\Entity|Test\TargetEntity|owningSideField' => [
+                        'target_entity' => 'Test\TargetEntity'
+                    ]
+                ]
+            ]
+        );
+        $fieldType = 'manyToOne|Test\Entity|Test\TargetEntity|owningSideField||';
+        $additionalFieldOptions = [];
+
+        list($resultFieldType, $resultFieldOptions) = $this->configHelper->createFieldOptions(
+            $extendEntityConfig,
+            $fieldType,
+            $additionalFieldOptions
+        );
+        $this->assertEquals('oneToMany', $resultFieldType);
+        $this->assertEquals(
+            [
+                'extend' => [
+                    'is_extend' => true,
+                    'origin'        => ExtendScope::ORIGIN_CUSTOM,
+                    'owner'         => ExtendScope::OWNER_CUSTOM,
+                    'state'         => ExtendScope::STATE_NEW,
+                    'relation_key'  => 'manyToOne|Test\Entity|Test\TargetEntity|owningSideField',
+                    'target_entity' => 'Test\TargetEntity',
+                    'bidirectional' => false,
+                ]
+            ],
+            $resultFieldOptions
+        );
     }
 
     /**
-     * @dataProvider simpleFieldTypeDataProvider
-     * @param string $fieldType
-     * @param array $additionalFieldOptions
-     * @param string $expectedFieldType
-     * @param array $expectedAdditionalFieldOptions
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The field type "item1||item2" is not supported.
      */
-    public function testCreateFieldOptionsWhenSimpleFieldTypeIsGiven(
-        $fieldType,
-        $additionalFieldOptions,
-        $expectedFieldType,
-        $expectedAdditionalFieldOptions
-    ) {
-        $extendEntityConfig = $this->createMock(ConfigInterface::class);
+    public function testCreateFieldOptionsForNotSupportedFieldType()
+    {
+        $extendEntityConfig = $this->getEntityConfig('Test\Entity', []);
+        $fieldType = 'item1||item2';
+        $additionalFieldOptions = [];
 
-        $result = $this->configHelper->createFieldOptions($extendEntityConfig, $fieldType, $additionalFieldOptions);
-
-        $this->assertEquals([$expectedFieldType, $expectedAdditionalFieldOptions], $result);
+        $this->configHelper->createFieldOptions($extendEntityConfig, $fieldType, $additionalFieldOptions);
     }
 
     public function testGetEntityConfig()

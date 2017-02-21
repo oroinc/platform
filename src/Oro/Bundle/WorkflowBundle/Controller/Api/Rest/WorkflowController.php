@@ -172,7 +172,8 @@ class WorkflowController extends FOSRestController
         return $this->handleView(
             $this->view(
                 array(
-                    'workflowItem' => $workflowItem
+                    'workflowItem' => $workflowItem,
+                    'redirectUrl' => $workflowItem->getResult()->redirectUrl,
                 ),
                 Codes::HTTP_OK
             )
@@ -247,7 +248,7 @@ class WorkflowController extends FOSRestController
      */
     public function activateAction(WorkflowDefinition $workflowDefinition)
     {
-        $workflowManager = $this->get('oro_workflow.manager');
+        $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
 
         $workflowManager->resetWorkflowData($workflowDefinition->getName());
         $workflowManager->activateWorkflow($workflowDefinition->getName());
@@ -281,7 +282,7 @@ class WorkflowController extends FOSRestController
      */
     public function deactivateAction(WorkflowDefinition $workflowDefinition)
     {
-        $workflowManager = $this->get('oro_workflow.manager');
+        $workflowManager = $this->get('oro_workflow.registry.workflow_manager')->getManager();
 
         $workflowManager->resetWorkflowData($workflowDefinition->getName());
         $workflowManager->deactivateWorkflow($workflowDefinition->getName());

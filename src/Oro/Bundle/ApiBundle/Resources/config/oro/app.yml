@@ -16,9 +16,8 @@ nelmio_api_doc:
 security:
     firewalls:
         api_wsse_secured:
-            pattern: ^/api/(?!(soap|rest|doc)($|/.*))
-            # @todo: should be enabled in scope of BAP-11128
-            # stateless:  true
+            pattern: ^/api/(?!(rest|doc)($|/.*))
+            stateless:  true
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"
@@ -146,6 +145,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -165,6 +166,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -184,6 +187,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -203,6 +208,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -222,6 +229,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -243,6 +252,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -266,6 +277,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -285,6 +298,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -304,6 +319,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -323,6 +340,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -342,6 +361,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:

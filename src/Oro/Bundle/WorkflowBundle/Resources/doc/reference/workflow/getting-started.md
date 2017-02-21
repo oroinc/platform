@@ -6,10 +6,12 @@ Table of Contents
  - [What is Workflow?](#what-is-workflow)
  - [Main Entities](#main-entities)
  - [How it works?](#how-it-works)
+ - [Workflow Related Entity](#workflow-related-entity)
  - [Workflow Fields](#workflow-fields)
  - [Activation State](#activation-state)
  - [Mutually Exclusive Workflows](#mutually-exclusive-workflows)
  - [Filtering by Scopes](#filtering-by-scopes)
+ - [Initial Transitions](#initial-transitions)
  - [Disabling Operations](#disabling-operations)
  - [Configuration](#configuration)
  - [Console commands](#console-commands)
@@ -62,7 +64,7 @@ associated workflow.
 
 * **TransitionTriggerEvent** - allows to perform transition when needed entity trigger needed Doctrine Event. 
 
-* **TransitionTriggerCron** - allows to perform transition by cron definition. 
+* **TransitionTriggerCron** - allows to perform transition by cron definition.
 
 How it works?
 -------------
@@ -89,6 +91,13 @@ To be able to attach an entity to specific workflow (e.g. make entity workflow r
 - Entity can not have composite fields as its primary keys.
 - Entity primary key can be integer or string (for doctrine types it is: BIGINT, DECIMAL, INTEGER, SMALLINT, STRING). In other words - all types that can be casted by SQL CAST to text representation.
 - Entity should be configurable see [Annotation](./#annotation) section.
+
+Workflow Related Entity
+-----------------------
+
+The main entity for workflow that used as a central point of all business processes described in concrete workflow configuration.
+The entity class is declared through `entity` node as FQCN of workflow configuration.
+All **OTHER** entities in context of this documentation called *not related entities* or *not directly related*.
 
 Activation State
 ----------------
@@ -185,6 +194,14 @@ Example of scope configuration in :
 
 For more information about scopes see [ScopeBundle documentation](../../../../../ScopeBundle/Resources/doc/scope.md).
 
+Initial Transitions
+-------------------
+To provide an ability to start some workflow from *not related entity* we have special functionality that called **initial transitions**.
+It is a special type of transition configuration that allows us to use transition as an initiative (as it comes from the name) for new workflow instance (workflow item) creation.
+The main difference from *start transitions* is that *init transition* can be invoked from almost any part of an application within indirect relation to main workflow entity or without it (if we able to fill all necessary data of main entity).
+Distinctive configuration features of *init transitions* are special nodes `init_entities`, `init_routes`, `init_datagrids` in transition configuration together with `is_start: true`.
+For more details see [configuration reference](./configuration-reference.md#transitions-configuration) section.
+
 Disabling Operations
 --------------------
 
@@ -216,6 +233,7 @@ workflows:
         entity: Oro\Bundle\UserBundle\Entity\User # workflow related entity
         entity_attribute: user                    # attribute name of current entity that can be used in configuration
         start_step: started                       # step that will be assigned automatically to new entities
+        force_autostart: false                    # if `start_step` is defined: force start workflow on entity creation like from cli, message queue (without any filters like applications, scopes, features)
         steps_display_ordered: true               # defines whether all steps will be shown on view page in steps widget
         defaults:
             active: true                          # active by default
@@ -223,6 +241,7 @@ workflows:
         exclusive_record_groups:
             - unique_run                          # only one started workflow for the `entity` from specified groups can exist at time
         priority: 100                             # has priority of 100
+        applications: [ commerce ]                # web application availability level 
         scopes:
             -                                     # definition of configuration for one scope
                 scopeField1: 42                   # context for scope will have field `scopeField1` and entity with id `42`
@@ -271,7 +290,9 @@ workflows:
                                 required: true              # define this field as required
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
-            add_email:                                      # transition from step "add_email" to "add_email" (self-transition)
+                display_type: page                          # form will be opened in separate page
+                destination_page: index                     # after submitting form will be opened index page of workflow`s related entity 
+            add_email:                                      # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions
                 form_options:                               # options which will be passed to form type of transition
@@ -282,7 +303,7 @@ workflows:
                                 constraints:                # list of constraints
                                     - NotBlank: ~           # this field must be filled
                                     - Email: ~              # field must contain valid email
-            schedule_transition:                                            # transition from step "add_email" to "add_email" (self-transition)
+            schedule_transition:                                            # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                                          # next step after transition performing
                 transition_definition: schedule_transition_definition       # link to definition of conditions and post actions
                 triggers:                                                   # transition triggers
@@ -319,7 +340,7 @@ workflows:
                     - '@assign_value': [$user.status, 'processed']# change user's status
 ```
 
-This configuration describes Workflow that includes two steps - "set_name" and "add_email".
+This configuration describes Workflow that includes two transitions - "set_name" and "add_email".
 
 On step "started" user can update full name (first, middle and last name) using transition "set_name".
 Then on step "processed" user can add additional emails using transition "add_email".

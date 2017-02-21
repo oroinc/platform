@@ -37,6 +37,5 @@ services:
 
     oro_layout.templating.form.engine:
         class: %oro_layout.templating.form.engine.class%
-        arguments:
-            - '@templating.engine.php'
-            - %templating.helper.form.resources%
+        decorates: 'templating.form.engine'
+        parent: 'templating.form.engine'
