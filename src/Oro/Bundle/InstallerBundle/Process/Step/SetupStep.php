@@ -16,8 +16,13 @@ class SetupStep extends AbstractStep
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_config.global');
 
+        $applicationUrl = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://';
+        $applicationUrl .= $_SERVER['SERVER_PORT'] != '80'
+            ? $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"]
+            : $_SERVER['SERVER_NAME'];
+
         $form->get('organization_name')->setData($configManager->get('oro_ui.organization_name'));
-        $form->get('application_url')->setData($configManager->get('oro_ui.application_url'));
+        $form->get('application_url')->setData($applicationUrl);
 
         return $this->render(
             'OroInstallerBundle:Process/Step:setup.html.twig',
