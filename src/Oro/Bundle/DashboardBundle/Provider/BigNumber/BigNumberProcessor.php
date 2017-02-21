@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
 class BigNumberProcessor
 {
@@ -13,25 +12,19 @@ class BigNumberProcessor
     /** @var BigNumberDateHelper */
     protected $dateHelper;
 
-    /** @var OwnerHelper */
-    protected $ownerHelper;
-
     /** @var object[] */
     protected $valueProviders = [];
 
     /**
      * @param BigNumberFormatter  $bigNumberFormatter
      * @param BigNumberDateHelper $dateHelper
-     * @param OwnerHelper         $ownerHelper
      */
     public function __construct(
         BigNumberFormatter $bigNumberFormatter,
-        BigNumberDateHelper $dateHelper,
-        OwnerHelper $ownerHelper
+        BigNumberDateHelper $dateHelper
     ) {
         $this->bigNumberFormatter = $bigNumberFormatter;
         $this->dateHelper         = $dateHelper;
-        $this->ownerHelper        = $ownerHelper;
     }
 
     /**
