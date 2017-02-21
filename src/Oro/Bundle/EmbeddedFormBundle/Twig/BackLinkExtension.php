@@ -1,29 +1,38 @@
 <?php
+
 namespace Oro\Bundle\EmbeddedFormBundle\Twig;
 
-use Symfony\Component\Routing\Router;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class BackLinkExtension extends \Twig_Extension
 {
-    /**
-     * @var Router
-     */
-    protected $router;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var TranslatorInterface
+     * @param ContainerInterface $container
      */
-    protected $translator;
-
-    /**
-     * @param Router $router
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(Router $router, TranslatorInterface $translator)
+    public function __construct(ContainerInterface $container)
     {
-        $this->router = $router;
-        $this->translator = $translator;
+        $this->container = $container;
+    }
+
+    /**
+     * @return RouterInterface
+     */
+    protected function getRouter()
+    {
+        return $this->container->get('router');
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    protected function getTranslator()
+    {
+        return $this->container->get('translator');
     }
 
     /**
@@ -58,7 +67,7 @@ class BackLinkExtension extends \Twig_Extension
             $linkText = 'oro.embeddedform.back_link_default_text';
         }
 
-        $link = $this->getLink($id, $this->translator->trans($linkText));
+        $link = $this->getLink($id, $this->getTranslator()->trans($linkText));
 
         return str_replace($placeholder, $link, $string);
     }
@@ -72,7 +81,7 @@ class BackLinkExtension extends \Twig_Extension
             );
         }
 
-        $url = $this->router->generate('oro_embedded_form_submit', ['id' => $id]);
+        $url = $this->getRouter()->generate('oro_embedded_form_submit', ['id' => $id]);
 
         return sprintf('<a href="%s">%s</a>', $url, $linkText);
     }

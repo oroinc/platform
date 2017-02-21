@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
@@ -11,80 +12,19 @@ class PlaceholderExtension extends \Twig_Extension
 {
     const EXTENSION_NAME = 'oro_placeholder';
 
-    /**
-     * @var \Twig_Environment
-     */
-    protected $environment;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var PlaceholderProvider
+     * @param ContainerInterface $container
      */
-    protected $placeholder;
-
-    /**
-     * @var HttpKernelExtension
-     */
-    protected $kernelExtension;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @param \Twig_Environment   $environment
-     * @param PlaceholderProvider $placeholder
-     * @param HttpKernelExtension $kernelExtension
-     */
-    public function __construct(
-        \Twig_Environment $environment,
-        PlaceholderProvider $placeholder,
-        HttpKernelExtension $kernelExtension
-    ) {
-        $this->environment     = $environment;
-        $this->placeholder     = $placeholder;
-        $this->kernelExtension = $kernelExtension;
-    }
-
-    /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
-     */
-    public function getFunctions()
+    public function __construct(ContainerInterface $container)
     {
-        return array(
-            'placeholder' => new \Twig_Function_Method(
-                $this,
-                'renderPlaceholder',
-                array(
-                    'is_safe' => array('html')
-                )
-            )
-        );
+        $this->container = $container;
     }
 
     /**
-     * Render placeholder by name
-     *
-     * @param string $name
-     * @param array  $variables
-     * @param array  $attributes Supported attributes:
-     *                           'delimiter' => string
-     * @return string|array
-     */
-    public function renderPlaceholder($name, array $variables = array(), array $attributes = array())
-    {
-        return implode(
-            isset($attributes['delimiter']) ? $attributes['delimiter'] : '',
-            $this->getPlaceholderData($name, $variables, true)
-        );
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -92,39 +32,91 @@ class PlaceholderExtension extends \Twig_Extension
     }
 
     /**
-     * @param Request $request
+     * @return PlaceholderProvider
      */
-    public function setRequest(Request $request = null)
+    protected function getPlaceholderProvider()
     {
-        $this->request = $request;
+        return $this->container->get('oro_ui.placeholder.provider');
+    }
+
+    /**
+     * @return Request|null
+     */
+    protected function getRequest()
+    {
+        return $this->container->get('request_stack')->getCurrentRequest();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunctions()
+    {
+        return [
+            new \Twig_SimpleFunction(
+                'placeholder',
+                [$this, 'renderPlaceholder'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
+            )
+        ];
+    }
+
+    /**
+     * Render placeholder by name
+     *
+     * @param \Twig_Environment $environment ,
+     * @param string            $name
+     * @param array             $variables
+     * @param array             $attributes  Supported attributes:
+     *                                       'delimiter' => string
+     *
+     * @return string|array
+     */
+    public function renderPlaceholder(
+        \Twig_Environment $environment,
+        $name,
+        array $variables = [],
+        array $attributes = []
+    ) {
+        return implode(
+            isset($attributes['delimiter']) ? $attributes['delimiter'] : '',
+            $this->getPlaceholderData($environment, $name, $variables)
+        );
     }
 
     /**
      * Renders the given item.
      *
-     * @param array $item
-     * @param array $variables
+     * @param \Twig_Environment $environment
+     * @param array             $item
+     * @param array             $variables
+     *
      * @return string
+     *
      * @throws \RuntimeException If placeholder cannot be rendered.
      */
-    protected function renderItemContent(array $item, array $variables)
+    protected function renderItemContent(\Twig_Environment $environment, array $item, array $variables)
     {
         if (isset($item['data']) || array_key_exists('data', $item)) {
             $variables['data'] = $item['data'];
         }
 
         if (isset($item['template'])) {
-            return $this->environment->render($item['template'], $variables);
+            return $environment->render($item['template'], $variables);
         }
 
         if (isset($item['action'])) {
-            $query = array();
-            if ($this->request) {
-                $query = $this->request->query->all();
+            $query = [];
+            $request = $this->getRequest();
+            if (null !== $request) {
+                $query = $request->query->all();
             }
 
-            return $this->kernelExtension->renderFragment(
-                $this->kernelExtension->controller($item['action'], $variables, $query)
+            /** @var HttpKernelExtension $kernelExtension */
+            $kernelExtension = $environment->getExtension(HttpKernelExtension::class);
+
+            return $kernelExtension->renderFragment(
+                $kernelExtension->controller($item['action'], $variables, $query)
             );
         }
 
@@ -137,17 +129,19 @@ class PlaceholderExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $name
-     * @param array  $variables
+     * @param \Twig_Environment $environment
+     * @param string            $name
+     * @param array             $variables
+     *
      * @return array
      */
-    protected function getPlaceholderData($name, $variables)
+    protected function getPlaceholderData(\Twig_Environment $environment, $name, $variables)
     {
-        $result = array();
+        $result = [];
 
-        $items = $this->placeholder->getPlaceholderItems($name, $variables);
+        $items = $this->getPlaceholderProvider()->getPlaceholderItems($name, $variables);
         foreach ($items as $item) {
-            $result[] = $this->renderItemContent($item, $variables);
+            $result[] = $this->renderItemContent($environment, $item, $variables);
         }
 
         return $result;
