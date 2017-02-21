@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub;
 
-class CustomFormType
+use Symfony\Component\Form\AbstractType;
+
+class CustomFormType extends AbstractType
 {
 
 }
