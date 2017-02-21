@@ -56,6 +56,7 @@ define(function(require) {
             if (!(this.filterModel instanceof ColumnFilterModel)) {
                 throw new TypeError('Invalid required option "filterModel"');
             }
+
             options.filterer = _.bind(this.filterModel.filterer, this.filterModel);
             ColumnManagerCollectionView.__super__.initialize.apply(this, arguments);
         },

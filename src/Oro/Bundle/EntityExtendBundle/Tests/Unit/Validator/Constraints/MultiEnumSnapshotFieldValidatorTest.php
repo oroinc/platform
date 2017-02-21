@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -59,8 +60,11 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit_Framework_TestCase
             'enum'
         );
 
+        /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject $eventDispatcher */
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $this->validator = new MultiEnumSnapshotFieldValidator(
-            new FieldNameValidationHelper($extendConfigProvider)
+            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher)
         );
     }
 

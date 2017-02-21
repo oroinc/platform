@@ -3,13 +3,12 @@
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -21,23 +20,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/attribute")
- * @Acl(
- *      id="oro_attribute_manage",
- *      label="oro.entity_config.action.attribute.manage",
- *      type="action",
- *      group_name=""
- * )
  */
 class AttributeController extends Controller
 {
     /**
      * @Route("/create/{alias}", name="oro_attribute_create")
-     * @Acl(
-     *      id="oro_attribute_create",
-     *      label="oro.entity_config.action.attribute.create",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template
      * @param Request $request
      * @param string $alias
@@ -63,7 +50,6 @@ class AttributeController extends Controller
 
     /**
      * @Route("/save/{alias}", name="oro_attribute_save")
-     * @AclAncestor("oro_attribute_create")
      * @Template("OroEntityConfigBundle:Attribute:update.html.twig")
      * @param Request $request
      * @param string $alias
@@ -103,12 +89,6 @@ class AttributeController extends Controller
 
     /**
      * @Route("/update/{id}", name="oro_attribute_update", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_attribute_update",
-     *      label="oro.entity_config.action.attribute.update",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template
      * @param FieldConfigModel $fieldConfigModel
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -236,12 +216,6 @@ class AttributeController extends Controller
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
-     * @Acl(
-     *      id="oro_attribute_remove",
-     *      label="oro.entity_config.action.attribute.remove",
-     *      type="action",
-     *      group_name=""
-     * )
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -264,12 +238,6 @@ class AttributeController extends Controller
      *      name="oro_attribute_unremove",
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
-     * )
-     * @Acl(
-     *      id="oro_attribute_unremove",
-     *      label="oro.entity_config.action.attribute.unremove",
-     *      type="action",
-     *      group_name=""
      * )
      * @param FieldConfigModel $field
      * @return \Symfony\Component\HttpFoundation\JsonResponse

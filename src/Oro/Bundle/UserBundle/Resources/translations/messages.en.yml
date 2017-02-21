@@ -60,13 +60,13 @@ oro:
             user_groupes.description: List of system groups
             users_management.label: User Management
             user_create.label: Create User
-            shortcut_new_user.label: Create new user
+            shortcut_new_user.label: Create new User
             shortcut_new_user.description: Create new user instance
-            shortcut_list_users.label: Show users list
+            shortcut_list_users.label: Show Users list
             shortcut_list_users.description: List of all system users
-            shortcut_new_role.label: Create new role
+            shortcut_new_role.label: Create new Role
             shortcut_new_role.description: Create new role instance
-            shortcut_new_group.label: Create new group
+            shortcut_new_group.label: Create new Group
             shortcut_new_group.description: Create new group instance
             oro_user_profile_view.label: My User
             oro_user_profile_configuration.label: My Configuration
@@ -215,7 +215,7 @@ oro:
                 flash:
                     success: Reset password email has been sent to user
             force_reset:
-                popup.message: User {{ user }} will receive reset password by email and will be disabled from login.
+                popup.message: User {{ user }} will receive the email to reset password and will be disabled from login.
                 popup.question: Are you sure you want to proceed?
                 popup.button: Reset
                 success.message: Password reset request has been sent to %email%.
@@ -280,6 +280,8 @@ oro:
         permission:
             update_configuration:
                 label: Configure
+            manage_api_key:
+                label: Manage API Key
 
         security:
             password_changed.message: Your password was updated by an administrator. New password was sent to you by email.

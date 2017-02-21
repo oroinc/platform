@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Functinal\Engine;
+namespace Oro\Bundle\CronBundle\Tests\Functional\Engine;
 
 use Oro\Bundle\CronBundle\Engine\CommandRunner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

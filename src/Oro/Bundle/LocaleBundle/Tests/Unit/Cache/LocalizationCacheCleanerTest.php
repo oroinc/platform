@@ -20,15 +20,10 @@ class LocalizationCacheCleanerTest extends \PHPUnit_Framework_TestCase
         $this->cleaner = new LocalizationCacheCleaner($this->manager);
     }
 
-    protected function tearDown()
-    {
-        unset($this->cleaner, $this->manager);
-    }
-
     public function testClear()
     {
         $this->manager->expects($this->once())->method('clearCache');
 
-        $this->cleaner->clear(null);
+        $this->cleaner->clear();
     }
 }

@@ -36,7 +36,7 @@ class CustomEntityGridListener
         $this->addVisitedDatagrid($datagrid);
 
         // enable DynamicFieldsExtension to add custom fields
-        $config->offsetSet('extended_entity_name', $datagrid->getParameters()->get('class_name'));
+        $config->setExtendedEntityClassName($datagrid->getParameters()->get('class_name'));
     }
 
     /**

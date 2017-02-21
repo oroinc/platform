@@ -23,18 +23,16 @@
             }) }}
         {% endif %}
     {% endif %}
-    {% if resource_granted('EDIT', entity) %}
-            {{ UI.editButton({
-                'path' : path('oro_user_update', { id: entity.id }),
-                'entity_label': 'oro.user.entity_label'|trans
-            }) }}
-    {% else %}
-        {% if isProfileView and resource_granted('update_own_profile') %}
-            {{ UI.editButton({
-                'path': path('oro_user_profile_update'),
-                'entity_label': 'profile'|trans
-            }) }}
-        {% endif %}
+    {% if resource_granted('EDIT', entity) and not isProfileView %}
+        {{ UI.editButton({
+            'path' : path('oro_user_update', { id: entity.id }),
+            'entity_label': 'oro.user.entity_label'|trans
+        }) }}
+    {% elseif isProfileView and resource_granted('update_own_profile') %}
+        {{ UI.editButton({
+            'path': path('oro_user_profile_update'),
+            'entity_label': 'profile'|trans
+        }) }}
     {% endif %}
     {% if resource_granted('DELETE', entity) and entity.id != app.user.id %}
         {{ UI.deleteButton({

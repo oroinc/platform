@@ -57,8 +57,9 @@ class Grid extends Element
 
     /**
      * @param int $number
+     * @param int $cellNumber
      */
-    public function checkFirstRecords($number)
+    public function checkFirstRecords($number, $cellNumber = 0)
     {
         $rows = $this->getRows();
 
@@ -69,7 +70,7 @@ class Grid extends Element
         );
 
         for ($i = 0; $i < $number; $i++) {
-            $rows[$i]->checkMassActionCheckbox();
+            $rows[$i]->checkMassActionCheckbox($cellNumber);
         }
     }
 
@@ -162,9 +163,7 @@ class Grid extends Element
             $link = $row->find('named', ['link', $action]);
         }
 
-        if (!$link) {
-            throw new ElementNotFoundException($this->getDriver(), 'link', 'id|title|alt|text', $action);
-        }
+        self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $row->getText(), $action));
 
         return $link;
     }

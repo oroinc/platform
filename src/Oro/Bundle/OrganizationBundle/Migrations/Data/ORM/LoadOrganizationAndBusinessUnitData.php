@@ -12,6 +12,7 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture implements Ord
 {
     const MAIN_ORGANIZATION  = 'default';
     const MAIN_BUSINESS_UNIT = 'Main';
+    const REFERENCE_DEFAULT_ORGANIZATION = 'default_organization';
 
     /**
      * {@inheritdoc}
@@ -35,7 +36,7 @@ class LoadOrganizationAndBusinessUnitData extends AbstractFixture implements Ord
         $defaultOrganization
             ->setName(self::MAIN_ORGANIZATION)
             ->setEnabled(true);
-        $this->addReference('default_organization', $defaultOrganization);
+        $this->addReference(self::REFERENCE_DEFAULT_ORGANIZATION, $defaultOrganization);
         $manager->persist($defaultOrganization);
 
         // load default business unit

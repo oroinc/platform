@@ -184,7 +184,7 @@
             {%- else -%}
                 {{ label|trans({}, translation_domain) }}
             {%- endif -%}
-            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
+             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {%- endif -%}
     {% endspaceless %}
@@ -224,9 +224,8 @@
     {% endif %}
 
     {% set options = {
-        component: 'oroui/js/app/components/view-component',
         view: 'oroui/js/app/views/datepicker/datepicker-view',
-        screenType: 'desktop',
+        nativeMode: isMobileVersion(),
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
@@ -239,12 +238,14 @@
             changeMonth: true,
             changeYear: true,
             yearRange: years|default('-80:+1'),
+            minDate: minDate,
+            maxDate: maxDate,
             showButtonPanel: true
         }
     } %}
 
     {% set attr = attr|merge({
-        'data-page-component-module': 'oroui/js/app/components/viewport-component',
+        'data-page-component-module': 'oroui/js/app/components/view-component',
         'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))
     }) %}
 
@@ -267,9 +268,8 @@
     {% endif %}
 
     {% set options = {
-        component: 'oroui/js/app/components/view-component',
         view: 'oroui/js/app/views/datepicker/datetimepicker-view',
-        screenType: 'desktop',
+        nativeMode: isMobileVersion(),
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
@@ -296,7 +296,7 @@
     } %}
 
     {% set attr = attr|merge({
-        'data-page-component-module': 'oroui/js/app/components/viewport-component',
+        'data-page-component-module': 'oroui/js/app/components/view-component',
         'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))
     }) %}
 

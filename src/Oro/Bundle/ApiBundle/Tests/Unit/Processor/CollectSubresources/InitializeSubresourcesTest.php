@@ -691,4 +691,122 @@ class InitializeSubresourcesTest extends \PHPUnit_Framework_TestCase
             ['scalar'],
         ];
     }
+
+    public function testProcessForToOneAssociationWithEmptyAcceptableTargetClassNames()
+    {
+        $resource = new ApiResource('Test\Class');
+
+        $resourceConfig = new Config();
+        $resourceConfig->setDefinition(new EntityDefinitionConfig());
+        $resourceMetadata = new EntityMetadata();
+        $toOneAssociation = new AssociationMetadata();
+        $toOneAssociation->setName('association1');
+        $toOneAssociation->setTargetClassName('Test\Association1Target');
+        $toOneAssociation->setIsCollection(false);
+        $resourceMetadata->addAssociation($toOneAssociation);
+
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setVersion('1.1');
+        $this->context->setResources([$resource]);
+        $this->context->setAccessibleResources(['Test\Association1Target']);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($resourceConfig);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
+                [],
+                true
+            )
+            ->willReturn($resourceMetadata);
+
+        $this->processor->process($this->context);
+
+        $expectedSubresources = new ApiResourceSubresources($resource->getEntityClass());
+        $toOneAssociationSubresource = new ApiSubresource();
+        $toOneAssociationSubresource->setTargetClassName($toOneAssociation->getTargetClassName());
+        $toOneAssociationSubresource->setAcceptableTargetClassNames(
+            $toOneAssociation->getAcceptableTargetClassNames()
+        );
+        $toOneAssociationSubresource->setIsCollection($toOneAssociation->isCollection());
+        $toOneAssociationSubresource->setExcludedActions(
+            ['add_relationship', 'delete_relationship']
+        );
+        $expectedSubresources->addSubresource($toOneAssociation->getName(), $toOneAssociationSubresource);
+
+        $this->assertEquals(
+            ['Test\Class' => $expectedSubresources],
+            $this->context->getResult()->toArray()
+        );
+    }
+
+    public function testProcessForToManyAssociationWithEmptyAcceptableTargetClassNames()
+    {
+        $resource = new ApiResource('Test\Class');
+
+        $resourceConfig = new Config();
+        $resourceConfig->setDefinition(new EntityDefinitionConfig());
+        $resourceMetadata = new EntityMetadata();
+        $toManyAssociation = new AssociationMetadata();
+        $toManyAssociation->setName('association1');
+        $toManyAssociation->setTargetClassName('Test\Association1Target');
+        $toManyAssociation->setIsCollection(true);
+        $resourceMetadata->addAssociation($toManyAssociation);
+
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->setVersion('1.1');
+        $this->context->setResources([$resource]);
+        $this->context->setAccessibleResources(['Test\Association1Target']);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra()]
+            )
+            ->willReturn($resourceConfig);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(
+                $resource->getEntityClass(),
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                $resourceConfig->getDefinition(),
+                [],
+                true
+            )
+            ->willReturn($resourceMetadata);
+
+        $this->processor->process($this->context);
+
+        $expectedSubresources = new ApiResourceSubresources($resource->getEntityClass());
+        $toManyAssociationSubresource = new ApiSubresource();
+        $toManyAssociationSubresource->setTargetClassName($toManyAssociation->getTargetClassName());
+        $toManyAssociationSubresource->setAcceptableTargetClassNames(
+            $toManyAssociation->getAcceptableTargetClassNames()
+        );
+        $toManyAssociationSubresource->setIsCollection($toManyAssociation->isCollection());
+        $toManyAssociationSubresource->setExcludedActions(
+            []
+        );
+        $expectedSubresources->addSubresource($toManyAssociation->getName(), $toManyAssociationSubresource);
+
+        $this->assertEquals(
+            ['Test\Class' => $expectedSubresources],
+            $this->context->getResult()->toArray()
+        );
+    }
 }

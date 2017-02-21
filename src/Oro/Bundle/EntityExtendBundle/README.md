@@ -184,8 +184,6 @@ To load a list of options you can use data fixtures, for example:
 ``` php
 <?php
 
-<?php
-
 namespace Oro\Bundle\DemoDataBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;

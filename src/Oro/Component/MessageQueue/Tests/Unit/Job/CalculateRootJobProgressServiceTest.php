@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 
 class CalculateRootJobProgressServiceTest extends \PHPUnit_Framework_TestCase
 {
-
     public function calculateProgressProvider()
     {
         return [
@@ -63,6 +62,6 @@ class CalculateRootJobProgressServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function createJobStorageMock()
     {
-        return $this->getMock(JobStorage::class, [], [], '', false);
+        return $this->createMock(JobStorage::class);
     }
 }

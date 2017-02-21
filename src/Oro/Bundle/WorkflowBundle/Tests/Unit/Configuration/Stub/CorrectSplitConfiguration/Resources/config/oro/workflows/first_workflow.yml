@@ -46,6 +46,7 @@ workflows:
                     class: foo
                 form_type: custom_workflow_transition
                 display_type: page
+                destination_page: index
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
                 init_entities:

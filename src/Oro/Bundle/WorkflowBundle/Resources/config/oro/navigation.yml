@@ -2,17 +2,17 @@ navigation:
     menu_config:
         items:
             process_definition_list:
-                label: 'oro.workflow.processdefinition.entity_plural_label'
+                label:    'oro.workflow.processdefinition.entity_plural_label'
+                position: 105
                 extras:
-                    position:    105
                     description: 'oro.workflow.menu.process_definition_list.description'
                     routes:      ['/^oro_process_definition/']
                 route: 'oro_process_definition_index'
 
             workflow_definition_list:
-                label: 'oro.workflow.workflowdefinition.entity_plural_label'
+                label:    'oro.workflow.workflowdefinition.entity_plural_label'
+                position: 100
                 extras:
-                    position:    100
                     description: 'oro.workflow.menu.workflow_definition_list.description'
                     routes:      ['/^oro_workflow_definition/']
                 route: 'oro_workflow_definition_index'

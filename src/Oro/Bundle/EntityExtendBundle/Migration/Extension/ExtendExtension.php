@@ -346,14 +346,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds one-to-many relation
      *
      * @param Schema       $schema
-     * @param Table|string $table                     A Table object or table name
+     * @param Table|string $table                     A Table object or table name of owning side entity
      * @param string       $associationName           The name of a relation field
-     * @param Table|string $targetTable               A Table object or table name
+     * @param Table|string $targetTable               A Table object or table name of inverse side entity
      * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
-     * @param array        $options                   Entity config values
-     *                                                format is [CONFIG_SCOPE => [CONFIG_KEY => CONFIG_VALUE]]
+     * @param array        $options                   Entity config options. [scope => [name => value, ...], ...]
      * @param string       $fieldType                 The field type. By default the field type is oneToMany,
      *                                                but you can specify another type if it is based on oneToMany.
      *                                                In this case this type should be registered
@@ -371,6 +370,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $fieldType = RelationType::ONE_TO_MANY
     ) {
         $this->ensureExtendFieldSet($options);
+        $options['extend']['bidirectional'] = true; // has to be bidirectional
 
         $selfTableName = $this->getTableName($table);
         $selfTable     = $this->getTable($table, $schema);
@@ -378,11 +378,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $targetTableName  = $this->getTableName($targetTable);
         $targetTable      = $this->getTable($targetTable, $schema);
-        $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $targetColumnName = $this->nameGenerator->generateOneToManyRelationColumnName(
             $selfClassName,
             $associationName,
-            '_' . $selfPrimaryKeyColumnName
+            '_' . $this->getPrimaryKeyColumnName($selfTable)
         );
 
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
@@ -421,13 +420,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds the inverse side of a one-to-many relation
      *
      * @param Schema       $schema
-     * @param Table|string $table                     A Table object or table name
-     * @param string       $associationName           The name of a relation field
-     * @param Table|string $targetTable               A Table object or table name
-     * @param string       $targetAssociationName     The name of a relation field on the inverse side
-     * @param string       $targetColumnName          A column name is used to show related entity
-     * @param array        $options                   Entity config values
-     *                                                format is [CONFIG_SCOPE => [CONFIG_KEY => CONFIG_VALUE]]
+     * @param Table|string $table                 A Table object or table name of owning side entity
+     * @param string       $associationName       The name of a relation field
+     * @param Table|string $targetTable           A Table object or table name of inverse side entity
+     * @param string       $targetAssociationName The name of a relation field on the inverse side
+     * @param string       $titleColumnName       A column name is used to show owning side entity
+     * @param array        $options               Entity config options. [scope => [name => value, ...], ...]
+     *
+     * @deprecated since 2.1, cause oneToMany relation has to be bidirectional always
      */
     public function addOneToManyInverseRelation(
         Schema $schema,
@@ -435,12 +435,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $associationName,
         $targetTable,
         $targetAssociationName,
-        $targetColumnName,
+        $titleColumnName,
         array $options = []
     ) {
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
+        $selfTable     = $this->getTable($selfTableName, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
@@ -452,15 +453,16 @@ class ExtendExtension implements NameGeneratorAwareInterface
             $associationName
         );
 
-        $this->checkColumnsExist($targetTable, [$targetColumnName]);
+        $this->checkColumnsExist($selfTable, [$titleColumnName]);
         $this->checkColumnsExist($targetTable, [$existingTargetColumnName]);
 
-        $relationKey = ExtendHelper::buildRelationKey(
+        $selfRelationKey = ExtendHelper::buildRelationKey(
             $selfClassName,
             $associationName,
             RelationType::ONE_TO_MANY,
             $targetClassName
         );
+        $targetRelationKey = ExtendHelper::toggleRelationKey($selfRelationKey);
 
         $targetFieldId = new FieldConfigId(
             'extend',
@@ -469,13 +471,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
             RelationType::MANY_TO_ONE
         );
 
-        $selfTableOptions['extend']['relation.' . $relationKey . '.target_field_id'] = $targetFieldId;
+        $selfTableOptions['extend']['relation.' . $selfRelationKey . '.target_field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
         );
 
-        $targetTableOptions['extend']['relation.' . $relationKey . '.field_id'] = $targetFieldId;
+        $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions
@@ -483,8 +485,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name'   => $selfTableName,
-            'relation_key' => $relationKey,
-            'column'       => $targetColumnName,
+            'relation_key' => $targetRelationKey,
+            'column'       => $titleColumnName,
         ];
         $options[ExtendOptionsManager::TYPE_OPTION]   = RelationType::MANY_TO_ONE;
         $options['extend']['column_name']             = $existingTargetColumnName;
@@ -499,13 +501,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds many-to-many relation
      *
      * @param Schema       $schema
-     * @param Table|string $table                     A Table object or table name
+     * @param Table|string $table                     A Table object or table name of owning side entity
      * @param string       $associationName           The name of a relation field
-     * @param Table|string $targetTable               A Table object or table name
+     * @param Table|string $targetTable               A Table object or table name of inverse side entity
      * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
-     * @param array        $options
+     * @param array        $options                   Entity config options. [scope => [name => value, ...], ...]
      * @param string       $fieldType                 The field type. By default the field type is manyToMany,
      *                                                but you can specify another type if it is based on manyToMany.
      *                                                In this case this type should be registered
@@ -547,13 +549,22 @@ class ExtendExtension implements NameGeneratorAwareInterface
             $targetClassName
         );
         $joinTable                 = $schema->createTable($joinTableName);
+        $selfJoinTableColumnNamePrefix = null;
+        $targetJoinTableColumnNamePrefix = null;
+        if ($selfClassName === $targetClassName) {
+            // fix the collision of names if owning side entity equals to inverse side entity
+            $selfJoinTableColumnNamePrefix = 'src_';
+            $targetJoinTableColumnNamePrefix = 'dest_';
+        }
         $selfJoinTableColumnName   = $this->nameGenerator->generateManyToManyJoinTableColumnName(
             $selfClassName,
-            '_' . $selfIdColumn
+            '_' . $selfIdColumn,
+            $selfJoinTableColumnNamePrefix
         );
         $targetJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName(
             $targetClassName,
-            '_' . $targetIdColumn
+            '_' . $targetIdColumn,
+            $targetJoinTableColumnNamePrefix
         );
         $this->addRelation(
             $joinTable,
@@ -591,15 +602,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds the inverse side of a many-to-many relation
      *
      * @param Schema       $schema
-     * @param Table|string $table                     A Table object or table name
-     * @param string       $associationName           The name of a relation field
-     * @param Table|string $targetTable               A Table object or table name
-     * @param string       $targetAssociationName     The name of a relation field on the inverse side
-     * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
-     * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
-     * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
-     * @param array        $options                   Entity config values
-     *                                                format is [CONFIG_SCOPE => [CONFIG_KEY => CONFIG_VALUE]]
+     * @param Table|string $table                 A Table object or table name of owning side entity
+     * @param string       $associationName       The name of a relation field
+     * @param Table|string $targetTable           A Table object or table name of inverse side entity
+     * @param string       $targetAssociationName The name of a relation field on the inverse side
+     * @param string[]     $titleColumnNames      Column names are used to show a title of owning side entity
+     * @param string[]     $detailedColumnNames   Column names are used to show detailed info about owning side entity
+     * @param string[]     $gridColumnNames       Column names are used to show owning side entity in a grid
+     * @param array        $options               Entity config options. [scope => [name => value, ...], ...]
      */
     public function addManyToManyInverseRelation(
         Schema $schema,
@@ -607,30 +617,31 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $associationName,
         $targetTable,
         $targetAssociationName,
-        array $targetTitleColumnNames,
-        array $targetDetailedColumnNames,
-        array $targetGridColumnNames,
+        array $titleColumnNames,
+        array $detailedColumnNames,
+        array $gridColumnNames,
         array $options = []
     ) {
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
+        $selfTable     = $this->getTable($selfTableName, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
-        $targetTable     = $this->getTable($targetTable, $schema);
         $targetClassName = $this->getEntityClassByTableName($targetTableName);
 
-        $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
-        $this->checkColumnsExist($targetTable, $targetDetailedColumnNames);
-        $this->checkColumnsExist($targetTable, $targetGridColumnNames);
+        $this->checkColumnsExist($selfTable, $titleColumnNames);
+        $this->checkColumnsExist($selfTable, $detailedColumnNames);
+        $this->checkColumnsExist($selfTable, $gridColumnNames);
 
-        $relationKey = ExtendHelper::buildRelationKey(
+        $selfRelationKey = ExtendHelper::buildRelationKey(
             $selfClassName,
             $associationName,
             RelationType::MANY_TO_MANY,
             $targetClassName
         );
+        $targetRelationKey = ExtendHelper::toggleRelationKey($selfRelationKey);
 
         $targetFieldId = new FieldConfigId(
             'extend',
@@ -639,13 +650,19 @@ class ExtendExtension implements NameGeneratorAwareInterface
             RelationType::MANY_TO_MANY
         );
 
-        $selfTableOptions['extend']['relation.' . $relationKey . '.target_field_id'] = $targetFieldId;
+        $selfTableOptions['extend']['relation.' . $selfRelationKey . '.target_field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
         );
 
-        $targetTableOptions['extend']['relation.' . $relationKey . '.field_id'] = $targetFieldId;
+        $this->extendOptionsManager->mergeColumnOptions(
+            $selfTableName,
+            $associationName,
+            ['extend' => ['bidirectional' => true]]
+        );
+
+        $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions
@@ -653,11 +670,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name'   => $selfTableName,
-            'relation_key' => $relationKey,
+            'relation_key' => $targetRelationKey,
             'columns'      => [
-                'title'    => $targetTitleColumnNames,
-                'detailed' => $targetDetailedColumnNames,
-                'grid'     => $targetGridColumnNames,
+                'title'    => $titleColumnNames,
+                'detailed' => $detailedColumnNames,
+                'grid'     => $gridColumnNames,
             ],
         ];
         $options[ExtendOptionsManager::TYPE_OPTION]   = RelationType::MANY_TO_MANY;
@@ -672,22 +689,22 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds many-to-one relation
      *
      * @param Schema       $schema
-     * @param Table|string $table              A Table object or table name
-     * @param string       $associationName    The name of a relation field
-     * @param Table|string $targetTable        A Table object or table name
-     * @param string       $targetColumnName   A column name is used to show related entity
-     * @param array        $options
-     * @param string       $fieldType          The field type. By default the field type is manyToOne,
-     *                                         but you can specify another type if it is based on manyToOne.
-     *                                         In this case this type should be registered
-     *                                         in entity_extend.yml under underlying_types section
+     * @param Table|string $table                 A Table object or table name of owning side entity
+     * @param string       $associationName       The name of a relation field
+     * @param Table|string $targetTable           A Table object or table name of inverse side entity
+     * @param string       $targetTitleColumnName A column name is used to show related entity
+     * @param array        $options               Entity config options. [scope => [name => value, ...], ...]
+     * @param string       $fieldType             The field type. By default the field type is manyToOne,
+     *                                            but you can specify another type if it is based on manyToOne.
+     *                                            In this case this type should be registered
+     *                                            in entity_extend.yml under underlying_types section
      */
     public function addManyToOneRelation(
         Schema $schema,
         $table,
         $associationName,
         $targetTable,
-        $targetColumnName,
+        $targetTitleColumnName,
         array $options = [],
         $fieldType = RelationType::MANY_TO_ONE
     ) {
@@ -703,7 +720,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             '_' . $primaryKeyColumnName
         );
 
-        $this->checkColumnsExist($targetTable, [$targetColumnName]);
+        $this->checkColumnsExist($targetTable, [$targetTitleColumnName]);
 
         $relation = $options['extend'];
         if (array_key_exists('on_delete', $relation)) {
@@ -728,7 +745,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name' => $targetTableName,
-            'column'     => $targetColumnName,
+            'column'     => $targetTitleColumnName,
         ];
         $options[ExtendOptionsManager::TYPE_OPTION]   = $fieldType;
         $this->extendOptionsManager->setColumnOptions(
@@ -742,15 +759,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Adds the inverse side of a many-to-one relation
      *
      * @param Schema       $schema
-     * @param Table|string $table                     A Table object or table name
-     * @param string       $associationName           The name of a relation field
-     * @param Table|string $targetTable               A Table object or table name
-     * @param string       $targetAssociationName     The name of a relation field on the inverse side
-     * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
-     * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
-     * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
-     * @param array        $options                   Entity config values
-     *                                                format is [CONFIG_SCOPE => [CONFIG_KEY => CONFIG_VALUE]]
+     * @param Table|string $table                 A Table object or table name of owning side entity
+     * @param string       $associationName       The name of a relation field
+     * @param Table|string $targetTable           A Table object or table name of inverse side entity
+     * @param string       $targetAssociationName The name of a relation field on the inverse side
+     * @param string[]     $titleColumnNames      Column names are used to show a title of owning side entity
+     * @param string[]     $detailedColumnNames   Column names are used to show detailed info about owning side entity
+     * @param string[]     $gridColumnNames       Column names are used to show owning side entity in a grid
+     * @param array        $options               Entity config options. [scope => [name => value, ...], ...]
      */
     public function addManyToOneInverseRelation(
         Schema $schema,
@@ -758,30 +774,31 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $associationName,
         $targetTable,
         $targetAssociationName,
-        array $targetTitleColumnNames,
-        array $targetDetailedColumnNames,
-        array $targetGridColumnNames,
+        array $titleColumnNames,
+        array $detailedColumnNames,
+        array $gridColumnNames,
         array $options = []
     ) {
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
+        $selfTable     = $this->getTable($selfTableName, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
-        $targetTable     = $this->getTable($targetTable, $schema);
         $targetClassName = $this->getEntityClassByTableName($targetTableName);
 
-        $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
-        $this->checkColumnsExist($targetTable, $targetDetailedColumnNames);
-        $this->checkColumnsExist($targetTable, $targetGridColumnNames);
+        $this->checkColumnsExist($selfTable, $titleColumnNames);
+        $this->checkColumnsExist($selfTable, $detailedColumnNames);
+        $this->checkColumnsExist($selfTable, $gridColumnNames);
 
-        $relationKey = ExtendHelper::buildRelationKey(
+        $selfRelationKey = ExtendHelper::buildRelationKey(
             $selfClassName,
             $associationName,
             RelationType::MANY_TO_ONE,
             $targetClassName
         );
+        $targetRelationKey = ExtendHelper::toggleRelationKey($selfRelationKey);
 
         $targetFieldId = new FieldConfigId(
             'extend',
@@ -790,13 +807,19 @@ class ExtendExtension implements NameGeneratorAwareInterface
             RelationType::ONE_TO_MANY
         );
 
-        $selfTableOptions['extend']['relation.' . $relationKey . '.target_field_id'] = $targetFieldId;
+        $selfTableOptions['extend']['relation.' . $selfRelationKey . '.target_field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
         );
 
-        $targetTableOptions['extend']['relation.' . $relationKey . '.field_id'] = $targetFieldId;
+        $this->extendOptionsManager->mergeColumnOptions(
+            $selfTableName,
+            $associationName,
+            ['extend' => ['bidirectional' => true]]
+        );
+
+        $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions
@@ -804,11 +827,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name'   => $selfTableName,
-            'relation_key' => $relationKey,
+            'relation_key' => $targetRelationKey,
             'columns'      => [
-                'title'    => $targetTitleColumnNames,
-                'detailed' => $targetDetailedColumnNames,
-                'grid'     => $targetGridColumnNames,
+                'title'    => $titleColumnNames,
+                'detailed' => $detailedColumnNames,
+                'grid'     => $gridColumnNames,
             ],
         ];
         $options[ExtendOptionsManager::TYPE_OPTION]   = RelationType::ONE_TO_MANY;
@@ -1023,6 +1046,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
         }
         if (!isset($options['extend']['owner'])) {
             $options['extend']['owner'] = ExtendScope::OWNER_SYSTEM;
+        }
+        if (!isset($options['extend']['bidirectional'])) {
+            $options['extend']['bidirectional'] = false;
         }
         if (!isset($options[ExtendOptionsManager::MODE_OPTION])) {
             $options[ExtendOptionsManager::MODE_OPTION] = ConfigModel::MODE_READONLY;

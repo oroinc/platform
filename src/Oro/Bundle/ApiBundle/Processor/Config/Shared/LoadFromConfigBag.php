@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\NodeInterface;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\MergeConfig\MergeEntityConfigHelper;
+use Oro\Bundle\ApiBundle\Provider\ResourceHierarchyProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 /**
  * Base processor to load raw configuration.
@@ -25,28 +24,28 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     /** @var ConfigLoaderFactory */
     protected $configLoaderFactory;
 
-    /** @var EntityHierarchyProviderInterface */
-    protected $entityHierarchyProvider;
+    /** @var ResourceHierarchyProvider */
+    protected $resourceHierarchyProvider;
 
-    /** @var NodeInterface */
-    private $configurationTree;
-
-    /** @var array */
-    private $configCache = [];
+    /** @var MergeEntityConfigHelper */
+    private $mergeEntityConfigHelper;
 
     /**
-     * @param ConfigExtensionRegistry          $configExtensionRegistry
-     * @param ConfigLoaderFactory              $configLoaderFactory
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param ConfigExtensionRegistry   $configExtensionRegistry
+     * @param ConfigLoaderFactory       $configLoaderFactory
+     * @param ResourceHierarchyProvider $resourceHierarchyProvider
+     * @param MergeEntityConfigHelper   $mergeEntityConfigHelper
      */
     public function __construct(
         ConfigExtensionRegistry $configExtensionRegistry,
         ConfigLoaderFactory $configLoaderFactory,
-        EntityHierarchyProviderInterface $entityHierarchyProvider
+        ResourceHierarchyProvider $resourceHierarchyProvider,
+        MergeEntityConfigHelper $mergeEntityConfigHelper
     ) {
         $this->configExtensionRegistry = $configExtensionRegistry;
-        $this->configLoaderFactory     = $configLoaderFactory;
-        $this->entityHierarchyProvider = $entityHierarchyProvider;
+        $this->configLoaderFactory = $configLoaderFactory;
+        $this->resourceHierarchyProvider = $resourceHierarchyProvider;
+        $this->mergeEntityConfigHelper = $mergeEntityConfigHelper;
     }
 
     /**
@@ -61,10 +60,16 @@ abstract class LoadFromConfigBag implements ProcessorInterface
             return;
         }
 
-        $this->saveConfig(
-            $context,
-            $this->loadConfig($context->getClassName(), $context->getVersion())
-        );
+        $this->processConfig($context);
+    }
+
+    /**
+     * @param ConfigContext $context
+     */
+    protected function processConfig(ConfigContext $context)
+    {
+        $config = $this->loadConfig($context->getClassName(), $context->getVersion(), $context->getRequestType());
+        $this->saveConfig($context, $config);
     }
 
     /**
@@ -87,7 +92,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
             }
         }
 
-        $sectionNames = $this->getAllConfigSectionNames();
+        $sectionNames = $this->configExtensionRegistry->getConfigSectionNames();
         foreach ($sectionNames as $sectionName) {
             unset($config[$sectionName]);
         }
@@ -100,44 +105,41 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
-     * @param string $version
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
      *
      * @return array
      */
-    protected function loadConfig($entityClass, $version)
+    protected function loadConfig($entityClass, $version, RequestType $requestType)
     {
-        $cacheKey = $entityClass . '|' . $version;
-        if (isset($this->configCache[$cacheKey])) {
-            return $this->configCache[$cacheKey];
-        }
-
-        $config = $this->buildConfig($entityClass, $version);
-        $this->configCache[$cacheKey] = $config;
-
-        return $config;
+        return $this->buildConfig($entityClass, $version, $requestType);
     }
+
     /**
-     * @param string $entityClass
-     * @param string $version
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
      *
      * @return array
      */
-    protected function buildConfig($entityClass, $version)
+    protected function buildConfig($entityClass, $version, RequestType $requestType)
     {
-        $config = $this->getConfig($entityClass, $version);
+        $config = $this->getConfig($entityClass, $version, $requestType);
         $isInherit = true;
-        if (null !== $config) {
-            $isInherit = $this->getInheritAndThenRemoveIt($config);
-        } else {
+        if (null === $config) {
             $config = [];
+        } else {
+            $isInherit = $this->getInheritAndThenRemoveIt($config);
         }
         if ($isInherit) {
             $configs = [$config];
-            $parentClasses = $this->entityHierarchyProvider->getHierarchyForClassName($entityClass);
+            $parentClasses = $this->resourceHierarchyProvider->getParentClassNames($entityClass);
             foreach ($parentClasses as $parentClass) {
-                $config = $this->getConfig($parentClass, $version);
-                if (!empty($config)) {
+                $config = $this->getConfig($parentClass, $version, $requestType);
+                if (false === $config) {
+                    break;
+                } elseif (!empty($config)) {
                     $isInherit = $this->getInheritAndThenRemoveIt($config);
                     $configs[] = $config;
                     if (!$isInherit) {
@@ -174,7 +176,7 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      *
      * @return bool
      */
-    public static function getInheritAndThenRemoveIt(array &$config)
+    protected function getInheritAndThenRemoveIt(array &$config)
     {
         if (array_key_exists(ConfigUtil::INHERIT, $config)) {
             $isInherit = $config[ConfigUtil::INHERIT];
@@ -187,25 +189,6 @@ abstract class LoadFromConfigBag implements ProcessorInterface
     }
 
     /**
-     * @return string[]
-     */
-    protected function getAllConfigSectionNames()
-    {
-        $sectionNameMap = [];
-        $extensions     = $this->configExtensionRegistry->getExtensions();
-        foreach ($extensions as $extension) {
-            $sections = $extension->getEntityConfigurationSections();
-            foreach ($sections as $name => $configuration) {
-                if (!isset($sectionNameMap[$name])) {
-                    $sectionNameMap[$name] = true;
-                }
-            }
-        }
-
-        return array_keys($sectionNameMap);
-    }
-
-    /**
      * @param array $config
      * @param array $parentConfig
      *
@@ -213,33 +196,17 @@ abstract class LoadFromConfigBag implements ProcessorInterface
      */
     protected function mergeConfigs(array $config, array $parentConfig)
     {
-        $processor = new Processor();
-
-        return $processor->process($this->getConfigurationTree(), [$parentConfig, $config]);
+        return $this->mergeEntityConfigHelper->mergeConfigs($config, $parentConfig);
     }
 
     /**
-     * @return NodeInterface
-     */
-    protected function getConfigurationTree()
-    {
-        if (null === $this->configurationTree) {
-            $this->configurationTree = $this->createConfigurationTree();
-        }
-
-        return $this->configurationTree;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param string $version
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
      *
-     * @return array|null
+     * @return array|false|null Returns an array if a configuration exists,
+     *                          null if if a configuration does not exist,
+     *                          and FALSE if loading of a configuration of parent classes should be stopped
      */
-    abstract protected function getConfig($entityClass, $version);
-
-    /**
-     * @return NodeInterface
-     */
-    abstract protected function createConfigurationTree();
+    abstract protected function getConfig($entityClass, $version, RequestType $requestType);
 }

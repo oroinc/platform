@@ -145,6 +145,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -164,6 +166,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -183,6 +187,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -202,6 +208,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -221,6 +229,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -242,6 +252,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -265,6 +277,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -284,6 +298,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -303,6 +319,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -322,6 +340,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:
@@ -341,6 +361,8 @@ oro_api:
             processing_groups:
                 initialize:
                     priority: -10
+                resource_check:
+                    priority: -15
                 normalize_input:
                     priority: -20
                 security_check:

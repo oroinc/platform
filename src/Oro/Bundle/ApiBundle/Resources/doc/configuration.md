@@ -154,11 +154,9 @@ oro_entity:
 "entity_aliases" configuration section
 --------------------------------------
 
-The `entity_aliases` section allows to override existing system-wide entity aliases.
+The `entity_aliases` section allows to override existing system-wide entity aliases or add aliases for models intended to be used only in Data API.
 
-It can be helpful when you need to provide entity aliases for Data API but it is not possible to make them system-wide. For example because the backwards compatibility promise.
-
-Please note that you can override existing entity aliases via `Resources/config/oro/api.yml`, but it is not possible to introduce aliases for new entities here.
+It can be helpful when you need to provide entity aliases for Data API but it is not possible to make them system-wide. For example because the backwards compatibility promise or because your models were created for using only in Data API.
 
 Please see [documentation](../../../EntityBundle/Resources/doc/entity_aliases.md) for more details about entity aliases.
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
@@ -82,7 +83,7 @@ class NormalizeEntityClass implements ProcessorInterface
      * @param string      $version
      * @param RequestType $requestType
      *
-     * @return string|null
+     * @return string
      */
     protected function getEntityClass($entityType, $version, RequestType $requestType)
     {
@@ -95,7 +96,7 @@ class NormalizeEntityClass implements ProcessorInterface
         if (null !== $entityClass
             && !$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)
         ) {
-            $entityClass = null;
+            throw new ResourceNotAccessibleException();
         }
 
         return $entityClass;

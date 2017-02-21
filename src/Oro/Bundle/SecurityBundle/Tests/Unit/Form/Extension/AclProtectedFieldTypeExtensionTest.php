@@ -5,7 +5,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormEvent;
@@ -25,9 +24,6 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityClassResolver;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -35,6 +31,9 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
     /** @var TestLogger */
     protected $logger;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
 
     /** @var AclProtectedFieldTypeExtension */
     protected $extension;
@@ -45,9 +44,6 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -56,12 +52,16 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             ->getMock();
         $this->logger = new TestLogger();
 
+        $this->eventDispatcher = $this->getMockForAbstractClass(
+            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
+        );
+
         $this->extension = new AclProtectedFieldTypeExtension(
             $this->securityFacade,
-            $this->entityClassResolver,
             $this->doctrineHelper,
             $this->configProvider,
-            $this->logger
+            $this->logger,
+            $this->eventDispatcher
         );
     }
 
@@ -110,8 +110,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
                 'show_restricted_fields' => true
             ]
         );
-        $this->entityClassResolver->expects($this->once())
-            ->method('isEntity')
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
             ->with('Acme\Demo\TestEntity')
             ->willReturn(true);
         $this->configProvider->expects($this->once())
@@ -133,8 +133,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $options = [
             'data_class' => 'test',
         ];
-        $this->entityClassResolver->expects($this->once())
-            ->method('isEntity')
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
             ->with('test')
             ->willReturn(false);
         list($dispatcher, $builder) = $this->getFormBuilderWithEventDispatcher();
@@ -330,8 +330,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
             ]
         );
 
-        $this->entityClassResolver->expects($this->any())
-            ->method('isEntity')
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntityClass')
             ->with($className)
             ->willReturn(true);
         $this->configProvider->expects($this->any())

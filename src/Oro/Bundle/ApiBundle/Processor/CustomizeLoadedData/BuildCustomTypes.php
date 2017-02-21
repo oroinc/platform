@@ -15,6 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  * Computes values of fields that represent
  * * extended associations
  * * nested objects
+ * * nested associations
  */
 class BuildCustomTypes implements ProcessorInterface
 {
@@ -54,7 +55,7 @@ class BuildCustomTypes implements ProcessorInterface
             }
 
             $dataType = $field->getDataType();
-            if (DataType::isNestedObject($dataType)) {
+            if (DataType::isNestedObject($dataType) || DataType::isNestedAssociation($dataType)) {
                 $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity());
                 $hasChanges = true;
             } elseif (DataType::isExtendedAssociation($dataType) && !array_key_exists($fieldName, $data)) {

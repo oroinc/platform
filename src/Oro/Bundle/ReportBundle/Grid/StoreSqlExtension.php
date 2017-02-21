@@ -5,7 +5,6 @@ namespace Oro\Bundle\ReportBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -35,10 +34,10 @@ class StoreSqlExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return
-            $config->getDatasourceType() === OrmDatasource::TYPE &&
-            $this->getParameters()->get(self::DISPLAY_SQL_QUERY, false) &&
-            $this->securityFacade->getLoggedUser() &&
-            $this->securityFacade->isGranted('oro_report_view_sql');
+            $config->isOrmDatasource()
+            && $this->getParameters()->get(self::DISPLAY_SQL_QUERY, false)
+            && $this->securityFacade->getLoggedUser()
+            && $this->securityFacade->isGranted('oro_report_view_sql');
     }
 
     /**

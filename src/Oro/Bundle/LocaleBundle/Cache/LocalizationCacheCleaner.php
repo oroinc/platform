@@ -24,7 +24,7 @@ class LocalizationCacheCleaner implements CacheClearerInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($cacheDir)
+    public function clear($cacheDir = null)
     {
         $this->localizationManager->clearCache();
     }

@@ -3,6 +3,8 @@ Feature: Quick access menu
   As crm user
   I need to have link to history, favorites and most viewed pages
 
+  @skip
+  # todo: unskip when BAP-13526 will resolved
   Scenario: History
     Given I login as administrator
     And History is empty
@@ -16,18 +18,22 @@ Feature: Quick access menu
       | Dashboards/ Manage Dashboards             |
       | Dashboards/ Dashboard                     |
     Then History must looks like:
-      | Manage dashboards - Dashboards             |
+      | Manage Dashboards - Dashboards             |
       | Users - User Management - System           |
       | Manage Custom Reports - Reports & Segments |
 
+  @skip
+  # todo: unskip when BAP-13526 will resolved
   Scenario: Most viewed pages
     Given I choose Most Viewed tab
     Then Most Viewed must looks like:
       | Users - User Management - System           |
-      | Manage dashboards - Dashboards             |
+      | Manage Dashboards - Dashboards             |
       | Manage Custom Reports - Reports & Segments |
 
   Scenario: Add page to favorite
+  # todo: remove login whne BAP-13526 will resolved
+    Given I login as administrator
     Given I click icon bars
     And I go to System/ User Management/ Users
     And I add page to favorites

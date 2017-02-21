@@ -164,7 +164,6 @@ class ContextSearchHandler implements ConverterInterface
 
         foreach ($result as $target) {
             $items[] = new Item(
-                $this->objectManager,
                 $target['entity'],
                 $target['id'],
                 $target['title']

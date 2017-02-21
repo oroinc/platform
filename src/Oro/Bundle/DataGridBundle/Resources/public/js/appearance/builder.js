@@ -3,7 +3,7 @@ define(function(require) {
 
     var $ = require('jquery');
     var tools = require('oroui/js/tools');
-    var console = window.console;
+    var error = require('oroui/js/error');
 
     var appearanceBuilder = {
         /**
@@ -27,12 +27,7 @@ define(function(require) {
                 .done(function() {
                     deferred.resolve();
                 }).fail(function(e) {
-                    if (console && console.error) {
-                        console.log(e);
-                        console.error('Apperance options loading failed. Reason: ' + e.message);
-                    } else {
-                        throw e;
-                    }
+                    error.showErrorInConsole(e);
                     deferred.resolve();
                 });
             return deferred;

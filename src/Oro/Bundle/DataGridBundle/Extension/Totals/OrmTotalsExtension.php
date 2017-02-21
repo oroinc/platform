@@ -14,7 +14,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
@@ -70,7 +69,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->getDatasourceType() === OrmDatasource::TYPE;
+        return $config->isOrmDatasource();
     }
 
     /**
@@ -299,13 +298,6 @@ class OrmTotalsExtension extends AbstractExtension
         $queryBuilder
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
-
-        $parameters = $queryBuilder->getParameters();
-        if ($parameters->count()) {
-            $queryBuilder->resetDQLPart('where')
-                ->resetDQLPart('having');
-            QueryUtils::removeUnusedParameters($queryBuilder);
-        }
 
         $this->addPageLimits($queryBuilder, $pageData, $perPage);
 

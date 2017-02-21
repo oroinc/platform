@@ -37,7 +37,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  * Updates configuration of fields if other fields a linked to them using "property_path".
  * Sets "exclusion_policy = all" for the entity. It means that the configuration
  * of all fields and associations was completed.
- * Completes configuration of fields that represent nested objects.
+ * Completes configuration of fields that represent nested objects and nested associations.
  * By performance reasons all these actions are done in one processor.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -214,6 +214,8 @@ class CompleteDefinition implements ProcessorInterface
                 $dataType = $field->getDataType();
                 if (DataType::isNestedObject($dataType)) {
                     $this->completeNestedObject($fieldName, $field);
+                } elseif (DataType::isNestedAssociation($dataType)) {
+                    $this->completeNestedAssociation($field, $version, $requestType);
                 } elseif (DataType::isExtendedAssociation($dataType)) {
                     if ($field->getTargetType()) {
                         throw new \RuntimeException(
@@ -245,8 +247,12 @@ class CompleteDefinition implements ProcessorInterface
                     $this->completeAssociation($field, $targetClass, $version, $requestType);
 
                     $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
-                    $field->setDependsOn(array_values($targets));
-                    $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
+                    if (empty($targets)) {
+                        $field->setFormOption('mapped', false);
+                    } else {
+                        $field->setDependsOn(array_values($targets));
+                        $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
+                    }
                 }
             }
         }
@@ -531,6 +537,8 @@ class CompleteDefinition implements ProcessorInterface
             $dataType = $field->getDataType();
             if (DataType::isNestedObject($dataType)) {
                 $this->completeNestedObject($fieldName, $field);
+            } elseif (DataType::isNestedAssociation($dataType)) {
+                $this->completeNestedAssociation($field, $version, $requestType);
             } else {
                 $targetClass = $field->getTargetClass();
                 if ($targetClass) {
@@ -558,6 +566,21 @@ class CompleteDefinition implements ProcessorInterface
             $formOptions['property_path'] = $fieldName;
             $field->setFormOptions($formOptions);
         }
+    }
+
+    /**
+     * @param EntityDefinitionFieldConfig $field
+     * @param string                      $version
+     * @param RequestType                 $requestType
+     */
+    protected function completeNestedAssociation(
+        EntityDefinitionFieldConfig $field,
+        $version,
+        RequestType $requestType
+    ) {
+        $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $this->completeAssociation($field, EntityIdentifier::class, $version, $requestType);
+        $this->completeDependsOn($field);
     }
 
     /**

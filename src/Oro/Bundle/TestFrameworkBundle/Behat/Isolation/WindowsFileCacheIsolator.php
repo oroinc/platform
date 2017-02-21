@@ -20,12 +20,15 @@ final class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator 
         'doctrine',
         'oro_data',
         'oro_entities',
-        'oro'
     ];
 
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $this->cacheDirectories['oro'] = 'oro';
+        }
+
         return
             $this->isApplicableOS()
             && 'session.handler.native_file' == $container->getParameter('session_handler');

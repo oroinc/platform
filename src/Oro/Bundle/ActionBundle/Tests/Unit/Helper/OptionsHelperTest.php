@@ -55,6 +55,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                 'showDialog' => false,
                 'executionUrl' => 'generated-url',
                 'url' => 'generated-url',
+                'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
             ],
             'data' => [],
         ];
@@ -89,6 +90,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'dialogUrl' => 'generated-url',
                         'executionUrl' => 'generated-url',
                         'url' => 'generated-url',
+                        'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
                     ],
                     'data' => [
                         'some' => 'data',

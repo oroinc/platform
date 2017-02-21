@@ -8,12 +8,18 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
+use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -142,7 +148,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             $decisionMaker
         );
         $this->context = new PermissionGrantingStrategyContext($this->selector);
-        $contextLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $contextLink = $this->getMockBuilder(ServiceLink::class)
             ->disableOriginalConstructor()
             ->getMock();
         $contextLink->expects($this->any())
@@ -156,7 +162,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $this->rsid = new RoleSecurityIdentity('TestRole');
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->any())
             ->method('getUser')
             ->will($this->returnValue($user));
@@ -286,7 +292,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testIsGrantedCallsAuditLoggerOnGrant()
     {
-        $logger = $this->createMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->createMock(AuditLoggerInterface::class);
         $logger
             ->expects($this->once())
             ->method('logIfNeeded');
@@ -301,7 +307,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testIsGrantedCallsAuditLoggerOnDeny()
     {
-        $logger = $this->createMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->createMock(AuditLoggerInterface::class);
         $logger
             ->expects($this->once())
             ->method('logIfNeeded');
@@ -348,6 +354,85 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ['equal', 1 << 0 | 1 << 1, 1 << 1, false],
             ['equal', 1 << 0 | 1 << 1, 1 << 0 | 1 << 1, true],
         ];
+    }
+
+    public function testIsFieldGranted()
+    {
+        $obj = new TestEntity(1);
+        $this->context->setObject($obj);
+        $masks = $this->getMasks('VIEW', $obj);
+        $aceMask = $this->getMaskBuilder('VIEW', $obj)->get();
+
+        $acl = $this->getAcl(ObjectIdentity::fromDomainObject($obj));
+        $acl->insertClassAce($this->rsid, $aceMask);
+        $acl->insertClassFieldAce(
+            'regularField',
+            $this->rsid,
+            $this->getMaskBuilder('VIEW', $obj)->add('view_global')->get()
+        );
+        $acl->insertClassFieldAce(
+            'regularHiddenField',
+            $this->rsid,
+            $this->getMaskBuilder('VIEW', $obj)->add('view_global')->get()
+        );
+        $acl->insertClassFieldAce(
+            'fieldWithAlias',
+            $this->rsid,
+            $this->getMaskBuilder('VIEW', $obj)->add('view_global')->get()
+        );
+        $acl->insertClassFieldAce(
+            'restrictedField',
+            $this->rsid,
+            $this->getMaskBuilder('VIEW', $obj)->get()
+        );
+
+        /**
+         * @var EntitySecurityMetadataProvider|\PHPUnit_Framework_MockObject_MockObject $securityMetadataProvider
+         */
+        $securityMetadataProvider = $this->getMockBuilder(EntitySecurityMetadataProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityMetadataProvider->expects($this->any())
+            ->method('isProtectedEntity')
+            ->willReturn(true);
+        $securityMetadataProvider->expects($this->any())
+            ->method('getMetadata')
+            ->with(get_class($obj))
+            ->willReturnCallback(function () use ($obj) {
+                $fields = [
+                    'regularField'     => new FieldSecurityMetadata('regularField'),
+                    'regularHiddenField' => new FieldSecurityMetadata('regularHiddenField', '', [], null, true),
+                    'fieldWithAlias'   => new FieldSecurityMetadata('fieldWithAlias', '', [], null, 'restrictedField'),
+                    'restrictedField'  => new FieldSecurityMetadata('restrictedField', '', ['VIEW', 'CREATE', 'EDIT'])
+                ];
+
+                return new EntitySecurityMetadata('ACL', get_class($obj), '', 'Label', [], '', '', $fields);
+            });
+
+        $securityMetadataProviderLink = $this->getMockBuilder(ServiceLink::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityMetadataProviderLink->expects(self::any())
+            ->method('getService')
+            ->willReturn($securityMetadataProvider);
+        $this->strategy->setSecurityMetadataProvider($securityMetadataProviderLink);
+
+        // regular field
+        $this->assertTrue(
+            $this->strategy->isFieldGranted($acl, 'regularField', $masks, [$this->rsid])
+        );
+        // regular hidden field
+        $this->assertTrue(
+            $this->strategy->isFieldGranted($acl, 'regularHiddenField', $masks, [$this->rsid])
+        );
+        // has alias to another field that is restricted
+        $this->assertFalse(
+            $this->strategy->isFieldGranted($acl, 'fieldWithAlias', $masks, [$this->rsid])
+        );
+        // restricted field
+        $this->assertFalse(
+            $this->strategy->isFieldGranted($acl, 'restrictedField', $masks, [$this->rsid])
+        );
     }
 
     protected function getAcl($oid = null, $entriesInheriting = true)

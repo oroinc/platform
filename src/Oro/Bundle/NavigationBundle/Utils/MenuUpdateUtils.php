@@ -10,6 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 
 class MenuUpdateUtils
 {
@@ -173,6 +174,18 @@ class MenuUpdateUtils
         }
 
         return null;
+    }
+
+    /**
+     * Generates cache key for menu updates in specified scope
+     *
+     * @param string $menuName
+     * @param Scope $scope
+     * @return string
+     */
+    public static function generateKey($menuName, Scope $scope)
+    {
+        return $menuName.'_'.$scope->getId();
     }
 
     /**

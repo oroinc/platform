@@ -93,7 +93,7 @@ class ImportStrategyHelper
      *                                    string in format "permission;descriptor"
      *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters
-     * @param  mixed          $obj        A domain object, object identity or object identity descriptor
+     * @param  object         $obj        A domain object, object identity or object identity descriptor
      *
      * @param  string         $property
      * @return bool
@@ -153,18 +153,7 @@ class ImportStrategyHelper
             if ($this->isDeletedField($basicEntityClass, $propertyName)) {
                 continue;
             }
-            if (!$this->isGranted('EDIT', $importedEntity, $propertyName)) {
-                $error = $this->translator->trans(
-                    'oro.importexport.import.errors.access_denied_property_entity',
-                    [
-                        '%property_name%' => $propertyName,
-                        '%entity_name%' => $basicEntityClass,
-                    ]
-                );
-                $this->context->addError($error);
 
-                continue;
-            }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
             $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
         }

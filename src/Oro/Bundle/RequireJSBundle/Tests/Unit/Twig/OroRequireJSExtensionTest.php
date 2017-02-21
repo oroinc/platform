@@ -6,55 +6,37 @@ use Oro\Bundle\RequireJSBundle\Config\Config;
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 use Oro\Bundle\RequireJSBundle\Provider\ConfigProvider;
 use Oro\Bundle\RequireJSBundle\Twig\OroRequireJSExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var OroRequireJSExtension
-     */
-    protected $twigExtension;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Config
-     */
+    /** @var OroRequireJSExtension */
+    protected $extension;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $config;
 
     protected function setUp()
     {
-        $this->config = $this->createMock('Oro\Bundle\RequireJSBundle\Config\Config');
-
-        $provider = $this->createMock('Oro\Bundle\RequireJSBundle\Provider\ConfigProvider');
+        $this->config = $this->createMock(Config::class);
+        $provider = $this->createMock(ConfigProvider::class);
         $provider->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($this->config));
 
-        $manager = $this->createMock('Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager');
+        $manager = $this->createMock(ConfigProviderManager::class);
         $manager->expects($this->any())
             ->method('getProvider')
             ->with('oro_requirejs_config_provider')
             ->will($this->returnValue($provider));
 
-        $this->twigExtension = new OroRequireJSExtension($manager, './web/root');
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_requirejs.config_provider.manager', $manager)
+            ->getContainer($this);
 
-    /**
-     * @dataProvider expectedFunctionsProvider
-     *
-     * @param string $keyName
-     * @param string $functionName
-     */
-    public function testGetFunctions($keyName, $functionName)
-    {
-        $actualFunctions = $this->twigExtension->getFunctions();
-        /** @var \Twig_SimpleFunction $function */
-        $function = $actualFunctions[$keyName];
-
-        $this->assertArrayHasKey($keyName, $actualFunctions);
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals(
-            [$this->twigExtension, $functionName],
-            $function->getCallable()
-        );
+        $this->extension = new OroRequireJSExtension($container, './web/root');
     }
 
     public function testGetRequireJSConfig()
@@ -65,7 +47,10 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getMainConfig')
             ->will($this->returnValue($config));
 
-        $this->assertEquals($config, $this->twigExtension->getRequireJSConfig('oro_requirejs_config_provider'));
+        $this->assertEquals(
+            $config,
+            self::callTwigFunction($this->extension, 'get_requirejs_config', ['oro_requirejs_config_provider'])
+        );
     }
 
     public function testGetRequireJSBuildPath()
@@ -76,7 +61,10 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getOutputFilePath')
             ->will($this->returnValue($filePath));
 
-        $this->assertEquals($filePath, $this->twigExtension->getRequireJSBuildPath('oro_requirejs_config_provider'));
+        $this->assertEquals(
+            $filePath,
+            self::callTwigFunction($this->extension, 'get_requirejs_build_path', ['oro_requirejs_config_provider'])
+        );
     }
 
     public function testIsRequireJSBuildExists()
@@ -87,7 +75,9 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getOutputFilePath')
             ->will($this->returnValue($filePath));
 
-        $this->assertFalse($this->twigExtension->isRequireJSBuildExists('oro_requirejs_config_provider'));
+        $this->assertFalse(
+            self::callTwigFunction($this->extension, 'requirejs_build_exists', ['oro_requirejs_config_provider'])
+        );
     }
 
     public function testGetRequireJSConfigNull()
@@ -98,7 +88,10 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getMainConfig')
             ->will($this->returnValue($config));
 
-        $this->assertEquals($config, $this->twigExtension->getRequireJSConfig());
+        $this->assertEquals(
+            $config,
+            self::callTwigFunction($this->extension, 'get_requirejs_config', [])
+        );
     }
 
     public function testGetRequireJSBuildPathNull()
@@ -109,7 +102,10 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getOutputFilePath')
             ->will($this->returnValue($filePath));
 
-        $this->assertEquals($filePath, $this->twigExtension->getRequireJSBuildPath());
+        $this->assertEquals(
+            $filePath,
+            self::callTwigFunction($this->extension, 'get_requirejs_build_path', [])
+        );
     }
 
     public function testIsRequireJSBuildExistsNull()
@@ -120,23 +116,13 @@ class OroRequireJSExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getOutputFilePath')
             ->will($this->returnValue($filePath));
 
-        $this->assertFalse($this->twigExtension->isRequireJSBuildExists());
+        $this->assertFalse(
+            self::callTwigFunction($this->extension, 'requirejs_build_exists', [])
+        );
     }
 
     public function testGetName()
     {
-        $this->assertEquals('requirejs_extension', $this->twigExtension->getName());
-    }
-
-    /**
-     * @return array
-     */
-    public function expectedFunctionsProvider()
-    {
-        return [
-            ['get_requirejs_config', 'getRequireJSConfig'],
-            ['get_requirejs_build_path', 'getRequireJSBuildPath'],
-            ['requirejs_build_exists', 'isRequireJSBuildExists'],
-        ];
+        $this->assertEquals('requirejs_extension', $this->extension->getName());
     }
 }

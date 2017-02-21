@@ -1,9 +1,0 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-
-{% set key = constant('Oro\\Bundle\\WorkflowBundle\\Entity\\WorkflowDefinition::GROUP_TYPE_EXCLUSIVE_ACTIVE') %}
-
-{% if value[key] is defined and value[key] is not empty %}
-    {{ UI.renderList(value[key]) }}
-{% else %}
-    {{ 'N/A'|trans }}
-{% endif %}

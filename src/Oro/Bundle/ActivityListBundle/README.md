@@ -60,7 +60,7 @@ Widget can be displayed on `view` and/or `update` pages. Allowed values see in `
  *      }
  * )
  */
-class AccountUserRole extends AbstractRole { ... }
+class CustomerUserRole extends AbstractRole { ... }
 ```
 
 Register a new entity

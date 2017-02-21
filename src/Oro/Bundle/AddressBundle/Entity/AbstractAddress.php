@@ -747,7 +747,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updated = clone $this->created;
     }
 
     /**

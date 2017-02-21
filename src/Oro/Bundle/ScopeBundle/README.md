@@ -83,7 +83,7 @@ class ScopeAccountCriteriaProvider extends AbstractScopeCriteriaProvider
             return [];
         }
         $loggedUser = $token->getUser();
-        if (null !== $loggedUser && $loggedUser instanceof AccountUser) {
+        if (null !== $loggedUser && $loggedUser instanceof CustomerUser) {
             return [self::ACCOUNT => $loggedUser->getAccount()];
         }
 
@@ -146,7 +146,7 @@ For example, let's create the following scope criteria providers and register th
 
 * ScopeWebsiteCriteriaProvider (priority:100)
 
-**Note:** The third ScopeAccountGroupCriteriaProvider is NOT involved in the scope type, so the scope will be filtered to have no AccountGroup criteria defined. 
+**Note:** The third ScopeAccountGroupCriteriaProvider is NOT involved in the scope type, so the scope will be filtered to have no CustomerGroup criteria defined. 
 
 The scope model has tree fields:
 ```
@@ -220,7 +220,7 @@ $qb->select('slug')
 $scopeCriteria = $this->scopeManager->getCriteria('web_content');
 $scopeCriteria->applyToJoinWithPriority($qb, 'scopes'); 
 ```
-As you do not pass a context to the Scope Manager in the getCriteria method, the current context is used by default(e.g. a logged on customer is a part of Account with id=1, and this account is a part of AccountGroup with id=1.
+As you do not pass a context to the Scope Manager in the getCriteria method, the current context is used by default(e.g. a logged on customer is a part of Account with id=1, and this account is a part of CustomerGroup with id=1.
 
 The scopes applicable for the current context are:
 

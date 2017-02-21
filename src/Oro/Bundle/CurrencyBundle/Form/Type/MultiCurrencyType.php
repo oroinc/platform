@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\CurrencyBundle\Form\Type;
 
-use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
-use Oro\Bundle\CurrencyBundle\Entity\MultiCurrencyHolderInterface;
-use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MultiCurrencyTransformer;
 use Symfony\Component\Validator\Constraints\NotBlank;
+
+use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 
 class MultiCurrencyType extends PriceType
 {

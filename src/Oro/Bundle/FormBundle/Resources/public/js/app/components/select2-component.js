@@ -27,9 +27,6 @@ define(function(require) {
             this.excluded = _.result(options, 'excluded') || this.excluded;
             config = this.preConfig(config);
             config = this.setConfig(config);
-            if (config.allowClear === undefined && !options._sourceElement[0].required) {
-                config.allowClear = true;
-            }
             if (options._sourceElement.is('select') || config.query || config.ajax || config.data || config.tags) {
                 this.view = new this.ViewType(this.prepareViewOptions(options, config));
             }
@@ -154,7 +151,7 @@ define(function(require) {
                 callback(data);
             } else {
                 var item = data.pop();
-                if (!_.isUndefined(item.children) && _.isArray(item.children)) {
+                if (!_.isUndefined(item) && !_.isUndefined(item.children) && _.isArray(item.children)) {
                     callback(item.children.pop());
                 } else {
                     callback(item);
@@ -189,7 +186,8 @@ define(function(require) {
 
         var selectedData;
         var dataIds;
-        var currentValue = tools.ensureArray(element.inputWidget('val'));
+        var inputValue = element.inputWidget('val');
+        var currentValue = inputValue === '' ? [] : tools.ensureArray(inputValue);
 
         if (config.forceSelectedData && element.data('selected-data')) {
             var data = element.data('selected-data');
@@ -227,7 +225,10 @@ define(function(require) {
                 return;
             }
         }
-        setSelect2ValueById(currentValue);
+
+        if (currentValue.length !== 0) {
+            setSelect2ValueById(currentValue);
+        }
     }
     function highlightSelection(str, selection) {
         return str && selection && selection.term ?

@@ -215,6 +215,22 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
         $this->userManager->reloadUser($user);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     */
+    public function testRefreshUserNotFound()
+    {
+        $user = $this->getUser();
+        $crit = ['username' => $user->getUsername()];
+
+        $this->repository
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with($this->equalTo($crit));
+
+        $this->userManager->refreshUser($user);
+    }
+
     public function testRefreshUser()
     {
         $user = $this->getUser();
@@ -224,7 +240,7 @@ class BaseUserManagerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('findOneBy')
             ->with($this->equalTo($crit))
-            ->will($this->returnValue([]));
+            ->willReturn($user);
 
         $this->userManager->refreshUser($user);
     }

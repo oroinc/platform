@@ -12,7 +12,6 @@ parameters:
     oro_tag.provider.virtual_relation.tags.class: Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider
     oro_tag.security_provider.class: Oro\Bundle\TagBundle\Security\SecurityProvider
 
-    oro_tag.twig.tag.extension.class: Oro\Bundle\TagBundle\Twig\TagExtension
     oro_tag.event_listener.search_results_grid_listener.class: Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener
 
     oro_tag.owner_assignment_checker.tag.class: Oro\Bundle\TagBundle\Ownership\TagOwnerAssignmentChecker
@@ -68,12 +67,11 @@ services:
             - '%oro_tag.taxonomy.entity.class%'
             - '@doctrine.orm.entity_manager'
  
-    # Twig extension
     oro_tag.twig.tag.extension:
-        class: %oro_tag.twig.tag.extension.class%
+        class: Oro\Bundle\TagBundle\Twig\TagExtension
+        public: false
         arguments:
-            - '@oro_tag.tag.manager'
-            - '@oro_tag.helper.taggable_helper'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -135,7 +133,7 @@ services:
         class: Oro\Bundle\TagBundle\Grid\TagsExtension
         arguments:
             - '@oro_tag.tag.manager'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
             - '@oro_security.security_facade'
@@ -146,7 +144,7 @@ services:
         class: Oro\Bundle\TagBundle\Grid\TagsReportExtension
         arguments:
             - '@oro_tag.tag.manager'
-            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
         tags:
@@ -183,7 +181,6 @@ services:
         class: Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension
         arguments:
             - '@oro_search.formatter.result_formatter'
-            - '@doctrine.orm.entity_manager'
             - '@oro_search.mapper'
             - '@event_dispatcher'
         tags:
@@ -266,4 +263,3 @@ services:
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: taxonomy, acl_resource: oro_taxonomy_view }
- 

@@ -2,52 +2,40 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Twig;
 
-use Twig_SimpleFilter;
-
+use Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
 use Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class CurrencyExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CurrencyExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var CurrencyExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|NumberFormatter */
     protected $formatter;
 
     protected function setUp()
     {
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
+        $this->formatter = $this->getMockBuilder(NumberFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider */
-        $viewTypeProvider = $this
-            ->getMockBuilder('Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider')
+        $viewTypeProvider = $this->getMockBuilder(ViewTypeConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $currencyNameHelper = new CurrencyNameHelperStub();
 
-        $this->extension = new CurrencyExtension($this->formatter, $viewTypeProvider, new CurrencyNameHelperStub());
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.formatter.number', $this->formatter)
+            ->add('oro_currency.provider.view_type', $viewTypeProvider)
+            ->add('oro_currency.helper.currency_name', $currencyNameHelper)
+            ->getContainer($this);
 
-    public function testGetFilters()
-    {
-        /** @var Twig_SimpleFilter[] $filters */
-        $filters = $this->extension->getFilters();
-
-        $this->assertCount(2, $filters);
-
-        $availableFilters = ['oro_format_price', 'oro_localized_currency_name'];
-
-        foreach ($filters as $filter) {
-            $this->assertInstanceOf('Twig_SimpleFilter', $filter);
-            $this->assertTrue(in_array($filter->getName(), $availableFilters, true));
-        }
+        $this->extension = new CurrencyExtension($container);
     }
 
     /**
@@ -69,7 +57,10 @@ class CurrencyExtensionTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($expected));
 
-        $this->assertEquals($expected, $this->extension->formatPrice($price, $options));
+        $this->assertEquals(
+            $expected,
+            self::callTwigFilter($this->extension, 'oro_format_price', [$price, $options])
+        );
     }
 
     /**

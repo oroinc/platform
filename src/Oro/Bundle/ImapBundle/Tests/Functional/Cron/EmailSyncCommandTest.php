@@ -17,7 +17,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 
 /**
- * @outputBuffering enabled
  * @dbIsolationPerTest
  */
 class EmailSyncCommandTest extends WebTestCase
@@ -45,6 +44,7 @@ class EmailSyncCommandTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->serviceFactory = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapServicesFactory')
+            ->setMethods(['createImapServices', 'getDefaultImapStorage'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->imapServices = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapServices')
@@ -80,6 +80,8 @@ class EmailSyncCommandTest extends WebTestCase
             ->will($this->returnValue($imapConnector));
 
         $this->getContainer()->set('oro_imap.connector.factory', $this->imapConnectorFactory);
+
+        $this->toggleEmailFeatureValue(true);
     }
 
     public function testImapSyncNoOrigins()
@@ -152,6 +154,7 @@ class EmailSyncCommandTest extends WebTestCase
         $configManager = $this->getContainer()->get('oro_config.manager');
         $configManager->set($key, (bool) $value);
         $configManager->flush();
+        $configManager->reload();
 
         $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
         $featureChecker->resetCache();
