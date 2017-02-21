@@ -134,7 +134,7 @@ workflows:
                 is_start: true
                 transition_definition: quote_update_definition
                 display_type: dialog
-                form_type: 'oro_sale_quote' #define a custom form type to use for transit
+                form_type: 'Oro\Bundle\SaleBundle\Form\Type\QuoteType' #define a custom form type to use for transit
                 form_options:
                     configuration: #define configuration for the custom form type
                         handler: 'default' #which handler should process the from (custom form transition handler)
@@ -169,13 +169,14 @@ Here, above, workflow configured which creates a new Quote from the start on Cus
 the Quote it circularly in each transition, because it brings us back to the same step.
 
 Now lets look at configuration specific moments.
-To use your custom form type that replaces default transition form you must set the type in `form_type` option to your custom one.
+To use your custom form type that replaces default transition form you must set the type in `form_type` option to your custom one. 
+**Note** That FQCN should be used as the value for *form_type* when defining custom form type and this form must be resolvable by "Form Registry".  
 Together with that, you must specify correct `configuration` for the type customization (`handler`, `template`, `data_provider`, `data_attribute` options).
-Here we have `oro_sale_quote` from type. But for proper handling of that complex form type, we need to specify additional options in
+Here we have `Oro\Bundle\SaleBundle\Form\Type\QuoteType` from type. But for proper handling of that complex form type, we need to specify additional options in
 `form_options.configuration` node. Those are:
 - `handler` - an alias of registered by the tag `oro_form.registry.form_handler` service. You can use the default one by just passing `'default'`. 
 See more about form update handler in corresponding [OroFormBundle doc page](../../../../../FormBundle/Resources/doc/reference/update_handler.md).
-- `template` - the name of a template that should be used for the custom form. 
+- `template` - the name of a template that should be used for the custom form, default value is `OroWorkflowBundle:actions:update.html.twig` and this template can be used as starting point for customizations. 
 **Note**: it should be extended from `OroUIBundle:actions:update.html.twig` for compatibility with transition form page (usually all Oro update templates do so).
 - `data_provider` - an alias of registered by tag `oro_form.form_template_data_provider` service that implements `Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface`.
 It should return all necessary data for specified template as controllers usually do.

@@ -403,7 +403,7 @@ Transition configuration has next options:
     (CSS class of icon of transition button).
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
-    will be shown when user clicks transition button. Se more at [Transition Forms](./transition-forms.md)).
+    will be shown when user clicks transition button. See more at [Transition Forms](./transition-forms.md)).
 * **transition_definition**
     *string*
     Name of associated transition definition.
