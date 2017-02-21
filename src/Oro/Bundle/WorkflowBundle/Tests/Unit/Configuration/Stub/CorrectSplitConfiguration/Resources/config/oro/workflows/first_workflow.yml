@@ -91,7 +91,13 @@ workflows:
                         template: 'template'
                         data_provider: 'data_provider'
                         data_attribute: 'form_data'
-
+            transition_with_form_options_configuration_defaults:
+                step_to: first_step
+                transition_definition: first_transition_definition
+                form_options:
+                    configuration:
+                        data_provider: 'data_provider'
+                        data_attribute: 'form_data'
         transition_definitions:
             first_transition_definition:
                 preactions:

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\CustomFormType;
 use Symfony\Component\Form\FormRegistryInterface;
 
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
@@ -26,7 +27,7 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
 
     /** @var array */
     protected static $transitionConfiguration = [
-        'form_type' => 'CustomFormType',
+        'form_type' => CustomFormType::class,
         'form_options' => [
             WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
                 'handler' => 'CustomFormHandler',
@@ -57,6 +58,20 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAssembleUnregisteredFormTypeException()
+    {
+        $transitionConfiguration = self::$transitionConfiguration;
+        $transitionConfiguration['form_type'] = 'UnknownFormType';
+
+        $expectedExceptionMessage = sprintf(
+            'Form type should be FQCN or class not found got "%s"',
+            $transitionConfiguration['form_type']
+        );
+        $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->assembler->assemble($transitionConfiguration);
+    }
+
     public function testAssembleRequiredFormTypeException()
     {
         $expectedExceptionMessage = sprintf(
@@ -65,9 +80,8 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
         );
         $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $transition = $this->createMock(Transition::class);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(false);
-        $this->assembler->assemble(self::$transitionConfiguration, $transition);
+        $this->assembler->assemble(self::$transitionConfiguration);
     }
 
     public function testAssembleRequiredHandlerException()
@@ -79,10 +93,9 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
         );
         $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $transition = $this->createMock(Transition::class);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(false);
-        $this->assembler->assemble(self::$transitionConfiguration, $transition);
+        $this->assembler->assemble(self::$transitionConfiguration);
     }
 
     public function testAssembleRequiredDataProviderException()
@@ -94,19 +107,17 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
         );
         $this->expectException('\Oro\Bundle\WorkflowBundle\Exception\AssemblerException');
         $this->expectExceptionMessage($expectedExceptionMessage);
-        $transition = $this->createMock(Transition::class);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(true);
         $this->formTemplateDataProviderRegistry->expects($this->once())->method('has')->willReturn(false);
-        $this->assembler->assemble(self::$transitionConfiguration, $transition);
+        $this->assembler->assemble(self::$transitionConfiguration);
     }
 
     public function testAssemble()
     {
-        $transition = $this->createMock(Transition::class);
         $this->formRegistry->expects($this->once())->method('hasType')->willReturn(true);
         $this->formHandlerRegistry->expects($this->once())->method('has')->willReturn(true);
         $this->formTemplateDataProviderRegistry->expects($this->once())->method('has')->willReturn(true);
-        $this->assembler->assemble(self::$transitionConfiguration, $transition);
+        $this->assembler->assemble(self::$transitionConfiguration);
     }
 }

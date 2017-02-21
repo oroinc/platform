@@ -37,12 +37,17 @@ class FormOptionsConfigurationAssembler
 
     /**
      * @param array $transitionConfiguration
-     * @param Transition $transition
      *
      * @throws AssemblerException
      */
-    public function assemble(array $transitionConfiguration, Transition $transition)
+    public function assemble(array $transitionConfiguration)
     {
+        if (!class_exists($transitionConfiguration['form_type'], true)) {
+            throw new AssemblerException(
+                sprintf('Form type should be FQCN or class not found got "%s"', $transitionConfiguration['form_type'])
+            );
+        }
+
         if (!$this->formRegistry->hasType($transitionConfiguration['form_type'])) {
             throw new AssemblerException(
                 sprintf('Unable to resolve form type "%s"', $transitionConfiguration['form_type'])
