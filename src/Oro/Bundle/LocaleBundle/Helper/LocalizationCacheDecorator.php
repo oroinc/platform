@@ -6,6 +6,7 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Symfony\Component\Serializer\SerializerInterface;
 
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationCacheDecorator extends CacheProvider
@@ -23,7 +24,7 @@ class LocalizationCacheDecorator extends CacheProvider
     private $serializer;
 
     /**
-     * @param CacheProvider $cacheProvider
+     * @param CacheProvider       $cacheProvider
      * @param SerializerInterface $serializer
      */
     public function __construct(
@@ -44,13 +45,27 @@ class LocalizationCacheDecorator extends CacheProvider
     {
         $cache = $this->cacheProvider->fetch($id);
 
-        return $cache ? $this->unserializeLocalizations($cache) : false;
+        if (!$cache) {
+            return false;
+        }
+
+        $cache = $this->unserializeLocalizations($cache);
+
+        if (count($cache) === 1) {
+            $this->resolveParent(reset($cache));
+
+            return $cache;
+        }
+
+        $this->resolveParents($cache);
+
+        return $cache;
     }
 
     /**
-     * @param string $id
+     * @param string         $id
      * @param Localization[] $data
-     * @param int $lifeTime
+     * @param int            $lifeTime
      * @return bool
      */
     public function save($id, $data, $lifeTime = 0)
@@ -63,7 +78,15 @@ class LocalizationCacheDecorator extends CacheProvider
      */
     public function delete($id)
     {
-        $this->cacheProvider->delete($id);
+        return $this->cacheProvider->delete($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteAll()
+    {
+        return $this->cacheProvider->deleteAll();
     }
 
     /**
@@ -134,5 +157,43 @@ class LocalizationCacheDecorator extends CacheProvider
         return array_map(function ($element) {
             return $this->serializer->serialize($element, static::SERIALIZATION_FORMAT);
         }, $localizations);
+    }
+
+    /**
+     * @param Localization[] $cache
+     */
+    private function resolveParents(array $cache)
+    {
+        /** @var Localization $localization */
+        foreach ($cache as $localization) {
+            if ($localization->getParentLocalization()
+                && array_key_exists($localization->getParentLocalization()->getId(), $cache)
+            ) {
+                $localization->setParentLocalization($cache[$localization->getParentLocalization()->getId()]);
+            }
+        }
+    }
+
+    /**
+     * @param Localization $localization
+     */
+    private function resolveParent(Localization $localization)
+    {
+        if (!$localization->getParentLocalization()) {
+            return;
+        }
+
+        $cacheKey = LocalizationManager::getCacheKey($localization->getParentLocalization()->getId());
+        $cache = $this->cacheProvider->fetch($cacheKey);
+
+        if (!$cache) {
+            return;
+        }
+
+        $cache = $this->unserializeLocalizations($cache);
+        $parentLocalization = reset($cache);
+        $localization->setParentLocalization($parentLocalization);
+
+        $this->resolveParent($parentLocalization);
     }
 }

@@ -185,12 +185,20 @@
                             'onMoveRoute' : 'oro_navigation_menuupdate_move'
                         } %}
                         {{ UI.renderJsTree(
-                        {
-                            'module': 'oronavigation/js/app/components/tree-manage-component',
-                            'label': 'oro.navigation.menu.menu_list_default.label'|trans,
-                            'treeOptions': treeOptions
-                        },
-                        ['expand', 'collapse']
+                            {
+                                'module': 'oronavigation/js/app/components/tree-manage-component',
+                                'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                                'treeOptions': treeOptions
+                            },
+                            {
+                                'expand': 'expand',
+                                'collapse': 'collapse',
+                                'move': {
+                                    'view': 'oroui/js/app/views/jstree/move-action-view',
+                                    'routeName': menuJsMoveRoute,
+                                    'routeParams': {menuName: menuName, scopeId: scope.id}
+                                }
+                            }
                         ) }}
                     </div>
                 </div>
@@ -198,7 +206,6 @@
                     <div class="system-content-wrapper">
                         {{ parent() }}
                     </div>
-
                 </div>
             </div>
         </div>

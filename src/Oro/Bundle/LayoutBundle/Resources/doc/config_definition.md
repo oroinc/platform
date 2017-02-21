@@ -28,6 +28,57 @@ styles:
     output: 'css/layout/first_theme/styles.css'
 ```
 
+```yml
+#DemoBundle/Resources/views/layouts/first_theme/page/layout.yml
+layout:
+    actions:
+    ...
+    - '@add':
+        id: styles
+        parentId: head
+        blockType: style
+        options:
+            src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]))'
+    ...
+```
+
+**Example how to create 2 or more outputs:**
+
+```yaml
+#DemoBundle/Resources/views/layouts/first_theme/config/assets.yml
+libraries:
+    inputs:
+        - 'bundles/demo/css/bootstrap.min.css'
+        - 'bundles/demo/css/font-awesome.min.css'
+    output: 'css/layout/first_theme/lib.css'
+
+own_styles:
+    inputs:
+        - 'bundles/demo/css/custom.min.css'
+        - 'bundles/demo/css/additional.min.css'
+    output: 'css/layout/first_theme/styles.css'
+```
+
+```yml
+#DemoBundle/Resources/views/layouts/first_theme/page/layout.yml
+layout:
+    actions:
+    ...
+    - '@add':
+        id: libraries
+        parentId: head
+        blockType: style
+        options:
+            src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]), "libraries")'
+    - '@add':
+        id: own_styles
+        parentId: head
+        blockType: style
+        options:
+            src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]), "own_styles")'
+    ...
+```
+
 ## Images
 
 ### Configuration
