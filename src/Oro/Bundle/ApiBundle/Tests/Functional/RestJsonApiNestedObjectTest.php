@@ -25,7 +25,7 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         $entity = $this->getReference('test_entity');
         $entityType = $this->getEntityType(TestEntity::class);
 
-        $response = $this->get('oro_rest_api_get', ['entity' => $entityType, 'id' => (string)$entity->getId()]);
+        $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
 
         $result = self::jsonToArray($response->getContent());
         self::assertEquals((string)$entity->getId(), $result['data']['id']);
@@ -54,7 +54,7 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->post('oro_rest_api_post', ['entity' => $entityType], $data);
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
@@ -82,7 +82,7 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->post('oro_rest_api_post', ['entity' => $entityType], $data);
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
         self::assertNull(
@@ -116,7 +116,6 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         ];
 
         $response = $this->patch(
-            'oro_rest_api_patch',
             ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );
@@ -154,7 +153,6 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         ];
 
         $response = $this->patch(
-            'oro_rest_api_patch',
             ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );
@@ -188,7 +186,6 @@ class RestJsonApiNestedObjectTest extends RestJsonApiTestCase
         ];
 
         $response = $this->patch(
-            'oro_rest_api_patch',
             ['entity' => $entityType, 'id' => (string)$entity->getId()],
             $data
         );

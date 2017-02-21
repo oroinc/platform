@@ -2,23 +2,31 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Event\ValidateBeforeRemoveFieldEvent;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 
 class FieldNameValidationHelperTest extends \PHPUnit_Framework_TestCase
 {
     const ENTITY_CLASS = 'Test\Entity';
 
+    const REMOVE_ERROR_MESSAGE = 'error message';
+
     /** @var ConfigProviderMock */
     protected $extendConfigProvider;
 
     /** @var FieldNameValidationHelper */
     protected $validationHelper;
+
+    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
 
     protected function setUp()
     {
@@ -30,8 +38,9 @@ class FieldNameValidationHelperTest extends \PHPUnit_Framework_TestCase
             $configManager,
             'extend'
         );
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->validationHelper = new FieldNameValidationHelper($this->extendConfigProvider);
+        $this->validationHelper = new FieldNameValidationHelper($this->extendConfigProvider, $this->eventDispatcher);
     }
 
     /**
@@ -66,6 +75,38 @@ class FieldNameValidationHelperTest extends \PHPUnit_Framework_TestCase
             ['deletedField', true],
             ['toBeDeletedField', true],
         ];
+    }
+
+    public function testGetRemoveFieldValidationErrorsWithoutError()
+    {
+        $fieldConfigModel = new FieldConfigModel();
+        $event = new ValidateBeforeRemoveFieldEvent($fieldConfigModel);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(ValidateBeforeRemoveFieldEvent::NAME, $event);
+
+        $result = $this->validationHelper->getRemoveFieldValidationErrors($fieldConfigModel);
+
+        $this->assertEquals([], $result);
+    }
+
+    public function testGetRemoveFieldValidationErrorsWithError()
+    {
+        $fieldConfigModel = new FieldConfigModel();
+        $validationEvent = new ValidateBeforeRemoveFieldEvent($fieldConfigModel);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(ValidateBeforeRemoveFieldEvent::NAME, $validationEvent)
+            ->willReturnCallback(
+                function ($eventName, ValidateBeforeRemoveFieldEvent $event) {
+                    $event->addValidationMessage(self::REMOVE_ERROR_MESSAGE);
+                }
+            );
+
+        $result = $this->validationHelper->getRemoveFieldValidationErrors($fieldConfigModel);
+
+        $this->assertEquals([self::REMOVE_ERROR_MESSAGE], $result);
     }
 
     /**
