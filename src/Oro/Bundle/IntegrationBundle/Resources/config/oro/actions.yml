@@ -58,6 +58,12 @@ operations:
                 label: oro.integration.operation.attribute.actionSuccess.label
                 type: boolean
         preactions:
+            - '@assign_constant_value':
+                attribute: $.upsType
+                value: Oro\Bundle\UPSBundle\Provider\ChannelType::TYPE
+            - '@assign_constant_value':
+                attribute: $.flatRateType
+                value: Oro\Bundle\FlatRateBundle\Integration\FlatRateChannelType::TYPE
             - '@call_service_method':
                 service: oro_integration.utils.edit_mode
                 method: isSwitchEnableAllowed
@@ -65,6 +71,8 @@ operations:
                 attribute: $.actionAllowed
         preconditions:
             '@and':
+                - '@not_equal': [$type, $.upsType]
+                - '@not_equal': [$type, $.flatRateType]
                 - '@equal': [$.actionAllowed, true]
                 - '@equal': [$.data.enabled, true]
         actions:
