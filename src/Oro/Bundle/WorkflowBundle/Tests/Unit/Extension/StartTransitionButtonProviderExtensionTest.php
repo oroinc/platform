@@ -21,6 +21,10 @@ class StartTransitionButtonProviderExtensionTest extends StartTransitionButtonPr
      */
     protected function createExtension()
     {
-        return new StartTransitionButtonProviderExtension($this->workflowRegistry, $this->routeProvider);
+        return new StartTransitionButtonProviderExtension(
+            $this->workflowRegistry,
+            $this->routeProvider,
+            $this->destinationPageResolver
+        );
     }
 }

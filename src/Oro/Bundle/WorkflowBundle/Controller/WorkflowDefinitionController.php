@@ -9,6 +9,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
+use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -90,12 +92,21 @@ class WorkflowDefinitionController extends Controller
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
 
+        $entityFields = [];
+        if (null !== $workflowDefinition->getRelatedEntity()) {
+            /* @var $provider EntityWithFieldsProvider */
+            $provider = $this->get('oro_entity.entity_field_list_provider');
+            $entityFields = $provider->getFields(false, false, true, false, true, true);
+        }
+
         return [
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
             'translateLinks' => $translateLinks,
+            'entityFields' => $entityFields,
+            'availableDestinations' => DestinationPageResolver::AVAILABLE_DESTINATIONS,
         ];
     }
 
