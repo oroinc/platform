@@ -3,14 +3,16 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Knp\Menu\FactoryInterface;
+use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+
+use Oro\Component\Config\Resolver\SystemAwareResolver;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +22,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     protected $configurationBuilder;
 
     /**
-     * @var AclAwareMenuFactoryExtension
+     * @var MenuFactory
      */
     protected $factory;
 
@@ -30,6 +32,9 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
+    /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $configurationProvider;
+
     protected function setUp()
     {
         $resolver = new SystemAwareResolver();
@@ -37,7 +42,16 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->menuFactory = $this->createMock('Knp\Menu\FactoryInterface');
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->configurationBuilder = new ConfigurationBuilder($resolver, $this->menuFactory, $this->eventDispatcher);
+        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configurationBuilder = new ConfigurationBuilder(
+            $resolver,
+            $this->menuFactory,
+            $this->eventDispatcher,
+            $this->configurationProvider
+        );
 
         $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
             ->setMethods(['getRouteInfo', 'processRoute'])
@@ -58,7 +72,11 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuild($options)
     {
-        $this->configurationBuilder->setConfiguration($options);
+        $this->configurationProvider
+            ->expects($this->once())
+            ->method('getConfiguration')
+            ->with(ConfigurationProvider::MENU_CONFIG_KEY)
+            ->willReturn($options);
 
         $menu = new MenuItem('navbar', $this->factory);
 
@@ -85,7 +103,11 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetAreaToExtra($options, $expectedArea)
     {
-        $this->configurationBuilder->setConfiguration($options);
+        $this->configurationProvider
+            ->expects($this->once())
+            ->method('getConfiguration')
+            ->with(ConfigurationProvider::MENU_CONFIG_KEY)
+            ->willReturn($options);
 
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, [], 'navbar');
@@ -93,6 +115,9 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedArea, $menu->getExtra('scope_type'));
     }
 
+    /**
+     * @return array
+     */
     public function setAreaToExtraProvider()
     {
         return [
@@ -262,7 +287,13 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
-        $this->configurationBuilder->setConfiguration($options);
+
+        $this->configurationProvider
+            ->expects($this->once())
+            ->method('getConfiguration')
+            ->with(ConfigurationProvider::MENU_CONFIG_KEY)
+            ->willReturn($options);
+
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, [], 'navbar');
     }

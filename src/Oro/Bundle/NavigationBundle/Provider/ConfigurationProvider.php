@@ -56,18 +56,6 @@ class ConfigurationProvider
     }
 
     /**
-     * Checks if this provider can be used to load configuration
-     *
-     * @return bool
-     */
-    public function isApplicable()
-    {
-        $this->ensureConfigurationLoaded();
-
-        return 0 !== count($this->rawConfiguration);
-    }
-
-    /**
      * Loads configurations and save them in cache
      *
      * @param ContainerBuilder $container The container builder
@@ -80,7 +68,7 @@ class ConfigurationProvider
     {
         $config = [];
 
-        $configLoader = self::getConfigurationLoader();
+        $configLoader = $this->getConfigurationLoader();
         $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
             if (array_key_exists(self::NAVIGATION_CONFIG_ROOT, $resource->data)) {
@@ -90,8 +78,16 @@ class ConfigurationProvider
         }
 
         $rawConfiguration = &$config[self::MENU_CONFIG_KEY];
-        if (array_key_exists('tree', $rawConfiguration)) {
-            $this->reorganizeTree($rawConfiguration['tree']);
+        if (is_array($rawConfiguration) && array_key_exists('tree', $rawConfiguration)) {
+            foreach ($rawConfiguration['tree'] as $type => &$menuPartConfig) {
+                if (isset($rawConfiguration['tree'][$type])
+                    && is_array($rawConfiguration['tree'][$type])
+                    && is_array($menuPartConfig)
+                ) {
+                    $this->reorganizeTree($rawConfiguration['tree'][$type], $menuPartConfig);
+                }
+            }
+            unset($menuPartConfig);
         }
 
         // validate configuration
@@ -100,9 +96,7 @@ class ConfigurationProvider
 
         $this->normalizeOptionNames($this->rawConfiguration[self::MENU_CONFIG_KEY]);
 
-        if ($this->cache instanceof Cache) {
-            $this->cache->save(self::CACHE_KEY, $this->rawConfiguration);
-        }
+        $this->cache->save(self::CACHE_KEY, $this->rawConfiguration);
 
         return $this;
     }
@@ -112,9 +106,7 @@ class ConfigurationProvider
      */
     private function getRawConfiguration()
     {
-        if (!$this->isApplicable()) {
-            throw new \RuntimeException(sprintf('Navigation configuration was not found.'));
-        }
+        $this->ensureConfigurationLoaded();
 
         return $this->rawConfiguration;
     }
@@ -125,7 +117,7 @@ class ConfigurationProvider
     private function ensureConfigurationLoaded()
     {
         if (count($this->rawConfiguration) === 0) {
-            if (!$this->cache instanceof Cache || !$this->cache->contains(self::CACHE_KEY)) {
+            if (!$this->cache->contains(self::CACHE_KEY)) {
                 $this->loadConfiguration();
             } else {
                 $this->rawConfiguration = $this->cache->fetch(self::CACHE_KEY);
@@ -137,70 +129,45 @@ class ConfigurationProvider
 
     /**
      * @param array $config
+     * @param array $configPart
      *
-     * @return ConfigurationProvider
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function reorganizeTree(array &$config)
+    private function reorganizeTree(array &$config, array &$configPart)
     {
-        foreach ($config as $childName => &$childConfig) {
-            $childConfig = (array) $childConfig;
-            $strategy = array_key_exists('merge_strategy', $childConfig) ? $childConfig['merge_strategy'] : 'append';
-            switch ($strategy) {
-                case 'append':
-                    if (array_key_exists('children', $childConfig)) {
-                        $this->reorganizeTree($childConfig['children']);
+        if (!empty($configPart['children'])) {
+            foreach ($configPart['children'] as $childName => &$childConfig) {
+                if (isset($childConfig['merge_strategy']) && $childConfig['merge_strategy'] !== 'append') {
+                    if ($childConfig['merge_strategy'] === 'move') {
+                        $existingItem = $this->getMenuItemByName($config, $childName);
+                        if (!empty($existingItem['children'])) {
+                            $childChildren = isset($childConfig['children']) ? $childConfig['children'] : [];
+                            $childConfig['children'] = array_merge($existingItem['children'], $childChildren);
+                        }
                     }
-                    break;
-                case 'move':
-                    $this->moveItem($childName, $childConfig);
-                    break;
-                case 'remove':
-                    $config = $this->rawConfiguration[self::MENU_CONFIG_KEY]['tree'];
                     $this->removeItem($config, $childName);
-                    break;
-                default:
-                    throw new \InvalidArgumentException('Unknown menu config merge strategy.');
+                } elseif (is_array($childConfig)) {
+                    $this->reorganizeTree($config, $childConfig);
+                }
             }
         }
-
-        return $this;
     }
 
     /**
-     * @param string $childName
-     * @param array  $childConfig
-     *
-     * @return ConfigurationProvider
-     */
-    private function moveItem($childName, array &$childConfig)
-    {
-        $config = $this->rawConfiguration[self::MENU_CONFIG_KEY]['tree'];
-        $existingItem = $this->getMenuItemByName($config, $childName);
-        if (!empty($existingItem['children'])) {
-            $childChildren = array_key_exists('children', $childConfig) ? $childConfig['children'] : [];
-            $childConfig['children'] = array_merge($existingItem['children'], $childChildren);
-
-            $this->removeItem($config, $childName);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param array  $config
-     * @param string $childName
+     * @param array $config
+     * @param       $childName
      *
      * @return array|null
      */
     private function getMenuItemByName(array $config, $childName)
     {
-        if (array_key_exists('children', $config) && is_array($config['children'])) {
+        if (!empty($config['children'])) {
             foreach ($config['children'] as $key => $configRow) {
                 if ($key === $childName) {
                     return $config['children'][$childName];
+                } elseif (is_array($configRow)) {
+                    return $this->getMenuItemByName($configRow, $childName);
                 }
-
-                return $this->getMenuItemByName($configRow, $childName);
             }
         }
 
@@ -284,7 +251,7 @@ class ConfigurationProvider
     /**
      * @return CumulativeConfigLoader
      */
-    public static function getConfigurationLoader()
+    private function getConfigurationLoader()
     {
         return new CumulativeConfigLoader(
             self::COMPILER_PASS_NAME,

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\NavigationBundle\Entity\Title;
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Provider\TitleProvider;
 
 class TitleProviderTest extends \PHPUnit_Framework_TestCase
@@ -10,15 +11,26 @@ class TitleProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
+    /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $configurationProvider;
+
     /** @var TitleProvider */
     protected $titleProvider;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->titleProvider  = new TitleProvider($this->doctrineHelper);
+
+        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->titleProvider = new TitleProvider($this->doctrineHelper, $this->configurationProvider);
     }
 
     public function testGetTitleTemplatesFromDatabase()
@@ -56,9 +68,11 @@ class TitleProviderTest extends \PHPUnit_Framework_TestCase
         $routeName   = 'test_route';
         $configTitle = 'Test config title';
 
-        $this->titleProvider->setTitles(
-            [$routeName => $configTitle]
-        );
+        $this->configurationProvider
+            ->expects($this->once())
+            ->method('getConfiguration')
+            ->with(ConfigurationProvider::TITLES_KEY)
+            ->willReturn([$routeName => $configTitle]);
 
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
@@ -85,6 +99,12 @@ class TitleProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetTitleTemplatesShouldReturnEmptyArrayIfTemplatesDoNotExist()
     {
         $routeName = 'test_route';
+
+        $this->configurationProvider
+            ->expects($this->once())
+            ->method('getConfiguration')
+            ->with(ConfigurationProvider::TITLES_KEY)
+            ->willReturn([]);
 
         $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()

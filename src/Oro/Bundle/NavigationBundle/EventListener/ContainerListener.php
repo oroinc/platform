@@ -12,18 +12,18 @@ use Oro\Component\Config\Dumper\ConfigMetadataDumperInterface;
 class ContainerListener
 {
     /** @var ConfigurationProvider */
-    private $confProvider;
+    private $configurationProvider;
 
     /** @var ConfigMetadataDumperInterface */
     private $dumper;
 
     /**
-     * @param ConfigurationProvider         $provider
+     * @param ConfigurationProvider         $configurationProvider
      * @param ConfigMetadataDumperInterface $dumper
      */
-    public function __construct(ConfigurationProvider $provider, ConfigMetadataDumperInterface $dumper)
+    public function __construct(ConfigurationProvider $configurationProvider, ConfigMetadataDumperInterface $dumper)
     {
-        $this->confProvider = $provider;
+        $this->configurationProvider = $configurationProvider;
         $this->dumper = $dumper;
     }
 
@@ -35,11 +35,11 @@ class ContainerListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         if (!$this->dumper->isFresh()) {
-            $temporaryConfigContainer = new ContainerBuilder();
+            $container = new ContainerBuilder();
 
             // Reload navigation config to warm-up the cache
-            $this->confProvider->loadConfiguration($temporaryConfigContainer);
-            $this->dumper->dump($temporaryConfigContainer);
+            $this->configurationProvider->loadConfiguration($container);
+            $this->dumper->dump($container);
         }
     }
 }
