@@ -178,9 +178,11 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
             foreach ($row as $cell) {
                 list($role, $value) = explode(':', $cell);
                 self::assertNotEmpty($permissionsArray[$entityName][$role]);
+                $expected = $permissionsArray[$entityName][$role];
                 self::assertEquals(
-                    $permissionsArray[$entityName][$role],
-                    $value
+                    $expected,
+                    $value,
+                    "Failed asserting that permission $expected equals $value for $entityName"
                 );
             }
         }
