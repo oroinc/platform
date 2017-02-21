@@ -90,7 +90,6 @@ define(function(require) {
             // remove properties to prevent disposing them with the columns manager
             delete this.columns;
             delete this.grid;
-            delete this.enableFilters;
 
             ColumnManagerComponent.__super__.dispose.apply(this, arguments);
         },
