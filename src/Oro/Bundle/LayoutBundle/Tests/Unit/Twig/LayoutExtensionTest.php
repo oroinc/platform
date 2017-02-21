@@ -294,7 +294,6 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
                 'some string',
                 'some string'
             ]
-
         ];
     }
 }
