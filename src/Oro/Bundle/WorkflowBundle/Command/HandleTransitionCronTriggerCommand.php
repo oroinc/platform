@@ -118,14 +118,6 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implement
     /**
      * {@inheritdoc}
      */
-    public function getDefaultDefinition()
-    {
-        return '*/5 * * * *';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function isActive()
     {
         return true;
