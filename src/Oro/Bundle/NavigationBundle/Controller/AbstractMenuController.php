@@ -7,10 +7,10 @@ use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
@@ -20,9 +20,9 @@ use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractMenuController extends Controller
 {
@@ -151,15 +151,14 @@ abstract class AbstractMenuController extends Controller
      * @param Request $request
      * @param string  $menuName
      * @param array   $context
-     * @param array   $menuTreeContext
-     * @return array|RedirectResponse
+     * @return Response|RedirectResponse
      */
-    protected function move(Request $request, $menuName, array $context = [], array $menuTreeContext = [])
+    protected function move(Request $request, $menuName, array $context = [])
     {
-        $this->checkAcl();
+        $this->checkAcl($context);
+        $context = $this->denormalizeContext($context);
 
-        $menu = $this->getMenu($menuName, $menuTreeContext);
-        $scope = $this->getScope($context);
+        $menu = $this->getMenu($menuName, $context);
 
         $handler = $this->get('oro_navigation.tree.menu_update_tree_handler');
         $treeItems = $handler->getTreeItemList($menu, true);
@@ -175,7 +174,7 @@ abstract class AbstractMenuController extends Controller
         ]);
 
         $responseData = [
-            'scope' => $scope,
+            'context' => $context,
             'menuName' => $menu->getName(),
             'treeItems' => $treeItems,
             'changed' => [],
@@ -187,10 +186,10 @@ abstract class AbstractMenuController extends Controller
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var EntityManager $entityManager */
-            $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
-
+            $entityManager = $this->getDoctrine()->getManagerForClass($this->getEntityClass());
+            $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context);
             $updates = $manager->moveMenuItems(
-                $menuName,
+                $menu,
                 $collection->source,
                 $scope,
                 $collection->target->getKey(),
@@ -203,7 +202,7 @@ abstract class AbstractMenuController extends Controller
                     $form->addError(new FormError(
                         $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message')
                     ));
-                    return array_merge($responseData, ['form' => $form->createView()]);
+                    return $this->renderMoveDialog($responseData, $form);
                 }
                 $entityManager->persist($update);
                 $responseData['changed'][] = [
@@ -214,12 +213,24 @@ abstract class AbstractMenuController extends Controller
             }
 
             $entityManager->flush();
-            $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+            $this->dispatchMenuUpdateChangeEvent($menuName, $context);
 
             $responseData['saved'] = true;
         }
 
-        return array_merge($responseData, ['form' => $form->createView()]);
+        return $this->renderMoveDialog($responseData, $form);
+    }
+
+    /**
+     * @param array         $params
+     * @param FormInterface $form
+     * @return Response
+     */
+    protected function renderMoveDialog(array $params, FormInterface $form)
+    {
+        $params = array_merge($params, ['form' => $form->createView()]);
+
+        return $this->render('@OroNavigation/menuUpdate/dialog/move.html.twig', $params);
     }
 
     /**

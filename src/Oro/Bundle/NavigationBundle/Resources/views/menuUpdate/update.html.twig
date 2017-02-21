@@ -32,7 +32,7 @@
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
                     'successMessage': 'oro.navigation.menuupdate.deleted_message'|trans(),
-                    'dataUrl': path(routePrefix ~ 'delete', {context: context, menuName: menuName, key: app.request.get('key')}),
+                    'dataUrl': path(routePrefix ~ 'ajax_delete', {context: context, menuName: menuName, key: app.request.get('key')}),
                     'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.menu, context: context}),
                     'aCss': 'no-hash remove-button',
                     'id': 'btn-remove-attribute',
@@ -49,7 +49,7 @@
                             'title': 'oro.navigation.menuupdate.hide'|trans,
                             'dataId': entity.id,
                             'dataMethod': 'PUT',
-                            'dataUrl': path(routePrefix ~ 'hide', {context: context, menuName: menuName, key: app.request.get('key')}),
+                            'dataUrl': path(routePrefix ~ 'ajax_hide', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
                             'successMessage': 'oro.navigation.menuupdate.hide_success_message'
                         }) }}
@@ -64,7 +64,7 @@
                             'title': 'oro.navigation.menuupdate.show'|trans,
                             'dataId': entity.id,
                             'dataMethod': 'PUT',
-                            'dataUrl': path(routePrefix ~ 'show', {context: context, menuName: menuName, key: app.request.get('key')}),
+                            'dataUrl': path(routePrefix ~ 'ajax_show', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
                             'successMessage': 'oro.navigation.menuupdate.show_success_message'
                         }) }}
@@ -182,7 +182,7 @@
                             'updateAllowed' : true,
                             'onRootSelectRoute' : routePrefix ~ 'view',
                             'onSelectRoute' : routePrefix ~ 'update',
-                            'onMoveRoute' : routePrefix ~ 'move'
+                            'onMoveRoute' : routePrefix ~ 'ajax_move'
                         } %}
                         {{ UI.renderJsTree(
                             {
@@ -196,7 +196,7 @@
                                 'move': {
                                     'view': 'oroui/js/app/views/jstree/move-action-view',
                                     'routeName': routePrefix ~ 'move',
-                                    'routeParams': {menuName: menuName, scopeId: scope.id}
+                                    'routeParams': {menuName: menuName, context: context}
                                 }
                             }
                         ) }}

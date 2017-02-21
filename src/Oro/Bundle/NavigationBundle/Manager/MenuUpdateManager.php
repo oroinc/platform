@@ -284,24 +284,23 @@ class MenuUpdateManager
     }
 
     /**
-     * @param string     $menuName
-     * @param TreeItem[] $treeItems
-     * @param Scope      $scope
-     * @param string     $parentKey
-     * @param int        $position
-     *
-     * @return MenuUpdateInterface[]
+     * @param ItemInterface $menu
+     * @param TreeItem[]    $treeItems
+     * @param Scope         $scope
+     * @param string        $parentKey
+     * @param int           $position
+     * @return \Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface[]
      */
-    public function moveMenuItems($menuName, $treeItems, Scope $scope, $parentKey, $position)
+    public function moveMenuItems(ItemInterface $menu, $treeItems, Scope $scope, $parentKey, $position)
     {
-        $parent = $this->findMenuItem($menuName, $parentKey, $scope);
+        $parent = $this->findMenuItem($menu, $parentKey);
         $menuUpdates = [];
 
         foreach ($treeItems as $index => $treeItem) {
-            $currentUpdate = $this->findOrCreateMenuUpdate($menuName, $treeItem->getKey(), $scope);
+            $currentUpdate = $this->findOrCreateMenuUpdate($menu, $treeItem->getKey(), $scope);
             $menuUpdates[] = $currentUpdate;
 
-            if ($menuName !== $parentKey) {
+            if ($menu->getName() !== $parentKey) {
                 $currentUpdate->setParentKey($parent ? $parent->getName() : null);
             }
 
@@ -320,7 +319,7 @@ class MenuUpdateManager
 
         return array_merge(
             $menuUpdates,
-            $this->getReorderedMenuUpdates($menuName, $order, $scope)
+            $this->getReorderedMenuUpdates($menu, $order, $scope)
         );
     }
 

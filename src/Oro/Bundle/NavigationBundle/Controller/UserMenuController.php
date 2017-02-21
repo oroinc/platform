@@ -71,8 +71,6 @@ class UserMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/move", name="oro_navigation_user_menu_move")
-     * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param Request $request
      * @param string  $menuName
@@ -81,7 +79,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function moveAction(Request $request, $menuName)
     {
-        return parent::move($request, $menuName);
+        return parent::move($request, $menuName, $this->getContext());
     }
 
     /**

@@ -19,7 +19,7 @@
                     {% set actionButtons %}
                         <div class="pull-right">
                             {{ resetButton({
-                                'dataUrl': path(routePrefix ~ 'reset', {menuName: entity.root.name, context: context}),
+                                'dataUrl': path(routePrefix ~ 'ajax_reset', {menuName: entity.root.name, context: context}),
                                 'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.root.name, context: context}),
                                 'menuKey': entity.root.name
                             }) }}
@@ -97,7 +97,7 @@
                                         'updateAllowed' : true,
                                         'onRootSelectRoute' : routePrefix ~ 'view',
                                         'onSelectRoute' : routePrefix ~ 'update',
-                                        'onMoveRoute' : routePrefix ~ 'move'
+                                        'onMoveRoute' : routePrefix ~ 'ajax_move'
                                     } %}
 
                                     {{ UI.renderJsTree(
@@ -112,7 +112,7 @@
                                             'move': {
                                                 'view': 'oroui/js/app/views/jstree/move-action-view',
                                                 'routeName': routePrefix ~ 'move',
-                                                'routeParams': {menuName: entity.root.name, scopeId: scope.id}
+                                                'routeParams': {menuName: entity.root.name, context: context}
                                             }
                                         }
                                     ) }}

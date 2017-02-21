@@ -67,8 +67,6 @@ class GlobalMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/move", name="oro_navigation_global_menu_move")
-     * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param Request $request
      * @param string  $menuName
