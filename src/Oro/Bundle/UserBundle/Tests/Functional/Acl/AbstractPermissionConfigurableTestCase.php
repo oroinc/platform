@@ -25,7 +25,7 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
      */
     public static function buildOriginCache()
     {
-        $provider= self::getClientInstance()->getContainer()->get('oro_security.acl.configurable_permission_provider');
+        $provider = self::getClientInstance()->getContainer()->get('oro_security.acl.configurable_permission_provider');
         $provider->buildCache();
     }
 

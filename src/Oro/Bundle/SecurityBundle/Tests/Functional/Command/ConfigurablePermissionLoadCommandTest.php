@@ -6,7 +6,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
-use Oro\Bundle\SecurityBundle\Command\ConfigurablePermissionLoadCommand;
+use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
+use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundle2\TestBundle2;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Command\Stub\TestBundleIncorrect\TestBundleIncorrect;
@@ -14,7 +15,7 @@ use Oro\Component\Config\CumulativeResourceManager;
 
 class ConfigurablePermissionLoadCommandTest extends WebTestCase
 {
-    /** @var  */
+    /** @var ConfigurablePermissionConfigurationProvider */
     protected $provider;
 
     /**
@@ -24,15 +25,15 @@ class ConfigurablePermissionLoadCommandTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->provider =
-            $this->getContainer()->get('oro_security.configuration.provider.configurable_permission_configuration');
+        $this->provider = $this->getContainer()
+            ->get('oro_security.configuration.provider.configurable_permission_configuration');
     }
 
     public function testExecute()
     {
         $this->loadBundles([new TestBundle1(), new TestBundle2()]);
 
-        $result = $this->runCommand(ConfigurablePermissionLoadCommand::NAME, ['--no-ansi']);
+        $result = $this->runCommand(LoadConfigurablePermissionCommand::NAME, ['--no-ansi']);
         $this->assertContains('All configurable permissions successfully loaded into cache', $result);
 
         $cache = $this->getContainer()->get('oro_security.cache.provider.configurable_permission');
@@ -61,7 +62,7 @@ class ConfigurablePermissionLoadCommandTest extends WebTestCase
     {
         $this->loadBundles([new TestBundleIncorrect(), new TestBundle1()]);
 
-        $result = $this->runCommand(ConfigurablePermissionLoadCommand::NAME, ['--no-ansi']);
+        $result = $this->runCommand(LoadConfigurablePermissionCommand::NAME, ['--no-ansi']);
         $this->assertContains('InvalidConfigurationException', $result);
     }
 

@@ -10,7 +10,6 @@ use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 class ConfigurablePermissionProvider
 {
     const CACHE_ID = 'configurable_permissions';
-
     const DEFAULT_CONFIGURABLE_NAME = 'default';
 
     /** @var ConfigurablePermissionConfigurationProvider */
@@ -42,12 +41,14 @@ class ConfigurablePermissionProvider
             return new ConfigurablePermission($name);
         }
 
+        $data = $data[$name];
+
         return new ConfigurablePermission(
             $name,
-            array_key_exists('default', $data[$name]) ? $data[$name]['default'] : false,
-            array_key_exists('entities', $data[$name]) ? $data[$name]['entities'] : [],
-            array_key_exists('capabilities', $data[$name]) ? $data[$name]['capabilities'] : [],
-            array_key_exists('workflows', $data[$name]) ? $data[$name]['workflows'] : []
+            $this->getValue($data, 'default', false),
+            $this->getValue($data, 'entities', []),
+            $this->getValue($data, 'capabilities', []),
+            $this->getValue($data, 'workflows', [])
         );
     }
 
@@ -66,5 +67,16 @@ class ConfigurablePermissionProvider
         }
 
         return $this->cache->fetch(self::CACHE_ID);
+    }
+
+    /**
+     * @param array $data
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
+    private function getValue(array $data, $name, $default = null)
+    {
+        return array_key_exists($name, $data) ? $data[$name] : $default;
     }
 }

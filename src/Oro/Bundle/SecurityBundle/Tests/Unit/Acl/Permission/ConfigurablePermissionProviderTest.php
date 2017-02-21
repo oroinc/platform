@@ -27,10 +27,7 @@ class ConfigurablePermissionProviderTest extends \PHPUnit_Framework_TestCase
         $this->configurationProvider = $this->createMock(ConfigurablePermissionConfigurationProvider::class);
         $this->cacheProvider = $this->createMock(CacheProvider::class);
 
-        $this->provider = new ConfigurablePermissionProvider(
-            $this->configurationProvider,
-            $this->cacheProvider
-        );
+        $this->provider = new ConfigurablePermissionProvider($this->configurationProvider, $this->cacheProvider);
     }
 
     public function testBuildCache()
@@ -54,14 +51,12 @@ class ConfigurablePermissionProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet($name, array $data, ConfigurablePermission $expected)
     {
-        $this->cacheProvider
-            ->expects($this->once())
+        $this->cacheProvider->expects($this->once())
             ->method('contains')
             ->with(ConfigurablePermissionProvider::CACHE_ID)
             ->willReturn(true);
 
-        $this->cacheProvider
-            ->expects($this->once())
+        $this->cacheProvider->expects($this->once())
             ->method('fetch')
             ->with(ConfigurablePermissionProvider::CACHE_ID)
             ->willReturn($data);
@@ -108,21 +103,18 @@ class ConfigurablePermissionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWithCacheBuild()
     {
         $data = ['some_data'];
-        $this->cacheProvider
-            ->expects($this->once())
+        $this->cacheProvider->expects($this->once())
             ->method('contains')
             ->with(ConfigurablePermissionProvider::CACHE_ID)
             ->willReturn(false);
 
         $this->configurationProvider->expects($this->once())->method('getConfiguration')->willReturn($data);
 
-        $this->cacheProvider
-            ->expects($this->once())
+        $this->cacheProvider->expects($this->once())
             ->method('save')
             ->with(ConfigurablePermissionProvider::CACHE_ID, $data);
 
-        $this->cacheProvider
-            ->expects($this->once())
+        $this->cacheProvider->expects($this->once())
             ->method('fetch')
             ->with(ConfigurablePermissionProvider::CACHE_ID)
             ->willReturn($data);
