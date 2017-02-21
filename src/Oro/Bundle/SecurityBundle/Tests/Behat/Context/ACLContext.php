@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -117,6 +118,97 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
 
         $this->getSession('second_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
+    }
+
+    /**
+     * Change group of permissions on create/edit pages
+     *
+     * Example: And select following permissions:
+     *       | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
+     *       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User    |
+     *
+     * @Then /^(?:|I )select following permissions:$/
+     */
+    public function iSelectFollowingPermissions(TableNode $table)
+    {
+        /** @var UserRoleForm $userRoleForm */
+        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
+
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $cell) {
+                list($role, $value) = explode(':', $cell);
+                $userRoleForm->setPermission($entityName, $role, $value);
+            }
+        }
+    }
+
+    /**
+     * Set capability permission on create/edit pages by selecting checkbox
+     *
+     * Example: And I check "Access dotmailer statistics" entity permission
+     *
+     * @Then /^(?:|I )check "(?P<name>([\w\s]+))" entity permission$/
+     */
+    public function checkEntityPermission($name)
+    {
+        /** @var UserRoleForm $userRoleForm */
+        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
+        $userRoleForm->setCheckBoxPermission($name);
+    }
+
+    /**
+     * Asserts that provided permissions allowed
+     *
+     * Example: Then I should see following active permissions:
+     *            | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
+     *            | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
+     *
+     * @Then /^(?:|I )should see following active permissions:$/
+     */
+    public function iSeeFollowingPermissions(TableNode $table)
+    {
+        /** @var UserRoleForm $userRoleForm */
+        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
+        $permissionsArray = $userRoleForm->getPermissions();
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $cell) {
+                list($role, $value) = explode(':', $cell);
+                self::assertNotEmpty($permissionsArray[$entityName][$role]);
+                self::assertEquals(
+                    $permissionsArray[$entityName][$role],
+                    $value
+                );
+            }
+        }
+    }
+
+    /**
+     * Asserts that provided capability permissions allowed
+     *
+     * Example: And I should see following capability permissions checked:
+     *           | Access dotmailer statistics     |
+     *           | Manage Abandoned Cart Campaigns |
+     *
+     * @Then /^(?:|I )should see following capability permissions checked:$/
+     */
+    public function iShouldSeePermissionsChecked(TableNode $table)
+    {
+        /** @var UserRoleForm $userRoleForm */
+        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
+        $permissions = $userRoleForm->getCapabilityPermissions();
+
+        foreach ($table->getRows() as $row) {
+            $value = current($row);
+            self::assertContains(
+                ucfirst(strtolower($value)),
+                $permissions,
+                "$value not found in active permissions list: " . print_r($permissions, true)
+            );
+        }
     }
 
     /**
