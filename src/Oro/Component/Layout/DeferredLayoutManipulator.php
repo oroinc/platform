@@ -819,7 +819,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         // use default args to string converter which does the following:
         // - if args array is empty returns empty string
         // - otherwise, convert the first argument to string
-        // @see Exception\DeferredUpdateFailureException
         return null;
     }
 }
