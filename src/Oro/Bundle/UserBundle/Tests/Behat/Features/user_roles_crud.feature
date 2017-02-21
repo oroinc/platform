@@ -58,3 +58,12 @@ Feature: Managing users roles
       | Manage Abandoned Cart Campaigns |
       | Access job queue                |
       | Access entity management        |
+
+  Scenario: Delete user role
+    Given I go to System/User Management/Roles
+    Then I should see Edited test role in grid
+    And there is 7 records in grid
+    When I click Delete Edited test role in grid
+    And I confirm deletion
+    Then there is 6 records in grid
+    And I should not see "Edited test role"
