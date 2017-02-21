@@ -7,6 +7,7 @@ define(function(require) {
     var Util = require('./entity-fields-util');
     require('jquery-ui');
     require('jquery.select2');
+    require('oroui/js/input-widget-manager');
 
     $.widget('oroentity.fieldChoice', {
         options: {
@@ -163,6 +164,7 @@ define(function(require) {
                 .data('data', data);
 
             this.util.init(entity, data);
+            this.element.inputWidget('refresh');
         },
 
         setValue: function(value) {

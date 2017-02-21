@@ -10,14 +10,14 @@ class DateGrouping
     protected $fieldName;
 
     /**
-     * @var string
+     * @var bool
      */
-    protected $notNullableField;
+    protected $useSkipEmptyPeriodsFilter;
 
     /**
      * @var bool
      */
-    protected $useSkipEmptyPeriodsFilter;
+    protected $useDateGroupFilter;
 
     /**
      * @return string
@@ -39,25 +39,6 @@ class DateGrouping
     }
 
     /**
-     * @return string
-     */
-    public function getNotNullableField()
-    {
-        return $this->notNullableField;
-    }
-
-    /**
-     * @param string $notNullableField
-     * @return $this
-     */
-    public function setNotNullableField($notNullableField)
-    {
-        $this->notNullableField = $notNullableField;
-
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function getUseSkipEmptyPeriodsFilter()
@@ -72,6 +53,25 @@ class DateGrouping
     public function setUseSkipEmptyPeriodsFilter($useSkipEmptyPeriodsFilter)
     {
         $this->useSkipEmptyPeriodsFilter = $useSkipEmptyPeriodsFilter;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseDateGroupFilter()
+    {
+        return $this->useDateGroupFilter;
+    }
+
+    /**
+     * @param bool $useDateGroupFilter
+     * @return $this
+     */
+    public function setUseDateGroupFilter($useDateGroupFilter)
+    {
+        $this->useDateGroupFilter = $useDateGroupFilter;
 
         return $this;
     }

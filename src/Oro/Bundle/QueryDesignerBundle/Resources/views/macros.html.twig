@@ -250,6 +250,7 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
+        {{ form_row(form.useDateGroupFilter) }}
         {{ form_row(form.fieldName, {
             'label': 'oro.query_designer.form.date_grouping.field_name',
             'entity_choice_selector': '[data-ftid=' ~ params.entity_choice_id ~ ']',

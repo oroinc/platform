@@ -51,12 +51,4 @@ class CalendarDateCommand extends ContainerAwareCommand implements CronCommandIn
 
         return self::STATUS_SUCCESS;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isActive()
-    {
-        return true;
-    }
 }

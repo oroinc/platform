@@ -9,12 +9,12 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Bundle\QueryDesignerBundle\Form\EventListener\DateGroupingFormSubscriber;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
 
 abstract class AbstractQueryDesignerType extends AbstractType
 {
-    const DATE_GROUPING_NAME = 'dateGrouping';
+    const DATE_GROUPING_FORM_NAME = 'dateGrouping';
 
     /**
      * {@inheritdoc}
@@ -56,62 +56,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
             }
         );
 
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            function (FormEvent $event) {
-                if (!$this->isDateGroupingInvolved($event)) {
-                    return;
-                }
-                $dateGroupingModel = $event->getForm()->get(static::DATE_GROUPING_NAME)->getData();
-                if (!$dateGroupingModel instanceof DateGrouping) {
-                    $dateGroupingModel = new DateGrouping();
-                }
-                $definition = json_decode($event->getData()->getDefinition(), true);
-                if (!is_array($definition) || !array_key_exists(static::DATE_GROUPING_NAME, $definition)) {
-                    return;
-                }
-
-                $dateGroupingArray = $definition[static::DATE_GROUPING_NAME];
-                if (array_key_exists(DateGroupingType::FIELD_NAME_ID, $dateGroupingArray)) {
-                    $dateGroupingModel->setFieldName($dateGroupingArray[DateGroupingType::FIELD_NAME_ID]);
-                }
-
-                if (array_key_exists(DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID, $dateGroupingArray)) {
-                    $dateGroupingModel->setUseSkipEmptyPeriodsFilter(
-                        $dateGroupingArray[DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID]
-                    );
-                }
-
-                $event->getForm()->get(static::DATE_GROUPING_NAME)->setData($dateGroupingModel);
-            }
-        );
-
-        $builder->addEventListener(
-            FormEvents::SUBMIT,
-            function (FormEvent $event) {
-                if (!$this->isDateGroupingInvolved($event)) {
-                    return;
-                }
-
-                $dateGroupingModel = $event->getForm()->get(static::DATE_GROUPING_NAME)->getData();
-                $definition = json_decode($event->getData()->getDefinition(), true);
-                if (!is_array($definition)) {
-                    $definition = [];
-                }
-                if (!array_key_exists(static::DATE_GROUPING_NAME, $definition)) {
-                    $definition[static::DATE_GROUPING_NAME] = [];
-                }
-                $definition[static::DATE_GROUPING_NAME][DateGroupingType::FIELD_NAME_ID] =
-                    $dateGroupingModel->getFieldName();
-                $definition[static::DATE_GROUPING_NAME][DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID] =
-                    $dateGroupingModel->getUseSkipEmptyPeriodsFilter();
-                // add default group by entity id if not provided
-                if (!array_key_exists('grouping_columns', $definition) || count($definition['grouping_columns']) === 0) {
-                    $definition['grouping_columns'][] = ['name' => 'id'];
-                }
-                $event->getData()->setDefinition(json_encode($definition));
-            }
-        );
+        $builder->addEventSubscriber(new DateGroupingFormSubscriber());
     }
 
     /**
@@ -196,7 +141,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
         if ($dateGroupingChoiceType) {
             $form->add(
                 $factory->createNamed(
-                    static::DATE_GROUPING_NAME,
+                    AbstractQueryDesignerType::DATE_GROUPING_FORM_NAME,
                     'oro_query_designer_date_grouping',
                     null,
                     [
@@ -208,20 +153,5 @@ abstract class AbstractQueryDesignerType extends AbstractType
                 )
             );
         }
-    }
-
-    /**
-     * @param FormEvent $event
-     * @return bool
-     */
-    protected function isDateGroupingInvolved(FormEvent $event)
-    {
-        $data = $event->getData();
-        $form = $event->getForm();
-        if (!$data instanceof AbstractQueryDesigner || !$form->has(static::DATE_GROUPING_NAME)) {
-            return false;
-        }
-
-        return true;
     }
 }

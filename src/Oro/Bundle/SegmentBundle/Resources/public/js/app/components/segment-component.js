@@ -68,7 +68,6 @@ define(function(require) {
                 this.$fieldsLoader = this.initFieldsLoader();
                 this.initGrouping();
                 this.initColumn();
-                // this.initDateGrouping();
                 this.configureFilters();
                 if (this.options.initEntityChangeEvents) {
                     this.initEntityChangeEvents();
@@ -331,107 +330,6 @@ define(function(require) {
             }, this);
 
             return $entityChoice;
-        },
-
-        /**
-         * Initializes Date Fields Grouping component
-         */
-        initDateGrouping: function() {
-            var self = this;
-            var options = this.options.grouping;
-            var $table = $(options.itemContainer);
-            var $editor = $(options.form);
-
-            if (_.isEmpty($table) || _.isEmpty($editor)) {
-                // there's no grouping
-                return;
-            }
-
-            // setup FieldChoice of Items Manager Editor
-            var fieldChoiceOptions = _.extend({}, this.options.fieldChoiceOptions,
-                this.options.metadata.grouping, {select2: {}});
-            var $fieldChoice = $editor.find('[data-purpose=date-grouping-selector]');
-            $fieldChoice.fieldChoice(fieldChoiceOptions);
-            this.on('fieldsLoaded', function(entity, data) {
-                $fieldChoice.fieldChoice('updateData', entity, data);
-            });
-
-            // prepare collection for Items Manager
-            var collection = new FieldsCollection(this.load('date_grouping_columns'), {
-                model: GroupingModel,
-                entityFieldsUtil: this.entityFieldsUtil
-            });
-            this.listenTo(collection, 'add remove sort change', function() {
-                this.save(collection.toJSON(), 'date_grouping_columns');
-            });
-
-            // setup confirmation dialog for delete item
-            // var confirm = new DeleteConfirmation({content: ''});
-            // confirm.on('ok', function() {
-            //     collection.remove(this.model);
-            // });
-            // confirm.on('hidden', function() {
-            //     delete this.model;
-            // });
-
-            // setup Items Manager's editor
-            $editor.itemsManagerEditor($.extend(options.editor, {
-                collection: collection
-            }));
-
-            // this.on('validate-data', function(issues) {
-            //     if ($editor.itemsManagerEditor('hasChanges')) {
-            //         issues.push({
-            //             component: __('oro.segment.grouping_editor'),
-            //             type: SegmentComponent.UNSAVED_CHANGES_ISSUE
-            //         });
-            //     }
-            //     if (!collection.isValid()) {
-            //         issues.push({
-            //             component: __('oro.segment.grouping_editor'),
-            //             type: SegmentComponent.INVALID_DATA_ISSUE
-            //         });
-            //     }
-            // });
-
-            this.on('before-submit', function() {
-                collection.removeInvalidModels();
-                $editor.itemsManagerEditor('reset');
-            });
-
-            // // setup Items Manager's table
-            // var template = _.template(this.options.fieldChoiceOptions.select2.formatSelectionTemplate);
-            // $table.itemsManagerTable({
-            //     collection: collection,
-            //     itemTemplate: $(options.itemTemplate).html(),
-            //     itemRender: function(tmpl, data) {
-            //         try {
-            //             data.name = self.formatChoice(data.name, template);
-            //         } catch (e) {
-            //             data.name = __('oro.querydesigner.field_not_found');
-            //             data.deleted = true;
-            //         }
-            //         return tmpl(data);
-            //     },
-            //     deleteHandler: function(model, data) {
-            //         confirm.setContent(data.message);
-            //         confirm.model = model;
-            //         confirm.open();
-            //     }
-            // });
-
-            this.on('resetData', function(data) {
-                data.date_grouping_columns = [];
-                $table.itemsManagerTable('reset');
-                $editor.itemsManagerEditor('reset');
-            });
-
-            this.once('dispose:before', function() {
-                confirm.dispose();
-                collection.dispose();
-                $editor.itemsManagerEditor('destroy');
-                $table.itemsManagerTable('destroy');
-            }, this);
         },
 
         /**

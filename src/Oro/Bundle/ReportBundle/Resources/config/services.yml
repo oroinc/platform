@@ -46,14 +46,12 @@ services:
         class: %oro_report.grid.datagrid_configuration_builder.class%
         parent: oro_report.grid.base_configuration_builder
         calls:
-            - [setDispatcher, ['@event_dispatcher']]
+            - [setDateGroupingBuilder, ['@oro_report.grid.date_grouping_builder']]
 
-    oro_report.listener.grid_config_build:
-        class: Oro\Bundle\ReportBundle\EventListener\ReportGridConfigurationListener
+    oro_report.grid.date_grouping_builder:
+        class: Oro\Bundle\ReportBundle\EventListener\DatagridDateGroupingBuilder
         arguments:
             - "%oro_report.calendar_date.entity.class%"
-        tags:
-            - { name: kernel.event_listener, event: after_build_grid_configuration_event, method: onReportGridConfigurationBuild}
 
     oro_report.listener.segment_subscriber:
         class: %oro_report.listener.segment_subscriber.class%
@@ -87,3 +85,8 @@ services:
         class: Oro\Bundle\ReportBundle\Validator\ReportDefinitionValidator
         tags:
             - { name: validator.constraint_validator, alias: oro_report.report_definition_validator }
+
+    oro_report.validator.report_date_grouping_validator:
+        class: Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_report.report_date_grouping_validator }

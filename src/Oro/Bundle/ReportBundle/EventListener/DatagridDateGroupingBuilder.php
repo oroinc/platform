@@ -7,14 +7,13 @@ use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\FilterBundle\Filter\DateGroupingFilter;
 use Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
-use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\ReportBundle\Entity\Report;
-use Oro\Bundle\ReportBundle\Event\AfterBuildGridConfigurationEvent;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 
-class ReportGridConfigurationListener
+class DatagridDateGroupingBuilder
 {
     const FILTERS_KEY_NAME = 'filters';
     const SOURCE_KEY_NAME = 'source';
@@ -25,6 +24,7 @@ class ReportGridConfigurationListener
     const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = 'CAST(%s as DATE) = CAST(%s.%s as DATE)';
     const CALENDAR_DATE_GRID_COLUMN_NAME = 'dateGrouping';
     const DATE_PERIOD_FILTER = 'datePeriodFilter';
+    const DEFAULT_GROUP_BY_FIELD = 'id';
 
     /**
      * @var string
@@ -32,31 +32,21 @@ class ReportGridConfigurationListener
     protected $calendarDateClass;
 
     /**
-     * @var JoinIdentifierHelper
-     */
-    protected $joinIdentifierHelper;
-
-    /**
      * @param string $calendarDateEntity
      */
     public function __construct($calendarDateEntity)
     {
         $this->calendarDateClass = $calendarDateEntity;
-        $this->joinIdentifierHelper = new JoinIdentifierHelper($this->calendarDateClass);
     }
 
     /**
-     * @param AfterBuildGridConfigurationEvent $event
+     * @param DatagridConfiguration $config
+     * @param AbstractQueryDesigner $report
      * @throws InvalidDatagridConfigException
      */
-    public function onReportGridConfigurationBuild(AfterBuildGridConfigurationEvent $event)
+    public function applyDateGroupingFilterIfRequired(DatagridConfiguration $config, AbstractQueryDesigner $report)
     {
-        $config = $event->getConfiguration();
-        $report = $event->getSource();
-
-        if (!$config instanceof DatagridConfiguration
-            || !$report instanceof Report
-        ) {
+        if (!$report instanceof Report) {
             return;
         }
 
@@ -69,16 +59,26 @@ class ReportGridConfigurationListener
             throw new InvalidDatagridConfigException();
         }
 
-        $dateGroupDefinition = $reportDefinition[AbstractQueryDesignerType::DATE_GROUPING_NAME];
-        $notNullableField = $this->getRealNotNullableField($config);
+        $joinHelper = new JoinIdentifierHelper($report->getEntity());
+        $dateGroupDefinition = $reportDefinition[DateGroupingType::DATE_GROUPING_NAME];
+
+        $dateFieldName = $joinHelper->getFieldName($dateGroupDefinition[DateGroupingType::FIELD_NAME_ID]);
+        $dateFieldTableAlias = $this->getRealDateFieldTableAlias(
+            $config,
+            $joinHelper->explodeColumnName(
+                $dateGroupDefinition[DateGroupingType::FIELD_NAME_ID]
+            )
+        );
+        $notNullableField = $this->getNotNullableField($config);
 
         $this->changeFiltersSection(
             $config,
-            $notNullableField,
-            $event->getSource()->getEntity(),
-            $dateGroupDefinition[DateGroupingType::FIELD_NAME_ID]
+            $report->getEntity(),
+            $dateFieldTableAlias,
+            $dateFieldName,
+            $notNullableField
         );
-        $this->changeSourceSection($config, $dateGroupDefinition[DateGroupingType::FIELD_NAME_ID]);
+        $this->changeSourceSection($config, $dateFieldTableAlias, $dateFieldName);
         $this->changeSortersSection($config);
         $this->changeColumnsSection($config);
         $this->addEmptyPeriodsFilter(
@@ -90,16 +90,19 @@ class ReportGridConfigurationListener
 
     /**
      * @param DatagridConfiguration $config
-     * @param string $notNullableField
      * @param string $rootEntityClass
-     * @param string $dateGroupinFieldName
+     * @param string $dateFieldName
+     * @param string $dateFieldTableAlias
+     * @param string $notNullableField
      * @param string $defaultFilterValue
+     * @internal param string $dateGroupingWithAlias
      */
     protected function changeFiltersSection(
         DatagridConfiguration $config,
-        $notNullableField,
         $rootEntityClass,
-        $dateGroupinFieldName,
+        $dateFieldTableAlias,
+        $dateFieldName,
+        $notNullableField,
         $defaultFilterValue = DateGroupingFilterType::TYPE_DAY
     ) {
         $filters = $config->offsetGet(static::FILTERS_KEY_NAME);
@@ -112,14 +115,11 @@ class ReportGridConfigurationListener
             'calendar_entity' => $this->calendarDateClass,
             'target_entity' => $rootEntityClass,
             'not_nullable_field' => $notNullableField,
+            'joined_column' => $dateFieldName,
+            'first_joined_table' => $dateFieldTableAlias, // @todo: Refactor after best-selling-products refactored
+            'second_joined_table' => $dateFieldTableAlias, // @todo: Refactor after best-selling-products refactored
         ];
-        $dateGroupinFieldAlias = $this->getColumnAlias($config, $dateGroupinFieldName);
-        if (!array_key_exists(static::DATE_PERIOD_FILTER, $filters['columns'])
-            && (
-                is_null($dateGroupinFieldAlias)
-                || !array_key_exists($dateGroupinFieldAlias, $filters['columns'])
-            )
-        ) {
+        if (!array_key_exists(static::DATE_PERIOD_FILTER, $filters['columns'])) {
             $filters['columns'][static::DATE_PERIOD_FILTER] = [
                 'label' => 'oro.report.datagrid.column.time_period.label',
                 'type' => 'datetime',
@@ -155,7 +155,7 @@ class ReportGridConfigurationListener
             'label' => 'oro.report.filter.skip_empty_periods.label',
             'not_nullable_field' => $notNullableField,
         ];
-        $filters['default'][SkipEmptyPeriodsFilter::NAME] = ['value' => true];
+        $filters['default'][SkipEmptyPeriodsFilter::NAME] = ['value' => 1];
         $config->offsetSet(static::FILTERS_KEY_NAME, $filters);
     }
 
@@ -197,9 +197,10 @@ class ReportGridConfigurationListener
 
     /**
      * @param DatagridConfiguration $config
+     * @param string $dateFieldTableAlias
      * @param string $dateFieldName
      */
-    protected function changeSourceSection(DatagridConfiguration $config, $dateFieldName)
+    protected function changeSourceSection(DatagridConfiguration $config, $dateFieldTableAlias, $dateFieldName)
     {
         $source = $config->offsetGet(static::SOURCE_KEY_NAME);
         $from = $source['query']['from'][0];
@@ -219,7 +220,7 @@ class ReportGridConfigurationListener
             'join' => $from['table'],
             'alias' => $from['alias'],
             'conditionType' => 'WITH',
-            'condition' => $this->getCalendarJoinCondition($from['alias'], $dateFieldName),
+            'condition' => $this->getCalendarJoinCondition($dateFieldTableAlias, $dateFieldName),
         ];
         foreach ($source['query']['join']['left'] as $join) {
             $newLeftJoins[] = $join;
@@ -230,17 +231,17 @@ class ReportGridConfigurationListener
     }
 
     /**
-     * @param string $rootEntityAlias
-     * @param string $rootEntityDateFieldName
+     * @param string $dateFieldTableAlias
+     * @param string $dateFieldName
      * @return string
      */
-    protected function getCalendarJoinCondition($rootEntityAlias, $rootEntityDateFieldName)
+    protected function getCalendarJoinCondition($dateFieldTableAlias, $dateFieldName)
     {
         return sprintf(
             static::CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE,
             $this->getCalendarDateFieldReferenceString(),
-            $rootEntityAlias,
-            $rootEntityDateFieldName
+            $dateFieldTableAlias,
+            $dateFieldName
         );
     }
 
@@ -276,7 +277,6 @@ class ReportGridConfigurationListener
             && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['table_aliases'])
             && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query'])
             && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['select'])
-            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['groupBy'])
             && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['from'])
             && count($config->offsetGet(static::SOURCE_KEY_NAME)['query']['from']) > 0
             && $config->offsetExists(static::SORTERS_KEY_NAME)
@@ -296,14 +296,14 @@ class ReportGridConfigurationListener
     protected function isDateGroupingFilterRequired($definition)
     {
         return (is_array($definition)
-            && array_key_exists(AbstractQueryDesignerType::DATE_GROUPING_NAME, $definition)
+            && array_key_exists(DateGroupingType::DATE_GROUPING_NAME, $definition)
             && array_key_exists(
                 DateGroupingType::FIELD_NAME_ID,
-                $definition[AbstractQueryDesignerType::DATE_GROUPING_NAME]
+                $definition[DateGroupingType::DATE_GROUPING_NAME]
             )
             && array_key_exists(
                 DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID,
-                $definition[AbstractQueryDesignerType::DATE_GROUPING_NAME]
+                $definition[DateGroupingType::DATE_GROUPING_NAME]
             )
         );
     }
@@ -311,25 +311,31 @@ class ReportGridConfigurationListener
     /**
      * @param DatagridConfiguration $config
      * @return string
-     * @throws InvalidDatagridConfigException
      */
-    protected function getRealNotNullableField(DatagridConfiguration $config)
+    protected function getNotNullableField(DatagridConfiguration $config)
     {
-        $source = $config->offsetGet(static::SOURCE_KEY_NAME);
-        $groupBy = explode(',', $source['query']['groupBy']);
+        $aliases = $config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['table_aliases'];
 
-        return reset($groupBy);
+        return sprintf('%s.%s', $aliases[''], static::DEFAULT_GROUP_BY_FIELD);
     }
 
     /**
      * @param DatagridConfiguration $config
-     * @param string $fieldName
-     * @return null
+     * @param  [] $joinIds
+     * @return string
+     * @throws InvalidDatagridConfigException
      */
-    protected function getColumnAlias(DatagridConfiguration $config, $fieldName)
+    protected function getRealDateFieldTableAlias(DatagridConfiguration $config, $joinIds)
     {
-        $aliases = $config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['column_aliases'];
+        $tableAliasKey = end($joinIds);
+        $tableAliases = $config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['table_aliases'];
 
-        return (array_key_exists($fieldName, $aliases)) ? $aliases[$fieldName] : null;
+        if (!array_key_exists($tableAliasKey, $tableAliases)) {
+            throw new InvalidDatagridConfigException(
+                sprintf('The table alias for key %s must be defined!', $tableAliasKey)
+            );
+        }
+
+        return $tableAliases[$tableAliasKey];
     }
 }
