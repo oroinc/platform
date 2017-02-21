@@ -8,19 +8,22 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType;
+use Oro\Bundle\FilterBundle\Utils\ArrayTrait;
 
 class DateGroupingFilter extends ChoiceFilter
 {
+    use ArrayTrait;
+
     const COLUMN_NAME_SUFFIX = 'DateGroupingFilter';
     const CALENDAR_TABLE = 'calendarDate';
     const CALENDAR_COLUMN = 'date';
-    const FIRST_CALENDAR_TABLE_FOR_GROUPING = 'calendarDate1';
-    const SECOND_CALENDAR_TABLE_FOR_GROUPING = 'calendarDate2';
+    const CALENDAR_TABLE_FOR_GROUPING = 'calendarDate1';
     const CALENDAR_COLUMN_FOR_GROUPING = 'date';
     const FIRST_JOINED_TABLE = 'order1';
     const SECOND_JOINED_TABLE = 'order2';
     const JOINED_COLUMN = 'createdAt';
     const TARGET_COLUMN = 'date';
+    const QUARTER_LENGTH = 3;
 
     /** @var array */
     protected $groupingNames = [];
@@ -30,6 +33,12 @@ class DateGroupingFilter extends ChoiceFilter
 
     /** @var array */
     protected $config = [];
+
+    /** @var array */
+    protected $exclusionCriteria = [];
+
+    /** @var array */
+    protected $specificDateExpressions = [];
 
     /**
      * @param EntityManager $entityManager
@@ -58,6 +67,7 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         $this->resolveConfiguration();
+        $this->resolveExclusionCriteria();
 
         /** @var OrmFilterDatasourceAdapter $ds */
         $qb = $ds->getQueryBuilder();
@@ -88,6 +98,7 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
                 );
+                $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_MONTH);
                 break;
             case DateGroupingFilterType::TYPE_QUARTER:
@@ -100,6 +111,8 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
                 );
+                $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
+                $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_QUARTER;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_QUARTER);
                 break;
             default:
@@ -110,6 +123,9 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
                 );
+                $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
+                $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_QUARTER;
+                $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_YEAR;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_YEAR);
         }
 
@@ -149,13 +165,11 @@ class DateGroupingFilter extends ChoiceFilter
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
         $whereClauseParameters = $qb->getParameters();
-        $extraWhereClauses = $qb->getDQLPart('where') ?
-            $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts()) :
-            '';
-
-        $firstSubQueryBuilder = $this->generateSubQuery(
+        $extraWhereClauses = !$qb->getDQLPart('where') ?:
+            $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts());
+        $usedDates = $this->getUsedDates(
             $filterType,
-            $this->config['first_calendar_table_for_grouping'],
+            $this->config['calendar_table_for_grouping'],
             $this->config['calendar_column_for_grouping'],
             $this->config['first_joined_table'],
             $this->config['joined_column'],
@@ -163,36 +177,51 @@ class DateGroupingFilter extends ChoiceFilter
             $whereClauseParameters
         );
 
-        $secondSubQueryBuilder = $this->generateSubQuery(
-            $filterType,
-            $this->config['second_calendar_table_for_grouping'],
-            $this->config['calendar_column_for_grouping'],
-            $this->config['second_joined_table'],
-            $this->config['joined_column'],
-            $extraWhereClauses,
-            $whereClauseParameters
-        );
-
         $qb->andWhere(
             $qb->expr()->orX(
-                $qb->expr()->notIn(
-                    sprintf(
-                        '%s(%s.%s)',
-                        $filterType,
-                        $this->config['calendar_table'],
-                        $this->config['calendar_column']
+                $qb->expr()->andX(
+                    $qb->expr()->orX(
+                        $qb->expr()->notIn(
+                            sprintf(
+                                '%s(%s.%s)',
+                                $filterType,
+                                $this->config['calendar_table'],
+                                $this->config['calendar_column']
+                            ),
+                            $usedDates
+                        ),
+                        $qb->expr()->notIn(
+                            sprintf(
+                                '%s(%s.%s)',
+                                DateGroupingFilterType::TYPE_YEAR,
+                                $this->config['calendar_table'],
+                                $this->config['calendar_column']
+                            ),
+                            $usedDates
+                        )
                     ),
-                    $firstSubQueryBuilder->getDQL()
+                    $this->addSpecificEmptyDateQuery($qb, DateGroupingFilterType::TYPE_MONTH),
+                    $this->addSpecificEmptyDateQuery($qb, DateGroupingFilterType::TYPE_QUARTER),
+                    $this->addSpecificEmptyDateQuery($qb, DateGroupingFilterType::TYPE_YEAR)
                 ),
                 $qb->expr()->andX(
                     $qb->expr()->in(
                         sprintf(
                             '%s(%s.%s)',
-                            $filterType,
+                            strtoupper($filterType),
                             $this->config['calendar_table'],
                             $this->config['calendar_column']
                         ),
-                        $secondSubQueryBuilder->getDQL()
+                        $usedDates
+                    ),
+                    $qb->expr()->in(
+                        sprintf(
+                            '%s(%s.%s)',
+                            DateGroupingFilterType::TYPE_YEAR,
+                            $this->config['calendar_table'],
+                            $this->config['calendar_column']
+                        ),
+                        $usedDates
                     ),
                     $qb->expr()->isNotNull($this->config['not_nullable_field'])
                 )
@@ -208,9 +237,9 @@ class DateGroupingFilter extends ChoiceFilter
      * @param $joinedColumn
      * @param $extraWhereClauses
      * @param $extraWhereParameters
-     * @return QueryBuilder
+     * @return array|bool
      */
-    private function generateSubQuery(
+    private function getUsedDates(
         $filterType,
         $calendarTableForGrouping,
         $calendarColumnForGrouping,
@@ -226,11 +255,14 @@ class DateGroupingFilter extends ChoiceFilter
             $extraWhereClauses
         );
 
-        return $subQueryBuilder
+        $subQueryBuilder
             ->select(
                 sprintf(
-                    '%s(%s.%s)',
+                    'DISTINCT %s(%s.%s), %s(%s.%s)',
                     $filterType,
+                    $calendarTableForGrouping,
+                    $calendarColumnForGrouping,
+                    DateGroupingFilterType::TYPE_YEAR,
                     $calendarTableForGrouping,
                     $calendarColumnForGrouping
                 )
@@ -248,9 +280,15 @@ class DateGroupingFilter extends ChoiceFilter
                     $this->config['target_column'],
                     $extraWhereClauses
                 )
-            )
-            ->setParameters($extraWhereParameters)
-            ->groupBy(sprintf('%s.%s', $calendarTableForGrouping, $calendarColumnForGrouping));
+            );
+
+        if ($extraWhereClauses != '') {
+            $subQueryBuilder->setParameters($extraWhereParameters);
+        }
+
+        $datesArray = $subQueryBuilder->getQuery()->getArrayResult();
+
+        return $this->arrayFlatten($datesArray);
     }
 
     /**
@@ -261,10 +299,8 @@ class DateGroupingFilter extends ChoiceFilter
         $this->config['data_name'] = $this->get(FilterUtility::DATA_NAME_KEY);
         $this->config['calendar_table'] = $this->getOr('calendar_table', self::CALENDAR_TABLE);
         $this->config['calendar_column'] = $this->getOr('calendar_column', self::CALENDAR_COLUMN);
-        $this->config['first_calendar_table_for_grouping'] = $this
-            ->getOr('first_calendar_table_for_grouping', self::FIRST_CALENDAR_TABLE_FOR_GROUPING);
-        $this->config['second_calendar_table_for_grouping'] = $this
-            ->getOr('second_calendar_table_for_grouping', self::SECOND_CALENDAR_TABLE_FOR_GROUPING);
+        $this->config['calendar_table_for_grouping'] = $this
+            ->getOr('calendar_table_for_grouping', self::CALENDAR_TABLE_FOR_GROUPING);
         $this->config['calendar_column_for_grouping'] = $this
             ->getOr('calendar_column_for_grouping', self::CALENDAR_COLUMN_FOR_GROUPING);
         $this->config['first_joined_table'] = $this->getOr('first_joined_table', self::FIRST_JOINED_TABLE);
@@ -299,5 +335,71 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return $extraWhereClauses;
+    }
+
+    /**
+     * @param $qb
+     * @param $filterType
+     * @return string
+     */
+    public function addSpecificEmptyDateQuery($qb, $filterType)
+    {
+        if (!in_array($filterType, $this->specificDateExpressions)) {
+            return '1=1';
+        }
+
+        return $qb->expr()->in(
+            sprintf(
+                '%s(%s.%s)',
+                $this->exclusionCriteria[$filterType]['format'],
+                $this->config['calendar_table'],
+                $this->config['calendar_column']
+            ),
+            $this->exclusionCriteria[$filterType]['data']
+        );
+    }
+
+    /**
+     * @return $this
+     */
+    public function resolveExclusionCriteria()
+    {
+        $this->exclusionCriteria = [
+            DateGroupingFilterType::TYPE_MONTH => [
+                'format' => DateGroupingFilterType::TYPE_DAY,
+                'data' => 1,
+            ],
+            DateGroupingFilterType::TYPE_QUARTER => [
+                'format' => DateGroupingFilterType::TYPE_MONTH,
+                'data' => $this->generateFirstMonthOfQuarters(),
+            ],
+            DateGroupingFilterType::TYPE_YEAR => [
+                'format' => DateGroupingFilterType::TYPE_QUARTER,
+                'data' => 1
+            ]
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function generateFirstMonthOfQuarters()
+    {
+        $startDate = new \DateTime('first day of january');
+        $endDate = new \DateTime('last day of december');
+
+        $period = new \DatePeriod($startDate, new \DateInterval('P1M'), $endDate);
+        $firstMonthsOfQuarters = [];
+
+        foreach ($period as $date) {
+            $month = intval($date->format('m'));
+            if ($month % self::QUARTER_LENGTH == 1) {
+                $firstMonthsOfQuarters[] = $month;
+            }
+        }
+
+        return $firstMonthsOfQuarters;
     }
 }
