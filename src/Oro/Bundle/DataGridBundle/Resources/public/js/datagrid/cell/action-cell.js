@@ -45,13 +45,13 @@ define([
 
         /** @property */
         baseMarkup:
-        '<div class="more-bar-holder">' +
-        '<div class="dropdown">' +
-        '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
-        '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
-        'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
-        '</div>' +
-        '</div>',
+            '<div class="more-bar-holder">' +
+                '<div class="dropdown">' +
+                    '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
+                    '<ul class="dropdown-menu dropdown-menu__action-cell launchers-dropdown-menu" ' +
+                        'data-options="{&quot;container&quot;: true, &quot;align&quot;: &quot;right&quot;}"></ul>' +
+                '</div>' +
+            '</div>',
 
         /** @property */
         simpleBaseMarkup: '<div class="more-bar-holder action-row"></div>',
@@ -66,18 +66,18 @@ define([
         /** @property */
         launchersListTemplate: _.template(
             '<% if (withIcons) { %>' +
-            '<li><ul class="nav nav-pills icons-holder launchers-list"></ul></li>' +
+                '<li><ul class="nav nav-pills icons-holder launchers-list"></ul></li>' +
             '<% } else { %>' +
-            '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+                '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
             '<% } %>'
         ),
 
         /** @property */
         simpleLaunchersListTemplate: _.template(
             '<% if (withIcons) { %>' +
-            '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
+                '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
             '<% } else { %>' +
-            '<ul class="unstyled launchers-list"></ul>' +
+                '<ul class="unstyled launchers-list"></ul>' +
             '<% } %>'
         ),
 
@@ -164,7 +164,7 @@ define([
                     result.push(this.createAction(action, config[name] || {}));
                 }
             }, this);
-
+2
             return _.sortBy(result, 'order');
         },
 
