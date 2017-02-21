@@ -14,11 +14,6 @@
         box-shadow: $btn-shadow;
     }
 
-    @include element-state('disabled') {
-        opacity: .75;
-    }
-
-    //
     &--action {
         border-color: get-color('additional', 'darker');
         background-color: get-color('additional', 'darker');

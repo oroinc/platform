@@ -94,7 +94,7 @@ public function testCgetEntity()
         ]
     ];
     $entityType = $this->getEntityType(InventoryLevel::class);
-    $response = $this->get('oro_rest_api_cget', ['entity' => $entityType], $parameters);
+    $response = $this->cget(['entity' => $entityType], $parameters);
     $this->assertResponseContains(
         '@OroWarehouseBundle/Tests/Functional/Api/responses/cget_filter_by_product.yml',
         $response
@@ -120,7 +120,6 @@ public function testUpdateEntity()
         ],
     ];
     $response = $this->patch(
-        'oro_rest_api_patch',
         ['entity' => $entityType, 'product.sku' => '@product-1->sku'],
         $body
     );
@@ -133,7 +132,6 @@ or you can hold yaml in ```.yml``` file:
 public function testCreateCustomer()
 {
     $this->post(
-        'oro_rest_api_post',
         ['entity' => $this->getEntityType(Customer::class)],
         __DIR__.'/requests/create_customer.yml'
     );

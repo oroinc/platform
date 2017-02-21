@@ -79,6 +79,9 @@ oro:
             title: "Grid Settings"
             tooltip: "Use drag and drop to sort items"
             select_all: "Select All"
+            unselect_all: "Unselect All"
+            deselect_all: "Deselect All"
+            reset: "Reset"
             filter:
                 all: 'All'
                 selected: 'Selected'

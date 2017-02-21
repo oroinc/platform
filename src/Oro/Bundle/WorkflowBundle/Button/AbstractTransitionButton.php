@@ -95,6 +95,7 @@ abstract class AbstractTransitionButton implements ButtonInterface
                     'route' => $this->buttonContext->getRouteName(),
                     'datagrid' => $this->buttonContext->getDatagridName(),
                     'group' => $this->buttonContext->getGroup(),
+                    'originalUrl' => $showDialog ? null : $this->buttonContext->getOriginalUrl(),
                 ],
                 'executionRoute' => $this->buttonContext->getExecutionRoute(),
                 'dialogRoute' => $showDialog

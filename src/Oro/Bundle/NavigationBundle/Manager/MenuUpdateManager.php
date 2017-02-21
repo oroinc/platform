@@ -17,6 +17,7 @@ use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\UIBundle\Model\TreeItem;
 
 class MenuUpdateManager
 {
@@ -302,6 +303,47 @@ class MenuUpdateManager
         );
 
         return $updates;
+    }
+
+    /**
+     * @param string     $menuName
+     * @param TreeItem[] $treeItems
+     * @param Scope      $scope
+     * @param string     $parentKey
+     * @param int        $position
+     *
+     * @return MenuUpdateInterface[]
+     */
+    public function moveMenuItems($menuName, $treeItems, Scope $scope, $parentKey, $position)
+    {
+        $parent = $this->findMenuItem($menuName, $parentKey, $scope);
+        $menuUpdates = [];
+
+        foreach ($treeItems as $index => $treeItem) {
+            $currentUpdate = $this->findOrCreateMenuUpdate($menuName, $treeItem->getKey(), $scope);
+            $menuUpdates[] = $currentUpdate;
+
+            if ($menuName !== $parentKey) {
+                $currentUpdate->setParentKey($parent ? $parent->getName() : null);
+            }
+
+            $currentUpdate->setPriority($position + $index);
+        }
+
+        $order = [];
+        $i = 0;
+
+        /** @var ItemInterface $child */
+        foreach ($parent->getChildren() as $child) {
+            $newPosition = $i < $position ? $i : $i + count($treeItems);
+            $order[$newPosition] = $child;
+            $i++;
+        }
+
+        return array_merge(
+            $menuUpdates,
+            $this->getReorderedMenuUpdates($menuName, $order, $scope)
+        );
     }
 
     /**

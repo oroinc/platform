@@ -33,6 +33,13 @@ services:
             - '@request_stack'
             - '@oro_action.provider.route'
 
+    oro_action.helper.destination_page:
+        class: 'Oro\Bundle\ActionBundle\Helper\DestinationPageHelper'
+        arguments:
+            - '@request_stack'
+            - '@oro_entity_config.helper.entity_config'
+            - '@router'
+
     oro_action.provider.current_application:
         class: 'Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider'
         arguments:
@@ -59,6 +66,13 @@ services:
         class: %oro_action.helper.applications_url.class%
         arguments:
             - '@oro_action.provider.route'
+            - '@router'
+
+    oro_action.resolver.destination_page_resolver:
+        class: 'Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver'
+        arguments:
+            - '@request_stack'
+            - '@oro_entity_config.helper.entity_config'
             - '@router'
 
     oro_action.operation_registry:

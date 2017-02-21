@@ -68,9 +68,14 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
             $buttonContext = (new ButtonContext())
                 ->setEntity($entityClass)
                 ->setRouteName($routeName)
+                ->setOriginalUrl('example.com')
                 ->setDatagridName($datagrid);
 
+            $this->destinationPageResolver->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
+
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
+        } else {
+            $this->destinationPageResolver->expects($this->never())->method('getOriginalUrl');
         }
 
         $this->assertEquals(

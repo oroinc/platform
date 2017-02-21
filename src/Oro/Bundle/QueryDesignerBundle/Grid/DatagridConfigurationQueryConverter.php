@@ -3,19 +3,17 @@
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
 use Doctrine\ORM\Query;
-
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
-
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 {
@@ -23,6 +21,11 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      * @var DatagridGuesser
      */
     protected $datagridGuesser;
+
+    /**
+     * @var EntityNameResolver
+     */
+    protected $entityNameResolver;
 
     /**
      * @var DatagridConfiguration
@@ -61,15 +64,18 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
      * @param DatagridGuesser               $datagridGuesser
+     * @param EntityNameResolver            $entityNameResolver
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         ManagerRegistry $doctrine,
-        DatagridGuesser $datagridGuesser
+        DatagridGuesser $datagridGuesser,
+        EntityNameResolver $entityNameResolver
     ) {
         parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
         $this->datagridGuesser = $datagridGuesser;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -160,16 +166,28 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
                 $columnAlias
             );
         }
-        $this->selectColumns[] = sprintf(
-            '%s as %s',
-            $functionExpr !== null ? $functionExpr : $columnExpr,
-            $columnAlias
-        );
 
         $fieldType = $functionReturnType;
         if ($fieldType === null) {
             $fieldType = $this->getFieldType($entityClassName, $fieldName);
         }
+
+        if (!$functionExpr && $fieldType === 'dictionary') {
+            list($entityAlias) = explode('.', $columnExpr);
+            $nameDql = $this->entityNameResolver->getNameDQL(
+                $entityClassName,
+                $entityAlias
+            );
+            if ($nameDql) {
+                $columnExpr = $nameDql;
+            }
+        }
+
+        $this->selectColumns[] = sprintf(
+            '%s as %s',
+            $functionExpr !== null ? $functionExpr : $columnExpr,
+            $columnAlias
+        );
 
         $columnOptions = [
             DatagridGuesser::FORMATTER => [

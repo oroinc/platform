@@ -112,6 +112,28 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Checks first records in provided column number
+     * Example: And I check first 5 records in 1 column
+     *
+     * @When /^(?:|I )check first (?P<amount>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
+     */
+    public function iCheckRecordsInColumn($amount, $column)
+    {
+        $this->getGrid()->checkFirstRecords($amount, $column);
+    }
+
+    /**
+     * Unchecks first records in provided column number
+     * Example: And I uncheck first 2 records in 1 column
+     *
+     * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
+     */
+    public function iUncheckFirstRecordsInColumn($number, $column)
+    {
+        $this->getGrid()->checkFirstRecords($number, $column);
+    }
+
+    /**
      * Example: And I uncheck first 2 records in grid
      *
      * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in grid$/
@@ -504,6 +526,31 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             $grid->getMassActionLink($action),
             sprintf('%s mass action should not be accassable', $action)
         );
+    }
+
+    /**
+     * Check that record with provided name exists in grid
+     * Example: Then I should see First test group in grid
+     *
+     * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iShouldSeeRecordInGrid($recordName)
+    {
+        $this->getGrid()->getRowByContent($recordName);
+    }
+
+    /**
+     * Check that given collection of records exists in grid
+     * Example: Then I should see following records in grid:
+     *            | Alice1  |
+     *            | Alice10 |
+     * @Then /^(?:|I )should see following records in grid:$/
+     */
+    public function iShouldSeeFollowingRecordsInGrid(TableNode $table)
+    {
+        foreach ($table->getRows() as list($value)) {
+            $this->iShouldSeeRecordInGrid($value);
+        }
     }
 
     /**
