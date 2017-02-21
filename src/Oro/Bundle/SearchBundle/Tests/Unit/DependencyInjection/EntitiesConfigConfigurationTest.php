@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Oro\Bundle\SearchBundle\DependencyInjection\EntitiesConfigConfiguration;
 use Oro\Component\Testing\Unit\LoadTestCaseDataTrait;
-use Oro\Bundle\SearchBundle\DependencyInjection\Configuration;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class EntitiesConfigConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     use LoadTestCaseDataTrait;
 
-    /** @var Configuration */
+    /** @var EntitiesConfigConfiguration */
     protected $configuration;
 
     protected function setUp()
     {
-        $this->configuration = new Configuration();
+        $this->configuration = new EntitiesConfigConfiguration();
     }
 
     protected function tearDown()
@@ -28,7 +28,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf(TreeBuilder::class, $this->configuration->getConfigTreeBuilder());
     }
-
 
     /**
      * @dataProvider processConfigurationDataProvider
@@ -51,7 +50,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $path = implode(DIRECTORY_SEPARATOR, [
             __DIR__,
             'test_cases',
-            'configuration',
+            'entities_config_configuration',
         ]);
 
         return $this->getTestCaseData($path);
