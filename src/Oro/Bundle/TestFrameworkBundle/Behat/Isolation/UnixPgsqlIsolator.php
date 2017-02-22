@@ -155,11 +155,12 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
         $process = sprintf(
             'PGPASSWORD="%s" psql -h %s -U %s %s -t -c "'.
             'select \'drop table \"\' || tablename || \'\" cascade;\' from pg_tables where schemaname=\'public\'"'.
-            '| psql -h %s -U %s %s',
+            '| PGPASSWORD="%s" psql -h %s -U %s %s',
             $this->dbPass,
             $this->dbHost,
             $this->dbUser,
             $this->dbName,
+            $this->dbPass,
             $this->dbHost,
             $this->dbUser,
             $this->dbName

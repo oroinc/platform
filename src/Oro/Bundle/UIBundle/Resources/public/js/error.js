@@ -27,7 +27,7 @@ define([
          */
         handle: function(event, xhr, settings) {
             if (this.isXHRStatus(xhr, 401)) {
-                this._processRedirect();
+                this._processRedirect(xhr.responseJSON || {});
             } else if (xhr.readyState === 4) {
                 var errorMessage = this.getErrorMessage(event, xhr, settings);
                 var isShowError = Boolean(errorMessage);
@@ -135,9 +135,10 @@ define([
         /**
          * Redirects to login
          *
+         * @param {Object} response
          * @private
          */
-        _processRedirect: function() {
+        _processRedirect: function(response) {
             var hashUrl = '';
             // @TODO add extra parameter for redirect after login
             /*if (Navigation.isEnabled()) {
@@ -145,7 +146,7 @@ define([
                 hashUrl = '#url=' + navigation.getHashUrl();
             }*/
 
-            window.location.href = routing.generate('oro_user_security_login') + hashUrl;
+            window.location.href = response.redirectUrl || (routing.generate('oro_user_security_login') + hashUrl);
         }
     };
 
