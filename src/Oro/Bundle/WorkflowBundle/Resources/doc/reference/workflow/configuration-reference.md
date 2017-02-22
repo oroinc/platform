@@ -113,7 +113,7 @@ Single workflow configuration has next properties:
     *string*
     Workflow should have a unique name in scope of all application. As workflow configuration doesn't support merging
     two workflows with the same name will lead to exception during configuration loading.
-* **label**
+* **label** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.label` 
     This value will be shown in the UI
 * **entity**
@@ -221,7 +221,7 @@ Single attribute can be described with next configuration:
         object should support serialize/deserialize, option "class" is required for this type
     * **entity**
         Doctrine entity, option "class" is required and it must be a Doctrine manageable class
-* **label**
+* **label** (translation file field)
     *translatable*: `oro.workflow.{workflow_name}.attribute.{attribute_name}.label`
     Label can be shown in the UI
 * **entity_acl**
@@ -286,7 +286,7 @@ Summarizing all above, step has next configuration:
 * **name**
     *string*
     Step must have unique name in scope of Workflow
-* **label**
+* **label** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.step.{step_name}.label`
     Label of step, can be shown in UI if Workflow has type wizard
 * **order**
@@ -340,7 +340,7 @@ Transition configuration has next options:
 * **unique name**
     *string*
     A transition must have unique name in scope of Workflow. Step configuration references transitions by this value.
-* **label**
+* **label** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.label` 
     Label of transition, will to be shown in UI.
 * **step_to**
@@ -364,7 +364,7 @@ Transition configuration has next options:
 * **acl_message**
     *string*
     Message, that will be sown in case when acl_resource is not granted.
-* **message**
+* **message** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message`
     Notification message, that will be shown at frontend before transition execution.
 * **init_routes**
@@ -390,8 +390,8 @@ Transition configuration has next options:
     *string*
     (optional) Parameter used only when `display_type` equals `page`.
     Specified value will be converted to url by entity configuration (see action `@resolve_destination_page`).
-    In case when `@redirect` action used in `actions` of transition definition, effect from taht option will be ignored.
-    Allowed values: `name` or `index` (`index` - will be converted to `name`) , 'view' or `~`. Default value `~`.
+    In case when `@redirect` action used in `actions` of transition definition, effect from that option will be ignored.
+    Allowed values: `name` or `index` (`index` - will be converted to `name`) , `view` or `~`. Default value `~`.
 * **page_template**
     *string*
     Custom transition template for transition pages. Should be extended from OroWorkflowBundle:Workflow:transitionForm.html.twig.
@@ -403,7 +403,7 @@ Transition configuration has next options:
     (CSS class of icon of transition button).
 * **form_options**
     These options will be passed to form type of transition, they can contain options for form types of attributes that
-    will be shown when user clicks transition button.
+    will be shown when user clicks transition button. See more at [Transition Forms](./transition-forms.md)).
 * **transition_definition**
     *string*
     Name of associated transition definition.
@@ -559,14 +559,6 @@ Transition definition configuration has next options.
     Configuration of Conditions that must satisfy to allow transition.
 * **actions**
     Configuration of Post Actions that must be performed after transit to next step will be performed.
-* **form_init**
-    Configuration of Form Init Actions that may be performed on workflow item before conditions and actions.
-* **pre_conditions**
-    Deprecated, use `preconditions` instead.
-* **init_actions**
-    Deprecated, use `form_init` instead.
-* **post_actions**
-    Deprecated, use `actions` instead.
 
 Example
 -------
@@ -580,14 +572,13 @@ workflows:
                 # Set timeout value
                 preactions:
                     - @assign_value: [$call_timeout, 120]
+                    - @increment_value: [$call_attempt]
                 # Check that timeout is set
                 conditions:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
                 actions:
                     - @assign_value: [$call_successfull, true]
-                form_init:
-                    - @increment_value: [$call_attempt]
             not_answered_definition: # Callee did not answer
                 # Set timeout value
                 preactions:
@@ -764,8 +755,6 @@ workflows:
         transition_definitions:
             # some transition definition
                 preactions:
-                    - @some_action: ~
-                form_init:
                     - @assign_value: [$call_attempt, 1]
                 actions:
                     - @create_entity: # create an entity PhoneConversation
@@ -958,6 +947,7 @@ oro:
 ```
 As usual for Symfony translations (messages) files, structure of nodes can be grouped by key dots. This code above 
 provide full tree just for example.
+See more about translations on [the Translations Wizard page](./translations-wizard.md)
 
 PhoneCall Entity
 ----------------
