@@ -125,6 +125,12 @@
     {% endspaceless %}
 {%- endblock %}
 
+{% block page_title_widget -%}
+    {% spaceless %}
+        <h3>{{ value|block_text(translation_domain) }}</h3>
+    {% endspaceless %}
+{%- endblock %}
+
 {% block meta_widget %}
     {% if charset is defined %}
         {% set attr = attr|merge({

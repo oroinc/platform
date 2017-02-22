@@ -3,71 +3,56 @@
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Twig;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
+use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
+use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
+use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $navigation;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $dataCollector;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $messageManager;
 
-    /**
-     * @var EntityPaginationExtension
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $requestStack;
+
+    /** @var EntityPaginationExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->navigation =
-            $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $this->dataCollector = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector')
+        $this->navigation =$this->getMockBuilder(EntityPaginationNavigation::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->dataCollector = $this->getMockBuilder(StorageDataCollector::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->messageManager = $this->getMockBuilder(MessageManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->messageManager = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Manager\MessageManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = self::getContainerBuilder()
+            ->add('oro_entity_pagination.navigation', $this->navigation)
+            ->add('oro_entity_pagination.storage.data_collector', $this->dataCollector)
+            ->add('oro_entity_pagination.message_manager', $this->messageManager)
+            ->add('request_stack', $this->requestStack)
+            ->getContainer($this);
 
-        $this->extension = new EntityPaginationExtension(
-            $this->navigation,
-            $this->dataCollector,
-            $this->messageManager
-        );
-    }
-
-    public function testGetFunctions()
-    {
-        $expectedFunctions = [
-            'oro_entity_pagination_pager' => [$this->extension, 'getPager'],
-            'oro_entity_pagination_collect_data' => [$this->extension, 'collectData'],
-            'oro_entity_pagination_show_info_message' => [$this->extension, 'showInfoMessage'],
-        ];
-
-        $functions = $this->extension->getFunctions();
-        $this->assertSameSize($functions, $expectedFunctions);
-
-        foreach ($functions as $function) {
-            /** @var \Twig_SimpleFunction $function */
-            $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-            $name = $function->getName();
-            $this->assertArrayHasKey($name, $expectedFunctions);
-            $this->assertEquals($expectedFunctions[$name], $function->getCallable());
-        }
+        $this->extension = new EntityPaginationExtension($container);
     }
 
     /**
@@ -90,7 +75,10 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($entity, $scope)
             ->will($this->returnValue($currentNumber));
 
-        $this->assertSame($expected, $this->extension->getPager($entity, $scope));
+        $this->assertSame(
+            $expected,
+            self::callTwigFunction($this->extension, 'oro_entity_pagination_pager', [$entity, $scope])
+        );
     }
 
     public function testCollectData()
@@ -99,14 +87,18 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
         $scope = 'test';
         $result = true;
 
+        $this->requestStack->expects(self::once())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
         $this->dataCollector->expects($this->once())
             ->method('collect')
             ->with($request, $scope)
             ->will($this->returnValue($result));
 
-        $this->extension->setRequest($request);
-
-        $this->assertSame($result, $this->extension->collectData($scope));
+        $this->assertSame(
+            $result,
+            self::callTwigFunction($this->extension, 'oro_entity_pagination_collect_data', [$scope])
+        );
     }
 
     /**
@@ -154,7 +146,7 @@ class EntityPaginationExtensionTest extends \PHPUnit_Framework_TestCase
                 ->method('addFlashMessage');
         }
 
-        $this->extension->showInfoMessage($entity, $scope);
+        self::callTwigFunction($this->extension, 'oro_entity_pagination_show_info_message', [$entity, $scope]);
     }
 
     public function showInfoMessageDataProvider()

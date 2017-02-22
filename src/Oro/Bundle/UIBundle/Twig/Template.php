@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Twig_Template;
-
-abstract class Template extends Twig_Template
+abstract class Template extends \Twig_Template
 {
     /**
      * Render template with a given context and adds template and parent template name to output

@@ -10,6 +10,12 @@
     -webkit-appearance: none;
 }
 
+@mixin base-disabled-style($opacity: .5) {
+    opacity: $opacity;
+
+    pointer-events: none;
+}
+
 @mixin base-ui-element(
     $use-base-style:   false,
     $padding:          $base-ui-element-offset,

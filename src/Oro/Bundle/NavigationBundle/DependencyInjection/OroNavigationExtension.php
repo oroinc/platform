@@ -18,6 +18,7 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 class OroNavigationExtension extends Extension
 {
     const TITLES_KEY = 'titles';
+    const SETTINGS_KEY = 'settings';
     const MENU_CONFIG_KEY = 'menu_config';
     const NAVIGATION_ELEMENTS_KEY = 'navigation_elements';
     const NAVIGATION_CONFIG_ROOT = 'navigation';
@@ -75,27 +76,26 @@ class OroNavigationExtension extends Extension
         $loader->load('content_providers.yml');
         $loader->load('form_types.yml');
 
+        $navigationElements = $config[Configuration::NAVIGATION_ELEMENTS_NODE];
+        unset($config[Configuration::NAVIGATION_ELEMENTS_NODE]);
+        $navigationSettings = array_intersect_key($config, array_flip([self::SETTINGS_KEY]));
+        unset($config[self::SETTINGS_KEY]);
+
         $container
-            ->getDefinition('oro_menu.configuration_builder')
-            ->addMethodCall('setConfiguration', array($config));
-        $container
-            ->getDefinition('oro_menu.twig.extension')
-            ->addMethodCall('setMenuConfiguration', array($config));
+            ->getDefinition('oro_menu.configuration')
+            ->replaceArgument(0, $config);
 
         $container
             ->getDefinition('oro_navigation.title_config_reader')
-            ->addMethodCall('setConfigData', array($titlesConfig));
+            ->addMethodCall('setConfigData', [$titlesConfig]);
         $container
             ->getDefinition('oro_navigation.title_provider')
-            ->addMethodCall('setTitles', array($titlesConfig));
+            ->addMethodCall('setTitles', [$titlesConfig]);
         $container
             ->getDefinition('oro_navigation.content_provider.navigation_elements')
-            ->replaceArgument(0, $config[Configuration::NAVIGATION_ELEMENTS_NODE]);
-        $container
-            ->getDefinition('oro_navigation.extension.datasource.menu')
-            ->addMethodCall('setMenuConfiguration', [$config]);
+            ->replaceArgument(0, $navigationElements);
 
-        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+        $container->prependExtensionConfig($this->getAlias(), $navigationSettings);
 
         $this->addClassesToCompile(
             [
