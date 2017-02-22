@@ -27,3 +27,21 @@ Feature: User
           | Enabled           | Enabled        |
     And I save and close form
     Then I should see "User saved" flash message
+
+  Scenario: Edit user data
+    Given I go to System/User Management/Users
+    And click Edit First Name in grid
+    When I fill form with:
+      | Username          | johnny                |
+      | First Name        | Johnny                |
+      | Last Name         | Mnemonic              |
+      | Primary Email     | edited@test.com       |
+    And I save and close form
+    Then I should see "User saved" flash message
+    When I go to System/User Management/Users
+    Then I should see johnny in grid with following data:
+      | Username          | johnny                |
+      | First Name        | Johnny                |
+      | Last Name         | Mnemonic              |
+      | Primary Email     | edited@test.com       |
+      | Enabled           | Enabled        |
