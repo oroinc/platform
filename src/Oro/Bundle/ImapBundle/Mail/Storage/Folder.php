@@ -26,7 +26,7 @@ class Folder extends BaseFolder
 
     /** @var array */
     protected $possibleSentFolderNameMap = [
-        'SentBox', 'Sent'
+        'SentBox', 'Sent', 'INBOX.Sent'
     ];
 
     /** @var string[] */

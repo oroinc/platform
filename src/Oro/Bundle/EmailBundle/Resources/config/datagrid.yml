@@ -102,10 +102,11 @@ datagrid:
                     - e
                     - eu.receivedAt as receivedAt
                     - eb.textBody AS body_content
-                    - >
-                        (SELECT COUNT(_ec.id)
-                        FROM OroEmailBundle:Email _ec
-                        WHERE _ec.thread = e.thread) AS thread_email_count
+# counting logic moved to EmailQueryFactory:addEmailsCount
+#                    - >
+#                        (SELECT COUNT(_ec.id)
+#                        FROM OroEmailBundle:Email _ec
+#                        WHERE _ec.thread = e.thread) AS thread_email_count
                     - >
                         CASE
                             WHEN e.thread IS NULL THEN eb.hasAttachments
@@ -262,7 +263,7 @@ datagrid:
             email.id: ~
             view_thread_link:
                 type: url
-                route: oro_email_thread_view
+                route: oro_email_user_thread_view
                 params: { id: email.id }
             toggle_seen_link:
                 type: url

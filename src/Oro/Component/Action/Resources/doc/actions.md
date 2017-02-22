@@ -151,6 +151,8 @@ Create Entity
  - attribute - attribute that will contain the created entity instance;
  - flush - (optional) when flush in DB should be performed.
            Immediately after entity creation if ``true`` or later if ``false`` (default value: false);
+           _Note: This option might significantly slow down an application, 
+           so it should be set to "true" only if entity really must be flushed to DB during this action_;
  - data - (optional) array of data that should be set to entity.
 
 **Configuration Example**

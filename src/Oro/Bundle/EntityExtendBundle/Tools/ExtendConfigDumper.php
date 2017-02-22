@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\Common\Cache\ClearableCache;
+use Doctrine\Common\Cache\FlushableCache;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
 use Symfony\Component\Filesystem\Filesystem;
@@ -112,6 +113,8 @@ class ExtendConfigDumper
      *
      * @param callable|null $filter function (ConfigInterface $config) : bool
      * @param bool $updateCustom
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function updateConfig($filter = null, $updateCustom = false)
     {
@@ -259,7 +262,9 @@ class ExtendConfigDumper
             /** @var ClassMetadataFactory $metadataFactory */
             $metadataFactory = $em->getMetadataFactory();
             $metadataCache   = $metadataFactory->getCacheDriver();
-            if ($metadataCache instanceof ClearableCache) {
+            if ($metadataCache instanceof FlushableCache) {
+                $metadataCache->flushAll();
+            } elseif ($metadataCache instanceof ClearableCache) {
                 $metadataCache->deleteAll();
             }
         }

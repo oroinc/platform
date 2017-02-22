@@ -189,6 +189,7 @@ services:
         class: %swiftmailer.class%
         arguments:
             - '@oro_notification.mailer.transport'
+            - '@oro_email.logger.link'
 
     swiftmailer.mailer.db_spool_mailer.transport.real:
         alias: swiftmailer.transport.real
