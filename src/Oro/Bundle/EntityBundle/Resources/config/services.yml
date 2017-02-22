@@ -489,3 +489,9 @@ services:
         calls:
             - [addDriver, ['@oro_entity.database.driver.mysql']]
             - [addDriver, ['@oro_entity.database.driver.pgsql']]
+
+    oro_entity.doctrine.field_updates_checker:
+        class: Oro\Component\DoctrineUtils\ORM\FieldUpdatesChecker
+        arguments:
+            - '@doctrine'
+            - '@property_accessor'
