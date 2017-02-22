@@ -30,6 +30,17 @@ class InterruptConsumptionExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context)
     {
+        if (! file_exists($this->filePath)) {
+            $context->getLogger()->info(
+                '[InterruptConsumptionExtension] Execution interrupted. File does not exists.',
+                ['context' => $context]
+            );
+
+            $context->setExecutionInterrupted(true);
+
+            return;
+        }
+
         clearstatcache(true, $this->filePath);
 
         if (filemtime($this->filePath) > $this->timestamp) {

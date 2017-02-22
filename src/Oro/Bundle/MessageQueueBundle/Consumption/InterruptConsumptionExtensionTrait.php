@@ -11,7 +11,7 @@ trait InterruptConsumptionExtensionTrait
     protected $filePath;
 
     /**
-     * Create file if not exists
+     * Create file if not exist
      *
      * @param string $filePath
      *
