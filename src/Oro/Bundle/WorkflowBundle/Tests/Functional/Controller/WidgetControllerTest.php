@@ -4,16 +4,16 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType;
-use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithFormConfiguration;
 use Symfony\Component\DomCrawler\Crawler;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionsWithFormConfiguration;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WidgetControllerTest extends WebTestCase
@@ -59,10 +59,7 @@ class WidgetControllerTest extends WebTestCase
                 '_widgetContainer' => 'dialog',
                 'entityClass' => self::ENTITY_CLASS,
                 'entityId' => $this->entity->getId()
-            ]),
-            [],
-            [],
-            $this->generateBasicAuthHeader()
+            ])
         );
 
         $response = $this->client->getResponse();
@@ -98,7 +95,7 @@ class WidgetControllerTest extends WebTestCase
      */
     protected function getStepLabel($workflowName, $stepName)
     {
-        return WorkflowTemplate::KEY_PREFIX . '.' . $workflowName . '.step.' . $stepName . '.label';
+        return sprintf('%s.%s.step.%s.label', WorkflowTemplate::KEY_PREFIX, $workflowName, $stepName);
     }
 
     /**
@@ -109,7 +106,7 @@ class WidgetControllerTest extends WebTestCase
      */
     protected function getTransitionLabel($workflowName, $transitionName)
     {
-        return WorkflowTemplate::KEY_PREFIX . '.' . $workflowName . '.transition.' . $transitionName . '.label';
+        return sprintf('%s.%s.transition.%s.label', WorkflowTemplate::KEY_PREFIX, $workflowName, $transitionName);
     }
 
     public function testStartTransitionFormAction()
@@ -123,9 +120,7 @@ class WidgetControllerTest extends WebTestCase
                 'workflowName' => LoadWorkflowDefinitions::MULTISTEP,
                 'transitionName' => LoadWorkflowDefinitions::MULTISTEP_START_TRANSITION,
             ]),
-            ['entityId' => $this->entity->getId(),],
-            [],
-            $this->generateBasicAuthHeader()
+            ['entityId' => $this->entity->getId()]
         );
 
         $response = $this->client->getResponse();
@@ -143,12 +138,7 @@ class WidgetControllerTest extends WebTestCase
                 'workflowName' => LoadWorkflowDefinitions::WITH_INIT_OPTION,
                 'transitionName' => LoadWorkflowDefinitions::START_FROM_ROUTE_TRANSITION_WITH_FORM,
             ]),
-            [
-                'entityClass' => 'class1',
-                'route' => 'route1'
-            ],
-            [],
-            $this->generateBasicAuthHeader()
+            ['entityClass' => 'class1', 'route' => 'route1']
         );
 
         $response = $this->client->getResponse();
@@ -173,17 +163,15 @@ class WidgetControllerTest extends WebTestCase
                 'workflowName' => LoadWorkflowDefinitionsWithFormConfiguration::WFC_WORKFLOW_NAME,
                 'transitionName' => LoadWorkflowDefinitionsWithFormConfiguration::WFC_START_TRANSITION,
             ]),
-            ['entityId' => $this->entity->getId(),],
-            [],
-            $this->generateBasicAuthHeader()
+            ['entityId' => $this->entity->getId()]
         );
 
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
         $this->assertNotEmpty($crawler->html());
 
-        $workflowItem = (new WorkflowItem())
-            ->setEntityId($this->entity->getId())
+        $workflowItem = new WorkflowItem();
+        $workflowItem->setEntityId($this->entity->getId())
             ->setWorkflowName(LoadWorkflowDefinitionsWithFormConfiguration::WFC_WORKFLOW_NAME);
 
         $this->assertTransitionFromWithConfigurationSubmit($crawler, $workflowItem, 'data_value_one', [
@@ -201,10 +189,7 @@ class WidgetControllerTest extends WebTestCase
                 '_widgetContainer' => 'dialog',
                 'workflowItemId' => $workflowItem->getId(),
                 'transitionName' => LoadWorkflowDefinitions::MULTISTEP_START_TRANSITION,
-            ]),
-            [],
-            [],
-            $this->generateBasicAuthHeader()
+            ])
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
@@ -231,10 +216,7 @@ class WidgetControllerTest extends WebTestCase
                 '_widgetContainer' => 'dialog',
                 'workflowItemId' => $workflowItem->getId(),
                 'transitionName' => LoadWorkflowDefinitionsWithFormConfiguration::WFC_TRANSITION,
-            ]),
-            [],
-            [],
-            $this->generateBasicAuthHeader()
+            ])
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);
@@ -274,7 +256,7 @@ class WidgetControllerTest extends WebTestCase
     /**
      * @param Crawler $crawler
      * @param WorkflowItem $workflowItem
-     * @param $dataAttribute
+     * @param string $dataAttribute
      * @param array $data
      */
     protected function assertTransitionFromWithConfigurationSubmit(
@@ -311,10 +293,7 @@ class WidgetControllerTest extends WebTestCase
                 '_widgetContainer' => 'dialog',
                 'entityClass' => self::ENTITY_CLASS,
                 'entityId' => $this->entity->getId(),
-            ]),
-            [],
-            [],
-            $this->generateBasicAuthHeader()
+            ])
         );
         $response = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($response, 200);

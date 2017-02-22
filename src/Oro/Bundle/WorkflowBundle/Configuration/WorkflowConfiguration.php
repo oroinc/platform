@@ -324,12 +324,12 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                             ->always(function ($config) {
                                 if (isset($config[self::NODE_FORM_OPTIONS_CONFIGURATION])) {
                                     if (empty($config[self::NODE_FORM_OPTIONS_CONFIGURATION]['handler'])) {
-                                        $handler = self::DEFAULT_FORM_CONFIGURATION_HANDLER;
-                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['handler'] = $handler;
+                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['handler'] =
+                                            self::DEFAULT_FORM_CONFIGURATION_HANDLER;
                                     }
                                     if (empty($config[self::NODE_FORM_OPTIONS_CONFIGURATION]['template'])) {
-                                        $template = self::DEFAULT_FORM_CONFIGURATION_TEMPLATE;
-                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['template'] = $template;
+                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['template'] =
+                                            self::DEFAULT_FORM_CONFIGURATION_TEMPLATE;
                                     }
                                 }
                                 return $config;
