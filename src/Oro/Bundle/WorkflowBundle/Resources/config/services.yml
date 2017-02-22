@@ -142,7 +142,6 @@ services:
     # use only for system calls, cli, background listeners, etc, when main definition filters aren't available
     oro_workflow.registry.system:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
-        public: false
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'

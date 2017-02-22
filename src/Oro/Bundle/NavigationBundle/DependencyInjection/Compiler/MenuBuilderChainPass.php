@@ -12,9 +12,11 @@ class MenuBuilderChainPass implements CompilerPassInterface
     const MENU_PROVIDER_KEY = 'oro_menu.builder_chain';
     const ITEMS_BUILDER_TAG = 'oro_navigation.item.builder';
     const ITEMS_PROVIDER_KEY = 'oro_navigation.item.factory';
+    const MENU_HELPER_SERVICE = 'knp_menu.helper';
 
     public function process(ContainerBuilder $container)
     {
+        $container->getDefinition(self::MENU_HELPER_SERVICE)->setPublic(true);
         $this->processMenu($container);
         $this->processItems($container);
     }
