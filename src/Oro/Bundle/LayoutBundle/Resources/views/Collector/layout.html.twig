@@ -112,35 +112,62 @@
 {% block panel %}
     <h2>Layouts</h2>
 
-    {% if collector.data.views|length %}
-        <div id="tree-menu" class="tree">
-            <div class="expand-all">
-                <a id="expand-all" href="#" data-collapsed-title="Collapse All">Expand All</a>
+    <div id="layout-profiler" class="sf-tabs">
+        <div class="tab">
+            <h3 class="tab-title">
+                Layout Tree
+                <span class="badge">{{ collector.data.count }}</span>
+            </h3>
+            <div class="tab-content">
+                {% if collector.data.views|length %}
+                    <div id="tree-menu" class="tree">
+                        <div class="expand-all">
+                            <a id="expand-all" href="#" data-collapsed-title="Collapse All">Expand All</a>
+                        </div>
+                        <ul>
+                            {% for viewId, viewData in collector.data.views %}
+                                {{ view_tree_entry(viewId, viewData, true) }}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div id="tree-details-container">
+                        {% for viewId, viewData in collector.data.views %}
+                            {{ view_tree_details(viewId, viewData) }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        <p>No views were found for this request.</p>
+                    </div>
+                {% endif %}
             </div>
-            <ul>
-                {% for viewId, viewData in collector.data.views %}
-                    {{ view_tree_entry(viewId, viewData, true) }}
-                {% endfor %}
-            </ul>
         </div>
-        <div id="tree-details-container">
-            {% for viewId, viewData in collector.data.views %}
-                {% set viewData = viewData|merge({
-                    not_applied_actions_count: collector.data.not_applied_actions_count,
-                    not_applied_actions: collector.data.not_applied_actions,
-                    context: {
-                        data: collector.data.context.data,
-                        items: collector.data.context.items
-                    }
-                }) %}
-                {{ view_tree_details(viewId, viewData) }}
-            {% endfor %}
+        <div class="tab">
+            <h3 class="tab-title">
+                Not Applied Actions
+                <span class="badge">{{ collector.data.not_applied_actions_count }}</span>
+            </h3>
+            <div class="tab-content">
+                {% if collector.data.not_applied_actions_count > 0 %}
+                    {{ not_applied_actions_tab(collector.data.not_applied_actions) }}
+                {% endif %}
+            </div>
         </div>
-    {% else %}
-        <div class="empty">
-            <p>No views were found for this request.</p>
+        <div class="tab">
+            <h3 class="tab-title">Context</h3>
+            <div class="tab-content">
+                <div class="tree-details">
+                    {% if collector.data.context.items|length %}
+                        {{ view_block_details('context', 'Context', {'Items': collector.data.context.items}) }}
+                    {% endif %}
+
+                    {% if collector.data.context.data|length %}
+                        {{ view_block_details('context-data', 'Context Data', {'Items': collector.data.context.data}, true) }}
+                    {% endif %}
+                </div>
+            </div>
         </div>
-    {% endif %}
+    </div>
 
     <script type="text/javascript">
         (function(){
@@ -315,9 +342,7 @@
                         Sfjs.addClass(target, 'hidden');
                     }
 
-                    if (tabs.length > 0) {
-                        select(tabs[0]);
-                    }
+                    select(tabs[0]);
                 };
 
                 return {
@@ -427,111 +452,83 @@
                 <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
             {% endif %}
         </h2>
-        <div class="sf-tabs">
-            {% if data.context.items|length %}
-                {{ tree.view_block_details(data.id, 'Context', {'Items': data.context.items}, 'context_items', true) }}
-            {% endif %}
 
-            {% if data.context.data|length %}
-                {{ tree.view_block_details(data.id, 'Context Data', {'Items': data.context.data}, 'context_items', true) }}
-            {% endif %}
+        {% if data.build_block_options is defined %}
+            {{ tree.view_block_details(data.id ~ '-build-block', 'Build Block', {'Options': data.build_block_options}, true) }}
+        {% endif %}
 
-            {% if data.build_block_options is defined %}
-                {{ tree.view_block_details(data.id, 'Build Block', {'Options': data.build_block_options}, 'build_block_options', true) }}
-            {% endif %}
+        {% if data.build_view_options is defined %}
+            {{ tree.view_block_details(data.id ~ '-build-view', 'Build View', {'Options': data.build_view_options}, true) }}
+        {% endif %}
 
-            {% if data.build_view_options is defined %}
-                {{ tree.view_block_details(data.id, 'Build View', {'Options': data.build_view_options}, 'build_view_options', true) }}
-            {% endif %}
-
-            {% if data.view_vars is defined %}
-                {{ tree.view_block_details(data.id, 'Variables', {'Variables': data.view_vars}, 'view_vars') }}
-            {% endif %}
-
-            {% if data.not_applied_actions_count is defined and data.not_applied_actions_count %}
-                {{ tree.not_applied_actions_tab(data.not_applied_actions_count, data.not_applied_actions) }}
-            {% endif %}
-        </div>
+        {% if data.view_vars is defined %}
+            {{ tree.view_block_details(data.id ~ '-vars', 'Variables', {'Variables': data.view_vars}) }}
+        {% endif %}
     </div>
 
     {% for childName, childData in data.children %}
-        {% set childData = childData|merge({
-            not_applied_actions_count: data.not_applied_actions_count,
-            not_applied_actions: data.not_applied_actions,
-            context: {
-                data: data.context.data,
-                items: data.context.items
-            }
-        }) %}
         {{ tree.view_tree_details(childName, childData) }}
     {% endfor %}
 {% endmacro %}
 
-{% macro view_block_details(id, title, groups, class, hidden) %}
-    <div class="tab">
-        <h3 class="tab-title">{{ title }}</h3>
-        <div class="tab-content">
-            {% for name, options in groups %}
-                {% if options %}
-                    <h4>{{ name }}</h4>
-                    <table>
-                        <thead>
+{% macro view_block_details(id, title, groups, hidden) %}
+    <h3>
+        <a class="toggle-button" data-toggle-target-id="{{ id }}-details" href="#">
+            {{ title }} <span class="toggle-icon"></span>
+        </a>
+    </h3>
+    <div id="{{ id }}-details"{% if hidden %} class="hidden"{% endif %}>
+        {% for name, options in groups %}
+            {% if options %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th width="180">Key</th>
+                        <th>Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for option, value in options %}
                         <tr>
-                            <th width="180">Key</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for option, value in options %}
-                            <tr>
-                                <th scope="row">{{ option }}</th>
-                                <td>
-                                    {{ convert_value_to_string(value) }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-            {% endfor %}
-        </div>
-    </div>
-{% endmacro %}
-
-{% macro not_applied_actions_tab(count, actions) %}
-    <div class="tab">
-        <h3 class="tab-title">
-            Not applied actions
-            <span class="badge">{{ count }}</span>
-        </h3>
-        <div class="tab-content">
-            <table>
-                <thead>
-                <tr>
-                    <th width="180">Action name</th>
-                    <th>Arguments</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {% for action in actions %}
-                        <tr>
+                            <th scope="row">{{ option }}</th>
                             <td>
-                                <strong>
-                                    @{{ action.name }}
-                                </strong>
-                            </td>
-                            <td>
-                                {% for argName, argValue in action.args %}
-                                    <div>
-                                        <strong>{{ argName }}:</strong>
-                                        {{ convert_value_to_string(argValue) }}
-                                    </div>
-                                {% endfor %}
+                                {{ convert_value_to_string(value) }}
                             </td>
                         </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endfor %}
     </div>
+{% endmacro %}
+
+{% macro not_applied_actions_tab(actions) %}
+    <table>
+        <thead>
+        <tr>
+            <th width="180">Action name</th>
+            <th>Arguments</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for action in actions %}
+                <tr>
+                    <td>
+                        <strong>
+                            @{{ action.name }}
+                        </strong>
+                    </td>
+                    <td>
+                        {% for argName, argValue in action.args %}
+                            <div>
+                                <strong>{{ argName }}:</strong>
+                                {{ convert_value_to_string(argValue) }}
+                            </div>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endmacro %}
