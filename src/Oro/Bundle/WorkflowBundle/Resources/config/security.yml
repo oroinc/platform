@@ -17,6 +17,12 @@ services:
         tags:
             - { name: security.voter, priority: 500 }
 
+    oro_workflow.filter.privilege_workflow_filter:
+        class: 'Oro\Bundle\WorkflowBundle\Acl\Filter\AclPrivilegeWorkflowFilter'
+        public: false
+        tags:
+            - { name: oro.security.filter.acl_privilege }
+
     oro_workflow.acl.metadata_provider:
         public: false
         class: Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider

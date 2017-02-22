@@ -2,12 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Twig\EntityExtension;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class EntityExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityIdAccessor;
 
@@ -21,69 +28,36 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     protected $entityAliasResolver;
 
     /** @var EntityExtension */
-    protected $twigExtension;
+    protected $extension;
 
     protected function setUp()
     {
-        $this->entityIdAccessor    = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityIdAccessor')
+        $this->entityIdAccessor = $this->getMockBuilder(EntityIdAccessor::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
+        $this->entityRoutingHelper = $this->getMockBuilder(EntityRoutingHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityNameResolver  = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
+        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityAliasResolver = $this->getMockBuilder(EntityAliasResolver::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = self::getContainerBuilder()
+            ->add('oro_entity.entity_identifier_accessor', $this->entityIdAccessor)
+            ->add('oro_entity.routing_helper', $this->entityRoutingHelper)
+            ->add('oro_entity.entity_name_resolver', $this->entityNameResolver)
+            ->add('oro_entity.entity_alias_resolver', $this->entityAliasResolver)
+            ->getContainer($this);
 
-        $this->twigExtension = new EntityExtension(
-            $this->entityIdAccessor,
-            $this->entityRoutingHelper,
-            $this->entityNameResolver,
-            $this->entityAliasResolver
-        );
+        $this->extension = new EntityExtension($container);
     }
 
     protected function tearDown()
     {
-        unset($this->twigExtension);
-    }
-
-    public function testGetFunctions()
-    {
-        $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(4, $functions);
-
-        /** @var \Twig_SimpleFunction $function */
-        $function = $functions[0];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_class_name', $function->getName());
-        $this->assertEquals([$this->twigExtension, 'getClassName'], $function->getCallable());
-        $function = $functions[1];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_url_class_name', $function->getName());
-        $this->assertEquals([$this->twigExtension, 'getUrlClassName'], $function->getCallable());
-        $function = $functions[2];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_class_alias', $function->getName());
-        $this->assertEquals([$this->twigExtension, 'getClassAlias'], $function->getCallable());
-        $function = $functions[3];
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('oro_action_params', $function->getName());
-        $this->assertEquals([$this->twigExtension, 'getActionParams'], $function->getCallable());
-    }
-
-    public function testGetFilters()
-    {
-        $filters = $this->twigExtension->getFilters();
-
-        $this->assertCount(1, $filters);
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $this->assertEquals('oro_format_name', $filters[0]->getName());
+        unset($this->extension);
     }
 
     /**
@@ -97,7 +71,10 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->entityRoutingHelper->expects($this->never())
             ->method('getUrlSafeClassName');
 
-        $this->assertEquals($expectedClass, $this->twigExtension->getClassName($object));
+        $this->assertEquals(
+            $expectedClass,
+            self::callTwigFunction($this->extension, 'oro_class_name', [$object])
+        );
     }
 
     public function getClassNameDataProvider()
@@ -135,7 +112,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expectedClass,
-            $this->twigExtension->getClassName($object, true)
+            self::callTwigFunction($this->extension, 'oro_class_name', [$object, true])
         );
     }
 
@@ -143,7 +120,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [],
-            $this->twigExtension->getActionParams(null)
+            self::callTwigFunction($this->extension, 'oro_action_params', [null])
         );
     }
 
@@ -151,7 +128,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [],
-            $this->twigExtension->getActionParams('string')
+            self::callTwigFunction($this->extension, 'oro_action_params', ['string'])
         );
     }
 
@@ -181,7 +158,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expected,
-            $this->twigExtension->getActionParams($object, $action)
+            self::callTwigFunction($this->extension, 'oro_action_params', [$object, $action])
         );
     }
 
@@ -198,13 +175,13 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $expectedResult,
-            $this->twigExtension->getEntityName($entity, $locale)
+            self::callTwigFilter($this->extension, 'oro_format_name', [$entity, $locale])
         );
     }
 
     public function testGetName()
     {
-        $this->assertEquals('oro_entity', $this->twigExtension->getName());
+        $this->assertEquals('oro_entity', $this->extension->getName());
     }
 
     public function testGetUrlClassName()
@@ -217,6 +194,9 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($originalClass)
             ->willReturn($urlSafeClass);
 
-        $this->assertEquals($urlSafeClass, $this->twigExtension->getUrlClassName($originalClass));
+        $this->assertEquals(
+            $urlSafeClass,
+            self::callTwigFunction($this->extension, 'oro_url_class_name', [$originalClass])
+        );
     }
 }
