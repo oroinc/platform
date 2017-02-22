@@ -38,10 +38,10 @@ define(function(require) {
         },
 
         /** @property */
-        template: null,
+        template: '#template-datagrid-grid-view',
 
         /** @property */
-        titleTemplate: null,
+        titleTemplate: '#template-datagrid-grid-view-label',
 
         /** @property */
         title: null,
@@ -94,8 +94,8 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['viewsCollection', 'title', 'appearances']));
 
-            this.template = _.template($('#template-datagrid-grid-view').html());
-            this.titleTemplate = _.template($('#template-datagrid-grid-view-label').html());
+            this.template = _.template($(this.template).html());
+            this.titleTemplate = _.template($(this.titleTemplate).html());
 
             if (options.permissions) {
                 this.permissions = _.extend(this.permissions, options.permissions);

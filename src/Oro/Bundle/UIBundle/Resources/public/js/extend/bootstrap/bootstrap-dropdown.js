@@ -56,13 +56,10 @@ define(function(require) {
     function Dropdown(element) {
         var $el = $(element).on('click.dropdown.data-api', this.toggle);
         var globalHandlers = {
-            'click.dropdown.data-api select2-open.dropdown.data-api showTimepicker.dropdown.data-api': function(e) {
+            'click.dropdown.data-api select2-open.dropdown.data-api showTimepicker.dropdown.data-api': function() {
                 var $dropdown = $el.parent();
-                var isPreventToClose = $(e.target).closest('[data-prevent-dropdown-close]').length;
-                if ($dropdown.is('.open') && !isPreventToClose) {
+                if ($dropdown.is('.open')) {
                     $dropdown.trigger('hide.bs.dropdown').removeClass('open');
-                } else {
-                    e.stopPropagation();
                 }
                 $el.dropdown('detach', false);
             }

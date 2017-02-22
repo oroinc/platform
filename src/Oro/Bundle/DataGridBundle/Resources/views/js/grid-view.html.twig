@@ -1,96 +1,18 @@
 <script type="text/template" id="template-datagrid-grid-view">
     <div class="btn-toolbar">
         <% if (choices.length) { %>
-            <div class="btn-group views-group dropdown" data-dropdown-trigger>
-                {#<div data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">
+            <div class="btn-group views-group">
+                <div data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">
                     {# this is already escaped in the title template #}
-                {#<%= title %>
-            </div>#}
-                {#<ul class="dropdown-menu">
+                    <%= title %>
+                </div>
+                <ul class="dropdown-menu">
                     <% _.each(choices, function (choice) { %>
-                        <li>
-                            <a href="#" data-value="<%- choice.value %>">
-                                <% if (choice.icon) { %><i class="<%- choice.icon %>"></i><% } %><%- choice.label %>
-                            </a>
+                        <li><a href="#" data-value="<%- choice.value %>">
+                                <% if (choice.icon) { %><i class="<%- choice.icon %>"></i><% } %><%- choice.label %></a>
                         </li>
                     <% }); %>
-                    <% if (isFrontendPage && showActions) { %>
-                        <% _.each(actions, function(action) { %>
-                        <% if (action.enabled) { %>
-                        <li><a href="#" class="<%- action.name %>"><%- action.label %></a></li>
-                        <% } %>
-                        <% }); %>
-                    <% } %>
-                </ul>#}
-                <a data-toggle="dropdown" class="grid-views__dropdown-toggle <% if (disabled) { %>disabled<% } %>">
-                    Test title
-                    <i class="fa-angle-down"></i>
-                </a>
-                <div class="grid-views__dropdown dropdown-menu">
-                    <span class="grid-views__close">
-                        <i class="fa-times"></i>
-                    </span>
-                    <div class="grid-views__containner" data-prevent-dropdown-close>
-                        <h3 class="grid-views__dropdown__title">Saved Views</h3>
-                        <ul class="grid-views__list">
-                            <% _.each(choices, function (choice) { %>
-                            <li class="grid-views__item">
-                                <label class="grid-views__label custom-radio">
-                                    <% if (choice.icon) { %><i class="<%- choice.icon %>"></i><% } %>
-                                    <input type="radio" class="custom-radio__control" value="<%- choice.value %>" name="grid-view">
-                                    <span class="custom-radio__text"><%- choice.label %></span>
-                                </label>
-                                <ul class="grid-views__icons-list">
-                                    <li class="grid-views__icons-list__item">
-                                        <a href="#" class="grid-views__icons-list__icon">
-                                            <i class="fa-reply-all"></i>
-                                        </a>
-                                    </li>
-                                    <li class="grid-views__icons-list__item">
-                                        <a href="#" class="grid-views__icons-list__icon">
-                                            <i class="fa-floppy-o"></i>
-                                        </a>
-                                    </li>
-                                    <li class="grid-views__icons-list__item">
-                                        <a href="#" class="grid-views__icons-list__icon">
-                                            <i class="fa-pencil"></i>
-                                        </a>
-                                    </li>
-                                    <li class="grid-views__icons-list__item">
-                                        <a href="#" class="grid-views__icons-list__icon">
-                                            <i class="fa-trash"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <% }); %>
-                        </ul>
-
-                        <div class="grid-views__footer">
-                            <div class="grid-views__footer__toggle-container">
-                                <a href="javascript: void(0);" data-toggle="dropdown" data-child-toggle >
-                                    <i class="fa-plus-circle hide-text"></i>
-                                    <span>Save As New</span>
-                                </a>
-                            </div>
-
-                            <div class="grid-views__footer__form clearfix">
-                                <form action="#">
-                                    <input type="text" class="input" placeholder="Enter new list name">
-                                    <div class="actions">
-                                        <button class="btn btn--info btn--size-s">Add</button>
-                                        <button class="btn btn--size-s">Cancel</button>
-                                    </div>
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" class="custom-checkbox__input">
-                                        <span class="custom-checkbox__icon"></span>
-                                        <span class="custom-checkbox__text">Set as Default</span>
-                                    </label>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </ul>
             </div>
         <% } %>
         <% if (showActions) { %>

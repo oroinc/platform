@@ -1,6 +1,8 @@
 // @theme: blank;
 
 .grid-views {
+    margin: $grid-views-offset;
+
     &__dropdown-toggle {
         color: inherit;
     }

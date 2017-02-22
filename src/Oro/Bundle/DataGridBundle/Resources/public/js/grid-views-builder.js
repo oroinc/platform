@@ -4,10 +4,17 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
     var GridViewsView = require('orodatagrid/js/datagrid/grid-views/view');
     var GridViewsCollection = require('orodatagrid/js/datagrid/grid-views/collection');
     var gridContentManager = require('orodatagrid/js/content-manager');
     var gridGridViewsSelector = '.page-title > .navbar-extra .pull-left-extra > .pull-left';
+
+    var config = require('module').config();
+    config = _.extend({
+        View: GridViewsView
+    }, config);
+
     var gridViewsBuilder = {
         /**
          * Runs grid views builder
@@ -31,8 +38,15 @@ define(function(require) {
                 $gridEl: options.$el,
                 showInNavbar: options.showViewsInNavbar,
                 buildViews: function(grid) {
-                    var gridViews = gridViewsBuilder.build.call(this, grid.collection);
-                    deferred.resolve(gridViews);
+                    if (_.isString(config.View)) {
+                        tools.loadModules(config.View, function(View) {
+                            var gridViews = gridViewsBuilder.build.call(self, View, grid.collection);
+                            deferred.resolve(gridViews);
+                        });
+                    } else {
+                        var gridViews = gridViewsBuilder.build.call(this, config.View, grid.collection);
+                        deferred.resolve(gridViews);
+                    }
                 }
             };
 
@@ -66,7 +80,7 @@ define(function(require) {
          * @param {orodatagrid.PageableCollection} collection
          * @returns {orodatagrid.datagrid.GridViewsView}
          */
-        build: function(collection) {
+        build: function(View, collection) {
             var gridViews;
             var options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
@@ -76,10 +90,10 @@ define(function(require) {
                     var $gridViews = $(gridGridViewsSelector);
                     gridViewsOptions.title = $gridViews.text();
 
-                    gridViews = new GridViewsView(gridViewsOptions);
+                    gridViews = new View(gridViewsOptions);
                     $gridViews.html(gridViews.render().$el);
                 } else {
-                    gridViews = new GridViewsView(gridViewsOptions);
+                    gridViews = new View(gridViewsOptions);
                     this.$gridEl.prepend(gridViews.render().$el);
                 }
             }
