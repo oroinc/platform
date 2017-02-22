@@ -45,3 +45,11 @@ Feature: User
       | Last Name         | Mnemonic              |
       | Primary Email     | edited@test.com       |
       | Enabled           | Enabled        |
+
+  Scenario: Delete user
+    Given I should see johnny in grid
+    And I keep in mind number of records in list
+    When I click Delete johnny in grid
+    And I confirm deletion
+    Then the number of records decreased by 1
+    And I should not see "johnny"
