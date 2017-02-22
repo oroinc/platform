@@ -2,32 +2,34 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Util\ClassUtils;
+
 use Oro\Bundle\EntityConfigBundle\Config\AttributeConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Twig\AbstractDynamicFieldsExtension;
 
-use Symfony\Component\Security\Acl\Util\ClassUtils;
-
 class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExtension
 {
-    /**
-     * @var AbstractDynamicFieldsExtension
-     */
+    /** @var AbstractDynamicFieldsExtension */
     private $extension;
 
     /**
-     * @var AttributeConfigHelper
+     * @param AbstractDynamicFieldsExtension $extension
+     * @param ContainerInterface             $container
      */
-    private $attributeHelper;
+    public function __construct(AbstractDynamicFieldsExtension $extension, ContainerInterface $container)
+    {
+        parent::__construct($container);
+        $this->extension = $extension;
+    }
 
     /**
-     * @param AbstractDynamicFieldsExtension $extension
-     * @param AttributeConfigHelper $attributeHelper
+     * @return AttributeConfigHelper
      */
-    public function __construct(AbstractDynamicFieldsExtension $extension, AttributeConfigHelper $attributeHelper)
+    private function getAttributeHelper()
     {
-        $this->extension = $extension;
-        $this->attributeHelper = $attributeHelper;
+        return $this->container->get('oro_entity_config.config.attributes_config_helper');
     }
 
     /**
@@ -48,10 +50,12 @@ class DynamicFieldsExtensionAttributeDecorator extends AbstractDynamicFieldsExte
             $entityClass = ClassUtils::getRealClass($entity);
         }
 
+        $attributeHelper = $this->getAttributeHelper();
+
         return array_filter(
             $fields,
-            function ($fieldName) use ($entityClass) {
-                return !$this->attributeHelper->isFieldAttribute($entityClass, $fieldName);
+            function ($fieldName) use ($attributeHelper, $entityClass) {
+                return !$attributeHelper->isFieldAttribute($entityClass, $fieldName);
             },
             ARRAY_FILTER_USE_KEY
         );

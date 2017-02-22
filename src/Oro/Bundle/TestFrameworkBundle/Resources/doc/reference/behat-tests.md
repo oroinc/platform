@@ -172,27 +172,42 @@ default: &default
       bundle: AcmeDemoBundle
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
-        - Acme\DemoBundle\Tests\Behat\Context\FeatureContext
+        - OroDataGridBundle::GridContext
+        - AcmeDemoBundle::FeatureContext
       paths:
-        - src/Acme/DemoBundle/Tests/Behat/Features
+        - '@AcmeDemoBundle/Tests/Behat/Features'
+```
+
+Or in bundle behat configuration ```{BundleName}/Tests/Behat/behat.yml```:
+
+```yml
+oro_behat_extension:
+  suites:
+    AcmeDemoBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - AcmeDemoBundle::FeatureContext
+      paths:
+        - '@AcmeDemoBundle/Tests/Behat/Features'
 ```
 
 Every bundle that has configured suite in configuration file will not be autoloaded by extension.
 
-#### Page elements
+#### Elements
 
-Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/oro/behat.yml``` in way:
+Every Bundle can have own number of elements. All elements must be discribed in ```{BundleName}/Tests/Behat/behat.yml``` in way:
 
 ```yml
-elements:
-  Login:
-    selector: '#login-form'
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
-    options:
-      mapping:
-        Username: '_username'
-        Password: '_password'
+oro_behat_extension:
+  elements:
+    Login:
+      selector: '#login-form'
+      class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
+      options:
+        mapping:
+          Username: '_username'
+          Password: '_password'
 ```
 
 1. ```Login``` is an element name. It must be unique.
@@ -211,7 +226,43 @@ elements:
  ```
  
 3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
+You can omnit class, if so ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` will use by default.
 4. ```options``` it's an array of extra options that will be set in options property of Element class
+
+#### Page element
+
+Page element encapsulate whole web page with it's url and path to this page.
+Every Page element should extends from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Page```
+Typical Page config is looks like:
+```yml
+oro_behat_extension:
+  pages:
+    User Profile View:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
+      route: 'oro_user_profile_view'
+```
+And Page class:
+```php
+<?php
+
+namespace Oro\Bundle\UserBundle\Tests\Behat\Page;
+
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Page;
+
+class UserProfileView extends Page
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function open(array $parameters = [])
+    {
+        $userMenu = $this->elementFactory->createElement('UserMenu');
+        $userMenu->find('css', 'i.fa-sort-desc')->click();
+
+        $userMenu->clickLink('My User');
+    }
+}
+```
 
 #### Feature isolation
 
@@ -219,6 +270,8 @@ Every feature can interact with application, perform CRUD operation and thereby 
 So, it is why features are isolated to each other.
 The isolation is reached by dumping the database and cache dir before tests execution
 and restoring the cache and database after execution of each feature.
+Every isolator must implement ```Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface``` and ```oro_behat.isolator``` tag with priority.
+See [TestFrameworkBundle/Behat/ServiceContainer/config/isolators.yml](../../../Behat/ServiceContainer/config/isolators.yml)
 
 ### Write your first feature
 

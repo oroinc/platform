@@ -1,3 +1,4 @@
+@skip
 Feature: User configuration
   In order to have ability to change configuration on user level
   As admin

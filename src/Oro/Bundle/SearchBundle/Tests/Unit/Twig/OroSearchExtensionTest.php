@@ -40,10 +40,4 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('search_extension', $this->extension->getName());
     }
-
-    public function testGetFilters()
-    {
-        $filters = $this->extension->getFilters();
-        $this->assertEquals(3, count($filters));
-    }
 }

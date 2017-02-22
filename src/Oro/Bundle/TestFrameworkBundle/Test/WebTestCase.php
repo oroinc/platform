@@ -199,7 +199,6 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if (!self::$clientInstance) {
-            $options['debug'] = false;
             self::$clientInstance = static::createClient($options, $server);
 
             if (self::isClassHasAnnotation(get_called_class(), 'dbReindex')) {
@@ -218,6 +217,14 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return $this->client = self::$clientInstance;
+    }
+
+    /** {@inheritdoc} */
+    protected static function createKernel(array $options = array())
+    {
+        $options['debug'] = false;
+
+        return parent::createKernel($options);
     }
 
     /**
