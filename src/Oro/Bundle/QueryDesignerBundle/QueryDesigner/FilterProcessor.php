@@ -5,11 +5,31 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
+use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
+use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterInterface;
 
-class FilterProcessor extends SegmentQueryConverter
+class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFilterInterface
 {
     /** @var string */
     protected $rootEntityAlias;
+
+    public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
+    {
+        $queryFilter = $widgetOptions->get('queryFilter', []);
+        $filters = isset($queryFilter['definition']['filters'])
+            ? $queryFilter['definition']['filters']
+            : [];
+
+        if (!$filters) {
+            // nothing to do
+            return $queryBuilder;
+        }
+
+        $rootEntity = $queryFilter['entity'];
+        $rootEntityAlias = $this->getRootAlias($queryBuilder);
+
+        return $this->process($queryBuilder, $rootEntity, $filters, $rootEntityAlias);
+    }
 
     /**
      * @param QueryBuilder $qb
@@ -21,10 +41,6 @@ class FilterProcessor extends SegmentQueryConverter
      */
     public function process(QueryBuilder $qb, $rootEntity, array $filters, $rootEntityAlias)
     {
-        if (!$filters) {
-            // nothing to do
-            return $qb;
-        }
         $this->setRootEntity($rootEntity);
         $this->rootEntityAlias          = $rootEntityAlias;
         $this->definition['filters']    = $filters;
@@ -78,5 +94,30 @@ class FilterProcessor extends SegmentQueryConverter
         $joinId                              = self::ROOT_ALIAS_KEY;
         $this->tableAliases[$joinId]         = $this->rootEntityAlias;
         $this->joins[$this->rootEntityAlias] = $joinId;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function getRootAlias(QueryBuilder $qb)
+    {
+        $aliases = $qb->getRootAliases();
+        if (count($aliases) !== 1) {
+            if (count($aliases) === 0) {
+                throw new \RuntimeException(
+                    'Cannot get root alias. A query builder has no root entity.'
+                );
+            } else {
+                throw new \RuntimeException(
+                    'Cannot get root alias. A query builder has more than one root entity.'
+                );
+            }
+        }
+
+        return $aliases[0];
     }
 }
