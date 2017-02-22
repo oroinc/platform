@@ -3,39 +3,56 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter;
-use Oro\Bundle\LocaleBundle\Twig\NumberExtension;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class CurrencyFormatterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CurrencyFormatter
-     */
+    /** @var CurrencyFormatter */
     protected $formatter;
 
-    /**
-     * @var NumberExtension
-     */
-    protected $numberExtension;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $numberFormatter;
 
     protected function setUp()
     {
-        $this->numberExtension = $this
-            ->getMockBuilder('Oro\Bundle\LocaleBundle\Twig\NumberExtension')
+        $this->numberFormatter = $this->getMockBuilder(NumberFormatter::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formatter = new CurrencyFormatter($this->numberExtension);
+        $this->formatter = new CurrencyFormatter($this->numberFormatter);
+    }
+
+    public function testFormatWithDefaultArguments()
+    {
+        $dateTime = new \DateTime();
+
+        $this->numberFormatter->expects($this->once())
+            ->method('formatCurrency')
+            ->with($dateTime, null, [], [], [], null)
+            ->willReturn('123.45');
+        $this->assertEquals('123.45', $this->formatter->format($dateTime));
     }
 
     public function testFormat()
     {
         $dateTime = new \DateTime();
 
-        $this->numberExtension
-            ->expects($this->once())
+        $this->numberFormatter->expects($this->once())
             ->method('formatCurrency')
-            ->with($dateTime, [])
-            ->willReturn('2000-01-01 00:00:00');
-        $this->assertEquals('2000-01-01 00:00:00', $this->formatter->format($dateTime));
+            ->with($dateTime, 'USD', ['attr' => 'val'], ['textAttr' => 'val'], ['$'], 'en')
+            ->willReturn('123.45');
+        $this->assertEquals(
+            '123.45',
+            $this->formatter->format(
+                $dateTime,
+                [
+                    'currency'       => 'USD',
+                    'attributes'     => ['attr' => 'val'],
+                    'textAttributes' => ['textAttr' => 'val'],
+                    'symbols'        => ['$'],
+                    'locale'         => 'en',
+                ]
+            )
+        );
     }
 
     public function testGetSupportedTypes()

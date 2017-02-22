@@ -2,33 +2,49 @@
 
 namespace Oro\Bundle\SyncBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 
 class OroSyncExtension extends \Twig_Extension
 {
-    /**
-     * @var TopicPublisher
-     */
-    protected $publisher;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param TopicPublisher $publisher
+     * @param ContainerInterface $container
      */
-    public function __construct(TopicPublisher $publisher)
+    public function __construct(ContainerInterface $container)
     {
-        $this->publisher = $publisher;
+        $this->container = $container;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * @return TopicPublisher
+     */
+    protected function getTopicPublisher()
+    {
+        return $this->container->get('oro_wamp.publisher');
+    }
+
+    /**
+     * @return TagGeneratorInterface
+     */
+    protected function getTagGenerator()
+    {
+        return $this->container->get('oro_sync.content.tag_generator_chain');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('check_ws', array($this, 'checkWsConnected')),
-        );
+        return [
+            new \Twig_SimpleFunction('check_ws', [$this, 'checkWsConnected']),
+            new \Twig_SimpleFunction('oro_sync_get_content_tags', [$this, 'generate'])
+        ];
     }
 
     /**
@@ -38,7 +54,20 @@ class OroSyncExtension extends \Twig_Extension
      */
     public function checkWsConnected()
     {
-        return $this->publisher->check();
+        return $this->getTopicPublisher()->check();
+    }
+
+    /**
+     * @param mixed $data
+     * @param bool  $includeCollectionTag
+     * @param bool  $processNestedData
+     *
+     * @return array
+     */
+    public function generate($data, $includeCollectionTag = false, $processNestedData = true)
+    {
+        // enforce plain array should returns
+        return array_values($this->getTagGenerator()->generate($data, $includeCollectionTag, $processNestedData));
     }
 
     /**

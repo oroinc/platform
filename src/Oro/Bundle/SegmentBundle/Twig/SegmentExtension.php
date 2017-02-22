@@ -4,13 +4,10 @@ namespace Oro\Bundle\SegmentBundle\Twig;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Twig_Extension;
-use Twig_SimpleFunction;
-
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 
-class SegmentExtension extends Twig_Extension
+class SegmentExtension extends \Twig_Extension
 {
     const NAME = 'oro_segment';
 
@@ -31,8 +28,8 @@ class SegmentExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            new Twig_SimpleFunction('update_segment_widget_options', [$this, 'updateSegmentWidgetOptions']),
-            new Twig_SimpleFunction(
+            new \Twig_SimpleFunction('update_segment_widget_options', [$this, 'updateSegmentWidgetOptions']),
+            new \Twig_SimpleFunction(
                 'update_segment_condition_builder_options',
                 [$this, 'updateSegmentConditionBuilderOptions']
             ),

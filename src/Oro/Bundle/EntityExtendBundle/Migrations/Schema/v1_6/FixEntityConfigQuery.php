@@ -58,6 +58,8 @@ class FixEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
 
     /**
      * @param array $row
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function processRow(array $row)
     {

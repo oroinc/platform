@@ -26,10 +26,6 @@ services:
         arguments:
             - '@oro_entity_config.provider.extend'
 
-    oro_address.provider.phone.link:
-        tags:
-            - { name: oro_service_link,  service: oro_address.provider.phone }
-
     oro_address.provider.country:
         class: 'Oro\Bundle\AddressBundle\Provider\CountryProvider'
         arguments:
@@ -51,3 +47,11 @@ services:
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: map }
+
+    oro_address.twig.extension.phone:
+        class: Oro\Bundle\AddressBundle\Twig\PhoneExtension
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }
