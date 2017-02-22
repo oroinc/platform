@@ -35,6 +35,7 @@ class Table extends Element
      */
     public function getRowByContent($content)
     {
+        /** @var TableRow $row */
         $row = $this->findElementContains(static::TABLE_ROW_ELEMENT, $content);
         self::assertTrue($row->isIsset(), sprintf(static::ERROR_NO_ROW_CONTENT, $content));
         return $row;
