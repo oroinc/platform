@@ -1,3 +1,6 @@
+parameters:
+  oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
+
 services:
     oro_message_queue.consumption.extensions:
         class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
