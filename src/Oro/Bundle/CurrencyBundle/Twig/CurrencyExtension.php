@@ -2,42 +2,49 @@
 
 namespace Oro\Bundle\CurrencyBundle\Twig;
 
-use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Provider\ViewTypeProviderInterface;
+use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class CurrencyExtension extends \Twig_Extension
 {
-    /**
-     * @var NumberFormatter
-     */
-    protected $formatter;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var ViewTypeProviderInterface
+     * @param ContainerInterface $container
      */
-    protected $provider;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @var CurrencyNameHelper
+     * @return NumberFormatter
      */
-    protected $currencyNameHelper;
+    protected function getNumberFormatter()
+    {
+        return $this->container->get('oro_locale.formatter.number');
+    }
 
     /**
-     * @param NumberFormatter           $formatter
-     * @param ViewTypeProviderInterface $provider
+     * @return ViewTypeProviderInterface
      */
-    public function __construct(
-        NumberFormatter $formatter,
-        ViewTypeProviderInterface $provider,
-        CurrencyNameHelper $currencyNameHelper
-    ) {
-        $this->formatter = $formatter;
-        $this->provider  = $provider;
-        $this->currencyNameHelper = $currencyNameHelper;
+    protected function getViewTypeProvider()
+    {
+        return $this->container->get('oro_currency.provider.view_type');
+    }
+
+    /**
+     * @return CurrencyNameHelper
+     */
+    protected function getCurrencyNameHelper()
+    {
+        return $this->container->get('oro_currency.helper.currency_name');
     }
 
     /**
@@ -46,7 +53,7 @@ class CurrencyExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_currency_view_type', array($this->provider, 'getViewType')),
+            new \Twig_SimpleFunction('oro_currency_view_type', [$this, 'getViewType']),
             new \Twig_SimpleFunction(
                 'oro_currency_symbol_collection',
                 [$this, 'getSymbolCollection'],
@@ -66,11 +73,16 @@ class CurrencyExtension extends \Twig_Extension
                 [$this, 'formatPrice'],
                 ['is_safe' => ['html']]
             ),
-            new \Twig_SimpleFilter(
-                'oro_localized_currency_name',
-                [Intl::getCurrencyBundle(), 'getCurrencyName']
-            )
+            new \Twig_SimpleFilter('oro_localized_currency_name', [$this, 'getCurrencyName'])
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewType()
+    {
+        return $this->getViewTypeProvider()->getViewType();
     }
 
     /**
@@ -107,7 +119,8 @@ class CurrencyExtension extends \Twig_Extension
         $symbols = (array)$this->getOption($options, 'symbols', []);
         $locale = $this->getOption($options, 'locale');
 
-        return $this->formatter->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
+        return $this->getNumberFormatter()
+            ->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale);
     }
 
     /**
@@ -117,15 +130,28 @@ class CurrencyExtension extends \Twig_Extension
      */
     public function getSymbolCollection()
     {
-        $currencySymbolCollection = $this->currencyNameHelper->getCurrencyChoices(
-            ViewTypeProviderInterface::VIEW_TYPE_SYMBOL
-        );
+        $currencySymbolCollection = $this->getCurrencyNameHelper()
+            ->getCurrencyChoices(ViewTypeProviderInterface::VIEW_TYPE_SYMBOL);
         
-        $currencySymbolCollection = array_map(function ($symbol) {
-            return ['symbol' => $symbol];
-        }, $currencySymbolCollection);
+        $currencySymbolCollection = array_map(
+            function ($symbol) {
+                return ['symbol' => $symbol];
+            },
+            $currencySymbolCollection
+        );
 
         return json_encode($currencySymbolCollection);
+    }
+
+    /**
+     * @param string      $currency
+     * @param string|null $displayLocale
+     *
+     * @return string|null
+     */
+    public function getCurrencyName($currency, $displayLocale = null)
+    {
+        return Intl::getCurrencyBundle()->getCurrencyName($currency, $displayLocale);
     }
 
     /**

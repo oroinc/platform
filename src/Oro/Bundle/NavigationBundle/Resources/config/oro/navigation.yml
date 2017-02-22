@@ -53,10 +53,10 @@ navigation:
                     icon: 'fa-flag'
                 uri: '#'
             menu_list_default:
-                label: 'oro.navigation.menu.menu_list_default.label'
-                route: 'oro_navigation_global_menu_index'
+                label:    'oro.navigation.menu.menu_list_default.label'
+                route:    'oro_navigation_global_menu_index'
+                position: 90
                 extras:
-                    position: 90
                     routes: ['/^oro_navigation_global_menu_[\w_]+$/']
                     description: 'Manage menus in default scope type'
 
