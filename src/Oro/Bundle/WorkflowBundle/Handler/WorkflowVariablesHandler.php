@@ -11,6 +11,8 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
     /**
      * @param WorkflowDefinition $definition
      * @param WorkflowData       $data
+     *
+     * @return WorkflowDefinition
      */
     public function updateWorkflowVariables(WorkflowDefinition $definition, WorkflowData $data)
     {
@@ -28,5 +30,7 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
         $workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS] = $variableDefinitionsConfig;
         $definition->setConfiguration($workflowConfig);
         $this->process($definition);
+
+        return $definition;
     }
 }

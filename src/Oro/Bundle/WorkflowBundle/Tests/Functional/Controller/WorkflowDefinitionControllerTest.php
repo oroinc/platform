@@ -105,7 +105,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     {
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_workflow_definition_view', ['name' => LoadWorkflowDefinitions::MULTISTEP]),
+            $this->getUrl('oro_workflow_definition_configure', ['name' => LoadWorkflowDefinitions::MULTISTEP]),
             [],
             [],
             $this->generateBasicAuthHeader()
