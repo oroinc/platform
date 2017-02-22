@@ -132,8 +132,6 @@ define([
             }
             delete this.actions;
             delete this.column;
-            delete this.launcherMode;
-            delete this.actionsState;
 
             this.$('.dropdown-toggle').dropdown('destroy');
             ActionCell.__super__.dispose.apply(this, arguments);
@@ -164,7 +162,7 @@ define([
                     result.push(this.createAction(action, config[name] || {}));
                 }
             }, this);
-2
+
             return _.sortBy(result, 'order');
         },
 

@@ -1,7 +1,5 @@
 .button,
 .btn {
-    $btn-shadow: inset 0 3px 5px 0 rgba(0, 0, 0, .35) !default;
-
     text-align: center;
 
     @extend %base-transition;
@@ -62,8 +60,6 @@
         }
 
         &.pressed {
-            background-color: get-color('additional', 'base');
-            
             box-shadow: $btn-shadow;
         }
     }

@@ -34,7 +34,8 @@ oro:
             prev: Prev
             next: Next
         pagesize:
-            label: Per page
+            label: View per page
+            labelShort: Per page
     grid:
         mass_action:
             label: Mass Actions

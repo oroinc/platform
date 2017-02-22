@@ -202,18 +202,18 @@ define([
 
         /**
          * Remove toolbar sections if they are present
-         * @param {Array/jQuery} sections.actions List of actions
+         * @param {Array/jQuery} sections List of actions
          */
-        removeToolBarSections: function($sections) {
+        removeToolBarSections: function(sections) {
             var self = this;
 
-            if (!_.isObject(this.removeSections) && $sections.length) {
+            if (!_.isObject(this.removeSections) && sections.length) {
                 return ;
             }
 
             $.each(this.removeSections, function(index, values) {
                 if (index === self.$el.data('gridToolbar')) {
-                    $.each($sections, function() {
+                    $.each(sections, function() {
                         var key = $(this).data('section');
 
                         for (var i = 0; i < values.length; i++) {

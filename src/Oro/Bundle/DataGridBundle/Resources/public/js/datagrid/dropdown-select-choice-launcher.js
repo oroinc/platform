@@ -48,6 +48,7 @@ define(function(require) {
         iconClassName: undefined,
 
         /** @property {Boolean} */
+        /** @deprecated use launcherMode */
         iconHideText: config.iconHideText,
 
         /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
@@ -139,15 +140,15 @@ define(function(require) {
          * @return {String}
          */
         _convertToLauncherMode: function() {
-            var old = '';
+            var str = '';
 
             if (this.icon) {
-                old = this.iconHideText ? 'icon-only'  : 'icon-text';
+                str = this.iconHideText ? 'icon-only'  : 'icon-text';
             } else {
-                old = 'text-only';
+                str = 'text-only';
             }
 
-            return old;
+            return str;
         },
 
         /**
@@ -159,7 +160,7 @@ define(function(require) {
             }
             delete this.action;
             delete this.runAction;
-            delete this.launcherMode;
+
             SelectChoiceLauncher.__super__.dispose.apply(this, arguments);
         },
 
@@ -173,7 +174,6 @@ define(function(require) {
                 title: this.selectedItem.title,
                 className: this.selectedItem.className,
                 iconClassName: this.selectedItem.iconClassName,
-                iconHideText: this.iconHideText,
                 launcherMode: this.launcherMode,
                 link: this.link,
                 links: this.items,
