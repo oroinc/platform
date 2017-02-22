@@ -20,7 +20,7 @@
     $border-radius:    $base-ui-element-border-radius,
     $background-color: $base-ui-element-bg-color,
     $color:            $base-ui-element-color,
-    $appearance:       false
+    $input-appearance: false
     ) {
     @if ($use-base-style) {
         display: inline-block;
@@ -45,13 +45,14 @@
 
         box-sizing: border-box;
 
+        @if ($input-appearance) {
+            @include appearance();
+        }
+
         &--full,
         &.full {
             width: 100%;
         }
-    }
-    @if ($appearance) {
-        @include appearance();
     }
 }
 
