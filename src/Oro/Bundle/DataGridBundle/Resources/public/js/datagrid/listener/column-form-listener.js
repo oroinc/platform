@@ -31,6 +31,7 @@ define([
                 throw new Error('Field selectors is not specified');
             }
             this.selectors = options.selectors;
+
             this.grid = options.grid;
             this.confirmModal = {};
 
@@ -68,30 +69,22 @@ define([
          * @inheritDoc
          */
         _processValue: function(id, model) {
-            var original = this.get('original');
+            id = parseInt(id, 10);
+
             var included = this.get('included');
             var excluded = this.get('excluded');
 
             var isActive = model.get(this.columnName);
-            var originallyActive;
-            if (_.has(original, id)) {
-                originallyActive = original[id];
-            } else {
-                originallyActive = !isActive;
-                original[id] = originallyActive;
-            }
 
             if (isActive) {
-                if (originallyActive) {
-                    included = _.without(included, [id]);
+                if (_.contains(excluded, id)) {
+                    excluded = _.without(excluded, id);
                 } else {
                     included = _.union(included, [id]);
                 }
-                excluded = _.without(excluded, id);
             } else {
-                included = _.without(included, id);
-                if (!originallyActive) {
-                    excluded = _.without(excluded, [id]);
+                if (_.contains(included, id)) {
+                    included = _.without(included, id);
                 } else {
                     excluded = _.union(excluded, [id]);
                 }
@@ -101,7 +94,6 @@ define([
 
             this.set('included', included);
             this.set('excluded', excluded);
-            this.set('original', original);
 
             this._synchronizeState();
         },
@@ -112,7 +104,6 @@ define([
         _clearState: function() {
             this.set('included', []);
             this.set('excluded', []);
-            this.set('original', {});
         },
 
         /**
@@ -151,8 +142,8 @@ define([
           * @private
           */
         _restoreState: function() {
-            var included = '';
-            var excluded = '';
+            var included = [];
+            var excluded = [];
             var columnName = this.columnName;
             if (this.selectors.included && $(this.selectors.included).length) {
                 included = this._explode($(this.selectors.included).val());
@@ -162,9 +153,10 @@ define([
                 excluded = this._explode($(this.selectors.excluded).val());
                 this.set('excluded', excluded);
             }
+
             _.each(this.grid.collection.models, function(model) {
                 var isActive = model.get(columnName);
-                var modelId = model.id;
+                var modelId = parseInt(model.id, 10);
                 if (!isActive && _.contains(included, modelId)) {
                     model.set(columnName, true);
                 }
@@ -172,6 +164,7 @@ define([
                     model.set(columnName, false);
                 }
             });
+
             if (included || excluded) {
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_in', included);
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_not_in', excluded);

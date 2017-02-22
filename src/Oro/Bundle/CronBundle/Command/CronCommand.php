@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,28 +31,36 @@ class CronCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+
+        /** @var $logger LoggerInterface */
+        $logger = $this->getContainer()->get('logger');
+
         // check for maintenance mode - do not run cron jobs if it is switched on
         if ($this->getContainer()->get('oro_platform.maintenance')->isOn()) {
+            $message = 'System is in maintenance mode, aborting';
             $output->writeln('');
-            $output->writeln('<error>System is in maintenance mode, aborting</error>');
-
+            $output->writeln(sprintf('<error>%s</error>', $message));
+            $logger->error($message);
             return;
         }
 
         $schedules = $this->getAllSchedules();
+
+        /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {
             $cronExpression = $this->getCronHelper()->createCron($schedule->getDefinition());
             if ($cronExpression->isDue()) {
                 /** @var CronCommandInterface $command */
                 $command = $this->getApplication()->get($schedule->getCommand());
 
-                if (!$command instanceof CronCommandInterface) {
-                    $output->writeln(
-                        sprintf(
-                            '<error>The cron command %s must be implements CronCommandInterface</error>',
-                            $schedule->getCommand()
-                        )
+                if (!$command instanceof ActiveCronCommandInterface) {
+                    $message = sprintf(
+                        'The cron command %s must be implements ActiveCronCommandInterface',
+                        $schedule->getCommand()
                     );
+
+                    $output->writeln(sprintf('<error>%s</error>', $message));
+                    $logger->error($message);
 
                     continue;
                 }

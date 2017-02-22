@@ -2,11 +2,24 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 abstract class AbstractDynamicFieldsExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config_fields';
+
+    /** @var ContainerInterface */
+    protected $container;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * {@inheritdoc}

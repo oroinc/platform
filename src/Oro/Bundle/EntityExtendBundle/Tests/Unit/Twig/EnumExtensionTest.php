@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class EnumExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrine;
 
@@ -16,7 +21,7 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -53,14 +58,14 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('findAll')
             ->will($this->returnValue([]));
 
-        $this->extension->transEnum('val1', $enumValueEntityClass1);
-        $this->extension->transEnum('val1', $enumValueEntityClass2);
+        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass1]);
+        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass2]);
         // call one more time to check local cache
-        $this->extension->transEnum('val1', $enumValueEntityClass1);
-        $this->extension->transEnum('val1', $enumValueEntityClass2);
+        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass1]);
+        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass2]);
         // call with enum code to check local cache keys
-        $this->extension->transEnum('val1', $enumCode1);
-        $this->extension->transEnum('val1', $enumCode2);
+        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumCode1]);
+        self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumCode2]);
     }
 
     public function testTransEnum()
@@ -84,11 +89,11 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'Value 1',
-            $this->extension->transEnum('val1', $enumValueEntityClass)
+            self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass])
         );
         $this->assertEquals(
             'val2',
-            $this->extension->transEnum('val2', $enumValueEntityClass)
+            self::callTwigFilter($this->extension, 'trans_enum', ['val2', $enumValueEntityClass])
         );
     }
 
@@ -113,7 +118,7 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             '0',
-            $this->extension->transEnum('val1', $enumValueEntityClass)
+            self::callTwigFilter($this->extension, 'trans_enum', ['val1', $enumValueEntityClass])
         );
     }
 
@@ -138,7 +143,7 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'Value 1',
-            $this->extension->transEnum('0', $enumValueEntityClass)
+            self::callTwigFilter($this->extension, 'trans_enum', ['0', $enumValueEntityClass])
         );
     }
 
@@ -166,39 +171,22 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             ['val1', 'val4', 'val2'],
-            $this->extension->sortEnum(['val2', 'val4', 'val1'], $enumValueEntityClass)
+            self::callTwigFilter($this->extension, 'sort_enum', [['val2', 'val4', 'val1'], $enumValueEntityClass])
         );
         // call one ore time to check local cache
         $this->assertEquals(
             ['val3', 'val1', 'val4', 'val2'],
-            $this->extension->sortEnum(['val1', 'val2', 'val3', 'val4'], $enumValueEntityClass)
+            self::callTwigFilter(
+                $this->extension,
+                'sort_enum',
+                [['val1', 'val2', 'val3', 'val4'], $enumValueEntityClass]
+            )
         );
         // call when the list of ids is a string
         $this->assertEquals(
             ['val1', 'val4', 'val2'],
-            $this->extension->sortEnum('val1,val2,val4', $enumValueEntityClass)
+            self::callTwigFilter($this->extension, 'sort_enum', ['val1,val2,val4', $enumValueEntityClass])
         );
-    }
-
-    public function testGetFilters()
-    {
-        $filters = $this->extension->getFilters();
-
-        $this->assertCount(2, $filters);
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $this->assertEquals('sort_enum', $filters[0]->getName());
-        $callable = $filters[0]->getCallable();
-        $this->assertCount(2, $callable);
-        $this->assertSame($this->extension, $callable[0]);
-        $this->assertEquals('sortEnum', $callable[1]);
-
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[1]);
-        $this->assertEquals('trans_enum', $filters[1]->getName());
-        $callable = $filters[1]->getCallable();
-        $this->assertCount(2, $callable);
-        $this->assertSame($this->extension, $callable[0]);
-        $this->assertEquals('transEnum', $callable[1]);
     }
 
     public function testGetName()
