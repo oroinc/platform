@@ -5,12 +5,14 @@ namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class FeatureContext extends OroFeatureContext implements
     KernelAwareContext,
@@ -53,6 +55,33 @@ class FeatureContext extends OroFeatureContext implements
     public function charlieUserInTheSystem()
     {
         $this->fixtureLoader->loadFixtureFile('user.yml');
+    }
+
+    /**
+     * Sets enabled flag for user account
+     *
+     * Example: I make charlie account disabled
+     *
+     * @Then /^I make (?P<username>([\w\s]+)) account (?P<type>(enabled|disabled))$/
+     */
+    public function disableAccount($username, $type)
+    {
+        /** @var ManagerRegistry $registry */
+        $registry = $this->getContainer()->get('doctrine');
+        $users = $registry->getRepository('OroUserBundle:User')->findUsersByUsernames([$username]);
+
+        self::assertCount(
+            1,
+            $users,
+            "Found few users by username $username. There must be the only one"
+        );
+
+        /** @var User $user */
+        $user = reset($users);
+        $enabled = $type == 'enabled' ? true : false;
+        $user->setEnabled($enabled);
+        $registry->getManager()->persist($user);
+        $registry->getManager()->flush();
     }
 
     /**
