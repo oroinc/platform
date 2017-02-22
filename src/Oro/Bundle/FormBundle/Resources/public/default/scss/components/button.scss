@@ -14,6 +14,22 @@
         box-shadow: $btn-shadow;
     }
 
+    &.caret {
+        &:after {
+            content: '';
+
+            display: inline-block;
+            width: 0;
+            height: 0;
+
+            border-top: 4px solid;
+            border-right: 4px solid transparent;
+            border-left: 4px solid transparent;
+
+            vertical-align: middle;
+        }
+    }
+
     &--action {
         border-color: get-color('additional', 'darker');
         background-color: get-color('additional', 'darker');
@@ -46,25 +62,9 @@
         }
 
         &.pressed {
-            background: get-color('additional', 'base');
+            background-color: get-color('additional', 'base');
             
             box-shadow: $btn-shadow;
-        }
-
-        &.btn-toggle {
-            &:after {
-                content: '';
-
-                display: inline-block;
-                width: 0;
-                height: 0;
-
-                border-top: 4px solid;
-                border-right: 4px solid transparent;
-                border-left: 4px solid transparent;
-
-                vertical-align: middle;
-            }
         }
     }
 
