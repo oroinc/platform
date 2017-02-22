@@ -262,7 +262,7 @@ services:
             - { name: form.type, alias: oro_encoded_password }
 
     oro_form.type.encoded_placeholder_password:
-        class: %oro_form.type.encoded_password.class%
+        class: 'Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType'
         arguments:
             - '@oro_security.encoder.mcrypt'
         tags:
