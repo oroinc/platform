@@ -2,38 +2,41 @@
 
 namespace Oro\Bundle\PlatformBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 
 class PlatformExtension extends \Twig_Extension
 {
     const EXTENSION_NAME = 'oro_platform';
 
-    /**
-     * @var VersionHelper
-     */
-    protected $helper;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param VersionHelper $helper
+     * @param ContainerInterface $container
      */
-    public function __construct(VersionHelper $helper)
+    public function __construct(ContainerInterface $container)
     {
-        $this->helper = $helper;
+        $this->container = $container;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * @return VersionHelper
+     */
+    protected function getVersionHelper()
+    {
+        return $this->container->get('oro_platform.composer.version_helper');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
-        return array(
-            'oro_version' => new \Twig_Function_Method(
-                $this,
-                'getVersion'
-            )
-        );
+        return [
+            new \Twig_SimpleFunction('oro_version', [$this, 'getVersion'])
+        ];
     }
 
     /**
@@ -41,7 +44,7 @@ class PlatformExtension extends \Twig_Extension
      */
     public function getVersion()
     {
-        return $this->helper->getVersion();
+        return $this->getVersionHelper()->getVersion();
     }
 
     /**

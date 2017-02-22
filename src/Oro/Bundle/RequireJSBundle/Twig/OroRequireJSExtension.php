@@ -2,50 +2,54 @@
 
 namespace Oro\Bundle\RequireJSBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\RequireJSBundle\Manager\ConfigProviderManager;
 
 class OroRequireJSExtension extends \Twig_Extension
 {
     const DEFAULT_PROVIDER_ALIAS = 'oro_requirejs_config_provider';
 
-    /**
-     * @var ConfigProviderManager
-     */
-    protected $manager;
+    /** @var ContainerInterface */
+    protected $container;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $webRoot;
 
     /**
-     * @param ConfigProviderManager $manager
-     * @param string                $webRoot
+     * @param ContainerInterface $container
+     * @param string             $webRoot
      */
-    public function __construct(ConfigProviderManager $manager, $webRoot)
+    public function __construct(ContainerInterface $container, $webRoot)
     {
-        $this->manager = $manager;
+        $this->container = $container;
         $this->webRoot = $webRoot;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * @return ConfigProviderManager
+     */
+    protected function getManager()
+    {
+        return $this->container->get('oro_requirejs.config_provider.manager');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
-            'get_requirejs_config'      => new \Twig_SimpleFunction(
+            new \Twig_SimpleFunction(
                 'get_requirejs_config',
                 [$this, 'getRequireJSConfig'],
                 ['is_safe' => ['html']]
             ),
-            'get_requirejs_build_path'  => new \Twig_SimpleFunction(
+            new \Twig_SimpleFunction(
                 'get_requirejs_build_path',
                 [$this, 'getRequireJSBuildPath']
             ),
-            'requirejs_build_exists'    => new \Twig_SimpleFunction(
+            new \Twig_SimpleFunction(
                 'requirejs_build_exists',
                 [$this, 'isRequireJSBuildExists']
             ),
@@ -61,9 +65,13 @@ class OroRequireJSExtension extends \Twig_Extension
      */
     public function getRequireJSConfig($alias = null)
     {
-        $provider = $this->manager->getProvider($this->getDefaultAliasIfEmpty($alias));
+        $provider = $this->getManager()->getProvider($this->getDefaultAliasIfEmpty($alias));
 
-        return $provider ? $provider->getConfig()->getMainConfig() : json_encode([]);
+        if (null === $provider) {
+            return json_encode([]);
+        }
+
+        return $provider->getConfig()->getMainConfig();
     }
 
     /**
@@ -75,9 +83,13 @@ class OroRequireJSExtension extends \Twig_Extension
      */
     public function getRequireJSBuildPath($alias = null)
     {
-        $provider = $this->manager->getProvider($this->getDefaultAliasIfEmpty($alias));
+        $provider = $this->getManager()->getProvider($this->getDefaultAliasIfEmpty($alias));
 
-        return $provider ? $provider->getConfig()->getOutputFilePath() : null;
+        if (null === $provider) {
+            return null;
+        }
+
+        return $provider->getConfig()->getOutputFilePath();
     }
 
     /**

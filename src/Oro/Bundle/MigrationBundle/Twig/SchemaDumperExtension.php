@@ -7,38 +7,21 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
 class SchemaDumperExtension extends \Twig_Extension
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $managerRegistry;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @var AbstractPlatform
-     */
+    /** @var AbstractPlatform */
     protected $platform;
 
-    /**
-     * @var Column
-     */
+    /** @var Column */
     protected $defaultColumn;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $defaultColumnOptions = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $optionNames = [
         'default',
         'notnull',
@@ -51,6 +34,14 @@ class SchemaDumperExtension extends \Twig_Extension
     ];
 
     /**
+     * @param ManagerRegistry $doctrine
+     */
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getName()
@@ -59,21 +50,13 @@ class SchemaDumperExtension extends \Twig_Extension
     }
 
     /**
-     * @param ManagerRegistry $managerRegistry
-     */
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
-        $this->managerRegistry = $managerRegistry;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getFunctions()
     {
-        return array(
-            'oro_migration_get_schema_column_options' => new \Twig_Function_Method($this, 'getColumnOptions'),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_migration_get_schema_column_options', [$this, 'getColumnOptions']),
+        ];
     }
 
     /**
@@ -122,7 +105,7 @@ class SchemaDumperExtension extends \Twig_Extension
     protected function getPlatform()
     {
         if (!$this->platform) {
-            $this->platform = $this->managerRegistry->getConnection()->getDatabasePlatform();
+            $this->platform = $this->doctrine->getConnection()->getDatabasePlatform();
         }
 
         return $this->platform;

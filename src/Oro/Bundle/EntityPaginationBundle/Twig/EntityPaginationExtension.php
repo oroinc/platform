@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Twig;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
@@ -12,39 +13,47 @@ class EntityPaginationExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_pagination';
 
-    /**
-     * @var EntityPaginationNavigation
-     */
-    protected $paginationNavigation;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var StorageDataCollector
+     * @param ContainerInterface $container
      */
-    protected $dataCollector;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @var MessageManager
+     * @return EntityPaginationNavigation
      */
-    protected $messageManager;
+    protected function getPaginationNavigation()
+    {
+        return $this->container->get('oro_entity_pagination.navigation');
+    }
 
     /**
-     * @var Request
+     * @return StorageDataCollector
      */
-    protected $request;
+    protected function getStorageDataCollector()
+    {
+        return $this->container->get('oro_entity_pagination.storage.data_collector');
+    }
 
     /**
-     * @param EntityPaginationNavigation $paginationNavigation
-     * @param StorageDataCollector $dataCollector
-     * @param MessageManager $messageManager
+     * @return MessageManager
      */
-    public function __construct(
-        EntityPaginationNavigation $paginationNavigation,
-        StorageDataCollector $dataCollector,
-        MessageManager $messageManager
-    ) {
-        $this->paginationNavigation = $paginationNavigation;
-        $this->dataCollector = $dataCollector;
-        $this->messageManager = $messageManager;
+    protected function getMessageManager()
+    {
+        return $this->container->get('oro_entity_pagination.message_manager');
+    }
+
+    /**
+     * @return RequestStack
+     */
+    protected function getRequestStack()
+    {
+        return $this->container->get('request_stack');
     }
 
     /**
@@ -52,11 +61,11 @@ class EntityPaginationExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction('oro_entity_pagination_pager', [$this, 'getPager']),
             new \Twig_SimpleFunction('oro_entity_pagination_collect_data', [$this, 'collectData']),
             new \Twig_SimpleFunction('oro_entity_pagination_show_info_message', [$this, 'showInfoMessage']),
-        );
+        ];
     }
 
     /**
@@ -65,16 +74,18 @@ class EntityPaginationExtension extends \Twig_Extension
      *
      * @param object $entity
      * @param string $scope
+     *
      * @return null|array
      */
     public function getPager($entity, $scope)
     {
-        $totalCount = $this->paginationNavigation->getTotalCount($entity, $scope);
+        $paginationNavigation = $this->getPaginationNavigation();
+        $totalCount = $paginationNavigation->getTotalCount($entity, $scope);
         if (!$totalCount) {
             return null;
         }
 
-        $currentNumber = $this->paginationNavigation->getCurrentNumber($entity, $scope);
+        $currentNumber = $paginationNavigation->getCurrentNumber($entity, $scope);
         if (!$currentNumber) {
             return null;
         }
@@ -84,11 +95,13 @@ class EntityPaginationExtension extends \Twig_Extension
 
     /**
      * @param string $scope
+     *
      * @return bool
      */
     public function collectData($scope)
     {
-        return $this->dataCollector->collect($this->request, $scope);
+        return $this->getStorageDataCollector()
+            ->collect($this->getRequestStack()->getCurrentRequest(), $scope);
     }
 
     /**
@@ -97,18 +110,11 @@ class EntityPaginationExtension extends \Twig_Extension
      */
     public function showInfoMessage($entity, $scope)
     {
-        $message = $this->messageManager->getInfoMessage($entity, $scope);
+        $messageManager = $this->getMessageManager();
+        $message = $messageManager->getInfoMessage($entity, $scope);
         if ($message) {
-            $this->messageManager->addFlashMessage('info', $message);
+            $messageManager->addFlashMessage('info', $message);
         }
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request = null)
-    {
-        $this->request = $request;
     }
 
     /**
