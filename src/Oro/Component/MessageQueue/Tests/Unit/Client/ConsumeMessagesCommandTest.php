@@ -4,49 +4,61 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Container;
 
-use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\ConsumeMessagesCommand;
-use Oro\Component\MessageQueue\Client\DelegateMessageProcessor;
+use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
 class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCouldBeConstructedWithRequiredAttributes()
+    /** @var ConsumeMessagesCommand */
+    private $command;
+
+    /** @var Container */
+    private $container;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $consumer;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $registry;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $processor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $logger;
+
+    protected function setUp()
     {
-        new ConsumeMessagesCommand(
-            $this->createQueueConsumerMock(),
-            $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([]),
-            $this->createLoggerInterfaceMock()
-        );
+        $this->consumer = $this->createMock(QueueConsumer::class);
+        $this->registry = $this->createMock(DestinationMetaRegistry::class);
+        $this->processor = $this->createMock(MessageProcessorInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->command = new ConsumeMessagesCommand();
+
+        $this->container = new Container();
+        $this->container->set('oro_message_queue.client.queue_consumer', $this->consumer);
+        $this->container->set('oro_message_queue.client.meta.destination_meta_registry', $this->registry);
+        $this->container->set('oro_message_queue.client.delegate_message_processor', $this->processor);
+        $this->container->set('logger', $this->logger);
+        $this->command->setContainer($this->container);
     }
 
     public function testShouldHaveCommandName()
     {
-        $command = new ConsumeMessagesCommand(
-            $this->createQueueConsumerMock(),
-            $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([]),
-            $this->createLoggerInterfaceMock()
-        );
-
-        $this->assertEquals('oro:message-queue:consume', $command->getName());
+        $this->assertEquals('oro:message-queue:consume', $this->command->getName());
     }
 
     public function testShouldHaveExpectedOptions()
     {
-        $command = new ConsumeMessagesCommand(
-            $this->createQueueConsumerMock(),
-            $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([]),
-            $this->createLoggerInterfaceMock()
-        );
-
-        $options = $command->getDefinition()->getOptions();
+        $options = $this->command->getDefinition()->getOptions();
 
         $this->assertCount(3, $options);
         $this->assertArrayHasKey('memory-limit', $options);
@@ -56,14 +68,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldHaveExpectedAttributes()
     {
-        $command = new ConsumeMessagesCommand(
-            $this->createQueueConsumerMock(),
-            $this->createDelegateMessageProcessorMock(),
-            $this->createDestinationMetaRegistry([]),
-            $this->createLoggerInterfaceMock()
-        );
-
-        $arguments = $command->getDefinition()->getArguments();
+        $arguments = $this->command->getDefinition()->getArguments();
 
         $this->assertCount(1, $arguments);
         $this->assertArrayHasKey('clientDestinationName', $arguments);
@@ -71,87 +76,58 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldExecuteConsumptionAndUseDefaultQueueName()
     {
-        $processor = $this->createDelegateMessageProcessorMock();
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->once())
+            ->method('close');
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('close')
-        ;
-
-        $consumer = $this->createQueueConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $this->consumer->expects($this->once())
             ->method('bind')
-            ->with('aprefixt.adefaultqueuename', $this->identicalTo($processor))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with('aprefixt.adefaultqueuename', $this->identicalTo($this->processor));
+        $this->consumer->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with($this->isInstanceOf(ChainExtension::class));
+        $this->consumer->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
-        $destinationMetaRegistry = $this->createDestinationMetaRegistry([
-            'default' => [],
-        ]);
+        $this->registry->expects($this->once())
+            ->method('getDestinationsMeta')
+            ->willReturn([
+                new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')
+            ]);
 
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->never())
-            ->method('error')
-        ;
+        $this->logger->expects($this->never())
+            ->method('error');
 
-        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([]);
     }
 
     public function testShouldExecuteConsumptionAndUseCustomClientDestinationName()
     {
-        $processor = $this->createDelegateMessageProcessorMock();
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->once())
+            ->method('close');
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('close')
-        ;
-
-        $consumer = $this->createQueueConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $this->consumer->expects($this->once())
             ->method('bind')
-            ->with('aprefixt.non-default-queue', $this->identicalTo($processor))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with('aprefixt.non-default-queue', $this->identicalTo($this->processor));
+        $this->consumer->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with($this->isInstanceOf(ChainExtension::class));
+        $this->consumer->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
-        $destinationMetaRegistry = $this->createDestinationMetaRegistry([
-            'non-default-queue' => []
-        ]);
+        $this->registry->expects($this->once())
+            ->method('getDestinationMeta')
+            ->with('non-default-queue')
+            ->willReturn(new DestinationMeta('aclient', 'aprefixt.non-default-queue'));
 
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->never())
-            ->method('error')
-        ;
+        $this->logger->expects($this->never())
+            ->method('error');
 
-        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'clientDestinationName' => 'non-default-queue'
         ]);
@@ -159,45 +135,29 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldExecuteConsumptionAndUseCustomClientDestinationNameWithCustomQueueFromArgument()
     {
-        $processor = $this->createDelegateMessageProcessorMock();
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->once())
+            ->method('close');
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('close')
-        ;
-
-        $consumer = $this->createQueueConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $this->consumer->expects($this->once())
             ->method('bind')
-            ->with('non-default-transport-queue', $this->identicalTo($processor))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with('non-default-transport-queue', $this->identicalTo($this->processor));
+        $this->consumer->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with($this->isInstanceOf(ChainExtension::class));
+        $this->consumer->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
-        $destinationMetaRegistry = $this->createDestinationMetaRegistry([
-            'default' => [],
-            'non-default-queue' => ['transportName' => 'non-default-transport-queue']
-        ]);
+        $this->registry->expects($this->once())
+            ->method('getDestinationMeta')
+            ->with('non-default-queue')
+            ->willReturn(new DestinationMeta('aclient', 'non-default-transport-queue'));
 
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->never())
-            ->method('error')
-        ;
+        $this->logger->expects($this->never())
+            ->method('error');
 
-        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'clientDestinationName' => 'non-default-queue'
         ]);
@@ -207,95 +167,35 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
     {
         $expectedException = new \Exception('the message');
 
-        $processor = $this->createDelegateMessageProcessorMock();
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->once())
+            ->method('close');
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('close')
-        ;
-
-        $consumer = $this->createQueueConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $this->consumer->expects($this->once())
             ->method('bind')
-            ->with('aprefixt.adefaultqueuename', $this->identicalTo($processor))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with('aprefixt.adefaultqueuename', $this->identicalTo($this->processor));
+        $this->consumer->expects($this->once())
             ->method('consume')
             ->with($this->isInstanceOf(ChainExtension::class))
-            ->willThrowException($expectedException)
-        ;
-        $consumer
-            ->expects($this->once())
+            ->willThrowException($expectedException);
+        $this->consumer->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
-        $destinationMetaRegistry = $this->createDestinationMetaRegistry([
-            'default' => [],
-        ]);
+        $this->registry->expects($this->once())
+            ->method('getDestinationsMeta')
+            ->willReturn([
+                new DestinationMeta('aclient', 'aprefixt.adefaultqueuename')
+            ]);
 
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('error')
-            ->with($this->identicalTo(
-                sprintf('Consume messages command exception. "%s"', $expectedException->getMessage())
-            ))
-        ;
+            ->with(sprintf('Consume messages command exception. "%s"', $expectedException->getMessage()));
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage($expectedException->getMessage());
 
-        $command = new ConsumeMessagesCommand($consumer, $processor, $destinationMetaRegistry, $logger);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([]);
-    }
-
-    /**
-     * @param array $destinationNames
-     *
-     * @return DestinationMetaRegistry
-     */
-    protected function createDestinationMetaRegistry(array $destinationNames)
-    {
-        $config = new Config('aPrefixt', 'aRouterMessageProcessorName', 'aRouterQueueName', 'aDefaultQueueName');
-
-        return new DestinationMetaRegistry($config, $destinationNames, 'default');
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConnectionInterface
-     */
-    protected function createConnectionMock()
-    {
-        return $this->createMock(ConnectionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DelegateMessageProcessor
-     */
-    protected function createDelegateMessageProcessorMock()
-    {
-        return $this->createMock(DelegateMessageProcessor::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|QueueConsumer
-     */
-    protected function createQueueConsumerMock()
-    {
-        return $this->createMock(QueueConsumer::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
-     */
-    protected function createLoggerInterfaceMock()
-    {
-        return $this->createMock(LoggerInterface::class);
     }
 }

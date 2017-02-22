@@ -7,8 +7,6 @@ parameters:
     oro_attachment.manager.api.class:                            Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
     oro_attachment.manager.file.api.class:                       Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
 
-    oro_attachment.twig.file_extension.class:                    Oro\Bundle\AttachmentBundle\Twig\FileExtension
-
     oro_attachment.entity_config_dumper.extension.file.class:    Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
     oro_attachment.entity_config_dumper.extension.class:         Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
     oro_attachment.entity_generator.extension.class:             Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
@@ -100,8 +98,10 @@ services:
             - { name: doctrine.event_listener, event: postUpdate }
 
     oro_attachment.twig.file_extension:
-        class: %oro_attachment.twig.file_extension.class%
-        arguments: ['@oro_attachment.manager', '@oro_entity_config.config_manager', '@doctrine']
+        class: Oro\Bundle\AttachmentBundle\Twig\FileExtension
+        public: false
+        arguments:
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
