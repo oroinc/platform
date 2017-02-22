@@ -67,18 +67,17 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * @param string $route
      * @param array $routeParameters
      * @param array $parameters
      * @return null|Response
      */
-    protected function get($route, array $routeParameters = [], array $parameters = [])
+    protected function get(array $routeParameters = [], array $parameters = [])
     {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'GET',
-            $this->getUrl($route, $routeParameters),
+            $this->getUrl('oro_rest_api_get', $routeParameters),
             $parameters
         );
 
@@ -90,18 +89,83 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * @param string $route
+     * @param array $routeParameters
+     * @param array $parameters
+     * @return null|Response
+     */
+    protected function getRelationship(array $routeParameters = [], array $parameters = [])
+    {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'GET',
+            $this->getUrl('oro_rest_api_get_relationship', $routeParameters),
+            $parameters
+        );
+
+        $entityType = isset($parameters['entity']) ? $parameters['entity'] : 'unknown';
+        $this->assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        return $response;
+    }
+
+    /**
+     * @param array $routeParameters
+     * @param array $parameters
+     * @return null|Response
+     */
+    protected function getSubresource(array $routeParameters = [], array $parameters = [])
+    {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'GET',
+            $this->getUrl('oro_rest_api_get_subresource', $routeParameters),
+            $parameters
+        );
+
+        $entityType = isset($parameters['entity']) ? $parameters['entity'] : 'unknown';
+        $this->assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        return $response;
+    }
+
+    /**
+     * @param array $routeParameters
+     * @param array $parameters
+     * @return null|Response
+     */
+    protected function cget(array $routeParameters = [], array $parameters = [])
+    {
+        $routeParameters = self::processTemplateData($routeParameters);
+        $parameters = self::processTemplateData($parameters);
+        $response = $this->request(
+            'GET',
+            $this->getUrl('oro_rest_api_cget', $routeParameters),
+            $parameters
+        );
+
+        $entityType = isset($parameters['entity']) ? $parameters['entity'] : 'unknown';
+        $this->assertApiResponseStatusCodeEquals($response, Response::HTTP_OK, $entityType, 'get list');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+
+        return $response;
+    }
+
+    /**
      * @param array $routeParameters
      * @param array $parameters
      * @return Response
      */
-    protected function post($route, array $routeParameters = [], $parameters = [])
+    protected function post(array $routeParameters = [], $parameters = [])
     {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'POST',
-            $this->getUrl($route, $routeParameters),
+            $this->getUrl('oro_rest_api_post', $routeParameters),
             $parameters
         );
         self::assertResponseStatusCodeEquals($response, Response::HTTP_CREATED);
@@ -111,19 +175,18 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * @param string $route
      * @param array $routeParameters
      * @param array $parameters
      * @return Response
      */
-    protected function patch($route, array $routeParameters = [], $parameters = [])
+    protected function patch(array $routeParameters = [], $parameters = [])
     {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
             'PATCH',
             $this->getUrl(
-                $route,
+                'oro_rest_api_patch',
                 $routeParameters
             ),
             $parameters

@@ -22,7 +22,7 @@ class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->post('oro_rest_api_post', ['entity' => $entityType], $data);
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department created by API', $result['data']['attributes']['title']);
@@ -50,7 +50,7 @@ class RestJsonApiUpdateWithTableInheritanceTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->patch('oro_rest_api_patch', ['entity' => $entityType, 'id' => $id], $data);
+        $response = $this->patch(['entity' => $entityType, 'id' => $id], $data);
 
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department updated by API', $result['data']['attributes']['title']);

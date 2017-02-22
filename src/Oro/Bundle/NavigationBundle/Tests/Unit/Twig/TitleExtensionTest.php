@@ -2,32 +2,31 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class TitleExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $service;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var TitleExtension
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $titleService;
+
+    /** @var TitleExtension */
     private $extension;
 
     protected function setUp()
     {
-        $this->service = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
-        $this->extension = new TitleExtension($this->service);
-    }
+        $this->titleService = $this->getMockBuilder(TitleService::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    public function testFunctionDeclaration()
-    {
-        $functions = $this->extension->getFunctions();
-        $this->assertArrayHasKey('oro_title_render', $functions);
-        $this->assertArrayHasKey('oro_title_render_short', $functions);
-        $this->assertArrayHasKey('oro_title_render_serialized', $functions);
+        $container = self::getContainerBuilder()
+            ->add('oro_navigation.title_service', $this->titleService)
+            ->getContainer($this);
+
+        $this->extension = new TitleExtension($container);
     }
 
     public function testNameConfigured()
@@ -39,13 +38,18 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $expectedResult = 'expected';
 
-        $this->service->expects($this->at(0))
+        $this->titleService->expects($this->at(0))
             ->method('setData')
             ->will($this->returnSelf());
 
-        $this->service->expects($this->at(1))->method('getSerialized')->will($this->returnValue($expectedResult));
+        $this->titleService->expects($this->at(1))
+            ->method('getSerialized')
+            ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->renderSerialized());
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_title_render_serialized', [])
+        );
     }
 
     public function testRender()
@@ -53,17 +57,20 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedResult = 'expected';
         $title = 'title';
 
-        $this->service->expects($this->at(0))
+        $this->titleService->expects($this->at(0))
             ->method('setData')
             ->with(array())
             ->will($this->returnSelf());
 
-        $this->service->expects($this->at(1))
+        $this->titleService->expects($this->at(1))
             ->method('render')
             ->with(array(), $title, null, null, true)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->render($title));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_title_render', [$title])
+        );
     }
 
     public function testRenderShort()
@@ -71,17 +78,20 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedResult = 'expected';
         $title = 'title';
 
-        $this->service->expects($this->at(0))
+        $this->titleService->expects($this->at(0))
             ->method('setData')
             ->with(array())
             ->will($this->returnSelf());
 
-        $this->service->expects($this->at(1))
+        $this->titleService->expects($this->at(1))
             ->method('render')
             ->with(array(), $title, null, null, true, true)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->renderShort($title));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_title_render_short', [$title])
+        );
     }
 
     /**
@@ -99,17 +109,20 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedResult = 'expected';
         $title = 'test';
 
-        $this->service->expects($this->at(0))
+        $this->titleService->expects($this->at(0))
             ->method('setData')
             ->with($expectedData)
             ->will($this->returnSelf());
 
-        $this->service->expects($this->at(1))
+        $this->titleService->expects($this->at(1))
             ->method('render')
             ->with(array(), $title, null, null, true)
             ->will($this->returnValue($expectedResult));
 
-        $this->assertEquals($expectedResult, $this->extension->render($title));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_title_render', [$title])
+        );
     }
 
     public function renderAfterSetDataProvider()
@@ -147,7 +160,8 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
         $fooData = array('k' => 'foo');
         $barData = array('k' => 'bar');
 
-        $this->service->expects($this->never())->method('setData');
+        $this->titleService->expects($this->never())
+            ->method('setData');
 
         $this->extension->set($fooData);
         $this->extension->set($barData);

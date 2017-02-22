@@ -4,10 +4,8 @@ namespace Oro\Component\MessageQueue\Consumption;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 trait LimitsExtensionsCommandTrait
@@ -20,9 +18,12 @@ trait LimitsExtensionsCommandTrait
         $this
             ->addOption('message-limit', null, InputOption::VALUE_REQUIRED, 'Consume n messages and exit')
             ->addOption('time-limit', null, InputOption::VALUE_REQUIRED, 'Consume messages during this time')
-            ->addOption('memory-limit', null, InputOption::VALUE_REQUIRED, 'Consume messages until process reaches'.
-                ' this memory limit in MB');
-        ;
+            ->addOption(
+                'memory-limit',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Consume messages until process reaches this memory limit in MB'
+            );
     }
 
     /**

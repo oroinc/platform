@@ -899,6 +899,25 @@ define(function(require) {
                     }
                 });
             });
+
+            this.listenTo(mediator, 'datagrid:changeColumnParam:' + this.name, function(columnName, option, value) {
+                this.changeColumnParam(columnName, option, value);
+            });
+        },
+
+        /**
+         * Changes column`s option  if such option exist
+         *
+         * @param columnName
+         * @param option
+         * @param value
+         */
+        changeColumnParam: function(columnName, option, value) {
+            this.columns.each(function(column) {
+                if (column.get('name') === columnName && option in column) {
+                    column.set(option, value);
+                }
+            });
         },
 
         /**

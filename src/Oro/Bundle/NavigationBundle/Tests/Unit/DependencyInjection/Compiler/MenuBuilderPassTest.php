@@ -8,6 +8,9 @@ class MenuBuilderPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcessSkip()
     {
+        $menuHelperDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
+
         $containerMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->getMock();
         $containerMock->expects($this->exactly(2))
@@ -19,10 +22,16 @@ class MenuBuilderPassTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->will($this->returnValue(false));
-        $containerMock->expects($this->never())
-            ->method('getDefinition');
+        $containerMock->expects($this->once())
+            ->method('getDefinition')
+            ->with('knp_menu.helper')
+            ->willReturn($menuHelperDefinition);
         $containerMock->expects($this->never())
             ->method('findTaggedServiceIds');
+
+        $menuHelperDefinition->expects(self::once())
+            ->method('setPublic')
+            ->with(true);
 
         $compilerPass = new MenuBuilderChainPass();
         $compilerPass->process($containerMock);
@@ -30,6 +39,8 @@ class MenuBuilderPassTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
+        $menuHelperDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
         $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
         $definition->expects($this->exactly(4))
@@ -65,17 +76,15 @@ class MenuBuilderPassTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue(true));
 
-        $containerMock->expects($this->exactly(4))
+        $containerMock->expects($this->exactly(5))
             ->method('getDefinition')
-            ->with(
-                $this->logicalOr(
-                    $this->equalTo('oro_menu.builder_chain'),
-                    $this->equalTo('oro_navigation.item.factory'),
-                    $this->equalTo('service1'),
-                    $this->equalTo('service2')
-                )
-            )
-            ->will($this->returnValue($definition));
+            ->willReturnMap([
+                ['knp_menu.helper', $menuHelperDefinition],
+                ['oro_menu.builder_chain', $definition],
+                ['oro_navigation.item.factory', $definition],
+                ['service1', $definition],
+                ['service2', $definition],
+            ]);
 
         $containerMock->expects($this->exactly(2))
             ->method('findTaggedServiceIds')
@@ -86,6 +95,10 @@ class MenuBuilderPassTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->will($this->returnValue($serviceIds));
+
+        $menuHelperDefinition->expects(self::once())
+            ->method('setPublic')
+            ->with(true);
 
         $compilerPass = new MenuBuilderChainPass();
         $compilerPass->process($containerMock);
