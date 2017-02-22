@@ -233,10 +233,13 @@ class Form extends Element
     {
         $field = $this->findFieldByLabel($fieldName);
 
-        self::assertTrue($field->hasClass("error"), "Field $fieldName has no validation errors");
+        if ($field->hasAttribute('id')) {
+            $fieldId = $field->getAttribute('id');
+        } else {
+            $fieldId = $field->getAttribute('for');
+        }
 
-        $fieldId = $field->getAttribute('id');
-        $errorSpan = $field->getParent()->find('css', "span.validation-failed[for='$fieldId']");
+        $errorSpan = $this->getPage()->find('css', "span.validation-failed[for='$fieldId']");
 
         return $errorSpan->getText();
     }

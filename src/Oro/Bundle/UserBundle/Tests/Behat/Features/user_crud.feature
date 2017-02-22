@@ -8,6 +8,14 @@ Feature: User
     Given I login as administrator
     And go to System/User Management/Users
     And press "Create User"
+    When I save and close form
+    Then I should see validation errors:
+      | Enabled       | This value should not be null.  |
+      | Username      | This value should not be blank. |
+      | Password      | This value should not be blank. |
+      | First Name    | This value should not be blank. |
+      | Last Name     | This value should not be blank. |
+      | Primary Email | This value should not be blank. |
     When I fill "User Form" with:
           | Username          | userName       |
           | Password          | Pa$$w0rd       |
