@@ -2,34 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\Config\Merger\ConfigurationMerger;
-
-class PermissionConfigurationProvider
+class PermissionConfigurationProvider extends AbstractPermissionsConfigurationProvider
 {
-    const ROOT_NODE_NAME = 'oro_permissions';
-
-    /** @var PermissionListConfiguration */
-    protected $permissionConfiguration;
-
-    /** @var array */
-    protected $kernelBundles;
-
-    /** @var string */
-    protected $configPath = 'Resources/config/oro/permissions.yml';
-
-    /**
-     * @param PermissionListConfiguration $permissionConfiguration
-     * @param array $kernelBundles
-     */
-    public function __construct(PermissionListConfiguration $permissionConfiguration, array $kernelBundles)
-    {
-        $this->permissionConfiguration = $permissionConfiguration;
-        $this->kernelBundles = array_values($kernelBundles);
-    }
+    const CONFIG_PATH = 'Resources/config/oro/permissions.yml';
 
     /**
      * @param array $acceptedPermissions
@@ -52,41 +27,18 @@ class PermissionConfigurationProvider
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    protected function loadConfiguration()
+    protected function getRootName()
     {
-        $configLoader = new CumulativeConfigLoader('oro_security', new YamlCumulativeFileLoader($this->configPath));
-
-        $resources = $configLoader->load();
-        $configs = [];
-
-        foreach ($resources as $resource) {
-            if (array_key_exists(self::ROOT_NODE_NAME, $resource->data)) {
-                $configs[$resource->bundleClass] = $resource->data;
-            }
-        }
-
-        $merger = new ConfigurationMerger($this->kernelBundles);
-
-        return $merger->mergeConfiguration($configs);
+        return PermissionListConfiguration::ROOT_NODE_NAME;
     }
 
     /**
-     * @param array $configuration
-     * @return array
-     * @throws InvalidConfigurationException
+     * {@inheritdoc}
      */
-    protected function parseConfiguration(array $configuration)
+    protected function getConfigPath()
     {
-        try {
-            $permissionsData = $this->permissionConfiguration->processConfiguration($configuration);
-        } catch (InvalidConfigurationException $exception) {
-            throw new InvalidConfigurationException(
-                sprintf('Can\'t parse permission configuration. %s', $exception->getMessage())
-            );
-        }
-
-        return $permissionsData;
+        return self::CONFIG_PATH;
     }
 }

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -38,6 +40,38 @@ class OroMainContext extends MinkContext implements
     public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
+     * @BeforeStep
+     * @param BeforeStepScope $scope
+     */
+    public function beforeStep(BeforeStepScope $scope)
+    {
+        if (false === $this->getMink()->isSessionStarted('first_session')) {
+            return;
+        }
+
+        $session = $this->getMink()->getSession('first_session');
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        $url = $session->getCurrentUrl();
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            $driver->waitPageToLoad();
+
+            return;
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        }
+
+        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
+        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
+            return;
+        }
+
+        $driver->waitForAjax();
     }
 
     /**

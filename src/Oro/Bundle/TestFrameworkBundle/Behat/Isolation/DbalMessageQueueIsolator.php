@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
@@ -116,6 +117,14 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
     /**
      * {@inheritdoc}
      */
+    public function getTag()
+    {
+        return 'message-queue';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getApplicableOs()
     {
         return [
@@ -133,7 +142,14 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
         $time = $timeLimit;
         /** @var Connection $connection */
         $connection = $this->kernel->getContainer()->get('doctrine')->getManager()->getConnection();
-        $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
+
+        try {
+            $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
+        } catch (TableNotFoundException $e) {
+            // Schema is not initialized yet
+            return;
+        }
+
 
         while (0 !== $result) {
             if ($time <= 0) {
