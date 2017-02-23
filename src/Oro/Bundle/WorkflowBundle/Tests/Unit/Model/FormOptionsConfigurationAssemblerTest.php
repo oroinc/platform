@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\CustomFormType;
 use Symfony\Component\Form\FormRegistryInterface;
 
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\CustomFormType;
 
 class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
 {

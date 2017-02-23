@@ -106,7 +106,6 @@ workflows:
                 transition_definition: first_transition_definition
                 form_options:
                     configuration:
-#                        handler: ~
                         data_provider: 'data_provider'
                         data_attribute: 'form_data'
         transition_definitions:
