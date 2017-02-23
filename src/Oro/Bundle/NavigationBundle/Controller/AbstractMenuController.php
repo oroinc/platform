@@ -218,14 +218,6 @@ abstract class AbstractMenuController extends Controller
             $responseData['saved'] = true;
         }
 
-        /** @var MenuUpdateRepository $repository */
-        $repository = $this->get('doctrine')
-            ->getManagerForClass('OroCommerceMenuBundle:MenuUpdate')
-            ->getRepository('OroCommerceMenuBundle:MenuUpdate');
-        $menuUpdate = $repository->findAll();
-        var_dump(count($menuUpdate));
-
-
         return $this->renderMoveDialog($responseData, $form);
     }
 
