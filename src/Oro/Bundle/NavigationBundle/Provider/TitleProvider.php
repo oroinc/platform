@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\NavigationBundle\Entity\Title;
 
 class TitleProvider
 {
@@ -50,6 +49,6 @@ class TitleProvider
             $result = [];
         }
 
-        return [];
+        return $result;
     }
 }
