@@ -2,7 +2,7 @@ layout:
     actions:
         - '@setOption':
             id: page_title
-            optionName: text
+            optionName: defaultValue
             optionValue: 'oro_frontend_style_book.groups.forms.title'
 
         - '@addTree':
