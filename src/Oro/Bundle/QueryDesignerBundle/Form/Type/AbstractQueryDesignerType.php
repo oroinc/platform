@@ -9,7 +9,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\QueryDesignerBundle\Form\EventListener\DateGroupingFormSubscriber;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 abstract class AbstractQueryDesignerType extends AbstractType
@@ -55,8 +54,6 @@ abstract class AbstractQueryDesignerType extends AbstractType
                 $that->addFields($form, $factory, $entity);
             }
         );
-
-        $builder->addEventSubscriber(new DateGroupingFormSubscriber());
     }
 
     /**

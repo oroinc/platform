@@ -164,13 +164,13 @@ class DateGroupingFilter extends ChoiceFilter
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
         $whereClauseParameters = $qb->getParameters();
-        $extraWhereClauses = !$qb->getDQLPart('where') ?:
+        $extraWhereClauses = !$qb->getDQLPart('where') ? null :
             $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts());
         $usedDates = $this->getUsedDates(
             $filterType,
             $this->config['calendar_table_for_grouping'],
             $this->config['calendar_column_for_grouping'],
-            $this->config['first_joined_table'],
+            $this->config['joined_table'],
             $this->config['joined_column'],
             $extraWhereClauses,
             $whereClauseParameters

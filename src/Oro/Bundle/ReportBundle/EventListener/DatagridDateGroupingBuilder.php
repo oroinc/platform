@@ -15,6 +15,7 @@ use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 
 class DatagridDateGroupingBuilder
 {
+    const ACTIONS_KEY_NAME = 'actions';
     const FILTERS_KEY_NAME = 'filters';
     const SOURCE_KEY_NAME = 'source';
     const SORTERS_KEY_NAME = 'sorters';

@@ -9,7 +9,8 @@ class ReportDateGroupingConstraint extends Constraint
     /**
      * @var string
      */
-    public $message = 'oro.report.date_grouping.group_by_mandatory';
+    public $groupByMandatoryMessage = 'oro.report.date_grouping.group_by_mandatory';
+    public $dateFieldMandatoryMessage = 'oro.report.date_grouping.date_field.mandatory';
 
     /**
      * {@inheritdoc}

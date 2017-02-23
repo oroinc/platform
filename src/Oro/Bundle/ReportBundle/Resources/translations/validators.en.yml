@@ -5,3 +5,4 @@ oro:
                 mandatory: You must specify at least one column for the report grid
         date_grouping:
             group_by_mandatory: The date grouping filter requires to additionally make a column grouping. Please select an unique column (ex. id) in the "Grouping" section for the main entity
+            date_field.mandatory: Please select a field for the dare grouping filter to apply it

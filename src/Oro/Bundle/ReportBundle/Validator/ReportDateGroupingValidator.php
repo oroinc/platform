@@ -26,9 +26,16 @@ class ReportDateGroupingValidator extends ConstraintValidator
         if (!isset($definition[DateGroupingType::DATE_GROUPING_NAME])) {
             return;
         }
+        $dateGroupingDef = $definition[DateGroupingType::DATE_GROUPING_NAME];
 
         if (!isset($definition['grouping_columns']) || empty($definition['grouping_columns'])) {
-            $this->context->addViolation($constraint->message);
+            $this->context->addViolation($constraint->groupByMandatoryMessage);
+        }
+
+        if (isset($dateGroupingDef[DateGroupingType::USE_DATE_GROUPING_FILTER])
+            && !isset($dateGroupingDef[DateGroupingType::FIELD_NAME_ID])
+        ) {
+            $this->context->addViolation($constraint->dateFieldMandatoryMessage);
         }
     }
 }

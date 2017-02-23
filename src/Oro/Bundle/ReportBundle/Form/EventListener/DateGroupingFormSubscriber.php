@@ -1,15 +1,16 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Form\EventListener;
+namespace Oro\Bundle\ReportBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
+use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Form\Type\ReportType;
 
 class DateGroupingFormSubscriber implements EventSubscriberInterface
 {
@@ -29,12 +30,14 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
      */
     public function onPostSetData(FormEvent $event)
     {
+        /** @var Report $data */
         $data = $event->getData();
         $form = $event->getForm();
-        if (!$data instanceof AbstractQueryDesigner || !$form->has(AbstractQueryDesignerType::DATE_GROUPING_FORM_NAME)) {
+        if (!$data instanceof AbstractQueryDesigner || !$form->has(ReportType::DATE_GROUPING_FORM_NAME)) {
             return;
         }
-        $dateGroupingModel = $form->get(AbstractQueryDesignerType::DATE_GROUPING_FORM_NAME)->getData();
+        /** @var  $dateGroupingModel */
+        $dateGroupingModel = $form->get(ReportType::DATE_GROUPING_FORM_NAME)->getData();
         if (!$dateGroupingModel instanceof DateGrouping) {
             $dateGroupingModel = new DateGrouping();
         }
@@ -55,7 +58,7 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
             $dateGroupingModel->setUseDateGroupFilter(true);
         }
 
-        $form->get(AbstractQueryDesignerType::DATE_GROUPING_FORM_NAME)->setData($dateGroupingModel);
+        $form->get(ReportType::DATE_GROUPING_FORM_NAME)->setData($dateGroupingModel);
     }
 
     /**
@@ -65,13 +68,14 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
         $form = $event->getForm();
-        if (!$data instanceof AbstractQueryDesigner
-            || !$form->has(AbstractQueryDesignerType::DATE_GROUPING_FORM_NAME)
+        if (!$data instanceof Report
+            || !$form->has(ReportType::DATE_GROUPING_FORM_NAME)
         ) {
             return;
         }
 
-        $dateGroupingModel = $form->get(AbstractQueryDesignerType::DATE_GROUPING_FORM_NAME)->getData();
+        /** @var DateGrouping $dateGroupingModel */
+        $dateGroupingModel = $form->get(ReportType::DATE_GROUPING_FORM_NAME)->getData();
         $definition = json_decode($data->getDefinition(), true);
         if (!is_array($definition)) {
             $definition = [];
@@ -88,6 +92,8 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
                 $dateGroupingModel->getFieldName();
             $definition[DateGroupingType::DATE_GROUPING_NAME][DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID] =
                 $dateGroupingModel->getUseSkipEmptyPeriodsFilter();
+            $definition[DateGroupingType::DATE_GROUPING_NAME][DateGroupingType::USE_DATE_GROUPING_FILTER] =
+                $dateGroupingModel->getUseDateGroupFilter();
         }
 
         $data->setDefinition(json_encode($definition));

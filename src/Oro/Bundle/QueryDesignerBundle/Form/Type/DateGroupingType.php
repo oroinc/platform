@@ -23,9 +23,30 @@ class DateGroupingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(static::FIELD_NAME_ID, 'oro_date_field_choice', ['required' => true])
-            ->add(static::USE_SKIP_EMPTY_PERIODS_FILTER_ID, CheckboxType::class, ['required' => false])
-            ->add(static::USE_DATE_GROUPING_FILTER, CheckboxType::class, ['required' => false]);
+            ->add(
+                static::FIELD_NAME_ID,
+                'oro_date_field_choice',
+                [
+                    'required' => true,
+                    'label' => 'oro.report.form.date_grouping_field.label',
+                ]
+            )
+            ->add(
+                static::USE_SKIP_EMPTY_PERIODS_FILTER_ID,
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => 'oro.report.form.use_skip_empty_periods.label',
+                ]
+            )
+            ->add(
+                static::USE_DATE_GROUPING_FILTER,
+                CheckboxType::class,
+                [
+                    'required' => false,
+                    'label' => 'oro.report.form.use_date_grouping_filter.label',
+                ]
+            );
     }
 
     /**
