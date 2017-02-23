@@ -765,6 +765,7 @@ UserBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $genderProvider`
     - removed property `protected $securityContext`
+- Added Configurable Permission `default` for View and Edit pages of User Role (see [configurable-permissions.md](./src/Oro/Bundle/SecurityBundle/Resources/doc/configurable-permissions.md))
 
 WindowsBundle
 -------------

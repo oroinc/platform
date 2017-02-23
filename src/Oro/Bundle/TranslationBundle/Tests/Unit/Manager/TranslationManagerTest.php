@@ -117,7 +117,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($translationKey1, $translationKey2);
     }
 
-    public function testCreateTranslation()
+    public function testSaveTranslation()
     {
         $key = 'key';
         $value = 'value';
@@ -138,11 +138,39 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $this->objectManager->expects($this->never())->method('flush');
 
         $manager = $this->getTranslationManager();
-        $translation1 = $manager->createTranslation($key, $value, $locale, $domain);
-        $translation2 = $manager->createTranslation($key, $value, $locale, $domain);
+        $translation1 = $manager->saveTranslation($key, $value, $locale, $domain);
+        $translation2 = $manager->saveTranslation($key, $value, $locale, $domain);
 
         $this->assertInstanceOf(Translation::class, $translation1);
         $this->assertSame($translation1, $translation2);
+    }
+
+    public function testCreateTranslation()
+    {
+        $key = 'key';
+        $value = 'value';
+        $domain = TranslationManager::DEFAULT_DOMAIN;
+        $locale = 'locale';
+        $expectedTranslation = $this->createTranslation($key, $value, $locale, $domain);
+
+        $this->translationKeyRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['key' => $key, 'domain' => $domain])
+            ->willReturn((new TranslationKey())->setKey($key)->setDomain($domain));
+
+        $this->languageRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['code' => $locale])
+            ->willReturn((new Language())->setCode($locale));
+
+        $this->objectManager->expects($this->never())->method('persist');
+        $this->objectManager->expects($this->never())->method('flush');
+
+        $manager = $this->getTranslationManager();
+        $translation = $manager->createTranslation($key, $value, $locale, $domain);
+
+        $this->assertInstanceOf(Translation::class, $translation);
+        $this->assertEquals($expectedTranslation, $translation);
     }
 
     public function testFlush()
@@ -155,7 +183,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findOneBy')->willReturn((new Language())->setCode('locale'));
 
         $manager = $this->getTranslationManager();
-        $translation = $manager->createTranslation('key', 'value', 'locale', 'domain');
+        $translation = $manager->saveTranslation('key', 'value', 'locale', 'domain');
 
         $this->objectManager->expects($this->at(0))->method('persist')->with($translationKey);
         $this->objectManager->expects($this->at(1))->method('persist')->with($translation);
@@ -171,7 +199,7 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
         $locale = 'test_locale';
         $domain = 'test_domain';
 
-        $translation = $this->createTranslation(42, $key, $value, $locale, $domain);
+        $translation = $this->createTranslation($key, $value, $locale, $domain, 42);
 
         $this->translationKeyRepository->expects($this->any())
             ->method('findOneBy')
@@ -267,14 +295,15 @@ class TranslationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param int $id
      * @param string $key
      * @param string $value
      * @param string $locale
      * @param string $domain
+     * @param int|null $id
+     *
      * @return Translation
      */
-    protected function createTranslation($id, $key, $value, $locale, $domain)
+    protected function createTranslation($key, $value, $locale, $domain, $id = null)
     {
         $translationKey = new TranslationKey();
         $translationKey->setKey($key)->setDomain($domain);
