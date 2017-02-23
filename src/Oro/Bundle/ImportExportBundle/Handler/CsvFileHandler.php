@@ -22,7 +22,7 @@ class CsvFileHandler
         $handle = fopen($file->getRealPath(), 'r');
         $tempName = $file->getRealPath() . '_formatted';
         $formattedHandle = fopen($tempName, 'w');
-        while(($line = fgets($handle)) !== false) {
+        while (($line = fgets($handle)) !== false) {
             $formattedLine = $this->convertLineEndings($line);
             //Update the file contents
             fwrite($formattedHandle, $formattedLine);
