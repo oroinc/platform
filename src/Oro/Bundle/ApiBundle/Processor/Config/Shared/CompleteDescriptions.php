@@ -35,12 +35,12 @@ class CompleteDescriptions implements ProcessorInterface
 {
     const PLACEHOLDER_INHERIT_DOC = '{@inheritdoc}';
 
-    const ID_DESCRIPTION           = 'The unique identifier of a resource';
-    const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation';
-    const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record';
-    const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record';
+    const ID_DESCRIPTION           = 'The unique identifier of a resource.';
+    const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation.';
+    const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record.';
+    const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record.';
     const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm, '
-    . 'company or another organization to which the users belong';
+    . 'company or another organization to which the users belong.';
 
     const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
     const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
