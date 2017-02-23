@@ -129,6 +129,12 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     }
 
     /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
+    }
+
+    /** {@inheritdoc} */
     protected function makeDump()
     {
         $this->runProcess(sprintf(
