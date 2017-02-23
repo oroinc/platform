@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener;
@@ -16,8 +17,14 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var WorkflowDefinitionRepository|\PHPUnit_Framework_MockObject_MockObject */
+    protected $repository;
+
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
@@ -41,7 +48,22 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        $this->repository = $this->createMock(WorkflowDefinitionRepository::class);
+
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with(WorkflowDefinition::class)
+            ->willReturn($this->repository);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(
+                function ($object) {
+                    return get_class($object);
+                }
+            );
+
         $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->systemWorkflowManager = $this->createMock(WorkflowManager::class);
         $this->workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
@@ -154,19 +176,41 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->postPersist($this->getEvent($workflowItem));
     }
 
+    public function testPreRemoveWhenNotApplicableEntity()
+    {
+        $entity = new \stdClass();
+
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(false);
+        $this->systemWorkflowManager->expects($this->never())->method($this->anything());
+
+        $this->listener->preRemove($this->getEvent($entity));
+    }
+
+    public function testPreRemoveWithEntityNotInWorkflow()
+    {
+        $entity = new \stdClass();
+
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(true);
+
+        $this->repository->expects($this->once())->method('getAllRelatedEntityClasses')->willReturn([]);
+
+        $this->systemWorkflowManager->expects($this->never())->method($this->anything());
+
+        $this->listener->preRemove($this->getEvent($entity));
+    }
+
     /**
      * @param bool $hasWorkflowItems
      * @dataProvider preRemoveDataProvider
      */
     public function testPreRemove($hasWorkflowItems = false)
     {
-        $entity = new \DateTime();
+        $entity = new \stdClass();
         $workflowItem = new WorkflowItem();
 
-        $this->entityConnector->expects($this->once())
-            ->method('isApplicableEntity')
-            ->with($entity)
-            ->willReturn(true);
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(true);
+
+        $this->repository->expects($this->once())->method('getAllRelatedEntityClasses')->willReturn(['stdClass']);
 
         $this->systemWorkflowManager->expects($this->once())
             ->method('getWorkflowItemsByEntity')
@@ -190,12 +234,12 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function preRemoveDataProvider()
     {
-        return array(
-            'aware entity without workflow item' => array(),
-            'aware entity with workflow item' => array(
+        return [
+            'aware entity without workflow item' => [],
+            'aware entity with workflow item' => [
                 'hasWorkflowItem' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     public function testPreRemoveWithUnsupportedEntity()
