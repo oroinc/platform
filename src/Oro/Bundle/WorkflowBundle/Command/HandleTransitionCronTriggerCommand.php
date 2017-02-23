@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -17,7 +17,7 @@ use Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implements ActiveCronCommandInterface
+class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const NAME = 'oro:workflow:handle-transition-cron-trigger';
 
@@ -116,10 +116,27 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implement
     }
 
     /**
-     * {@inheritdoc}
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be refactored at BAP-13973
+     *
+     * This command cannot be disabled
+     *
+     * @return bool
      */
     public function isActive()
     {
         return true;
+    }
+
+    /**
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be refactored at BAP-13973
+     *
+     * This method never used because all schedules for workflow transition triggers must
+     * defined within YML configuration
+     *
+     * @return string
+     */
+    public function getDefaultDefinition()
+    {
+        return '*/1 * * * *';
     }
 }

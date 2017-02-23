@@ -5,11 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -262,12 +260,25 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
             ]);
     }
 
-    public function testCommandImplementsProperInterface()
+    /**
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be refactored at BAP-13973
+     *
+     * This method never used because all schedules for workflow processes must defined within YML configuration
+     *
+     * @return string
+     */
+    public function testGetDefaultDefinition()
     {
-        $this->assertInstanceOf(ActiveCronCommandInterface::class, $this->command);
-        $this->assertNotInstanceOf(CronCommandInterface::class, $this->command);
+        $this->assertEquals('*/1 * * * *', $this->command->getDefaultDefinition());
     }
 
+    /**
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be refactored at BAP-13973
+     *
+     * This command cannot be disabled
+     *
+     * @return bool
+     */
     public function testIsActive()
     {
         $this->assertTrue($this->command->isActive());

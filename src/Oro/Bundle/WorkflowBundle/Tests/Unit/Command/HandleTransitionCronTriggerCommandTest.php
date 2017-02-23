@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
-use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 
 class HandleTransitionCronTriggerCommandTest extends \PHPUnit_Framework_TestCase
@@ -30,12 +28,26 @@ class HandleTransitionCronTriggerCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($this->command->getName());
     }
 
-    public function testCommandImplementsProperInterface()
+    /**
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be refactored at BAP-13973
+     *
+     * This method never used because all schedules for workflow transition triggers must
+     * defined within YML configuration
+     *
+     * @return string
+     */
+    public function testGetDefaultDefinition()
     {
-        $this->assertInstanceOf(ActiveCronCommandInterface::class, $this->command);
-        $this->assertNotInstanceOf(CronCommandInterface::class, $this->command);
+        $this->assertEquals('*/1 * * * *', $this->command->getDefaultDefinition());
     }
 
+    /**
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be refactored at BAP-13973
+     *
+     * This command cannot be disabled
+     *
+     * @return bool
+     */
     public function testIsActive()
     {
         $this->assertTrue($this->command->isActive());
