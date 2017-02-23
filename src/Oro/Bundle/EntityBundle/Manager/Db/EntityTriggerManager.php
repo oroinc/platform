@@ -23,6 +23,11 @@ class EntityTriggerManager
     private $connection;
 
     /**
+     * @var DoctrineHelper
+     */
+    private $doctrineHelper;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param string         $entityClass
      */
@@ -30,9 +35,8 @@ class EntityTriggerManager
         DoctrineHelper $doctrineHelper,
         $entityClass
     ) {
-        $this->entityClass = $entityClass;
-        $this->connection  = $doctrineHelper->getEntityManagerForClass($entityClass)
-            ->getConnection();
+        $this->doctrineHelper = $doctrineHelper;
+        $this->entityClass    = $entityClass;
     }
 
     /**
@@ -64,6 +68,9 @@ class EntityTriggerManager
      */
     private function getDriver()
     {
+        $this->connection = $this->doctrineHelper->getEntityManagerForClass($this->entityClass)
+            ->getConnection();
+
         $platform = $this->connection->getParams()['driver'];
 
         if (!isset($this->drivers[$platform])) {
