@@ -17,4 +17,11 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
      * @return Layout
      */
     public function getLayout(ContextInterface $context, $rootId = null);
+
+    /**
+     * Returns all actions which still not applied to layout
+     *
+     * @return array
+     */
+    public function getNotAppliedActions();
 }

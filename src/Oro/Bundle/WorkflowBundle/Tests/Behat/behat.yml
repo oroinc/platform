@@ -1,0 +1,5 @@
+oro_behat_extension:
+  elements:
+    Workflow Transition Form:
+      selector: 'form[name="oro_workflow_transition"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form

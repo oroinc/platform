@@ -1,40 +1,41 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
-use Oro\Bundle\NavigationBundle\Event\RequestTitleListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+use Oro\Bundle\NavigationBundle\Event\RequestTitleListener;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+
 class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $titleService;
+
+    /** @var RequestTitleListener */
+    protected $listener;
 
     protected function setUp()
     {
-        $this->titleService = $this->createMock('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface');
+        $this->titleService = $this->createMock(TitleServiceInterface::class);
+
+        $container = TestContainerBuilder::create()
+            ->add('oro_navigation.title_service', $this->titleService)
+            ->getContainer($this);
+
+        $this->listener = new RequestTitleListener($container);
     }
 
-    /**
-     * @dataProvider provider
-     * @param $data
-     */
-    public function testRequest($data)
+    public function testRequestForMasterRequest()
     {
-        $invokeTimes = (int) ($data == HttpKernelInterface::MASTER_REQUEST);
-
         /** @var $request \PHPUnit_Framework_MockObject_MockObject */
-        $request = $this->getRequest($invokeTimes);
+        $request = $this->getRequest(1);
 
-        $titleService = $this->titleService;
-
-        if ($invokeTimes) {
-            $titleService->expects($this->exactly($invokeTimes))
-                ->method('loadByRoute')
-                ->with('test_route');
-        }
+        $this->titleService->expects($this->once())
+            ->method('loadByRoute')
+            ->with('test_route');
 
         $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
             ->disableOriginalConstructor()
@@ -43,22 +44,31 @@ class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequest')
             ->will($this->returnValue($request));
         $event->expects($this->once())
-            ->method('getRequestType')
-            ->will($this->returnValue($data));
+            ->method('isMasterRequest')
+            ->will($this->returnValue(true));
 
-        $listener = new RequestTitleListener($titleService);
-        $listener->onKernelRequest($event);
+        $this->listener->onKernelRequest($event);
     }
 
-    /**
-     * @return array
-     */
-    public function provider()
+    public function testRequestForSubRequest()
     {
-        return array(
-            array(HttpKernelInterface::MASTER_REQUEST),
-            array(HttpKernelInterface::SUB_REQUEST)
-        );
+        /** @var $request \PHPUnit_Framework_MockObject_MockObject */
+        $request = $this->getRequest(0);
+
+        $this->titleService->expects($this->never())
+            ->method('loadByRoute');
+
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue($request));
+        $event->expects($this->once())
+            ->method('isMasterRequest')
+            ->will($this->returnValue(false));
+
+        $this->listener->onKernelRequest($event);
     }
 
     /**

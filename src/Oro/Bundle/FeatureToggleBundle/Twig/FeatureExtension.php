@@ -2,21 +2,29 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class FeatureExtension extends \Twig_Extension
 {
-    /**
-     * @var FeatureChecker
-     */
-    protected $featureChecker;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param FeatureChecker $featureChecker
+     * @param ContainerInterface $container
      */
-    public function __construct(FeatureChecker $featureChecker)
+    public function __construct(ContainerInterface $container)
     {
-        $this->featureChecker = $featureChecker;
+        $this->container = $container;
+    }
+
+    /**
+     * @return FeatureChecker
+     */
+    protected function getFeatureChecker()
+    {
+        return $this->container->get('oro_featuretoggle.checker.feature_checker');
     }
 
     /**
@@ -45,7 +53,7 @@ class FeatureExtension extends \Twig_Extension
      */
     public function isFeatureEnabled($feature, $scopeIdentifier = null)
     {
-        return $this->featureChecker->isFeatureEnabled($feature, $scopeIdentifier);
+        return $this->getFeatureChecker()->isFeatureEnabled($feature, $scopeIdentifier);
     }
 
     /**
@@ -56,6 +64,6 @@ class FeatureExtension extends \Twig_Extension
      */
     public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
     {
-        return $this->featureChecker->isResourceEnabled($resource, $resourceType, $scopeIdentifier);
+        return $this->getFeatureChecker()->isResourceEnabled($resource, $resourceType, $scopeIdentifier);
     }
 }
