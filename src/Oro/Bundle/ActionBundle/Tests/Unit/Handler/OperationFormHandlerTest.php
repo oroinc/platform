@@ -12,6 +12,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -173,6 +174,21 @@ class OperationFormHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(OperationNotFoundException::class);
         $this->expectExceptionMessage('Operation with name "operation" not found');
+
+        $this->handler->process('operation', new Request(), $this->flashBag);
+    }
+
+    public function testProcessForbiddenOperationException()
+    {
+        $operation = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operation->expects($this->once())->method('isAvailable')->willReturn(false);
+
+        $this->operationRegistry->expects($this->once())
+            ->method('findByName')
+            ->with('operation')
+            ->willReturn($operation);
+
+        $this->expectException(ForbiddenOperationException::class);
 
         $this->handler->process('operation', new Request(), $this->flashBag);
     }

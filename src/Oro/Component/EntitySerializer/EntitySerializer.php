@@ -155,6 +155,7 @@ class EntitySerializer
      * @param FieldAccessor            $fieldAccessor
      * @param ConfigNormalizer         $configNormalizer
      * @param DataNormalizer           $dataNormalizer
+     * @param ConfigConverter          $configConverter
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -163,7 +164,8 @@ class EntitySerializer
         QueryFactory $queryFactory,
         FieldAccessor $fieldAccessor,
         ConfigNormalizer $configNormalizer,
-        DataNormalizer $dataNormalizer
+        DataNormalizer $dataNormalizer,
+        ConfigConverter $configConverter = null
     ) {
         $this->doctrineHelper   = $doctrineHelper;
         $this->dataAccessor     = $dataAccessor;
@@ -173,7 +175,10 @@ class EntitySerializer
         $this->configNormalizer = $configNormalizer;
         $this->dataNormalizer   = $dataNormalizer;
 
-        $this->configConverter = new ConfigConverter();
+        if (null === $configConverter) {
+            $configConverter = new ConfigConverter();
+        }
+        $this->configConverter = $configConverter;
     }
 
     /**

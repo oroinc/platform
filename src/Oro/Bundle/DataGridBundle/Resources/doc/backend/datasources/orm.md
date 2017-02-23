@@ -22,6 +22,24 @@ datagrids:
                 from:
                     - { table: OroContactBundle:Group, alias: g }
 ```
+Important notes
+---------------
+
+By default all datagrids that use ORM datasource is marked by [HINT_PRECISE_ORDER_BY](../../../../../../Component/DoctrineUtils/README.md#preciseorderbywalker-class) query hint. This guarantee that rows are sorted in the same way independent from a state of SQL server and from values of OFFSET and LIMIT clauses. More details you can find in [PostgreSQL documentation](https://www.postgresql.org/docs/8.1/static/queries-limit.html).
+
+If you need to disable this behaviour for your datagrid the following configuration can be used:
+
+```yaml
+
+datagrids:
+    DATAGRID_NAME_HERE:
+        source:
+            type: orm
+            query:
+                ...
+            hints:
+                - { name: HINT_PRECISE_ORDER_BY, value: false }
+```
 
 Modification of a query configuration from PHP code
 ---------------------------------------------------
@@ -51,8 +69,9 @@ public function onPreBuild(PreBuild $event)
     $config = $event->getConfig();
     $parameters = $event->getParameters();
 
+    $filters = $parameters->get(OrmFilterExtension::FILTER_ROOT_PARAM, []);
     $sorters = $parameters->get(OrmSorterExtension::SORTERS_ROOT_PARAM, []);
-    if (empty($sorters['channelName'])) {
+    if (empty($filters['channelName']) && empty($sorters['channelName'])) {
         $config->getOrmQuery()->convertAssociationJoinToSubquery(
             'g',
             'groupName',

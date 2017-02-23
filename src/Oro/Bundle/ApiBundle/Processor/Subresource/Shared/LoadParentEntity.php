@@ -37,8 +37,11 @@ class LoadParentEntity implements ProcessorInterface
 
         $parentEntityClass = $context->getParentClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($parentEntityClass)) {
-            // only manageable entities are supported
-            return;
+            // only manageable entities or resources based on manageable entities are supported
+            $parentEntityClass = $context->getParentConfig()->getParentResourceClass();
+            if (!$parentEntityClass || !$this->doctrineHelper->isManageableEntityClass($parentEntityClass)) {
+                return;
+            }
         }
 
         $parentEntity = $this->doctrineHelper

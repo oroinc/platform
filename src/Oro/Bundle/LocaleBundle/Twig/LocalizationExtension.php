@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
+use Doctrine\Common\Collections\Collection;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
@@ -10,34 +16,39 @@ class LocalizationExtension extends \Twig_Extension
 {
     const NAME = 'oro_locale_localization';
 
-    /**
-     * @var LanguageCodeFormatter
-     */
-    protected $languageCodeFormatter;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var FormattingCodeFormatter
+     * @param ContainerInterface $container
      */
-    protected $formattingCodeFormatter;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @var LocalizationHelper
+     * @return LanguageCodeFormatter
      */
-    protected $localizationHelper;
+    protected function getLanguageCodeFormatter()
+    {
+        return $this->container->get('oro_locale.formatter.language_code');
+    }
 
     /**
-     * @param LanguageCodeFormatter $languageCodeFormatter
-     * @param FormattingCodeFormatter $formattingCodeFormatter
-     * @param LocalizationHelper $localizationHelper
+     * @return FormattingCodeFormatter
      */
-    public function __construct(
-        LanguageCodeFormatter $languageCodeFormatter,
-        FormattingCodeFormatter $formattingCodeFormatter,
-        LocalizationHelper $localizationHelper
-    ) {
-        $this->languageCodeFormatter = $languageCodeFormatter;
-        $this->formattingCodeFormatter = $formattingCodeFormatter;
-        $this->localizationHelper = $localizationHelper;
+    protected function getFormattingCodeFormatter()
+    {
+        return $this->container->get('oro_locale.formatter.formatting_code');
+    }
+
+    /**
+     * @return LocalizationHelper
+     */
+    protected function getLocalizationHelper()
+    {
+        return $this->container->get('oro_locale.helper.localization');
     }
 
     /**
@@ -53,7 +64,7 @@ class LocalizationExtension extends \Twig_Extension
             ),
             new \Twig_SimpleFilter(
                 'oro_locale_code_title',
-                [$this->languageCodeFormatter, 'formatLocale'],
+                [$this, 'formatLocale'],
                 ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFilter(
@@ -63,7 +74,7 @@ class LocalizationExtension extends \Twig_Extension
             ),
             new \Twig_SimpleFilter(
                 'localized_value',
-                [$this->localizationHelper, 'getLocalizedValue'],
+                [$this, 'getLocalizedValue'],
                 ['is_safe' => ['html']]
             ),
         ];
@@ -71,20 +82,43 @@ class LocalizationExtension extends \Twig_Extension
 
     /**
      * @param string $code
+     *
      * @return string
      */
     public function getLanguageTitleByCode($code)
     {
-        return $this->languageCodeFormatter->format($code);
+        return $this->getLanguageCodeFormatter()->format($code);
     }
 
     /**
      * @param string $code
+     *
+     * @return string
+     */
+    public function formatLocale($code)
+    {
+        return $this->getLanguageCodeFormatter()->formatLocale($code);
+    }
+
+    /**
+     * @param string $code
+     *
      * @return string
      */
     public function getFormattingTitleByCode($code)
     {
-        return $this->formattingCodeFormatter->format($code);
+        return $this->getFormattingCodeFormatter()->format($code);
+    }
+
+    /**
+     * @param Collection        $values
+     * @param Localization|null $localization
+     *
+     * @return LocalizedFallbackValue
+     */
+    public function getLocalizedValue(Collection $values, Localization $localization = null)
+    {
+        return $this->getLocalizationHelper()->getLocalizedValue($values, $localization);
     }
 
     /**

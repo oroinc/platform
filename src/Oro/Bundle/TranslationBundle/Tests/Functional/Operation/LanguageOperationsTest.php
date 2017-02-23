@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -10,19 +11,20 @@ use Oro\Bundle\TranslationBundle\Helper\LanguageHelper;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 
 /**
- * @dbIsolation
+ * @dbIsolationPerTest
  */
 class LanguageOperationsTest extends ActionTestCase
 {
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader(), true);
+        $this->initClient([], $this->generateBasicAuthHeader());
 
         $this->loadFixtures(
             [
                 LoadLanguages::class,
             ]
         );
+        $this->client->disableReboot();
     }
 
     public function testEnableLanguage()
@@ -74,10 +76,9 @@ class LanguageOperationsTest extends ActionTestCase
         $languageHelper->expects($this->any())
             ->method('isAvailableInstallTranslates')
             ->willReturn(true);
-        $client = $this->mockLanguageHelper($languageHelper);
 
-        $crawler = $client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
-        $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
+        $crawler = $this->client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $form = $crawler->selectButton('Install')->form([
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE1,
@@ -86,13 +87,8 @@ class LanguageOperationsTest extends ActionTestCase
         // temporary file would be removed automatically
         copy(__DIR__ . '/../DataFixtures/Translations/en_CA.zip', $tmpDir . '.zip');
 
-        $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');
-        $client = $this->mockLanguageHelper($languageHelper);
-        self::$kernel->getContainer()->get('session')->set('_csrf/oro_action_operation', $token);
-        $client->followRedirects(true);
-        $crawler = $client->submit($form);
+        $crawler = $this->submitOperationForm($form);
 
-        $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         $this->assertContains('Language has been installed', $crawler->html());
         $this->assertNotEmpty($this->getLanguageEntity($language->getId())->getInstalledBuildDate());
     }
@@ -101,45 +97,42 @@ class LanguageOperationsTest extends ActionTestCase
     {
         /** @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE2);
-        $tmpDir = self::$kernel->getContainer()->get('oro_translation.service_provider')->getTmpDir('oro-test-trans');
+        $tmpDir = $this->getContainer()->get('oro_translation.service_provider')->getTmpDir('oro-test-trans');
         $tmpDir .= '/' . LoadLanguages::LANGUAGE2;
         $url = $this->getOperationDialogUrl($language, 'oro_translation_language_update');
         $languageHelper = $this->getLanguageHelperMock($tmpDir);
         $languageHelper->expects($this->any())
             ->method('isAvailableUpdateTranslates')
             ->willReturn(true);
-        $client = $this->mockLanguageHelper($languageHelper);
 
-        $crawler = $client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
-        $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
+        $crawler = $this->client->request('GET', $url, [], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
+        // temporary file would be removed automatically
+        copy(__DIR__ . '/../DataFixtures/Translations/fr_FR.zip', $tmpDir . '.zip');
 
         $form = $crawler->selectButton('Update')->form([
             'oro_action_operation[language_code]' => LoadLanguages::LANGUAGE2,
         ]);
 
-        // temporary file would be removed automatically
-        copy(__DIR__ . '/../DataFixtures/Translations/fr_FR.zip', $tmpDir . '.zip');
+        $crawler = $this->submitOperationForm($form);
 
-        $token = self::$kernel->getContainer()->get('session')->get('_csrf/oro_action_operation');
-        $client = $this->mockLanguageHelper($languageHelper);
-        self::$kernel->getContainer()->get('session')->set('_csrf/oro_action_operation', $token);
-        $client->followRedirects(true);
-        $crawler = $client->submit($form);
-
-        $this->assertHtmlResponseStatusCodeEquals($client->getResponse(), 200);
         $this->assertContains('Language has been updated', $crawler->html());
     }
 
     /**
-     * @param LanguageHelper $languageHelper
-     * @return Client
+     * @param Form $form
+     * @return Crawler
      */
-    private function mockLanguageHelper(LanguageHelper $languageHelper)
+    private function submitOperationForm(Form $form)
     {
-        $client = self::createClient([], $this->generateBasicAuthHeader());
-        self::$kernel->getContainer()->set('oro_translation.helper.language', $languageHelper);
+        $token = $this->getContainer()->get('session')->get('_csrf/oro_action_operation');
+        $this->getContainer()->get('session')->set('_csrf/oro_action_operation', $token);
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form);
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
-        return $client;
+        return $crawler;
     }
 
     /**
@@ -158,6 +151,8 @@ class LanguageOperationsTest extends ActionTestCase
         $languageHelper->expects($this->any())
             ->method('getLanguageStatistic')
             ->willReturn(['lastBuildDate' => new \DateTime()]);
+
+        $this->getContainer()->set('oro_translation.helper.language', $languageHelper);
 
         return $languageHelper;
     }
@@ -187,7 +182,7 @@ class LanguageOperationsTest extends ActionTestCase
      */
     private function getLanguageEntity($id)
     {
-        return self::$kernel->getContainer()
+        return $this->getContainer()
             ->get('doctrine')
             ->getManagerForClass(Language::class)
             ->getRepository(Language::class)

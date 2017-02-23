@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Datagrid\Extension;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Inflector\Inflector;
+use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -112,6 +113,10 @@ class LocalizedValueExtension extends AbstractExtension
 
         foreach ($properties as $name => $definition) {
             $propertyPath = $definition[LocalizedValueProperty::DATA_NAME_KEY];
+
+            $shouldAllowEmpty = array_key_exists(LocalizedValueProperty::ALLOW_EMPTY, $definition);
+            $joinType = $shouldAllowEmpty ? Join::LEFT_JOIN : Join::INNER_JOIN;
+
             if (false === strpos($propertyPath, '.')) {
                 $propertyPath = sprintf('%s.%s', $rootEntityAlias, $propertyPath);
             }
@@ -120,8 +125,21 @@ class LocalizedValueExtension extends AbstractExtension
                 $queryBuilder,
                 Inflector::pluralize($propertyPath),
                 Inflector::pluralize($name),
-                $name
+                $name,
+                $joinType
             );
+
+            // in case of left join , use only default localization
+            if ($shouldAllowEmpty) {
+                $localizedEntityAliasValues = explode('.', $propertyPath);
+                $queryBuilder->andWhere(
+                    sprintf(
+                        '%s.id IS NOT NULL or %s.id IS NULL',
+                        Inflector::pluralize($name),
+                        reset($localizedEntityAliasValues)
+                    )
+                );
+            }
 
             if ($queryBuilder->getDQLPart('groupBy')) {
                 $queryBuilder->addGroupBy($name);

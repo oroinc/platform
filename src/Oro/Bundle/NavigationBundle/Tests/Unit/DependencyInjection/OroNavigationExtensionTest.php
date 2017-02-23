@@ -35,29 +35,12 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->load($configs, $container);
 
-        $this->assertTrue($container->hasDefinition('oro_menu.configuration_builder'));
-        $menuBuilder = $container->getDefinition('oro_menu.configuration_builder');
-        $data = $menuBuilder->getMethodCalls();
+        $this->assertTrue($container->hasDefinition('oro_menu.configuration'));
+        $menuConfiguration = $container->getDefinition('oro_menu.configuration');
         $this->assertEquals(
-            array(
-                array(
-                    'setConfiguration',
-                    array($expectedMenu)
-                )
-            ),
-            $data,
-            'Unexpected menu for builder'
-        );
-
-        $this->assertTrue($container->hasDefinition('oro_menu.twig.extension'));
-        $menuBuilder = $container->getDefinition('oro_menu.twig.extension');
-        $data = $menuBuilder->getMethodCalls();
-
-        $actualCall = end($data);
-        $this->assertEquals(
-            ['setMenuConfiguration', [$expectedMenu]],
-            $actualCall,
-            'Unexpected menu for twig'
+            $expectedMenu,
+            $menuConfiguration->getArgument(0),
+            'Unexpected menu configuration'
         );
 
         $this->assertTrue($container->hasDefinition('oro_navigation.title_config_reader'));
@@ -154,8 +137,6 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         )
                     ),
                     'templates' => array(),
-                    'settings' => $settings,
-                    'oro_navigation_elements' => array()
                 ),
                 'expectedTitles' => array()
             ),
@@ -265,23 +246,6 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         )
                     ),
                     'templates' => array(),
-                    'settings'                => $settings,
-                    'oro_navigation_elements' => array(
-                        'favoriteButton' => array(
-                            'default' => true,
-                            'routes'  => array(
-                                'call_list'  => false,
-                                'some_route' => false
-                            )
-                        ),
-                        'shortcutsPanel' => array(
-                            'default' => true,
-                            'routes'  => array(
-                                'call_list'  => true,
-                                'some_route' => false
-                            )
-                        ),
-                    )
                 ),
                 'expectedTitles' => array(
                     'oro_call_index' => 'Calls'

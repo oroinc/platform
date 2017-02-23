@@ -29,7 +29,5 @@ services:
 
     oro_message_queue.command.consume_messages:
         class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
-        arguments:
-            - '@oro_message_queue.consumption.queue_consumer'
         tags:
-            - { name: 'console.command' }
+            - { name: console.command }

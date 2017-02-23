@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernel;
+
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 
 class RequestTitleListener
 {
-    /** @var TitleServiceInterface */
-    private $titleService;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @param TitleServiceInterface $titleService
+     * @param ContainerInterface $container
      */
-    public function __construct(TitleServiceInterface $titleService)
+    public function __construct(ContainerInterface $container)
     {
-        $this->titleService = $titleService;
+        $this->container = $container;
     }
 
     /**
@@ -28,7 +28,7 @@ class RequestTitleListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (HttpKernel::MASTER_REQUEST != $event->getRequestType()
+        if (!$event->isMasterRequest()
             || $request->getRequestFormat() != 'html'
             || ($request->getMethod() != 'GET'
                 && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
@@ -39,8 +39,14 @@ class RequestTitleListener
             return;
         }
 
-        $route = $request->get('_route');
+        $this->getTitleService()->loadByRoute($request->get('_route'));
+    }
 
-        $this->titleService->loadByRoute($route);
+    /**
+     * @return TitleServiceInterface
+     */
+    protected function getTitleService()
+    {
+        return $this->container->get('oro_navigation.title_service');
     }
 }

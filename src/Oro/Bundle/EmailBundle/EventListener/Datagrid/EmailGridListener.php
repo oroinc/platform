@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
@@ -21,20 +22,17 @@ class EmailGridListener implements FeatureToggleableInterface
 {
     use FeatureCheckerHolderTrait;
 
-    /**
-     * @var EmailQueryFactory
-     */
+    /** @var EmailQueryFactory */
     protected $factory;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @var GridViewManager
-     */
+    /** @var GridViewManager */
     protected $gridViewManager;
+
+    /** @var ConfigManager */
+    protected $configManager;
 
     /**
      * Stores join's root and alias if joins for filters are added - ['eu' => ['alias1']]
@@ -47,15 +45,18 @@ class EmailGridListener implements FeatureToggleableInterface
      * @param EmailQueryFactory $factory
      * @param SecurityFacade $securityFacade
      * @param GridViewManager $gridViewManager
+     * @param ConfigManager $configManager
      */
     public function __construct(
         EmailQueryFactory $factory,
         SecurityFacade $securityFacade,
-        GridViewManager $gridViewManager
+        GridViewManager $gridViewManager,
+        ConfigManager $configManager
     ) {
         $this->factory = $factory;
         $this->securityFacade = $securityFacade;
         $this->gridViewManager = $gridViewManager;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -91,9 +92,20 @@ class EmailGridListener implements FeatureToggleableInterface
         $countQb       = $ormDataSource->getCountQb();
         $parameters    = $event->getDatagrid()->getParameters();
 
-        $this->factory->applyAcl($queryBuilder);
-        if ($countQb) {
-            $this->factory->applyAcl($countQb);
+        $isThreadGroupingEnabled = $this->configManager && $this->configManager->get('oro_email.threads_grouping');
+
+        $this->factory->addEmailsCount($queryBuilder, $isThreadGroupingEnabled);
+
+        if ($isThreadGroupingEnabled) {
+            $this->factory->applyAclThreadsGrouping($queryBuilder);
+            if ($countQb) {
+                $this->factory->applyAclThreadsGrouping($countQb);
+            }
+        } else {
+            $this->factory->applyAcl($queryBuilder);
+            if ($countQb) {
+                $this->factory->applyAcl($countQb);
+            }
         }
 
         if ($parameters->has('emailIds')) {
@@ -188,9 +200,9 @@ class EmailGridListener implements FeatureToggleableInterface
         $groupByParts = $qb->getDQLPart('groupBy');
         $qb->resetDQLPart('groupBy');
         /** @var GroupBy $groupByPart */
-        foreach ($groupByParts as $i => $groupByPart) {
+        foreach ($groupByParts as $groupByPart) {
             $newGroupByPart = [];
-            foreach ($groupByPart->getParts() as $j => $val) {
+            foreach ($groupByPart->getParts() as $val) {
                 if ($val !== $part) {
                     $newGroupByPart[] = $val;
                 }

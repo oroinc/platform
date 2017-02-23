@@ -6,9 +6,6 @@ use Symfony\Component\BrowserKit\Response;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class RestApiTest extends WebTestCase
 {
     /**

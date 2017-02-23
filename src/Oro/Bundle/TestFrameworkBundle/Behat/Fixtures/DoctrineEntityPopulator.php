@@ -120,7 +120,7 @@ class DoctrineEntityPopulator implements MethodInterface
      * @param string|int|array $id
      * @return object
      */
-    private function findObject(string $class, $id)
+    private function findObject($class, $id)
     {
         $targetObject = $this->getEm()
             ->getRepository($class)

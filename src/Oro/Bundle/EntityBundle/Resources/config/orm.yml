@@ -61,3 +61,13 @@ services:
         arguments:
             - '@service_container'
             - [] # will be replaced with repository services array
+
+    oro_entity.query_hint.precise_order_by:
+        public: false
+        abstract: true
+        tags:
+            -
+                name: oro_entity.query_hint
+                hint: oro_entity.precise_order_by
+                alias: HINT_PRECISE_ORDER_BY
+                tree_walker: Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker

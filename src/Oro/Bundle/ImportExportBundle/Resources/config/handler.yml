@@ -4,6 +4,7 @@ parameters:
     oro_importexport.handler.import.http.class:        Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler
     oro_importexport.handler.import.cli.class:         Oro\Bundle\ImportExportBundle\Handler\CliImportHandler
     oro_importexport.handler.export.class:             Oro\Bundle\ImportExportBundle\Handler\ExportHandler
+    oro_importexport.handler.csv.file.class:           Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler
 
 services:
     oro_importexport.handler.abstract:
@@ -12,7 +13,6 @@ services:
         arguments:
             - '@oro_importexport.job_executor'
             - '@oro_importexport.processor.registry'
-            - '@oro_importexport.file.file_system_operator'
             - '@oro_entity_config.provider.entity'
             - '@translator'
 
@@ -33,9 +33,13 @@ services:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
             - [setRouter, ['@router']]
             - [setConfigManager, ['@oro_config.global']]
+            - [setFileManager, ['@oro_importexport.file.file_manager']]
         lazy: true
 
     oro_importexport.handler.import.cli:
         class: %oro_importexport.handler.import.cli.class%
         parent: oro_importexport.handler.import.abstract
         lazy: true
+
+    oro_importexport.handler.csv.file:
+        class: %oro_importexport.handler.csv.file.class%

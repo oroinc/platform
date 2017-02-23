@@ -17,7 +17,7 @@ class Form extends Element
     {
         foreach ($table->getRows() as $row) {
             $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
-            $value = $this->normalizeValue($row[1]);
+            $value = self::normalizeValue($row[1]);
             $this->fillField($locator, $value);
         }
     }
@@ -29,8 +29,8 @@ class Form extends Element
             $field = $this->findField($locator);
             self::assertNotNull($field, "Field with '$locator' locator not found");
 
-            $expectedValue = $this->normalizeValue($row[1]);
-            $fieldValue = $this->normalizeValue($field->getValue());
+            $expectedValue = self::normalizeValue($row[1]);
+            $fieldValue = self::normalizeValue($field->getValue());
             self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
         }
     }
@@ -172,11 +172,11 @@ class Form extends Element
      * @param array|string $value
      * @return array|string
      */
-    protected function normalizeValue($value)
+    public static function normalizeValue($value)
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
-                $value[$key] = $this->normalizeValue($item);
+                $value[$key] = self::normalizeValue($item);
             }
 
             return $value;
@@ -185,7 +185,7 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return explode(',', trim($value, '[]'));
+            return array_map('trim', explode(',', trim($value, '[]')));
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -221,5 +221,23 @@ class Form extends Element
         } while ($field === null && $i < $deep);
 
         return $field;
+    }
+
+    /**
+     * Retrieves validation error message text for provided field name
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function getFieldValidationErrors($fieldName)
+    {
+        $field = $this->findFieldByLabel($fieldName);
+
+        self::assertTrue($field->hasClass("error"), "Field $fieldName has no validation errors");
+
+        $fieldId = $field->getAttribute('id');
+        $errorSpan = $field->getParent()->find('css', "span.validation-failed[for='$fieldId']");
+
+        return $errorSpan->getText();
     }
 }

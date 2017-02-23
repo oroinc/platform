@@ -77,7 +77,7 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
     /**
      * @var array
      */
-    private static $attributesData = [];
+    protected static $attributesData = [];
 
     /**
      * @param ObjectManager $manager
@@ -90,7 +90,7 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
         $entityManager = $configManager->getEntityManager();
 
         $persistedAttributes = [];
-        foreach (self::$attributes as $attributeName => $attributeOptions) {
+        foreach (static::$attributes as $attributeName => $attributeOptions) {
             $attribute = $configManager->createConfigFieldModel(
                 $entityModel->getClassName(),
                 $attributeName,
@@ -111,10 +111,10 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
             $persistedAttributes[$attributeName] = $attribute;
         }
 
-        $entityManager->flush();
+        $configManager->flush();
 
         foreach ($persistedAttributes as $attributeName => $attribute) {
-            self::$attributesData[$attributeName] = $attribute->getId();
+            static::$attributesData[$attributeName] = $attribute->getId();
         }
     }
 
@@ -124,6 +124,6 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
      */
     public static function getAttributeIdByName($attributeName)
     {
-        return isset(self::$attributesData[$attributeName]) ? self::$attributesData[$attributeName] : null;
+        return isset(static::$attributesData[$attributeName]) ? static::$attributesData[$attributeName] : null;
     }
 }

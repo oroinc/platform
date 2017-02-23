@@ -114,7 +114,7 @@ class InstallPackageCommand extends ContainerAwareCommand
         $minimalSuggestedMemory = 2 * pow(1024, 3);
         $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
         if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
-            $warnings[] = '<comment>We recommend at least 2Gb to be available for PHP CLI</comment>';
+            $warnings[] = '<comment>It\'s recommended at least 2Gb to be available for PHP CLI</comment>';
         }
 
         if (extension_loaded('xdebug')) {

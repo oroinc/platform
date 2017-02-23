@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
@@ -33,6 +33,11 @@ class ScopeManager
      * @var PropertyAccessor
      */
     protected $propertyAccessor;
+
+    /**
+     * @var array
+     */
+    protected $fields;
 
     /**
      * @param ScopeEntityStorage $entityStorage
@@ -85,7 +90,7 @@ class ScopeManager
     /**
      * @param $scopeType
      * @param null $context
-     * @return BufferedQueryResultIterator|\Oro\Bundle\ScopeBundle\Entity\Scope[]
+     * @return BufferedQueryResultIteratorInterface|\Oro\Bundle\ScopeBundle\Entity\Scope[]
      */
     public function findBy($scopeType, $context = null)
     {
@@ -105,7 +110,7 @@ class ScopeManager
     /**
      * @param $scopeType
      * @param array|object|null $context
-     * @return BufferedQueryResultIterator|Scope[]
+     * @return BufferedQueryResultIteratorInterface|Scope[]
      */
     public function findRelatedScopes($scopeType, $context = null)
     {
@@ -222,7 +227,7 @@ class ScopeManager
             $criteria[$field] = $this->getPropertyAccessor()->getValue($scope, $field);
         }
 
-        return new ScopeCriteria($criteria);
+        return new ScopeCriteria($criteria, $this->getFields());
     }
 
     /**
@@ -252,7 +257,7 @@ class ScopeManager
             }
         }
 
-        return new ScopeCriteria($criteria);
+        return new ScopeCriteria($criteria, $this->getFields());
     }
 
     /**
@@ -262,8 +267,7 @@ class ScopeManager
     {
         if ($this->nullContext === null) {
             $this->nullContext = [];
-            $fields = $this->getEntityFieldProvider()->getRelations(Scope::class);
-            foreach ($fields as $field) {
+            foreach ($this->getFields() as $field) {
                 $this->nullContext[$field['name']] = null;
             }
         }
@@ -327,7 +331,7 @@ class ScopeManager
             $criteria = array_merge($criteria, $localCriteria);
         }
 
-        return new ScopeCriteria($criteria);
+        return new ScopeCriteria($criteria, $this->getFields());
     }
 
     /**
@@ -340,5 +344,17 @@ class ScopeManager
         }
 
         return $this->entityFieldProvider;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFields()
+    {
+        if ($this->fields === null) {
+            $this->fields = $this->getEntityFieldProvider()->getRelations(Scope::class);
+        }
+
+        return $this->fields;
     }
 }
