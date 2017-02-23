@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-
 use Oro\Bundle\EmailBundle\Async\Topics as EmailTopics;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
@@ -195,10 +195,11 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     }
 
     /**
-     * If we don't receive a disabled-listeners option we disable three listeners by default:
+     * If we don't receive a disabled-listeners option we disable four listeners by default:
      * - SearchIndex listener (to prevent a lot of reindex messages)
      * - EntityListener in EmailBundle (to prevent a lot of UpdateEmailAssociations messages)
      * - WorkflowEventTrigger (to prevent additional reindexing)
+     * - SendChangedEntitiesToMessageQueueListener (to prevent data audit for the loaded demo-data)
      * After loading the demo data we send the messages manually and re-enable the listeners
      */
     protected function disableDefaultListeners()
@@ -241,7 +242,8 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
         return [
             'oro_search.index_listener',
             'oro_email.listener.entity_listener',
-            'oro_workflow.listener.event_trigger_collector'
+            'oro_workflow.listener.event_trigger_collector',
+            'oro_dataaudit.listener.send_changed_entities_to_message_queue'
         ];
     }
 
