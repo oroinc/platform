@@ -114,10 +114,9 @@ class WorkflowDataSerializeListener
 
         // workflow attributes must not be serialized
         $workflowConfig = $workflowItem->getDefinition()->getConfiguration();
-        if ($variableNames = $this->getVariablesNamesFromConfiguration($workflowConfig)) {
-            foreach ($variableNames as $variableName) {
-                $workflowData->remove($variableName);
-            }
+        $variableNames = $this->getVariablesNamesFromConfiguration($workflowConfig);
+        foreach ($variableNames as $variableName) {
+            $workflowData->remove($variableName);
         }
 
         $serializedData = $this->serializer->serialize($workflowData, $this->format);
@@ -160,7 +159,7 @@ class WorkflowDataSerializeListener
     protected function getVariablesNamesFromConfiguration($configuration)
     {
         $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
-        $variablesNode   = WorkflowConfiguration::NODE_VARIABLES;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
 
         if (!is_array($configuration) || !isset($configuration[$definitionsNode][$variablesNode])) {
             return [];

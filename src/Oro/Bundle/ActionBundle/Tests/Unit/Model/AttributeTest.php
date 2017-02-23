@@ -67,6 +67,5 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ParameterInterface', $attribute);
 
         $this->assertEquals('attribute', $attribute->getInternalType());
-        $this->assertTrue($attribute->isInternalType('attribute'));
     }
 }

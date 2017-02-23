@@ -51,6 +51,5 @@ class VariableTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ParameterInterface', $variable);
 
         $this->assertEquals('variable', $variable->getInternalType());
-        $this->assertTrue($variable->isInternalType('variable'));
     }
 }

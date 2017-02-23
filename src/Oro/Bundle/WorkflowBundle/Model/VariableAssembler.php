@@ -96,10 +96,11 @@ class VariableAssembler extends BaseAbstractAssembler
     protected function assembleVariable(Workflow $workflow, $name, array $options)
     {
         $variable = new Variable();
-        $variable->setName($name);
-        $variable->setLabel($options['label']);
-        $variable->setType($options['type']);
-        $variable->setOptions($this->getOption($options, 'options', []));
+        $variable
+            ->setName($name)
+            ->setLabel($options['label'])
+            ->setType($options['type'])
+            ->setOptions($this->getOption($options, 'options', []));
 
         $denormalizedValue = $this->dataNormalizer->denormalizeVariable($workflow, $variable, $options['value']);
         $variable->setValue($denormalizedValue);

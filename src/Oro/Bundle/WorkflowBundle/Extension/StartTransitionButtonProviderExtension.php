@@ -59,13 +59,13 @@ class StartTransitionButtonProviderExtension extends AbstractStartTransitionButt
             ->setEntityClass($workflow->getDefinition()->getRelatedEntity())
             ->setDefinition($workflow->getDefinition())
             ->setWorkflowName($workflow->getName())
-            ->setData(new WorkflowData([
-                $transition->getInitContextAttribute() => $searchContext
-            ]));
+            ->setData(new WorkflowData([$transition->getInitContextAttribute() => $searchContext]));
 
         // populate WorkflowData with variables
         if ($variables = $workflow->getVariables()) {
-            $workflowItem->getData()->add($variables->toArray());
+            foreach ($variables as $name => $variable) {
+                $workflowItem->getData()->set($name, $variable->getValue());
+            }
         }
 
         return $workflowItem;

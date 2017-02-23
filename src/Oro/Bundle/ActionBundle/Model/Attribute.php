@@ -207,14 +207,4 @@ class Attribute implements EntityParameterInterface
     {
         return ParameterInterface::INTERNAL_TYPE_ATTRIBUTE;
     }
-
-    /**
-     * @param string $type
-     *
-     * @return bool
-     */
-    public function isInternalType($type)
-    {
-        return (ParameterInterface::INTERNAL_TYPE_ATTRIBUTE === $type);
-    }
 }

@@ -10,6 +10,7 @@ class Variable implements ParameterInterface
      * @var string
      */
     protected $name;
+
     /**
      * @var string
      */
@@ -182,6 +183,9 @@ class Variable implements ParameterInterface
         return isset($this->options[$key]);
     }
 
+    /**
+     * @return array|mixed
+     */
     public function getFormOptions()
     {
         if (!$this->hasOption('form_options')) {
@@ -197,15 +201,5 @@ class Variable implements ParameterInterface
     public function getInternalType()
     {
         return ParameterInterface::INTERNAL_TYPE_VARIABLE;
-    }
-
-    /**
-     * @param string $type
-     *
-     * @return bool
-     */
-    public function isInternalType($type)
-    {
-        return (ParameterInterface::INTERNAL_TYPE_VARIABLE === $type);
     }
 }
