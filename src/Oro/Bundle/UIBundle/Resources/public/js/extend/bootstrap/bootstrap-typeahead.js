@@ -41,6 +41,11 @@ define(function(require) {
             });
 
             return offset;
+        },
+        keypress: function() {
+            if (this.suppressKeyPressRepeat) {
+                return;
+            }
         }
     };
 
