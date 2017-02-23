@@ -4,6 +4,7 @@ parameters:
     oro_importexport.handler.import.http.class:        Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler
     oro_importexport.handler.import.cli.class:         Oro\Bundle\ImportExportBundle\Handler\CliImportHandler
     oro_importexport.handler.export.class:             Oro\Bundle\ImportExportBundle\Handler\ExportHandler
+    oro_importexport.handler.csv.file.class:           Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler
 
 services:
     oro_importexport.handler.abstract:
@@ -39,3 +40,6 @@ services:
         class: %oro_importexport.handler.import.cli.class%
         parent: oro_importexport.handler.import.abstract
         lazy: true
+
+    oro_importexport.handler.csv.file:
+        class: %oro_importexport.handler.csv.file.class%

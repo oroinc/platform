@@ -3,6 +3,8 @@ oro:
         definition:
             columns:
                 mandatory: You must specify at least one column for the report grid
+        dublicate:
+            columns: You are trying to add several copies of column(s) %columnName% to the report. Only one copy of the column may be added. Please, review the list of columns to remove duplicates.
         date_grouping:
             group_by_mandatory: The date grouping filter requires to additionally make a column grouping. Please select an unique column (ex. id) in the "Grouping" section for the main entity
             date_field.mandatory: Please select a field for the dare grouping filter to apply it

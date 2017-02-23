@@ -10,6 +10,12 @@ define(function(require) {
     var ColumnFilterView = require('orodatagrid/js/app/views/column-manager/column-manager-filter-view');
     var ColumnManagerCollectionView = require('orodatagrid/js/app/views/column-manager/column-manager-collection-view');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
+    var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        enableFilters: true
+    }, config);
 
     /**
      * @class ColumnManagerComponent
@@ -39,6 +45,12 @@ define(function(require) {
          * @type {boolean}
          */
         addSorting: true,
+
+        /**
+         * Check if filters enabled
+         * @type {boolean}
+         */
+        enableFilters: config.enableFilters,
 
         /**
          * @inheritDoc
@@ -109,10 +121,14 @@ define(function(require) {
                 collection: this.managedColumns,
                 columnFilterModel: this.columnFilterModel
             });
-            this.columnFilterView = new ColumnFilterView({
-                el: this.columnManagerView.$('.column-manager-filter').get(0),
-                model: this.columnFilterModel
-            });
+
+            if (this.enableFilters) {
+                this.columnFilterView = new ColumnFilterView({
+                    el: this.columnManagerView.$('.column-manager-filter').get(0),
+                    model: this.columnFilterModel
+                });
+            }
+
             this.columnManagerCollectionView = new ColumnManagerCollectionView({
                 el: this.columnManagerView.$('.column-manager-table').get(0),
                 collection: this.managedColumns,

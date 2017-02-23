@@ -3,7 +3,6 @@ parameters:
     oro_config.config_definition_bag.class:                                      Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag
     oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
     oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserScopeManager
-    oro_config.twig_extension.class:                                             Oro\Bundle\ConfigBundle\Twig\ConfigExtension
     oro_config.provider.system_configuration.form_provider.class:                Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
 
     oro_config.form.config_subscriber.class:                                     Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
@@ -68,9 +67,10 @@ services:
             - '@event_dispatcher'
 
     oro_config.twig.config_extension:
-        class: %oro_config.twig_extension.class%
+        class: Oro\Bundle\ConfigBundle\Twig\ConfigExtension
+        public: false
         arguments:
-           - '@oro_config.user'
+           - '@service_container'
         tags:
             - { name: twig.extension }
 

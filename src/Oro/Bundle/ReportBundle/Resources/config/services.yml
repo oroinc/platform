@@ -86,6 +86,11 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_report.report_definition_validator }
 
+    oro_report.validator.report_column_dublicate_validator:
+        class: Oro\Bundle\ReportBundle\Validator\ReportColumnDublicateValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_report.report_column_dublicate_validator }
+
     oro_report.validator.report_date_grouping_validator:
         class: Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator
         tags:
