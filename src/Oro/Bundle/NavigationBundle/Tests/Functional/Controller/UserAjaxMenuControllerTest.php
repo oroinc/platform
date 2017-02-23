@@ -24,31 +24,11 @@ class UserAjaxMenuControllerTest extends WebTestCase
         ]);
     }
 
-    public function testReset()
-    {
-        $parameters = [
-            'menuName' => self::MENU_NAME,
-            'context' => [
-                'user' => $this->getReference(LoadUserData::SIMPLE_USER)->getId()
-            ]
-        ];
-
-        $this->client->request(
-            'DELETE',
-            $this->getUrl('oro_navigation_user_menu_ajax_reset', $parameters),
-            ['ownerId' => 0]
-        );
-
-        $result = $this->client->getResponse();
-
-        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NO_CONTENT);
-    }
-
     public function testCreate()
     {
         $parameters = [
             'menuName' => self::MENU_NAME,
-            'parentKey' => MenuUpdateData::MENU_UPDATE_3,
+            'parentKey' => MenuUpdateData::MENU_UPDATE_1,
             'context' => [
                 'user' => $this->getReference(LoadUserData::SIMPLE_USER)->getId()
             ]
@@ -153,5 +133,25 @@ class UserAjaxMenuControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, Response::HTTP_OK);
+    }
+
+    public function testReset()
+    {
+        $parameters = [
+            'menuName' => self::MENU_NAME,
+            'context' => [
+                'user' => $this->getReference(LoadUserData::SIMPLE_USER)->getId()
+            ]
+        ];
+
+        $this->client->request(
+            'DELETE',
+            $this->getUrl('oro_navigation_user_menu_ajax_reset', $parameters),
+            ['ownerId' => 0]
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NO_CONTENT);
     }
 }

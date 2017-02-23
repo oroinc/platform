@@ -21,23 +21,6 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
         $this->loadFixtures([MenuUpdateData::class]);
     }
 
-    public function testReset()
-    {
-        $parameters = [
-            'menuName' => self::MENU_NAME
-        ];
-
-        $this->client->request(
-            'DELETE',
-            $this->getUrl('oro_navigation_global_menu_ajax_reset', $parameters),
-            ['ownerId' => 0]
-        );
-
-        $result = $this->client->getResponse();
-
-        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NO_CONTENT);
-    }
-
     public function testCreate()
     {
         $parameters = [
@@ -132,5 +115,22 @@ class GlobalAjaxMenuControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, Response::HTTP_OK);
+    }
+
+    public function testReset()
+    {
+        $parameters = [
+            'menuName' => self::MENU_NAME
+        ];
+
+        $this->client->request(
+            'DELETE',
+            $this->getUrl('oro_navigation_global_menu_ajax_reset', $parameters),
+            ['ownerId' => 0]
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NO_CONTENT);
     }
 }

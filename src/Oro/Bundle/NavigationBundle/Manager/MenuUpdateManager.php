@@ -301,6 +301,8 @@ class MenuUpdateManager
 
             if ($menu->getName() !== $parentKey) {
                 $currentUpdate->setParentKey($parent ? $parent->getName() : null);
+            } else {
+                $currentUpdate->setParentKey(null);
             }
 
             $currentUpdate->setPriority($position + $index);
