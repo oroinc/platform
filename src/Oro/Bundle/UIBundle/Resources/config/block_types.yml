@@ -35,3 +35,11 @@ services:
             - [setOptionsConfig, [{text: ~, icon: {default: ''}, badge: {default: ''}}]]
         tags:
             - { name: layout.block_type, alias: page_subtitle }
+
+    oro_ui.layout.block_type.breadcrumbs:
+        parent: oro_layout.block_type.abstract_configurable_container
+        calls:
+            - [setName, ['breadcrumbs']]
+            - [setOptionsConfig, [{breadcrumbs: {default: []}}]]
+        tags:
+            - { name: layout.block_type, alias: breadcrumbs }

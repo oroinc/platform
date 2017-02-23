@@ -37,10 +37,11 @@ define([
                 .appendTo(this.$el);
             this.$unknownAddress = $('<div class="map-unknown">' + __('map.unknown.location') + '</div>')
                 .appendTo(this.$el);
-            this.mapLocationUnknown();
 
             if (options.address) {
                 this.updateMap(options.address.address, options.address.label);
+            } else {
+                this.mapLocationUnknown();
             }
         },
 

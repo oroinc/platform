@@ -74,17 +74,12 @@ define([
             var checker;
             var isApplicable = true;
 
-            for (var check in testViewport) {
+            _.each(testViewport, function(testValue, check) {
                 checker = this['_' + check + 'Checker'];
-                if (!checker) {
-                    continue;
+                if (checker && isApplicable) {
+                    isApplicable = checker.call(this, testViewport[check]);
                 }
-
-                isApplicable = checker.call(this, testViewport[check]);
-                if (!isApplicable) {
-                    break;
-                }
-            }
+            }, this);
 
             return isApplicable;
         },
@@ -153,7 +148,7 @@ define([
         },
 
         _maxWidthChecker: function(maxWidth) {
-            return !this.viewport.width <= maxWidth;
+            return this.viewport.width <= maxWidth;
         },
 
         _isMobileChecker: function(isMobile) {
