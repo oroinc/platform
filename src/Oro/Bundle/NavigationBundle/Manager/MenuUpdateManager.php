@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityRepository;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Exception\NotFoundParentException;
@@ -70,7 +69,7 @@ class MenuUpdateManager
         if (isset($options['parentKey'])) {
             $parent = $this->findMenuItem($menu, $options['parentKey']);
             if (!$parent) {
-                throw new NotFoundParentException(sprintf('Parent with "%s" id not found.', $options['parentKey']));
+                throw new NotFoundParentException(sprintf('Parent with "%s" parentKey not found.', $options['parentKey']));
             }
             $entity->setParentKey($options['parentKey']);
         }
