@@ -285,6 +285,7 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Acl\Voter\LocalizationVoter'
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_config.manager'
         calls:
             - [setClassName, ['%oro_locale.entity.localization.class%']]
         tags:
