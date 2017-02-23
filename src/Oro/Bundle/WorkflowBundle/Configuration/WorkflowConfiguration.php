@@ -40,6 +40,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
+    const DEFAULT_FORM_CONFIGURATION_TEMPLATE = 'OroWorkflowBundle:actions:update.html.twig';
+    const DEFAULT_FORM_CONFIGURATION_HANDLER = 'default';
 
     const NODE_FORM_OPTIONS_CONFIGURATION = 'configuration';
 
@@ -318,6 +320,21 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                             })
                         ->end()
                         ->append($this->getTransitionFormOptionsConfiguration())
+                        ->beforeNormalization()
+                            ->always(function ($config) {
+                                if (isset($config[self::NODE_FORM_OPTIONS_CONFIGURATION])) {
+                                    if (empty($config[self::NODE_FORM_OPTIONS_CONFIGURATION]['handler'])) {
+                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['handler'] =
+                                            self::DEFAULT_FORM_CONFIGURATION_HANDLER;
+                                    }
+                                    if (empty($config[self::NODE_FORM_OPTIONS_CONFIGURATION]['template'])) {
+                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['template'] =
+                                            self::DEFAULT_FORM_CONFIGURATION_TEMPLATE;
+                                    }
+                                }
+                                return $config;
+                            })
+                        ->end()
                     ->end()
                     ->scalarNode('page_template')
                         ->defaultNull()
@@ -568,16 +585,18 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
         $rootNode
                 ->children()
                     ->scalarNode('handler')
-                        ->isRequired()
+                        ->defaultValue(self::DEFAULT_FORM_CONFIGURATION_HANDLER)
                     ->end()
                     ->scalarNode('data_attribute')
                         ->isRequired()
+                        ->cannotBeEmpty()
                     ->end()
                     ->scalarNode('template')
-                        ->isRequired()
+                        ->defaultValue(self::DEFAULT_FORM_CONFIGURATION_TEMPLATE)
                     ->end()
                     ->scalarNode('data_provider')
                         ->isRequired()
+                        ->cannotBeEmpty()
                     ->end()
                 ->end();
 

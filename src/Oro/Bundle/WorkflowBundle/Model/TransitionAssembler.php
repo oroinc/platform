@@ -175,7 +175,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         }
 
         if (!empty($options['form_options'][WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION])) {
-            $this->formOptionsConfigurationAssembler->assemble($options, $transition);
+            $this->formOptionsConfigurationAssembler->assemble($options);
         }
         return $transition;
     }
