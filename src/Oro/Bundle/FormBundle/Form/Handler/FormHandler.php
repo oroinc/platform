@@ -74,12 +74,4 @@ class FormHandler implements FormHandlerInterface
 
         return false;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAlias()
-    {
-        return 'default';
-    }
 }

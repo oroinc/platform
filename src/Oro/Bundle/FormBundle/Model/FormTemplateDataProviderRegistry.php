@@ -2,78 +2,59 @@
 
 namespace Oro\Bundle\FormBundle\Model;
 
+use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
+use Oro\Component\DependencyInjection\ServiceLinkRegistry;
+use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface;
+
 use Oro\Bundle\FormBundle\Exception\UnknownProviderException;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Registry of form template data provider services by their aliases.
  *
- * Has late construction (instantiation) mechanism (internal resolving from service container),
+ * Has late construction (instantiation) mechanism (internal resolving from service links registry),
  * as all instances of providers not needed in a single request runtime.
  */
-class FormTemplateDataProviderRegistry
+class FormTemplateDataProviderRegistry implements ServiceLinkRegistryAwareInterface
 {
-    /** @var FormTemplateDataProviderInterface[]|string[] */
-    private $formDataProvidersServices = [];
+    const DEFAULT_PROVIDER_NAME = 'default';
 
-    /** @var ContainerInterface */
-    private $container;
+    /** @var ServiceLinkRegistry */
+    private $serviceLinkRegistry;
 
     /**
-     * @param ContainerInterface $container
+     * @param ServiceLinkRegistry $serviceLinkAliasRegistry
      */
-    public function __construct(ContainerInterface $container)
+    public function setServiceLinkRegistry(ServiceLinkRegistry $serviceLinkAliasRegistry)
     {
-        $this->container = $container;
+        $this->serviceLinkRegistry = $serviceLinkAliasRegistry;
     }
 
     /**
      * @param string $alias
+     *
      * @return FormTemplateDataProviderInterface
      */
     public function get($alias)
     {
-        if (!isset($this->formDataProvidersServices[$alias])) {
-            throw new UnknownProviderException($alias);
+        try {
+            $provider = $this->serviceLinkRegistry->get($alias);
+        } catch (UnknownAliasException $parent) {
+            throw new UnknownProviderException($alias, $parent);
         }
 
-        if (is_string($this->formDataProvidersServices[$alias])) {
-            $this->formDataProvidersServices[$alias] = $this->container->get($this->formDataProvidersServices[$alias]);
-        }
-
-        if (!$this->formDataProvidersServices[$alias] instanceof FormTemplateDataProviderInterface) {
+        if (!$provider instanceof FormTemplateDataProviderInterface) {
             throw new \DomainException(
                 sprintf(
-                    'Form data provider service `%s` with `%s` alias must implement %s.',
-                    get_class($this->formDataProvidersServices[$alias]),
+                    'Form data provider `%s` with `%s` alias must implement %s.',
+                    get_class($provider),
                     $alias,
                     FormTemplateDataProviderInterface::class
                 )
             );
         }
 
-        return $this->formDataProvidersServices[$alias];
-    }
-
-    /**
-     * @param string|FormTemplateDataProviderInterface $service
-     * @param string $alias
-     */
-    public function addProviderService($service, $alias)
-    {
-        if (!is_string($service) && !$service instanceof FormTemplateDataProviderInterface) {
-            $type = gettype($service);
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Can\'t add provider service.' .
-                    ' The first argument MUST be service name or instance of `%s`. `%s` given.',
-                    FormTemplateDataProviderInterface::class,
-                    $type === 'object' ? get_class($service) : $type
-                )
-            );
-        }
-        $this->formDataProvidersServices[$alias] = $service;
+        return $provider;
     }
 
     /**
@@ -83,6 +64,6 @@ class FormTemplateDataProviderRegistry
      */
     public function has($alias)
     {
-        return isset($this->formDataProvidersServices[$alias]);
+        return $this->serviceLinkRegistry->has($alias);
     }
 }

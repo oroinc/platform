@@ -12,6 +12,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
 use Oro\Bundle\UIBundle\Route\Router;
 
+/**
+ * @deprecated since v2.1.0 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade (oro_form.update_handler) instead
+ */
 class UpdateHandler
 {
     /**
@@ -35,11 +38,6 @@ class UpdateHandler
     protected $doctrineHelper;
 
     /**
-     * @var FormTemplateDataProviderRegistry
-     */
-    protected $dataProviderRegistry;
-
-    /**
      * @var FormHandler
      */
     protected $formHandler;
@@ -50,22 +48,19 @@ class UpdateHandler
      * @param Router $router
      * @param DoctrineHelper $doctrineHelper
      * @param FormHandler $formHandler
-     * @param FormTemplateDataProviderRegistry $dataProviderRegistry
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         Router $router,
         DoctrineHelper $doctrineHelper,
-        FormHandler $formHandler,
-        FormTemplateDataProviderRegistry $dataProviderRegistry
+        FormHandler $formHandler
     ) {
         $this->requestStack = $requestStack;
         $this->session = $session;
         $this->router = $router;
         $this->doctrineHelper = $doctrineHelper;
         $this->formHandler = $formHandler;
-        $this->dataProviderRegistry = $dataProviderRegistry;
     }
 
     /**
@@ -122,7 +117,7 @@ class UpdateHandler
      * @param string $saveMessage Message added to session flash bag in case if form will be saved successfully
      *               and if form is not submitted from widget.
      * @param null|callable $formHandler Callback to handle form, by default method saveForm used.
-     * @param callable|string|null $resultCallback optional callable or alias of FormTemplateDataProvider service
+     * @param callable|null $resultCallback
      * @return array|RedirectResponse Returns an array
      *                                  if form wasn't successfully submitted
      *                                  or when request method is not PUT and POST,
@@ -237,14 +232,14 @@ class UpdateHandler
     /**
      * @param object $entity
      * @param FormInterface $form
-     * @param callable|string|null $resultCallback
+     * @param callable|null $resultCallback
      * @return array
      */
     protected function getResult($entity, FormInterface $form, $resultCallback = null)
     {
         $request = $this->getCurrentRequest();
-        if ($resultCallback) {
-            $result = $this->getResultData($resultCallback, $entity, $form);
+        if (is_callable($resultCallback)) {
+            $result = call_user_func($resultCallback, $entity, $form, $request);
         } else {
             $result = [
                 'form' => $form->createView()
@@ -256,23 +251,6 @@ class UpdateHandler
         $result['isWidgetContext'] = (bool)$request->get('_wid', false);
 
         return $result;
-    }
-
-    /**
-     * @param string|callable $resultCallback
-     * @param object $entity
-     * @param FormInterface $form
-     *
-     * @return array
-     */
-    private function getResultData($resultCallback, $entity, FormInterface $form)
-    {
-        $request = $this->getCurrentRequest();
-        if (is_callable($resultCallback)) {
-            return $resultCallback($entity, $form, $request);
-        } else {
-            return $this->dataProviderRegistry->get($resultCallback)->getData($entity, $form, $request);
-        }
     }
 
     /**

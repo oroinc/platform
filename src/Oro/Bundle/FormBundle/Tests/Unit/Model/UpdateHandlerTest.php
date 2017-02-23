@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
-use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
-use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
-use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\UIBundle\Route\Router;
-use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Bundle\FormBundle\Event\FormHandler\AfterFormProcessEvent;
 use Oro\Bundle\FormBundle\Event\FormHandler\Events;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
+use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
+use Oro\Bundle\FormBundle\Model\UpdateHandler;
+use Oro\Bundle\UIBundle\Route\Router;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -68,28 +66,25 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     protected $formHandler;
 
     /**
-     * @var FormTemplateDataProviderRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $formTemplateDataProviderRegistry;
-
-    /**
      * @var UpdateHandler
      */
     protected $handler;
 
     protected function setUp()
     {
-        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->request = $this->createMock(Request::class);
 
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
 
-        $this->session = $this->createMock('Symfony\Component\HttpFoundation\Session\Session');
-        $this->router = $this->createMock('Oro\Bundle\UIBundle\Route\Router');
-        $this->doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->form = $this->createMock('Symfony\Component\Form\FormInterface');
-        $this->formTemplateDataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
+        $this->session = $this->createMock(Session::class);
+        $this->router = $this->createMock(Router::class);
+        $this->form = $this->createMock(FormInterface::class);
+
         $this->formHandler = new FormHandler($this->eventDispatcher, $this->doctrineHelper);
 
         $this->resultCallbackInvoked = false;
@@ -99,8 +94,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             $this->session,
             $this->router,
             $this->doctrineHelper,
-            $this->formHandler,
-            $this->formTemplateDataProviderRegistry
+            $this->formHandler
         );
     }
 
@@ -120,7 +114,6 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $resultCallback = function () use (&$called, $expectedForm) {
             $this->resultCallbackInvoked = true;
-
             return ['form' => $expectedForm, 'test' => 1];
         };
 
@@ -663,35 +656,6 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $expected['test'] = 1;
 
         $result = $this->handler->update($data, $this->form, 'Saved', $handler, $this->getResultCallback($this->form));
-        $this->assertEquals($expected, $result);
-    }
-
-    public function testUpdateWithFormTemplateDateProviderAliasProvided()
-    {
-        $data = $this->getObject();
-
-        $handler = $this->getHandlerStub($data);
-        $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')
-            ->with($data)
-            ->will($this->returnValue(1));
-
-        $expected = $this->getExpectedSaveData($this->form, $data);
-        $expected['savedId'] = 1;
-        $expected['form'] = $this->form;
-        $expected['test'] = 1;
-
-        $formTemplateDataProvider = $this->getMockBuilder(FormTemplateDataProviderInterface::class)->getMock();
-        $this->formTemplateDataProviderRegistry->expects($this->once())
-            ->method('get')
-            ->with('provider_name')
-            ->willReturn($formTemplateDataProvider);
-        $formTemplateDataProvider->expects($this->once())
-            ->method('getData')
-            ->with($data, $this->form, $this->request)
-            ->willReturn($expected);
-
-        $result = $this->handler->update($data, $this->form, 'Saved', $handler, 'provider_name');
         $this->assertEquals($expected, $result);
     }
 

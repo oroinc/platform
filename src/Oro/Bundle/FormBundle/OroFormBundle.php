@@ -8,12 +8,15 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass;
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormCompilerPass;
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormGuesserCompilerPass;
-use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormHandlerCompilerPass;
-use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormTemplateDataProviderCompilerPass;
 use Oro\Bundle\FormBundle\Validator\HtmlPurifierTelValidator;
+
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
 
 class OroFormBundle extends Bundle
 {
+    const FORM_TEMPLATE_DATA_PROVIDER_TAG = 'oro_form.form_template_data_provider';
+    const FORM_HANDLER_TAG = 'oro_form.form.handler';
+
     /**
      * {@inheritdoc}
      */
@@ -24,8 +27,18 @@ class OroFormBundle extends Bundle
         $container->addCompilerPass(new AutocompleteCompilerPass());
         $container->addCompilerPass(new FormCompilerPass());
         $container->addCompilerPass(new FormGuesserCompilerPass());
-        $container->addCompilerPass(new FormTemplateDataProviderCompilerPass());
-        $container->addCompilerPass(new FormHandlerCompilerPass());
+        $container->addCompilerPass(
+            new TaggedServiceLinkRegistryCompilerPass(
+                self::FORM_TEMPLATE_DATA_PROVIDER_TAG,
+                'oro_form.registry.form_template_data_provider'
+            )
+        );
+        $container->addCompilerPass(
+            new TaggedServiceLinkRegistryCompilerPass(
+                self::FORM_HANDLER_TAG,
+                'oro_form.registry.form_handler'
+            )
+        );
     }
 
     /**

@@ -4,15 +4,17 @@ namespace Oro\Bundle\FormBundle\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\FormBundle\DependencyInjection\Compiler as Compiler;
+use Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 use Oro\Bundle\FormBundle\OroFormBundle;
+
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
 
 class OroFormBundleTest extends \PHPUnit_Framework_TestCase
 {
     public function testBuild()
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+        $containerBuilder = $this->getMockBuilder(ContainerBuilder::class)
             ->disableOriginalConstructor()
             ->setMethods(['addCompilerPass'])
             ->getMock();
@@ -44,16 +46,18 @@ class OroFormBundleTest extends \PHPUnit_Framework_TestCase
         $containerBuilder->expects($this->at(3))
             ->method('addCompilerPass')
             ->with(
-                $this->isInstanceOf(
-                    Compiler\FormTemplateDataProviderCompilerPass::class
+                new TaggedServiceLinkRegistryCompilerPass(
+                    OroFormBundle::FORM_TEMPLATE_DATA_PROVIDER_TAG,
+                    'oro_form.registry.form_template_data_provider'
                 )
             );
 
         $containerBuilder->expects($this->at(4))
             ->method('addCompilerPass')
             ->with(
-                $this->isInstanceOf(
-                    Compiler\FormHandlerCompilerPass::class
+                new TaggedServiceLinkRegistryCompilerPass(
+                    OroFormBundle::FORM_HANDLER_TAG,
+                    'oro_form.registry.form_handler'
                 )
             );
 

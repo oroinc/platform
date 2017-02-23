@@ -14,6 +14,7 @@ services:
             - { name: twig.extension }
 
     oro_form.model.update_handler:
+        deprecated: The "%service_id%" service is deprecated since v2.1.0 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade (oro_form.update_handler) instead
         class: 'Oro\Bundle\FormBundle\Model\UpdateHandler'
         arguments:
             - '@request_stack'
@@ -43,20 +44,38 @@ services:
         arguments:
             - '@oro_form.doctrine.orm.validator_initializer.inner'
 
+    oro_form.update_builder:
+        class: Oro\Bundle\FormBundle\Model\UpdateBuilder
+        arguments:
+            - '@oro_form.registry.form_handler'
+            - '@oro_form.registry.form_template_data_provider'
+
+    oro_form.update_handler:
+        class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade
+        arguments:
+            - '@request_stack'
+            - '@session'
+            - '@oro_ui.router'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_form.update_builder'
+
+    oro_form.provider.from_template_data.default:
+        class: Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider
+        tags:
+            - { name: oro_form.form_template_data_provider, alias: default }
+
     oro_form.registry.form_template_data_provider:
-        public: false
         class: 'Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry'
-        arguments: ['@service_container']
+        public: false
 
     oro_form.registry.form_handler:
         public: false
         class: 'Oro\Bundle\FormBundle\Model\FormHandlerRegistry'
 
     oro_form.form.handler.default:
-        public: false
         class: 'Oro\Bundle\FormBundle\Form\Handler\FormHandler'
         arguments:
             - '@oro_form.event.event_dispatcher'
             - '@oro_entity.doctrine_helper'
         tags:
-            - { name: oro_form.form.handler }
+            - { name: oro_form.form.handler, alias: default }

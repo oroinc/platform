@@ -15,9 +15,4 @@ interface FormHandlerInterface
      * @return bool
      */
     public function process($data, FormInterface $form, Request $request);
-
-    /**
-     * @return string
-     */
-    public function getAlias();
 }

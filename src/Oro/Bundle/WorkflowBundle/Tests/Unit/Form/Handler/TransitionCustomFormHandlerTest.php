@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Handler;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -10,8 +13,6 @@ use Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class TransitionCustomFormHandlerTest extends \PHPUnit_Framework_TestCase
 {

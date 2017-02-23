@@ -291,6 +291,21 @@ FormBundle
 - The service `oro_form.twig.js_validation_extension` was removed
 - Class `Oro\Bundle\FormBundle\Twig\JsValidationExtension` was removed. Its functionality was moved to `Oro\Bundle\FormBundle\Twig\FormExtension`
 
+- Deprecation of class `Oro\Bundle\FormBundle\Model\UpdateHandler` use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` (`@oro_form.update_handler`) instead.
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard update handler.
+
+- Interface `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface` added for standard form handlers.
+- Class `Oro\Bundle\FormBundle\Form\Handler\FormHandler` added ('@oro_form.form.handler.default') as default form processing mechanism.
+- Tag `oro_form.form.handler` added to register custom form handlers under its `alias`.
+- Class `Oro\Bundle\FormBundle\Model\FormHandlerRegistry` added to collect tagged with `oro_form.form.handler` services.
+- Class `Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler` added as interface compatibility helper for callable.
+
+- Interface `Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface`  added for common update template data population.
+- Class `Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider` (`@oro_form.provider.from_template_data.default`) as default update template data provider.
+- Tag `oro_form.form_template_data_provider` added to register custom update template data providers.
+- Class `Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry` added to collect tagged with `oro_form.form_template_data_provider` services.
+- Class `Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider` added as interface compatibility helper for callable.
+
 HelpBundle
 ----------
 - The parameter `oro_help.twig.extension.class` was removed from DIC
@@ -298,6 +313,7 @@ HelpBundle
 - Class `Oro\Bundle\HelpBundle\Twig\HelpExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $linkProvider`
+
 
 ImapBundle
 ----------
@@ -844,3 +860,20 @@ QueryDesignerBundle
         `ManagerRegistry` $doctrine,
         `DatagridGuesser` $datagridGuesser,
         `EntityNameResolver` $entityNameResolver
+
+Tree Component
+--------------
+- `Oro\Component\Tree\Handler\AbstractTreeHandler`:
+    - added method `getTreeItemList`
+    
+DependencyInjection Component
+-----------------------------
+- Class `Oro\Component\DependencyInjection\ServiceLinkRegistry` together with 
+`Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface` for injection awareness. Can be used to provide 
+injection of a collection of services that are registered in system, but there no need to instantiate 
+all of them on every runtime. The registry has `@service_container` dependency (`Symfony\Component\DependencyInjection\ContainerInterface`) 
+and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. It can register public services by `ServiceLinkRegistry::add` 
+with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
+- Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
+which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
+provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).  

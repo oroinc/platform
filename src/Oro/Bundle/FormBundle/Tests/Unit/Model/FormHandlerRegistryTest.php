@@ -5,36 +5,40 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Model\FormHandlerRegistry;
 
+use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
+use Oro\Component\DependencyInjection\ServiceLinkRegistry;
+
 class FormHandlerRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var FormHandlerRegistry
-     */
+    /** @var ServiceLinkRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    private $serviceLinkRegistry;
+
+    /** @var FormHandlerRegistry */
     private $registry;
 
     protected function setUp()
     {
+        $this->serviceLinkRegistry = $this->createMock(ServiceLinkRegistry::class);
         $this->registry = new FormHandlerRegistry();
+        $this->registry->setServiceLinkRegistry($this->serviceLinkRegistry);
     }
 
     public function testRegisterAndGet()
     {
-        $handler = $this->getHandlerMock('test');
-
-        $this->registry->addHandler($handler);
-
+        $handler = $this->getHandlerMock();
+        $this->serviceLinkRegistry->expects($this->once())->method('get')->with('test')->willReturn($handler);
         $this->assertSame($this->registry->get('test'), $handler);
     }
 
-    public function testRegisterOverridesPreviousByAlias()
+    /**
+     */
+    public function testHas()
     {
-        $handlerOne = $this->getHandlerMock('handler_name');
-        $this->registry->addHandler($handlerOne);
-        $handlerTwo = $this->getHandlerMock('handler_name');
-        $this->registry->addHandler($handlerTwo);
+        $this->serviceLinkRegistry->expects($this->at(0))->method('has')->with('exists')->willReturn(true);
+        $this->serviceLinkRegistry->expects($this->at(1))->method('has')->with('not_exists')->willReturn(false);
 
-        $this->assertSame($this->registry->get('handler_name'), $handlerTwo);
-        $this->assertNotSame($this->registry->get('handler_name'), $handlerOne);
+        $this->assertTrue($this->registry->has('exists'));
+        $this->assertFalse($this->registry->has('not_exists'));
     }
 
     /**
@@ -43,43 +47,38 @@ class FormHandlerRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUnregisteredException()
     {
+        $this->serviceLinkRegistry->expects($this->once())
+            ->method('get')->with('test')
+            ->willThrowException(new UnknownAliasException('test'));
+
+        $this->registry->get('test');
+    }
+
+
+    public function testExceptionOnInvalidServiceInterface()
+    {
+        $handler = (object)[];
+        $this->serviceLinkRegistry->expects($this->once())->method('get')->with('test')->willReturn($handler);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage(
+            sprintf(
+                'Form data provider `%s` with `%s` alias must implement %s.',
+                get_class($handler),
+                'test',
+                FormHandlerInterface::class
+            )
+        );
+
         $this->registry->get('test');
     }
 
     /**
-     * @dataProvider hasDataProvider
-     *
-     * @param bool $expected
-     * @param string $alias
-     * @param FormHandlerInterface|null $handler
-     */
-    public function testHas($expected, $alias, FormHandlerInterface $handler = null)
-    {
-        if ($handler) {
-            $this->registry->addHandler($handler);
-        }
-        $this->assertEquals($expected, $this->registry->has($alias));
-    }
-
-    /**
-     * @return \Generator
-     */
-    public function hasDataProvider()
-    {
-        yield 'correct' => ['expected' => true, 'alias' => 'test', 'handler' => $this->getHandlerMock()];
-        yield 'not registered' => ['expected' => false, 'alias' => uniqid(), 'handler' => $this->getHandlerMock()];
-        yield 'incorrect' => ['expected' => false, 'alias' => 'test', 'handler' => null];
-    }
-
-    /**
-     * @param string $alias
-     *
      * @return \PHPUnit_Framework_MockObject_MockObject|FormHandlerInterface
      */
-    protected function getHandlerMock($alias = 'test')
+    protected function getHandlerMock()
     {
         $handler = $this->getMockBuilder(FormHandlerInterface::class)->disableOriginalConstructor()->getMock();
-        $handler->expects($this->any())->method('getAlias')->willReturn($alias);
 
         return $handler;
     }
