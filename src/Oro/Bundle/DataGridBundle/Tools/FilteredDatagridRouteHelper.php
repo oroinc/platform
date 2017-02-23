@@ -45,7 +45,7 @@ class FilteredDatagridRouteHelper implements DatagridAwareRouteHelperInterface
      */
     public function generate(array $filters = [], $referenceType = RouterInterface::ABSOLUTE_PATH)
     {
-        $params = ['f' => []];
+        $params = ['i'=>1, 'f' => []];
 
         foreach ($filters as $filterName => $filterCriteria) {
             $params['f'][$filterName]['value'] = (string)$filterCriteria;

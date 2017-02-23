@@ -54,7 +54,7 @@ class FilteredDatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
         $this->datagridRouteHelper->expects($this->once())->method('generate')->with(
             $this->gridRouteName,
             $this->gridName,
-            ['f' => ['filterName' => ['value' => '10']]],
+            ['i'=>1, 'f' => ['filterName' => ['value' => '10']]],
             RouterInterface::ABSOLUTE_PATH
         )->willReturn('generatedURL');
 
