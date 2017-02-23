@@ -69,7 +69,9 @@ class MenuUpdateManager
         if (isset($options['parentKey'])) {
             $parent = $this->findMenuItem($menu, $options['parentKey']);
             if (!$parent) {
-                throw new NotFoundParentException(sprintf('Parent with "%s" parentKey not found.', $options['parentKey']));
+                throw new NotFoundParentException(
+                    sprintf('Parent with "%s" parentKey not found.', $options['parentKey'])
+                );
             }
             $entity->setParentKey($options['parentKey']);
         }
