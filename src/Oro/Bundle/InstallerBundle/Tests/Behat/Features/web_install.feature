@@ -1,5 +1,6 @@
 # Warning! This feature need a special install configuration
 # with clear cache and setted "installed" parameter to false in parameters.yml
+# with clear database
 Feature: Web install
   In order to have install as simple as possible
   As a developer
@@ -7,8 +8,8 @@ Feature: Web install
 
   Scenario: Web install
     Given I am on homepage
-#    And I should see "Welcome to Oro Installer"
-#    And I press "Begin Installation"
+    And I should see "Welcome to Oro Installer"
+    And I press "Begin Installation"
     And I follow "Next"
     And I fill Configuration form according to my parameters.yml
     And I press "Next"
