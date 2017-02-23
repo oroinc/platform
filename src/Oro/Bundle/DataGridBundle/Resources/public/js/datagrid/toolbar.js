@@ -120,10 +120,6 @@ define([
                 this.template = _.template($(options.template || this.template).html());
             }
 
-            if (_.isObject(options.removeSections)) {
-                this.removeSections = options.removeSections;
-            }
-
             if (!_.isUndefined(options.hideItemsCounter)) {
                 this.hideItemsCounter = options.hideItemsCounter;
             }
@@ -167,13 +163,10 @@ define([
         render: function() {
             var $pagination;
             this.$el.empty();
-            this.$el.append(this.template());
-            var $sections = this.$el.find('[data-section]');
+            this.$el.append(this.template({toolbarPosition: this.$el.data('gridToolbar')}));
 
             $pagination = this.subviews.pagination.render().$el;
             $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
-
-            this.removeToolBarSections($sections);
 
             this.$(this.selector.pagination).replaceWith($pagination);
             if (this.subviews.pageSize) {
@@ -198,33 +191,6 @@ define([
             }
 
             return this;
-        },
-
-        /**
-         * Remove toolbar sections if they are present
-         * @param {Array/jQuery} sections List of actions
-         */
-        removeToolBarSections: function(sections) {
-            var self = this;
-
-            if (!_.isObject(this.removeSections) && sections.length) {
-                return ;
-            }
-
-            $.each(this.removeSections, function(index, values) {
-                if (index === self.$el.data('gridToolbar')) {
-                    $.each(sections, function() {
-                        var key = $(this).data('section');
-
-                        for (var i = 0; i < values.length; i++) {
-                            if (values[i] === key) {
-                                $(this).remove();
-                                break;
-                            }
-                        }
-                    });
-                }
-            });
         }
     });
 
