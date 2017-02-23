@@ -176,29 +176,6 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->postPersist($this->getEvent($workflowItem));
     }
 
-    public function testPreRemoveWhenNotApplicableEntity()
-    {
-        $entity = new \stdClass();
-
-        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(false);
-        $this->systemWorkflowManager->expects($this->never())->method($this->anything());
-
-        $this->listener->preRemove($this->getEvent($entity));
-    }
-
-    public function testPreRemoveWithEntityNotInWorkflow()
-    {
-        $entity = new \stdClass();
-
-        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(true);
-
-        $this->repository->expects($this->once())->method('getAllRelatedEntityClasses')->willReturn([]);
-
-        $this->systemWorkflowManager->expects($this->never())->method($this->anything());
-
-        $this->listener->preRemove($this->getEvent($entity));
-    }
-
     /**
      * @param bool $hasWorkflowItems
      * @dataProvider preRemoveDataProvider
@@ -254,6 +231,48 @@ class WorkflowItemListenerTest extends \PHPUnit_Framework_TestCase
         $this->workflowManager->expects($this->never())->method($this->anything());
 
         $this->listener->preRemove($this->getEvent($entity));
+    }
+
+    public function testPreRemoveWithEntityNotInWorkflow()
+    {
+        $entity = new \stdClass();
+
+        $this->entityConnector->expects($this->once())->method('isApplicableEntity')->with($entity)->willReturn(true);
+
+        $this->repository->expects($this->once())->method('getAllRelatedEntityClasses')->willReturn([]);
+
+        $this->systemWorkflowManager->expects($this->never())->method($this->anything());
+
+        $this->listener->preRemove($this->getEvent($entity));
+    }
+
+    public function testClearLocalCacheOnPpostFlush()
+    {
+        $entity = new \stdClass();
+        $event = $this->getEvent($entity);
+
+        $this->entityConnector->expects($this->exactly(5))
+            ->method('isApplicableEntity')
+            ->with($entity)
+            ->willReturn(true);
+        $this->systemWorkflowManager->expects($this->exactly(5))
+            ->method('getWorkflowItemsByEntity')
+            ->with($entity);
+
+        $this->repository->expects($this->exactly(2))->method('getAllRelatedEntityClasses')->willReturn(['stdClass']);
+
+        //local cache should be created
+        $this->listener->preRemove($event);
+
+        //should be used local cache
+        $this->listener->preRemove($event);
+        $this->listener->preRemove($event);
+        $this->listener->preRemove($event);
+
+        //local cache should be cleared
+        $this->listener->postFlush();
+
+        $this->listener->preRemove($event);
     }
 
     public function testScheduleStartWorkflowForNewEntityNoWorkflow()
