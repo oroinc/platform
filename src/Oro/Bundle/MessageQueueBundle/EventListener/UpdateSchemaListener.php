@@ -3,7 +3,7 @@ namespace Oro\Bundle\MessageQueueBundle\EventListener;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\InterruptConsumptionExtensionTrait;
 
-class SchemaUpdateListener
+class UpdateSchemaListener
 {
     use InterruptConsumptionExtensionTrait;
 

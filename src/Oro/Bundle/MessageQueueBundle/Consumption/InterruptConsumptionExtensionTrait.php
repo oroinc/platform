@@ -29,6 +29,9 @@ trait InterruptConsumptionExtensionTrait
             }
 
             touch($filePath);
+
+            chmod($directory, 0777); // in some cases mkdir() cannot set passed mode parameter
+            chmod($filePath, 0666);
         }
     }
 }

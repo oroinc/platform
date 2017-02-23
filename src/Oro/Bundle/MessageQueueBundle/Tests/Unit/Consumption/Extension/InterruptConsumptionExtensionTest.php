@@ -67,7 +67,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('info')
             ->with(
-                $this->stringContains('File does not exists'),
+                $this->stringContains('cache was cleared'),
                 ['context' => $context]
             )
         ;
@@ -80,13 +80,13 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         $context
             ->expects($this->once())
             ->method('setExecutionInterrupted')
-            ->with(true)
+            ->with($this->isTrue())
         ;
 
         $extension->onBeforeReceive($context);
     }
 
-    public function testShouldInterruptConsumptionIfFileMetadataWasChanged()
+    public function testShouldInterruptConsumptionIfFileMetadataIncreased()
     {
         $extension = new InterruptConsumptionExtension($this->filePath);
 
@@ -99,7 +99,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('info')
             ->with(
-                $this->stringContains('Execution interrupted by request'),
+                $this->stringContains('cache was invalidated'),
                 ['context' => $context]
             )
         ;
@@ -112,7 +112,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit_Framework_TestCase
         $context
             ->expects($this->once())
             ->method('setExecutionInterrupted')
-            ->with(true)
+            ->with($this->isTrue())
         ;
 
         $extension->onBeforeReceive($context);
