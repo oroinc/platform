@@ -13,7 +13,7 @@ services:
         arguments:
             - '@suite.registry'
         tags:
-            - { name: cli.controller, priority: 1100 }
+            - { name: cli.controller, priority: 700 }
 
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
@@ -111,6 +111,7 @@ services:
             - '@oro_test.entity_class_resolver'
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
+            - ~
         tags:
             - { name: 'suite_aware' }
 
@@ -151,3 +152,10 @@ services:
             - '@context.factory'
         tags:
             - { name: 'environment.handler', priority: 100 }
+
+    oro_test.context.oro_behat_class_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\OroBehatClassResolver
+        arguments:
+            - '@symfony2_extension.kernel'
+        tags:
+            - { name: 'context.class_resolver' }

@@ -2566,6 +2566,92 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testProcessExtendedAssociationWithEmptyTargets()
+    {
+        $config = [
+            'fields' => [
+                'association1' => [
+                    'data_type' => 'association:manyToOne'
+                ],
+            ]
+        ];
+
+        $this->associationManager->expects($this->once())
+            ->method('getAssociationTargets')
+            ->with(self::TEST_CLASS_NAME, null, 'manyToOne', null)
+            ->willReturn([]);
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects($this->once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                EntityIdentifier::class,
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => null,
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'data_type'              => 'association:manyToOne',
+                        'target_class'           => EntityIdentifier::class,
+                        'target_type'            => 'to-one',
+                        'identifier_field_names' => ['id'],
+                        'collapse'               => true,
+                        'form_options'           => [
+                            'mapped' => false
+                        ],
+                        'fields'                 => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testProcessNestedObjectForNotManageableEntity()
     {
         $config = [

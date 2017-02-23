@@ -7,11 +7,15 @@ use Doctrine\Common\Cache\CacheProvider;
 use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
     /**#@+
@@ -39,10 +43,13 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     private $cache;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * @var array
      */
-    protected $aclCache = array();
+    protected $aclCache = [];
 
     /**
      * @var bool
@@ -70,6 +77,14 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     }
 
     /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * @param bool $value
      */
     public function setHideAllForNotLoggedInUsers($value)
@@ -93,14 +108,26 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      * @param  array $options
      * @return array
      */
-    public function buildOptions(array $options = array())
+    public function buildOptions(array $options = [])
     {
         if (!$this->alreadyDenied($options)) {
-            $this->processAcl($options);
+            $newOptions = [];
 
-            if ($options['extras']['isAllowed'] && !empty($options['route'])) {
-                $this->processRoute($options);
+            $localCache = $this->getGlobalCacheKey($options);
+            if ($this->cache && $this->cache->contains($localCache)) {
+                $newOptions = $this->cache->fetch($localCache);
+            } else {
+                $this->processAcl($newOptions, $options);
+
+                if ($newOptions['extras']['isAllowed'] && !empty($options['route'])) {
+                    $this->processRoute($newOptions, $options);
+                }
+
+                if ($this->cache) {
+                    $this->cache->save($localCache, $newOptions);
+                }
             }
+            $options = array_merge_recursive($newOptions, $options);
         }
 
         return $options;
@@ -109,14 +136,16 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     /**
      * Check ACL based on acl_resource_id, route or uri.
      *
+     * @param array $newOptions
      * @param array $options
      *
-     * @return void
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function processAcl(array &$options = array())
+    protected function processAcl(array &$newOptions, $options)
     {
         $isAllowed                      = self::DEFAULT_ACL_POLICY;
-        $options['extras']['isAllowed'] = self::DEFAULT_ACL_POLICY;
+        $newOptions['extras']['isAllowed'] = $isAllowed;
+        $options['extras']['isAllowed'] = $isAllowed;
         $securityFacade = $this->securityFacadeLink->getService();
 
         if (isset($options['check_access']) && $options['check_access'] === false) {
@@ -158,15 +187,16 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
         }
 
-        $options['extras']['isAllowed'] = $isAllowed;
+        $newOptions['extras']['isAllowed'] = $isAllowed;
     }
 
     /**
      * Add uri based on route.
      *
+     * @param array $newOptions
      * @param array $options
      */
-    protected function processRoute(array &$options = array())
+    protected function processRoute(array &$newOptions, $options)
     {
         $params = [];
         if (isset($options['routeParameters'])) {
@@ -183,27 +213,15 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             }
         }
         if (!$hasInCache) {
-            $absolute = false;
-            if (isset($options['routeAbsolute'])) {
-                $absolute = $options['routeAbsolute'];
-            }
-            $uri = $this->router->generate($options['route'], $params, $absolute);
+            $uri = $this->router->generate($options['route'], $params, !empty($options['routeAbsolute']));
             if ($this->cache) {
                 $this->cache->save($cacheKey, $uri);
             }
         }
 
-        $options['uri'] = $uri;
-
-        $options = array_merge_recursive(
-            [
-                'extras' => [
-                    'routes'           => [$options['route']],
-                    'routesParameters' => [$options['route'] => $params],
-                ]
-            ],
-            $options
-        );
+        $newOptions['uri'] = $uri;
+        $newOptions['extras']['routes'] = [$options['route']];
+        $newOptions['extras']['routesParameters'] = [$options['route'] => $params];
     }
 
     /**
@@ -211,8 +229,10 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      *
      * @param  array         $options
      * @return array|boolean
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function getRouteInfo(array $options = array())
+    protected function getRouteInfo(array $options)
     {
         $key = null;
         $cacheKey = null;
@@ -247,11 +267,11 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
         $info = explode(self::CONTROLLER_ACTION_DELIMITER, $key);
         if (count($info) == 2) {
-            return array(
+            return [
                 'controller' => $info[0],
                 'action' => $info[1],
                 'key' => $key
-            );
+            ];
         } else {
             return false;
         }
@@ -286,6 +306,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
             return $routeInfo[self::ROUTE_CONTROLLER_KEY];
         } catch (ResourceNotFoundException $e) {
+            $this->logger->debug($e->getMessage(), ['pathinfo' => $uri]);
         }
 
         return null;
@@ -311,5 +332,39 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     {
         return array_key_exists('extras', $options) && array_key_exists('isAllowed', $options['extras']) &&
         ($options['extras']['isAllowed'] === false);
+    }
+
+    /**
+     * @param array $options
+     * @return string
+     */
+    private function getGlobalCacheKey(array $options)
+    {
+        $securityFacade = $this->securityFacadeLink->getService();
+
+        $data = [
+            $this->hideAllForNotLoggedInUsers,
+            $securityFacade->hasLoggedUser(),
+            $this->getOptionIfExist('route', $options),
+            $this->getOptionIfExist('routeParameters', $options),
+            $this->getOptionIfExist('uri', $options),
+            $this->getOptionIfExist('check_access', $options) === false,
+            $securityFacade->getToken() !== null,
+            $this->getOptionIfExist('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras']),
+            $this->getOptionIfExist('extras', $options) && !empty($options['extras']['show_non_authorized']),
+            $this->getOptionIfExist(self::ACL_RESOURCE_ID_KEY, $options),
+        ];
+
+        return $this->getCacheKey('global', serialize($data));
+    }
+
+    /**
+     * @param string $key
+     * @param array  $options
+     * @return mixed|null
+     */
+    private function getOptionIfExist($key, array $options)
+    {
+        return array_key_exists($key, $options) ? $options[$key] : null;
     }
 }

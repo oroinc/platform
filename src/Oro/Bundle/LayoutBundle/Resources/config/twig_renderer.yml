@@ -1,43 +1,34 @@
-parameters:
-    oro_layout.twig.extension.layout.class:   Oro\Bundle\LayoutBundle\Twig\LayoutExtension
-    oro_layout.twig.renderer.class:           Oro\Bundle\LayoutBundle\Twig\TwigRenderer
-    oro_layout.twig.renderer.engine.class:    Oro\Bundle\LayoutBundle\Form\TwigRendererEngine
-    oro_layout.twig.layout_renderer.class:    Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer
-    oro_layout.twig.form.engine.class:        Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine
-
 services:
     oro_layout.twig.extension.layout:
         public: false
-        class: %oro_layout.twig.extension.layout.class%
+        class: Oro\Bundle\LayoutBundle\Twig\LayoutExtension
         arguments:
-            - '@oro_layout.twig.renderer'
-            - '@oro_layout.text.helper'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
     oro_layout.twig.renderer:
-        public: false
-        class: %oro_layout.twig.renderer.class%
+        class: Oro\Bundle\LayoutBundle\Twig\TwigRenderer
         arguments:
             - '@oro_layout.twig.renderer.engine'
 
     oro_layout.twig.renderer.engine:
         public: false
-        class: %oro_layout.twig.renderer.engine.class%
+        class: Oro\Bundle\LayoutBundle\Form\TwigRendererEngine
         arguments:
             - %oro_layout.twig.resources%
         calls:
-            - [setLayoutHelper, ['@oro_layout.helper']]
+            - [setConfigManager, ['@oro_config.user']]
 
     oro_layout.twig.layout_renderer:
         public: false
-        class: %oro_layout.twig.layout_renderer.class%
+        class: Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer
         arguments:
             - '@oro_layout.twig.renderer'
             - '@twig.form.engine'
             - '@twig'
 
     oro_layout.twig.form.engine:
-        class: %oro_layout.twig.form.engine.class%
-        arguments:
-            - %twig.form.resources%
+        class: Oro\Bundle\LayoutBundle\Form\RendererEngine\TwigRendererEngine
+        decorates: 'twig.form.engine'
+        parent: 'twig.form.engine'

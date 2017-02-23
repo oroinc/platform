@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-use Oro\Component\PhpUtils\PhpIniUtil;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Component\PhpUtils\PhpIniUtil;
+use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+
 class PlatformUpdateCommand extends AbstractCommand
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -41,7 +43,7 @@ class PlatformUpdateCommand extends AbstractCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -69,6 +71,7 @@ class PlatformUpdateCommand extends AbstractCommand
                     ]
                 )
                 ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
+                ->runCommand(LoadConfigurablePermissionCommand::NAME, ['--process-isolation' => true])
                 ->runCommand(
                     'oro:workflow:definitions:load',
                     ['--process-isolation' => true]
@@ -122,7 +125,7 @@ class PlatformUpdateCommand extends AbstractCommand
         $minimalSuggestedMemory = 1 * pow(1024, 3);
         $memoryLimit = PhpIniUtil::parseBytes(ini_get('memory_limit'));
         if ($memoryLimit !== -1 && $memoryLimit < $minimalSuggestedMemory) {
-            $output->writeln('<comment>We recommend at least 1Gb to be available for PHP CLI</comment>');
+            $output->writeln('<comment>It\'s recommended at least 1Gb to be available for PHP CLI</comment>');
         }
     }
 }

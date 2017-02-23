@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 
+/**
+ * @dbIsolationPerTest
+ */
 class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
 {
     /**
@@ -38,7 +41,7 @@ class RestJsonApiGetSubresourcesTest extends RestJsonApiTestCase
         );
         $this->assertApiResponseStatusCodeEquals(
             $response,
-            200,
+            [200, 404],
             sprintf('%s(%s)->%s', $entityType, $entityId, $associationName),
             'get subresource'
         );

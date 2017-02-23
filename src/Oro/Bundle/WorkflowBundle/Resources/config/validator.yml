@@ -16,5 +16,6 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.permission_registry'
             - '@oro_workflow.restriction.manager'
+            - '@oro_entity.helper.field_helper'
         tags:
             - { name: validator.constraint_validator, alias: oro_workflow.validator.workflow_entity }

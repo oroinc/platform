@@ -14,31 +14,23 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
+/**
+ * @dbIsolationPerTest
+ */
 class AuditChangedEntitiesProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
 
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->initClient([], [], true);
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
-        self::$loadedFixtures = [];
+        $this->initClient();
     }
 
     public function testCouldBeGetFromContainerAsService()
     {
         /** @var AuditChangedEntitiesProcessor $processor */
         $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
-        
+
         $this->assertInstanceOf(AuditChangedEntitiesProcessor::class, $processor);
     }
 

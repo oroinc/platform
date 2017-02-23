@@ -2,10 +2,9 @@ navigation:
     menu_config:
         items:
             emails:
-                label: 'oro.email.entity_plural_label'
-                uri: '#'
-                extras:
-                    position: 40
+                label:    'oro.email.entity_plural_label'
+                uri:      '#'
+                position: 40
             oro_email_emailtemplate_list:
                 label: 'oro.email.menu.emailtemplate.entity_plural_label'
                 route: 'oro_email_emailtemplate_index'
@@ -13,12 +12,11 @@ navigation:
                     routes: ['oro_email_emailtemplate_*']
                     description: 'oro.email.menu.emailtemplate_list.description'
             oro_email_user_emails:
-                label: 'oro.email.menu.user_emails'
-                route: 'oro_email_user_emails'
+                label:    'oro.email.menu.user_emails'
+                route:    'oro_email_user_emails'
+                position: 15
                 attributes:
                     class: oro-email-user-emails
-                extras:
-                    position: 15
 
             # if exist option "dialog", then you need to add dialog_config options
             shortcut_compose_email:

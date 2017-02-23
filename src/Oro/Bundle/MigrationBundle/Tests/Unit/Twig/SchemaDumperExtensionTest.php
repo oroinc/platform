@@ -2,42 +2,36 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var SchemaDumperExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var SchemaDumperExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $platform;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $managerRegistry;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
 
     protected function setUp()
     {
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->extension = new SchemaDumperExtension($this->managerRegistry);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+
+        $this->extension = new SchemaDumperExtension($this->doctrine);
     }
 
     public function testGetName()
     {
         $this->assertEquals('schema_dumper_extension', $this->extension->getName());
-    }
-
-    public function testGetFunctions()
-    {
-        $this->assertEquals(1, count($this->extension->getFunctions()));
     }
 
     public function testGetStringColumnOptions()
@@ -50,7 +44,7 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $column = new Column('string_column', Type::getType(Type::STRING));
         $column->setLength(255);
         $result = $this->extension->getColumnOptions($column);
-        $this->assertEquals(1, count($result));
+        $this->assertCount(1, $result);
         $this->assertEquals(255, $result['length']);
     }
 
@@ -66,7 +60,7 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $column->setAutoincrement(true);
         $column->setUnsigned(true);
         $result = $this->extension->getColumnOptions($column);
-        $this->assertEquals(4, count($result));
+        $this->assertCount(4, $result);
         $this->assertTrue($result['unsigned']);
         $this->assertTrue($result['autoincrement']);
         $this->assertFalse($result['notnull']);
@@ -84,7 +78,7 @@ class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $connection->expects($this->once())
             ->method('getDatabasePlatform')
             ->will($this->returnValue($this->platform));
-        $this->managerRegistry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getConnection')
             ->will($this->returnValue($connection));
     }

@@ -6,7 +6,10 @@ use Carbon\Carbon;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Engine\Orm\DbalStorer;
 use Oro\Bundle\SearchBundle\Entity\IndexDatetime;
 use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
@@ -14,6 +17,9 @@ use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item;
 
+/**
+ * @deprecated Test should be removed after DbalStorer is dropped.
+ */
 class DbalStorerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DbalStorer */
@@ -22,9 +28,12 @@ class DbalStorerTest extends \PHPUnit_Framework_TestCase
     /** @var Connection|\PHPUnit_Framework_MockObject_MockObject */
     protected $connection;
 
+    /** @var EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $entityManager;
+
     public function setUp()
     {
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+        $this->connection = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->connection->expects($this->any())
@@ -33,20 +42,20 @@ class DbalStorerTest extends \PHPUnit_Framework_TestCase
                 return $identifier;
             }));
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityManager = $this->getMockBuilder(EntityManagerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $em->expects($this->any())
+        $this->entityManager->expects($this->any())
             ->method('getConnection')
             ->will($this->returnValue($this->connection));
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
         $doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->with('OroSearchBundle:Item')
-            ->will($this->returnValue($em));
+            ->with(\Oro\Bundle\SearchBundle\Entity\Item::class)
+            ->will($this->returnValue($this->entityManager));
 
         $this->dbalStorer = new DbalStorer($doctrineHelper);
     }
@@ -108,6 +117,16 @@ class DbalStorerTest extends \PHPUnit_Framework_TestCase
                     ->setField('decimalField')
                     ->setValue(0.3)
             );
+
+        $itemClassMetadata = $this->getMockBuilder(ClassMetadata::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $itemClassMetadata->method('getTableName')
+            ->willReturn('oro_search_item');
+
+        $this->entityManager->method('getClassMetadata')
+            ->with(Item::class)
+            ->willReturn($itemClassMetadata);
 
         $this->dbalStorer->addItem($item1);
         $this->dbalStorer->addItem($item2);

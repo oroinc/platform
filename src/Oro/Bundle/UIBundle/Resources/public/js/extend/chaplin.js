@@ -10,6 +10,7 @@ define([
     var utils = Chaplin.utils;
     var location = window.location;
     original.viewDispose = Chaplin.View.prototype.dispose;
+    original.collectionViewRender = Chaplin.CollectionView.prototype.render;
 
     /**
      * Added raw argument. Removed Internet Explorer < 9 workaround
@@ -42,7 +43,17 @@ define([
         }
         this.disposePageComponents();
         this.trigger('dispose', this);
-        original.viewDispose.call(this, arguments);
+        original.viewDispose.call(this);
+    };
+
+    /**
+     * Detach all item view elements before render of collection to preserve DOM event handlers bound
+     */
+    Chaplin.CollectionView.prototype.render = function() {
+        _.each(this.getItemViews(), function(itemView) {
+            itemView.$el.detach();
+        });
+        return original.collectionViewRender.call(this);
     };
 
     /**

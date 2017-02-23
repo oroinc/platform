@@ -91,6 +91,11 @@ class ColumnsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
+        /** Set default columns data to initial state from config */
+        $this->setInitialStateColumnsOrder($config, $data);
+        /** Set default columns data to metadata */
+        $this->setColumnsOrder($config, $data);
+
         $currentUser = $this->getCurrentUser();
         if (!$currentUser) {
             return;
@@ -98,12 +103,6 @@ class ColumnsExtension extends AbstractExtension
 
         $gridName  = $config->getName();
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
-
-        /** Set default columns data to initial state from config */
-        $this->setInitialStateColumnsOrder($config, $data);
-        /** Set default columns data to metadata */
-        $this->setColumnsOrder($config, $data);
-
         if (!$gridViews) {
             $this->setStateColumnsOrder($config, $data);
         }

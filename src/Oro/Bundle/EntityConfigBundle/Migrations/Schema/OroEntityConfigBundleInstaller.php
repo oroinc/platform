@@ -22,7 +22,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
      */
     public function getMigrationVersion()
     {
-        return 'v1_13';
+        return 'v1_14';
     }
 
     /**
@@ -265,7 +265,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
     {
         $table = $schema->createTable('oro_attribute_group');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('code', 'string', ['length' => 255]);
+        $table->addColumn('code', 'string', ['length' => 255, 'notnull' => true]);
         $table->addColumn('attribute_family_id', 'integer', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);

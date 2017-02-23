@@ -1,41 +1,26 @@
 <?php
 namespace Oro\Component\MessageQueue\Client;
 
-use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class CreateQueuesCommand extends Command
+use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
+
+class CreateQueuesCommand extends Command implements ContainerAwareInterface
 {
-    /**
-     * @var DestinationMetaRegistry
-     */
-    private $destinationMetaRegistry;
-
-    /**
-     * @var DriverInterface
-     */
-    private $driver;
-
-    /**
-     * @param DestinationMetaRegistry $destinationMetaRegistry
-     * @param DriverInterface         $driver
-     */
-    public function __construct(DestinationMetaRegistry $destinationMetaRegistry, DriverInterface $driver)
-    {
-        parent::__construct('oro:message-queue:create-queues');
-
-        $this->destinationMetaRegistry = $destinationMetaRegistry;
-        $this->driver = $driver;
-    }
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        $this->setDescription('Creates all required queues');
+        $this
+            ->setName('oro:message-queue:create-queues')
+            ->setDescription('Creates all required queues');
     }
 
     /**
@@ -43,10 +28,14 @@ class CreateQueuesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $meta) {
+        /** @var DriverInterface $driver */
+        $driver = $this->container->get('oro_message_queue.client.driver');
+        /** @var DestinationMetaRegistry $destinationMetaRegistry */
+        $destinationMetaRegistry = $this->container->get('oro_message_queue.client.meta.destination_meta_registry');
+        foreach ($destinationMetaRegistry->getDestinationsMeta() as $meta) {
             $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getTransportName()));
 
-            $this->driver->createQueue($meta->getTransportName());
+            $driver->createQueue($meta->getTransportName());
         }
     }
 }

@@ -4,66 +4,85 @@ namespace Oro\Bundle\DataGridBundle\Twig;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
-
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DataGridExtension extends \Twig_Extension
 {
     const ROUTE = 'oro_datagrid_index';
 
-    /** @var ManagerInterface */
-    protected $manager;
-
-    /** @var NameStrategyInterface */
-    protected $nameStrategy;
-
-    /** @var RouterInterface */
-    protected $router;
-
-    /** @var SecurityFacade $securityFacade */
-    protected $securityFacade;
-
-    /** @var DatagridRouteHelper */
-    protected $datagridRouteHelper;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var LoggerInterface */
-    protected $logger;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param ManagerInterface $manager
-     * @param NameStrategyInterface $nameStrategy
-     * @param RouterInterface $router
-     * @param SecurityFacade $securityFacade
-     * @param DatagridRouteHelper $datagridRouteHelper
-     * @param RequestStack $requestStack
-     * @param LoggerInterface $logger
+     * @param ContainerInterface $container
      */
-    public function __construct(
-        ManagerInterface $manager,
-        NameStrategyInterface $nameStrategy,
-        RouterInterface $router,
-        SecurityFacade $securityFacade,
-        DatagridRouteHelper $datagridRouteHelper,
-        RequestStack $requestStack,
-        LoggerInterface $logger = null
-    ) {
-        $this->manager = $manager;
-        $this->nameStrategy = $nameStrategy;
-        $this->router = $router;
-        $this->securityFacade = $securityFacade;
-        $this->datagridRouteHelper = $datagridRouteHelper;
-        $this->requestStack = $requestStack;
-        $this->logger = $logger;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @return Manager
+     */
+    protected function getManager()
+    {
+        return $this->container->get('oro_datagrid.datagrid.manager');
+    }
+
+    /**
+     * @return NameStrategyInterface
+     */
+    protected function getNameStrategy()
+    {
+        return $this->container->get('oro_datagrid.datagrid.name_strategy');
+    }
+
+    /**
+     * @return RouterInterface
+     */
+    protected function getRouter()
+    {
+        return $this->container->get('router');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->container->get('oro_security.security_facade');
+    }
+
+    /**
+     * @return DatagridRouteHelper
+     */
+    protected function getRouteHelper()
+    {
+        return $this->container->get('oro_datagrid.helper.route');
+    }
+
+    /**
+     * @return RequestStack
+     */
+    protected function getRequestStack()
+    {
+        return $this->container->get('request_stack');
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    protected function getLogger()
+    {
+        return $this->container->get('logger');
     }
 
     /**
@@ -86,7 +105,7 @@ class DataGridExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
             new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
             new \Twig_SimpleFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
-            new \Twig_SimpleFunction('oro_datagrid_link', [$this->datagridRouteHelper, 'generate']),
+            new \Twig_SimpleFunction('oro_datagrid_link', [$this, 'generateGridUrl']),
             new \Twig_SimpleFunction('oro_datagrid_column_attributes', [$this, 'getColumnAttributes']),
             new \Twig_SimpleFunction('oro_datagrid_get_page_url', [$this, 'getPageUrl']),
         ];
@@ -94,13 +113,14 @@ class DataGridExtension extends \Twig_Extension
 
     /**
      * @param string $name
-     * @param array $params
+     * @param array  $params
+     *
      * @return DatagridInterface
      */
     public function getGrid($name, array $params = [])
     {
         if ($this->isAclGrantedForGridName($name)) {
-            return $this->manager->getDatagridByRequestParams($name, $params);
+            return $this->getManager()->getDatagridByRequestParams($name, $params);
         }
 
         return null;
@@ -110,14 +130,15 @@ class DataGridExtension extends \Twig_Extension
      * Returns grid metadata array
      *
      * @param DatagridInterface $grid
-     * @param array $params
+     * @param array             $params
+     *
      * @return array
      */
     public function getGridMetadata(DatagridInterface $grid, array $params = [])
     {
         $metaData = $grid->getMetadata();
-        $params   = array_merge(
-            $metaData->offsetGetByPath('[options][urlParams]') ? : [],
+        $params = array_merge(
+            $metaData->offsetGetByPath('[options][urlParams]') ?: [],
             $params
         );
 
@@ -125,7 +146,7 @@ class DataGridExtension extends \Twig_Extension
         $metaData->offsetAddToArray(
             'options',
             [
-                'url' => $this->generateUrl($grid, $route, $params),
+                'url'       => $this->generateUrl($grid, $route, $params),
                 'urlParams' => $params,
             ]
         );
@@ -137,6 +158,7 @@ class DataGridExtension extends \Twig_Extension
      * Renders grid data
      *
      * @param DatagridInterface $grid
+     *
      * @return array
      */
     public function getGridData(DatagridInterface $grid)
@@ -144,12 +166,12 @@ class DataGridExtension extends \Twig_Extension
         try {
             return $grid->getData()->toArray();
         } catch (\Exception $e) {
-            $this->logger->error('Getting grid data failed.', ['exception' => $e]);
+            $this->getLogger()->error('Getting grid data failed.', ['exception' => $e]);
 
             return [
-                "data" => [],
+                "data"     => [],
                 "metadata" => [],
-                "options" => []
+                "options"  => []
             ];
         }
     }
@@ -158,7 +180,8 @@ class DataGridExtension extends \Twig_Extension
      * Generate grid element id.
      *
      * @param DatagridInterface $grid
-     * @return array
+     *
+     * @return string
      */
     public function generateGridElementId(DatagridInterface $grid)
     {
@@ -176,11 +199,12 @@ class DataGridExtension extends \Twig_Extension
      *
      * @param string $name
      * @param string $scope
-     * @return array
+     *
+     * @return string
      */
     public function buildGridFullName($name, $scope)
     {
-        return $this->nameStrategy->buildGridFullName($name, $scope);
+        return $this->getNameStrategy()->buildGridFullName($name, $scope);
     }
 
     /**
@@ -192,7 +216,7 @@ class DataGridExtension extends \Twig_Extension
      */
     public function buildGridInputName($name)
     {
-        return $this->nameStrategy->getGridUniqueName($name);
+        return $this->getNameStrategy()->getGridUniqueName($name);
     }
 
     /**
@@ -226,7 +250,7 @@ class DataGridExtension extends \Twig_Extension
      */
     public function getPageUrl(DatagridInterface $grid, $page)
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->getRequestStack()->getCurrentRequest();
 
         $queryString = $request->getQueryString();
         parse_str($queryString, $queryStringComponents);
@@ -241,21 +265,40 @@ class DataGridExtension extends \Twig_Extension
 
         $route = $request->get('_route');
 
-        return $this->router->generate($route, $queryStringComponents);
+        return $this->getRouter()->generate($route, $queryStringComponents);
+    }
+
+    /**
+     * @param string $routeName
+     * @param string $gridName
+     * @param array  $params
+     * @param int    $referenceType
+     *
+     * @return string
+     */
+    public function generateGridUrl(
+        $routeName,
+        $gridName,
+        array $params = [],
+        $referenceType = RouterInterface::ABSOLUTE_PATH
+    ) {
+        return $this->getRouteHelper()->generate($routeName, $gridName, $params, $referenceType);
     }
 
     /**
      * @param DatagridInterface $grid
-     * @param string $route
-     * @param array $params
+     * @param string            $route
+     * @param array             $params
+     *
      * @return string
      */
     protected function generateUrl(DatagridInterface $grid, $route, $params)
     {
-        $gridFullName = $this->nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
-        $gridUniqueName = $this->nameStrategy->getGridUniqueName($gridFullName);
+        $nameStrategy = $this->getNameStrategy();
+        $gridFullName = $nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
+        $gridUniqueName = $nameStrategy->getGridUniqueName($gridFullName);
 
-        return $this->router->generate(
+        return $this->getRouter()->generate(
             $route ?: self::ROUTE,
             ['gridName' => $gridFullName, $gridUniqueName => $params]
         );
@@ -268,11 +311,11 @@ class DataGridExtension extends \Twig_Extension
      */
     protected function isAclGrantedForGridName($gridName)
     {
-        $gridConfig = $this->manager->getConfigurationForGrid($gridName);
+        $gridConfig = $this->getManager()->getConfigurationForGrid($gridName);
 
         if ($gridConfig) {
             $aclResource = $gridConfig->getAclResource();
-            if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
+            if ($aclResource && !$this->getSecurityFacade()->isGranted($aclResource)) {
                 return false;
             } else {
                 return true;

@@ -30,6 +30,6 @@
     }
 
     @include element-state('disabled') {
-        cursor: default;
+        @include base-disabled-style(.75);
     }
 }

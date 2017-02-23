@@ -5,9 +5,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 
-/**
- * @dbIsolation
- */
 class RestInvalidUsersTest extends WebTestCase
 {
     protected function setUp()

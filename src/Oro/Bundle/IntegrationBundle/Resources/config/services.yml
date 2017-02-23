@@ -45,9 +45,14 @@ parameters:
 
     oro_integration.workflow.action.populate_integration_owner.class:     Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner
 
-    oro_integration.twig.integration.class:                                Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
-
 services:
+    oro_integration.manager.api:
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_integration.entity.class%
+            - '@doctrine.orm.entity_manager'
+
     oro_integration.form.channel:
         class:                        Symfony\Component\Form\Form
         factory_method:               createNamed
@@ -287,7 +292,8 @@ services:
             - { name: oro_action.action, alias: populate_integration_owner }
 
     oro_integration.twig.integration:
-        class: %oro_integration.twig.integration.class%
+        class: Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
+        public: false
         arguments:
             - '@event_dispatcher'
         tags:
@@ -322,3 +328,8 @@ services:
 
     oro_integration.utils.edit_mode:
         class: 'Oro\Bundle\IntegrationBundle\Utils\EditModeUtils'
+
+    oro_integration.generator.prefixed_identifier_generator:
+        class: 'Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator'
+        abstract: true
+        public: false

@@ -3,50 +3,38 @@
 
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\ThemeBundle\Model\Theme;
+use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 use Oro\Bundle\ThemeBundle\Twig\ThemeExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $themeRegistry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $theme;
 
-    /**
-     * @var ThemeExtension
-     */
+    /** @var ThemeExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->themeRegistry = $this->getMockBuilder('Oro\Bundle\ThemeBundle\Model\ThemeRegistry')
+        $this->themeRegistry = $this->getMockBuilder(ThemeRegistry::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->theme = $this->getMockBuilder(Theme::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->theme = $this->getMockBuilder('Oro\Bundle\ThemeBundle\Model\Theme')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = self::getContainerBuilder()
+            ->add('oro_theme.registry', $this->themeRegistry)
+            ->getContainer($this);
 
-        $this->extension = new ThemeExtension($this->themeRegistry);
-    }
-
-    public function testGetFunctions()
-    {
-        $functions = $this->extension->getFunctions();
-        $this->assertCount(2, $functions);
-
-        $this->assertInstanceOf('\Twig_SimpleFunction', $functions[0]);
-        $this->assertEquals('oro_theme_logo', $functions[0]->getName());
-        $this->assertEquals(array($this->extension, 'getThemeLogo'), $functions[0]->getCallable());
-
-        $this->assertInstanceOf('\Twig_SimpleFunction', $functions[1]);
-        $this->assertEquals('oro_theme_icon', $functions[1]->getName());
-        $this->assertEquals(array($this->extension, 'getThemeIcon'), $functions[1]->getCallable());
+        $this->extension = new ThemeExtension($container);
     }
 
     public function testGetName()
@@ -66,7 +54,10 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getLogo')
             ->will($this->returnValue($logo));
 
-        $this->assertEquals($logo, $this->extension->getThemeLogo());
+        $this->assertEquals(
+            $logo,
+            self::callTwigFunction($this->extension, 'oro_theme_logo', [])
+        );
     }
 
     public function testGetThemeLogoNoActiveTheme()
@@ -75,7 +66,10 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getActiveTheme')
             ->will($this->returnValue(null));
 
-        $this->assertEquals('', $this->extension->getThemeLogo());
+        $this->assertEquals(
+            '',
+            self::callTwigFunction($this->extension, 'oro_theme_logo', [])
+        );
     }
 
     public function testGetThemeIcon()
@@ -84,13 +78,16 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getActiveTheme')
             ->will($this->returnValue($this->theme));
 
-        $logo = 'icon.ico';
+        $icon = 'icon.ico';
 
         $this->theme->expects($this->once())
             ->method('getIcon')
-            ->will($this->returnValue($logo));
+            ->will($this->returnValue($icon));
 
-        $this->assertEquals($logo, $this->extension->getThemeIcon());
+        $this->assertEquals(
+            $icon,
+            self::callTwigFunction($this->extension, 'oro_theme_icon', [])
+        );
     }
 
     public function testGetThemeIconNoActiveTheme()
@@ -99,6 +96,9 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getActiveTheme')
             ->will($this->returnValue(null));
 
-        $this->assertEquals('', $this->extension->getThemeIcon());
+        $this->assertEquals(
+            '',
+            self::callTwigFunction($this->extension, 'oro_theme_icon', [])
+        );
     }
 }

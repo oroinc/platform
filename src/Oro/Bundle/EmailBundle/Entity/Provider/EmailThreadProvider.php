@@ -9,6 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailThreadProvider
 {
@@ -112,6 +113,52 @@ class EmailThreadProvider
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
+        } else {
+            $result = [$entity];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get emails in thread by given email.
+     * Used on `My Emails` page to show emails thread with only emails being related to currently logged user.
+     *
+     * @param EntityManager $entityManager
+     * @param Email         $entity
+     * @param User          $user
+     * @param array         $mailboxes
+     * @return array
+     */
+    public function getUserThreadEmails(EntityManager $entityManager, Email $entity, User $user, $mailboxes = [])
+    {
+        $thread = $entity->getThread();
+        if ($thread) {
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
+            $queryBuilder->join('e.emailUsers', 'eu');
+
+            $criteria = new Criteria();
+            $criteria->where($criteria->expr()->eq('thread', $thread));
+            $criteria->orderBy(['sentAt' => Criteria::DESC]);
+
+            if ($mailboxes) {
+                $criteria->andWhere(
+                    $criteria->expr()->orX(
+                        $criteria->expr()->in('eu.mailboxOwner', $mailboxes),
+                        $criteria->expr()->eq('eu.owner', $user)
+                    )
+                );
+            } else {
+                $criteria->andWhere(
+                    $criteria->expr()->eq('eu.owner', $user)
+                );
+            }
+
+            $result = $queryBuilder
+                ->addCriteria($criteria)
+                ->getQuery()
+                ->getResult();
         } else {
             $result = [$entity];
         }

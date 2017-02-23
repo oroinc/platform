@@ -55,6 +55,7 @@ config:
         'oroform/js/validator/time': 'bundles/oroform/js/validator/time.js'
         'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
+        'oroform/js/validator/callback': 'bundles/oroform/js/validator/callback.js'
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
         'oroform/js/optional-validation-groups-handler': 'bundles/oroform/js/optional-validation-groups-handler.js'
 

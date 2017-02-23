@@ -4,10 +4,10 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 
+use Akeneo\Bundle\BatchBundle\Item\ParseException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
 class CsvFileReader extends AbstractReader
 {
@@ -89,7 +89,7 @@ class CsvFileReader extends AbstractReader
                 $data = array_combine($this->header, $data);
             }
         } else {
-            throw new RuntimeException('An error occurred while reading the csv.');
+            throw new ParseException('An error occurred while reading the csv.');
         }
 
         return $data;

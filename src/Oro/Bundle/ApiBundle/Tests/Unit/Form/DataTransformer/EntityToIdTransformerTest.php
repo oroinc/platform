@@ -223,6 +223,18 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => 'Test\Class']);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     * @expectedExceptionMessage There are no acceptable classes.
+     */
+    public function testReverseTransformWhenAnyEntityTypeShouldBeRejected()
+    {
+        $metadata = $this->getAssociationMetadata([]);
+        $metadata->setEmptyAcceptableTargetsAllowed(false);
+        $transformer = new EntityToIdTransformer($this->doctrine, $metadata);
+        $transformer->reverseTransform(['class' => Group::class, 'id' => ['primary' => 1]]);
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException

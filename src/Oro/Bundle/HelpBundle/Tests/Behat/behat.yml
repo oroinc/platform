@@ -1,0 +1,5 @@
+oro_behat_extension:
+  elements:
+    Help Icon:
+      selector: a.help
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

@@ -7,9 +7,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-/**
-* @SuppressWarnings(PHPMD.TooManyMethods)
-*/
 class OroEntityConfigBundle implements Migration
 {
     /**
@@ -19,6 +16,5 @@ class OroEntityConfigBundle implements Migration
     {
         $table = $schema->getTable('oro_attribute_group');
         $table->addColumn('is_visible', 'boolean', ['default' => '1']);
-        $table->changeColumn('code', ['notnull' => true]);
     }
 }

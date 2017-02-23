@@ -42,6 +42,13 @@ class TestActivityTarget extends ExtendTestActivityTarget implements
     protected $attributeFamily;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="string", type="string", nullable=true)
+     */
+    protected $string;
+
+    /**
      * @return int
      */
     public function getId()
@@ -77,5 +84,48 @@ class TestActivityTarget extends ExtendTestActivityTarget implements
     public function getAttributeFamily()
     {
         return $this->attributeFamily;
+    }
+
+    /**
+     * @return string
+     */
+    public function getString()
+    {
+        return $this->string;
+    }
+
+    /**
+     * @param string $string
+     * @return TestActivityTarget
+     */
+    public function setString($string)
+    {
+        $this->string = $string;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return $this|null
+     */
+    public function __call($name, $arguments)
+    {
+        preg_match('/^(set|get).*/', $name, $matches);
+        if (count($matches) !== 2) {
+            return;
+        }
+
+        $fieldName = strtolower(str_replace($matches[1], '', $matches[0]));
+        if (strtolower($matches[1]) === 'get') {
+            return isset($this->serialized_data[$fieldName])
+                ? $this->serialized_data[$fieldName]
+                : null;
+        }
+
+        $this->serialized_data[$fieldName] = $arguments[0];
+        
+        return $this;
     }
 }

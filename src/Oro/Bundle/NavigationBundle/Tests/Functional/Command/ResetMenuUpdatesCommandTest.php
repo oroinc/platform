@@ -4,9 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class ResetMenuUpdatesCommandTest extends WebTestCase
 {
     /**
