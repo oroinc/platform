@@ -180,15 +180,13 @@ abstract class AbstractMenuController extends Controller
             'changed' => [],
         ];
 
-        $manager = $this->get('oro_navigation.manager.menu_update');
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var EntityManager $entityManager */
             $entityManager = $this->getDoctrine()->getManagerForClass($this->getEntityClass());
             $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context);
-            $updates = $manager->moveMenuItems(
+            $updates = $this->getMenuUpdateManager()->moveMenuItems(
                 $menu,
                 $collection->source,
                 $scope,
