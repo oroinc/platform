@@ -4,10 +4,10 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\EventListener;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
-use Oro\Bundle\MessageQueueBundle\EventListener\SchemaUpdateListener;
+use Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class SchemaUpdateListenerTest extends WebTestCase
+class UpdateSchemaListenerTest extends WebTestCase
 {
     public function setUp()
     {
@@ -31,7 +31,7 @@ class SchemaUpdateListenerTest extends WebTestCase
 
         $isListenerExist = false;
         foreach ($dispatcher->getListeners(UpdateSchemaEvent::NAME) as $listener) {
-            if (! $listener[0] instanceof SchemaUpdateListener) {
+            if (! $listener[0] instanceof UpdateSchemaListener) {
                 $isListenerExist = true;
                 break;
             }
@@ -75,14 +75,14 @@ class SchemaUpdateListenerTest extends WebTestCase
     }
 
     /**
-     * Remove all listeners except SchemaUpdateLister for UpdateSchemaEvent
+     * Remove all listeners except UpdateSchemaListener for UpdateSchemaEvent
      */
     protected function removeListenersForEventExceptTested()
     {
         $dispatcher = $this->getEventDispatcher();
 
         foreach ($dispatcher->getListeners(UpdateSchemaEvent::NAME) as $listener) {
-            if (! $listener[0] instanceof SchemaUpdateListener) {
+            if (! $listener[0] instanceof UpdateSchemaListener) {
                 $dispatcher->removeListener(UpdateSchemaEvent::NAME, $listener);
             }
         }

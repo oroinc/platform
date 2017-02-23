@@ -43,8 +43,8 @@ services:
         tags:
             - { name: 'console.command' }
 
-    oro_message_queue.listener.schema_update:
-        class: 'Oro\Bundle\MessageQueueBundle\EventListener\SchemaUpdateListener'
+    oro_message_queue.listener.update_schema:
+        class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
         arguments:
             - '%oro_message_queue.consumption.interrupt_filepath%'
         tags:
