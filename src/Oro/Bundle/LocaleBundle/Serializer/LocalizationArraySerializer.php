@@ -14,6 +14,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationArraySerializer implements SerializerInterface
 {
+    /**
+     * @var array
+     */
     protected static $fieldsToSerializeInLocalization = [
         'id',
         'languageCode',
@@ -24,6 +27,9 @@ class LocalizationArraySerializer implements SerializerInterface
         'updatedAtSet'
     ];
 
+    /**
+     * @var array
+     */
     protected static $fieldsToSerializeInLocalizedFallbackValue = [
         'id',
         'fallback',
@@ -41,6 +47,9 @@ class LocalizationArraySerializer implements SerializerInterface
         'parentLocalization' => [Localization::class, 'id']
     ];
 
+    /**
+     * @var string
+     */
     protected static $titleKeyName = 'titles';
 
     /**
@@ -105,19 +114,18 @@ class LocalizationArraySerializer implements SerializerInterface
 
         foreach (static::$fieldsToSerializeInLocalization as $propertyName) {
             $reflectionProperty = $reflectionLocalization->getProperty($propertyName);
+
+            if (!array_key_exists($reflectionProperty->getName(), $data)) {
+                continue;
+            }
+
             $reflectionProperty->setAccessible(true);
             $reflectionProperty->setValue($localization, $data[$reflectionProperty->getName()]);
             $reflectionProperty->setAccessible(false);
         }
 
         $this->deserializeRelationProperties($data, $reflectionLocalization, $localization);
-
-        $titlesCollection = $this->getDeserializedTitles($data[static::$titleKeyName]);
-        $reflectionLocalization = new \ReflectionObject($localization);
-        $titlesProperty = $reflectionLocalization->getProperty(static::$titleKeyName);
-        $titlesProperty->setAccessible(true);
-        $titlesProperty->setValue($localization, $titlesCollection);
-        $titlesProperty->setAccessible(false);
+        $this->deserializeTitles($data, $localization);
 
         return $localization;
     }
@@ -215,7 +223,7 @@ class LocalizationArraySerializer implements SerializerInterface
         Localization $localization
     ) {
         foreach (static::$relationClasses as $propertyName => list($className, $classPropertyName)) {
-            if ($data[$propertyName] === null) {
+            if (!array_key_exists($propertyName, $data) || $data[$propertyName] === null) {
                 continue;
             }
 
@@ -233,5 +241,23 @@ class LocalizationArraySerializer implements SerializerInterface
             $reflectionProperty->setValue($localization, $relationClass);
             $reflectionProperty->setAccessible(false);
         }
+    }
+
+    /**
+     * @param array        $data
+     * @param Localization $localization
+     */
+    private function deserializeTitles($data, Localization $localization)
+    {
+        if (!array_key_exists(static::$titleKeyName, $data)) {
+            return;
+        }
+
+        $titlesCollection = $this->getDeserializedTitles($data[static::$titleKeyName]);
+        $reflectionLocalization = new \ReflectionObject($localization);
+        $titlesProperty = $reflectionLocalization->getProperty(static::$titleKeyName);
+        $titlesProperty->setAccessible(true);
+        $titlesProperty->setValue($localization, $titlesCollection);
+        $titlesProperty->setAccessible(false);
     }
 }

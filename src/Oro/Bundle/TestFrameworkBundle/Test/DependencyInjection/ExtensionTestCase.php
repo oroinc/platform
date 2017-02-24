@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -100,13 +101,11 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\DependencyInjection\ContainerBuilder
+     * @return \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder
      */
     protected function buildContainerMock()
     {
-        return $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(['setDefinition', 'setParameter', 'prependExtensionConfig'])
-            ->getMock();
+        return $this->createMock(ContainerBuilder::class);
     }
 
     /**

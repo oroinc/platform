@@ -228,3 +228,11 @@ services:
             - '@oro_action.expression.context_accessor'
         tags:
             - { name: oro.action.extension.button_provider, priority: 100 }
+
+    oro_action.twig.extension.operation:
+        class: 'Oro\Bundle\ActionBundle\Twig\OperationExtension'
+        public: false
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: twig.extension }

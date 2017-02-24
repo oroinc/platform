@@ -353,7 +353,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
                 'updatedAt' => new \DateTime('@1486059637'),
                 'updatedAtSet' => null
             ],
-            'WithParentLocalization' => [
+            'With parentLocalization' => [
                 'array' => [
                     'id' => 2,
                     'languageCode' => null,
@@ -373,6 +373,19 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
                 'parentLocalization' => $this->getEntity(Localization::class, ['id' => 1]),
                 'titles' => [],
                 'hierarchy' => [1, null],
+                'createdAt' => null,
+                'updatedAt' => null,
+                'updatedAtSet' => null
+            ],
+            'Empty array' => [
+                'array' => [],
+                'id' => null,
+                'languageCode' => null,
+                'formattingCode' => null,
+                'name' => null,
+                'parentLocalization' => null,
+                'titles' => [],
+                'hierarchy' => [null],
                 'createdAt' => null,
                 'updatedAt' => null,
                 'updatedAtSet' => null

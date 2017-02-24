@@ -2,49 +2,38 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Twig\CalendarExtension;
 use Oro\Bundle\LocaleBundle\Model\Calendar;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class CalendarExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CalendarExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var CalendarExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $localeSettings;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendar;
 
     protected function setUp()
     {
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+        $this->localeSettings = $this->getMockBuilder(LocaleSettings::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calendar = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\Calendar')->getMock();
-        $this->extension = new CalendarExtension($this->localeSettings);
-    }
+        $this->calendar = $this->getMockBuilder(Calendar::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    public function testGetFunctions()
-    {
-        $filters = $this->extension->getFunctions();
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.settings', $this->localeSettings)
+            ->getContainer($this);
 
-        $this->assertCount(3, $filters);
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $filters[0]);
-        $this->assertEquals('oro_calendar_month_names', $filters[0]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $filters[1]);
-        $this->assertEquals('oro_calendar_day_of_week_names', $filters[1]->getName());
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $filters[2]);
-        $this->assertEquals('oro_calendar_first_day_of_week', $filters[2]->getName());
+        $this->extension = new CalendarExtension($container);
     }
 
     public function testGetMonthNames()
@@ -61,7 +50,10 @@ class CalendarExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($locale)
             ->will($this->returnValue($this->calendar));
 
-        $this->assertEquals($expectedResult, $this->extension->getMonthNames($width, $locale));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_calendar_month_names', [$width, $locale])
+        );
     }
 
     public function testGetDayOfWeekNames()
@@ -78,7 +70,10 @@ class CalendarExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($locale)
             ->will($this->returnValue($this->calendar));
 
-        $this->assertEquals($expectedResult, $this->extension->getDayOfWeekNames($width, $locale));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_calendar_day_of_week_names', [$width, $locale])
+        );
     }
 
     public function testGetFirstDayOfWeek()
@@ -94,7 +89,10 @@ class CalendarExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($locale)
             ->will($this->returnValue($this->calendar));
 
-        $this->assertEquals($expectedResult, $this->extension->getFirstDayOfWeek($locale));
+        $this->assertEquals(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_calendar_first_day_of_week', [$locale])
+        );
     }
 
     public function testGetName()

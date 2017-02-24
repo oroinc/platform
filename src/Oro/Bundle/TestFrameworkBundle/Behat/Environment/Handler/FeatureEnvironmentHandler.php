@@ -55,11 +55,19 @@ class FeatureEnvironmentHandler implements EnvironmentHandler
      */
     public function buildEnvironment(Suite $suite)
     {
-        $environment = new InitializedContextEnvironment($suite);
+        try {
+            $environment = new InitializedContextEnvironment($suite);
 
-        foreach ($this->getNormalizedContextSettings($suite) as $context) {
-            $context = $this->factory->createContext($this->resolveClass($context[0]), $context[1]);
-            $environment->registerContext($context);
+            foreach ($this->getNormalizedContextSettings($suite) as $context) {
+                $context = $this->factory->createContext($this->resolveClass($context[0]), $context[1]);
+                $environment->registerContext($context);
+            }
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                sprintf('Error whil build "%s" suite envirorment', $suite->getName()),
+                0,
+                $e
+            );
         }
 
         return $environment;
