@@ -75,7 +75,9 @@ class WorkflowVariablesType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefined([
+            'workflow',
+        ])->setDefaults([
             'data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
         ])->setAllowedTypes([
             'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
