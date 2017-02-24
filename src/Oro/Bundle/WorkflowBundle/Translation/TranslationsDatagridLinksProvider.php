@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Translation;
 
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
@@ -42,7 +44,7 @@ class TranslationsDatagridLinksProvider
 
         $linksData = [
             WorkflowConfiguration::NODE_STEPS => ['label'],
-            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message']
+            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message'],
         ];
 
         foreach ($linksData as $node => $attributes) {
@@ -52,6 +54,11 @@ class TranslationsDatagridLinksProvider
         $translateLinks[WorkflowConfiguration::NODE_ATTRIBUTES] = $this->getTransitionAttributeNodesTranslateLinks(
             $configuration
         );
+
+        $variableDefinitions = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variables = WorkflowConfiguration::NODE_VARIABLES;
+        $variableConfiguration = $configuration[$variableDefinitions][$variables];
+        $translateLinks[$variableDefinitions][$variables] = $this->getVariableTranslateLinks($variableConfiguration);
 
         return $translateLinks;
     }
@@ -106,5 +113,24 @@ class TranslationsDatagridLinksProvider
         }
 
         return $attributes;
+    }
+
+    /**
+     * @param array $variablesConfiguration
+     * @return array
+     */
+    private function getVariableTranslateLinks(array $variablesConfiguration)
+    {
+        $links = [];
+
+        foreach ($variablesConfiguration as $name => $config) {
+            $links[$name] = $this->routeHelper->generate(
+                ['key' => $name],
+                RouterInterface::ABSOLUTE_PATH,
+                ['key' => 1]
+            );
+        }
+
+        return $links;
     }
 }

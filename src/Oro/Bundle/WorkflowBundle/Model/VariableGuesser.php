@@ -9,16 +9,16 @@ class VariableGuesser
     /**
      * @var array
      */
-    protected $formTypeMapping = array();
+    protected $formTypeMapping = [];
 
     /**
-     * @param string $attributeType
+     * @param string $variableType
      * @param string $formType
      * @param array $formOptions
      */
-    public function addFormTypeMapping($attributeType, $formType, array $formOptions = [])
+    public function addFormTypeMapping($variableType, $formType, array $formOptions = [])
     {
-        $this->formTypeMapping[$attributeType] = [
+        $this->formTypeMapping[$variableType] = [
             'type' => $formType,
             'options' => $formOptions,
         ];
@@ -36,7 +36,7 @@ class VariableGuesser
         }
 
         $formType = $this->formTypeMapping[$type]['type'];
-        $formOptions = array_merge($this->formTypeMapping[$type]['options'], $variable->getFormOptions());
+        $formOptions = array_merge_recursive($this->formTypeMapping[$type]['options'], $variable->getFormOptions());
         if (!is_null($variable->getLabel())) {
             $formOptions['label'] = $variable->getLabel();
         }
