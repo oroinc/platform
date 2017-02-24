@@ -824,6 +824,8 @@ WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $workflowManager`
+- Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand`.
+- Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand`.
 
 TestFrameworkBundle
 -------------------
@@ -861,3 +863,8 @@ QueryDesignerBundle
         `ManagerRegistry` $doctrine,
         `DatagridGuesser` $datagridGuesser,
         `EntityNameResolver` $entityNameResolver
+
+CronBundle
+-------------------
+ - Interface `Oro\Bundle\CronBundle\Command\CronCommandInterface`
+    - deprecated method `isActive`
