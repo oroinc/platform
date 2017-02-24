@@ -531,6 +531,3 @@ services:
             - '@oro_entity.database_checker.state_manager'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
-
-#    oro_entity_extend.entity_config.extend_scope_helper:
-#        class: Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper
