@@ -341,10 +341,20 @@
                 <div class="row-fluid form-horizontal">
                     <div class="responsive-block">
                         {% for variable in variables %}
-                            {{ UI.renderProperty(
-                                variable.label,
-                                (variable.value is iterable) ? variable.value|join(', ') : variable.value
-                            ) }}
+                            <div class="control-group">
+                                <label class="control-label">
+                                    {% if variable.options.form_options is defined and variable.options.form_options.tooltip is defined %}
+                                        {{ UI.tooltip(variable.options.form_options.tooltip) }}
+                                    {% endif %}
+                                    {{ variable.label }}
+                                </label>
+                                <div class="controls">
+                                    <div class="control-label">
+                                        {{ ((variable.value is iterable) ? variable.value|join(', ') : variable.value) }}
+                                        {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.variable_definitions.variables[variable.name]) }}
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>

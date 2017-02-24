@@ -26,13 +26,11 @@ class WorkflowVariablesType extends AbstractType
     protected $variableGuesser;
 
     /**
-     * @param WorkflowRegistry           $workflowRegistry
-     * @param $variableGuesser           $variableGuesser
+     * @param WorkflowRegistry $workflowRegistry
+     * @param VariableGuesser $variableGuesser
      */
-    public function __construct(
-        WorkflowRegistry $workflowRegistry,
-        VariableGuesser $variableGuesser
-    ) {
+    public function __construct(WorkflowRegistry $workflowRegistry, VariableGuesser $variableGuesser)
+    {
         $this->workflowRegistry = $workflowRegistry;
         $this->variableGuesser = $variableGuesser;
     }
@@ -61,7 +59,11 @@ class WorkflowVariablesType extends AbstractType
         $this->addVariables($builder, $options);
     }
 
-    protected function addVariables(FormBuilderInterface $builder, $options)
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
+    protected function addVariables(FormBuilderInterface $builder, array $options)
     {
         /** @var Workflow $workflow */
         $workflow = $options['workflow'];

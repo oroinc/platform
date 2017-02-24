@@ -16,6 +16,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
@@ -116,7 +117,7 @@ class WorkflowDefinitionController extends Controller
      *      "/configure/{name}",
      *      name="oro_workflow_definition_configure"
      * )
-     * @Template("OroWorkflowBundle:WorkflowDefinition:configure.html.twig")
+     * @Template()
      * @Acl(
      *      id="oro_workflow_definition_configure",
      *      type="entity",
@@ -133,7 +134,8 @@ class WorkflowDefinitionController extends Controller
     {
         $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
         $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
-        $form = $this->createForm('oro_workflow_variables', null, [
+        $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
+        $form = $this->createForm(WorkflowVariablesType::NAME, null, [
             'workflow' => $workflow,
         ]);
 
@@ -147,6 +149,7 @@ class WorkflowDefinitionController extends Controller
         return [
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
+            'translateLinks' => $translateLinks,
         ];
     }
 
