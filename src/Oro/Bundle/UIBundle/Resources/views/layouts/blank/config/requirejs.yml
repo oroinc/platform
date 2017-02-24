@@ -82,6 +82,7 @@ config:
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
 
+        'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
         'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
 

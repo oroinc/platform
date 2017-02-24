@@ -171,7 +171,7 @@ class VariableAssembler extends BaseAbstractAssembler
         foreach ($optionNames as $optionName) {
             if ($variable->hasOption($optionName)) {
                 throw new AssemblerException(
-                    sprintf('Option "%s" cannot be used in variabe "%s"', $optionName, $variable->getName())
+                    sprintf('Option "%s" cannot be used in variable "%s"', $optionName, $variable->getName())
                 );
             }
         }

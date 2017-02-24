@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Driver;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\TriggerDriver;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\Driver\PdoPgsql;
+use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoPgsql;
 
 class PdoPgsqlTest extends \PHPUnit_Framework_TestCase
 {

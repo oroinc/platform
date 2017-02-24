@@ -10,7 +10,7 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
 {
     /**
      * @param WorkflowDefinition $definition
-     * @param WorkflowData       $data
+     * @param WorkflowData $data
      *
      * @return WorkflowDefinition
      */

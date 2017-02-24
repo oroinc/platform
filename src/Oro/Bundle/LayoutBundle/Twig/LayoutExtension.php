@@ -90,6 +90,10 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
             new \Twig_SimpleFunction(
                 'set_class_prefix_to_form',
                 [$this, 'setClassPrefixToForm']
+            ),
+            new \Twig_SimpleFunction(
+                'convert_value_to_string',
+                [$this, 'convertValueToString']
             )
         ];
     }
@@ -189,5 +193,22 @@ class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRun
     public function getName()
     {
         return 'layout';
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    public function convertValueToString($value)
+    {
+        if (is_array($value)) {
+            $value = stripslashes(json_encode($value));
+        } elseif (is_object($value)) {
+            $value = get_class($value);
+        } elseif (!is_string($value)) {
+            $value = var_export($value, true);
+        }
+
+        return $value;
     }
 }

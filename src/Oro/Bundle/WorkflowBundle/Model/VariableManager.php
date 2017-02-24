@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Oro\Bundle\ActionBundle\Model\AttributeManager;
-
-class VariableManager extends AttributeManager
+class VariableManager
 {
     /**
      * @var VariableAssembler
