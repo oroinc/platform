@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-interface ParameterInterface
+interface ParameterInterface extends OptionAwareInterface
 {
     const INTERNAL_TYPE_ATTRIBUTE = 'attribute';
     const INTERNAL_TYPE_VARIABLE = 'variable';
@@ -51,46 +51,6 @@ interface ParameterInterface
      * @return string
      */
     public function getName();
-
-    /**
-     * Set options.
-     *
-     * @param array $options
-     * @return ParameterInterface
-     */
-    public function setOptions(array $options);
-
-    /**
-     * Get options.
-     *
-     * @return array
-     */
-    public function getOptions();
-
-    /**
-     * Set option by key.
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return ParameterInterface
-     */
-    public function setOption($key, $value);
-
-    /**
-     * Get option by key.
-     *
-     * @param string $key
-     * @return null|mixed
-     */
-    public function getOption($key);
-
-    /**
-     * Check for option availability by key.
-     *
-     * @param string $key
-     * @return bool
-     */
-    public function hasOption($key);
 
     /**
      * @return string
