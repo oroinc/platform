@@ -76,4 +76,12 @@ class InitalMessageQueueIsolator implements IsolatorInterface
     {
         return 'Inital Message Queue Isolator';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTag()
+    {
+        return 'inital_message_queue';
+    }
 }

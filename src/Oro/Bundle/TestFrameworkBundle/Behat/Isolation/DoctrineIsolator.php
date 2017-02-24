@@ -110,6 +110,12 @@ class DoctrineIsolator implements IsolatorInterface, SuiteAwareInterface
         return 'Doctrine';
     }
 
+    /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'doctrine';
+    }
+
     /**
      * {@inheritdoc}
      */
