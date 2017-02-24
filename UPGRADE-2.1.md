@@ -146,6 +146,10 @@ DataGridBundle
    - renamed method `filterMetadata` to `filterMetadataAction`
 
 
+DistributionBundle
+------------------
+- The method `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handle` is deprecated. Use `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handleErrors` instead.
+
 EmailBundle
 -----------
 - Added `Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface` and implemented it in `Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer`
