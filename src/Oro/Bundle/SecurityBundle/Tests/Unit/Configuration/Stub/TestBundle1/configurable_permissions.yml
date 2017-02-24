@@ -1,0 +1,10 @@
+oro_configurable_permissions:
+    commerce:
+        entities:
+            TestEntity:
+                update: true
+        workflows:
+            TestWorkflow:
+                transit: false
+        capabilities:
+            action1: true

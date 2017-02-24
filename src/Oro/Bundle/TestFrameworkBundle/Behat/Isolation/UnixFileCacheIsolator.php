@@ -60,7 +60,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     protected function startCopyDumpToTempDir()
     {
         $this->copyDumpToTempDirProcess = new Process(sprintf(
-            "exec cp -r %s %s",
+            "exec cp -rp %s %s",
             $this->cacheDumpDir.'/*',
             $this->cacheTempDir.'/'
         ));
@@ -76,7 +76,7 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
 
         foreach ($this->cacheDirectories as $directory) {
             $commands[] = sprintf(
-                'cp -r %s %s',
+                'cp -rp %s %s',
                 $this->cacheDir.'/'.$directory,
                 $this->cacheDumpDir.'/'.$directory
             );

@@ -1,0 +1,91 @@
+configs:
+    -
+        Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
+            alias: test_alias
+            title_fields:
+                - id
+            search_template: search_template.html.twig
+            fields:
+                -
+                    name: some_field_1
+                    relation_type: one-to-one
+                    relation_fields:
+                        -
+                            name: emails
+                            relation_type: one-to-many
+                            relation_fields:
+                                -
+                                    name: email
+                                    target_type: text
+                                    target_fields:
+                                        - email
+                        -
+                            name: firstName
+                            target_type: text
+                            target_fields:
+                                - firstName
+    -
+        Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
+            fields:
+                -
+                    name: some_field_1
+                    relation_type: one-to-one
+                    relation_fields:
+                        -
+                            name: emails
+                            relation_type: one-to-one
+                            relation_fields:
+                                -
+                                    name: id
+                                    target_type: integer
+                                    target_fields:
+                                        - id
+                        -
+                            name: lastName
+                            target_type: text
+                            target_fields:
+                                - lastName
+
+expected:
+    Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
+        alias: test_alias
+        title_fields:
+            - id
+        search_template: search_template.html.twig
+        label: ~
+        mode: normal
+        fields:
+            some_field_1:
+                name: some_field_1
+                relation_type: one-to-one
+                relation_fields:
+                    emails:
+                        name: emails
+                        relation_type: one-to-one
+                        relation_fields:
+                            id:
+                                name: id
+                                target_type: integer
+                                target_fields:
+                                    - id
+                                relation_fields: {}
+                            email:
+                                name: email
+                                target_type: text
+                                target_fields:
+                                    - email
+                                relation_fields: {}
+                        target_fields: {}
+                    firstName:
+                        name: firstName
+                        target_type: text
+                        target_fields:
+                            - firstName
+                        relation_fields: {}
+                    lastName:
+                        name: lastName
+                        target_type: text
+                        target_fields:
+                            - lastName
+                        relation_fields: {}
+                target_fields: {}

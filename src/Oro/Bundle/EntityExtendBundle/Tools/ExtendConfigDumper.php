@@ -175,7 +175,7 @@ class ExtendConfigDumper
 
             if ($schema) {
                 $schemas[$className]                 = $schema;
-                $schemas[$className]['relationData'] = $extendConfig->get('relation', false, []);
+                $schemas[$className]['relationData'] = $this->getRelationDataForEntity($extendConfigs, $extendConfig);
             }
         }
 
@@ -192,6 +192,38 @@ class ExtendConfigDumper
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Load relation data and add state of scope extend  of entity config
+     *
+     * @param ConfigInterface[] $extendConfigs
+     * @param ConfigInterface $entityExtendConfig
+     *
+     * @return mixed|null
+     */
+    protected function getRelationDataForEntity($extendConfigs, ConfigInterface $entityExtendConfig)
+    {
+        $relationData = $entityExtendConfig->get('relation', false, []);
+
+        if (is_array($relationData)) {
+            foreach ($relationData as $key => &$item) {
+                /** @var ConfigInterface $extendConfig */
+                foreach ($extendConfigs as $extendConfig) {
+                    if ($extendConfig->getId()->getClassName() === $item['target_entity']) {
+                        $values = $extendConfig->getValues();
+                        $item['state'] = null;
+                        if (isset($values['state'])) {
+                            $item['state'] = $extendConfig->getValues();
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $relationData;
     }
 
     /**
