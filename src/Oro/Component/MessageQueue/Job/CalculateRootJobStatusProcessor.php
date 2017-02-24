@@ -17,9 +17,9 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     private $jobStorage;
 
     /**
-     * @var CalculateRootJobStatusService
+     * @var RootJobStatusCalculator
      */
-    private $calculateRootJobStatusService;
+    private $rootJobStatusCalculator;
 
     /**
      * @var MessageProducerInterface
@@ -33,18 +33,18 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
 
     /**
      * @param JobStorage $jobStorage
-     * @param CalculateRootJobStatusService $calculateRootJobStatusCase
+     * @param RootJobStatusCalculator $calculateRootJobStatusCase
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
      */
     public function __construct(
         JobStorage $jobStorage,
-        CalculateRootJobStatusService $calculateRootJobStatusCase,
+        RootJobStatusCalculator $calculateRootJobStatusCase,
         MessageProducerInterface $producer,
         LoggerInterface $logger
     ) {
         $this->jobStorage = $jobStorage;
-        $this->calculateRootJobStatusService = $calculateRootJobStatusCase;
+        $this->rootJobStatusCalculator = $calculateRootJobStatusCase;
         $this->producer = $producer;
         $this->logger = $logger;
     }
@@ -69,7 +69,7 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
             return self::REJECT;
         }
 
-        $isRootJobStopped = $this->calculateRootJobStatusService->calculate($job);
+        $isRootJobStopped = $this->rootJobStatusCalculator->calculate($job);
 
         if ($isRootJobStopped) {
             $this->producer->send(Topics::ROOT_JOB_STOPPED, [

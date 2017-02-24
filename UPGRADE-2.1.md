@@ -16,6 +16,9 @@ MessageQueue Component
 - Class `Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand`
     - removed the constructor
     - removed property `protected $consumer`
+- Unify percentage value for `Job::$jobProgress`. Now 100% is stored as 1 instead of 100.
+- Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
+- Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
 
 ActionBundle
 ------------
@@ -453,6 +456,11 @@ LocaleBundle
 - Class `Oro\Bundle\LocaleBundle\Twig\NumberExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $formatter`
+
+MessageQueueBundle
+------------------
+- The service `oro_message_queue.job.calculate_root_job_status_service` was renamed to `oro_message_queue.job.root_job_status_calculator` and marked as `private`
+- The service `oro_message_queue.job.calculate_root_job_progress_service` was renamed to `oro_message_queue.job.root_job_progress_calculator` and marked as `private`
 
 MigrationBundle
 ---------------
