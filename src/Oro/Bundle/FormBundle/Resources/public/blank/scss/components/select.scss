@@ -9,14 +9,11 @@
                              $select-border,
                              $select-border-radius,
                              $select-background-color,
-                             $select-color
+                             $select-color,
+                             $select-disable-platform-style
                             );
 
     background: $select-bg;
-
-    @if ($use-select-appearance) {
-        @include appearance();
-    }
 
     @include element-state('hover') {
         text-decoration: none;
