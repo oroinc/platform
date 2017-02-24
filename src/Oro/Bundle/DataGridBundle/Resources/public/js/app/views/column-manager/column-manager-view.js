@@ -4,13 +4,22 @@ define(function(require) {
     var ColumnManagerView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        templateSelector: null
+    }, config);
 
     ColumnManagerView = BaseView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager.html'),
+        templateSelector: config.templateSelector,
         autoRender: true,
         className: 'dropdown-menu',
         events: {
-            'click [data-role="column-manager-select-all"]': 'onSelectAll'
+            'click [data-role="column-manager-select-all"]': 'onSelectAll',
+            'click [data-role="column-manager-unselect-all"]': 'onunselectAll',
+            'click [data-role="column-manager-reset"]': 'reset'
         },
 
         listen: {
@@ -37,7 +46,14 @@ define(function(require) {
         updateView: function() {
             var models = this._getFilteredModels();
             var hasUnrenderable = Boolean(_.find(models, function(model) {return !model.get('renderable');}));
+            var hasRenderable = Boolean(_.find(models, function(model) {return model.get('renderable');}));
+            var hasChanged = Boolean(_.find(models, function(model) {
+                return model.get('renderable') !== model.get('metadata').renderable;
+            }));
+
             this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
+            this.$('[data-role="column-manager-unselect-all"]').toggleClass('disabled', !hasRenderable);
+            this.$('[data-role="column-manager-reset"]').toggleClass('disabled', !hasChanged);
         },
 
         /**
@@ -52,6 +68,22 @@ define(function(require) {
             e.preventDefault();
             _.each(this._getFilteredModels(), function(model) {
                 model.set('renderable', true);
+            });
+        },
+
+        onunselectAll: function(e) {
+            e.preventDefault();
+            _.each(this._getFilteredModels(), function(model) {
+                if (!model.get('disabledVisibilityChange')) {
+                    model.set('renderable', false);
+                }
+            });
+        },
+
+        reset: function(e) {
+            e.preventDefault();
+            _.each(this._getFilteredModels(), function(model) {
+                model.set('renderable', model.get('metadata').renderable);
             });
         },
 

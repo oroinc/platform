@@ -46,6 +46,31 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testFetchWithParentLocalization()
+    {
+        $parent = $this->getEntity(Localization::class, ['id' => 1]);
+        /** @var Localization $child */
+        $child = $this->getEntity(Localization::class, ['id' => 2]);
+        $child->setParentLocalization($parent);
+
+        $localizations = [1 => $parent, 2 => $child];
+
+        $cacheProvider = $this->getArrayCache($localizations);
+
+        $localizationCacheHelper = new LocalizationCacheDecorator(
+            $cacheProvider,
+            $this->localizationArraySerializer
+        );
+
+        $result = $localizationCacheHelper->fetch(LocalizationManager::CACHE_NAMESPACE);
+        $this->assertCount(count($localizations), $result);
+
+        foreach ($result as $i => $localization) {
+            $this->assertInstanceOf(Localization::class, $localization);
+            $this->assertEquals($localizations[$i], $localization);
+        }
+    }
+
     /**
      * @param Localization[] $localizations
      * @dataProvider getLocalizations
@@ -73,16 +98,16 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
     public function getLocalizations()
     {
         return [
-            [
+            'singleLocalization' => [
                 [10 => $this->getEntity(Localization::class, ['id' => 10])]
             ],
-            [
+            'twoLocalizationsWithKeys' => [
                 [
                     1 => $this->getEntity(Localization::class, ['id' => 1]),
                     5 => $this->getEntity(Localization::class, ['id' => 5]),
                 ]
             ],
-            [
+            'twoLocalizationsWithoutKeys' => [
                 [
                     $this->getEntity(Localization::class, ['id' => 1]),
                     $this->getEntity(Localization::class, ['id' => 2]),

@@ -1,9 +1,10 @@
 api:
     entities:
         Oro\Bundle\NoteBundle\Entity\Note:
+            documentation_resource: '@OroNoteBundle/Resources/doc/api/note.md'
             fields:
                 activityTargets:
-                    description: A records to which the Note record associated with
+                    description: A records to which the note record associated with.
                     data_type: association:manyToMany:activity
             subresources:
                 activityTargets:

@@ -1,33 +1,46 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption;
+
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Container;
 
 use Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCouldBeConstructedWithRequiredAttributes()
+    /** @var ConsumeMessagesCommand */
+    private $command;
+
+    /** @var Container */
+    private $container;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $consumer;
+
+    protected function setUp()
     {
-        new ConsumeMessagesCommand($this->createQueueConsumerMock());
+        $this->consumer = $this->createMock(QueueConsumer::class);
+
+        $this->command = new ConsumeMessagesCommand();
+
+        $this->container = new Container();
+        $this->container->set('oro_message_queue.consumption.queue_consumer', $this->consumer);
+        $this->command->setContainer($this->container);
     }
 
     public function testShouldHaveCommandName()
     {
-        $command = new ConsumeMessagesCommand($this->createQueueConsumerMock());
-
-        $this->assertEquals('oro:message-queue:transport:consume', $command->getName());
+        $this->assertEquals('oro:message-queue:transport:consume', $this->command->getName());
     }
 
     public function testShouldHaveExpectedOptions()
     {
-        $command = new ConsumeMessagesCommand($this->createQueueConsumerMock());
-
-        $options = $command->getDefinition()->getOptions();
+        $options = $this->command->getDefinition()->getOptions();
 
         $this->assertCount(3, $options);
         $this->assertArrayHasKey('memory-limit', $options);
@@ -37,9 +50,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldHaveExpectedAttributes()
     {
-        $command = new ConsumeMessagesCommand($this->createQueueConsumerMock());
-
-        $arguments = $command->getDefinition()->getArguments();
+        $arguments = $this->command->getDefinition()->getArguments();
 
         $this->assertCount(2, $arguments);
         $this->assertArrayHasKey('processor-service', $arguments);
@@ -52,13 +63,9 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
         $this->expectExceptionMessage('Invalid message processor service given.'.
             ' It must be an instance of Oro\Component\MessageQueue\Consumption\MessageProcessorInterface but stdClass');
 
-        $container = new Container();
-        $container->set('processor-service', new \stdClass());
+        $this->container->set('processor-service', new \stdClass());
 
-        $command = new ConsumeMessagesCommand($this->createQueueConsumerMock());
-        $command->setContainer($container);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'queue' => 'queue-name',
             'processor-service' => 'processor-service'
@@ -67,65 +74,28 @@ class ConsumeMessagesCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldExecuteConsumption()
     {
-        $processor = $this->createMessageProcessor();
+        $processor = $this->createMock(MessageProcessorInterface::class);
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('close')
-        ;
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->once())
+            ->method('close');
 
-        $consumer = $this->createQueueConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $this->consumer->expects($this->once())
             ->method('bind')
-            ->with('queue-name', $this->identicalTo($processor))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with('queue-name', $this->identicalTo($processor));
+        $this->consumer->expects($this->once())
             ->method('consume')
-            ->with($this->isInstanceOf(ChainExtension::class))
-        ;
-        $consumer
-            ->expects($this->once())
+            ->with($this->isInstanceOf(ChainExtension::class));
+        $this->consumer->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
-        $container = new Container();
-        $container->set('processor-service', $processor);
+        $this->container->set('processor-service', $processor);
 
-        $command = new ConsumeMessagesCommand($consumer);
-        $command->setContainer($container);
-
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute([
             'queue' => 'queue-name',
             'processor-service' => 'processor-service'
         ]);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConnectionInterface
-     */
-    protected function createConnectionMock()
-    {
-        return $this->createMock(ConnectionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessageProcessorInterface
-     */
-    protected function createMessageProcessor()
-    {
-        return $this->createMock(MessageProcessorInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|QueueConsumer
-     */
-    protected function createQueueConsumerMock()
-    {
-        return $this->createMock(QueueConsumer::class);
     }
 }

@@ -35,7 +35,10 @@ class FilterHandler implements ConfigurationHandlerInterface
         'form_type',
         'display_type',
         'destination_page',
-        'form_options'
+        'form_options',
+        WorkflowConfiguration::NODE_INIT_ENTITIES,
+        WorkflowConfiguration::NODE_INIT_ROUTES,
+        WorkflowConfiguration::NODE_INIT_DATAGRIDS,
     ];
 
     /** @var array */

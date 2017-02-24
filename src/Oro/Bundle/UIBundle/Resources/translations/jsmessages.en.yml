@@ -5,6 +5,7 @@
 "No": "No"
 "OK, got it.": "OK, got it."
 "Cancel": "Cancel"
+"Back": "Back"
 "Delete Confirmation": "Delete Confirmation"
 "Edit": "Edit"
 "Loading...": "Loading..."
@@ -87,9 +88,12 @@ oro:
             other: Other
         jstree:
             move_node_error: "You can not move node {{ nodeText }} here."
+            no_node_selected_error: "You didn't select any node"
+            move_success: '{{ nodes }} was successfully moved'
             actions:
                 expand: 'Expand all'
                 collapse: 'Collapse all'
+                move: 'Move To'
                 subcategories:
                     select: 'Select Sub Categories'
                     do_not_select: 'Do Not Select Sub Categories'

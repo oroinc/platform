@@ -370,6 +370,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $fieldType = RelationType::ONE_TO_MANY
     ) {
         $this->ensureExtendFieldSet($options);
+        $options['extend']['bidirectional'] = true; // has to be bidirectional
 
         $selfTableName = $this->getTableName($table);
         $selfTable     = $this->getTable($table, $schema);
@@ -425,6 +426,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string       $targetAssociationName The name of a relation field on the inverse side
      * @param string       $titleColumnName       A column name is used to show owning side entity
      * @param array        $options               Entity config options. [scope => [name => value, ...], ...]
+     *
+     * @deprecated since 2.1, cause oneToMany relation has to be bidirectional always
      */
     public function addOneToManyInverseRelation(
         Schema $schema,
@@ -653,6 +656,12 @@ class ExtendExtension implements NameGeneratorAwareInterface
             $selfTableOptions
         );
 
+        $this->extendOptionsManager->mergeColumnOptions(
+            $selfTableName,
+            $associationName,
+            ['extend' => ['bidirectional' => true]]
+        );
+
         $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
@@ -802,6 +811,12 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->extendOptionsManager->setTableOptions(
             $selfTableName,
             $selfTableOptions
+        );
+
+        $this->extendOptionsManager->mergeColumnOptions(
+            $selfTableName,
+            $associationName,
+            ['extend' => ['bidirectional' => true]]
         );
 
         $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
@@ -1031,6 +1046,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
         }
         if (!isset($options['extend']['owner'])) {
             $options['extend']['owner'] = ExtendScope::OWNER_SYSTEM;
+        }
+        if (!isset($options['extend']['bidirectional'])) {
+            $options['extend']['bidirectional'] = false;
         }
         if (!isset($options[ExtendOptionsManager::MODE_OPTION])) {
             $options[ExtendOptionsManager::MODE_OPTION] = ConfigModel::MODE_READONLY;
