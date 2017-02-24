@@ -92,6 +92,9 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
                     WorkflowConfiguration::NODE_STEPS => [],
                     WorkflowConfiguration::NODE_TRANSITIONS => [],
                     WorkflowConfiguration::NODE_ATTRIBUTES => [],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [],
+                    ],
                 ],
             ],
             'full' => [
@@ -111,7 +114,17 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ]
                         ]
-                    ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'var1' => [
+                                'label' => 'var_label',
+                                'form_options' => [
+                                    'tooltip' => 'var_tootltip',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'languagesAvailable' => true,
                 'expected' => [
@@ -125,7 +138,12 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit_Framework_TestCase
                     ],
                     WorkflowConfiguration::NODE_ATTRIBUTES => ['attr1' => [
                         'trans1' => ['label' => 'link_to_attr_label1']]
-                    ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'var1' => 'link_to_var1',
+                        ],
+                    ],
                 ],
             ],
             'full, languages not available' => [

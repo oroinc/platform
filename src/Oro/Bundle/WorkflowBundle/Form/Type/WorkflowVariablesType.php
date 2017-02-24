@@ -2,23 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class WorkflowVariablesType extends AbstractType
 {
     const NAME = 'oro_workflow_variables';
-
-    /**
-     * @var WorkflowRegistry
-     */
-    protected $workflowRegistry;
 
     /**
      * @var VariableGuesser
@@ -26,12 +20,10 @@ class WorkflowVariablesType extends AbstractType
     protected $variableGuesser;
 
     /**
-     * @param WorkflowRegistry $workflowRegistry
      * @param VariableGuesser $variableGuesser
      */
-    public function __construct(WorkflowRegistry $workflowRegistry, VariableGuesser $variableGuesser)
+    public function __construct(VariableGuesser $variableGuesser)
     {
-        $this->workflowRegistry = $workflowRegistry;
         $this->variableGuesser = $variableGuesser;
     }
 
@@ -77,34 +69,18 @@ class WorkflowVariablesType extends AbstractType
 
     /**
      * Custom options:
-     * - "workflow_definition"      - required, instance of WorkflowDefinition entity
-     * - "workflow"                 - optional, instance of Workflow
+     * - "workflow" - required, instance of Workflow
      *
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefined(['workflow', 'workflow_definition']);
-
-        $resolver->setDefaults(
-            [
-                'workflow' => function (Options $options, $workflow) {
-                    if (!$workflow) {
-                        $workflowName = $options['workflow_definition']->getName();
-                        $workflow = $this->workflowRegistry->getWorkflow($workflowName);
-                    }
-
-                    return $workflow;
-                },
-                'data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
-            ]
-        );
-
-        $resolver->setAllowedTypes(
-            [
-                'workflow_definition' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
-                'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
-            ]
-        );
+        $resolver->setDefaults([
+            'data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
+        ])->setAllowedTypes([
+            'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
+        ])->setRequired([
+            'workflow',
+        ]);
     }
 }

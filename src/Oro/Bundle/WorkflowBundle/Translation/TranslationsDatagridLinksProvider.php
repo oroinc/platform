@@ -55,10 +55,13 @@ class TranslationsDatagridLinksProvider
             $configuration
         );
 
-        $variableDefinitions = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
-        $variables = WorkflowConfiguration::NODE_VARIABLES;
-        $variableConfiguration = $configuration[$variableDefinitions][$variables];
-        $translateLinks[$variableDefinitions][$variables] = $this->getVariableTranslateLinks($variableConfiguration);
+        $varDefinitions = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $vars = WorkflowConfiguration::NODE_VARIABLES;
+        $variableConfiguration = [];
+        if (isset($configuration[$varDefinitions][$vars])) {
+            $variableConfiguration = $configuration[$varDefinitions][$vars];
+        }
+        $translateLinks[$varDefinitions][$vars] = $this->getVariableTranslateLinks($variableConfiguration);
 
         return $translateLinks;
     }
