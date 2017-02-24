@@ -142,6 +142,8 @@ DataGridBundle
     - removed property `protected $datagridRouteHelper`
     - removed property `protected $requestStack`
     - removed property `protected $logger`
+- Class `Oro\Bundle\DataGridBundle\Controller\GridController`
+   - renamed method `filterMetadata` to `filterMetadataAction`
 
 
 EmailBundle
@@ -773,6 +775,9 @@ UserBundle
     - removed property `protected $genderProvider`
     - removed property `protected $securityContext`
 - Added Configurable Permission `default` for View and Edit pages of User Role (see [configurable-permissions.md](./src/Oro/Bundle/SecurityBundle/Resources/doc/configurable-permissions.md))
+- Class `Oro\Bundle\UserBundle\Controller\StatusController`
+    - renamed method `setCurrentStatus` to `setCurrentStatusAction`
+    - renamed method `clearCurrentStatus` to `clearCurrentStatusAction`
 
 WindowsBundle
 -------------

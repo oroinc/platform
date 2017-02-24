@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\ORM\Driver;
+namespace Oro\Bundle\EntityBundle\ORM\TriggerDriver;
 
 use Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerDriverInterface;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
@@ -8,16 +8,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 abstract class AbstractDriver implements DatabaseDriverInterface, EntityTriggerDriverInterface
 {
-    /**
-     * @var string
-     */
-    protected $sql_disable = '';
-
-    /**
-     * @var string
-     */
-    protected $sql_enable = '';
-
     /**
      * @var DoctrineHelper
      */
@@ -51,7 +41,7 @@ abstract class AbstractDriver implements DatabaseDriverInterface, EntityTriggerD
     public function disable()
     {
         $this->init();
-        $this->connection->exec(sprintf($this->sql_disable, $this->tableName));
+        $this->connection->exec(sprintf($this->getSqlDisable(), $this->tableName));
     }
 
     /**
@@ -60,7 +50,7 @@ abstract class AbstractDriver implements DatabaseDriverInterface, EntityTriggerD
     public function enable()
     {
         $this->init();
-        $this->connection->exec(sprintf($this->sql_enable, $this->tableName));
+        $this->connection->exec(sprintf($this->getSqlEnable(), $this->tableName));
     }
 
     /**
@@ -70,6 +60,16 @@ abstract class AbstractDriver implements DatabaseDriverInterface, EntityTriggerD
     {
         $this->entityClass = $entityClass;
     }
+
+    /**
+     * @return string
+     */
+    abstract protected function getSqlDisable();
+
+    /**
+     * @return string
+     */
+    abstract protected function getSqlEnable();
 
     private function init()
     {

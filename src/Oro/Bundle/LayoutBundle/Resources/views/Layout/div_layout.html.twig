@@ -127,7 +127,10 @@
 
 {% block page_title_widget -%}
     {% spaceless %}
-        <h3>{{ value|block_text(translation_domain) }}</h3>
+        {% set value = value|block_text(translation_domain) %}
+        {% if value|length %}
+            <h3>{{ value }}</h3>
+        {% endif %}
     {% endspaceless %}
 {%- endblock %}
 

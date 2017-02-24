@@ -34,9 +34,13 @@ class AttachmentEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             'supports' => [
                 [
-                    'class'=> 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
+                    'class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
                     'relation' => [[]],
-                    'relationData' => [['field_id' => $fieldConfig, 'target_entity'=> 'testEntity']]
+                    'relationData' => [[
+                        'field_id' => $fieldConfig,
+                        'target_entity' => 'testEntity',
+                        'state' => 'Active'
+                    ]]
                 ],
                 true
             ],
