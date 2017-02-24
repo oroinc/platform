@@ -11,11 +11,12 @@ class MainMenu extends Element
     /**
      * @param string $path
      * @throws ElementNotFoundException
+     * @return NodeElement|null
      */
     public function openAndClick($path)
     {
         $items = explode('/', $path);
-        $linkLocator = array_pop($items);
+        $linkLocator = trim(array_pop($items));
         $that = $this;
 
         while ($item = array_shift($items)) {
@@ -27,9 +28,11 @@ class MainMenu extends Element
             }
 
             $link->mouseOver();
-            $that = $link->getParent();
+            $that = $link->getParent()->find('css', '.dropdown-menu');
         }
 
         $that->clickLink(trim($linkLocator));
+
+        return $that->findLink($linkLocator);
     }
 }

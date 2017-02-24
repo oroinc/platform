@@ -32,3 +32,9 @@ entity_config:
                 enableGridFilter:
                     options:
                         default_value:      true
+
+                # indicates whether to use default rendering of tags in entity view pages
+                # if FALSE tags will not be rendered automatically and allows to use custom rendering logic
+                enableDefaultRendering:
+                    options:
+                        default_value:      true

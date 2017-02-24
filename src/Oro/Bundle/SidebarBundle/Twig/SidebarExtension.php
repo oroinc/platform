@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SidebarBundle\Twig;
 
 use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
@@ -15,34 +16,39 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
 
     const NAME = 'oro_sidebar';
 
-    /**
-     * @var WidgetDefinitionRegistry
-     */
-    protected $widgetDefinitionsRegistry;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var TranslatorInterface
+     * @param ContainerInterface $container
      */
-    protected $translator;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @var AssetHelper
+     * @return WidgetDefinitionRegistry
      */
-    protected $assetHelper;
+    protected function getWidgetDefinitionRegistry()
+    {
+        return $this->container->get('oro_sidebar.widget_definition.registry');
+    }
 
     /**
-     * @param WidgetDefinitionRegistry $widgetDefinitionsRegistry
-     * @param TranslatorInterface $translator
-     * @param AssetHelper $assetHelper
+     * @return TranslatorInterface
      */
-    public function __construct(
-        WidgetDefinitionRegistry $widgetDefinitionsRegistry,
-        TranslatorInterface $translator,
-        AssetHelper $assetHelper
-    ) {
-        $this->widgetDefinitionsRegistry = $widgetDefinitionsRegistry;
-        $this->translator = $translator;
-        $this->assetHelper = $assetHelper;
+    protected function getTranslator()
+    {
+        return $this->container->get('translator');
+    }
+
+    /**
+     * @return AssetHelper
+     */
+    protected function getAssetHelper()
+    {
+        return $this->container->get('assets.packages');
     }
 
     /**
@@ -50,9 +56,9 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
      */
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('oro_sidebar_get_available_widgets', array($this, 'getWidgetDefinitions')),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_sidebar_get_available_widgets', [$this, 'getWidgetDefinitions']),
+        ];
     }
 
     /**
@@ -63,9 +69,11 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
      */
     public function getWidgetDefinitions($placement)
     {
-        $definitions = $this->widgetDefinitionsRegistry
+        $definitions = $this->getWidgetDefinitionRegistry()
             ->getWidgetDefinitionsByPlacement($placement)
             ->toArray();
+        $translator = $this->getTranslator();
+        $assetHelper = $this->getAssetHelper();
 
         foreach ($definitions as $name => &$definition) {
             if (!$this->featureChecker->isResourceEnabled($name, 'sidebar_widgets')) {
@@ -73,9 +81,9 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
                 continue;
             }
 
-            $definition['title'] = $this->translator->trans($definition['title']);
+            $definition['title'] = $translator->trans($definition['title']);
             if (!empty($definition['dialogIcon'])) {
-                $definition['dialogIcon'] = $this->assetHelper->getUrl($definition['dialogIcon']);
+                $definition['dialogIcon'] = $assetHelper->getUrl($definition['dialogIcon']);
             }
         }
 

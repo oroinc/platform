@@ -71,6 +71,11 @@ class AttributeGroupType extends AbstractContainerType
                 return $attributeGroup->getCode() == $code;
             }
         );
+
+        if ($attributeGroups->count() === 0) {
+            return;
+        }
+
         /** @var AttributeGroup $attributeGroup */
         $attributeGroup = $attributeGroups->first();
         $options['visible'] = $attributeGroup->getIsVisible();

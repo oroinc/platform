@@ -28,10 +28,9 @@ define(function(require) {
                     data && data.message ? data.message : __(successMessage)
                 );
                 mediator.execute('redirectTo', {url: redirect}, {redirect: true});
-                mediator.execute('hideLoading');
             },
-            error: function() {
-                mediator.execute('showFlashMessage', 'error', __(errorMessage));
+            errorHandlerMessage: __(errorMessage),
+            complete: function() {
                 mediator.execute('hideLoading');
             }
         });

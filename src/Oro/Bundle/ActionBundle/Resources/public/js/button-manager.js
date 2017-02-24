@@ -10,7 +10,7 @@ define(function(require) {
     var messenger = require('oroui/js/messenger');
     var widgetManager = require('oroui/js/widget-manager');
     var Backbone = require('backbone');
-    var DialogWidget = require('oro/dialog-widget');
+    var tools = require('oroui/js/tools');
 
     var ButtonManager = function(options) {
         this.initialize(options);
@@ -30,7 +30,8 @@ define(function(require) {
             confirmation: {},
             showDialog: false,
             hasDialog: false,
-            dialogOptions: {}
+            dialogOptions: {},
+            jsDialogWidget: 'oro/dialog-widget'
         },
 
         /**
@@ -63,7 +64,6 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = _.defaults(_.pick(options, _.identity) || {}, this.options);
-
             this.confirmModalConstructor = require(this.options.confirmation.component || this.confirmComponent);
         },
 
@@ -82,17 +82,19 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doExecute: function(e) {
+            var self = this;
             if (this.options.hasDialog) {
                 var options = this._getDialogOptions(this.options);
                 if (this.options.showDialog) {
-                    var widget = new DialogWidget(options);
+                    tools.loadModules(this.options.jsDialogWidget, function(Widget) {
+                        var _widget = new Widget(options);
+                        Backbone.listenTo(_widget, 'formSave', _.bind(function(response) {
+                            _widget.hide();
+                            self.doResponse(response, e);
+                        }, this));
 
-                    Backbone.listenTo(widget, 'formSave', _.bind(function(response) {
-                        widget.remove();
-                        this.doResponse(response, e);
-                    }, this));
-
-                    widget.render();
+                        _widget.render();
+                    });
                 } else {
                     this.doRedirect(options.url);
                 }

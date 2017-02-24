@@ -168,8 +168,8 @@ class QueueConsumer
         if ($context->isExecutionInterrupted()) {
             throw new ConsumptionInterruptedException();
         }
-
-        if ($message = $messageConsumer->receive($timeout = 1)) {
+        $logger->info('Pre receive Message');
+        if ($message = $messageConsumer->receive(1)) {
             $logger->info('Message received');
             $logger->debug('Headers: {headers}', ['headers' => new VarExport($message->getHeaders())]);
             $logger->debug('Properties: {properties}', ['properties' => new VarExport($message->getProperties())]);

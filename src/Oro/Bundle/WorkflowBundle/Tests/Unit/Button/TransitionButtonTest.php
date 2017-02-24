@@ -117,11 +117,13 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
                 'route' => $this->buttonContext->getRouteName(),
                 'datagrid' => $this->buttonContext->getDatagridName(),
                 'group' => $this->buttonContext->getGroup(),
+                'originalUrl' => $this->buttonContext->getOriginalUrl(),
                 'workflowItemId' => null
             ],
             'executionRoute' => $this->buttonContext->getExecutionRoute(),
             'dialogRoute' => null,
             'additionalData' => [],
+            'jsDialogWidget' => TransitionButton::TRANSITION_JS_DIALOG_WIDGET,
         ];
 
         $this->assertEquals(array_merge($defaultData, $customData), $this->button->getTemplateData($customData));

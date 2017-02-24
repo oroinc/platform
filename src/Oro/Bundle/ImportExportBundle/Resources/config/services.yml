@@ -50,13 +50,22 @@ services:
             - { name: oro_importexport.formatter.formatter, data_type: integer, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }
 
-    oro_importexport.async.import_export_job_summary_result_service:
-        class: Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService
+    oro_importexport.async.import_export_result_summarizer:
+        class: Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer
         arguments:
             - '@router'
             - '@oro_config.global'
             - '@oro_email.email_renderer'
             - '@doctrine'
+        public: false
 
     oro_importexport.writer.writer_chain:
         class: Oro\Bundle\ImportExportBundle\Writer\WriterChain
+
+    oro_importexport.splitter.splitter_chain:
+        class: Oro\Bundle\ImportExportBundle\Splitter\SplitterChain
+
+    oro_importexport.file.file_manager:
+        class: Oro\Bundle\ImportExportBundle\File\FileManager
+        arguments:
+          - '@knp_gaufrette.filesystem_map'

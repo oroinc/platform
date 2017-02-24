@@ -3,6 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -19,6 +21,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
@@ -37,6 +40,38 @@ class OroMainContext extends MinkContext implements
     public function beforeScenario()
     {
         $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
+     * @BeforeStep
+     * @param BeforeStepScope $scope
+     */
+    public function beforeStep(BeforeStepScope $scope)
+    {
+        if (false === $this->getMink()->isSessionStarted('first_session')) {
+            return;
+        }
+
+        $session = $this->getMink()->getSession('first_session');
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        $url = $session->getCurrentUrl();
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            $driver->waitPageToLoad();
+
+            return;
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        }
+
+        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
+        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
+            return;
+        }
+
+        $driver->waitForAjax();
     }
 
     /**
@@ -201,6 +236,28 @@ class OroMainContext extends MinkContext implements
         /** @var Form $form */
         $form = $this->createElement($formName);
         $form->fill($table);
+    }
+
+    /**
+     * Assert that provided validation errors for given fields appeared
+     * Example: Then I should see validation errors:
+     *            | Subject         | This value should not be blank.  |
+     *
+     * @Then /^(?:|I )should see validation errors:$/
+     */
+    public function iShouldSeeValidationErrors(TableNode $table)
+    {
+        $form = $this->createOroForm();
+
+        foreach ($table->getRows() as $row) {
+            list($label, $value) = $row;
+            $error = $form->getFieldValidationErrors($label);
+            self::assertEquals(
+                $value,
+                $error,
+                "Failed asserting that $label has error $value"
+            );
+        }
     }
 
     /**
@@ -427,6 +484,23 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert current page with its title
+     *
+     * @Given /^(?:|I )should be on "(?P<entityTitle>[\w\s\/]+)" (?P<page>[\w\s\/]+) ((v|V)iew) page$/
+     */
+    public function assertViewPage($page, $entityTitle)
+    {
+        $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
+        $route = $this->getContainer()->get('router')->match($urlPath);
+
+        self::assertEquals($this->getPage($page.' View')->getRoute(), $route['_route']);
+
+        $actualEntityTitle = $this->getSession()->getPage()->find('css', 'h1.user-name');
+        self::assertNotNull($actualEntityTitle, sprintf('Entity title not found on "%s" view page', $page));
+        self::assertEquals($entityTitle, $actualEntityTitle->getText());
+    }
+
+    /**
      * Example: Given I open Opportunity Create page
      * Example: Given I open Account Index page
      *
@@ -542,6 +616,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Mass inline grid field edit
+     * Accept table and pass it to inlineEditField
+     * Example: When I edit first record from grid:
+     *            | name      | editedName       |
+     *            | status    | Qualified        |
+     *
+     * @Then I edit first record from grid:
+     * @param TableNode $table
+     */
+    public function iEditFirstRecordFromGrid(TableNode $table)
+    {
+        foreach ($table->getRows() as $row) {
+            list($field, $value) = $row;
+            $this->inlineEditField($field, $value);
+        }
+    }
+
+    /**
      * Inline edit field
      * Example: When I edit Status as "Open"
      * Example: Given I edit Probability as "30"
@@ -592,19 +684,21 @@ class OroMainContext extends MinkContext implements
 
             self::assertNotCount(0, $labels, sprintf('Can\'t find "%s" label', $label));
 
-            /** @var NodeElement $label */
+            /** @var NodeElement $labelElement */
             foreach ($labels as $labelElement) {
-                $controlLabel = $labelElement->getParent()->find('css', 'div.controls div.control-label');
-                self::assertNotNull($controlLabel);
-                $text = $controlLabel->getText();
+                /** @var ControlGroup $controlLabel */
+                $controlLabel = $this->elementFactory->wrapElement(
+                    'ControlGroup',
+                    $labelElement->getParent()->find('css', 'div.controls div.control-label')
+                );
 
-                if (false !== stripos($text, $value)) {
+                if (true === $controlLabel->compareValues(Form::normalizeValue($value))) {
                     continue 2;
                 }
             }
 
             self::fail(
-                sprintf('Found %s "%s" labels, but no one has "%s" text value', count($labels), $label, $value)
+                sprintf('Found %s "%s" labels, but no one has "%s" value', count($labels), $label, $value)
             );
         }
     }

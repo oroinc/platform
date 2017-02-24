@@ -3,18 +3,18 @@
 namespace Oro\Bundle\IntegrationBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\IntegrationBundle\Entity\Status;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 
 /**
  * Command to clean up old integration status records
@@ -85,9 +85,9 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
         $failedInterval->sub(\DateInterval::createFromDateString(self::FAILED_STATUSES_INTERVAL));
 
         $integrationStatuses = $this->getOldIntegrationStatusesQueryBuilder($completedInterval, $failedInterval);
-        $iterator = new DeletionQueryResultIterator($integrationStatuses);
+        $iterator = new BufferedIdentityQueryResultIterator($integrationStatuses);
         $iterator->setBufferSize(self::BATCH_SIZE);
-        $iterator->setHydrationMode(AbstractQuery::HYDRATE_SCALAR);
+        $iterator->setHydrationMode(Query::HYDRATE_SCALAR);
 
         if (!count($iterator)) {
             $output->writeln('<info>There are no integration statuses eligible for clean up</info>');
@@ -104,13 +104,13 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     /**
      * Delete records using iterator
      *
-     * @param DeletionQueryResultIterator $iterator
+     * @param BufferedIdentityQueryResultIterator $iterator
      *
      * @param string                      $className Entity FQCN
      *
      * @throws \Exception
      */
-    protected function deleteRecords(DeletionQueryResultIterator $iterator, $className)
+    protected function deleteRecords(BufferedIdentityQueryResultIterator $iterator, $className)
     {
         $iteration = 0;
 

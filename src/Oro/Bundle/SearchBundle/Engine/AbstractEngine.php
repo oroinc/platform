@@ -12,7 +12,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 /**
  * Connector abstract class
  */
-abstract class AbstractEngine implements EngineV2Interface
+abstract class AbstractEngine implements EngineInterface
 {
     /** @var ManagerRegistry */
     protected $registry;

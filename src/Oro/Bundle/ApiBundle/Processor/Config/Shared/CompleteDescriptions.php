@@ -14,6 +14,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\RequestDependedTextProcessor;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -33,12 +35,12 @@ class CompleteDescriptions implements ProcessorInterface
 {
     const PLACEHOLDER_INHERIT_DOC = '{@inheritdoc}';
 
-    const ID_DESCRIPTION           = 'The unique identifier of a resource';
-    const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation';
-    const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record';
-    const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record';
+    const ID_DESCRIPTION           = 'The unique identifier of a resource.';
+    const CREATED_AT_DESCRIPTION   = 'The date and time of resource record creation.';
+    const UPDATED_AT_DESCRIPTION   = 'The date and time of the last update of the resource record.';
+    const OWNER_DESCRIPTION        = 'An owner record represents the ownership capabilities of the record.';
     const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm, '
-    . 'company or another organization to which the users belong';
+    . 'company or another organization to which the users belong.';
 
     const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
     const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
@@ -58,25 +60,34 @@ class CompleteDescriptions implements ProcessorInterface
     /** @var ConfigProvider */
     protected $ownershipConfigProvider;
 
+    /** @var RequestDependedTextProcessor */
+    protected $requestDependedTextProcessor;
+
+    /** @var RequestType */
+    private $requestType;
+
     /**
      * @param EntityDescriptionProvider    $entityDocProvider
      * @param ResourceDocProviderInterface $resourceDocProvider
      * @param MarkdownApiDocParser         $apiDocParser
      * @param TranslatorInterface          $translator
      * @param ConfigProvider               $ownershipConfigProvider
+     * @param RequestDependedTextProcessor $requestDependedTextProcessor
      */
     public function __construct(
         EntityDescriptionProvider $entityDocProvider,
         ResourceDocProviderInterface $resourceDocProvider,
         MarkdownApiDocParser $apiDocParser,
         TranslatorInterface $translator,
-        ConfigProvider $ownershipConfigProvider
+        ConfigProvider $ownershipConfigProvider,
+        RequestDependedTextProcessor $requestDependedTextProcessor
     ) {
         $this->entityDocProvider = $entityDocProvider;
         $this->resourceDocProvider = $resourceDocProvider;
         $this->apiDocParser = $apiDocParser;
         $this->translator = $translator;
         $this->ownershipConfigProvider = $ownershipConfigProvider;
+        $this->requestDependedTextProcessor = $requestDependedTextProcessor;
     }
 
     /**
@@ -94,19 +105,23 @@ class CompleteDescriptions implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         $definition = $context->getResult();
-
-        $this->setDescriptionForEntity(
-            $definition,
-            $entityClass,
-            $targetAction,
-            $context->isCollection(),
-            $context->getAssociationName(),
-            $context->getParentClassName()
-        );
-        $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
-        $filters = $context->getFilters();
-        if (null !== $filters) {
-            $this->setDescriptionsForFilters($filters, $definition, $entityClass);
+        $this->requestType = $context->getRequestType();
+        try {
+            $this->setDescriptionForEntity(
+                $definition,
+                $entityClass,
+                $targetAction,
+                $context->isCollection(),
+                $context->getAssociationName(),
+                $context->getParentClassName()
+            );
+            $this->setDescriptionsForFields($definition, $entityClass, $targetAction);
+            $filters = $context->getFilters();
+            if (null !== $filters) {
+                $this->setDescriptionsForFilters($filters, $definition, $entityClass);
+            }
+        } finally {
+            $this->requestType = null;
         }
     }
 
@@ -169,14 +184,28 @@ class CompleteDescriptions implements ProcessorInterface
                 }
             }
         }
-        if ($processInheritDoc && $definition->hasDocumentation()) {
-            $documentation = $definition->getDocumentation();
-            if (false !== strpos($documentation, self::PLACEHOLDER_INHERIT_DOC)) {
-                $entityDocumentation = $this->entityDocProvider->getEntityDocumentation($entityClass);
-                $definition->setDocumentation(
-                    str_replace(self::PLACEHOLDER_INHERIT_DOC, $entityDocumentation, $documentation)
-                );
-            }
+        if ($processInheritDoc) {
+            $this->processInheritDocForEntity($definition, $entityClass);
+        }
+
+        $documentation = $definition->getDocumentation();
+        if ($documentation) {
+            $definition->setDocumentation($this->processRequestDependedContent($documentation));
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     */
+    protected function processInheritDocForEntity(EntityDefinitionConfig $definition, $entityClass)
+    {
+        $documentation = $definition->getDocumentation();
+        if ($documentation && false !== strpos($documentation, self::PLACEHOLDER_INHERIT_DOC)) {
+            $entityDocumentation = $this->entityDocProvider->getEntityDocumentation($entityClass);
+            $definition->setDocumentation(
+                str_replace(self::PLACEHOLDER_INHERIT_DOC, $entityDocumentation, $documentation)
+            );
         }
     }
 
@@ -326,6 +355,11 @@ class CompleteDescriptions implements ProcessorInterface
                 }
             }
 
+            $description = $field->getDescription();
+            if ($description) {
+                $field->setDescription($this->processRequestDependedContent($description));
+            }
+
             $targetEntity = $field->getTargetEntity();
             if ($targetEntity && $targetEntity->hasFields()) {
                 $targetClass = $field->getTargetClass();
@@ -419,6 +453,11 @@ class CompleteDescriptions implements ProcessorInterface
                         $field->setDescription($description);
                     }
                 }
+            }
+
+            $description = $field->getDescription();
+            if ($description) {
+                $field->setDescription($this->processRequestDependedContent($description));
             }
         }
     }
@@ -574,5 +613,15 @@ class CompleteDescriptions implements ProcessorInterface
                 }
             }
         }
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return string
+     */
+    protected function processRequestDependedContent($content)
+    {
+        return $this->requestDependedTextProcessor->process($content, $this->requestType);
     }
 }

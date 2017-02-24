@@ -2,36 +2,24 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
- * DateTimeUserExtension allows get formatted date and calendar date range by user localization settings
- * @package Oro\Bundle\LocaleBundle\Twig
+ * Allows get formatted date and calendar date range by user localization settings
  *
  * @deprecated Since 1.11, will be removed after 1.13.
  *
- * @todo: it's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
+ * @todo it's a temporary workaround to fix dates in reminder emails CRM-5745 until improvement CRM-5758 is implemented
  */
 class DateTimeOrganizationExtension extends DateTimeExtension
 {
     /**
-     * @var DateTimeFormatter
+     * @return ConfigManager
      */
-    protected $formatter;
-
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function setConfigManager(ConfigManager $configManager)
+    protected function getConfigManager()
     {
-        $this->configManager = $configManager;
+        return $this->container->get('oro_config.global');
     }
 
     /**
@@ -45,6 +33,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
             [$this, 'formatDateTimeOrganization'],
             ['is_safe' => ['html']]
         );
+
         return $filters;
     }
 
@@ -62,7 +51,8 @@ class DateTimeOrganizationExtension extends DateTimeExtension
      * )
      *
      * @param \DateTime|string|int $date
-     * @param array $options
+     * @param array                $options
+     *
      * @return string
      */
     public function formatDateTimeOrganization($date, array $options = [])
@@ -73,7 +63,7 @@ class DateTimeOrganizationExtension extends DateTimeExtension
 
         list($locale, $timeZone) = $this->getLocaleSettings($organization, $options);
 
-        $result = $this->formatter->format($date, $dateType, $timeType, $locale, $timeZone);
+        $result = $this->getDateTimeFormatter()->format($date, $dateType, $timeType, $locale, $timeZone);
 
         return $result;
     }
@@ -87,8 +77,9 @@ class DateTimeOrganizationExtension extends DateTimeExtension
     protected function getLocaleSettings($organization, array $options)
     {
         if ($organization instanceof OrganizationInterface) {
-            $locale = $this->configManager->get('oro_locale.locale');
-            $timeZone = $this->configManager->get('oro_locale.timezone');
+            $configManager = $this->getConfigManager();
+            $locale = $configManager->get('oro_locale.locale');
+            $timeZone = $configManager->get('oro_locale.timezone');
         } else {
             $locale = $this->getOption($options, 'locale');
             $timeZone = $this->getOption($options, 'timeZone');

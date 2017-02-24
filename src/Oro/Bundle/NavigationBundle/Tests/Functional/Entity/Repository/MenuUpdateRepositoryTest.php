@@ -10,9 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
 
-/**
- * @dbIsolation
- */
 class MenuUpdateRepositoryTest extends WebTestCase
 {
     use UserUtilityTrait;
