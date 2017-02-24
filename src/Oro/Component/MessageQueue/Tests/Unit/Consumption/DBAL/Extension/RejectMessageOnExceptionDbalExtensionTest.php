@@ -49,12 +49,16 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit_Framework_TestC
     public function testShouldRejectMessage()
     {
         $message = new NullMessage();
+        $message->setMessageId(123);
 
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('debug')
-            ->with('[RejectMessageOnExceptionDbalExtension] Execution was interrupted and message was rejected')
+            ->with(
+                '[RejectMessageOnExceptionDbalExtension] Execution was interrupted and message was rejected. {id}',
+                ['id' => '123']
+            )
         ;
 
         $consumer = $this->createMessageConsumerMock();

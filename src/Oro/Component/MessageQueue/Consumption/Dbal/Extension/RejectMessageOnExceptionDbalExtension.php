@@ -23,7 +23,7 @@ class RejectMessageOnExceptionDbalExtension extends AbstractExtension
 
         $context->getLogger()->debug(
             '[RejectMessageOnExceptionDbalExtension] Execution was interrupted and message was rejected. {id}',
-            ['id' => $context->getMessage()->getId()]
+            ['id' => $context->getMessage()->getMessageId()]
         );
     }
 }

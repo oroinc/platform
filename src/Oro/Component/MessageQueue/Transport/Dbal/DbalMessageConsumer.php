@@ -2,6 +2,7 @@
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
@@ -142,9 +143,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
             ['id' => $message->getId(),],
             ['id' => Type::INTEGER,]
         )->fetch();
-
+        $affectedRows = null;
         if (count($row)) {
-            $affectedRows = null;
             try {
                 $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
                     'id' => Type::INTEGER,
@@ -163,12 +163,12 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     $this->dbal->rollBack();
                 }
             }
-            if (1 !== $affectedRows) {
-                throw new \LogicException(sprintf(
-                    'Expected record was removed but it is not. id: "%s"',
-                    $message->getId()
-                ));
-            }
+        }
+        if (1 !== $affectedRows) {
+            throw new \LogicException(sprintf(
+                'Expected record was removed but it is not. id: "%s"',
+                $message->getId()
+            ));
         }
     }
 
@@ -197,9 +197,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 'id' => Type::INTEGER,
             ]
         )->fetch();
-
+        $affectedRows = null;
         if (count($row)) {
-            $affectedRows = null;
             try {
                 $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
                     'id' => Type::INTEGER,
@@ -215,18 +214,16 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     );
                     $this->dbal->commit();
                 } catch (\Exception $e) {
-
                     $this->dbal->rollBack();
                 }
             }
-            if (1 !== $affectedRows) {
-                throw new \LogicException(sprintf(
-                    'Expected record was removed but it is not. id: "%s"',
-                    $message->getId()
-                ));
-            }
         }
-
+        if (1 !== $affectedRows) {
+            throw new \LogicException(sprintf(
+                'Expected record was removed but it is not. id: "%s"',
+                $message->getId()
+            ));
+        }
         if ($requeue) {
             $dbalMessage = [
                 'body' => $message->getBody(),

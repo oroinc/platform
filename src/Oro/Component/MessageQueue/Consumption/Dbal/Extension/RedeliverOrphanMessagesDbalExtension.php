@@ -54,7 +54,6 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
             'WHERE delivered_at <= :deliveredAt AND consumer_id=:consumerId',
             $connection->getTableName()
         );
-
         $affectedRows = $dbal->executeUpdate(
             $sql,
             [
