@@ -15,14 +15,17 @@ class Variable implements ParameterInterface
      * @var string
      */
     protected $type;
+
     /**
      * @var mixed
      */
     protected $value;
+
     /**
      * @var string
      */
     protected $label;
+
     /**
      * @var array
      */

@@ -34,10 +34,7 @@ class WorkflowVariablesHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->entityManager = $this->createMock(EntityManager::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
