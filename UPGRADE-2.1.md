@@ -294,8 +294,13 @@ FormBundle
 - Class `Oro\Bundle\FormBundle\Twig\JsValidationExtension` was removed. Its functionality was moved to `Oro\Bundle\FormBundle\Twig\FormExtension`
 
 - Deprecation of class `Oro\Bundle\FormBundle\Model\UpdateHandler` use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` (`@oro_form.update_handler`) instead.
-- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard update handler.
-
+    - changed `__constructor` signature: 
+        - first argument changed from `Symfony\Component\HttpFoundation\Request` to `Symfony\Component\HttpFoundation\RequestStack`
+        - fifth argument changed from `Symfony\Component\EventDispatcher\EventDispatcherInterface` to `Oro\Bundle\FormBundle\Form\Handler\FormHandler` as from handling encapsulation.
+        
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard `Oro\Bundle\FormBundle\Model\UpdateHandler`.
+So please consider to use it when for a new entity management development.
+ 
 - Interface `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface` added for standard form handlers.
 - Class `Oro\Bundle\FormBundle\Form\Handler\FormHandler` added ('@oro_form.form.handler.default') as default form processing mechanism.
 - Tag `oro_form.form.handler` added to register custom form handlers under its `alias`.

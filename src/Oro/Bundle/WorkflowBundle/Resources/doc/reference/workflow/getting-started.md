@@ -195,8 +195,8 @@ Additionally, if start transition of dominant workflow has unmet its conditions 
 Filtering by Scopes
 -------------------
 
-If the scope configuration is provided for the workflow, the Oro application will use only the workflows, 
-selected by filtering all available workflows using the scopes defined for `worflow_definition` scope type. 
+If a scope configuration is provided for a workflow, the Oro application will use only workflows 
+selected by filtering all available workflows using scopes defined for `worflow_definition` scope type. 
 
 Example of scope configuration:
 ```YAML
@@ -313,8 +313,6 @@ workflows:
                                     - NotBlank: ~           # this field must be filled
                 display_type: page                          # form will be opened in separate page
                 destination_page: index                     # after submitting form will be opened index page of workflow`s related entity 
-            create_quote:
-                step_to: 
             add_email:                                      # transition from step "processed" to "processed" (self-transition)
                 step_to: processed                          # next step after transition performing
                 transition_definition: add_email_definition # link to definition of conditions and post actions
@@ -340,7 +338,6 @@ workflows:
                         queued: false                                       # handle trigger not in queue
                         relation: user                                      # relation to Workflow entity
                         require: "entity.status = 'pending'"                # expression language condition
-
         transition_definitions:                                   # list of all existing transition definitions
             set_name_definition: []                               # definitions for transition "set_name", no extra conditions or actions here
             add_email_definition:                                 # definition for transition "add_email"
