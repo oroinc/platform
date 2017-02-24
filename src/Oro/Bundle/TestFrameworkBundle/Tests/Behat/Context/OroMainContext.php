@@ -82,30 +82,28 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title)
     {
-        /** @var NodeElement|false $messageElement */
-        $messageElement = $this->spin(function (OroMainContext $context) use ($title) {
-            $flashMessage = $context->findElementContains('Flash Message', $title);
+        $actualFlashMessages = [];
+        /** @var bool */
+        $caught = $this->spin(function (OroMainContext $context) use ($title, &$actualFlashMessages) {
+            $flashMessage = $context->createElement('Flash Message');
 
             if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                return $flashMessage;
+                $actualFlashMessageText = $flashMessage->getText();
+                $actualFlashMessages[$actualFlashMessageText] = $actualFlashMessageText;
+
+                if (false !== stripos($actualFlashMessageText, $title)) {
+                    return true;
+                }
             }
 
             return false;
-        });
+        }, 10);
 
-        self::assertNotFalse($messageElement, 'Flash message not found on page');
-        $flashMessage = $messageElement->getText();
-
-        $closeButton = $messageElement->find('css', 'button.close');
-
-        if ($closeButton->isVisible()) {
-            $closeButton->press();
-        }
-
-        self::assertContains($title, $flashMessage, sprintf(
-            'Expect that "%s" flash message contains "%s" string, but it isn\'t',
-            $flashMessage,
-            $title
+        self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
+        self::assertTrue($caught, sprintf(
+            'Expected "%s" message but got "%s" messages',
+            $title,
+            implode(',', $actualFlashMessages)
         ));
     }
 
@@ -151,12 +149,13 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @param \Closure $lambda
+     * @param int $timeLimit
      * @return false|mixed Return false if closure throw error or return not true value.
      *                     Return value that return closure
      */
-    public function spin(\Closure $lambda)
+    public function spin(\Closure $lambda, $timeLimit = 60)
     {
-        $time = 60;
+        $time = $timeLimit;
 
         while ($time > 0) {
             try {
@@ -520,6 +519,18 @@ class OroMainContext extends MinkContext implements
     public function openEntityEditPage($title, $entity)
     {
         $pageName = preg_replace('/\s+/', ' ', ucwords($entity)).' Edit';
+        $this->getPage($pageName)->open(['title' => $title]);
+    }
+
+    /**
+     * Example: Given I open "Charlie" Account view page
+     * Example: When I open "Supper sale" opportunity view page
+     *
+     * @Given /^(?:|I )open "(?P<title>[\w\s]+)" (?P<entity>[\w\s]+) view page$/
+     */
+    public function openEntityViewPage($title, $entity)
+    {
+        $pageName = preg_replace('/\s+/', ' ', ucwords($entity)).' View';
         $this->getPage($pageName)->open(['title' => $title]);
     }
 
