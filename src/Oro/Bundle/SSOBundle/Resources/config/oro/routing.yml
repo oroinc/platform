@@ -1,2 +1,2 @@
 oro_sso_google_login:
-    path: /admin/login/check-google
+    path: /login/check-google
