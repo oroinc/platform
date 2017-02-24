@@ -51,7 +51,7 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 
         $sql = sprintf(
             'UPDATE %s SET consumer_id=NULL, delivered_at=NULL, redelivered=:isRedelivered '.
-            'WHERE delivered_at <= :deliveredAt',
+            'WHERE delivered_at <= :deliveredAt AND consumer_id=:consumerId',
             $connection->getTableName()
         );
 
@@ -60,10 +60,12 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
             [
                 'isRedelivered' => true,
                 'deliveredAt' => time() - $this->orphanTime,
+                'consumerId' => $context->getMessageConsumer()->getId(),
             ],
             [
                 'isRedelivered' => Type::BOOLEAN,
                 'deliveredAt' => Type::INTEGER,
+                'consumerId' => Type::STRING,
             ]
         );
 
