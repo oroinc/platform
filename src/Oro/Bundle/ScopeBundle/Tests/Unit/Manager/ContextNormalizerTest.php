@@ -78,30 +78,6 @@ class ContextNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Entity identifier foo_entity is not valid.
-     */
-    public function testDenormalizeContextWithWrongEntityIdentifier()
-    {
-        $entity = $this->createMock(\stdClass::class);
-
-        $entities = [];
-        $context = ['foo_entity' => 100];
-        $scopeType = 'custom_scope_type';
-
-        $this->scopeManager->expects($this->once())
-            ->method('getScopeEntities')
-            ->with($scopeType)
-            ->willReturn($entities);
-
-        $expectedContext = ['entity' => $entity];
-        $this->assertEquals(
-            $expectedContext,
-            $this->contextNormalizer->denormalizeContext($scopeType, $context)
-        );
-    }
-
-    /**
-     * @expectedException \LogicException
      * @expectedExceptionMessage Entity foo_entity with identifier 100 does not exist.
      */
     public function testDenormalizeContextWithNonExistentEntity()

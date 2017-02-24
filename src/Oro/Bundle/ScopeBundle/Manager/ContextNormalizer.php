@@ -54,7 +54,7 @@ class ContextNormalizer
         $entities = $this->scopeManager->getScopeEntities($scopeType);
         foreach ($context as $identifier => $entityId) {
             if (!array_key_exists($identifier, $entities)) {
-                throw new \LogicException(sprintf('Entity identifier %s is not valid.', $identifier));
+                continue;
             }
             $entity = $this->registry
                 ->getManagerForClass($entities[$identifier])
