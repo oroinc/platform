@@ -38,7 +38,7 @@ class VariableHandler extends AbstractHandler
     protected function handleVariableConfiguration(array $variable, $name)
     {
         if (empty($name)) {
-            $name = uniqid('variable_');
+            $name = uniqid('variable_', true);
         }
         $variable['name'] = $name;
 

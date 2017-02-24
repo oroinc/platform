@@ -69,7 +69,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         );
 
         $definitions = $this->parseDefinitions($transitionDefinitionsConfiguration);
-        $variables   = $this->parseVariableDefinitions($configuration);
+        $variables = $this->parseVariableDefinitions($configuration);
 
         $transitions = new ArrayCollection();
         foreach ($transitionsConfiguration as $name => $options) {
@@ -121,7 +121,7 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected function parseVariableDefinitions(array $configuration)
     {
         $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
-        $variablesNode   = WorkflowConfiguration::NODE_VARIABLES;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
 
         if (!isset($configuration[$definitionsNode][$variablesNode])) {
             return [];
@@ -326,10 +326,10 @@ class TransitionAssembler extends BaseAbstractAssembler
             ['@assign_value' => $massAssignment]
         ];
 
-        if (!empty($definition['actions'])) {
-            $definition['actions'] = array_merge($definition['actions'], $assignValueActions);
+        if (!empty($definition['preactions'])) {
+            $definition['preactions'] = array_merge($definition['preactions'], $assignValueActions);
         } elseif ($variables) {
-            $definition['actions'] = $assignValueActions;
+            $definition['preactions'] = $assignValueActions;
         }
 
         return $definition;

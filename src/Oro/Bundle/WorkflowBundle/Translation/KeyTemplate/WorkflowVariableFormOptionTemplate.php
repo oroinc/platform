@@ -11,6 +11,6 @@ class WorkflowVariableFormOptionTemplate extends WorkflowVariableTemplate
      */
     public function getTemplate()
     {
-        return parent::getTemplate() . '.{{ option_name }}.label';
+        return parent::getTemplate() . '.{{ option_name }}';
     }
 }

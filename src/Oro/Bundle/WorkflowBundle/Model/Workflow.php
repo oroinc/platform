@@ -363,7 +363,9 @@ class Workflow
 
         // populate WorkflowData with variables
         if ($variables = $this->getVariables()) {
-            $workflowItem->getData()->add($variables->toArray());
+            foreach ($variables as $name => $variable) {
+                $workflowItem->getData()->set($name, $variable->getValue());
+            }
         }
 
         return $workflowItem;
@@ -593,7 +595,8 @@ class Workflow
             $manager = $this->getVariableManager();
             $definition = $this->getDefinition();
 
-            if (null !== $assembler = $manager->getVariableAssembler()) {
+            $assembler = $manager->getVariableAssembler();
+            if (null !== $assembler) {
                 $this->variables = $assembler->assemble(
                     $this,
                     $definition->getConfiguration()

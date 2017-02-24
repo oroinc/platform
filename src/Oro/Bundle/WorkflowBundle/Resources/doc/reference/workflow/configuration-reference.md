@@ -828,10 +828,10 @@ Example
 Defining a variable:
 ```
 workflows:
-    b2b_flow_alternative_checkout:
+    my_workflow:
         variable_definitions:
             variables:
-                order_approval_threshold:
+               threshold:
                     type: 'float'
                     value: 5000
                     options:
@@ -846,7 +846,7 @@ Using a variable:
         '@and':
             ...
             - '@not':
-                - '@less_order_total_limit': [$checkout, $.data.order_approval_threshold.value]
+                - '@less_total_limit': [$entity, $.data.threshold]
 ```
 
 Example Workflow Configuration

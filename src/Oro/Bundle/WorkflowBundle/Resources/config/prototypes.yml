@@ -3,7 +3,6 @@ parameters:
     oro_workflow.prototype.step_manager.class: Oro\Bundle\WorkflowBundle\Model\StepManager
     oro_workflow.prototype.attribute_manager.class: Oro\Bundle\ActionBundle\Model\AttributeManager
     oro_workflow.prototype.transition_manager.class: Oro\Bundle\WorkflowBundle\Model\TransitionManager
-    oro_workflow.prototype.variable_manager.class: Oro\Bundle\WorkflowBundle\Model\VariableManager
 
 services:
     oro_workflow.prototype.step_manager:
@@ -19,7 +18,7 @@ services:
         scope: prototype
 
     oro_workflow.prototype.variable_manager:
-        class: %oro_workflow.prototype.variable_manager.class%
+        class: 'Oro\Bundle\WorkflowBundle\Model\VariableManager'
         scope: prototype
         calls:
             - ['setVariableAssembler', ['@oro_workflow.variable_assembler']]

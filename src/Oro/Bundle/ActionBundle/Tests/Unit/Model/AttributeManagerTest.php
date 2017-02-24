@@ -114,27 +114,6 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedAttributes, $stringTypeAttributes);
     }
 
-    public function testGetAttributesByInternalType()
-    {
-        $attribute1 = $this->getAttributeObject('test1', 'string');
-        $attribute2 = $this->getAttributeObject('test2', 'integer');
-
-        $attributeManager = new AttributeManager();
-        $attributeManager->setAttributes(new ArrayCollection([
-            'test1' => $attribute1,
-            'test2' => $attribute2,
-        ]));
-
-        $internalTypeAttributes = $attributeManager->getAttributesByInternalType('attribute');
-        $expectedAttributes = new ArrayCollection([
-            'test1' => $attribute1,
-            'test2' => $attribute2,
-        ]);
-
-        $this->assertCount(2, $internalTypeAttributes);
-        $this->assertEquals($expectedAttributes, $internalTypeAttributes);
-    }
-
     /**
      * @param string $name
      * @param string $type

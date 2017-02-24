@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -85,7 +83,9 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
 
         // populate WorkflowData with variables
         if ($variables = $workflow->getVariables()) {
-            $object->add($variables->toArray());
+            foreach ($variables as $name => $variable) {
+                $object->set($name, $variable->getValue());
+            }
         }
 
         return $object;

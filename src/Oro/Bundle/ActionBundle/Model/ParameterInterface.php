@@ -96,11 +96,4 @@ interface ParameterInterface
      * @return string
      */
     public function getInternalType();
-
-    /**
-     * @param string $type
-     *
-     * @return bool
-     */
-    public function isInternalType($type);
 }
