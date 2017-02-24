@@ -12,6 +12,7 @@ $input-border: $base-ui-element-border !default;
 $input-border-radius: $base-ui-element-border-radius !default;
 $input-background-color: $base-ui-element-bg-color !default;
 $input-color: $base-ui-element-color !default;
+$input-disable-platform-style: true !default;
 
 // Hover
 $input-border-color-hover-state: get-color('additional', 'dark') !default;
