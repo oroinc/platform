@@ -36,7 +36,7 @@ class RunTimeSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            BeforeStepTested::BEFORE  => ['beforeStep', 50],
+//            BeforeStepTested::BEFORE  => ['beforeStep', 50],
             AfterScenarioTested::AFTER => ['afterScenario', 50],
         ];
     }

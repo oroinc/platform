@@ -115,6 +115,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         'manyToMany'
                     ),
                     'target_entity' => 'Test\TargetEntity1',
+                    'state' => 'Active'
                 ],
                 [
                     'field_id' => new FieldConfigId(
@@ -124,6 +125,7 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         'manyToMany'
                     ),
                     'target_entity' => 'Test\TargetEntity2',
+                    'state' => 'Active'
                 ],
                 [ // should be ignored because field type is not manyToMany
                     'field_id' => new FieldConfigId(
@@ -132,7 +134,9 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         ExtendHelper::buildAssociationName('Test\TargetEntity3', ActivityScope::ASSOCIATION_KIND),
                         'manyToOne'
                     ),
-                    'target_entity' => 'Test\TargetEntity3'
+                    'target_entity' => 'Test\TargetEntity3',
+                    'state' => 'Active'
+
                 ],
                 [ // should be ignored because field name is not match association naming conventions
                     'field_id' => new FieldConfigId(
@@ -141,7 +145,8 @@ class ActivityEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                         'testField',
                         'manyToMany'
                     ),
-                    'target_entity' => 'Test\TargetEntity4'
+                    'target_entity' => 'Test\TargetEntity4',
+                    'state' => 'Active'
                 ],
             ],
         ];

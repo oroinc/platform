@@ -155,7 +155,7 @@ Every bundle has its own test suite and can be run separately:
 #### Suites autoload
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
-During initialization, Extension will create [test suite](http://docs.behat.org/en/v3.0/guides/5.suites.html) with bundle name if any ```Tests/Behat/Features``` directory exits.
+During initialization, Extension will create test suite with bundle name if any ```Tests/Behat/Features``` directory exits.
 Thus, if bundle has no Features directory - no test suite would be created for it.
 
 If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
@@ -175,7 +175,7 @@ default: &default
         - OroDataGridBundle::GridContext
         - AcmeDemoBundle::FeatureContext
       paths:
-        - '@AcmeDemoBundle/Tests/Behat/Features'
+        - 'vendor/Acme/DemoBundle/Tests/Behat/Features'
 ```
 
 Or in bundle behat configuration ```{BundleName}/Tests/Behat/behat.yml```:
@@ -272,6 +272,11 @@ The isolation is reached by dumping the database and cache dir before tests exec
 and restoring the cache and database after execution of each feature.
 Every isolator must implement ```Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface``` and ```oro_behat.isolator``` tag with priority.
 See [TestFrameworkBundle/Behat/ServiceContainer/config/isolators.yml](../../../Behat/ServiceContainer/config/isolators.yml)
+
+#### Disable feature isolation
+
+You can disable feature isolation by adding ```--skip-isolators=database,cache``` option to behat console command
+In this case feature should run much faster, but you should care by yourself about database and cache consistency.
 
 ### Write your first feature
 
