@@ -5,17 +5,16 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 
-class HandleProcessTriggerCommand extends ContainerAwareCommand implements ActiveCronCommandInterface
+class HandleProcessTriggerCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const NAME = 'oro:process:handle-trigger';
 
@@ -125,10 +124,26 @@ class HandleProcessTriggerCommand extends ContainerAwareCommand implements Activ
     }
 
     /**
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be removed at BAP-13973
+     *
+     * This command cannot be disabled
+     *
      * @return bool
      */
     public function isActive()
     {
         return true;
+    }
+
+    /**
+     * @deprecated Since 2.0.3. Will be removed in 2.1. Must be removed at BAP-13973
+     *
+     * This method never used because all schedules for workflow processes must defined within YML configuration
+     *
+     * @return string
+     */
+    public function getDefaultDefinition()
+    {
+        return '*/1 * * * *';
     }
 }

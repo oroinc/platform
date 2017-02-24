@@ -12,7 +12,7 @@ oro:
         id.label:            Id
         is_default.label:    Is Default
         label.label:         Label
-        management_title:    Manage dashboards
+        management_title:    Manage Dashboards
         name.label:          Name
         owner.label:         Owner
         widgets.label:       Widgets

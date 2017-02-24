@@ -1062,6 +1062,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Removed listener `Oro\Bundle\CronBundle\EventListener\JobSubscriber`
 - Removed listener `Oro\Bundle\CronBundle\EventListener\LoadClassMetadataSubscriber` and service `oro_cron.listener.load_class_metadata_subscriber`
 
+
 ####UserBundle
 - Added `auth_status` extended enum property to `Oro\Bundle\UserBundle\Entity\User` entity.
 - Added `Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity` to User model.
