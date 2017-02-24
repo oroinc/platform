@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Twig;
 
-use Symfony\Component\Intl\Intl;
-
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Twig\LocaleExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     const TEST_TYPE = 'test_format_type';
     const TEST_FORMAT = 'MMM, d y t';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $localeSettings;
 
-    /**
-     * @var LocaleExtension
-     */
+    /** @var LocaleExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->localeSettings =
-            $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-                ->disableOriginalConstructor()
-                ->setMethods(array('getLocale', 'getTimeZone'))
-                ->getMock();
+        $this->localeSettings =$this->getMockBuilder(LocaleSettings::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->extension = new LocaleExtension($this->localeSettings);
+        $container = self::getContainerBuilder()
+            ->add('oro_locale.settings', $this->localeSettings)
+            ->getContainer($this);
+
+        $this->extension = new LocaleExtension($container);
     }
 
     protected function tearDown()
@@ -43,35 +43,6 @@ class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_locale', $this->extension->getName());
     }
 
-    public function testGetFunctions()
-    {
-        $expectedFunctions = array(
-            'oro_currency_name' => array(Intl::getCurrencyBundle(), 'getCurrencyName'),
-            'oro_locale' => array($this->localeSettings, 'getLocale'),
-            'oro_language' => array($this->localeSettings, 'getLanguage'),
-            'oro_country' => array($this->localeSettings, 'getCountry'),
-            'oro_currency_symbol' => array($this->localeSettings, 'getCurrencySymbolByCurrency'),
-            'oro_currency' => array($this->localeSettings, 'getCurrency'),
-            'oro_timezone' => array($this->localeSettings, 'getTimeZone'),
-            'oro_timezone_offset' => array($this->extension, 'getTimeZoneOffset'),
-            'oro_format_address_by_address_country' => array(
-                $this->localeSettings,
-                'isFormatAddressByAddressCountry'
-            )
-        );
-
-        $actualFunctions = $this->extension->getFunctions();
-        $this->assertSameSize($expectedFunctions, $actualFunctions);
-
-        /** @var $actualFunction \Twig_SimpleFunction */
-        foreach ($actualFunctions as $actualFunction) {
-            $this->assertInstanceOf('\Twig_SimpleFunction', $actualFunction);
-            $actualFunctionName = $actualFunction->getName();
-            $this->assertArrayHasKey($actualFunctionName, $expectedFunctions);
-            $this->assertEquals($expectedFunctions[$actualFunctionName], $actualFunction->getCallable());
-        }
-    }
-
     public function testGetTimeZoneOffset()
     {
         $timezoneString = 'UTC';
@@ -81,6 +52,9 @@ class LocaleExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getTimeZone')
             ->will($this->returnValue($timezoneString));
 
-        $this->assertEquals($timezoneOffset, $this->extension->getTimeZoneOffset());
+        $this->assertEquals(
+            $timezoneOffset,
+            self::callTwigFunction($this->extension, 'oro_timezone_offset', [])
+        );
     }
 }
