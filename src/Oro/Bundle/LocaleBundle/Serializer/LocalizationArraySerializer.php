@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -13,6 +14,9 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class LocalizationArraySerializer implements SerializerInterface
 {
+    /**
+     * @var array
+     */
     protected static $fieldsToSerializeInLocalization = [
         'id',
         'languageCode',
@@ -23,6 +27,9 @@ class LocalizationArraySerializer implements SerializerInterface
         'updatedAtSet'
     ];
 
+    /**
+     * @var array
+     */
     protected static $fieldsToSerializeInLocalizedFallbackValue = [
         'id',
         'fallback',
@@ -30,14 +37,29 @@ class LocalizationArraySerializer implements SerializerInterface
         'text'
     ];
 
+    /**
+     * Used to deserialize relation properties
+     * Format: [propertyName => [relationClassName, relationPropertyName]]
+     *
+     * @var array
+     */
+    protected static $relationClasses = [
+        'parentLocalization' => [Localization::class, 'id']
+    ];
+
+    /**
+     * @var string
+     */
     protected static $titleKeyName = 'titles';
 
     /**
      * {@inheritdoc}
      * Available format: array
+     * @throws \InvalidArgumentException
+     *
      * @return array
      */
-    public function serialize($data, $format = 'array', array $context = array())
+    public function serialize($data, $format = 'array', array $context = [])
     {
         if ($format !== 'array') {
             throw new \InvalidArgumentException("Only 'array' format is available.");
@@ -61,6 +83,8 @@ class LocalizationArraySerializer implements SerializerInterface
             $reflectionProperty->setAccessible(false);
         }
 
+        $localizationArray = $this->serializeRelationProperties($data, $reflectionLocalization, $localizationArray);
+
         $titlesArray = $this->getSerializedTitles($data->getTitles());
         $localizationArray[static::$titleKeyName] = $titlesArray;
 
@@ -71,9 +95,11 @@ class LocalizationArraySerializer implements SerializerInterface
      * {@inheritdoc}
      * Available type: Localization
      * Available format: array
+     * @throws \InvalidArgumentException
+     *
      * @return Localization
      */
-    public function deserialize($data, $type = Localization::class, $format = 'array', array $context = array())
+    public function deserialize($data, $type = Localization::class, $format = 'array', array $context = [])
     {
         if ($format !== 'array' || !is_array($data)) {
             throw new \InvalidArgumentException("Only 'array' format is available.");
@@ -88,17 +114,18 @@ class LocalizationArraySerializer implements SerializerInterface
 
         foreach (static::$fieldsToSerializeInLocalization as $propertyName) {
             $reflectionProperty = $reflectionLocalization->getProperty($propertyName);
+
+            if (!array_key_exists($reflectionProperty->getName(), $data)) {
+                continue;
+            }
+
             $reflectionProperty->setAccessible(true);
             $reflectionProperty->setValue($localization, $data[$reflectionProperty->getName()]);
             $reflectionProperty->setAccessible(false);
         }
 
-        $titlesCollection = $this->getDeserializedTitles($data[static::$titleKeyName]);
-        $reflectionLocalization = new \ReflectionObject($localization);
-        $titlesProperty = $reflectionLocalization->getProperty(static::$titleKeyName);
-        $titlesProperty->setAccessible(true);
-        $titlesProperty->setValue($localization, $titlesCollection);
-        $titlesProperty->setAccessible(false);
+        $this->deserializeRelationProperties($data, $reflectionLocalization, $localization);
+        $this->deserializeTitles($data, $localization);
 
         return $localization;
     }
@@ -145,6 +172,92 @@ class LocalizationArraySerializer implements SerializerInterface
                 $titlesCollection->add($title);
             }
         }
+
         return $titlesCollection;
+    }
+
+    /**
+     * @param Localization      $localization
+     * @param \ReflectionObject $reflectionLocalization
+     * @param array             $localizationArray
+     * @return array
+     */
+    protected function serializeRelationProperties(
+        Localization $localization,
+        \ReflectionObject $reflectionLocalization,
+        array $localizationArray
+    ) {
+        foreach (static::$relationClasses as $propertyName => $classOptions) {
+            $classPropertyName = $classOptions[1];
+
+            $reflectionProperty = $reflectionLocalization->getProperty($propertyName);
+            $reflectionProperty->setAccessible(true);
+
+            if ($reflectionProperty->getValue($localization) === null) {
+                $propertyValue = null;
+            } else {
+                try {
+                    $propertyValue = (new PropertyAccessor())->getValue(
+                        $reflectionProperty->getValue($localization),
+                        $classPropertyName
+                    );
+                } catch (\Exception $exception) {
+                    $propertyValue = null;
+                }
+            }
+            $localizationArray[$reflectionProperty->getName()] = $propertyValue;
+            $reflectionProperty->setAccessible(false);
+        }
+
+        return $localizationArray;
+    }
+
+    /**
+     * @param array             $data
+     * @param \ReflectionObject $reflectionLocalization
+     * @param Localization      $localization
+     */
+    protected function deserializeRelationProperties(
+        array $data,
+        \ReflectionObject $reflectionLocalization,
+        Localization $localization
+    ) {
+        foreach (static::$relationClasses as $propertyName => list($className, $classPropertyName)) {
+            if (!array_key_exists($propertyName, $data) || $data[$propertyName] === null) {
+                continue;
+            }
+
+            $reflectionProperty = $reflectionLocalization->getProperty($propertyName);
+
+            $relationClass = new $className();
+            $relationReflectionClass = new \ReflectionObject($relationClass);
+            $relationReflectionProperty = $relationReflectionClass->getProperty($classPropertyName);
+            $relationReflectionProperty->setAccessible(true);
+            $relationReflectionProperty->setValue($relationClass, $data[$propertyName]);
+            $relationReflectionProperty->setAccessible(false);
+
+            $reflectionProperty->setAccessible(true);
+
+            $reflectionProperty->setValue($localization, $relationClass);
+            $reflectionProperty->setAccessible(false);
+        }
+    }
+
+    /**
+     * @param array        $data
+     * @param Localization $localization
+     */
+    private function deserializeTitles($data, Localization $localization)
+    {
+        if (!array_key_exists(static::$titleKeyName, $data)) {
+            return;
+        }
+
+        $titlesCollection = $this->getDeserializedTitles($data[static::$titleKeyName]);
+        $reflectionLocalization = new \ReflectionObject($localization);
+        $titlesProperty = $reflectionLocalization->getProperty(static::$titleKeyName);
+        $titlesProperty->setAccessible(true);
+        $titlesProperty->setValue($localization, $titlesCollection);
+        $titlesProperty->setAccessible(false);
     }
 }

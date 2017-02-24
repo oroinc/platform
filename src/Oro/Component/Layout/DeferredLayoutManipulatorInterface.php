@@ -22,8 +22,11 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
      *                                   for all actions were executed.
      *                                   False means that all not executed actions should be kept.
      *                                   True means that not executed actions are the reason for an error.
-     *
-     * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
      */
     public function applyChanges(ContextInterface $context, $finalize = false);
+
+    /**
+     * @return array
+     */
+    public function getNotAppliedActions();
 }

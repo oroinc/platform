@@ -17,4 +17,31 @@ class PhpFileCache extends BasePhpFileCache implements SyncCacheInterface, Direc
     use NamespaceVersionSyncTrait;
     use DirectoryAwareFileCacheTrait;
     use ShortFileNameGeneratorTrait;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doSave($id, $data, $lifeTime = 0)
+    {
+        if ($lifeTime > 0) {
+            $lifeTime = time() + $lifeTime;
+        }
+
+        $filename = $this->getFilename($id);
+
+        $value = [
+            'lifetime' => $lifeTime,
+            'data' => $data,
+        ];
+
+        if (is_object($data) && method_exists($data, '__set_state')) {
+            $value = var_export($value, true);
+            $code = sprintf('<?php return %s;', $value);
+        } else {
+            $value = var_export(serialize($value), true);
+            $code = sprintf('<?php return unserialize(%s);', $value);
+        }
+
+        return $this->writeFile($filename, $code);
+    }
 }

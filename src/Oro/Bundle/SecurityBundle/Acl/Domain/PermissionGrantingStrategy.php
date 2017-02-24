@@ -10,7 +10,7 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
@@ -26,19 +26,13 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     const ANY   = 'any';
     const EQUAL = 'equal';
 
-    /**
-     * @var AuditLoggerInterface
-     */
+    /** @var AuditLoggerInterface */
     protected $auditLogger;
 
-    /**
-     * @var EntitySecurityMetadataProvider
-     */
-    protected $entitySecurityMetadataProvider;
+    /** @var ServiceLink */
+    private $securityMetadataProviderLink;
 
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     private $contextLink;
 
     /**
@@ -52,11 +46,11 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
     }
 
     /**
-     * @param EntitySecurityMetadataProvider $entitySecurityMetadataProvider
+     * @param ServiceLink $securityMetadataProviderLink
      */
-    public function setSecurityMetadataProvider(EntitySecurityMetadataProvider $entitySecurityMetadataProvider)
+    public function setSecurityMetadataProvider(ServiceLink $securityMetadataProviderLink)
     {
-        $this->entitySecurityMetadataProvider = $entitySecurityMetadataProvider;
+        $this->securityMetadataProviderLink = $securityMetadataProviderLink;
     }
 
     /**
@@ -120,6 +114,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function isFieldGranted(AclInterface $acl, $field, array $masks, array $sids, $administrativeMode = false)
     {
@@ -127,8 +122,9 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
         // check if field security metadata has alias and if so - use it instead of field being passed
         $type = $acl->getObjectIdentity()->getType();
-        if ($this->entitySecurityMetadataProvider->isProtectedEntity($type)) {
-            $entityMetadata = $this->entitySecurityMetadataProvider->getMetadata($type);
+        $securityMetadataProvider = $this->getSecurityMetadataProvider();
+        if ($securityMetadataProvider->isProtectedEntity($type)) {
+            $entityMetadata = $securityMetadataProvider->getMetadata($type);
             $entityFieldsMetadata = $entityMetadata->getFields();
             if (isset($entityFieldsMetadata[$field])) {
                 $field = $entityFieldsMetadata[$field]->getAlias() ? : $field;
@@ -335,5 +331,13 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 $extension->getPermissions($requiredMask, true),
                 $extension->getPermissions($aceMask, true)
             ));
+    }
+
+    /**
+     * @return EntitySecurityMetadataProvider
+     */
+    protected function getSecurityMetadataProvider()
+    {
+        return $this->securityMetadataProviderLink->getService();
     }
 }

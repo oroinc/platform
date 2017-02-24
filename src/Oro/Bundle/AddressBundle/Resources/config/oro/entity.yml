@@ -12,3 +12,27 @@ oro_entity:
                     join:
                         left:
                             - { join: entity.region, alias: region }
+            country_name:
+                query:
+                    select:
+                        expr: country.name
+                        return_type: string
+                    join:
+                        left:
+                            - { join: entity.country, alias: country }
+            country_iso2_code:
+                query:
+                    select:
+                        expr: country.iso2Code
+                        return_type: string
+                    join:
+                        left:
+                            - { join: entity.country, alias: country }
+            country_iso3_code:
+                query:
+                    select:
+                        expr: country.iso3Code
+                        return_type: string
+                    join:
+                        left:
+                            - { join: entity.country, alias: country }
