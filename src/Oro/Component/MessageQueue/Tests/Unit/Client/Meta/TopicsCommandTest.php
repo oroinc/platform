@@ -1,55 +1,71 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\Container;
+
+use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
-use Oro\Component\Testing\ClassExtensionTrait;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class TopicsCommandTest extends \PHPUnit_Framework_TestCase
 {
-    use ClassExtensionTrait;
-    
-    public function testShouldBeSubClassOfCommand()
+    /** @var TopicsCommand */
+    private $command;
+
+    /** @var Container */
+    private $container;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $topicRegistry;
+
+    protected function setUp()
     {
-        $this->assertClassExtends(Command::class, TopicsCommand::class);
-    }
-    
-    public function testCouldBeConstructedWithTopicMetaRegistryAsFirstArgument()
-    {
-        new TopicsCommand(new TopicMetaRegistry([]));
+        $this->topicRegistry = $this->createMock(TopicMetaRegistry::class);
+
+        $this->command = new TopicsCommand();
+
+        $this->container = new Container();
+        $this->container->set('oro_message_queue.client.meta.topic_meta_registry', $this->topicRegistry);
+        $this->command->setContainer($this->container);
     }
 
     public function testShouldShowMessageFoundZeroTopicsIfAnythingInRegistry()
     {
-        $command = new TopicsCommand(new TopicMetaRegistry([]));
+        $this->topicRegistry->expects(self::once())
+            ->method('getTopicsMeta')
+            ->willReturn([]);
 
-        $output = $this->executeCommand($command);
+        $output = $this->executeCommand();
 
         $this->assertContains('Found 0 topics', $output);
     }
 
     public function testShouldShowMessageFoundTwoTopics()
     {
-        $command = new TopicsCommand(new TopicMetaRegistry([
-            'fooTopic' => [],
-            'barTopic' => [],
-        ]));
+        $this->topicRegistry->expects(self::once())
+            ->method('getTopicsMeta')
+            ->willReturn([
+                new TopicMeta('fooTopic'),
+                new TopicMeta('barTopic'),
+            ]);
 
-        $output = $this->executeCommand($command);
+        $output = $this->executeCommand();
 
         $this->assertContains('Found 2 topics', $output);
     }
 
     public function testShouldShowInfoAboutTopics()
     {
-        $command = new TopicsCommand(new TopicMetaRegistry([
-            'fooTopic' => ['description' => 'fooDescription', 'subscribers' => ['fooSubscriber']],
-            'barTopic' => ['description' => 'barDescription', 'subscribers' => ['barSubscriber']],
-        ]));
+        $this->topicRegistry->expects(self::once())
+            ->method('getTopicsMeta')
+            ->willReturn([
+                new TopicMeta('fooTopic', 'fooDescription', ['fooSubscriber']),
+                new TopicMeta('barTopic', 'barDescription', ['barSubscriber']),
+            ]);
 
-        $output = $this->executeCommand($command);
+        $output = $this->executeCommand();
 
         $this->assertContains('fooTopic', $output);
         $this->assertContains('fooDescription', $output);
@@ -60,14 +76,13 @@ class TopicsCommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param Command $command
      * @param string[] $arguments
      *
      * @return string
      */
-    protected function executeCommand(Command $command, array $arguments = array())
+    protected function executeCommand(array $arguments = [])
     {
-        $tester = new CommandTester($command);
+        $tester = new CommandTester($this->command);
         $tester->execute($arguments);
 
         return $tester->getDisplay();

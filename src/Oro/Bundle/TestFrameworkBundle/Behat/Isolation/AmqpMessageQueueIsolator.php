@@ -121,6 +121,14 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getTag()
+    {
+        return 'message-queue';
+    }
+
+    /**
      * @return AMQPStreamConnection
      */
     private function createAmqpStreamConnection()

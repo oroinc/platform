@@ -28,7 +28,7 @@ class MainMenu extends Element
             }
 
             $link->mouseOver();
-            $that = $link->getParent();
+            $that = $link->getParent()->find('css', '.dropdown-menu');
         }
 
         $that->clickLink(trim($linkLocator));

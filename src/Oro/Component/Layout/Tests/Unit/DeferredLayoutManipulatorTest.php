@@ -35,23 +35,6 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->assertSame(0, $this->layoutManipulator->getNumberOfAddedItems());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
-     * @expectedExceptionMessage Failed to apply scheduled changes. 2 action(s) cannot be applied. Actions: add(header, unknown_root), add(logo, header).
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAddItemToUnknownParent()
-    {
-        $this->markTestSkipped('BAP-10043');
-        $this->layoutManipulator
-            ->add('root', null, 'root')
-            ->add('header', 'unknown_root', 'header')
-            ->add('logo', 'header', 'logo', ['title' => 'test']);
-
-        $this->getLayoutView();
-    }
-
     public function testSimpleLayout()
     {
         $this->layoutManipulator
@@ -1618,40 +1601,6 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
-     * @expectedExceptionMessage Failed to apply scheduled changes. 1 action(s) cannot be applied. Actions: setBlockTheme(logo).
-     */
-    // @codingStandardsIgnoreEnd
-    public function testSetBlockThemeForUnknownItem()
-    {
-        $this->markTestSkipped('BAP-10043');
-        $this->layoutManipulator
-            ->add('root', null, 'root')
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'logo');
-
-        $this->getLayoutView();
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
-     * @expectedExceptionMessage Failed to apply scheduled changes. 3 action(s) cannot be applied. Actions: add(header, logo1), add(logo1, logo2), add(logo2, header).
-     */
-    // @codingStandardsIgnoreEnd
-    public function testCyclicDependency()
-    {
-        $this->markTestSkipped('BAP-10043');
-        $this->layoutManipulator
-            ->add('root', null, 'root')
-            ->add('header', 'logo1', 'header')
-            ->add('logo1', 'logo2', 'logo')
-            ->add('logo2', 'header', 'logo');
-
-        $this->getLayoutView();
-    }
-
     public function testLayoutUpdates()
     {
         $this->registry->addExtension(
@@ -1756,38 +1705,6 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ],
             $view
         );
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
-     * @expectedExceptionMessage Failed to apply scheduled changes. 1 action(s) cannot be applied. Actions: add(logo1, header).
-     */
-    // @codingStandardsIgnoreEnd
-    public function testLayoutUpdatesWhenParentIsAddedInUpdateLinkedWithChild()
-    {
-        $this->markTestSkipped('BAP-10043');
-        $this->registry->addExtension(
-            new PreloadedExtension(
-                [],
-                [],
-                [
-                    'logo1' => [
-                        new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
-                                $layoutManipulator->add('header', $item->getParentId(), 'header');
-                            }
-                        )
-                    ]
-                ]
-            )
-        );
-
-        $this->layoutManipulator
-            ->add('root', null, 'root')
-            ->add('logo1', 'header', 'logo');
-
-        $this->getLayoutView();
     }
 
     /**
@@ -1903,5 +1820,37 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ],
             $view
         );
+    }
+
+    public function testGetNotAppliedActions()
+    {
+        $this->layoutManipulator->add('add_action_id', 'parent_action_id', 'blockType');
+        $this->layoutManipulator->remove('remove_action_id');
+        $this->layoutManipulator->move('move_action_id', 'parent_action_id');
+
+        $expected = [
+            [
+                'name' => 'add',
+                'args' => [
+                    'id' => 'add_action_id',
+                    'parentId' => 'parent_action_id',
+                    'blockType' => 'blockType'
+                ]
+            ],
+            [
+                'name' => 'move',
+                'args' => [
+                    'id' => 'move_action_id',
+                    'parentId' => 'parent_action_id'
+                ]
+            ],
+            [
+                'name' => 'remove',
+                'args' => [
+                    'id' => 'remove_action_id'
+                ]
+            ]
+        ];
+        $this->assertSame($expected, $this->layoutManipulator->getNotAppliedActions());
     }
 }
