@@ -72,6 +72,8 @@ AttachmentBundle
     - removed property `protected $manager`
     - removed property `protected $attachmentConfigProvider`
     - removed property `protected $doctrine`
+- Class `Oro\Bundle\AttachmentBundle\Manager\FileManager`
+    - method `writeStreamToStorage` was changed to `public`
 
 BatchBundle
 -----------
