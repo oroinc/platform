@@ -200,9 +200,8 @@ class WorkflowStepColumnListener
     /**
      * @param DatagridConfiguration $config
      * @param string $rootEntity
-     * @param string $rootEntityAlias
      */
-    protected function addWorkflowStep(DatagridConfiguration $config, $rootEntity, $rootEntityAlias)
+    protected function addWorkflowStep(DatagridConfiguration $config, $rootEntity)
     {
         // add column
         $columns = $config->offsetGetByPath('[columns]', []);
@@ -215,18 +214,6 @@ class WorkflowStepColumnListener
         $config->offsetSetByPath('[columns]', $columns);
 
         $isManyWorkflows = $this->isEntityHaveMoreThanOneWorkflow($rootEntity);
-        if (!$isManyWorkflows) {
-            $config->offsetSetByPath(
-                '[source][query]',
-                $this->addDatagridQuery(
-                    $config->offsetGetByPath('[source][query]', []),
-                    $rootEntityAlias,
-                    $rootEntity,
-                    'id',
-                    self::WORKFLOW_STEP_COLUMN
-                )
-            );
-        }
 
         // add filter (only if there is at least one filter)
         $filters = $config->offsetGetByPath('[filters][columns]', []);
@@ -259,13 +246,6 @@ class WorkflowStepColumnListener
                 ]
             ];
             $config->offsetSetByPath('[filters][columns]', $filters);
-        }
-
-        // add sorter (only if there is at least one sorter)
-        $sorters = $config->offsetGetByPath('[sorters][columns]', []);
-        if ($sorters && !$isManyWorkflows) {
-            $sorters[self::WORKFLOW_STEP_COLUMN] = ['data_name' => self::WORKFLOW_STEP_COLUMN . '.stepOrder'];
-            $config->offsetSetByPath('[sorters][columns]', $sorters);
         }
     }
 

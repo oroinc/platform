@@ -411,22 +411,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'join' => [
                                 'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
                                 'left' => [
-                                    ['join' => self::ALIAS . '.c', 'alias' => 'c'],
-                                    [
-                                        'join' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
-                                        'alias' => 'workflowItem',
-                                        'conditionType' => 'WITH',
-                                        'condition' => sprintf(
-                                            'CAST(%s.id as string) = CAST(workflowItem.entityId as string) ' .
-                                            'AND workflowItem.entityClass = %s',
-                                            self::ALIAS,
-                                            "'" . self::ENTITY_FULL_NAME . "'"
-                                        )
-                                    ],
-                                    [
-                                        'join' => 'workflowItem.currentStep',
-                                        'alias' => WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN
-                                    ]
+                                    ['join' => self::ALIAS . '.c', 'alias' => 'c']
                                 ]
                             ],
                         ],
@@ -466,8 +451,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                         'columns' => [
                             'rootField' => ['data_name' => self::ALIAS . '.rootField'],
                             'innerJoinField' => ['data_name' => 'b.innerJoinField'],
-                            'leftJoinField' => ['data_name' => 'c.leftJoinField'],
-                            'workflowStepLabel' => ['data_name' => 'workflowStepLabel.stepOrder']
+                            'leftJoinField' => ['data_name' => 'c.leftJoinField']
                         ],
                     ],
                 ],
