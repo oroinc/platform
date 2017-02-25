@@ -38,7 +38,7 @@ composer install
 Install application without fixture in prod mode:
 
 ```bash
-app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=OroCRM --env=prod --sample-data=n
+app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=ORO --env=prod --sample-data=n
 ```
 
 ### Run tests

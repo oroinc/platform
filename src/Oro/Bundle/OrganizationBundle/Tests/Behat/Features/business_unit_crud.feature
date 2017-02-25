@@ -24,7 +24,7 @@ Feature: Business Unit crud
     Then I should see "Business unit saved" flash message
     And I should see Business Unit with:
       | Name         | Acme Business Unit |
-      | Organization | OroCRM             |
+      | Organization | ORO                |
       | Phone        | 45-96-23           |
       | Website      | http://example.com |
       | Email        | acme@example.com   |
@@ -52,7 +52,7 @@ Feature: Business Unit crud
     Then I should see "Business unit saved" flash message
     And I should see Business Unit with:
       | Name         | Demo Business Unit |
-      | Organization | OroCRM             |
+      | Organization | ORO                |
       | Phone        | 68-32-23           |
       | Website      | http://example.org |
       | Email        | demo@example.org   |

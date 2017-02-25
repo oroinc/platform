@@ -668,7 +668,6 @@ class OroMainContext extends MinkContext implements
         }
 
         $row->setCellValue($field, $value);
-        $this->iShouldSeeFlashMessage('Inline edits are being saved');
         $this->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
