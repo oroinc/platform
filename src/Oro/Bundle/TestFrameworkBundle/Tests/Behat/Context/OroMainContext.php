@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
@@ -19,6 +18,7 @@ use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
@@ -83,16 +83,17 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeFlashMessage($title)
     {
         $actualFlashMessages = [];
-        /** @var bool */
-        $caught = $this->spin(function (OroMainContext $context) use ($title, &$actualFlashMessages) {
-            $flashMessage = $context->createElement('Flash Message');
+        $flashMessage = $this->spin(function (OroMainContext $context) use ($title, &$actualFlashMessages) {
+            $flashMessages = $context->findAllElements('Flash Message');
 
-            if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                $actualFlashMessageText = $flashMessage->getText();
-                $actualFlashMessages[$actualFlashMessageText] = $actualFlashMessageText;
+            foreach ($flashMessages as $flashMessage) {
+                if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                    $actualFlashMessageText = $flashMessage->getText();
+                    $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
 
-                if (false !== stripos($actualFlashMessageText, $title)) {
-                    return true;
+                    if (false !== stripos($actualFlashMessageText, $title)) {
+                        return $flashMessage;
+                    }
                 }
             }
 
@@ -100,11 +101,16 @@ class OroMainContext extends MinkContext implements
         }, 10);
 
         self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
-        self::assertTrue($caught, sprintf(
+        self::assertNotNull($flashMessage, sprintf(
             'Expected "%s" message but got "%s" messages',
             $title,
-            implode(',', $actualFlashMessages)
+            implode(',', array_keys($actualFlashMessages))
         ));
+
+        $closeButton = $flashMessage->find('css', 'button.close');
+        if ($closeButton->isVisible()) {
+            $closeButton->press();
+        }
     }
 
     /**
@@ -668,6 +674,7 @@ class OroMainContext extends MinkContext implements
         }
 
         $row->setCellValue($field, $value);
+        $this->iShouldSeeFlashMessage('Inline edits are being saved');
         $this->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
