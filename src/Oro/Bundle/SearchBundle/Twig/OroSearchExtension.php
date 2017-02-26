@@ -1,15 +1,19 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Twig;
 
 class OroSearchExtension extends \Twig_Extension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getFilters()
     {
-        return array(
-            'highlight'      => new \Twig_Filter_Method($this, 'highlight'),
-            'trim_string'    => new \Twig_Filter_Method($this, 'trimByString'),
-            'highlight_trim' => new \Twig_Filter_Method($this, 'highlightTrim'),
-        );
+        return [
+            new \Twig_SimpleFilter('highlight', [$this, 'highlight']),
+            new \Twig_SimpleFilter('trim_string', [$this, 'trimByString']),
+            new \Twig_SimpleFilter('highlight_trim', [$this, 'highlightTrim']),
+        ];
     }
 
     /**

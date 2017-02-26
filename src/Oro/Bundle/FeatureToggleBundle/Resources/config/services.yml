@@ -50,8 +50,9 @@ services:
 
     oro_featuretoggle.twig.feature_extension:
         class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'
+        public: false
         arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 

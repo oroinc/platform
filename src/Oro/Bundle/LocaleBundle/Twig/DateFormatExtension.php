@@ -2,21 +2,29 @@
 
 namespace Oro\Bundle\LocaleBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry;
 
 class DateFormatExtension extends \Twig_Extension
 {
-    /**
-     * @var DateTimeFormatConverterRegistry
-     */
-    protected $converterRegistry;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param DateTimeFormatConverterRegistry $converterRegistry
+     * @param ContainerInterface $container
      */
-    public function __construct(DateTimeFormatConverterRegistry $converterRegistry)
+    public function __construct(ContainerInterface $container)
     {
-        $this->converterRegistry = $converterRegistry;
+        $this->container = $container;
+    }
+
+    /**
+     * @return DateTimeFormatConverterRegistry
+     */
+    protected function getDateTimeFormatConverterRegistry()
+    {
+        return $this->container->get('oro_locale.format_converter.date_time.registry');
     }
 
     /**
@@ -32,13 +40,13 @@ class DateFormatExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('oro_datetime_formatter_list', array($this, 'getDateTimeFormatterList')),
-            new \Twig_SimpleFunction('oro_day_format', array($this, 'getDayFormat')),
-            new \Twig_SimpleFunction('oro_date_format', array($this, 'getDateFormat')),
-            new \Twig_SimpleFunction('oro_time_format', array($this, 'getTimeFormat')),
-            new \Twig_SimpleFunction('oro_datetime_format', array($this, 'getDateTimeFormat')),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_datetime_formatter_list', [$this, 'getDateTimeFormatterList']),
+            new \Twig_SimpleFunction('oro_day_format', [$this, 'getDayFormat']),
+            new \Twig_SimpleFunction('oro_date_format', [$this, 'getDateFormat']),
+            new \Twig_SimpleFunction('oro_time_format', [$this, 'getTimeFormat']),
+            new \Twig_SimpleFunction('oro_datetime_format', [$this, 'getDateTimeFormat']),
+        ];
     }
 
     /**
@@ -46,62 +54,62 @@ class DateFormatExtension extends \Twig_Extension
      */
     public function getDateTimeFormatterList()
     {
-        return array_keys($this->converterRegistry->getFormatConverters());
+        return array_keys($this->getDateTimeFormatConverterRegistry()->getFormatConverters());
     }
 
     /**
-     * @param string $type
+     * @param string      $type
      * @param string|null $locale
+     *
      * @return string
      */
     public function getDayFormat($type, $locale = null)
     {
-        return $this->converterRegistry->getFormatConverter($type)->getDayFormat(
-            $locale
-        );
+        return $this->getDateTimeFormatConverterRegistry()
+            ->getFormatConverter($type)
+            ->getDayFormat($locale);
     }
 
     /**
-     * @param string $type
+     * @param string      $type
      * @param string|null $dateType
      * @param string|null $locale
+     *
      * @return string
      */
     public function getDateFormat($type, $dateType = null, $locale = null)
     {
-        return $this->converterRegistry->getFormatConverter($type)->getDateFormat(
-            $dateType,
-            $locale
-        );
+        return $this->getDateTimeFormatConverterRegistry()
+            ->getFormatConverter($type)
+            ->getDateFormat($dateType, $locale);
     }
 
     /**
-     * @param string $type
+     * @param string      $type
      * @param string|null $timeType
      * @param string|null $locale
+     *
      * @return string
      */
     public function getTimeFormat($type, $timeType = null, $locale = null)
     {
-        return $this->converterRegistry->getFormatConverter($type)->getTimeFormat(
-            $timeType,
-            $locale
-        );
+        return $this->getDateTimeFormatConverterRegistry()
+            ->getFormatConverter($type)
+            ->getTimeFormat($timeType, $locale);
     }
 
     /**
-     * @param string $type
+     * @param string      $type
      * @param string|null $dateType
      * @param string|null $timeType
      * @param string|null $locale
+     *
      * @return string
      */
     public function getDateTimeFormat($type, $dateType = null, $timeType = null, $locale = null)
     {
-        return $this->converterRegistry->getFormatConverter($type)->getDateTimeFormat(
-            $dateType,
-            $timeType,
-            $locale
-        );
+        return $this->getDateTimeFormatConverterRegistry()
+            ->getFormatConverter($type)
+            ->getDateTimeFormat($dateType, $timeType, $locale);
     }
 }

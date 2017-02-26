@@ -41,7 +41,7 @@ class UserRoleForm extends Form
     }
 
     /**
-     * Checks capability permission checkbox on create/edit form
+     * Checks capability permission checkbox
      *
      * @param $name
      */
