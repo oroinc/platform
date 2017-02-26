@@ -16,6 +16,7 @@ Feature: Web install
     And wait for Database initialization finish
     And I follow "Next"
     And I fill form with:
+      | Organization name | ORO               |
       | Username          | admin             |
       | Password          | admin             |
       | Re-enter password | admin             |
