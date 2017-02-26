@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
@@ -17,7 +16,7 @@ use Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler;
 
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
-class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implements ActiveCronCommandInterface
+class HandleTransitionCronTriggerCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:workflow:handle-transition-cron-trigger';
 
@@ -113,13 +112,5 @@ class HandleTransitionCronTriggerCommand extends ContainerAwareCommand implement
     protected function getProducer()
     {
         return $this->getContainer()->get('oro_message_queue.client.message_producer');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isActive()
-    {
-        return true;
     }
 }

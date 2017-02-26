@@ -60,7 +60,8 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
                                 ExtendHelper::buildAssociationName('Test\TargetEntity', self::ASSOCIATION_KIND),
                                 'manyToOne'
                             ),
-                            'target_entity' => 'Test\TargetEntity'
+                            'target_entity' => 'Test\TargetEntity',
+                            'state' => 'Active'
                         ]
                     ]
                 ],
@@ -81,6 +82,7 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
                         'manyToOne'
                     ),
                     'target_entity' => 'Test\TargetEntity1',
+                    'state' => 'Active'
                 ],
                 [
                     'field_id' => new FieldConfigId(
@@ -90,6 +92,7 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
                         'manyToOne'
                     ),
                     'target_entity' => 'Test\TargetEntity2',
+                    'state' => 'Active'
                 ],
                 [ // should be ignored because field type is not manyToOne
                     'field_id' => new FieldConfigId(
