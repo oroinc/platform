@@ -45,6 +45,16 @@ trait PageObjectDictionary
     }
 
     /**
+     * @param string $name
+     * @param NodeElement|null $context
+     * @return Element[]
+     */
+    public function findAllElements($name, NodeElement $context = null)
+    {
+        return $this->elementFactory->findAllElements($name, $context);
+    }
+
+    /**
      * @param string $name Element name
      * @param string $text Text that contains in element node
      * @param OroElement $context
