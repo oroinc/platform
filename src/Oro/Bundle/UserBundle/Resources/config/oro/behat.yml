@@ -27,6 +27,9 @@ elements:
     selector: "form[id^='oro_user_role_form']"
     class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm
 
+  UserRoleView:
+    selector: "[data-target='#user-role-view']"
+    class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm
 pages:
   Login:
     class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login

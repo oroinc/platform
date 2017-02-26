@@ -18,6 +18,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
+use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 
 class ACLContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
 {
@@ -159,18 +160,18 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
     }
 
     /**
-     * Asserts that provided permissions allowed
+     * Asserts that provided permissions allowed on role view page
      *
-     * Example: Then I should see following active permissions:
+     * Example: Then the role has following active permissions:
      *            | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
      *            | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
      *
-     * @Then /^(?:|I )should see following active permissions:$/
+     * @Then /^the role has following active permissions:$/
      */
     public function iSeeFollowingPermissions(TableNode $table)
     {
-        /** @var UserRoleForm $userRoleForm */
-        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
+        /** @var UserRoleViewForm $userRoleForm */
+        $userRoleForm = $this->elementFactory->createElement('UserRoleView');
         $permissionsArray = $userRoleForm->getPermissions();
         foreach ($table->getRows() as $row) {
             $entityName = array_shift($row);
@@ -189,19 +190,19 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
     }
 
     /**
-     * Asserts that provided capability permissions allowed
+     * Asserts that provided capability permissions allowed on view page
      *
-     * Example: And I should see following capability permissions checked:
+     * Example: And following capability permissions should be checked:
      *           | Access dotmailer statistics     |
      *           | Manage Abandoned Cart Campaigns |
      *
-     * @Then /^(?:|I )should see following capability permissions checked:$/
+     * @Then /^following capability permissions should be checked:$/
      */
     public function iShouldSeePermissionsChecked(TableNode $table)
     {
-        /** @var UserRoleForm $userRoleForm */
-        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
-        $permissions = $userRoleForm->getCapabilityPermissions();
+        /** @var UserRoleViewForm $userRoleForm */
+        $userRoleForm = $this->elementFactory->createElement('UserRoleView');
+        $permissions = $userRoleForm->getEnabledCapabilityPermissions();
 
         foreach ($table->getRows() as $row) {
             $value = current($row);

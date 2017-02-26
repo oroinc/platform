@@ -20,16 +20,14 @@ Feature: Managing users roles
       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
     And I check "Access dotmailer statistics" entity permission
     And I check "Manage Abandoned Cart Campaigns" entity permission
-    Then I save and close form
-
-  Scenario: Created user role view
-    Given I should see "Test role"
-    Then I should see following active permissions:
+    When I save and close form
+    Then I should see "Test role"
+    And the role has following active permissions:
       | Call        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
       | Lead        | View:Division      | Create:User          | Edit:User | Delete:User | Assign:User |
       | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
-    And I should see following capability permissions checked:
+    And following capability permissions should be checked:
       | Access dotmailer statistics     |
       | Manage Abandoned Cart Campaigns |
 
@@ -48,15 +46,14 @@ Feature: Managing users roles
     And I check "Access entity management" entity permission
     When I save and close form
     Then I should see "Edited test role"
-    And I should see following active permissions:
+    And the role has following active permissions:
       | Contact        | View:Business Unit | Create:Business Unit | Edit:Division | Delete:Division      | Assign:User     |
       | Email Campaign | View:Global        | Create:Division      | Edit:Global   | Assign:Division      | Assign:Division |
       | Task           | View:User          | Create:Business Unit | Edit:User     | Delete:User          | Assign:User     |
-
       | Call           | View:Division      | Create:Business Unit | Edit:User     | Delete:User       | Assign:User    |
       | Lead           | View:Division      | Create:User          | Edit:User     | Delete:User       | Assign:User    |
       | Language       | View:Business Unit | Create:User          | Edit:User     | Assign:User       | Translate:User |
-    And I should see following capability permissions checked:
+    And following capability permissions should be checked:
       | Access dotmailer statistics     |
       | Manage Abandoned Cart Campaigns |
       | Access job queue                |
