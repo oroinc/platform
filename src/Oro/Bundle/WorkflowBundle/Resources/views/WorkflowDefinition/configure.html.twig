@@ -8,8 +8,12 @@
 {% endblock stats %}
 
 {% block navButtons %}
+    {% set html = UI.saveAndCloseButton({
+        'route': 'oro_workflow_definition_view', 'params': {'name': entity.name}
+    }) ~ UI.saveAndStayButton() %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+
     {{ UI.cancelButton(path('oro_workflow_definition_view', {'name': entity.name})) }}
-    {{ UI.saveActionButton([path('oro_workflow_definition_configure', {'name': entity.name})]) }}
 {% endblock navButtons %}
 
 {% block breadcrumbs %}

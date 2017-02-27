@@ -144,6 +144,8 @@ class WorkflowDefinitionController extends Controller
             $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
             $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
             $this->addFlash('success', $this->get('translator')->trans('oro.workflow.variable.save.success_message'));
+
+            return $this->get('oro_ui.router')->redirect($workflowDefinition);
         }
 
         return [
