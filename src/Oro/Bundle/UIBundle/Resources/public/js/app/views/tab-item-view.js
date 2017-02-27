@@ -7,27 +7,31 @@ define(function(require) {
 
     TabItemView = BaseView.extend({
         tagName: 'li',
-        className: function() {
-            var classes = ['nav-item'];
-            if (this.model.get('active')) {
-                classes.push('active');
-            }
-            if (this.model.get('changed')) {
-                classes.push('changed');
-            }
-            return classes.join(' ');
-        },
+
+        className: 'nav-item',
+
         template: _.template('<a href="#" class="nav-link"><%= label %></a>'),
+
         listen: {
-            'change:active model': 'updateClasses',
-            'change:changed model': 'updateClasses'
+            'change:active model': 'updateStates',
+            'change:changed model': 'updateStates'
         },
+
         events: {
             'click a': 'onSelect'
         },
-        updateClasses: function() {
-            this.$el[0].className = _.result(this, 'className');
+
+        initialize: function(options) {
+            TabItemView.__super__.initialize.apply(this, arguments);
+
+            this.updateStates();
         },
+
+        updateStates: function() {
+            this.$el.toggleClass('active', !!this.model.get('active'));
+            this.$el.toggleClass('changed', !!this.model.get('changed'));
+        },
+
         onSelect: function() {
             this.model.set('active', true);
         }
