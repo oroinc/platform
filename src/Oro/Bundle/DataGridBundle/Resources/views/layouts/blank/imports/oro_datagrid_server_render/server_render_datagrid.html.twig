@@ -66,9 +66,10 @@
         <div class="oro-datagrid"
              data-skip-input-widgets
         >
+
             {% if toolbarOptions.placement.top %}
-                <div class="toolbar" data-grid-toolbar="top">
-                    {{ block_widget(block[id ~ '_toolbar']) }}
+                <div class="toolbar">
+                    {{ block_widget(block[id ~ '_toolbar'],{attr: {'data-grid-toolbar': 'top'}}) }}
                 </div>
             {% endif %}
 
@@ -110,8 +111,8 @@
             </div>
 
             {% if toolbarOptions.placement.bottom %}
-                <div class="toolbar dropup-area" data-grid-toolbar="bottom">
-                    {{ block_widget(block[id ~ '_toolbar']) }}
+                <div class="toolbar dropup-area">
+                    {{ block_widget(block[id ~ '_toolbar'], {attr: {'data-grid-toolbar':'bottom'}}) }}
                 </div>
             {% endif %}
         </div>
