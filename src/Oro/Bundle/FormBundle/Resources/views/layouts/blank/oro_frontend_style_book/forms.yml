@@ -11,7 +11,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_text
-                        label: Input text
+                        label: Text Input (One Line)
                 group_element_item_form_text:
                     blockType: group_element_item
                 form_text:
@@ -23,7 +23,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_password
-                        label: Input Password
+                        label: Password Input
                 group_element_item_form_password:
                     blockType: group_element_item
                 form_password:
@@ -35,7 +35,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_select
-                        label: Select
+                        label: An Option (Drop-Down)
                 group_element_item_form_select:
                     blockType: group_element_item
                 form_select:
@@ -47,7 +47,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_checkbox
-                        label: Input Checkbox
+                        label: Opt In/Opt Out (Checkbox)
                 group_element_item_form_checkbox:
                     blockType: group_element_item
                 form_checkbox: 
@@ -59,7 +59,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_radio
-                        label: Input Radio
+                        label: An Option (Radio)
                 group_element_item_form_radio:
                     blockType: group_element_item
                 form_radio:
@@ -71,7 +71,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_checkboxes
-                        label: Input Checkboxes
+                        label: Multiple Options (Checkbox)
                 group_element_item_form_checkboxes:
                     blockType: group_element_item
                 form_checkboxes:
@@ -83,7 +83,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_radios
-                        label: Input Radios
+                        label: An Option (Radio)
                 group_element_item_form_radios:
                     blockType: group_element_item
                 form_radios:
@@ -95,7 +95,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_multiselect
-                        label: Multiselect
+                        label: Multiple Options (Drop-Down)
                 group_element_item_form_multiselect:
                     blockType: group_element_item
                 form_multiselect:
@@ -107,7 +107,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_datetime
-                        label: Input Datetime
+                        label: Date and Time Input
                 group_element_item_form_datetime:
                     blockType: group_element_item
                 form_datetime:
@@ -119,7 +119,7 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_textarea
-                        label: Textarea
+                        label: Text Input (Multiline)
                 group_element_item_form_textarea:
                     blockType: group_element_item
                 form_textarea: 
