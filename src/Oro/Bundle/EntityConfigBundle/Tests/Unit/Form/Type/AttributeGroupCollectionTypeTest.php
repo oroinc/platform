@@ -86,16 +86,15 @@ class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
                 'labels' => [
                     ['string' => 'Group1 Label 1'],
                     ['string' => 'Group1 Label 2'],
-                ]
-
+                ],
             ],
             [
                 'labels' => [
                     ['string' => 'Group2 Label 3'],
                     ['string' => 'Group2 Label 4'],
-                ]
-
-            ]
+                ],
+                'isVisible' => 1
+            ],
         ];
 
         $form->submit($submittedData, [$existingEntity]);

@@ -190,6 +190,7 @@ define(function(require) {
             top: dropdownMenuOriginalPosition.top + parentPosition.top - parentOriginalPosition.top,
             left: dropdownMenuOriginalPosition.left + parentPosition.left - parentOriginalPosition.left
         };
+
         var options = $dropdownMenu.data('options');
         var attachToParent = options.attachToParent || false;
 
@@ -201,6 +202,7 @@ define(function(require) {
                 css.width = $parent.outerWidth();
             }
         }
+
         $dropdownMenu.css(css);
     };
 
@@ -389,7 +391,8 @@ define(function(require) {
             var $toggle = $(toggleDropdown, $dropdown);
             var $dropdownMenu = $('>.dropdown-menu', $dropdown);
             var dropdownMenuContainer = $toggle.closest('.ui-dialog-content')[0] ||
-                $toggle.closest('.scrollable-container')[0];
+                $toggle.closest('.scrollable-container')[0] ||
+                $toggle.closest('.grid-scrollable-container')[0];
             var scrollableRect = scrollHelper.getFinalVisibleRect(dropdownMenuContainer);
             var toggleRect = $toggle[0].getBoundingClientRect();
 

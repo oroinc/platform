@@ -4,46 +4,29 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\AddressBundle\Twig\PhoneExtension;
 use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|PhoneProvider
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|PhoneProvider */
     protected $provider;
 
-    /**
-     * @var PhoneExtension
-     */
+    /** @var PhoneExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->provider = $this->getMockBuilder('Oro\Bundle\AddressBundle\Provider\PhoneProvider')
+        $this->provider = $this->getMockBuilder(PhoneProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new PhoneExtension($this->provider);
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_address.provider.phone', $this->provider)
+            ->getContainer($this);
 
-    public function testGetFunctions()
-    {
-        $expectedFunctions = [
-            [$this->extension, 'getPhoneNumber'],
-            [$this->extension, 'getPhoneNumbers'],
-        ];
-
-        $actualFunctions = $this->extension->getFunctions();
-
-        $this->assertSameSize($expectedFunctions, $actualFunctions);
-
-        foreach ($expectedFunctions as $index => $expectedCallable) {
-            $this->assertArrayHasKey($index, $actualFunctions);
-            /** @var \Twig_SimpleFunction $actualFunction */
-            $actualFunction = $actualFunctions[$index];
-            $this->assertInstanceOf('\Twig_SimpleFunction', $actualFunction);
-            $this->assertEquals($expectedCallable, $actualFunction->getCallable());
-        }
+        $this->extension = new PhoneExtension($container);
     }
 
     /**
@@ -60,7 +43,7 @@ class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($object)
             ->willReturn($object ? $expectedPhone : null);
 
-        $actualPhone = $this->extension->getPhoneNumber($object);
+        $actualPhone = self::callTwigFunction($this->extension, 'phone_number', [$object]);
         if ($object) {
             $this->assertEquals($expectedPhone, $actualPhone);
         } else {
@@ -89,7 +72,7 @@ class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($object)
             ->willReturn($object ? $sourcePhones : null);
 
-        $actualPhones = $this->extension->getPhoneNumbers($object);
+        $actualPhones = self::callTwigFunction($this->extension, 'phone_numbers', [$object]);
         if ($object) {
             $this->assertEquals($expectedPhones, $actualPhones);
         } else {

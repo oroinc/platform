@@ -16,7 +16,7 @@ services:
         arguments:
             - '@oro_locale.manager.localization'
         tags:
-            - { name: kernel.cache_warmer, priority: 5 }
+            - { name: kernel.cache_warmer }
 
     oro_locale.localization.localization_provider.cache.clearer:
         public: false

@@ -133,7 +133,7 @@ define([
                 if (_.has(this.collection.initialState.filters, name)) {
                     state[name] = filter.getValue();
                 } else if (filter.enabled) {
-                    if (!filter.isEmpty()) {
+                    if (!filter.isEmptyValue()) {
                         state[name] = filter.getValue();
                     } else if (!filter.defaultEnabled) {
                         state[shortName] = '1';

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Model;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
@@ -19,7 +18,7 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
             'field1' => 1,
             'field2' => 2,
         ];
-        $criteria = new ScopeCriteria($criteriaData);
+        $criteria = new ScopeCriteria($criteriaData, []);
         $this->assertSame($criteriaData, $criteria->toArray());
     }
 
@@ -33,19 +32,32 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
                 'notNullField' => ScopeCriteria::IS_NOT_NULL,
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
+                'multiField' => [1, 2],
+            ],
+            [
+                'nullField' => ['relation_type' => 'manyToOne'],
+                'notNullField' => ['relation_type' => 'manyToOne'],
+                'fieldWithValue' => ['relation_type' => 'manyToOne'],
+                'ignoredField' => ['relation_type' => 'manyToOne'],
+                'multiField' => ['relation_type' => 'manyToMany'],
             ]
         );
         $qb->method('expr')->willReturn(new Expr());
-        $qb->expects($this->exactly(3))
+        $qb->expects($this->exactly(4))
             ->method('andWhere')
             ->withConsecutive(
                 ['scope.nullField IS NULL'],
                 ['scope.notNullField IS NOT NULL'],
-                ['scope.fieldWithValue = :scope_param_fieldWithValue']
+                ['scope.fieldWithValue = :scope_param_fieldWithValue'],
+                new Expr\Func('scope_multiField.id IN', [':scope_multiField_param_id'])
             );
-        $qb->expects($this->once())
-            ->method('setParameter')
-            ->with('scope_param_fieldWithValue', 1);
+
+        $qb->expects($this->exactly(2))
+        ->method('setParameter')
+        ->withConsecutive(
+            ['scope_param_fieldWithValue', 1],
+            ['scope_multiField_param_id', [1, 2]]
+        );
 
         $criteria->applyWhere($qb, 'scope', ['ignoredField']);
     }
@@ -55,17 +67,14 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
         /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject $qb */
         $qb = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
 
-        $platform = $this->getMockBuilder(MySQLPlatform::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->platformIsCalled($platform, $qb);
         $criteria = new ScopeCriteria(
             [
                 'nullField' => null,
                 'notNullField' => ScopeCriteria::IS_NOT_NULL,
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
-            ]
+            ],
+            []
         );
         $qb->method('expr')->willReturn(new Expr());
         $qb->expects($this->exactly(3))
@@ -94,7 +103,8 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
                 'notNullField' => ScopeCriteria::IS_NOT_NULL,
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
-            ]
+            ],
+            []
         );
 
         $qb = $this->getBaseQbMock();
@@ -136,13 +146,17 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
                 'notNullField' => ScopeCriteria::IS_NOT_NULL,
                 'fieldWithValue' => 1,
                 'ignoredField' => 2,
+                'multiField' => [1, 2],
+            ],
+            [
+                'nullField' => ['relation_type' => 'manyToOne'],
+                'notNullField' => ['relation_type' => 'manyToOne'],
+                'fieldWithValue' => ['relation_type' => 'manyToOne'],
+                'ignoredField' => ['relation_type' => 'manyToOne'],
+                'multiField' => ['relation_type' => 'manyToMany'],
             ]
         );
         $qb = $this->getBaseQbMock();
-        $platform = $this->getMockBuilder(MySQLPlatform::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->platformIsCalled($platform, $qb);
 
         $qb->expects($this->once())
             ->method('innerJoin')
@@ -156,22 +170,41 @@ class ScopeCriteriaTest extends \PHPUnit_Framework_TestCase
                 'id'
             );
 
-        $qb->expects($this->once())
+        $qb->expects($this->exactly(2))
             ->method('leftJoin')
-            ->with(
-                \stdClass::class,
-                'otherJoin',
-                Join::WITH,
-                '(otherJoin.joinField = 1)',
-                'otherJoin.created_at'
+            ->withConsecutive(
+                [
+                    'scope.multiField',
+                    'scope_multiField',
+                    Join::WITH,
+                    new Expr\Orx(
+                        [
+                            new Expr\Func('scope_multiField.id IN', [':scope_multiField_param_id']),
+                            'scope_multiField.id IS NULL'
+                        ]
+                    )
+                ],
+                [
+                    \stdClass::class,
+                    'otherJoin',
+                    Join::WITH,
+                    '(otherJoin.joinField = 1)',
+                    'otherJoin.created_at'
+                ]
             );
-        $qb->expects($this->once())
+        $qb->expects($this->exactly(2))
             ->method('addOrderBy')
-            ->with('scope.fieldWithValue', 'DESC');
+            ->withConsecutive(
+                ['scope.fieldWithValue', 'DESC'],
+                ['scope_multiField.id', 'DESC']
+            );
 
-        $qb->expects($this->once())
+        $qb->expects($this->exactly(2))
             ->method('setParameter')
-            ->with('scope_param_fieldWithValue', 1);
+            ->withConsecutive(
+                ['scope_param_fieldWithValue', 1],
+                ['scope_multiField_param_id', [1, 2]]
+            );
 
         $criteria->applyToJoinWithPriority($qb, 'scope', ['ignoredField']);
     }

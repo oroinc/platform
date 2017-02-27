@@ -34,7 +34,11 @@ class FilterHandler implements ConfigurationHandlerInterface
         'frontend_options',
         'form_type',
         'display_type',
-        'form_options'
+        'destination_page',
+        'form_options',
+        WorkflowConfiguration::NODE_INIT_ENTITIES,
+        WorkflowConfiguration::NODE_INIT_ROUTES,
+        WorkflowConfiguration::NODE_INIT_DATAGRIDS,
     ];
 
     /** @var array */
@@ -63,6 +67,7 @@ class FilterHandler implements ConfigurationHandlerInterface
         'entity_attribute',
         'steps_display_ordered',
         'priority',
+        WorkflowDefinition::CONFIG_FORCE_AUTOSTART,
         WorkflowDefinition::CONFIG_SCOPES,
         WorkflowConfiguration::NODE_STEPS,
         WorkflowConfiguration::NODE_ATTRIBUTES,
@@ -70,7 +75,8 @@ class FilterHandler implements ConfigurationHandlerInterface
         WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
         WorkflowConfiguration::NODE_ENTITY_RESTRICTIONS,
         WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
-        WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS
+        WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
+        WorkflowConfiguration::NODE_APPLICATIONS,
     ];
 
     /**

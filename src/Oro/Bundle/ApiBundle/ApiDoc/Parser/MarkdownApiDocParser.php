@@ -141,7 +141,8 @@ class MarkdownApiDocParser
         $html = $parser->transform($fileContent);
 
         $doc = new \DOMDocument();
-        $doc->loadHTML($html);
+        // suppress warnings like "Document is empty"
+        @$doc->loadHTML($html);
 
         $xpath = new \DOMXPath($doc);
 

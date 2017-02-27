@@ -13,9 +13,25 @@ class KernelStub implements KernelInterface
 
     protected $container;
 
+    protected $parameters = [
+        'database_driver' => 'pdo_mysql',
+        'database_host' => '127.0.0.1',
+        'database_port' => null,
+        'database_name' => 'oro_crm',
+        'database_user' => 'root',
+        'database_password' => null,
+        'session_handler' => 'session.handler.native_file',
+        'message_queue_transport' => 'dbal',
+        'message_queue_transport_config' => null,
+    ];
+
     public function __construct()
     {
         $this->container = new Container();
+
+        foreach ($this->parameters as $key => $value) {
+            $this->container->setParameter($key, $value);
+        }
     }
 
     /**

@@ -2,18 +2,28 @@ UPGRADE FROM 1.10 to 2.0
 ========================
 
 ####General
-- **Upgrade to 2.0 is available only from 1.10 version**. For this update
-  was added the command "oro:platform:upgrade20". Before run this command the cache has to be deleted.
-  Command have to be run only one time. In next releases 2.x to apply release changes it will be enough run the command "oro:platform:update".
+- **Upgrade to 2.0 is available only from 1.10 version**.
+
+  To correctly upgrade to version 2.0 follow the steps in the guide [How to Upgrade to a New Version](https://www.orocrm.com/documentation/index/current/cookbook/how-to-upgrade-to-new-version).
+  At **Step 7** instead of running
+  ```shell
+  $ sudo -u www-data php app/console oro:platform:update --env=prod --force
+  ```
+  you will run **only once** the upgrade command introduced to help upgrading from 1.10 to 2.0
+  ```shell
+  $ sudo -u www-data php app/console oro:platform:upgrade20 --env=prod --force
+  ```
+  
   Upgrade from version less then 1.10 is not supported.
+
 - Changed minimum required php version to 5.6
 - PhpUnit 5.7 support
 - LiipImagineBundle was updated to 1.5.* version.
 - Added dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin.
 - All original third-party asset libraries were moved out from platform and added to composer.json as bower-asset/npm-asset dependency.
-  
+
 ####SOAP API was removed
-- removed all dependencies to the `besimple/soap-bundle` bundle. 
+- removed all dependencies to the `besimple/soap-bundle` bundle.
 - removed SOAP annotations from the entities. Updated entities:
     - Oro\Bundle\ActivityListBundle\Entity\ActivityList
     - Oro\Bundle\ActivityListBundle\Entity\ActivityOwner
@@ -102,6 +112,9 @@ UPGRADE FROM 1.10 to 2.0
 ####EntitySerializer Component
 - Method `isMetadataProperty` of `Oro\Component\EntitySerializer\ConfigUtil` marked as deprecated. Use `isMetadataProperty` of `Oro\Component\EntitySerializer\FieldAccessor` instead
 
+####OrganizationBundle
+- Changed signature of method `Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository::getEnabledOrganizations`.
+
 ####ActionBundle
 - Class `Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType` was removed -> block type `action_buttons` replaced with DI configuration.
 - Added class `Oro\Bundle\ActionBundle\Layout\DataProvider\ActionButtonsProvider` - layout data provider.
@@ -133,9 +146,9 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
 - Added `Oro\Bundle\ActionBundle\Button\ButtonProviderExtensionInterface`, that declare method `find()` for collect buttons from extensions
 - Added `Oro\Bundle\ActionBundle\Button\ButtonsCollection` to handle relation between button (ButtonInterface) and its extension (ButtonProviderExtensionInterface), so it can be used in its `map` or `filter` methods as arguments.
     the collection can be used to keep matched buttons under single structure fot further reuse
-    - method `filter():ButtonsCollection`filter to a new collection instance by provided filter callback  
+    - method `filter():ButtonsCollection`filter to a new collection instance by provided filter callback
     - method `map():ButtonsCollection` to a new collection instance through provided map callback
-    - method `toList():ButtonInterface[]` gets ordered array of buttons by (ButtonInterface::getOrder()) 
+    - method `toList():ButtonInterface[]` gets ordered array of buttons by (ButtonInterface::getOrder())
     - method `toArray():ButtonInterface[]` gets all buttons that handle the collection
     - can be iterated (implements `\IteratorAggregate`) through `\ArrayIterator` of `toList()` result.
     - implements `\Countable`
@@ -169,10 +182,12 @@ Please use `Oro\Bundle\ActionBundle\Provider\CurrentApplicationProvider` and `Or
  - third argument `Oro\Bundle\ActionBundle\Model\OperationManager` replaced with `Oro\Bundle\ActionBundle\Model\OperationRegistry` and additional `Oro\Bundle\ActionBundle\Helper\ContextHelper` as fourth argument.
 - Class `Oro\Bundle\ActionBundle\Form\Type\OperationType` first constructor argument (OperationManager) removed.
 - Class `Oro\Bundle\ActionBundle\Model\OperationManager` with service `oro_action.operation_manager` removed. Use:
- - `Oro\Bundle\ActionBundle\Model\OperationRegistry` (`@oro_action.operation_registry`) to retrieve an Operation directly
- - `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension` (`@oro_action.provider.button.extension.operation`) for OperationButtons
- - `Oro\Bundle\ActionBundle\Provider\ButtonProvider` (`@oro_action.provider.button`) - to operate all buttons
- 
+- `Oro\Bundle\ActionBundle\Model\OperationRegistry` (`@oro_action.operation_registry`) to retrieve an Operation directly
+- `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension` (`@oro_action.provider.button.extension.operation`) for OperationButtons
+- `Oro\Bundle\ActionBundle\Provider\ButtonProvider` (`@oro_action.provider.button`) - to operate all buttons
+- Changed signature of constructor of `Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Changed signature of constructor of `Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+
 ####ApiBundle
 - The `oro.api.action_processor` DI tag was removed. To add a new action processor, use `oro_api.actions` section of the ApiBundle configuration.
 - The `oro_api.config_extension` DI tag was removed. To add a new configuration extension, use `oro_api.config_extensions` section of the ApiBundle configuration.
@@ -388,7 +403,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added `Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension` as `Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface`, that provide transition buttons
 - Added `Oro\Bundle\WorkflowBundle\Extension\StartTransitionButtonProviderExtension` as `Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface`, that provide start transition buttons
 - Added `Oro\Bundle\WorkflowBundle\Button\TransitionButton`
-- Added `Oro\Bundle\WorkflowBundle\Button\StartTransitionButton` 
+- Added `Oro\Bundle\WorkflowBundle\Button\StartTransitionButton`
 - Changed `Oro\Bundle\WorkflowBundle\Model\AttributeAssembler::assemble`, now it processing WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE
 - Changed `Oro\Bundle\WorkflowBundle\Model\Transition`, added properties $initEntities, $initRoutes, $initContextAttribute and getters/setters for it
 - Changed `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler::assembleTransition`, now it process NODE_INIT_ENTITIES, NODE_INIT_ROUTES, NODE_INIT_CONTEXT_ATTRIBUTE
@@ -399,7 +414,9 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added class `Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter` and registered as an additional (tag: `oro_action.operation_registry.filter`) filter for OperationRegistry.
 - Added class `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler`
 - Added class `Oro\Bundle\WorkflowBundle\Provider\TransitionDataProvider`
-- Added class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`  
+- Added class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
+- Changed signature of constructor of `Oro\Bundle\WorkflowBundle\Datagrid\Extension\RestrictionsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Changed signature of constructor of `Oro\Bundle\WorkflowBundle\Datagrid\WorkflowStepColumnListener`. The argument `EntityClassResolver $entityClassResolver` was added.
 
 ####LocaleBundle:
 - Added helper `Oro\Bundle\LocaleBundle\Helper\LocalizationQueryTrait` for adding necessary joins to QueryBuilder
@@ -417,6 +434,8 @@ To migrate all labels from configuration translatable fields automatically you c
     - `LanguageProvider $languageProvider`.
 - `oro_locale.repository.localization` inherits `oro_entity.abstract_repository`
 - Updated moment-timezone.js library to version 0.5.*
+- Changed signature of constructor of `Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension`. The argument `EntityClassResolver $entityClassResolver` was added.
+- Removed methods `getRootEntityNameAndAlias` and `getEntityClassName` from `Oro\Bundle\LocaleBundle\Datagrid\Extension\LocalizedValueExtension`
 
 ####SearchBundle
 - Changed all `private` fields and accessors to `protected` in `Oro/Bundle/SearchBundle/Entity/IndexDecimal`, `Oro/Bundle/SearchBundle/Entity/IndexInteger`,
@@ -427,6 +446,9 @@ To migrate all labels from configuration translatable fields automatically you c
 - `\Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider::getEntityModeConfig` default value is Mode::NORMAL if configurations is mepty
 - `\Oro\Bundle\SearchBundle\Engine\ObjectMapper::mapSelectedData` returns empty array if data fields not found
 - `\Oro\Bundle\SearchBundle\Query\Result\Item::_construct` signature changed, array type hintings added
+- Constructor of class `Oro\Bundle\SearchBundle\Datagrid\Extension\SearchResultsExtension` was changed. Dependency on `Doctrine\ORM\EntityManager` was removed.
+- Constructor of class `Oro\Bundle\SearchBundle\Query\Result\Item` was changed. Dependency on `Doctrine\ORM\EntityManager` was removed.
+- Method `getEntity` was removed from `Oro\Bundle\SearchBundle\Query\Result\Item`.
 - Changed signature of the constructor of `Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener`. Removed `$databaseDriver` parameter.
 - Changed signature of the constructor of `Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener`. Added `Connection $connection` parameter.
 
@@ -435,7 +457,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - The option `--force` were removed from `oro:cron:integration:sync` cli command. Pass it as connector option  `force=true`.
 - The option `--transport-batch-size force` were removed from `oro:cron:integration:sync` cli command.
 - The option `--params` were removed from `oro:integration:reverse:sync` cli command. Use `--connector-parameters` instead.
-- The `SyncScheduler::schedule` method signature was changed. 
+- The `SyncScheduler::schedule` method signature was changed.
 - The `GenuineSyncScheduler::schedule` method signature was changed.
 - The parameter `oro_integration.genuine_sync_scheduler.class` was removed.
 - The parameter `oro_integration.reverse_sync.processor.class` was removed.
@@ -534,6 +556,7 @@ To migrate all labels from configuration translatable fields automatically you c
 
 ####AttachmentBundle:
 - Class `Oro\Bundle\AttachmentBundle\Resizer\ImageResizer` introduced to resize images by filter name
+- Removed constant `GRID_LEFT_JOIN_PATH` from `Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener`
 
 ####DatagridBundle:
 - Class `Oro/Bundle/DataGridBundle/Provider/ConfigurationProvider.php`
@@ -566,7 +589,16 @@ To migrate all labels from configuration translatable fields automatically you c
         `MessageProducerInterface` $producer
 - Added helper `Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper`
 - Class `Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction\ActionWidgetAction` renamed to `Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction\ActionWidgetAction\ButtonWidgetAction`
-
+- Removed class `Oro\Bundle\DataGridBundle\EventListener\AbstractDatagridListener`
+- Removed constant `DATASOURCE_BIND_PARAMETERS_PATH` from `Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener`
+- Changed signature of constructor of `Oro\Bundle\DataGridBundle\Extension\Board\Processor\DefaultProcessor`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Changed signature of constructor of `Oro\Bundle\DataGridBundle\Extension\Board\BoardExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Changed signature of constructor of `Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Removed constant `CONFIG_EXTENDED_ENTITY_KEY` from `Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration`
+- Changed signature of constructor of `Oro\Bundle\DataGridBundle\Extension\MassAction\DeleteMassActionExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Class `Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper` was marked as deprecated. Use `config->getOrmQuery()->getRootEntity()` and `config->getOrmQuery()->getRootAlias()` instead
+- Method `addSelect` of `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration` was marked as deprecated. Use `config->getOrmQuery()->addSelect()` instead
+- Method `joinTable` of `Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration` was marked as deprecated. Use `config->getOrmQuery()->addInnerJoin()` or `config->getOrmQuery()->addLeftJoin()` instead
 
 ####SecurityBundle
 - Removed layout context configurator `Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator`.
@@ -649,6 +681,7 @@ To migrate all labels from configuration translatable fields automatically you c
 - Added `Oro\Bundle\TranslationBundle\Translation\TranslationFieldsIteratorTrait`.
 - Added Data Provider `Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider` that provides the translator to Layouts.
 - Added helper `Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper`.
+- Changed signature of constructor of `Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 
 
 ####EntityExtendBundle
@@ -680,6 +713,9 @@ tag if it works with extend classes
 - `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension` added support of to-one relations
 - Method `get*TargetEntities` is generated as deprecated for both `many-to-many` and `many-to-one` associations.
 - Changed signature of auto-generated `get*Targets` method of `many-to-many` association. The parameter `$targetClass` is optional now. If this parameter is not specified this method returns all target entities without filtering them by type.
+- Removed constant `EXTEND_ENTITY_CONFIG_PATH` from `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Method `addManyToOneRelationTargetSide` of `Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder` was marked as deprecated because it is not used anywhere.
+
 
 ####ApiBundle:
 - API configuration file now loads from `Resources/config/oro/api.yml` instead of `Resources/config/api.yml`.
@@ -762,6 +798,9 @@ tag if it works with extend classes
 ####ActivityBundle:
 - Changed constructor of `Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler`. Replaced `ObjectMapper` with `EntityNameResolver`. Class now use EntityNameResolver instead of `title_fields`.
 - Removed method `getActivityTargetEntities` from `Oro\Bundle\ActivityBundle\Model\ActivityInterface` and `Oro\Bundle\ActivityBundle\Model\ExtendActivity`. To avoid BC break this method is still generated, but it is marked as deprecated.
+- Removed constant `GRID_EXTENDED_ENTITY_PATH` from `Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension`
+- Removed constant `GRID_FROM_PATH` from `Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension`
+- Changed signature of constructor of `Oro\Bundle\ActivityBundle\Grid\Extension\ContextsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
 
 ####ActivityListBundle:
 - Removed method `getActivityListTargetEntities` from `Oro\Bundle\ActivityListBundle\Entity\ActivityList`. To avoid BC break this method is still generated, but it is marked as deprecated.
@@ -864,6 +903,7 @@ placeholders:
 - Constructor of `Oro\Bundle\EmailBundle\Form\Type\EmailType` was changed. Added `ConfigManager $configManager` as last argument.
 - Constructor of `Oro\Bundle\EmailBundle\EventListener\EntityListener` was changed. Added `MessageProducerInterface $producer` as last argument.
 - Constructor of `Oro\Bundle\EmailBundle\EventListener\AutoResponseListener` was changed. Added `MessageProducerInterface $producer` as last argument.
+- Constructor of `Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener` was changed. Added `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` as last argument.
 - Moved class `Oro\Bundle\EmailBundle\Command\Manager\AssociationManager` to `Oro\Bundle\EmailBundle\Async\Manager`. Constructor of `Oro\Bundle\EmailBundle\Command\Manager\AssociationManager` was changed. Added `MessageProducerInterface` as last argument.
 - Service name `oro_email.command.association_manager` was changed to `oro_email.async.manager.association_manager`
 - `Oro/Bundle/EmailBundle/Cache/EntityCacheClearer` deprecated, tag on `oro_email.entity.cache.clearer` removed
@@ -885,6 +925,7 @@ placeholders:
 - Added `Oro\Bundle\EmailBundle\Controller\EmailController::checkSmtpConnectionAction`.
 - Added `Oro\Bundle\EmailBundle\Mailer\DirectMailer::afterPrepareSmtpTransport`.
 - Added `Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider` to get smtp settings from configuration.
+- Added service `oro_email.command.email_body_sync` for `Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand` command.
 
 ####EntityBundle
 - Added possibility to define
@@ -934,6 +975,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
    - 'Full' format: a space-delimited concatenation of all string fields of the entity.
    - For both formats: will return the entity ID when fields are found but their value is empty. Same applies for both `getName` and `getNameDQL` methods. Will return `false` if no suitable fields are available.
 - Added `Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider` which will resolve entity title in form of 'Item #1' (translates `oro.entity.item`). Can use only single-column identifiers, else returns `false`. Should be kept as last provider.
+- Removed constant `PATH_FROM` from `Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid`
 
 ####ContactBundle
 
@@ -1004,7 +1046,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 
 ####ImapBundle
  - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX` instead.
-
+ - Added service `oro_imap.command.email_sync` for `Oro\Bundle\ImapBundle\Command\Cron\EmailSyncCommand` command.
 
 ####CronBundle
 - Removed class `Oro\Bundle\CronBundle\Action\CreateJobAction`, service `oro_cron.action.create_job` and action `@create_job`
@@ -1016,7 +1058,7 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 - Removed class `Oro\Bundle\CronBundle\Job\Daemon` and service `oro_cron.job_daemon`
 - Removed class `Oro\Bundle\CronBundle\JobQueue\JMSJobQueueBundle`
 - Added command `oro:cron:definitions:load` (class `Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand`) to load cron command definitions to schedule table
-- Temporary added listener `Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener` to prevent default behavior for `jms_job_safe_object` type. 
+- Temporary added listener `Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener` to prevent default behavior for `jms_job_safe_object` type.
 - Removed command `oro:cron:cleanup` (class `Oro\Bundle\CronBundle\Command\CleanupCommand`).
 - Removed command `oro:daemon` (class `Oro\Bundle\CronBundle\Command\DaemonMonitorCommand`).
 - Removed command `oro:jms-job-queue:count` (class `Oro\Bundle\CronBundle\Command\JmsJobCountCommand`).
@@ -1038,20 +1080,21 @@ to the [Fallback documentation](./src/Oro/Bundle/EntityBundle/Resources/doc/enti
 ####ImapBundle
 - The command `oro:imap:clear-mailbox` was removed. Produce message to the topic `oro.imap.clear_inactive_mailbox` instead.
 - Removed action `@job_add_dependency`
-- Changed property name from `$possibleSentFolderNameMap` to `$knownFolderNameMap` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder` 
-- Changed method name from `guessSentTypeByName` to `guessFolderTypeByName` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder` 
+- Changed property name from `$possibleSentFolderNameMap` to `$knownFolderNameMap` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder`
+- Changed method name from `guessSentTypeByName` to `guessFolderTypeByName` in `Oro\Bundle\ImapBundle\Mail\Storage\Folder`
 
 ####OroInstallerBundle
 - Added interface `Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigrationProviderInterface`. it makes available add the rules for command "oro:platform:upgrade20"
 
 #### CurrencyBundle
 - `getViewType` method was removed form `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface`
-- `VIEW_TYPE_SYMBOL` and `VIEW_TYPE_ISO_CODE` constants were removed from `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` 
+- `VIEW_TYPE_SYMBOL` and `VIEW_TYPE_ISO_CODE` constants were removed from `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface`
 - `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` was renamed to `CurrencyListProviderInterface`
 - `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` was added
 - `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigInterface` was renamed to `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface`
-- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface` 
+- `Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface` extends `Oro\Bundle\CurrencyBundle\Provider\CurrencyListProviderInterface` and `Oro\Bundle\CurrencyBundle\Provider\DefaultCurrencyProviderInterface`
 - `Oro\Bundle\CurrencyBundle\Config\CurrencyConfigManager` was renamed to `DefaultCurrencyConfigProvider`
+- Changed signature of constructor of `Oro\Bundle\CurrencyBundle\Datagrid\EventListener\ColumnConfigListener`. The argument `EntityClassResolver $entityClassResolver` was removed.
 
 ####OroTrackingBundle
 - Moved ``TrackingBundle`` to a separate ``marketing`` package, required by default in the CRM applications.
@@ -1069,7 +1112,7 @@ After
 - Removed property `entityId` from SOAP API for entity `Oro\Bundle\NoteBundle\Entity\Note`.
 - Added use of `Oro\Bundle\ActivityBundle\Model\ActivityInterface` into class `Oro\Bundle\NoteBundle\Entity\Note`.
 - Removed methods from entity `Oro\Bundle\NoteBundle\Entity\Note`: `supportTarget`, `getTarget`, `setTarget`. Methods of `Oro\Bundle\ActivityBundle\Model\ActivityInterface` should be used to access target entities instead.
-- Removed extra classes and services were as unnecessary after Note entity became a regular activity entity. See detailed list of removed items below. 
+- Removed extra classes and services were as unnecessary after Note entity became a regular activity entity. See detailed list of removed items below.
 - Removed class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension`. Generic extension `Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension` is used to add relation of entity with Note as Activity.
 - Removed class `Oro\Bundle\NoteBundle\Migration\Extension\NoteExtensionAwareInterface`. Generic interface `\Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface` should be used instead in schema migrations.
 - Removed entity config with scope "note" after Note entity became a regular Activity entity.
@@ -1083,13 +1126,21 @@ After
 - Removed class `Oro\Bundle\NoteBundle\Model\Strategy\ReplaceStrategy` and service `oro_note.strategy.replace`. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy` applicable for activity entities now is used instead.
 - Removed class `Oro\Bundle\NoteBundle\Model\Stratgy\UniteStrategy` and service `oro_note.strategy.unite`. Generic class `Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy` applicable for activity entities now is used instead.
 - Removed service `oro_note.widget_provider.actions`.
-- Added parameter `renderContexts` to route controller action `Oro\Bundle\NoteBundle\Controller\Note::infoAction` (route `oro_note_widget_info`). Default value of the parameter is `true`. 
+- Added parameter `renderContexts` to route controller action `Oro\Bundle\NoteBundle\Controller\Note::infoAction` (route `oro_note_widget_info`). Default value of the parameter is `true`.
 - Changed signature of controller action `Oro\Bundle\NoteBundle\Controller\Note::createAction`. The parameters of route `oro_note_create` remain the same as before - `entityClass` and `entityId`.
 - Changed signature of method `Oro\Bundle\NoteBundle\Form\Handler\NoteHandler::__construct`.
 - Changed signature of method `Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider::__construct`.
 - Replaced method `Oro\Bundle\NoteBundle\Form\Type\NoteType::setDefaultOptions` with `Oro\Bundle\NoteBundle\Form\Type\NoteType::configureOptions`.
-- Changed view template `OroNoteBundle:Note:js/activityItemTemplate.html.twig`. 
+- Changed view template `OroNoteBundle:Note:js/activityItemTemplate.html.twig`.
 - Changed view template `OroNoteBundle:Note:widget/info.html.twig`.
 - Removed parameter `oro_note.manager.api.class` from DIC.
 - Removed parameter `oro_note.activity_list.provider.class` from DIC.
 - Removed parameter `oro_note.manager.class` from DIC.
+
+#### TagBundle
+- Constructor of `Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension` was changed. Dependency on `Doctrine\ORM\EntityManager` was removed.
+- Removed constant `GRID_FROM_PATH` from `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+- Removed constant `GRID_COLUMN_ALIAS_PATH` from `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+- Changed signature of constructor of `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Changed signature of constructor of `Oro\Bundle\TagBundle\Grid\TagsExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.
+- Changed signature of constructor of `Oro\Bundle\TagBundle\Grid\TagsReportExtension`. The argument `GridConfigurationHelper $gridConfigurationHelper` was replaces with `EntityClassResolver $entityClassResolver`.

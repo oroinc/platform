@@ -7,9 +7,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 
-/**
- * @dbIsolation
- */
 class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
 {
     /**
@@ -88,14 +85,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
-
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -163,14 +153,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'PATCH',
-            $this->getUrl('oro_rest_api_patch', ['entity' => $entityType, 'id' => $userId]),
-            $data
-        );
-
-        self::assertResponseStatusCodeEquals($response, 200);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        $response = $this->patch(['entity' => $entityType, 'id' => $userId], $data);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -214,7 +197,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
         );
 
         self::assertResponseStatusCodeEquals($response, 400);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
 
         self::assertEquals(
             [
@@ -300,14 +283,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
-
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
 
@@ -377,14 +353,7 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->request(
-            'POST',
-            $this->getUrl('oro_rest_api_post', ['entity' => $entityType]),
-            $data
-        );
-
-        self::assertResponseStatusCodeEquals($response, 201);
-        self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
+        $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
 

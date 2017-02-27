@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Component\Config\Common\ConfigObject;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Config\Common\ConfigObject;
 
 /**
  * @ORM\Table(
@@ -44,7 +45,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class Channel
+class Channel implements OrganizationAwareInterface
 {
     /** This mode allow to do any changes(including removing) with channel */
     const EDIT_MODE_ALLOW = 3;
@@ -82,7 +83,7 @@ class Channel
      * @var Transport
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport",
-     *     cascade={"all"}, orphanRemoval=true
+     *     cascade={"all"}, orphanRemoval=true, inversedBy="channel"
      * )
      */
     protected $transport;
@@ -91,7 +92,7 @@ class Channel
      * @var []
      * @ORM\Column(name="connectors", type="array")
      */
-    protected $connectors;
+    protected $connectors = [];
 
     /**
      * @var ConfigObject
@@ -363,7 +364,7 @@ class Channel
 
     /**
      * @deprecated Deprecated since 1.7.0 in favor of getLastStatusForConnector because of performance impact.
-     * @see Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector
+     * @see \Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector
      * @param string $connector
      * @param int|null $codeFilter
      *
@@ -402,15 +403,19 @@ class Channel
     }
 
     /**
-     * @param Organization $organization
+     * @param OrganizationInterface $organization
+     *
+     * @return $this
      */
-    public function setOrganization($organization)
+    public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;
+
+        return $this;
     }
 
     /**
-     * @return Organization
+     * @return OrganizationInterface
      */
     public function getOrganization()
     {
@@ -419,10 +424,14 @@ class Channel
 
     /**
      * @param boolean $enabled
+     *
+     * @return $this
      */
     public function setEnabled($enabled)
     {
         $this->enabled = $enabled;
+
+        return $this;
     }
 
     /**

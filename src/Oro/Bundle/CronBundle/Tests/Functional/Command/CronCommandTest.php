@@ -1,17 +1,14 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Functinal\Command;
+namespace Oro\Bundle\CronBundle\Tests\Functional\Command;
 
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Async\Topics;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
-use Oro\Bundle\CronBundle\Tests\Functional\Command\DataFixtures\LoadScheduleData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-/**
- * @dbIsolation
- */
 class CronCommandTest extends WebTestCase
 {
     use MessageQueueExtension;
@@ -19,10 +16,6 @@ class CronCommandTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-
-        $this->loadFixtures([
-            LoadScheduleData::class
-        ]);
     }
 
     public function testShouldRunAndScheduleIfCommandDue()
@@ -32,7 +25,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
         $this->assertNotEmpty($result);
 
-        $this->assertContains('Scheduling run for command oro:test', $result);
+        $this->assertContains('Scheduling run for command ', $result);
         $this->assertContains('All commands scheduled', $result);
     }
 
@@ -43,7 +36,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
 
         $this->assertNotEmpty($result);
-        $this->assertContains('Skipping command oro:test', $result);
+        $this->assertContains('Skipping not due command', $result);
         $this->assertContains('All commands scheduled', $result);
     }
 
@@ -69,12 +62,22 @@ class CronCommandTest extends WebTestCase
     public function testShouldNotSendMessagesIfNotCommandDue()
     {
         $this->mockCronHelper(false);
-
         $this->runCommand('oro:cron');
 
         $messages = self::getSentMessages();
 
         $this->assertCount(0, $messages);
+    }
+
+    public function testDisabledAllJobs()
+    {
+        $this->mockCronHelper(true);
+        $this->mockFeatureChecker();
+
+        $result = $this->runCommand('oro:cron', ['-vvv' => true]);
+        $this->assertNotEmpty($result);
+
+        $this->assertContains("All commands scheduled\n", $result);
     }
 
     /**
@@ -94,5 +97,19 @@ class CronCommandTest extends WebTestCase
         $mockCronHelper->expects($this->any())->method('createCron')->willReturn($cronExpression);
 
         $this->getContainer()->set('oro_cron.helper.cron', $mockCronHelper);
+    }
+
+    protected function mockFeatureChecker()
+    {
+        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->with($this->anything())
+            ->willReturn(false);
+
+        $this->getContainer()->set('oro_featuretoggle.checker.feature_checker', $featureChecker);
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WindowsBundle\Twig;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -14,6 +15,9 @@ class WindowsExtension extends \Twig_Extension
 {
     const EXTENSION_NAME = 'oro_windows';
 
+    /** @var ContainerInterface */
+    protected $container;
+
     /**
      * Protect extension from infinite loop
      *
@@ -21,22 +25,28 @@ class WindowsExtension extends \Twig_Extension
      */
     protected $rendered = false;
 
-    /** @var WindowsStateManagerRegistry */
-    protected $windowsStateManagerRegistry;
-
-    /** @var WindowsStateRequestManager */
-    protected $windowsStateRequestManager;
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @param WindowsStateManagerRegistry $windowsStateManagerRegistry
-     * @param WindowsStateRequestManager $windowsStateRequestManager
+     * @return WindowsStateManagerRegistry
      */
-    public function __construct(
-        WindowsStateManagerRegistry $windowsStateManagerRegistry,
-        WindowsStateRequestManager $windowsStateRequestManager
-    ) {
-        $this->windowsStateManagerRegistry = $windowsStateManagerRegistry;
-        $this->windowsStateRequestManager = $windowsStateRequestManager;
+    protected function getWindowsStateManagerRegistry()
+    {
+        return $this->container->get('oro_windows.manager.windows_state_registry');
+    }
+
+    /**
+     * @return WindowsStateRequestManager
+     */
+    protected function getWindowsStateRequestManager()
+    {
+        return $this->container->get('oro_windows.manager.windows_state_request');
     }
 
     /**
@@ -45,21 +55,15 @@ class WindowsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'oro_windows_restore' => new \Twig_Function_Method(
-                $this,
-                'render',
-                [
-                    'is_safe' => ['html'],
-                    'needs_environment' => true,
-                ]
+            new \Twig_SimpleFunction(
+                'oro_windows_restore',
+                [$this, 'render'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            'oro_window_render_fragment' => new \Twig_Function_Method(
-                $this,
-                'renderFragment',
-                [
-                    'is_safe' => ['html'],
-                    'needs_environment' => true,
-                ]
+            new \Twig_SimpleFunction(
+                'oro_window_render_fragment',
+                [$this, 'renderFragment'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
             ),
         ];
     }
@@ -80,7 +84,7 @@ class WindowsExtension extends \Twig_Extension
         $this->rendered = true;
 
         try {
-            $windowsStates = $this->windowsStateManagerRegistry->getManager()->getWindowsStates();
+            $windowsStates = $this->getWindowsStateManagerRegistry()->getManager()->getWindowsStates();
         } catch (AccessDeniedException $e) {
             $windowsStates = [];
         }
@@ -106,7 +110,7 @@ class WindowsExtension extends \Twig_Extension
         $windowState->setRenderedSuccessfully(false);
 
         try {
-            $uri = $this->windowsStateRequestManager->getUri($windowState->getData());
+            $uri = $this->getWindowsStateRequestManager()->getUri($windowState->getData());
 
             /** @var HttpKernelExtension $httpKernelExtension */
             $httpKernelExtension = $environment->getExtension('http_kernel');
@@ -122,7 +126,7 @@ class WindowsExtension extends \Twig_Extension
 
         if ($scheduleDelete) {
             try {
-                $this->windowsStateManagerRegistry->getManager()->deleteWindowsState($windowState->getId());
+                $this->getWindowsStateManagerRegistry()->getManager()->deleteWindowsState($windowState->getId());
             } catch (AccessDeniedException $e) {
                 return $result;
             }

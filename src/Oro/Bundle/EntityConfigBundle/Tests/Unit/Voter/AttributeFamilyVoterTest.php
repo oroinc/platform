@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Voter;
 
-use Doctrine\ORM\EntityRepository;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
-use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
 use Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -31,7 +29,12 @@ class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase
     private $doctrineHelper;
 
     /**
-     * @var \Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter
+     * @var AttributeFamilyManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $familyManager;
+
+    /**
+     * @var AttributeFamilyVoter
      */
     private $voter;
 
@@ -42,32 +45,18 @@ class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->voter = new \Oro\Bundle\EntityConfigBundle\Voter\AttributeFamilyVoter($this->doctrineHelper);
+        $this->familyManager = $this->getMockBuilder(AttributeFamilyManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->voter = new AttributeFamilyVoter($this->doctrineHelper, $this->familyManager);
     }
 
     /**
      * @param AttributeFamily $attributeFamily
-     * @param int $familiesCount
-     * @return AttributeFamilyRepository|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function expectsGetAttributeFamilyRepository(AttributeFamily $attributeFamily, $familiesCount)
+    private function configureDocrineHelperExpectations(AttributeFamily $attributeFamily)
     {
-        $attributeFamilyRepository = $this->getMockBuilder(AttributeFamilyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $attributeFamilyRepository
-            ->expects($this->once())
-            ->method('find')
-            ->with(self::FAMILY_ID)
-            ->willReturn($attributeFamily);
-
-        $attributeFamilyRepository
-            ->expects($this->once())
-            ->method('countFamiliesByEntityClass')
-            ->with(self::ENTITY_CLASS_NAME)
-            ->willReturn($familiesCount);
-
         $this->doctrineHelper
             ->expects($this->once())
             ->method('getSingleEntityIdentifier')
@@ -79,28 +68,6 @@ class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityClass')
             ->with($attributeFamily)
             ->willReturn(AttributeFamily::class);
-
-        return $attributeFamilyRepository;
-    }
-
-    /**
-     * @param mixed $returnedEntity
-     * @param AttributeFamily $attributeFamily
-     * @return EntityRepository|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private function expectsGetEntityRepository(AttributeFamily $attributeFamily, $returnedEntity)
-    {
-        $entityRepository = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityRepository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['attributeFamily' => $attributeFamily])
-            ->willReturn($returnedEntity);
-
-        return $entityRepository;
     }
 
     public function testVoteWithNotSupportedClass()
@@ -119,42 +86,20 @@ class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testVoteWhenAttributeFamilyIsLast()
+    public function testVoteWhenAttributeFamilyDeniedToDelete()
     {
         $attributeFamily = $this->getEntity(AttributeFamily::class, [
             'id' => self::FAMILY_ID,
             'entityClass' => self::ENTITY_CLASS_NAME
         ]);
 
-        $attributeFamilyRepository = $this->expectsGetAttributeFamilyRepository($attributeFamily, 1);
+        $this->configureDocrineHelperExpectations($attributeFamily);
 
-        $this->doctrineHelper
+        $this->familyManager
             ->expects($this->once())
-            ->method('getEntityRepository')
-            ->with(AttributeFamily::class)
-            ->willReturn($attributeFamilyRepository);
-
-        $this->assertEquals(
-            AbstractEntityVoter::ACCESS_DENIED,
-            $this->voter->vote($this->token, $attributeFamily, ['delete'])
-        );
-    }
-
-    public function testVoteWhenAttributeFamilyNotLastAndHasEntityAssignedToIt()
-    {
-        $attributeFamily = $this->getEntity(AttributeFamily::class, [
-            'id' => self::FAMILY_ID,
-            'entityClass' => self::ENTITY_CLASS_NAME
-        ]);
-
-        $attributeFamilyRepository = $this->expectsGetAttributeFamilyRepository($attributeFamily, 2);
-        $entityRepository = $this->expectsGetEntityRepository($attributeFamily, new \stdClass());
-
-        $this->doctrineHelper
-            ->expects($this->exactly(2))
-            ->method('getEntityRepository')
-            ->withConsecutive([AttributeFamily::class], [self::ENTITY_CLASS_NAME])
-            ->willReturnOnConsecutiveCalls($attributeFamilyRepository, $entityRepository);
+            ->method('isAttributeFamilyDeletable')
+            ->with(self::FAMILY_ID)
+            ->willReturn(false);
 
         $this->assertEquals(
             AbstractEntityVoter::ACCESS_DENIED,
@@ -169,14 +114,12 @@ class AttributeFamilyVoterTest extends \PHPUnit_Framework_TestCase
             'entityClass' => self::ENTITY_CLASS_NAME
         ]);
 
-        $attributeFamilyRepository = $this->expectsGetAttributeFamilyRepository($attributeFamily, 2);
-        $entityRepository = $this->expectsGetEntityRepository($attributeFamily, null);
-
-        $this->doctrineHelper
-            ->expects($this->exactly(2))
-            ->method('getEntityRepository')
-            ->withConsecutive([AttributeFamily::class], [self::ENTITY_CLASS_NAME])
-            ->willReturnOnConsecutiveCalls($attributeFamilyRepository, $entityRepository);
+        $this->configureDocrineHelperExpectations($attributeFamily);
+        $this->familyManager
+            ->expects($this->once())
+            ->method('isAttributeFamilyDeletable')
+            ->with(self::FAMILY_ID)
+            ->willReturn(true);
 
         $this->assertEquals(
             AbstractEntityVoter::ACCESS_ABSTAIN,

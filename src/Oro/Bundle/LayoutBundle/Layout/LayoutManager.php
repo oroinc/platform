@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout;
 
+use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
@@ -10,25 +11,25 @@ use Oro\Component\Layout\LayoutManager as BaseLayoutManager;
 
 class LayoutManager extends BaseLayoutManager
 {
-    /** @var string */
-    protected $defaultActiveTheme;
-
     /** @var LayoutContextHolder */
     protected $contextHolder;
 
+    /** @var LayoutDataCollector */
+    protected $layoutDataCollector;
+
     /**
      * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     * @param LayoutContextHolder           $contextHolder
-     * @param string                        $defaultActiveTheme
+     * @param LayoutContextHolder $contextHolder
+     * @param LayoutDataCollector $layoutDataCollector
      */
     public function __construct(
         LayoutFactoryBuilderInterface $layoutFactoryBuilder,
         LayoutContextHolder $contextHolder,
-        $defaultActiveTheme
+        LayoutDataCollector $layoutDataCollector
     ) {
         parent::__construct($layoutFactoryBuilder);
         $this->contextHolder = $contextHolder;
-        $this->defaultActiveTheme = $defaultActiveTheme;
+        $this->layoutDataCollector = $layoutDataCollector;
     }
 
     /**
@@ -45,11 +46,10 @@ class LayoutManager extends BaseLayoutManager
 
         $this->contextHolder->setContext($context);
 
-        if (!$context->has('theme')) {
-            $context->set('theme', $this->defaultActiveTheme);
-        }
+        $layout = $layoutBuilder->getLayout($context, $rootId);
+        $this->layoutDataCollector->setNotAppliedActions($layoutBuilder->getNotAppliedActions());
 
-        return $layoutBuilder->getLayout($context, $rootId);
+        return $layout;
     }
 
     /**

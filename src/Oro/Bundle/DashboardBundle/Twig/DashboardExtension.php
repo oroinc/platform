@@ -2,31 +2,47 @@
 
 namespace Oro\Bundle\DashboardBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 
 class DashboardExtension extends \Twig_Extension
 {
-    /** @var FilterDateRangeConverter */
-    protected $converter;
-
-    /** @var Manager */
-    protected $manager;
-
-    /** @var EntityProvider */
-    protected $entityProvider;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param FilterDateRangeConverter $converter
-     * @param Manager                  $manager
-     * @param EntityProvider           $entityProvider
+     * @param ContainerInterface $container
      */
-    public function __construct(FilterDateRangeConverter $converter, Manager $manager, EntityProvider $entityProvider)
+    public function __construct(ContainerInterface $container)
     {
-        $this->converter = $converter;
-        $this->manager = $manager;
-        $this->entityProvider = $entityProvider;
+        $this->container = $container;
+    }
+
+    /**
+     * @return FilterDateRangeConverter
+     */
+    protected function getDateRangeConverter()
+    {
+        return $this->container->get('oro_dashboard.widget_config_value.date_range.converter');
+    }
+
+    /**
+     * @return QueryDesignerManager
+     */
+    protected function getQueryDesignerManager()
+    {
+        return $this->container->get('oro_query_designer.query_designer.manager');
+    }
+
+    /**
+     * @return EntityProvider
+     */
+    protected function getEntityProvider()
+    {
+        return $this->container->get('oro_report.entity_provider');
     }
 
     /**
@@ -35,9 +51,9 @@ class DashboardExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'oro_filter_date_range_view' => new \Twig_Function_Method($this, 'getViewValue'),
-            'oro_query_filter_metadata' => new \Twig_Function_Method($this, 'getQueryFilterMetadata'),
-            'oro_query_filter_entities' => new \Twig_Function_Method($this, 'getQueryFilterEntities')
+            new \Twig_SimpleFunction('oro_filter_date_range_view', [$this, 'getViewValue']),
+            new \Twig_SimpleFunction('oro_query_filter_metadata', [$this, 'getQueryFilterMetadata']),
+            new \Twig_SimpleFunction('oro_query_filter_entities', [$this, 'getQueryFilterEntities'])
         ];
     }
 
@@ -48,7 +64,7 @@ class DashboardExtension extends \Twig_Extension
      */
     public function getViewValue($value)
     {
-        return $this->converter->getViewValue($value);
+        return $this->getDateRangeConverter()->getViewValue($value);
     }
 
     /**
@@ -59,13 +75,19 @@ class DashboardExtension extends \Twig_Extension
         return 'oro_dashboard';
     }
 
+    /**
+     * @return array
+     */
     public function getQueryFilterMetadata()
     {
-        return $this->manager->getMetadata('segment');
+        return $this->getQueryDesignerManager()->getMetadata('segment');
     }
 
+    /**
+     * @return array
+     */
     public function getQueryFilterEntities()
     {
-        return $this->entityProvider->getEntities();
+        return $this->getEntityProvider()->getEntities();
     }
 }

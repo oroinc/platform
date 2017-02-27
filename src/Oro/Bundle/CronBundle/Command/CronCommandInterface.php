@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\Command;
 
-interface CronCommandInterface
+interface CronCommandInterface extends ActiveCronCommandInterface
 {
     /**
      * Define default cron schedule definition for a command.

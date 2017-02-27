@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Config\Traits;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ActionConfig
+class ActionConfig implements ConfigBagInterface
 {
     use Traits\ConfigTrait;
     use Traits\ExcludeTrait;

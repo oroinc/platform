@@ -2,8 +2,10 @@ define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
-    './empty-filter'
-], function($, _, __, EmptyFilter) {
+    './empty-filter',
+    'oroui/js/tools',
+    'oroui/js/mediator'
+], function($, _, __, EmptyFilter, tools, mediator) {
     'use strict';
 
     var TextFilter;
@@ -74,6 +76,10 @@ define([
             'click .disable-filter': '_onClickDisableFilter'
         },
 
+        listen: {
+            'layout:reposition mediator': '_onLayoutReposition'
+        },
+
         /**
          * Initialize.
          *
@@ -106,9 +112,16 @@ define([
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
-            if (e.which === 13) {
-                this._applyValueAndHideCriteria();
+            if (e.which !== 13) {
+                return;
             }
+
+            if (!this._hasMinimumLength()) {
+                this._showMinLengthWarning();
+                return;
+            }
+
+            this._applyValueAndHideCriteria();
         },
 
         /**
@@ -118,8 +131,44 @@ define([
          * @private
          */
         _onClickUpdateCriteria: function(e) {
+
+            if (!this._hasMinimumLength()) {
+                this._showMinLengthWarning();
+                e.stopImmediatePropagation();
+                return;
+            }
+
             this.trigger('updateCriteriaClick', this);
             this._applyValueAndHideCriteria();
+        },
+
+        /**
+         * Handles min_length text filter option.
+         * 0 is default value which means any length is fine.
+         *
+         * @returns {boolean}
+         * @private
+         */
+        _hasMinimumLength: function() {
+            if (typeof this.min_length === 'undefined') {
+                return true;
+            }
+
+            var enoughCharacters =  this._readDOMValue().value.length >= this.min_length;
+            var noCharacters = this._readDOMValue().value.length === 0;
+
+            return this.min_length === 0 || enoughCharacters || noCharacters;
+        },
+
+        /**
+         * @private
+         */
+        _showMinLengthWarning: function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                __('oro.filter.warning.min_length', {min_length: this.min_length})
+            );
         },
 
         /**
@@ -156,12 +205,20 @@ define([
             }
         },
 
+        _onLayoutReposition: function() {
+            if (this.popupCriteriaShowed) {
+                this._alignCriteria();
+            }
+        },
+
         /**
          * @protected
          */
         _applyValueAndHideCriteria: function() {
             this._hideCriteria();
-            this.applyValue();
+            if (this._hasMinimumLength()) {
+                this.applyValue();
+            }
         },
 
         /**
@@ -217,14 +274,19 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            var $container = this._findDropdownFitContainer();
-            if ($container === null) {
+            if (tools.isMobile()) {
+                // no need to align criteria on mobile version, it is aligned over CSS
+                return;
+            }
+            var $container = this.$el.closest('.filter-box');
+            if (!$container.length) {
                 return;
             }
             var $dropdown = this.$(this.criteriaSelector);
+            $dropdown.css('margin-left', 'auto');
             var rect = $dropdown.get(0).getBoundingClientRect();
             var containerRect = $container.get(0).getBoundingClientRect();
-            var shift = rect.right - (containerRect.left + $container.prop('clientWidth'));
+            var shift = rect.right - containerRect.right;
             if (shift > 0) {
                 /**
                  * reduce shift to avoid overlaping left edge of container

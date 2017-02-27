@@ -1,4 +1,8 @@
-$input-padding: $base-ui-element-offset;
+// @theme: default
+
+$input-appearance: true;
+
+$input-padding: 11px;
 $input-padding--m: 10px 9px;
 $input-padding--s: 8px 9px;
 $input-padding--x-s: 6px 9px;

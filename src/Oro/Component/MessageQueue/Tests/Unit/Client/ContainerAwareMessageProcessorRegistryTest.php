@@ -15,10 +15,7 @@ class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_Test
     public function testShouldThrowExceptionIfProcessorIsNotSet()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'MessageProcessor was not found. processorName: "processor-name"'
-        );
-
+        $this->expectExceptionMessage('MessageProcessor was not found. processorName: "processor-name"');
         $registry = new ContainerAwareMessageProcessorRegistry();
         $registry->get('processor-name');
     }
@@ -38,7 +35,6 @@ class ContainerAwareMessageProcessorRegistryTest extends \PHPUnit_Framework_Test
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Container was not set');
-
         $processor = new \stdClass();
 
         $container = new Container();

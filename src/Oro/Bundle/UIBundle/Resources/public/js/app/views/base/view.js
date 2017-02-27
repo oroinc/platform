@@ -18,7 +18,10 @@ define([
             var template = this.template;
             var templateFunc = null;
 
-            if (typeof template === 'string') {
+            // If templateSelector is set in a extended view
+            if (this.templateSelector) {
+                templateFunc = _.template($(this.templateSelector).html());
+            } else if (typeof template === 'string') {
                 templateFunc = _.template(template);
                 // share a compiled template with all instances built with same constructor
                 this.constructor.prototype.template = templateFunc;

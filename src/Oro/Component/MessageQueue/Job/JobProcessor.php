@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Job;
 
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class JobProcessor
 {
@@ -91,12 +91,13 @@ class JobProcessor
         if ($job) {
             return $job;
         }
-        
+
         $job = $this->jobStorage->createJob();
         $job->setStatus(Job::STATUS_NEW);
         $job->setName($jobName);
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
+        $rootJob->addChildJob($job);
         $job->setJobProgress(0);
         $this->jobStorage->saveJob($job);
 
@@ -120,7 +121,7 @@ class JobProcessor
 
         $job = $this->jobStorage->findJobById($job->getId());
 
-        if ($job->getStatus() !== Job::STATUS_NEW) {
+        if (! in_array($job->getStatus(), [Job::STATUS_NEW, Job::STATUS_FAILED_REDELIVERED])) {
             throw new \LogicException(sprintf(
                 'Can start only new jobs: id: "%s", status: "%s"',
                 $job->getId(),
@@ -203,6 +204,33 @@ class JobProcessor
     /**
      * @param Job $job
      */
+    public function failAndRedeliveryChildJob(Job $job)
+    {
+        if ($job->isRoot()) {
+            throw new \LogicException(sprintf('Can\'t fail root jobs. id: "%s"', $job->getId()));
+        }
+
+        $job = $this->jobStorage->findJobById($job->getId());
+
+        if ($job->getStatus() !== Job::STATUS_RUNNING) {
+            throw new \LogicException(sprintf(
+                'Can fail and redelivery only running jobs. id: "%s", status: "%s"',
+                $job->getId(),
+                $job->getStatus()
+            ));
+        }
+
+        $job->setStatus(Job::STATUS_FAILED_REDELIVERED);
+        $this->jobStorage->saveJob($job);
+
+        $this->producer->send(Topics::CALCULATE_ROOT_JOB_STATUS, [
+                'jobId' => $job->getId()
+            ]);
+    }
+
+    /**
+     * @param Job $job
+     */
     public function cancelChildJob(Job $job)
     {
         if ($job->isRoot()) {
@@ -211,7 +239,7 @@ class JobProcessor
 
         $job = $this->jobStorage->findJobById($job->getId());
 
-        if (! in_array($job->getStatus(), [Job::STATUS_NEW, Job::STATUS_RUNNING])) {
+        if (! in_array($job->getStatus(), [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED])) {
             throw new \LogicException(sprintf(
                 'Can cancel only new or running jobs. id: "%s", status: "%s"',
                 $job->getId(),
@@ -236,6 +264,25 @@ class JobProcessor
     }
 
     /**
+     * @param Job $job
+     */
+    public function cancelAllActiveChildJobs(Job $job)
+    {
+        if (!$job->isRoot() || !$job->getChildJobs()) {
+            return;
+        }
+
+        foreach ($job->getChildJobs() as $childJob) {
+            if (in_array(
+                $childJob->getStatus(),
+                [Job::STATUS_NEW, Job::STATUS_RUNNING, Job::STATUS_FAILED_REDELIVERED]
+            )) {
+                $this->cancelChildJob($childJob);
+            }
+        }
+    }
+
+    /**
      * @param Job  $job
      * @param bool $force
      */
@@ -257,6 +304,7 @@ class JobProcessor
             $job->setInterrupted(true);
 
             if ($force) {
+                $this->cancelAllActiveChildJobs($job);
                 $job->setStoppedAt(new \DateTime());
             }
         });
@@ -264,7 +312,6 @@ class JobProcessor
 
     /**
      * @param $job
-     * @return void
      */
     protected function sendRecalculateJobProgressMessage($job)
     {

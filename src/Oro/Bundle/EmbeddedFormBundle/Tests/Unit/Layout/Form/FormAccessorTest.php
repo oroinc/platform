@@ -17,7 +17,7 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $this->form->expects($this->once())
+        $this->form->expects($this->any())
             ->method('getName')
             ->will($this->returnValue(self::FORM_NAME));
     }
@@ -31,10 +31,10 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
     public function testToString()
     {
         $formAccessor = new FormAccessor($this->form);
-        $this->assertEquals(self::FORM_NAME, $formAccessor->toString());
+        $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
     }
 
-    public function testToStringWithAllParams()
+    public function testGetHash()
     {
         $formAccessor = new FormAccessor(
             $this->form,
@@ -44,7 +44,7 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             self::FORM_NAME . ';action_route:test_route;method:post;enctype:multipart/form-data',
-            $formAccessor->toString()
+            $formAccessor->getHash()
         );
     }
 
@@ -77,7 +77,7 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertNull($formAccessor->getEnctype());
-        $this->assertEquals(self::FORM_NAME, $formAccessor->toString());
+        $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
     }
 
     public function testParamsInitializerForMultipartForm()
@@ -108,7 +108,7 @@ class FormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
         $this->assertEquals('multipart/form-data', $formAccessor->getEnctype());
-        $this->assertEquals(self::FORM_NAME, $formAccessor->toString());
+        $this->assertEquals('name:'.self::FORM_NAME, $formAccessor->toString());
     }
 
     public function testGetView()

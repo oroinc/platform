@@ -45,11 +45,26 @@ services:
                 - setOptionsConfig
                 -
                     -
+                        defaultValue: ~
                         value: {required: true}
                         params: ~
             - [setName, ['title']]
         tags:
              - { name: layout.block_type, alias: title }
+
+    oro_layout.block_type.page_title:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        defaultValue: ~
+                        value: {required: true}
+                        params: ~
+            - [setName, ['page_title']]
+        tags:
+             - { name: layout.block_type, alias: page_title }
 
     oro_layout.block_type.requires:
         parent: oro_layout.block_type.abstract_configurable

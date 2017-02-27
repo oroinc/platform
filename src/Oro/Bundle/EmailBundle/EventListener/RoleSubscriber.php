@@ -73,14 +73,16 @@ class RoleSubscriber implements EventSubscriber
         $oid = $aclManager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
         foreach ($this->insertedRoles as $role) {
             $sid = $aclManager->getSid($role);
-            $maskBuilder = $aclManager->getMaskBuilder($oid)
-                ->add('VIEW_SYSTEM')
-                ->add('CREATE_SYSTEM')
-                ->add('EDIT_SYSTEM');
-            $aclManager->setPermission($sid, $oid, $maskBuilder->get());
+            $mask = 0;
+
+            foreach (['VIEW', 'CREATE', 'EDIT'] as $permission) {
+                $maskBuilder = $aclManager->getMaskBuilder($oid, $permission);
+                $maskBuilder->add($permission . '_SYSTEM');
+                $mask |= $maskBuilder->get();
+            }
+            $aclManager->setPermission($sid, $oid, $mask);
         }
         $this->insertedRoles = [];
-
         $aclManager->flush();
     }
 

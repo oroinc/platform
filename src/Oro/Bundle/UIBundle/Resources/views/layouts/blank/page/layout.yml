@@ -9,7 +9,8 @@ layout:
                 title:
                     blockType: title
                     options:
-                        value: '=data["title_provider"].getTitle(context["route_name"], params)'
+                        defaultValue: '=data["title_provider"].getTitle(context["route_name"], params)'
+                        value: '=defaultValue'
                         params: []
                 meta_charset:
                     blockType: meta
@@ -56,7 +57,7 @@ layout:
                 app_script:
                     blockType: script
                     options:
-                        content: 'require(["oroui/js/app"]);'
+                        content: 'require(["oroui/js/app"]); require(["oroui/js/init-layout"]);'
             tree:
                 root:
                     head:

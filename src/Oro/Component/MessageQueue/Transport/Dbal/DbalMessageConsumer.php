@@ -36,7 +36,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private $consumerId;
 
     /**
-     * @var int
+     * @var int microseconds
      */
     private $pollingInterval = 1000000;
 
@@ -64,6 +64,8 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
+     * Get polling interval in milliseconds
+     *
      * @return int
      */
     public function getPollingInterval()
@@ -97,13 +99,13 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 return $message;
             }
 
-            if ($timeout && (microtime(true) - $startAt) * 1000 >= $timeout) {
+            if ($timeout && (microtime(true) - $startAt) >= $timeout) {
                 return;
             }
 
             usleep($this->pollingInterval);
 
-            if ($timeout && (microtime(true) - $startAt) * 1000 >= $timeout) {
+            if ($timeout && (microtime(true) - $startAt) >= $timeout) {
                 return;
             }
         }

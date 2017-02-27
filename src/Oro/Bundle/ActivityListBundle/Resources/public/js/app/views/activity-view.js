@@ -24,7 +24,8 @@ define(function(require) {
                 deleteItem: null
             },
             infoBlock: '> .accordion-group > .accordion-body .message .info',
-            commentsBlock: '> .accordion-group > .accordion-body .message .comment',
+            // commentsBlock is placed in next container after infoBlock
+            commentsBlock: '> .accordion-group > .accordion-body .message > .info + * > .comment',
             commentsCountBlock: '> .accordion-group > .accordion-heading .comment-count .count',
             ignoreHead: false
         },
@@ -164,8 +165,9 @@ define(function(require) {
         },
 
         _onContentChange: function() {
-            this.disposePageComponents();
-            this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+            this.$(this.options.infoBlock)
+                .trigger('content:remove') // to dispose only components related to infoBlock
+                .html(this.model.get('contentHTML'));
             this.initLayout().done(_.bind(function() {
                 // if the activity has an EmailTreadView -- handle comment count change in own way
                 var emailTreadView = this.getEmailThreadView();

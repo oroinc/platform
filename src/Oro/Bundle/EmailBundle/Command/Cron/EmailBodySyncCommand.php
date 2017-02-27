@@ -15,6 +15,11 @@ use Oro\Component\Log\OutputLogger;
 class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
+     * Command name
+     */
+    const COMMAND_NAME = 'oro:cron:email-body-sync';
+
+    /**
      * Number of emails in batch
      */
     const BATCH_SIZE = 25;
@@ -33,12 +38,22 @@ class EmailBodySyncCommand extends ContainerAwareCommand implements CronCommandI
     }
 
     /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        $featureChecker = $this->getContainer()->get('oro_featuretoggle.checker.feature_checker');
+
+        return $featureChecker->isResourceEnabled(self::COMMAND_NAME, 'cron_jobs');
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configure()
     {
         $this
-            ->setName('oro:cron:email-body-sync')
+            ->setName(self::COMMAND_NAME)
             ->setDescription('Synchronize email body')
             ->addOption(
                 'max-exec-time',

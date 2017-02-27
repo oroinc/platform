@@ -2,19 +2,26 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
+
 use Knp\Menu\ItemInterface;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
+use Oro\Bundle\UIBundle\Model\TreeCollection;
 
 abstract class AbstractMenuController extends Controller
 {
@@ -110,6 +117,81 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param string  $menuName
+     * @param array   $context
+     * @param array   $menuTreeContext
+     * @return array|RedirectResponse
+     */
+    protected function move(Request $request, $menuName, array $context = [], array $menuTreeContext = [])
+    {
+        $this->checkAcl();
+
+        $menu = $this->getMenu($menuName, $menuTreeContext);
+        $scope = $this->getScope($context);
+
+        $handler = $this->get('oro_navigation.tree.menu_update_tree_handler');
+        $treeItems = $handler->getTreeItemList($menu, true);
+
+        $collection = new TreeCollection();
+        $collection->source = array_intersect_key($treeItems, array_flip($request->get('selected', [])));
+
+        $treeData = $handler->createTree($menu, true);
+        $handler->disableTreeItems($collection->source, $treeData);
+        $form = $this->createForm(TreeMoveType::class, $collection, [
+            'tree_items' => $treeItems,
+            'tree_data' => $treeData,
+        ]);
+
+        $responseData = [
+            'scope' => $scope,
+            'menuName' => $menu->getName(),
+            'treeItems' => $treeItems,
+            'changed' => [],
+        ];
+
+        $manager = $this->get('oro_navigation.manager.menu_update');
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var EntityManager $entityManager */
+            $entityManager = $this->getDoctrine()->getManagerForClass(MenuUpdate::class);
+
+            $updates = $manager->moveMenuItems(
+                $menuName,
+                $collection->source,
+                $scope,
+                $collection->target->getKey(),
+                count($collection->target->getChildren())
+            );
+
+            foreach ($updates as $update) {
+                $errors = $this->get('validator')->validate($update);
+                if (count($errors)) {
+                    $form->addError(new FormError(
+                        $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message')
+                    ));
+                    return array_merge($responseData, ['form' => $form->createView()]);
+                }
+                $entityManager->persist($update);
+                $responseData['changed'][] = [
+                    'id' => $update->getKey(),
+                    'parent' => $collection->target->getKey(),
+                    'position' => $update->getPriority()
+                ];
+            }
+
+            $entityManager->flush();
+            $this->dispatchMenuUpdateScopeChangeEvent($menuName, $scope);
+
+            $responseData['saved'] = true;
+        }
+
+        return array_merge($responseData, ['form' => $form->createView()]);
+    }
+
+    /**
      * @param MenuUpdateInterface $menuUpdate
      * @param array               $context
      * @param array               $menuTreeContext
@@ -131,11 +213,15 @@ abstract class AbstractMenuController extends Controller
             $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
         );
 
+        $scope = $this->getScope($context);
+
         if (is_array($response)) {
-            $response['scope'] = $this->getScope($context);
+            $response['scope'] = $scope;
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
             $response['menuItem'] = $menuItem;
+        } else {
+            $this->dispatchMenuUpdateScopeChangeEvent($menu->getName(), $scope);
         }
 
         return $response;
@@ -154,8 +240,8 @@ abstract class AbstractMenuController extends Controller
     }
 
     /**
-     * @param       $menuName
-     * @param array $menuTreeContext
+     * @param string $menuName
+     * @param array  $menuTreeContext
      * @return ItemInterface
      */
     protected function getMenu($menuName, array $menuTreeContext = [])
@@ -178,5 +264,17 @@ abstract class AbstractMenuController extends Controller
     protected function createMenuTree($menu)
     {
         return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
+    }
+
+    /**
+     * @param string $menuName
+     * @param Scope $scope
+     */
+    protected function dispatchMenuUpdateScopeChangeEvent($menuName, Scope $scope)
+    {
+        $this->get('event_dispatcher')->dispatch(
+            MenuUpdateScopeChangeEvent::NAME,
+            new MenuUpdateScopeChangeEvent($menuName, $scope)
+        );
     }
 }

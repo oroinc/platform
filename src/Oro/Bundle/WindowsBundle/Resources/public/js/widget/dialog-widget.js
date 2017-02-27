@@ -144,9 +144,9 @@ define(function(require) {
             dialogManager.remove(this);
             if (this.model && !this.options.preventModelRemoval) {
                 this.model.destroy({
-                    errorOutput: function(event, xhr) {
-                        // Suppress error if it's 404 response and not debug mode
-                        return xhr.status !== 404 || tools.debug;
+                    errorHandlerMessage: function(event, xhr) {
+                        // Suppress error if it's 404 response
+                        return xhr.status !== 404;
                     }
                 });
             }
@@ -155,6 +155,7 @@ define(function(require) {
             // need to remove components in widget before DOM will be deleted
             this.disposePageComponents();
             _.invoke(this.subviews, 'dispose');
+            this.subviews = {};
 
             if (this.widget) {
                 this.widget.remove();

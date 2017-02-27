@@ -12,6 +12,7 @@ Table of Contents
  - [Change delete handler for entity](#change-delete-handler-for-entity)
  - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
  - [Configure nested object](#configure-nested-object)
+ - [Configure nested association](#configure-nested-association)
  - [Turn on Extended Many-To-One Associations](#turn-on-extended-many-to-one-associations)
  - [Turn on Extended Many-To-Many Associations](#turn-on-extended-many-to-many-associations)
  - [Turn on Extended Multiple Many-To-One Associations](#turn-on-extended-multiple-many-to-one-associations)
@@ -121,7 +122,7 @@ api:
         Acme\Bundle\ProductBundle\Product:
             actions:
                 delete:
-                    excluded: true
+                    exclude: true
 ```
 
 Also, you can use short syntax:
@@ -218,6 +219,46 @@ Here is an example how the nested objects looks in JSON.API:
       "interval": {
         "number": 2,
         "unit": "H"
+      }
+    }
+  }
+}
+```
+
+Configure nested association
+----------------------------
+
+Sometimes a relationship with a group of entities is implemented as two fields, "entityClass" and "entityId", rather than [many-to-one extended association](../../../EntityExtendBundle/Resources/doc/associations.md). But in Data API these fields should be represented as a regular relationship. To achieve this a special data type named `nestedAssociation` was implemented. For example lets suppose that an entity has two fields `sourceEntityClass` and `sourceEntityId` and you need to expose them in API as `source` relationship. This can be achieved by the following configuration:
+
+```yaml
+api:
+    entities:
+        Oro\Bundle\OrderBundle\Entity\Order:
+            fields:
+                source:
+                    data_type: nestedAssociation
+                    fields:
+                        __class__:
+                            property_path: sourceEntityClass
+                        id:
+                            property_path: sourceEntityId
+                sourceEntityClass:
+                    exclude: true
+                sourceEntityId:
+                    exclude: true
+```
+
+Here is an example how the nested association looks in JSON.API:
+
+```json
+{
+  "data": {
+    "type": "orders",
+    "id": "1",
+    "relationships": {
+      "source": {
+        "type": "contacts",
+        "id": 123
       }
     }
   }

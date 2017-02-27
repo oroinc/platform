@@ -17,6 +17,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
+use Oro\Component\Layout\ContextItemInterface;
+
 /**
  * @ORM\Table(name="oro_attribute_family")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository")
@@ -32,10 +34,18 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
  *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"="",
+ *              "category"="catalog"
+ *          }
  *      }
  * )
  */
-class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterface, OrganizationAwareInterface
+class AttributeFamily extends ExtendAttributeFamily implements
+    DatesAwareInterface,
+    OrganizationAwareInterface,
+    ContextItemInterface
 {
     use DatesAwareTrait;
 
@@ -45,6 +55,7 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     *
      */
     private $id;
 
@@ -83,6 +94,13 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     /**
      * @var string
      * @ORM\Column(name="code", type="string", length=255, unique=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     *  )
      */
     private $code;
 
@@ -257,7 +275,7 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|AttributeGroup[]
      */
     public function getAttributeGroups()
     {
@@ -327,5 +345,36 @@ class AttributeFamily extends ExtendAttributeFamily implements DatesAwareInterfa
     public function __toString()
     {
         return $this->getDefaultLabel()->getString();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toString()
+    {
+        return 'code:'.$this->getCode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHash()
+    {
+        $data = [];
+
+        /** @var AttributeGroup $group */
+        $groups = $this->getAttributeGroups();
+
+        foreach ($groups as $group) {
+            $item = ['group' => $group->getId(), 'attributes' => [], 'visible' => $group->getIsVisible()];
+
+            /** @var AttributeGroupRelation $attributeRelation */
+            foreach ($group->getAttributeRelations() as $attributeRelation) {
+                $item['attributes'][] = $attributeRelation->getEntityConfigFieldId();
+            }
+            $data[] = $item;
+        }
+
+        return md5(serialize([$this->getId() => $data]));
     }
 }

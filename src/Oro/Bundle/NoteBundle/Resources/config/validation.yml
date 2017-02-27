@@ -2,5 +2,3 @@ Oro\Bundle\NoteBundle\Entity\Note:
     properties:
         message:
             - NotBlank:     ~
-        organization:
-            - NotBlank: ~

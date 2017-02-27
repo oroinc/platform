@@ -4,7 +4,6 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
@@ -23,9 +22,6 @@ class Orm extends AbstractEngine
     /** @var ObjectMapper */
     protected $mapper;
 
-    /** @var array */
-    protected $drivers = [];
-
     /**
      * @param ManagerRegistry          $registry
      * @param ObjectMapper             $mapper
@@ -39,14 +35,6 @@ class Orm extends AbstractEngine
         parent::__construct($registry, $eventDispatcher);
 
         $this->mapper = $mapper;
-    }
-
-    /**
-     * @param array $drivers
-     */
-    public function setDrivers(array $drivers)
-    {
-        $this->drivers = $drivers;
     }
 
     /**
@@ -79,7 +67,6 @@ class Orm extends AbstractEngine
                 }
 
                 $results[$id] = new ResultItem(
-                    $this->registry->getManagerForClass($item['entity']),
                     $item['entity'],
                     $item['recordId'],
                     $item['title'],
@@ -108,8 +95,6 @@ class Orm extends AbstractEngine
         }
 
         $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
-        $this->indexRepository->setDriversClasses($this->drivers);
-        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
     }
@@ -117,7 +102,7 @@ class Orm extends AbstractEngine
     /**
      * Get search index repository
      *
-     * @return OroEntitymanager
+     * @return OroEntityManager
      */
     protected function getIndexManager()
     {

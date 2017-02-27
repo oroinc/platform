@@ -401,9 +401,6 @@ define(function(require) {
                 _this.enterEditMode(cell, fromPreviousCell);
                 _this.trigger('lockUserActions', false);
             }).fail(function(obj, status) {
-                if (status !== 'abort') {
-                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-                }
                 _this.trigger('lockUserActions', false);
             });
         },
