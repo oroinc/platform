@@ -19,12 +19,14 @@ class OroSSOExtension extends Extension implements PrependExtensionInterface
         if ($container->hasParameter('web_backend_prefix') && !empty($container->getParameter('web_backend_prefix'))) {
             foreach ($container->getExtensionConfig('security') as $config) {
                 $oauthResourceOwners = $config['firewalls']['main']['oauth']['resource_owners'];
-                foreach ($oauthResourceOwners as $name => $path) {
-                    $prefix = $container->getParameter('web_backend_prefix');
-                    $oauthResourceOwners[$name] = $prefix . $path;
+                if (isset($oauthResourceOwners)) {
+                    foreach ($oauthResourceOwners as $name => $path) {
+                        $prefix = $container->getParameter('web_backend_prefix');
+                        $oauthResourceOwners[$name] = $prefix . $path;
+                    }
+                    $config['firewalls']['main']['oauth']['resource_owners'] = $oauthResourceOwners;
+                    $container->setExtensionConfig('security', [$config]);
                 }
-                $config['firewalls']['main']['oauth']['resource_owners'] = $oauthResourceOwners;
-                $container->setExtensionConfig('security', [$config]);
             }
         }
     }
