@@ -16,17 +16,19 @@ class OroSSOExtension extends Extension implements PrependExtensionInterface
      */
     public function prepend(ContainerBuilder $container)
     {
-        if ($container->hasParameter('web_backend_prefix') && !empty($container->getParameter('web_backend_prefix'))) {
-            foreach ($container->getExtensionConfig('security') as $config) {
+        if (!$container->hasParameter('web_backend_prefix') || empty($container->getParameter('web_backend_prefix'))) {
+            return;
+        }
+
+        foreach ($container->getExtensionConfig('security') as $config) {
+            if (isset($config['firewalls']['main']['oauth']['resource_owners'])) {
                 $oauthResourceOwners = $config['firewalls']['main']['oauth']['resource_owners'];
-                if (isset($oauthResourceOwners)) {
-                    foreach ($oauthResourceOwners as $name => $path) {
-                        $prefix = $container->getParameter('web_backend_prefix');
-                        $oauthResourceOwners[$name] = $prefix . $path;
-                    }
-                    $config['firewalls']['main']['oauth']['resource_owners'] = $oauthResourceOwners;
-                    $container->setExtensionConfig('security', [$config]);
+                foreach ($oauthResourceOwners as $name => $path) {
+                    $prefix = $container->getParameter('web_backend_prefix');
+                    $oauthResourceOwners[$name] = $prefix . $path;
                 }
+                $config['firewalls']['main']['oauth']['resource_owners'] = $oauthResourceOwners;
+                $container->setExtensionConfig('security', [$config]);
             }
         }
     }
