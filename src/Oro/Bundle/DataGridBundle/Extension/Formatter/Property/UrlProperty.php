@@ -36,15 +36,11 @@ class UrlProperty extends AbstractProperty
      */
     public function getRawValue(ResultRecordInterface $record)
     {
-        try {
-            $route = $this->router->generate(
-                $this->get(self::ROUTE_KEY),
-                $this->getParameters($record),
-                $this->getOr(self::IS_ABSOLUTE_KEY, false)
-            );
-        } catch (InvalidParameterException $e) {
-            return null;
-        }
+        $route = $this->router->generate(
+            $this->get(self::ROUTE_KEY),
+            $this->getParameters($record),
+            $this->getOr(self::IS_ABSOLUTE_KEY, false)
+        );
 
         return $route . $this->getOr(self::ANCHOR_KEY);
     }

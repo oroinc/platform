@@ -95,3 +95,10 @@ services:
         class: Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator
         tags:
             - { name: validator.constraint_validator, alias: oro_report.report_date_grouping_validator }
+
+    oro_report.datagrid.extension.empty_link_remover:
+        class: Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension
+        arguments:
+            - "%oro_report.calendar_date.entity.class%"
+        tags:
+            - { name: oro_datagrid.extension }

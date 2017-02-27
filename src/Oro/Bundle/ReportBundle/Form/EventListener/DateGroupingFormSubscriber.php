@@ -7,7 +7,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
-use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Form\Type\ReportType;
@@ -33,7 +32,7 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
         /** @var Report $data */
         $data = $event->getData();
         $form = $event->getForm();
-        if (!$data instanceof AbstractQueryDesigner || !$form->has(ReportType::DATE_GROUPING_FORM_NAME)) {
+        if (!$data instanceof Report || !$form->has(ReportType::DATE_GROUPING_FORM_NAME)) {
             return;
         }
         /** @var  $dateGroupingModel */
