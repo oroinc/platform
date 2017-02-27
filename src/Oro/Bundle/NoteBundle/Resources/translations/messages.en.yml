@@ -4,18 +4,25 @@ oro:
 
         entity_label:         Note
         entity_plural_label:  Notes
-        entity_description:   Represent notes
+        entity_description:   Additional information that a user can leave about an entity record.
 
         id.label:             Id
         add.label:            Add
         save.label:           Save
         message:
             label:            Message
-            description:      The message body content
-        attachment.label:     Attachment
+            description:      The note text.
+        attachment:
+            label:            Attachment
+            description:      The file that is attached to the note.
         owner.label:          Created By
         organization.label:   Organization
-        updated_by.label:     Updated By
+        updated_by:
+            label:            Updated By
+            description:      The user who last updated the note record.
+        target:
+            label:            Target
+            description:      The entity record that the note was made about. The note is displayed on the view page of this record.
 
         action:
             add:              Add note
