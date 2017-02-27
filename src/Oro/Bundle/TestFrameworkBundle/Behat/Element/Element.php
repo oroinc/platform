@@ -157,11 +157,14 @@ class Element extends NodeElement
     }
 
     /**
-     * @return DocumentElement
+     * @return self
      */
     protected function getPage()
     {
-        return $this->session->getPage();
+        return $this->elementFactory->wrapElement(
+            'Page',
+            $this->session->getPage()
+        );
     }
 
     /**
