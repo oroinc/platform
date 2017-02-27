@@ -458,13 +458,13 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 ]
             )
             ->runCommand(
-                'oro:workflow:definitions:load',
+                'oro:cron:definitions:load',
                 [
                     '--process-isolation' => true
                 ]
             )
             ->runCommand(
-                'oro:cron:definitions:load',
+                'oro:workflow:definitions:load',
                 [
                     '--process-isolation' => true
                 ]
