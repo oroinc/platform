@@ -24,7 +24,6 @@ class OroNavigationExtensionTest extends ExtensionTestCase
             'oro_menu.configuration_builder',
             'oro_menu.twig.extension',
             'oro_navigation.title_config_reader',
-            'oro_navigation.title_provider',
             'oro_navigation.configuration.provider'
         ];
         $this->assertDefinitionsLoaded($expectedDefinitions);

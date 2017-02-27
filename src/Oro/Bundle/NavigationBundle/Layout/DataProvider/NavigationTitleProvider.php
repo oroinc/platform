@@ -25,18 +25,20 @@ class NavigationTitleProvider
         $this->userConfigManager = $userConfigManager;
     }
 
-
     /**
      * Load title template from config values
      *
-     * @param string $routeName
-     * @param array  $params
+     * @param array       $params
+     * @param string|null $routeName
      *
      * @return string
      */
-    public function getTitle($routeName, $params = [])
+    public function getTitle($params = [], $routeName = null)
     {
-        $this->titleService->loadByRoute($routeName);
+        if ($routeName) {
+            $this->titleService->loadByRoute($routeName);
+        }
+
         $this->titleService->setParams($params);
 
         $title = $this->titleService->render([], null, null, null, true);

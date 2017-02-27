@@ -2,20 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Symfony\Component\Routing\Route;
-
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\NavigationBundle\Entity\Title;
-use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
-use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
+use Oro\Component\DependencyInjection\ServiceLink;
+
 class TitleService implements TitleServiceInterface
 {
     /**
@@ -33,11 +25,9 @@ class TitleService implements TitleServiceInterface
     private $shortTemplate;
 
     /**
-     * Title data readers
-     *
-     * @var array
+     * @var TitleReaderRegistry
      */
-    private $readers = [];
+    private $titleReaderRegistry;
 
     /**
      * Current title template params
@@ -61,19 +51,9 @@ class TitleService implements TitleServiceInterface
     private $prefix;
 
     /**
-     * @var TitleProvider
-     */
-    private $titleProvider;
-
-    /**
      * @var TitleTranslator
      */
     private $titleTranslator;
-
-    /**
-     * @var ObjectManager
-     */
-    private $em;
 
     /**
      * @var ServiceLink
@@ -86,39 +66,21 @@ class TitleService implements TitleServiceInterface
     protected $userConfigManager;
 
     /**
-     * @param AnnotationsReader $reader
-     * @param ConfigReader $configReader
-     * @param TitleTranslator $titleTranslator
-     * @param ObjectManager $em
-     * @param $userConfigManager
-     * @param ServiceLink $breadcrumbManagerLink
-     * @param TitleProvider $titleProvider
+     * @param TitleReaderRegistry $titleReaderRegistry
+     * @param TitleTranslator     $titleTranslator
+     * @param ConfigManager       $userConfigManager
+     * @param ServiceLink         $breadcrumbManagerLink
      */
     public function __construct(
-        AnnotationsReader $reader,
-        ConfigReader $configReader,
+        TitleReaderRegistry $titleReaderRegistry,
         TitleTranslator $titleTranslator,
-        ObjectManager $em,
-        $userConfigManager,
-        ServiceLink $breadcrumbManagerLink,
-        TitleProvider $titleProvider
+        ConfigManager $userConfigManager,
+        ServiceLink $breadcrumbManagerLink
     ) {
-        $this->readers = [$reader, $configReader];
+        $this->titleReaderRegistry = $titleReaderRegistry;
         $this->titleTranslator = $titleTranslator;
-        $this->em = $em;
         $this->userConfigManager = $userConfigManager;
         $this->breadcrumbManagerLink = $breadcrumbManagerLink;
-        $this->titleProvider = $titleProvider;
-    }
-
-    /**
-     * @param BreadcrumbManagerInterface $breadcrumbManager
-     *
-     * @deprecated since 1.8 will be moved to constructor
-     */
-    public function setBreadcrumbManager(BreadcrumbManagerInterface $breadcrumbManager)
-    {
-        $this->breadcrumbManager = $breadcrumbManager;
     }
 
     /**
@@ -131,6 +93,8 @@ class TitleService implements TitleServiceInterface
      * @param bool   $isJSON
      * @param bool   $isShort
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function render(
         $params = [],
@@ -312,41 +276,42 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * Load title template from database, fallback to config values
-     *
-     * @param string $route
+     * {@inheritdoc}
      */
     public function loadByRoute($route)
     {
-        $templates = $this->titleProvider->getTitleTemplates($route);
-        if (!empty($templates)) {
-            $this->setTemplate($templates['title']);
-            $this->setShortTemplate($templates['short_title']);
-        }
+        $title = $this->titleReaderRegistry->getTitleByRoute($route);
+
+        $this->setTemplate($this->createTitle($route, $title));
+        $this->setShortTemplate($this->getShortTitle($title, $route));
+
+        return $this;
     }
 
+    /**
+     * @param string $route
+     * @param string $title
+     * @return bool|string
+     */
     protected function createTitle($route, $title)
     {
-        if (!($title instanceof Route)) {
-            $titleData = [];
+        $titleData = [];
 
-            if ($title) {
-                $titleData[] = $title;
-            }
-
-            $breadcrumbLabels = $this->getBreadcrumbs($route);
-            if (count($breadcrumbLabels)) {
-                $titleData = array_merge($titleData, $breadcrumbLabels);
-            }
-
-            if ($globalTitleSuffix = $this->userConfigManager->get('oro_navigation.title_suffix')) {
-                $titleData[] = $globalTitleSuffix;
-            }
-
-            return implode(' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ', $titleData);
+        if ($title) {
+            $titleData[] = $title;
         }
 
-        return false;
+        $breadcrumbLabels = $this->getBreadcrumbs($route);
+        if (count($breadcrumbLabels)) {
+            $titleData = array_merge($titleData, $breadcrumbLabels);
+        }
+
+        $globalTitleSuffix = $this->userConfigManager->get('oro_navigation.title_suffix');
+        if ($globalTitleSuffix) {
+            $titleData[] = $globalTitleSuffix;
+        }
+
+        return implode(' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ', $titleData);
     }
 
     /**
@@ -355,10 +320,10 @@ class TitleService implements TitleServiceInterface
      */
     protected function getBreadcrumbs($route)
     {
-        return $this->breadcrumbManagerLink->getService()->getBreadcrumbLabels(
-            $this->userConfigManager->get('oro_navigation.breadcrumb_menu'),
-            $route
-        );
+        /** @var BreadcrumbManagerInterface $breadcrumbManager */
+        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
+        $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
+        return $breadcrumbManager->getBreadcrumbLabels($menuName, $route);
     }
 
     /**

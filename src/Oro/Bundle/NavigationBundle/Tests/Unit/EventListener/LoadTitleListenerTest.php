@@ -1,14 +1,17 @@
 <?php
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
-use Oro\Bundle\NavigationBundle\Event\RequestTitleListener;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\NavigationBundle\EventListener\LoadTitleListener;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+
+class LoadTitleListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var TitleServiceInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $titleService;
 
@@ -21,7 +24,7 @@ class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider provider
      * @param $data
      */
-    public function testRequest($data)
+    public function testOnKernelController($data)
     {
         $invokeTimes = (int) ($data == HttpKernelInterface::MASTER_REQUEST);
 
@@ -36,7 +39,7 @@ class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
                 ->with('test_route');
         }
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
+        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterControllerEvent')
             ->disableOriginalConstructor()
             ->getMock();
         $event->expects($this->once())
@@ -46,8 +49,8 @@ class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequestType')
             ->will($this->returnValue($data));
 
-        $listener = new RequestTitleListener($titleService);
-        $listener->onKernelRequest($event);
+        $listener = new LoadTitleListener($titleService);
+        $listener->onKernelController($event);
     }
 
     /**
@@ -55,10 +58,10 @@ class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function provider()
     {
-        return array(
-            array(HttpKernelInterface::MASTER_REQUEST),
-            array(HttpKernelInterface::SUB_REQUEST)
-        );
+        return [
+            [HttpKernelInterface::MASTER_REQUEST],
+            [HttpKernelInterface::SUB_REQUEST]
+        ];
     }
 
     /**

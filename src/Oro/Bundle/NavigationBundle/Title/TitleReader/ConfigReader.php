@@ -1,7 +1,6 @@
 <?php
-namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
 use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 
@@ -19,28 +18,15 @@ class ConfigReader implements ReaderInterface
     }
 
     /**
-     * Get Route/Title information from bundle configs
-     *
-     * @param  array $routes
-     * @return array
-     * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * {@inheritdoc}
      */
-    public function getData(array $routes)
+    public function getTitle($route)
     {
-        $data = [];
-
         $titles = $this->configurationProvider->getConfiguration(ConfigurationProvider::TITLES_KEY);
-
-        foreach ($titles as $route => $title) {
-            if (array_key_exists($route, $routes)) {
-                $data[$route] = $title;
-            } else {
-                throw new InvalidConfigurationException(
-                    sprintf('Title for route "%s" could not be saved. Route not found.', $route)
-                );
-            }
+        if (array_key_exists($route, $titles)) {
+            return $titles[$route];
         }
 
-        return $data;
+        return null;
     }
 }

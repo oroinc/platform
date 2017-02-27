@@ -21,12 +21,14 @@ interface TitleServiceInterface
      * @param null  $suffix
      * @return string
      */
-    public function render($params = array(), $title = null, $prefix = null, $suffix = null);
+    public function render($params = [], $title = null, $prefix = null, $suffix = null);
 
     /**
-     * Load title template from database
+     * Load title template for current route from title readers
      *
-     * @param string $route
+     * @param $route
+     *
+     * @return TitleServiceInterface
      */
     public function loadByRoute($route);
 
@@ -36,5 +38,4 @@ interface TitleServiceInterface
      * @return string
      */
     public function getSerialized();
-
 }

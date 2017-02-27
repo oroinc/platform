@@ -1,12 +1,14 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Event;
+namespace Oro\Bundle\NavigationBundle\EventListener;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 
-class RequestTitleListener
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+
+class LoadTitleListener
 {
     /** @var TitleServiceInterface */
     private $titleService;
@@ -22,14 +24,14 @@ class RequestTitleListener
     /**
      * Find title for current route in database
      *
-     * @param GetResponseEvent $event
+     * @param FilterControllerEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelController(FilterControllerEvent $event)
     {
         $request = $event->getRequest();
-        if (HttpKernel::MASTER_REQUEST != $event->getRequestType()
-            || $request->getRequestFormat() != 'html'
-            || ($request->getMethod() != 'GET'
+        if (HttpKernel::MASTER_REQUEST !== $event->getRequestType()
+            || $request->getRequestFormat() !== 'html'
+            || ($request->getMethod() !== 'GET'
                 && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
             || ($request->isXmlHttpRequest()
                 && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
