@@ -97,6 +97,9 @@ operations:
                     route_parameters:
                         id: $id
     reset_password:
+        exclude_datagrids:
+            - owner-users-select-grid
+            - users--select-grid
         label: oro.user.password.reset_password.label
         entities:
             - Oro\Bundle\UserBundle\Entity\User
@@ -107,6 +110,11 @@ operations:
         routes:
             - oro_user_index
             - oro_user_view
+        preconditions:
+          '@and':
+              - '@or':
+                  - '@not_blank': $.routes[name]
+                  - '@not_blank': $.gridName
         order: 50
         acl_resource: [password_management]
         button_options:
@@ -161,6 +169,9 @@ operations:
                 parameters: [$.gridName]
 
     user_enable:
+        exclude_datagrids:
+            - owner-users-select-grid
+            - users-select-grid
         label: oro.user.action.enable.label
         acl_resource: oro_user_user_update
         entities:
@@ -199,6 +210,9 @@ operations:
                 parameters: [$.gridName]
 
     user_disable:
+        exclude_datagrids:
+            - owner-users-select-grid
+            - users-select-grid
         label: oro.user.action.disable.label
         acl_resource: oro_user_user_update
         entities:

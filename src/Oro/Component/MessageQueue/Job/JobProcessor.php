@@ -159,7 +159,7 @@ class JobProcessor
         }
 
         $job->setStatus(Job::STATUS_SUCCESS);
-        $job->setJobProgress(100);
+        $job->setJobProgress(1);
         $job->setStoppedAt(new \DateTime());
         $this->jobStorage->saveJob($job);
 
