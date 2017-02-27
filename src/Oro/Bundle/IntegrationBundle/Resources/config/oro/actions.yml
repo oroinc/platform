@@ -63,7 +63,7 @@ operations:
                 value: Oro\Bundle\UPSBundle\Provider\ChannelType::TYPE
             - '@assign_constant_value':
                 attribute: $.flatRateType
-                value: Oro\Bundle\FlatRateBundle\Integration\FlatRateChannelType::TYPE
+                value: Oro\Bundle\FlatRateShippingBundle\Integration\FlatRateChannelType::TYPE
             - '@call_service_method':
                 service: oro_integration.utils.edit_mode
                 method: isSwitchEnableAllowed
