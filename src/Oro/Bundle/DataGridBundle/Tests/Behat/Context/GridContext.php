@@ -115,11 +115,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Checks first records in provided column number
      * Example: And I check first 5 records in 1 column
      *
-     * @When /^(?:|I )check first (?P<amount>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
+     * @When /^(?:|I )check first (?P<number>(?:|one|two|\d+)) record(s|) in (?P<column>(?:|one|two|\d+)) column$/
      */
-    public function iCheckRecordsInColumn($amount, $column)
+    public function iCheckRecordsInColumn($number, $column)
     {
-        $this->getGrid()->checkFirstRecords($amount, $column);
+        $this->getGrid()->checkFirstRecords(
+            $this->getCount($number),
+            $this->getCount($column)
+        );
     }
 
     /**
@@ -602,9 +605,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             if ($gridToolbarActions->isVisible()) {
                 $gridToolbarActions->getActionByTitle('Filters')->click();
             } else {
-                $this->elementFactory->createElement($grid . 'FiltersState')->click();
+                $filterStateElementName = $grid . 'FiltersState';
+                $filterState = $this->elementFactory->createElement($filterStateElementName);
+                self::assertNotNull($filterState);
+
+                $filterState->click();
             }
         }
+
         return $filters;
     }
 }

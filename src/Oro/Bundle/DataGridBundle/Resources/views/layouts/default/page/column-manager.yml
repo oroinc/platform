@@ -9,6 +9,11 @@ layout:
             parentId: head
 
         - '@add':
+            id: commerce_column_manager_collection
+            blockType: block
+            parentId: head
+
+        - '@add':
             id: commerce_column_manager_item
             blockType: block
             parentId: head
