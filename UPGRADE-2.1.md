@@ -101,6 +101,9 @@ EntityExtendBundle
     To create bidirectional relation you _MUST_ call `*InverseRelation` method respectively
     - call to `addOneToManyRelation` creates bidirectional relation according to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional)
     - deprecated `addOneToManyInverseRelation`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension`
 
 EntityPaginationBundle
 ----------------------
