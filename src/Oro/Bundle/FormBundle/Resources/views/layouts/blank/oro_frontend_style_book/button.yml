@@ -9,7 +9,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_default
-                label: Button default
+                label: Default Button
 
         - '@add':
             id: style_book_button_element_wrapp
@@ -29,7 +29,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_acction
-                label: Button acction
+                label: Action Button
 
         - '@add':
             id: style_book_button_element_wrapp_action
@@ -49,7 +49,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_info
-                label: Button info
+                label: Info Button
 
         - '@add':
             id: style_book_button_element_wrapp_info
@@ -70,7 +70,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_primary
-                label: Button primary
+                label: Primary Button
 
         - '@add':
             id: style_book_button_element_wrapp_primary
@@ -90,7 +90,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_link
-                label: Button link
+                label: Link Button
 
         - '@add':
             id: style_book_button_element_wrapp_link
@@ -110,7 +110,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_large_size
-                label: Button large size
+                label: Large Button (type 1, --large)
 
         - '@add':
             id: style_book_button_element_wrapp_large_size
@@ -130,7 +130,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_size_l
-                label: Button size l
+                label: Large Button (type 2, --size-l)
 
         - '@add':
             id: style_book_button_element_wrapp_size_l
@@ -150,7 +150,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_size_m
-                label: Button size m
+                label: Medium Button (--size-m)
 
         - '@add':
             id: style_book_button_element_wrapp_size_m
@@ -170,7 +170,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_group
-                label: Button group
+                label: Drop-Down Button Group
 
         - '@add':
             id: style_book_button_element_wrapp_group
@@ -190,7 +190,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_inline_group
-                label: Button inline group
+                label: Inline Icon Button Group
 
         - '@add':
             id: style_book_button_element_wrapp_inline_group
@@ -210,7 +210,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_inline_btn_group
-                label: Button btn group
+                label: Horizontal Text Button Group
 
         - '@add':
             id: style_book_button_element_wrapp_btn_group
@@ -230,7 +230,7 @@ layout:
             blockType: group_element
             options:
                 anchor: button_inline_group_vertical
-                label: Button group vertical
+                label: Vertical Text Button Group
 
         - '@add':
             id: style_book_button_element_wrapp_btn_group_vertical
