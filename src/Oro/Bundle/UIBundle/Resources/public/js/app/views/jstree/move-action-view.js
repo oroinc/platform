@@ -4,6 +4,7 @@ define(function(require) {
     var MoveActionView;
     var AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var DialogWidget = require('oro/dialog-widget');
     var routing = require('routing');
     var messenger = require('oroui/js/messenger');
@@ -11,7 +12,7 @@ define(function(require) {
     MoveActionView = AbstractActionView.extend({
         options: _.extend({}, AbstractActionView.prototype.options, {
             icon: 'random',
-            label: _.__('oro.ui.jstree.actions.move'),
+            label: __('oro.ui.jstree.actions.move'),
             routeName: null,
             routeParams: {}
         }),
@@ -21,7 +22,7 @@ define(function(require) {
             var selectedIds = $tree.jstree('get_checked');
 
             if (!selectedIds.length) {
-                messenger.notificationFlashMessage('warning', _.__('oro.ui.jstree.no_node_selected_error'));
+                messenger.notificationFlashMessage('warning', __('oro.ui.jstree.no_node_selected_error'));
                 return;
             }
 
@@ -33,7 +34,7 @@ define(function(require) {
             }
 
             this.dialogWidget = new DialogWidget({
-                title: _.__('oro.ui.jstree.actions.move'),
+                title: __('oro.ui.jstree.actions.move'),
                 url: url,
                 stateEnabled: false,
                 incrementalPosition: true,

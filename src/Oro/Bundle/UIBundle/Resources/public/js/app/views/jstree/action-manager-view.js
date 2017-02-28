@@ -4,14 +4,16 @@ define(function(require) {
     var ActionManagerView;
     var $ = require('jquery');
     var _ = require('underscore');
-    var tools = require('oroui/js/tools');
+    var ActionManager = require('oroui/js/jstree-action-manager');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ActionManagerView = BaseView.extend({
         /**
          * @property {Object}
          */
-        options: {},
+        options: {
+            actions: {}
+        },
 
         /**
          * @property {Object}
@@ -32,28 +34,19 @@ define(function(require) {
 
             ActionManagerView.__super__.initialize.apply(this, arguments);
 
-            this._loadModules();
+            this.options.$tree.one('ready.jstree.actions', _.bind(this.collectActions, this));
         },
 
-        /**
-         * Loads modules for each action
-         * */
-        _loadModules: function() {
-            var modules = {};
-            _.each(this.options.actions, function(action, key) {
-                modules[key] = action.view;
-            });
-            var self = this;
-            tools.loadModules(modules, function(modules) {
-                _.each(modules, function(View, key) {
-                    var options = _.extend({
-                        $tree: self.options.$tree,
-                        action: key
-                    }, _.omit(self.options.actions[key], 'view'));
-                    self.subview(key, new View(options));
+        collectActions: function() {
+            _.each(ActionManager.getActions(this.options), function(action) {
+                var options = _.extend({}, this.options.actions[action.name] || {}, {
+                    $tree: this.options.$tree,
+                    action: action.name
                 });
-                self.render();
-            });
+                this.subview(action.name, new action.view(options));
+            }, this);
+
+            this.render();
         },
 
         render: function() {

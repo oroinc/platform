@@ -74,7 +74,7 @@
 
         <div class="layout-content scrollable-container">
             {% block content_data %}
-                <div class="left-panel-container"
+                <div class="left-panel-container tree-component-container"
                      data-page-component-module="orodatagrid/js/app/components/grid-sidebar-component"
                      data-page-component-options="{{ componentOptions|json_encode }}">
                     <div class="placeholder">
@@ -97,20 +97,17 @@
                                         'updateAllowed' : true,
                                         'onRootSelectRoute' : menuViewRoute,
                                         'onSelectRoute' : menuUpdateRoute,
-                                        'onMoveRoute' : 'oro_navigation_menuupdate_move'
+                                        'onMoveRoute' : 'oro_navigation_menuupdate_move',
+                                        'view' : 'oronavigation/js/app/views/tree-manage-view'
                                     } %}
 
                                     {{ UI.renderJsTree(
                                         {
-                                            'module': 'oronavigation/js/app/components/tree-manage-component',
                                             'label': 'oro.navigation.menu.menu_list_default.label'|trans,
                                             'treeOptions': treeOptions
                                         },
                                         {
-                                            'expand': 'expand',
-                                            'collapse': 'collapse',
                                             'move': {
-                                                'view': 'oroui/js/app/views/jstree/move-action-view',
                                                 'routeName': menuJsMoveRoute,
                                                 'routeParams': {menuName: entity.root.name, scopeId: scope.id}
                                             }
