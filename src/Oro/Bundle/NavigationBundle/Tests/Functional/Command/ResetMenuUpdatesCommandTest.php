@@ -40,7 +40,7 @@ class ResetMenuUpdatesCommandTest extends WebTestCase
     {
         return [
             'should show help' => [
-                '$expectedContent' => "Usage:\n  oro:navigation:menu:reset [options]",
+                '$expectedContent' => "Usage: oro:navigation:menu:reset [options]",
                 '$params'          => ['--help'],
                 '$rowsCount'       => 7
             ],
