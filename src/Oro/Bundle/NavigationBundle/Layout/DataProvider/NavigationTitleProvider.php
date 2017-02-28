@@ -28,17 +28,14 @@ class NavigationTitleProvider
     /**
      * Load title template from config values
      *
-     * @param array       $params
-     * @param string|null $routeName
+     * @param string $routeName
+     * @param array  $params
      *
      * @return string
      */
-    public function getTitle($params = [], $routeName = null)
+    public function getTitle($routeName, $params = [])
     {
-        if ($routeName) {
-            $this->titleService->loadByRoute($routeName);
-        }
-
+        $this->titleService->loadByRoute($routeName, 'frontend_menu');
         $this->titleService->setParams($params);
 
         $title = $this->titleService->render([], null, null, null, true);

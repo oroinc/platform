@@ -302,15 +302,9 @@ services:
         class: %oro_navigation.title_service.twig.extension.class%
         arguments:
             - '@oro_navigation.title_service'
+            - '@request_stack'
         tags:
             - { name: twig.extension }
-
-    oro_navigation.event_listener.load_title_listener:
-        class: Oro\Bundle\NavigationBundle\EventListener\LoadTitleListener
-        arguments:
-            - '@oro_navigation.title_service'
-        tags:
-            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
     oro_navigation.translation.extractor:
         class: %oro_navigation.translation.extractor.class%

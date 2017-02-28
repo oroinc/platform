@@ -41,12 +41,18 @@ class NavigationTitleProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getDataDataProvider
      *
+     * @param string $routeName
      * @param array  $params
      * @param string $title
      * @param string $expected
      */
-    public function testGetTitle($params, $title, $expected)
+    public function testGetTitle($routeName, $params, $title, $expected)
     {
+        $this->titleService->expects($this->once())
+            ->method('loadByRoute')
+            ->with($routeName, 'frontend_menu')
+            ->willReturn(null);
+
         $this->titleService->expects($this->once())
             ->method('setParams')
             ->with([])
@@ -62,7 +68,7 @@ class NavigationTitleProviderTest extends \PHPUnit_Framework_TestCase
             ->with('oro_navigation.title_delimiter')
             ->willReturn('-');
 
-        $result = $this->provider->getTitle($params);
+        $result = $this->provider->getTitle($routeName, $params);
         $this->assertEquals($expected, $result);
     }
 
@@ -73,12 +79,14 @@ class NavigationTitleProviderTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'existRoute' => [
+                'routeName' => 'oro_frontend_root',
                 'params' => [],
                 'title' => 'Home Page',
                 'expected' => 'Home Page'
 
             ],
             'existRouteWithSuffix' => [
+                'routeName' => 'oro_frontend_root',
                 'params' => [],
                 'title' => '- Home Page',
                 'expected' => 'Home Page'

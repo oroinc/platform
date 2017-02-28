@@ -26,11 +26,12 @@ interface TitleServiceInterface
     /**
      * Load title template for current route from title readers
      *
-     * @param string $route
+     * @param string      $route
+     * @param string|null $menuName
      *
      * @return TitleServiceInterface
      */
-    public function loadByRoute($route);
+    public function loadByRoute($route, $menuName = null);
 
     /**
      * Return serialized title data

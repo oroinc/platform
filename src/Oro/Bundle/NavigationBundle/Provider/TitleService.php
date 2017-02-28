@@ -278,9 +278,13 @@ class TitleService implements TitleServiceInterface
     /**
      * {@inheritdoc}
      */
-    public function loadByRoute($route)
+    public function loadByRoute($route, $menuName = null)
     {
         $title = $this->titleReaderRegistry->getTitleByRoute($route);
+
+        if (!$menuName) {
+            $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
+        }
 
         $this->setTemplate($this->createTitle($route, $title));
         $this->setShortTemplate($this->getShortTitle($title, $route));
@@ -299,7 +303,7 @@ class TitleService implements TitleServiceInterface
             $titleData[] = $title;
         }
 
-        $breadcrumbLabels = $this->getBreadcrumbs($route);
+        $breadcrumbLabels = $this->getBreadcrumbs($route, $menuName);
         if (count($breadcrumbLabels)) {
             $titleData = array_merge($titleData, $breadcrumbLabels);
         }
@@ -313,15 +317,14 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * @param $route
+     * @param string $route
+     * @param string $menuName
+     *
      * @return array
      */
-    protected function getBreadcrumbs($route)
+    protected function getBreadcrumbs($route, $menuName)
     {
-        /** @var BreadcrumbManagerInterface $breadcrumbManager */
-        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
-        $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
-        return $breadcrumbManager->getBreadcrumbLabels($menuName, $route);
+        return $this->breadcrumbManagerLink->getService()->getBreadcrumbLabels($menuName, $route);
     }
 
     /**

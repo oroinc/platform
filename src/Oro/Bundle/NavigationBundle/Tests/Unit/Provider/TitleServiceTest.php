@@ -262,6 +262,16 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Parent Path', $this->titleService->getShortTemplate());
     }
 
+    public function testLoadByRouteWithoutMenuName()
+    {
+        $this->userConfigManager->expects($this->once())
+            ->method('get')
+            ->with('oro_navigation.breadcrumb_menu')
+            ->will($this->returnValue('application_menu'));
+
+        $this->titleService->loadByRoute('test_route');
+    }
+
     public function testGetSerialized()
     {
         $this->titleService->setTemplate('test template');
