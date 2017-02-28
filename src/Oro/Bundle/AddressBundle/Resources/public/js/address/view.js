@@ -127,6 +127,7 @@ define([
             var data = this.model.toJSON();
             var mappedData = this.prepareData(data);
             data.formatted_address = addressFormatter.format(mappedData, null, '\n');
+            data.searchable_string = this.model.getSearchableString();
             this.$el.append(this.template(data));
             if (this.model.get('primary')) {
                 this.activate();

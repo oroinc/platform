@@ -16,6 +16,9 @@ class SecurityController extends Controller
      */
     public function loginAction()
     {
+        if ($this->getUser()) {
+            return $this->redirect($this->generateUrl('oro_default'));
+        }
         $request = $this->get('request_stack')->getCurrentRequest();
         // 302 redirect does not processed by Backbone.sync handler, but 401 error does.
         if ($request->isXmlHttpRequest()) {

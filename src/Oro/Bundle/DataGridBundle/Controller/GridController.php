@@ -90,7 +90,7 @@ class GridController extends Controller
     /**
      * @Route("/{gridName}/filter-metadata", name="oro_datagrid_filter_metadata", options={"expose"=true})
      */
-    public function filterMetadata(Request $request, $gridName)
+    public function filterMetadataAction(Request $request, $gridName)
     {
         $filterNames = $request->query->get('filterNames', []);
 

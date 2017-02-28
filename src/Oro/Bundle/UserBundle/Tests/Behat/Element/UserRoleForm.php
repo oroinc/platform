@@ -41,6 +41,16 @@ class UserRoleForm extends Form
     }
 
     /**
+     * Checks capability permission checkbox
+     *
+     * @param $name
+     */
+    public function setCheckBoxPermission($name)
+    {
+        $this->findLabel($name)->find('css', 'input')->check();
+    }
+
+    /**
      * @param NodeElement $entityRow
      * @param string $action
      * @return NodeElement

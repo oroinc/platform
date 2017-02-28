@@ -2,57 +2,51 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
-
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class TitleExtension extends \Twig_Extension
 {
     const EXT_NAME = 'oro_title';
 
-    /**
-     * @var TitleServiceInterface
-     */
-    protected $titleService;
+    /** @var ContainerInterface */
+    protected $container;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $templateFileTitleDataStack = [];
 
     /**
-     * @var RequestStack
+     * @param ContainerInterface $container
      */
-    protected $requestStack;
-
-    /**
-     * @param TitleServiceInterface $titleService
-     * @param RequestStack          $requestStack
-     */
-    public function __construct(TitleServiceInterface $titleService, RequestStack $requestStack)
+    public function __construct(ContainerInterface $container)
     {
-        $this->titleService = $titleService;
-        $this->requestStack = $requestStack;
+        $this->container = $container;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * @return TitleService
+     */
+    protected function getTitleService()
+    {
+        return $this->container->get('oro_navigation.title_service');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
-            'oro_title_render' => new \Twig_Function_Method($this, 'render'),
-            'oro_title_render_short' => new \Twig_Function_Method($this, 'renderShort'),
-            'oro_title_render_serialized' => new \Twig_Function_Method($this, 'renderSerialized'),
+            new \Twig_SimpleFunction('oro_title_render', [$this, 'render']),
+            new \Twig_SimpleFunction('oro_title_render_short', [$this, 'renderShort']),
+            new \Twig_SimpleFunction('oro_title_render_serialized', [$this, 'renderSerialized']),
         ];
     }
 
     /**
-     * Register new token parser
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getTokenParsers()
     {
@@ -71,11 +65,11 @@ class TitleExtension extends \Twig_Extension
      */
     public function render($titleData = null, $menuName = null)
     {
-        $route = $this->requestStack->getCurrentRequest()->get('_route');
+        $route = $this->getCurrenRoute();
 
-        return $this->titleService
-            ->setData($this->getTitleData())
+        return $this->getTitleService()
             ->loadByRoute($route, $menuName)
+            ->setData($this->getTitleData())
             ->render([], $titleData, null, null, true);
     }
 
@@ -89,11 +83,11 @@ class TitleExtension extends \Twig_Extension
      */
     public function renderShort($titleData = null, $menuName = null)
     {
-        $route = $this->requestStack->getCurrentRequest()->get('_route');
+        $route = $this->getCurrenRoute();
 
-        return $this->titleService
-            ->setData($this->getTitleData())
+        return $this->getTitleService()
             ->loadByRoute($route, $menuName)
+            ->setData($this->getTitleData())
             ->render([], $titleData, null, null, true, true);
     }
 
@@ -106,11 +100,11 @@ class TitleExtension extends \Twig_Extension
      */
     public function renderSerialized($menuName = null)
     {
-        $route = $this->requestStack->getCurrentRequest()->get('_route');
+        $route = $this->getCurrenRoute();
 
-        return $this->titleService
-            ->setData($this->getTitleData())
+        return $this->getTitleService()
             ->loadByRoute($route, $menuName)
+            ->setData($this->getTitleData())
             ->getSerialized();
     }
 
@@ -168,6 +162,17 @@ class TitleExtension extends \Twig_Extension
             }
         }
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    private function getCurrenRoute()
+    {
+        return $this->container
+            ->get('request_stack')
+            ->getCurrentRequest()
+            ->get('_route');
     }
 
     /**

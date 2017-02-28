@@ -5,7 +5,14 @@
 
     &__content {
         display: flex;
+
         padding: $page-main-inner-offset;
+
+        flex-wrap: wrap;
+    }
+
+    &__header {
+        width: 100%;
     }
 }
 

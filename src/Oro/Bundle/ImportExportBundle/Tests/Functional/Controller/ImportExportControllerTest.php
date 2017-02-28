@@ -216,6 +216,7 @@ class ImportExportControllerTest extends WebTestCase
             substr_count(file_get_contents($tmpFile->getPathname()), "\r\n")
         );
         unlink($tmpFile->getPathname());
+        unlink($file . '_formatted');
     }
 
     /**

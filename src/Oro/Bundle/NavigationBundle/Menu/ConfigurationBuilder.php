@@ -110,7 +110,7 @@ class ConfigurationBuilder implements BuilderInterface
     ) {
         $isAllowed = false;
         foreach ($data as $itemCode => $itemData) {
-            if (in_array($itemCode, $itemCodes)) {
+            if (in_array($itemCode, $itemCodes, true)) {
                 throw new \InvalidArgumentException(sprintf(
                     'Item key "%s" duplicated in tree menu "%s".',
                     $itemCode,

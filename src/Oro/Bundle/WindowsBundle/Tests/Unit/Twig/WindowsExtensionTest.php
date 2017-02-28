@@ -11,61 +11,52 @@ use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Twig\WindowsExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var WindowsExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var WindowsExtension */
     protected $extension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Twig_Environment
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|\Twig_Environment */
     protected $environment;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManager */
     protected $stateManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManagerRegistry
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateManagerRegistry */
     protected $stateManagerRegistry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateRequestManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|WindowsStateRequestManager */
     protected $requestStateManager;
 
     protected function setUp()
     {
-        $this->environment = $this->getMockBuilder('Twig_Environment')
+        $this->environment = $this->getMockBuilder(\Twig_Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->stateManager = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateManager')
+        $this->stateManager = $this->getMockBuilder(WindowsStateManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->stateManagerRegistry = $this
-            ->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry')
+        $this->stateManagerRegistry = $this->getMockBuilder(WindowsStateManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->stateManagerRegistry->expects($this->any())->method('getManager')->willReturn($this->stateManager);
-        $this->requestStateManager = $this
-            ->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager')
+        $this->stateManagerRegistry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->stateManager);
+        $this->requestStateManager = $this->getMockBuilder(WindowsStateRequestManager::class)
             ->setMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new WindowsExtension($this->stateManagerRegistry, $this->requestStateManager);
-    }
 
-    public function testGetFunctions()
-    {
-        $functions = $this->extension->getFunctions();
-        $this->assertArrayHasKey('oro_windows_restore', $functions);
-        $this->assertInstanceOf('Twig_Function_Method', $functions['oro_windows_restore']);
-        $this->assertAttributeEquals('render', 'method', $functions['oro_windows_restore']);
+        $container = self::getContainerBuilder()
+            ->add('oro_windows.manager.windows_state_registry', $this->stateManagerRegistry)
+            ->add('oro_windows.manager.windows_state_request', $this->requestStateManager)
+            ->getContainer($this);
+
+        $this->extension = new WindowsExtension($container);
     }
 
     public function testGetName()
@@ -75,10 +66,13 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderNoUser()
     {
-        $this->stateManager->expects($this->once())->method('getWindowsStates')
+        $this->stateManager->expects($this->once())
+            ->method('getWindowsStates')
             ->willThrowException(new AccessDeniedException());
 
-        $this->assertEmpty($this->extension->render($this->environment));
+        $this->assertEmpty(
+            self::callTwigFunction($this->extension, 'oro_windows_restore', [$this->environment])
+        );
     }
 
     public function testRender()
@@ -101,10 +95,16 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($expectedOutput));
 
-        $this->assertEquals($expectedOutput, $this->extension->render($this->environment));
+        $this->assertEquals(
+            $expectedOutput,
+            self::callTwigFunction($this->extension, 'oro_windows_restore', [$this->environment])
+        );
 
         // no need to render twice
-        $this->assertEquals('', $this->extension->render($this->environment));
+        $this->assertEquals(
+            '',
+            self::callTwigFunction($this->extension, 'oro_windows_restore', [$this->environment])
+        );
     }
 
     /**
@@ -139,7 +139,10 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($expectedOutput));
 
-        $this->assertEquals($expectedOutput, $this->extension->renderFragment($this->environment, $windowState));
+        $this->assertEquals(
+            $expectedOutput,
+            self::callTwigFunction($this->extension, 'oro_window_render_fragment', [$this->environment, $windowState])
+        );
         $this->assertTrue($windowState->isRenderedSuccessfully());
     }
 
@@ -188,7 +191,10 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('deleteWindowsState')
             ->with($windowState->getId());
 
-        $this->assertEquals('', $this->extension->renderFragment($this->environment, $windowState));
+        $this->assertEquals(
+            '',
+            self::callTwigFunction($this->extension, 'oro_window_render_fragment', [$this->environment, $windowState])
+        );
         $this->assertFalse($windowState->isRenderedSuccessfully());
     }
 
@@ -213,16 +219,20 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($cleanUrl)
             ->will($this->throwException(new \Exception('This is exception was not caught.')));
 
-        $this->extension->renderFragment($this->environment, $windowState);
+        self::callTwigFunction($this->extension, 'oro_window_render_fragment', [$this->environment, $windowState]);
     }
 
     public function testRenderFragmentWithEmptyCleanUrl()
     {
         $windowState = $this->createWindowState();
 
-        $this->environment->expects($this->never())->method($this->anything());
+        $this->environment->expects($this->never())
+            ->method($this->anything());
 
-        $this->assertEquals('', $this->extension->renderFragment($this->environment, $windowState));
+        $this->assertEquals(
+            '',
+            self::callTwigFunction($this->extension, 'oro_window_render_fragment', [$this->environment, $windowState])
+        );
         $this->assertFalse($windowState->isRenderedSuccessfully());
     }
 
@@ -232,10 +242,14 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->environment->expects($this->never())->method($this->anything());
 
-        $this->stateManager->expects($this->once())->method('deleteWindowsState')
+        $this->stateManager->expects($this->once())
+            ->method('deleteWindowsState')
             ->willThrowException(new AccessDeniedException());
 
-        $this->assertEquals('', $this->extension->renderFragment($this->environment, $windowState));
+        $this->assertEquals(
+            '',
+            self::callTwigFunction($this->extension, 'oro_window_render_fragment', [$this->environment, $windowState])
+        );
         $this->assertFalse($windowState->isRenderedSuccessfully());
     }
 
@@ -256,7 +270,7 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getHttpKernelExtensionMock()
     {
-        return $this->getMockBuilder('Symfony\Bridge\Twig\Extension\HttpKernelExtension')
+        return $this->getMockBuilder(HttpKernelExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

@@ -12,7 +12,7 @@ For details of build options see [example.build.js].
 OroRequireJSBundle requires [fxpio/composer-asset-plugin][composer-asset-plugin] to manage dependency in third-party asset libraries. The plugin has to be installed globally (per user):
  
 ```bash
-    composer global require "fxp/composer-asset-plugin:~1.2"
+    composer global require "fxp/composer-asset-plugin"
 ```
 
 ## Require.js config generation

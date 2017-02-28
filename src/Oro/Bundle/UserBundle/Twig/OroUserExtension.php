@@ -2,39 +2,49 @@
 
 namespace Oro\Bundle\UserBundle\Twig;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
 class OroUserExtension extends \Twig_Extension
 {
-    /** @var GenderProvider */
-    protected $genderProvider;
-
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param GenderProvider           $genderProvider
-     * @param SecurityContextInterface $securityContext
+     * @param ContainerInterface $container
      */
-    public function __construct(GenderProvider $genderProvider, SecurityContextInterface $securityContext)
+    public function __construct(ContainerInterface $container)
     {
-        $this->genderProvider  = $genderProvider;
-        $this->securityContext = $securityContext;
+        $this->container = $container;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * @return GenderProvider
+     */
+    protected function getGenderProvider()
+    {
+        return $this->container->get('oro_user.gender_provider');
+    }
+
+    /**
+     * @return TokenStorageInterface
+     */
+    protected function getSecurityTokenStorage()
+    {
+        return $this->container->get('security.token_storage');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
-            'oro_gender'       => new \Twig_SimpleFunction('oro_gender', [$this, 'getGenderLabel']),
-            'get_current_user' => new \Twig_SimpleFunction('get_current_user', [$this, 'getCurrentUser'])
+            new \Twig_SimpleFunction('oro_gender', [$this, 'getGenderLabel']),
+            new \Twig_SimpleFunction('get_current_user', [$this, 'getCurrentUser'])
         ];
     }
 
@@ -49,7 +59,7 @@ class OroUserExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->genderProvider->getLabelByName($name);
+        return $this->getGenderProvider()->getLabelByName($name);
     }
 
     /**
@@ -59,7 +69,7 @@ class OroUserExtension extends \Twig_Extension
      */
     public function getCurrentUser()
     {
-        $token = $this->securityContext->getToken();
+        $token = $this->getSecurityTokenStorage()->getToken();
         if (!$token) {
             return null;
         }
