@@ -103,13 +103,23 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testAcknowledgeShouldShouldDeleteRecordFromDb()
     {
+        $statment = $this->createMock(Statement::class);
+        $statment
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(1));
+
         $dbal = $this->createDBALConnectionMock();
+        $dbal
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
             ->with('tableName', ['id' => 123])
-            ->will($this->returnValue(1))
-        ;
+            ->will($this->returnValue(1));
 
         $connection = $this->createConnectionMock();
         $connection
@@ -118,7 +128,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -139,7 +149,18 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testAcknowledgeShouldThrowIfMessageWasNotRemoved()
     {
+        $statment = $this->createMock(Statement::class);
+        $statment
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(1));
+
         $dbal = $this->createDBALConnectionMock();
+        $dbal
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
@@ -154,7 +175,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -175,7 +196,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->acknowledge($message);
     }
 
-    public function testRejectShouldThrowIfInstanceOfMessageIsInvalid()
+    public function stestRejectShouldThrowIfInstanceOfMessageIsInvalid()
     {
         $connection = $this->createConnectionMock();
         $connection
@@ -204,7 +225,18 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testRejectShouldShouldDeleteRecordFromDb()
     {
+        $statment = $this->createMock(Statement::class);
+        $statment
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(1));
+
         $dbal = $this->createDBALConnectionMock();
+        $dbal
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
@@ -219,7 +251,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -240,7 +272,18 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testRejectShouldThrowIfMessageWasNotRemoved()
     {
+        $statment = $this->createMock(Statement::class);
+        $statment
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(1));
+
         $dbal = $this->createDBALConnectionMock();
+        $dbal
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
@@ -255,7 +298,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -279,7 +322,18 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testRejectShouldShouldInsertNewMessageIfRequeueIsTrue()
     {
+        $statment = $this->createMock(Statement::class);
+        $statment
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(1));
+
         $dbal = $this->createDBALConnectionMock();
+        $dbal
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
@@ -310,7 +364,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;
@@ -333,9 +387,65 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->reject($message, true);
     }
 
+    public function testRejectAndAckShouldThrowIfRecordWasNotFoundForDeleting()
+    {
+        $statment = $this->createMock(Statement::class);
+        $statment
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(null));
+
+        $dbal = $this->createDBALConnectionMock();
+        $dbal
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => 123])
+            ->willReturn($statment);
+
+        $connection = $this->createConnectionMock();
+        $connection
+            ->expects($this->once())
+            ->method('getDBALConnection')
+            ->will($this->returnValue($dbal))
+        ;
+        $connection
+            ->expects($this->once())
+            ->method('getTableName')
+            ->will($this->returnValue('tableName'))
+        ;
+
+        $session = $this->createSessionMock();
+        $session
+            ->expects($this->once())
+            ->method('getConnection')
+            ->will($this->returnValue($connection))
+        ;
+
+        $message = new DbalMessage();
+        $message->setId(123);
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Expected record was removed but it is not. id: "123"'
+        );
+        $consumer = new DbalMessageConsumer($session, new DbalDestination('queue'));
+        $consumer->reject($message, true);
+        $consumer->acknowledge($message);
+    }
+
     public function testRejectShouldThrowIfRecordWasNotInserted()
     {
+        $statment = $this->createMock(Statement::class);
+        $statment
+            ->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue(1));
+
         $dbal = $this->createDBALConnectionMock();
+        $dbal
+            ->expects($this->once())
+            ->method('executeQuery')
+            ->with('SELECT id FROM tableName WHERE id=:id FOR UPDATE', ['id' => null])
+            ->willReturn($statment);
         $dbal
             ->expects($this->once())
             ->method('delete')
@@ -354,7 +464,7 @@ class DbalMessageConsumerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($dbal))
         ;
         $connection
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('getTableName')
             ->will($this->returnValue('tableName'))
         ;

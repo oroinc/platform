@@ -64,7 +64,7 @@ class ArrayContainsConstraint extends \PHPUnit_Framework_Constraint
             $i++;
             if ($i > 10) {
                 $result .= "and others ...\n";
-                continue;
+                break;
             }
             $result .= sprintf("Path: \"%s\". Error: %s\n", implode('.', $error[0]), $error[1]);
         }
