@@ -7,11 +7,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
@@ -69,6 +69,13 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $propertyAccessor = new PropertyAccessor();
+        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
 
         $container = self::getContainerBuilder()
             ->add('oro_entity_config.provider.extend', $this->extendConfigProvider)
@@ -78,24 +85,10 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->add('property_accessor', $propertyAccessor)
             ->add('event_dispatcher', $this->dispatcher)
             ->add('oro_security.security_facade', $this->securityFacade)
+            ->add('oro_featuretoggle.checker.feature_checker', $this->featureChecker)
             ->getContainer($this);
 
         $this->extension = new DynamicFieldsExtension($container);
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->featureChecker->expects($this->any())
-            ->method('isResourceEnabled')
-            ->willReturn(true);
-
-        $this->extension = new DynamicFieldsExtension(
-            $this->configManager,
-            $this->fieldTypeHelper,
-            $this->dispatcher,
-            $this->securityFacade,
-            $this->featureChecker
-        );
     }
 
     /**
