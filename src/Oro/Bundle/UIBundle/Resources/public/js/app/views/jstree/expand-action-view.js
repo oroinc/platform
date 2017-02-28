@@ -4,11 +4,12 @@ define(function(require) {
     var ExpandActionView;
     var AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
 
     ExpandActionView = AbstractActionView.extend({
         options: _.extend({}, AbstractActionView.prototype.options, {
             icon: 'plus-square-o',
-            label: _.__('oro.ui.jstree.actions.expand')
+            label: __('oro.ui.jstree.actions.expand')
         }),
 
         onClick: function() {

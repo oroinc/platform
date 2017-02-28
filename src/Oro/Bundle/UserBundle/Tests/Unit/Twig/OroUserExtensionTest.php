@@ -2,71 +2,44 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Twig;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
+use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Oro\Bundle\UserBundle\Twig\OroUserExtension;
 use Oro\Bundle\UserBundle\Model\Gender;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var OroUserExtension
-     */
-    protected $twigExtension;
+    use TwigExtensionTestCaseTrait;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var OroUserExtension */
+    protected $extension;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $genderProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $securityContext;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
 
     protected function setUp()
     {
-        $this->genderProvider = $this->createMock(
-            'Oro\Bundle\UserBundle\Provider\GenderProvider',
-            array('getLabelByName'),
-            array(),
-            '',
-            false
-        );
+        $this->genderProvider = $this->getMockBuilder(GenderProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $this->securityContext = $this->createMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $container = self::getContainerBuilder()
+            ->add('oro_user.gender_provider', $this->genderProvider)
+            ->add('security.token_storage', $this->tokenStorage)
+            ->getContainer($this);
 
-        $this->twigExtension = new OroUserExtension($this->genderProvider, $this->securityContext);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->genderProvider);
-        unset($this->securityContext);
-        unset($this->twigExtension);
+        $this->extension = new OroUserExtension($container);
     }
 
     public function testGetName()
     {
-        $this->assertEquals('user_extension', $this->twigExtension->getName());
-    }
-
-    public function testGetFunctions()
-    {
-        $expectedFunctions = array(
-            'oro_gender'       => 'getGenderLabel',
-            'get_current_user' => 'getCurrentUser',
-        );
-
-        $actualFunctions = $this->twigExtension->getFunctions();
-        $this->assertSameSize($expectedFunctions, $actualFunctions);
-
-        foreach ($expectedFunctions as $twigFunction => $internalMethod) {
-            $this->assertArrayHasKey($twigFunction, $actualFunctions);
-            $this->assertInstanceOf('\Twig_SimpleFunction', $actualFunctions[$twigFunction]);
-            $this->assertEquals(
-                [$this->twigExtension, $internalMethod],
-                $actualFunctions[$twigFunction]->getCallable()
-            );
-        }
+        $this->assertEquals('user_extension', $this->extension->getName());
     }
 
     public function testGetGenderLabel()
@@ -77,7 +50,12 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(Gender::MALE)
             ->will($this->returnValue($label));
 
-        $this->assertNull($this->twigExtension->getGenderLabel(null));
-        $this->assertEquals($label, $this->twigExtension->getGenderLabel(Gender::MALE));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_gender', [null])
+        );
+        $this->assertEquals(
+            $label,
+            self::callTwigFunction($this->extension, 'oro_gender', [Gender::MALE])
+        );
     }
 }

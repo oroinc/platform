@@ -16,14 +16,10 @@ use Oro\Component\Config\Resolver\SystemAwareResolver;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ConfigurationBuilder $configurationBuilder
-     */
+    /** @var ConfigurationBuilder */
     protected $configurationBuilder;
 
-    /**
-     * @var MenuFactory
-     */
+    /** @var MenuFactory */
     protected $factory;
 
     /** @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -39,9 +35,8 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $resolver = new SystemAwareResolver();
 
-        $this->menuFactory = $this->createMock('Knp\Menu\FactoryInterface');
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
+        $this->menuFactory = $this->createMock(FactoryInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -53,7 +48,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             $this->configurationProvider
         );
 
-        $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
+        $this->factory = $this->getMockBuilder(MenuFactory::class)
             ->setMethods(['getRouteInfo', 'processRoute'])
             ->getMock();
 

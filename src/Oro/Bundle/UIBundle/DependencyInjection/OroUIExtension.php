@@ -37,7 +37,6 @@ class OroUIExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
-        $loader->load('twig.yml');
         $loader->load('content_providers.yml');
         $loader->load('layouts.yml');
         $loader->load('block_types.yml');
@@ -53,7 +52,10 @@ class OroUIExtension extends Extension
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
 
-        $this->addClassesToCompile(['Oro\Bundle\UIBundle\EventListener\ContentProviderListener']);
+        $this->addClassesToCompile([
+            'Oro\Bundle\UIBundle\EventListener\ContentProviderListener',
+            'Oro\Bundle\UIBundle\Twig\Environment'
+        ]);
     }
 
     /**

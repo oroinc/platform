@@ -31,7 +31,7 @@ every application needed permissions should be added\updated by creating corresp
 Look at the example of simple permission configuration.
 
 ```
-permissions:
+oro_permissions:
     PERMISSION1:                                                    # permission name (should start with a letter, digit or underscore and only contain
                                                                     # letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":")
         label: Label for Permission 1                               # permission label

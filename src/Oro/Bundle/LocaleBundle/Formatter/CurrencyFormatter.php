@@ -2,22 +2,19 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Oro\Bundle\LocaleBundle\Twig\NumberExtension;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 
 class CurrencyFormatter implements FormatterInterface
 {
-    /**
-     * @var NumberExtension
-     */
-    protected $numberExtension;
+    /** @var NumberFormatter */
+    protected $formatter;
 
     /**
-     * @param NumberExtension $numberExtension
+     * @param NumberFormatter $formatter
      */
-    public function __construct(NumberExtension $numberExtension)
+    public function __construct(NumberFormatter $formatter)
     {
-        $this->numberExtension = $numberExtension;
+        $this->formatter = $formatter;
     }
 
     /**
@@ -33,7 +30,20 @@ class CurrencyFormatter implements FormatterInterface
      */
     public function format($parameter, array $formatterArguments = [])
     {
-        return $this->numberExtension->formatCurrency($parameter, $formatterArguments);
+        $currency = $this->getOption($formatterArguments, 'currency');
+        $attributes = (array)$this->getOption($formatterArguments, 'attributes', []);
+        $textAttributes = (array)$this->getOption($formatterArguments, 'textAttributes', []);
+        $symbols = (array)$this->getOption($formatterArguments, 'symbols', []);
+        $locale = $this->getOption($formatterArguments, 'locale');
+
+        return $this->formatter->formatCurrency(
+            $parameter,
+            $currency,
+            $attributes,
+            $textAttributes,
+            $symbols,
+            $locale
+        );
     }
 
     /**
@@ -58,5 +68,18 @@ class CurrencyFormatter implements FormatterInterface
     public function isDefaultFormatter()
     {
         return true;
+    }
+
+    /**
+     * Gets option or default value if option not exist
+     *
+     * @param array $options
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
+    protected function getOption(array $options, $name, $default = null)
+    {
+        return isset($options[$name]) ? $options[$name] : $default;
     }
 }
