@@ -1,22 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var BasicTreeManageComponent;
+    var BaseTreeManageView;
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var widgetManager = require('oroui/js/widget-manager');
     var mediator = require('oroui/js/mediator');
     var messenger = require('oroui/js/messenger');
     var routing = require('routing');
-    var BasicTreeComponent = require('oroui/js/app/components/basic-tree-component');
+    var BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
 
-    /**
-     * @export oroui/js/app/components/basic-tree-manage-component
-     * @extends oroui.app.components.BasicTreeComponent
-     * @class oroui.app.components.BasicTreeManageComponent
-     */
-    BasicTreeManageComponent = BasicTreeComponent.extend({
+    BaseTreeManageView = BaseTreeView.extend({
+        treeEvents: {
+            'move_node.jstree':  'onMove',
+            'select-subtree-item:change':  'onSelectSubtreeChange'
+        },
+
         /**
          * @property {Boolean}
          */
@@ -48,10 +47,16 @@ define(function(require) {
         onMoveRoute: '',
 
         /**
+         * @property {Boolean}
+         */
+        checkboxEnabled: true,
+
+        /**
          * @param {Object} options
          */
         initialize: function(options) {
-            BasicTreeManageComponent.__super__.initialize.call(this, options);
+            BaseTreeManageView.__super__.initialize.call(this, options);
+
             if (!this.$tree) {
                 return;
             }
@@ -61,10 +66,6 @@ define(function(require) {
             this.onSelectRoute = options.onSelectRoute;
             this.onMoveRoute = options.onMoveRoute;
             this.onRootSelectRoute = options.onRootSelectRoute;
-
-            this.$tree.on('select_node.jstree', _.bind(this.onSelect, this));
-            this.$tree.on('move_node.jstree', _.bind(this.onMove, this));
-            this.$tree.on('select-subcategories:change', _.bind(this.onSelectSubcategoriesChange, this));
         },
 
         /**
@@ -73,7 +74,7 @@ define(function(require) {
          * @returns {Object}
          */
         customizeTreeConfig: function(options, config) {
-            BasicTreeManageComponent.__super__.customizeTreeConfig.call(this, options, config);
+            BaseTreeManageView.__super__.customizeTreeConfig.call(this, options, config);
             if (options.updateAllowed) {
                 config.plugins.push('dnd');
                 config.dnd = {
@@ -84,12 +85,12 @@ define(function(require) {
         },
 
         /**
-         * Triggers after switching selectSubCategories
+         * Triggers after switching selectSubTree
          *
          * @param {Object} data
          */
-        onSelectSubcategoriesChange: function(data) {
-            this.jsTreeInstance.settings.checkbox.cascade = data.selectSubcategories ?
+        onSelectSubtreeChange: function(data) {
+            this.jsTreeInstance.settings.checkbox.cascade = data.selectSubTree ?
                 'up+down+undetermined' :
                 'undetermined';
         },
@@ -101,6 +102,8 @@ define(function(require) {
          * @param {Object} selected
          */
         onSelect: function(e, selected) {
+            BaseTreeManageView.__super__.onSelect.apply(this, arguments);
+
             if (this.initialization || !this.updateAllowed) {
                 return;
             }
@@ -139,7 +142,7 @@ define(function(require) {
                         self.rollback(data);
                         messenger.notificationFlashMessage(
                             'error',
-                            __('oro.ui.jstree.move_node_error', {nodeText: data.node.text})
+                            _.__('oro.ui.jstree.move_node_error', {nodeText: data.node.text})
                         );
                     } else if (self.reloadWidget) {
                         widgetManager.getWidgetInstanceByAlias(self.reloadWidget, function(widget) {
@@ -168,14 +171,10 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.$tree
-                .off('select_node.jstree')
-                .off('move_node.jstree')
-                .off('select-subcategories:change');
 
-            BasicTreeManageComponent.__super__.dispose.call(this);
+            BaseTreeManageView.__super__.dispose.call(this);
         }
     });
 
-    return BasicTreeManageComponent;
+    return BaseTreeManageView;
 });
