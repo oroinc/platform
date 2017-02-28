@@ -19,13 +19,14 @@ layout:
 ```
 
 2. In `/config/oro/datagrids.yml` should be defined:
+
 ```yaml
 datagrids:
     frontend-some-grid:
 ...
 ```
 
-As we see in `layout.yml`, we need to extend generic layout block first. Latter defined in `OroDataGridBundle` (`imports` directive used). Also we should to specify `optionName` with `grid_name` and `optionValue` with grid identifier value defined in `datagrids.yml`. 
+As we see in `layout.yml`, we need to extend generic layout block first. Later defined in `OroDataGridBundle` (`imports` directive used). Also we should to specify `optionName` with `grid_name` and `optionValue` with grid identifier value defined in `datagrids.yml`. 
 
 If we open generic layout block for `base` theme (`base/imports/datagrid/layout.yml`) we could see other related with datagrid block: `datagrid_toolbar`:
 ```yaml
@@ -72,7 +73,7 @@ In `DataGridBundle/Layout/Block/Type/DatagridType.php` defined additional parame
     'grid_render_parameters' => [],
     'split_to_cells' => false,
 ```
-Using `split_to_cells` parameter we can manipulate grid layout on more detailed level - table cells. How to use this param described in `DataGridBundle/Resources/doc/frontend/grid_customization.md`
+Using `split_to_cells` parameter we can manipulate grid layout on more detailed level - table cells. How to use this param described in [Grid customization through 'split to cells' option](./Resources/doc/frontend/grid_customization.md)
 Other params defined in Twig macros `renderGrid` (`DataGridBundle/Resources/views/macros.html.twig`):
 
 - `grid_parameters` - parameters need to be passed to grid request
