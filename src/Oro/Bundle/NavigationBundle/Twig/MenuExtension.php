@@ -111,7 +111,7 @@ class MenuExtension extends \Twig_Extension
         $menu = $this->filterUnallowedItems($menu);
         $menuType = $menu->getExtra('type');
         // rewrite config options with args
-        if (!empty($menuType)) {
+        if (!empty($menuType) && array_key_exists('templates', $menuConfiguration)) {
             $templates = $menuConfiguration['templates'];
             if (!empty($templates[$menuType])) {
                 $options = array_replace_recursive($templates[$menuType], $options);

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 

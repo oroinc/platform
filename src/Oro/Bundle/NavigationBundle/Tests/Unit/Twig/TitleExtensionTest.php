@@ -43,14 +43,6 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new TitleExtension($container);
     }
 
-    public function testFunctionDeclaration()
-    {
-        $functions = $this->extension->getFunctions();
-        $this->assertArrayHasKey('oro_title_render', $functions);
-        $this->assertArrayHasKey('oro_title_render_short', $functions);
-        $this->assertArrayHasKey('oro_title_render_serialized', $functions);
-    }
-
     public function testNameConfigured()
     {
         $this->assertInternalType('string', $this->extension->getName());
