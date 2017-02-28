@@ -3,8 +3,10 @@
 namespace Oro\Bundle\ReportBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\ReportBundle\Migrations\Schema\v2_1\OroReportBundle as OroReportBundle21;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -17,7 +19,7 @@ class OroReportBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_0';
+        return 'v2_1';
     }
 
     /**
@@ -31,6 +33,8 @@ class OroReportBundleInstaller implements Installation
 
         /** Foreign keys generation **/
         $this->addOroReportForeignKeys($schema);
+
+        OroReportBundle21::createOroCalendarDateTable($schema);
     }
 
     /**
