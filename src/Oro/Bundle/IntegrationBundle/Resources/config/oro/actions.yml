@@ -107,7 +107,8 @@ operations:
                 method_parameters: [$.data.editMode]
                 attribute: $.actionAllowed
         preconditions:
-            '@equal': [$.actionAllowed, true]
+            '@and':
+                - '@equal': [$.actionAllowed, true]
         actions:
             - '@call_service_method':
                 service: oro_integration.action_handler.channel_delete
