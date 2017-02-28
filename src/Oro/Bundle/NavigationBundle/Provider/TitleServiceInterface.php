@@ -26,7 +26,7 @@ interface TitleServiceInterface
     /**
      * Load title template for current route from title readers
      *
-     * @param $route
+     * @param string $route
      *
      * @return TitleServiceInterface
      */
@@ -38,4 +38,14 @@ interface TitleServiceInterface
      * @return string
      */
     public function getSerialized();
+
+    /**
+     * Create full title based on short title and route name
+     *
+     * @param string $route
+     * @param string $title
+     *
+     * @return string
+     */
+    public function createTitle($route, $title);
 }

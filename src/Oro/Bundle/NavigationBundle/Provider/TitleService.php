@@ -289,11 +289,9 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * @param string $route
-     * @param string $title
-     * @return bool|string
+     * {@inheritdoc}
      */
-    protected function createTitle($route, $title)
+    public function createTitle($route, $title)
     {
         $titleData = [];
 
