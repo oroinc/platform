@@ -36,7 +36,7 @@ define([
                     autoResize: true
                 }
             };
-            var additionalOptions = element.data('dialog-options');
+            var additionalOptions = element.data('data-dialog-options');
             if (additionalOptions) {
                 if (!_.isUndefined(additionalOptions)) {
                     additionalOptions.dialogOptions = _.extend(

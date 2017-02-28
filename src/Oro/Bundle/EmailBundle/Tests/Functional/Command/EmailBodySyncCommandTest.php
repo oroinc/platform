@@ -20,11 +20,6 @@ class EmailBodySyncCommandTest extends WebTestCase
         ]);
     }
 
-    protected function tearDown()
-    {
-        $this->resetEmailFeature();
-    }
-
     /**
      * @dataProvider paramProvider
      *
@@ -57,7 +52,7 @@ class EmailBodySyncCommandTest extends WebTestCase
     {
         return [
             'should show help' => [
-                '$expectedContent' => "Usage:\n  oro:email:body-sync [options]",
+                '$expectedContent' => "Usage: oro:email:body-sync [options]",
                 '$params'          => ['--help'],
             ],
             'should show failed message for no id' => [

@@ -19,6 +19,17 @@
     </script>
 {% endblock %}
 
+{% block _commerce_column_manager_collection_widget %}
+    <script type="text/template" id="commerce-column-manager-collection-tpl">
+        <div class="table-wrapper">
+            <table class="table">
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="column-manager-no-columns"><span><%= _.__('oro.datagrid.column_manager.empty_list') %></span></div>
+    </script>
+{% endblock %}
+
 {% block _commerce_column_manager_item_widget %}
 <script type="text/template" id="commerce-column-manager-item-tpl">
     <td class="column-manager__item">

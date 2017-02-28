@@ -31,8 +31,11 @@ oro:
             label: Page
             totalPages: of %totalPages%
             totalRecords: Total of %totalRecords% records
+            prev: Prev
+            next: Next
         pagesize:
             label: View per page
+            labelShort: Per page
     grid:
         mass_action:
             label: Mass Actions
