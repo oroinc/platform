@@ -11,16 +11,24 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $handler;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->handler = new ErrorHandler();
         $this->handler->registerHandlers();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function tearDown()
     {
         unset($this->handler);
         restore_error_handler();
+        restore_error_handler();
+        restore_exception_handler();
     }
 
     /**
@@ -37,31 +45,34 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \ErrorException
      * @expectedExceptionMessage Test error
      */
-    public function testHandleError()
+    public function testHandleErrors()
     {
         trigger_error('Test error', E_USER_ERROR);
     }
 
-    public function testHandleIgnoredErrorIfErrorsSuppressed()
+    public function testHandleIgnoredErrorsIfErrorsSuppressed()
     {
-        @$this->handler->handle(E_ERROR, 'test', '', 0);
+        @$this->handler->handleErrors(E_ERROR, 'test', '', 0);
     }
 
     public function testHandleIgnoreWarnings()
     {
-        $this->assertFalse($this->handler->handle(E_WARNING, 'Test warning', '', 0));
+        $this->assertFalse($this->handler->handleErrors(E_WARNING, 'Test warning', '', 0));
     }
 
+    /**
+     * @return array
+     */
     public function warningDataProvider()
     {
-        return array(
-            'silenced php_network_getaddresses' => array(
+        return [
+            'silenced php_network_getaddresses' => [
                 'message' => 'PDO::__construct(): php_network_getaddresses: getaddrinfo failed: No such host is known'
-            ),
-            'passed warning' => array(
+            ],
+            'passed warning' => [
                 'message' => 'Some regualar warning',
                 'silenced' => false,
-            )
-        );
+            ]
+        ];
     }
 }

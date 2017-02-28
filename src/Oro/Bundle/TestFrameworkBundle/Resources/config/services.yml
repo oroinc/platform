@@ -65,3 +65,7 @@ services:
             - [setFileLocator, ['@file_locator']]
             - [addProcessor, ['@oro_test.alice_reference_processor']]
             - [addProcessor, ['@oro_test.alice_to_string_processor']]
+
+    oro_test.config_cache:
+        decorates: oro_config.cache
+        parent: oro.cache.abstract

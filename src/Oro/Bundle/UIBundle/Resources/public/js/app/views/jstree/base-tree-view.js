@@ -1,13 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var BasicTreeComponent;
+    var BaseTreeView;
     var $ = require('jquery');
     var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
+    var BaseView = require('oroui/js/app/views/base/view');
     var tools = require('oroui/js/tools');
-    var BaseComponent = require('oroui/js/app/components/base/component');
 
     require('jquery.jstree');
 
@@ -16,20 +14,35 @@ define(function(require) {
      * - data - tree structure in jstree json format
      * - nodeId - identifier of selected node
      *
-     * @export oroui/js/app/components/basic-tree-component
-     * @extends oroui.app.components.base.Component
-     * @class oroui.app.components.BasicTreeComponent
+     * @export oroui/js/app/views/jstree/base-tree-view
+     * @extends oroui.app.views.base.View
+     * @class oroui.app.views.BaseTreeView
      */
-    BasicTreeComponent = BaseComponent.extend({
-        /**
-         * @property {Object}
-         */
-        $el: null,
+    BaseTreeView = BaseView.extend({
+        autoRender: true,
+
+        events: {
+            'input [data-name="search"]': 'onSearch',
+            'change [data-action-type="checkAll"]': 'onCheckAllClick'
+        },
+
+        treeEvents: {
+            'after_open.jstree':  'onAfterOpen',
+            'before_open.jstree':  'onBeforeOpen',
+            'after_close.jstree':  'onAfterClose',
+            'select_node.jstree': 'onSelect',
+            'search.jstree': 'searchResultsFilter'
+        },
 
         /**
          * @property {Object}
          */
         $tree: null,
+
+        /**
+         * @property {Object}
+         */
+        jsTreeConfig: null,
 
         /**
          * @property {Object}
@@ -44,7 +57,7 @@ define(function(require) {
         /**
          * @property {Boolean}
          */
-        initialization: false,
+        initialization: true,
 
         /**
          * @property {Boolean}
@@ -54,19 +67,21 @@ define(function(require) {
         /**
          * @property {Number}
          */
-        searchTimeout: 0,
+        searchTimeout: 250,
 
         /**
          * @param {Object} options
          */
         initialize: function(options) {
+            BaseTreeView.__super__.initialize.apply(this, arguments);
             var nodeList = options.data;
             if (!nodeList) {
                 return;
             }
 
-            this.$el = $(options._sourceElement);
             this.$tree = this.$el.find('[data-role="jstree-container"]');
+            this.$tree.data('treeView', this);
+            this.onSearch = _.debounce(this.onSearch, this.searchTimeout);
 
             var config = {
                 'core': {
@@ -82,45 +97,28 @@ define(function(require) {
                 'plugins': ['state', 'wholerow']
             };
 
-            config = this.customizeTreeConfig(options, config);
-
             this.nodeId = options.nodeId;
+            this.jsTreeConfig = this.customizeTreeConfig(options, config);
 
-            this._deferredInit();
-            this.initialization = true;
+            this._deferredRender();
+        },
 
-            this.$tree.jstree(config);
+        render: function() {
+            this.$tree.jstree(this.jsTreeConfig);
             this.jsTreeInstance = $.jstree.reference(this.$tree);
 
+            var treeEvents = tools.getAllPropertyVersions(this, 'treeEvents');
+            treeEvents = _.extend.apply({}, treeEvents);
+            _.each(treeEvents, function(callback, event) {
+                if (this[callback]) {
+                    this.$tree.on(event, _.bind(this[callback], this));
+                }
+            }, this);
+
             this.$tree.one('ready.jstree', _.bind(function() {
-                this._resolveDeferredInit();
                 this.initialization = false;
-                this._fixContainerHeight();
-
-                this.$tree.on('before_open.jstree', _.bind(this.onBeforeOpen, this));
-                this.$tree.on('after_open.jstree', _.bind(this.onAfterOpen, this));
-                this.$tree.on('after_close.jstree', _.bind(this.onAfterClose, this));
+                this._resolveDeferredRender();
             }, this));
-
-            this.$el.parent().on('keyup', '[data-name="search"]', _.bind(this.onSearch, this));
-
-            if (this.checkboxEnabled) {
-                var $checkAll = this.$tree.closest('[data-role="jstree-wrapper"]').find('[data-action-type]');
-                $checkAll.on('click', _.bind(this.onCheckAllClick, this));
-            }
-
-            if (tools.isMobile()) {
-                this.$tree.on('select_node.jstree', _.bind(function(event, data) {
-                    var selectedNode = data.node;
-                    if (selectedNode) {
-                        selectedNode.parents.reverse().slice(1).forEach(_.bind(function(parentId) {
-                            var node = this.jsTreeInstance.get_node(parentId);
-                            this.hideNeighbors(node, 0);
-                        }, this));
-                    }
-                    this.jsTreeInstance.close_all(selectedNode);
-                }, this));
-            }
         },
 
         /**
@@ -139,7 +137,7 @@ define(function(require) {
                     three_state: false
                 };
 
-                $('[data-role="jstree-checkall"]').show();
+                this.$el.find('[data-role="jstree-checkall"]').show();
             }
 
             if (this.$el.find('[data-name="search"]').length) {
@@ -162,14 +160,83 @@ define(function(require) {
         },
 
         onSearch: function(event) {
-            var self = this;
-            if (this.searchTimeout) {
-                clearTimeout(this.searchTimeout);
+            var value = $(event.target).val();
+            if (this.jsTreeInstance.allNodesHidden) {
+                this.jsTreeInstance.show_all();
+                this.jsTreeInstance.allNodesHidden = false;
             }
-            this.searchTimeout = setTimeout(function() {
-                var value = $(event.target).val();
-                self.$tree.jstree(true).search(value);
-            }, 250);
+            this.jsTreeInstance.searchValue = value;
+            this.jsTreeInstance.settings.autohideNeighbors = tools.isMobile() && _.isEmpty(value);
+            this.jsTreeInstance.search(value);
+        },
+
+        /**
+         * Search results filter
+         *
+         * @param {Object} event
+         * @param {Object} data
+         */
+        searchResultsFilter: function(event, data) {
+            if (data.res.length) {
+                this.underlineFilter.apply(this, arguments);
+            } else {
+                this.showSearchResultMessage(_.__('oro.ui.jstree.search.search_no_found'));
+            }
+        },
+
+        /**
+         * Underline matches substrings
+         *
+         * @param {Object} event
+         * @param {Object} data
+         */
+        underlineFilter: _.debounce(function(event, data) {
+            var pattern = new RegExp(data.instance.searchValue, 'gi');
+            if (!data.nodes) {
+                return;
+            }
+            $('.jstree-search', this.$el).each(function(index, item) {
+                var $item = $(item);
+                var sourceText = $item.text().replace(pattern, '<span class="matched-keyword">$&</span>');
+                $item.contents().filter(function(index, node) {
+                    return node.nodeName === '#text' || node.className === 'matched-keyword';
+                }).remove();
+
+                $item.append(sourceText);
+            });
+        }),
+
+        /**
+         * Show search result message
+         *
+         * @param {string} message
+         */
+        showSearchResultMessage: function(message) {
+            if (_.isUndefined(message)) {
+                message = '';
+            }
+            this.jsTreeInstance.hide_all();
+            this.jsTreeInstance.allNodesHidden = true;
+            this.$tree.append(
+                $('<div />', {
+                    'class': 'search-no-results',
+                    'text': message
+                })
+            );
+        },
+
+        onSelect: function(event, data) {
+            if (!tools.isMobile()) {
+                return;
+            }
+            var selectedNode = data.node;
+            if (selectedNode) {
+                selectedNode.parents.reverse().slice(1).forEach(_.bind(function(parentId) {
+                    var node = this.jsTreeInstance.get_node(parentId);
+                    this.hideNeighbors(node, 0);
+                }, this));
+            }
+            this.jsTreeInstance.close_all(selectedNode);
         },
 
         /**
@@ -209,17 +276,18 @@ define(function(require) {
                     }
                 }, this));
             }
+            this.underlineFilter.apply(this, arguments);
         },
 
         onAfterOpen: function(event, data) {
             if (this.jsTreeInstance.settings.autohideNeighbors) {
-                this.hideNeighbors(data.node);
+                this.hideNeighbors(data.node, null);
             }
         },
 
         onAfterClose: function(event, data) {
             if (this.jsTreeInstance.settings.autohideNeighbors) {
-                this.showNeighbors(data.node);
+                this.showNeighbors(data.node, null);
             }
         },
 
@@ -291,57 +359,21 @@ define(function(require) {
             return node;
         },
 
-        /**
-         * Fix scrollable container height
-         * TODO: This method should be removed during fixing of https://magecore.atlassian.net/browse/BB-336
-         *
-         */
-        _fixContainerHeight: function() {
-            var tree = this.$tree.parent();
-            if (!tree.hasClass('tree-component')) {
-                return;
-            }
-
-            var container = tree.parent();
-            if (!container.hasClass('tree-component-container')) {
-                return;
-            }
-
-            var fixHeight = function() {
-                var anchor = $('#bottom-anchor').position().top;
-                var containerTop = container.position().top;
-                var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
-                var footerHeight = $('#footer:visible').height() || 0;
-                var fixContent = 1;
-
-                tree.height(anchor - containerTop - debugBarHeight - footerHeight + fixContent);
-            };
-
-            layout.onPageRendered(fixHeight);
-            $(window).on('resize', _.debounce(fixHeight, 50));
-            mediator.on('page:afterChange', fixHeight);
-            mediator.on('layout:adjustReloaded', fixHeight);
-            mediator.on('layout:adjustHeight', fixHeight);
-
-            fixHeight();
-        },
-
         dispose: function() {
             if (this.disposed) {
                 return;
             }
 
-            this.$el.off();
             this.$tree.off();
             this.$tree.parent().off();
 
-            delete this.$el;
             delete this.$tree;
             delete this.jsTreeInstance;
+            delete this.jsTreeConfig;
 
-            return BasicTreeComponent.__super__.dispose.call(this);
+            return BaseTreeView.__super__.dispose.call(this);
         }
     });
 
-    return BasicTreeComponent;
+    return BaseTreeView;
 });
