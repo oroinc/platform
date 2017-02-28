@@ -411,7 +411,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'join' => [
                                 'inner' => [['join' => self::ALIAS . '.b', 'alias' => 'b']],
                                 'left' => [
-                                    ['join' => self::ALIAS . '.c', 'alias' => 'c']
+                                    ['join' => self::ALIAS . '.c', 'alias' => 'c'],
                                 ]
                             ],
                         ],
@@ -451,7 +451,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                         'columns' => [
                             'rootField' => ['data_name' => self::ALIAS . '.rootField'],
                             'innerJoinField' => ['data_name' => 'b.innerJoinField'],
-                            'leftJoinField' => ['data_name' => 'c.leftJoinField']
+                            'leftJoinField' => ['data_name' => 'c.leftJoinField'],
                         ],
                     ],
                 ],
