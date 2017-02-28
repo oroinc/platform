@@ -292,6 +292,7 @@ services:
         class: %oro_navigation.title_service.twig.extension.class%
         arguments:
             - '@oro_navigation.title_service'
+            - '@request_stack'
         tags:
             - { name: twig.extension }
 

@@ -4,6 +4,8 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 
+use Symfony\Component\HttpFoundation\RequestStack;
+
 class TitleExtension extends \Twig_Extension
 {
     const EXT_NAME = 'oro_title';
@@ -19,11 +21,18 @@ class TitleExtension extends \Twig_Extension
     protected $templateFileTitleDataStack = array();
 
     /**
-     * @param TitleServiceInterface $titleService
+     * @var RequestStack
      */
-    public function __construct(TitleServiceInterface $titleService)
+    protected $requestStack;
+
+    /**
+     * @param TitleServiceInterface $titleService
+     * @param RequestStack          $requestStack
+     */
+    public function __construct(TitleServiceInterface $titleService, RequestStack $requestStack)
     {
         $this->titleService = $titleService;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -55,37 +64,54 @@ class TitleExtension extends \Twig_Extension
     /**
      * Renders title
      *
-     * @param null $titleData
+     * @param string|null $titleData
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function render($titleData = null)
+    public function render($titleData = null, $menuName = null)
     {
+        $route = $this->requestStack->getCurrentRequest()->get('_route');
+
         return $this->titleService
             ->setData($this->getTitleData())
+            ->loadByRoute($route, $menuName)
             ->render(array(), $titleData, null, null, true);
     }
 
     /**
      * Renders short title
      *
-     * @param null $titleData
+     * @param string|null $titleData
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function renderShort($titleData = null)
+    public function renderShort($titleData = null, $menuName = null)
     {
+        $route = $this->requestStack->getCurrentRequest()->get('_route');
+
         return $this->titleService
             ->setData($this->getTitleData())
+            ->loadByRoute($route, $menuName)
             ->render(array(), $titleData, null, null, true, true);
     }
 
     /**
      * Returns json serialized data
      *
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function renderSerialized()
+    public function renderSerialized($menuName = null)
     {
-        return $this->titleService->setData($this->getTitleData())->getSerialized();
+        $route = $this->requestStack->getCurrentRequest()->get('_route');
+
+        return $this->titleService
+            ->setData($this->getTitleData())
+            ->loadByRoute($route, $menuName)
+            ->getSerialized();
     }
 
     /**

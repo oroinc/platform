@@ -26,9 +26,12 @@ interface TitleServiceInterface
     /**
      * Load title template from database
      *
-     * @param string $route
+     * @param string      $route
+     * @param string|null $menuName
+     *
+     * @return $this
      */
-    public function loadByRoute($route);
+    public function loadByRoute($route, $menuName = null);
 
     /**
      * Return serialized title data
@@ -36,5 +39,4 @@ interface TitleServiceInterface
      * @return string
      */
     public function getSerialized();
-
 }

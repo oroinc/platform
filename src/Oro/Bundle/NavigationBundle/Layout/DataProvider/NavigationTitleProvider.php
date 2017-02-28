@@ -36,7 +36,7 @@ class NavigationTitleProvider
      */
     public function getTitle($routeName, $params = [])
     {
-        $this->titleService->loadByRoute($routeName);
+        $this->titleService->loadByRoute($routeName, 'frontend_menu');
         $this->titleService->setParams($params);
 
         $title = $this->titleService->render([], null, null, null, true);

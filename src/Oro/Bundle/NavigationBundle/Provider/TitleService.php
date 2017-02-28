@@ -312,17 +312,20 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * Load title template from database, fallback to config values
-     *
-     * @param string $route
+     * {@inheritdoc}
      */
-    public function loadByRoute($route)
+    public function loadByRoute($route, $menuName = null)
     {
+        if (!$menuName) {
+            $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
+        }
         $templates = $this->titleProvider->getTitleTemplates($route);
         if (!empty($templates)) {
             $this->setTemplate($templates['title']);
             $this->setShortTemplate($templates['short_title']);
         }
+
+        return $this;
     }
 
     protected function createTitle($route, $title)
@@ -334,7 +337,7 @@ class TitleService implements TitleServiceInterface
                 $titleData[] = $title;
             }
 
-            $breadcrumbLabels = $this->getBreadcrumbs($route);
+            $breadcrumbLabels = $this->getBreadcrumbs($route, $menuName);
             if (count($breadcrumbLabels)) {
                 $titleData = array_merge($titleData, $breadcrumbLabels);
             }
@@ -350,15 +353,14 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * @param $route
+     * @param string $route
+     * @param string $menuName
+     *
      * @return array
      */
-    protected function getBreadcrumbs($route)
+    protected function getBreadcrumbs($route, $menuName)
     {
-        return $this->breadcrumbManagerLink->getService()->getBreadcrumbLabels(
-            $this->userConfigManager->get('oro_navigation.breadcrumb_menu'),
-            $route
-        );
+        return $this->breadcrumbManagerLink->getService()->getBreadcrumbLabels($menuName, $route);
     }
 
     /**
