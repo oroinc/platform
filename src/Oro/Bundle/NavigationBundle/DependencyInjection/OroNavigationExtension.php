@@ -33,7 +33,6 @@ class OroNavigationExtension extends Extension
         $this->addClassesToCompile(
             [
                 'Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener',
-                'Oro\Bundle\NavigationBundle\Event\RequestTitleListener'
             ]
         );
     }

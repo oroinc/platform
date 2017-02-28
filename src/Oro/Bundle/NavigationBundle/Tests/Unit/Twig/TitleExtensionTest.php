@@ -26,14 +26,11 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
     private $requestStack;
 
     /**
-     * @var Request|\PHPUnit_Framework_MockObject_MockObject
+     * {@inheritdoc}
      */
-    protected $request;
-
     protected function setUp()
     {
         $this->service      = $this->createMock(TitleServiceInterface::class);
-        $this->request      = $this->createMock(Request::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->extension    = new TitleExtension($this->service, $this->requestStack);
     }
@@ -165,32 +162,32 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function renderAfterSetDataProvider()
     {
-        return array(
-            'override options in same template' => array(
-                array(
-                    array(array('k1' => 'v1')),
-                    array(array('k1' => 'v2')),
-                    array(array('k2' => 'v3')),
-                ),
-                array('k1' => 'v2', 'k2' => 'v3'),
-            ),
-            'override options in different template' => array(
-                array(
-                    array(array('k1' => 'v1'), 'child_template'),
-                    array(array('k1' => 'v2'), 'child_template'),
-                    array(array('k3' => 'v3'), 'child_template'),
-                    array(array('k1' => 'v4'), 'parent_template'),
-                    array(array('k2' => 'v5'), 'parent_template'),
-                    array(array('k3' => 'v6'), 'parent_template'),
-                    array(array('k4' => 'v7'), 'parent_template'),
-                ),
-                array('k1' => 'v2', 'k2' => 'v5', 'k3' => 'v3', 'k4' => 'v7'),
-            ),
-            'empty data' => array(
-                array(),
-                array(),
-            ),
-        );
+        return [
+            'override options in same template' => [
+                [
+                    [['k1' => 'v1']],
+                    [['k1' => 'v2']],
+                    [['k2' => 'v3']],
+                ],
+                ['k1' => 'v2', 'k2' => 'v3'],
+            ],
+            'override options in different template' => [
+                [
+                    [['k1' => 'v1'], 'child_template'],
+                    [['k1' => 'v2'], 'child_template'],
+                    [['k3' => 'v3'], 'child_template'],
+                    [['k1' => 'v4'], 'parent_template'],
+                    [['k2' => 'v5'], 'parent_template'],
+                    [['k3' => 'v6'], 'parent_template'],
+                    [['k4' => 'v7'], 'parent_template'],
+                ],
+                ['k1' => 'v2', 'k2' => 'v5', 'k3' => 'v3', 'k4' => 'v7'],
+            ],
+            'empty data' => [
+                [],
+                [],
+            ],
+        ];
     }
 
     public function testSet()
@@ -225,13 +222,14 @@ class TitleExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function setRouteName($routeName)
     {
-        $this->request->expects($this->any())
+        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $request->expects($this->any())
             ->method('get')
             ->with('_route')
             ->willReturn($routeName);
 
         $this->requestStack->expects($this->any())
             ->method('getCurrentRequest')
-            ->willReturn($this->request);
+            ->willReturn($request);
     }
 }

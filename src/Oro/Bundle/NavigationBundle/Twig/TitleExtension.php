@@ -18,7 +18,7 @@ class TitleExtension extends \Twig_Extension
     /**
      * @var array
      */
-    protected $templateFileTitleDataStack = array();
+    protected $templateFileTitleDataStack = [];
 
     /**
      * @var RequestStack
@@ -42,11 +42,11 @@ class TitleExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             'oro_title_render' => new \Twig_Function_Method($this, 'render'),
             'oro_title_render_short' => new \Twig_Function_Method($this, 'renderShort'),
             'oro_title_render_serialized' => new \Twig_Function_Method($this, 'renderSerialized'),
-        );
+        ];
     }
 
     /**
@@ -56,9 +56,9 @@ class TitleExtension extends \Twig_Extension
      */
     public function getTokenParsers()
     {
-        return array(
+        return [
             new TitleSetTokenParser()
-        );
+        ];
     }
 
     /**
@@ -76,7 +76,7 @@ class TitleExtension extends \Twig_Extension
         return $this->titleService
             ->setData($this->getTitleData())
             ->loadByRoute($route, $menuName)
-            ->render(array(), $titleData, null, null, true);
+            ->render([], $titleData, null, null, true);
     }
 
     /**
@@ -94,7 +94,7 @@ class TitleExtension extends \Twig_Extension
         return $this->titleService
             ->setData($this->getTitleData())
             ->loadByRoute($route, $menuName)
-            ->render(array(), $titleData, null, null, true, true);
+            ->render([], $titleData, null, null, true, true);
     }
 
     /**
@@ -126,7 +126,7 @@ class TitleExtension extends \Twig_Extension
      * @param string|null $templateScope
      * @return TitleExtension
      */
-    public function set(array $options = array(), $templateScope = null)
+    public function set(array $options = [], $templateScope = null)
     {
         $this->addTitleData($options, $templateScope);
         return $this;
@@ -136,7 +136,7 @@ class TitleExtension extends \Twig_Extension
      * @param array $options
      * @param string|null $templateScope
      */
-    protected function addTitleData(array $options = array(), $templateScope = null)
+    protected function addTitleData(array $options = [], $templateScope = null)
     {
         if (!$templateScope) {
             $backtrace = debug_backtrace(false);
@@ -148,7 +148,7 @@ class TitleExtension extends \Twig_Extension
         }
 
         if (!isset($this->templateFileTitleDataStack[$templateScope])) {
-            $this->templateFileTitleDataStack[$templateScope] = array();
+            $this->templateFileTitleDataStack[$templateScope] = [];
         }
         $this->templateFileTitleDataStack[$templateScope][] = $options;
     }
@@ -158,9 +158,9 @@ class TitleExtension extends \Twig_Extension
      */
     protected function getTitleData()
     {
-        $result = array();
+        $result = [];
         if ($this->templateFileTitleDataStack) {
-            $result = array();
+            $result = [];
             foreach (array_reverse($this->templateFileTitleDataStack) as $templateOptions) {
                 foreach ($templateOptions as $options) {
                     $result = array_replace_recursive($result, $options);
