@@ -73,7 +73,7 @@ In `DataGridBundle/Layout/Block/Type/DatagridType.php` defined additional parame
     'grid_render_parameters' => [],
     'split_to_cells' => false,
 ```
-Using `split_to_cells` parameter we can manipulate grid layout on more detailed level - table cells. How to use this param described in [Grid customization through 'split to cells' option](./Resources/doc/frontend/grid_customization.md)
+Using `split_to_cells` parameter we can manipulate grid layout on more detailed level - table cells. How to use this param described in [Grid customization through 'split to cells' option](./grid_customization.md)
 Other params defined in Twig macros `renderGrid` (`DataGridBundle/Resources/views/macros.html.twig`):
 
 - `grid_parameters` - parameters need to be passed to grid request
