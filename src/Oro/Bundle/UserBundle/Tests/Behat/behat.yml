@@ -28,6 +28,21 @@ oro_behat_extension:
       selector: "form[id^='oro_user_role_form']"
       class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm
 
+    User Config Form:
+      selector: 'form[name="look_and_feel"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Use parent scope for Position: 'look_and_feel[oro_ui___navbar_position][use_parent_scope_value]'
+
+    Sided Main Menu:
+      selector: 'div.main-menu-sided'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UserRoleView:
+      selector: "[data-target='#user-role-view']"
+      class: Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login
