@@ -112,6 +112,31 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Checks first records in provided column number
+     * Example: And I check first 5 records in 1 column
+     *
+     * @When /^(?:|I )check first (?P<number>(?:|one|two|\d+)) record(s|) in (?P<column>(?:|one|two|\d+)) column$/
+     */
+    public function iCheckRecordsInColumn($number, $column)
+    {
+        $this->getGrid()->checkFirstRecords(
+            $this->getCount($number),
+            $this->getCount($column)
+        );
+    }
+
+    /**
+     * Unchecks first records in provided column number
+     * Example: And I uncheck first 2 records in 1 column
+     *
+     * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
+     */
+    public function iUncheckFirstRecordsInColumn($number, $column)
+    {
+        $this->getGrid()->checkFirstRecords($number, $column);
+    }
+
+    /**
      * Example: And I uncheck first 2 records in grid
      *
      * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in grid$/
@@ -507,6 +532,31 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check that record with provided name exists in grid
+     * Example: Then I should see First test group in grid
+     *
+     * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iShouldSeeRecordInGrid($recordName)
+    {
+        $this->getGrid()->getRowByContent($recordName);
+    }
+
+    /**
+     * Check that given collection of records exists in grid
+     * Example: Then I should see following records in grid:
+     *            | Alice1  |
+     *            | Alice10 |
+     * @Then /^(?:|I )should see following records in grid:$/
+     */
+    public function iShouldSeeFollowingRecordsInGrid(TableNode $table)
+    {
+        foreach ($table->getRows() as list($value)) {
+            $this->iShouldSeeRecordInGrid($value);
+        }
+    }
+
+    /**
      * @param string $stringNumber
      * @return int
      */
@@ -555,9 +605,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             if ($gridToolbarActions->isVisible()) {
                 $gridToolbarActions->getActionByTitle('Filters')->click();
             } else {
-                $this->elementFactory->createElement($grid . 'FiltersState')->click();
+                $filterStateElementName = $grid . 'FiltersState';
+                $filterState = $this->elementFactory->createElement($filterStateElementName);
+                self::assertNotNull($filterState);
+
+                $filterState->click();
             }
         }
+
         return $filters;
     }
 }

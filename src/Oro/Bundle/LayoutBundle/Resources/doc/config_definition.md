@@ -69,13 +69,13 @@ layout:
         parentId: head
         blockType: style
         options:
-            src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]), "libraries")'
+            src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"], "libraries"))'
     - '@add':
         id: own_styles
         parentId: head
         blockType: style
         options:
-            src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"]), "own_styles")'
+            src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"], "own_styles"))'
     ...
 ```
 

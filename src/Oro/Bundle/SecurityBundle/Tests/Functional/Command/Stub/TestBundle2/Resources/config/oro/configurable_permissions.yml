@@ -1,0 +1,10 @@
+oro_configurable_permissions:
+    test_configurable_permissions1:
+        default: true
+    test_configurable_permissions2:
+        capabilities:
+            test_action: true
+    test_configurable_permissions3:
+        entities:
+            Oro\Bundle\TestFrameworkBundle\Entity\Item:
+                create: false

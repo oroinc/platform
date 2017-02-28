@@ -57,19 +57,20 @@ class Grid extends Element
 
     /**
      * @param int $number
+     * @param int $cellNumber
      */
-    public function checkFirstRecords($number)
+    public function checkFirstRecords($number, $cellNumber = 0)
     {
         $rows = $this->getRows();
 
-        self::assertGreaterThan(
+        self::assertGreaterThanOrEqual(
             $number,
             count($rows),
             sprintf('Can\'t check %s records, because grid has only %s records', $number, count($rows))
         );
 
         for ($i = 0; $i < $number; $i++) {
-            $rows[$i]->checkMassActionCheckbox();
+            $rows[$i]->checkMassActionCheckbox($cellNumber);
         }
     }
 

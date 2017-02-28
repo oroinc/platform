@@ -124,8 +124,12 @@ class ConfigurationType extends AbstractType
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('password', 'password', [
-                'label' => 'oro.imap.configuration.password.label', 'required' => true,
-                'attr' => ['class' => 'check-connection']
+                'label' => 'oro.imap.configuration.password.label',
+                'required' => true,
+                'attr' => [
+                    'class' => 'check-connection',
+                    'autocomplete' => 'new-password'
+                ]
             ]);
         if ($options['add_check_button']) {
             $builder->add('check_connection', 'oro_imap_configuration_check', [
