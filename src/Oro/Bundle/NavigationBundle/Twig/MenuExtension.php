@@ -8,8 +8,8 @@ use Knp\Menu\Provider\MenuProviderInterface;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 
 class MenuExtension extends \Twig_Extension
 {
@@ -53,11 +53,11 @@ class MenuExtension extends \Twig_Extension
     }
 
     /**
-     * @return ConfigurationProvider
+     * @return MenuConfiguration
      */
-    protected function getConfigurationProvider()
+    protected function getMenuConfiguration()
     {
-        return $this->container->get('oro_navigation.configuration.provider');
+        return $this->container->get('oro_menu.configuration');
     }
 
     /**
@@ -105,14 +105,11 @@ class MenuExtension extends \Twig_Extension
             $menu = $this->getMenu($menu, $path, $options);
         }
 
-        $menuConfiguration = $this->getConfigurationProvider()
-            ->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
-
         $menu = $this->filterUnallowedItems($menu);
         $menuType = $menu->getExtra('type');
         // rewrite config options with args
-        if (!empty($menuType) && array_key_exists('templates', $menuConfiguration)) {
-            $templates = $menuConfiguration['templates'];
+        if (!empty($menuType)) {
+            $templates = $this->getMenuConfiguration()->getTemplates();
             if (!empty($templates[$menuType])) {
                 $options = array_replace_recursive($templates[$menuType], $options);
             }

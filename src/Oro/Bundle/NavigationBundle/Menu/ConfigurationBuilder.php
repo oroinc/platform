@@ -7,8 +7,8 @@ use Knp\Menu\ItemInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 
 use Oro\Component\Config\Resolver\ResolverInterface;
 
@@ -25,25 +25,25 @@ class ConfigurationBuilder implements BuilderInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /** @var ConfigurationProvider */
-    private $configurationProvider;
+    /** @var MenuConfiguration */
+    protected $menuConfiguration;
 
     /**
      * @param ResolverInterface        $resolver
      * @param FactoryInterface         $factory
      * @param EventDispatcherInterface $eventDispatcher
-     * @param ConfigurationProvider    $configurationProvider
+     * @param MenuConfiguration        $menuConfiguration
      */
     public function __construct(
         ResolverInterface $resolver,
         FactoryInterface $factory,
         EventDispatcherInterface $eventDispatcher,
-        ConfigurationProvider $configurationProvider
+        MenuConfiguration $menuConfiguration
     ) {
         $this->resolver = $resolver;
         $this->factory = $factory;
         $this->eventDispatcher = $eventDispatcher;
-        $this->configurationProvider = $configurationProvider;
+        $this->menuConfiguration = $menuConfiguration;
     }
 
     /**
@@ -55,10 +55,11 @@ class ConfigurationBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $menuConfig = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
+        $tree = $this->menuConfiguration->getTree();
+        $items = $this->menuConfiguration->getItems();
 
-        if (!empty($menuConfig['items']) && !empty($menuConfig['tree'])) {
-            foreach ($menuConfig['tree'] as $menuTreeName => $menuTreeElement) {
+        if (!empty($tree) && !empty($items)) {
+            foreach ($tree as $menuTreeName => $menuTreeElement) {
                 if ($menuTreeName == $alias) {
                     if (!empty($menuTreeElement['extras'])) {
                         $menu->setExtras($menuTreeElement['extras']);
@@ -70,7 +71,7 @@ class ConfigurationBuilder implements BuilderInterface
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
 
-                    $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
+                    $this->createFromArray($menu, $menuTreeElement['children'], $items, $options);
                 }
             }
         }

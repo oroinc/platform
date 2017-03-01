@@ -30,8 +30,6 @@ parameters:
 
     oro_navigation.title_service.class:                        Oro\Bundle\NavigationBundle\Provider\TitleService
     oro_navigation.title_translator.class:                     Oro\Bundle\NavigationBundle\Provider\TitleTranslator
-    oro_navigation.title_service.annotations_reader.class:     Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
-    oro_navigation.title_service.config_reader.class:          Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
 
     oro_navigation.translation.extractor.class:                Oro\Bundle\NavigationBundle\Title\TranslationExtractor
 
@@ -85,7 +83,7 @@ services:
     oro_menu.configuration:
         class: Oro\Bundle\NavigationBundle\Config\MenuConfiguration
         arguments:
-            - [] # filled by Oro\Bundle\NavigationBundle\DependencyInjection\OroNavigationExtension
+            - '@oro_navigation.configuration.provider'
 
     oro_menu.configuration_resolver:
         class: %oro_menu.configuration_resolver.class%
@@ -98,7 +96,7 @@ services:
             - '@oro_menu.configuration_resolver'
             - '@oro_menu.factory'
             - '@event_dispatcher'
-            - '@oro_navigation.configuration.provider'
+            - '@oro_menu.configuration'
         tags:
             - { name: oro_menu.builder }
 
@@ -279,7 +277,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry
 
     oro_navigation.title_annotations_reader:
-        class: %oro_navigation.title_service.annotations_reader.class%
+        class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
         arguments:
             - '@request_stack'
             - '@oro_navigation.cached_reader.title_annotations'
@@ -287,7 +285,7 @@ services:
             - { name: oro_navigation.title_reader, priority: 10}
 
     oro_navigation.title_config_reader:
-        class: '%oro_navigation.title_service.config_reader.class%'
+        class: Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
         arguments:
             - '@oro_navigation.configuration.provider'
         tags:
@@ -390,8 +388,8 @@ services:
         arguments:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
-            - '@oro_navigation.configuration.provider'
             - '%oro_navigation.menu_update.scope_type%'
+            - '@oro_menu.configuration'
         tags:
             - { name: oro_datagrid.datasource, type: menu-update-default-provider }
 

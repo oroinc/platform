@@ -7,15 +7,11 @@ use Knp\Menu\MenuItem;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Twig\Helper;
 
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
-
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
 class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 {
     use TwigExtensionTestCaseTrait;
@@ -29,8 +25,8 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $breadcrumbManager;
 
-    /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $configurationProvider;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $menuConfiguration;
 
     /** @var MenuExtension */
     protected $extension;
@@ -42,7 +38,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->provider = $this->createMock(MenuProviderInterface::class);
-        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
+        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -50,7 +46,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->add('knp_menu.helper', $this->helper)
             ->add('oro_menu.builder_chain', $this->provider)
             ->add('oro_navigation.chain_breadcrumb_manager', $this->breadcrumbManager)
-            ->add('oro_navigation.configuration.provider', $this->configurationProvider)
+            ->add('oro_menu.configuration', $this->menuConfiguration)
             ->getContainer($this);
 
         $this->extension = new MenuExtension($container);
@@ -203,11 +199,8 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
         $runtimeOptions = [
             'template' => 'test_runtime.tpl'
         ];
-
-        $this->configurationProvider
-            ->expects($this->once())
-            ->method('getConfiguration')
-            ->with(ConfigurationProvider::MENU_CONFIG_KEY)
+        $this->menuConfiguration->expects(self::once())
+            ->method('getTemplates')
             ->willReturn($options);
 
         $this->assertRender($menuInstance, $menuInstance, $runtimeOptions, $renderer);

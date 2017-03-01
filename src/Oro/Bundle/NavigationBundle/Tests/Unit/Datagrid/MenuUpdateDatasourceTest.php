@@ -6,9 +6,9 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\Util\MenuManipulator;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 
 class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,11 +21,11 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
     /** @var MenuManipulator|\PHPUnit_Framework_MockObject_MockObject */
     protected $menuManipulator;
 
-    /** @var ConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
-    protected $configurationProvider;
-
     /** @var string */
     protected $scopeType = 'default';
+
+    /** @var MenuConfiguration|\PHPUnit_Framework_MockObject_MockObject */
+    protected $menuConfiguration;
 
     /**
      * {@inheritdoc}
@@ -34,15 +34,15 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->chainProvider = $this->createMock(BuilderChainProvider::class);
         $this->menuManipulator = $this->createMock(MenuManipulator::class);
-        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
+        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->datasource = new MenuUpdateDatasource(
             $this->chainProvider,
             $this->menuManipulator,
-            $this->configurationProvider,
-            $this->scopeType
+            $this->scopeType,
+            $this->menuConfiguration
         );
     }
 
@@ -65,11 +65,9 @@ class MenuUpdateDatasourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetResults(array $menu, $resultCount)
     {
-        $this->configurationProvider
-            ->expects($this->once())
-            ->method('getConfiguration')
-            ->with(ConfigurationProvider::MENU_CONFIG_KEY)
-            ->willReturn(['tree' => [$menu['name'] => $menu]]);
+        $this->menuConfiguration->expects(self::once())
+            ->method('getTree')
+            ->willReturn([$menu['name'] => $menu]);
 
         $factory = new MenuFactory();
         $menuItem = $factory->createItem($menu['name'], $menu);
