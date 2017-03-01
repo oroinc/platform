@@ -24,7 +24,7 @@ layout:
 ## Controlling the actions list view
 
 The `cellActionsHideCount` and `cellLauncherOptions > actionsState`parameters control the way mass actions collapse
-into the show more` group (`...`) and will be display on hover over the `…`.
+into the show more group (`...`) and will be display on hover over the `…`.
 
 When not collapsed, the actions show inline with the item: 'three dots' menu is hidden.
 
