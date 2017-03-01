@@ -19,7 +19,8 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         return new DynamicFieldsExtension(
             $this->configManager,
             $this->entityClassResolver,
-            new DatagridGuesserMock()
+            new DatagridGuesserMock(),
+            $this->getFeatureCheckerMock()
         );
     }
 
