@@ -8,8 +8,6 @@ use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
 /**
  * Contract for classes that filter widget providers' data
- *
- * @package Oro\Bundle\DashboardBundle\Filter\
  */
 interface WidgetProviderFilterInterface
 {

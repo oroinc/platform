@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Filter;
 
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
@@ -23,7 +22,8 @@ class WidgetProviderFilterManager
     /**
      * @param  QueryBuilder    $queryBuilder
      * @param  WidgetOptionBag $widgetOptions
-     * @return Query
+     *
+     * @return QueryBuilder
      */
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
@@ -31,6 +31,6 @@ class WidgetProviderFilterManager
             $filter->filter($queryBuilder, $widgetOptions);
         }
 
-        return $this->aclHelper->apply($queryBuilder);
+        return $queryBuilder;
     }
 }
