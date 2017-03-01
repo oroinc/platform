@@ -331,8 +331,6 @@ services:
 
     oro_dashboard.widget_provider.filter_manager:
         class: 'Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager'
-        arguments:
-            - '@oro_security.acl_helper'
 
     oro_dashboard.widget_provider.filter.owners:
         class: 'Oro\Bundle\DashboardBundle\Filter\OwnersWidgetProviderFilter'

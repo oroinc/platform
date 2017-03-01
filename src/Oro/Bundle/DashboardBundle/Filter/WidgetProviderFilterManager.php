@@ -6,23 +6,11 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class WidgetProviderFilterManager
 {
     /** @var WidgetProviderFilterInterface[] */
     protected $filters = [];
-
-    /** @var AclHelper */
-    protected $aclHelper;
-
-    /**
-     * @param AclHelper $aclHelper
-     */
-    public function __construct(AclHelper $aclHelper)
-    {
-        $this->aclHelper = $aclHelper;
-    }
 
     /**
      * @param WidgetProviderFilterInterface $filter
