@@ -1,6 +1,6 @@
 # Mass action configuration
 
-In the bundle ``layout.yml``, using the ``themeOptions`` parameters, a theme developer may customize
+In the bundle `layout.yml`, using the `themeOptions` parameters, a theme developer may customize
 and tune the way individual mass actions and the mass actions group show in the UI,
 when the items delivered by the bundle are shown in the grid view.
 
@@ -23,19 +23,19 @@ layout:
 
 ## Controlling the actions list view
 
-The ``cellActionsHideCount`` and ``cellLauncherOptions > actionsState`` parameters control the way mass actions collapse
-into the ``show more`` group (``...``) and will be display on hover over the ``…``.
+The `cellActionsHideCount` and `cellLauncherOptions > actionsState``parameters control the way mass actions collapse
+into the show more` group (`...`) and will be display on hover over the `…`.
 
 When not collapsed, the actions show inline with the item: 'three dots' menu is hidden.
 
-To collapse all actions into the ``show more`` group (``...``), set actionsState to ``hide``.
+To collapse all actions into the `show more` group (`...`), set actionsState to `hide`.
 In this case, the actionsHideCount value is ignored.
-> You get similar outcome with the options ``actionsState:`` `show` and ``actionsHideCount: 0``
+> You get similar outcome with the options `actionsState:`` `show` and ``actionsHideCount: 0`
 
 User see only 'three dots' menu.
 
-To keep all actions expanded, set ``actionsState`` to ``show``
-and set ``actionsHideCount`` to the reasonably large value (up to the max number of the actions you expect to get).
+To keep all actions expanded, set `actionsState` to show`
+and set `actionsHideCount` to the reasonably large value (up to the max number of the actions you expect to get).
 
 User see all line items.
 
@@ -48,7 +48,7 @@ User see only some line items and 'three dots' menu.
 
 ## Controlling the action view
 
-Based on the ``launcherMode`` value, the individual mass actions may display in one of the following modes.
+Based on the `launcherMode` value, the individual mass actions may display in one of the following modes.
 
 ### Label and icon:
 
