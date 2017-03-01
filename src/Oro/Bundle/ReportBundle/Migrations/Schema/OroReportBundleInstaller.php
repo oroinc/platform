@@ -6,7 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ReportBundle\Migrations\Schema\v2_1\OroReportBundle as OroReportBundle21;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -34,7 +33,8 @@ class OroReportBundleInstaller implements Installation
         /** Foreign keys generation **/
         $this->addOroReportForeignKeys($schema);
 
-        OroReportBundle21::createOroCalendarDateTable($schema);
+        /** Create calendar table */
+        $this->createOroCalendarDateTable($schema);
     }
 
     /**
@@ -102,5 +102,18 @@ class OroReportBundleInstaller implements Installation
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'SET NULL']
         );
+    }
+
+    /**
+     * Create oro_order_shipping_tracking table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroCalendarDateTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_calendar_date');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('date', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->setPrimaryKey(['id']);
     }
 }

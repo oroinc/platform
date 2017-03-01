@@ -23,7 +23,7 @@ class OroReportBundle implements Migration
      *
      * @param Schema $schema
      */
-    public static function createOroCalendarDateTable(Schema $schema)
+    protected function createOroCalendarDateTable(Schema $schema)
     {
         $table = $schema->createTable('oro_calendar_date');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
