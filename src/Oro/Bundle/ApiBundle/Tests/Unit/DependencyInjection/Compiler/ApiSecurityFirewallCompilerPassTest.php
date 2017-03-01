@@ -106,18 +106,18 @@ class ApiSecurityFirewallCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->compiler->process($this->container);
 
 
-        $contextListener = $this->container->getDefinition('security.context_listener_.0');
+        $contextListener = $this->container->getDefinition('oro_security.context_listener.main');
         $this->assertEquals('security.context_listener', $contextListener->getParent());
         $this->assertEquals('main', $contextListener->getArgument(2));
-        $contextFirewallListener = $this->container->getDefinition('security.context_listener_.0.testFirewall');
+        $contextFirewallListener = $this->container->getDefinition('oro_security.context_listener.main.testFirewall');
         $this->assertEquals(SecurityFirewallContextListener::class, $contextFirewallListener->getClass());
-        $this->assertEquals('security.context_listener_.0', (string)$contextFirewallListener->getArgument(0));
+        $this->assertEquals('oro_security.context_listener.main', (string)$contextFirewallListener->getArgument(0));
         $this->assertEquals(ApiExceptionListener::class, $exceptionListenerDefinition->getClass());
 
         $listeners = $contextFirewallContext->getArgument(0);
         $this->assertCount(2, $listeners);
         // Context serializer listener should does before the access listener
-        $this->assertEquals('security.context_listener_.0.testfirewall', (string)$listeners[0]);
+        $this->assertEquals('oro_security.context_listener.main.testfirewall', (string)$listeners[0]);
         $this->assertEquals('security.access_listener', (string)$listeners[1]);
     }
 }

@@ -27,6 +27,11 @@ define([
         /** @property */
         className: 'visible-items-counter pagination-centered',
 
+        /** @property */
+        themeOptions: {
+            optionPrefix: 'itemscounter'
+        },
+
         /**
          * Initializer.
          *
@@ -38,10 +43,14 @@ define([
         initialize: function(options) {
             options = options || {};
             this.hidden = options.hidden !== false;
+
+            if (options.template) {
+                this.template = options.template;
+            }
+
             if (!options.collection) {
                 throw new TypeError('"collection" is required');
             }
-
             this.collection = options.collection;
             this.listenTo(this.collection, 'add', this.render);
             this.listenTo(this.collection, 'remove', this.render);

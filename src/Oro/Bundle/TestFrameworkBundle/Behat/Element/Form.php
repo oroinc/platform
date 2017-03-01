@@ -232,11 +232,11 @@ class Form extends Element
     public function getFieldValidationErrors($fieldName)
     {
         $field = $this->findFieldByLabel($fieldName);
-
-        self::assertTrue($field->hasClass("error"), "Field $fieldName has no validation errors");
-
         $fieldId = $field->getAttribute('id');
-        $errorSpan = $field->getParent()->find('css', "span.validation-failed[for='$fieldId']");
+
+        $errorSpan = $this->find('css', "span.validation-failed[for='$fieldId']");
+
+        self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
         return $errorSpan->getText();
     }

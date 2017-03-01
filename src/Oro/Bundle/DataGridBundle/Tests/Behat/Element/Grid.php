@@ -37,7 +37,7 @@ class Grid extends Table
     {
         $rows = $this->getRows();
 
-        self::assertGreaterThan(
+        self::assertGreaterThanOrEqual(
             $number,
             count($rows),
             sprintf('Can\'t check %s records, because grid has only %s records', $number, count($rows))
