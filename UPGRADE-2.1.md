@@ -673,6 +673,8 @@ TranslationBundle
 - Class `Oro\Bundle\TranslationBundle\Twig\TranslationExtension`
     - the construction signature of was changed. Old signature `$debugTranslator, TranslationsDatagridRouteHelper $translationRouteHelper`. New signature `ContainerInterface $container, $debugTranslator`
     - removed property `protected $translationRouteHelper`
+- Added `array $filtersType = []` parameter to the `generate` method, that receives an array of filter types to be applies on the route in order to support 
+filters such as `contains` when generating routes
 
 UIBundle
 --------
@@ -814,55 +816,44 @@ WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
     - first argument argument `WorkflowManager $workflowManager` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
 - Added `variable_definitions` to workflow definition
-- `Oro\Bundle\WorkflowBundle\Validator\WorkflowValidationLoader`:
-- Added `configureAction` method with `Request $request`, `WorkflowDefinition $workflowDefinition` parameters to `Oro\Bundle\WorkflowBundle\Controlle\WorkflowDefinitionController` controller
 - Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler`
     - Changed `assemble` method signature from `assemble(array $configuration, array $definitionsConfiguration, $steps, $attributes)` to `assemble(array $configuration, $steps, $attributes)`, where `$configuration` is now the full workflow configuration
-- Class `Oro\Bundle\WorkflowBundle\Model\Workflow`:
-    - added property `protected $variableManager`
-    - added property `protected $variables`
-    - added `TransitionManager $transitionManager = null` as constructor's 6th parameter
-    - added `VariableManager $variableManager = null` as constructor's 7th parameter
-    - added public method `getVariableManager()`
-    - added public method `getVariables($refresh = false)`
-- Added `oro_workflow.variable_assembler` service
-- Added `oro_workflow.configuration.handler.variable` service
-- Added `oro_workflow.prototype.variable_manager` service
-- Added `oro_workflow.serializer.variable.normalizer` service
-- Added `oro_workflow.form.type.variables` service
-- Added `oro_workflow.handler.workflow_variables` service
-- Added `oro_workflow.variable_guesser` service
 - Added new `CONFIGURE` permission for workflows
 - Interface `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer`:
-    - changed 2nd parameter in `normalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `denormalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsNormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsDenormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
 - Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer`:
-    - changed 2nd parameter in `normalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `denormalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsNormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsDenormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `validateAttributeValue` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `getEntityManager` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
 - Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\MultipleEntityAttributeNormalizer`:
-    - changed 2nd parameter in `normalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `denormalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsNormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsDenormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `validateAttributeValue` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `getEntityManager` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
 - Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer`:
-    - changed 2nd parameter in `normalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `denormalize` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsNormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `supportsDenormalization` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `normalizeObject` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `denormalizeObject` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `normalizeObject`
+        - `denormalizeObject`
 - Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer`:
-    - changed 2nd parameter in `normalizeAttribute` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 2nd parameter in `denormalizeAttribute` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
-    - changed 3rd parameter in `findAttributeNormalizer` method's signature from `Attribute $attribute` to `ParameterInterface $attribute`
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalizeAttribute`
+        - `denormalizeAttribute`
+        - `findAttributeNormalizer`
     - added protected method `getVariablesNamesFromConfiguration(array $configuration)`
 - Abstract class `Oro\Bundle\WorkflowBundle\Translation\AbstractWorkflowTranslationFieldsIterator`:
     - added protected method `&variableFields(array &$configuration, \ArrayObject $context)`

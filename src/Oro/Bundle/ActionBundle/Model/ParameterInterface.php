@@ -4,9 +4,6 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 interface ParameterInterface extends OptionAwareInterface
 {
-    const INTERNAL_TYPE_ATTRIBUTE = 'attribute';
-    const INTERNAL_TYPE_VARIABLE = 'variable';
-
     /**
      * Set attribute type
      *

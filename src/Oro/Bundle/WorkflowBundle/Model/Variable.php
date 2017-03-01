@@ -6,6 +6,8 @@ use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 
 class Variable implements ParameterInterface
 {
+    const INTERNAL_TYPE_VARIABLE = 'variable';
+
     /**
      * @var string
      */
@@ -203,6 +205,6 @@ class Variable implements ParameterInterface
      */
     public function getInternalType()
     {
-        return ParameterInterface::INTERNAL_TYPE_VARIABLE;
+        return self::INTERNAL_TYPE_VARIABLE;
     }
 }

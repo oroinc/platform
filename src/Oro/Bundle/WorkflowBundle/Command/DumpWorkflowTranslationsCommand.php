@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
