@@ -29,6 +29,7 @@ into the ``show more`` group (``...``) and will be display on hover over the ``â
 When not collapsed, the actions show inline with the item: 'three dots' menu is hidden.
 
 To collapse all actions into the ``show more`` group (``...``), set actionsState to ``hide``.
+In this case, the actionsHideCount value is ignored.
 > You get similar outcome with the options ``actionsState:`` `show` and ``actionsHideCount: 0``
 
 User see only 'three dots' menu.
