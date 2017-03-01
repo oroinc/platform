@@ -5,7 +5,7 @@ and tune the way individual mass actions and the mass actions group show in the 
 when the items delivered by the bundle are shown in the grid view.
 
 Sample configuration in the `layout.yml` file(s) in the
-Resources/views/layouts/theme/page/folder in the bundle (e.g. OrderBundle):
+`Resources/views/layouts/theme/page/folder` in the bundle (e.g. OrderBundle):
 
 ```yml
 layout:
@@ -73,7 +73,7 @@ launcherMode: `icon-only`
 
 ### Label only:
 
-launcherMode: `icon-only`
+launcherMode: `text-only`
 
 ```html
     <a class="action" href="#action_url">
