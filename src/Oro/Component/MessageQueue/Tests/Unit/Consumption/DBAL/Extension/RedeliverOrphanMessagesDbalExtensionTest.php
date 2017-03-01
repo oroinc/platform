@@ -5,6 +5,7 @@ use Doctrine\DBAL\Connection;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 use Psr\Log\LoggerInterface;
@@ -23,38 +24,39 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
             ->expects($this->once())
             ->method('executeUpdate')
             ->with('UPDATE tableName SET consumer_id=NULL, delivered_at=NULL, redelivered=:isRedelivered '.
-                'WHERE delivered_at <= :deliveredAt')
-            ->will($this->returnValue(3))
-        ;
+                'WHERE delivered_at <= :deliveredAt AND consumer_id=:consumerId')
+            ->will($this->returnValue(3));
 
         $connection = $this->createConnectionMock();
         $connection
             ->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbal))
-        ;
+            ->will($this->returnValue($dbal));
         $connection
             ->expects($this->once())
             ->method('getTableName')
-            ->will($this->returnValue('tableName'))
-        ;
+            ->will($this->returnValue('tableName'));
 
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->will($this->returnValue($connection));
 
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('alert')
-            ->with('[RedeliverOrphanMessagesDbalExtension] Orphans were found and redelivered. number: 3')
-        ;
+            ->with('[RedeliverOrphanMessagesDbalExtension] Orphans were found and redelivered. number: 3');
 
+        $consumer = $this->createMock(DbalMessageConsumer::class);
+        $consumer
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn(123);
         $context = new Context($session);
         $context->setLogger($logger);
+        $context->setMessageConsumer($consumer);
 
         $extension = new RedeliverOrphanMessagesDbalExtension();
         $extension->onBeforeReceive($context);
