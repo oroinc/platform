@@ -246,7 +246,7 @@ Feature: User login
 
 Scenario: Success login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
@@ -254,7 +254,7 @@ Scenario: Success login
 
 Scenario Outline: Fail login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | <login>    |
       | Password | <password> |
   And I press "Log in"
