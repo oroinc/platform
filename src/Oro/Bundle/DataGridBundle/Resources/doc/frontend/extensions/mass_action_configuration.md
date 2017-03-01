@@ -4,7 +4,7 @@ In the bundle ``layout.yml``, using the ``themeOptions`` parameters, a theme dev
 and tune the way individual mass actions and the mass actions group show in the UI,
 when the items delivered by the bundle are shown in the grid view.
 
-Sample configuration in the ``layout.yml`` file(s) in the
+Sample configuration in the `layout.yml` file(s) in the
 Resources/views/layouts/<theme>/<page> folder in the bundle (e.g. OrderBundle):
 
 ```yml
@@ -56,7 +56,7 @@ launcherMode: `icon-text`
 
 ```html
     <a class="action" href="#action_url">
-        <i class="fa-<%= icon %>"></icon>
+        <i class="fa-<%= icon %>"></i>
         <%= label %>
     </a>
 ```
@@ -67,7 +67,7 @@ launcherMode: `icon-only`
 
 ```html
     <a class="action" href="#action_url">
-        <i class="fa-<%= icon %>"></icon>
+        <i class="fa-<%= icon %>"></i>
     </a>
 ```
 
