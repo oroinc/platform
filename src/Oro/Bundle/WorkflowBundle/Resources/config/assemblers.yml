@@ -16,6 +16,7 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Model\VariableAssembler'
         arguments:
             - '@oro_workflow.serializer.variable.normalizer'
+        public: false
 
     oro_workflow.step_assembler:
         class: %oro_workflow.step_assembler.class%

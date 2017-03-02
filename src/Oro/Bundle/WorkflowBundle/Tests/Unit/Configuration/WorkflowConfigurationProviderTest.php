@@ -78,10 +78,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
         $expectedConfiguration = $this->getExpectedWokflowConfiguration('CorrectConfiguration');
         $providedConfig = $configurationProvider->getWorkflowDefinitionConfiguration();
 
-        $this->assertEquals(
-            $expectedConfiguration,
-            $providedConfig
-        );
+        $this->assertEquals($expectedConfiguration, $providedConfig);
     }
 
     public function testGetWorkflowDefinitionsFilterByDirectory()
