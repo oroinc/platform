@@ -126,6 +126,11 @@ class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
                 'addViolation' => 'once',
                 'sourceEntity' => new EntityStub('non-valid'),
             ],
+            'non-valid-type' => [
+                'entityData'   => $this->createEntityData(),
+                'addViolation' => 'never',
+                'sourceEntity' => null,
+            ],
         ];
     }
 
@@ -166,9 +171,10 @@ class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getSourceEntity')
             ->will($this->returnValue($sourceEntity));
 
+        $fieldNameSuffix = is_object($sourceEntity) ? $sourceEntity->getId() : 'non-valid-type';
         $fieldData->expects($this->any())
             ->method('getFieldName')
-            ->will($this->returnValue('field-' . $sourceEntity->getId()));
+            ->will($this->returnValue('field-' . $fieldNameSuffix));
 
         return $fieldData;
     }
