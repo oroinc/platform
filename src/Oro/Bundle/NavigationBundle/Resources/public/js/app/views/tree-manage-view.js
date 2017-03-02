@@ -1,21 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var TreeManageComponent;
-    var __ = require('orotranslation/js/translator');
+    var TreeManageView;
+    var _ = require('underscore');
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var widgetManager = require('oroui/js/widget-manager');
     var messenger = require('oroui/js/messenger');
     var routing = require('routing');
-    var BasicTreeManageComponent = require('oroui/js/app/components/basic-tree-manage-component');
+    var BaseTreeManageView = require('oroui/js/app/views/jstree/base-tree-manage-view');
 
-    /**
-     * @export oronavigation/js/app/components/tree-manage-component
-     * @extends oroui.app.components.BasicTreeManageComponent
-     * @class oronavigation.app.components.TreeManageComponent
-     */
-    TreeManageComponent = BasicTreeManageComponent.extend({
+    TreeManageView = BaseTreeManageView.extend({
         /**
          * @property {String}
          */
@@ -27,16 +22,10 @@ define(function(require) {
         context: {},
 
         /**
-         * @property {Boolean}
-         */
-        checkboxEnabled: true,
-
-        /**
          * @param {Object} options
          */
         initialize: function(options) {
-            TreeManageComponent.__super__.initialize.call(this, options);
-
+            TreeManageView.__super__.initialize.call(this, options);
             this.menu = options.menu;
             this.context = options.context;
         },
@@ -97,13 +86,13 @@ define(function(require) {
                             widget.render();
                         });
                     }
-                    var message = __('oro.navigation.menuupdate.moved_success_message', {nodeText: data.node.text});
+                    var message = _.__('oro.navigation.menuupdate.moved_success_message', {nodeText: data.node.text});
                     messenger.notificationFlashMessage('success', message);
                 },
                 errorHandlerMessage: false,
                 error: function(xhr) {
                     self.rollback(data);
-                    var message = __('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
+                    var message = _.__('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
                     if (xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }
@@ -113,5 +102,5 @@ define(function(require) {
         }
     });
 
-    return TreeManageComponent;
+    return TreeManageView;
 });

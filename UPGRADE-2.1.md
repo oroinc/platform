@@ -257,6 +257,9 @@ EntityExtendBundle
     - removed property `protected $propertyAccessor`
     - removed property `protected $eventDispatcher`
     - removed property `protected $securityFacade`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension`
 
 EntityMergeBundle
 -----------------
@@ -870,3 +873,10 @@ CronBundle
 -------------------
  - Interface `Oro\Bundle\CronBundle\Command\CronCommandInterface`
     - deprecated method `isActive`
+
+TagBundle
+---------
+- Class `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+    - removed method `isReportOrSegmentGrid`
+    - removed method `addReportOrSegmentGridPrefix`
+    - added UnsupportedGridPrefixesTrait

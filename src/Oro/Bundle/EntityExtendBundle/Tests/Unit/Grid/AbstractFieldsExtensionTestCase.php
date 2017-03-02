@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -73,6 +74,23 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                     ]
                 )
             );
+    }
+
+    /**
+     * @param bool $isEnabled
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getFeatureCheckerMock($isEnabled = true)
+    {
+        $checker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $checker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn($isEnabled);
+
+        return $checker;
     }
 
     /**
