@@ -22,15 +22,11 @@ class WidgetProviderFilterManager
     /**
      * @param  QueryBuilder    $queryBuilder
      * @param  WidgetOptionBag $widgetOptions
-     *
-     * @return QueryBuilder
      */
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
         foreach ($this->filters as $filter) {
             $filter->filter($queryBuilder, $widgetOptions);
         }
-
-        return $queryBuilder;
     }
 }
