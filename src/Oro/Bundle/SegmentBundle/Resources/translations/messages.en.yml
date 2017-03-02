@@ -26,6 +26,9 @@ oro:
             label:   Type
             static:  Manual
 
+        records_limit:
+            label: Records limit
+
         form:
             choose_segment_type:    Choose segment type
             designer:               Designer

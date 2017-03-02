@@ -11,6 +11,11 @@ Oro\Bundle\SegmentBundle\Entity\Segment:
                 max: 255
         type:
             - NotBlank:     ~
+        recordsLimit:
+            - Type:
+                type: digit
+            - GreaterThan:
+                value: 0
         entity:
             - NotBlank:     ~
             - Length:
