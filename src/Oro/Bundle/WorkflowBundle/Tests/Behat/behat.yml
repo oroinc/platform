@@ -3,3 +3,42 @@ oro_behat_extension:
     Workflow Transition Form:
       selector: 'form[name="oro_workflow_transition"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+
+    Workflow Edit Form:
+      selector: 'form[name="oro_workflow_definition_form"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Name: 'oro_workflow_definition_form[label]'
+          Related Entity: 'oro_workflow_definition_form[related_entity]'
+          Display Steps Ordered: 'oro_workflow_definition_form[steps_display_ordered]'
+
+    Workflow Step Edit Form:
+      selector: 'div[id="step-form"] form'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Name: 'label'
+          Position: 'order'
+          
+    Workflow Transition Edit Info Form:
+      selector: 'div[id="transition-form"] form'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Name: 'label'
+          From step: 'step_from'
+          To step: 'step_to'
+          View form: 'display_type'
+          Destination Page: 'destination_page'
+          Warning message: 'message'
+
+    Workflow Transition Edit Attributes Form:
+      selector: 'div[id="transition-attributes"] form'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Entity field:
+            type: 'css'
+            locator: 'input[name="property_path"].select2-offscreen'
+          Label: 'label'
