@@ -323,19 +323,36 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * Assert record position in table
-     * It is find record by text and assert its position
-     * Example: Then Zyta Zywiec must be first record in appropriate table
-     * Example: And John Doe must be first record in appropriate table
-     *
-     * @Then /^(?P<content>([\w\s]+)) must be (?P<rowNumber>(first|second|[\d]+)) record in appropriate table$/
+     * @Then /^I should see that "(?P<content>([\w\s]+))" is in (?P<rowNum>([\d]+)) row$/
      */
-    public function assertRowContentInTable($content, $rowNumber)
+    public function assertRowContentInTable($content, $rowNum)
     {
         /** @var Table $table */
         $table = $this->findElementContains('Table', $content);
-        $row = $table->getRowByNumber($this->getNumberFromString($rowNumber));
-        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
+        $row = $table->getRowByNumber($rowNum);
+        self::assertTrue(
+            $row->has('named', ['content', $content]),
+            "There is no content '$content' in $rowNum row"
+        );
+    }
+
+    /**
+     * Assert that text is in table with some content
+     * Example: Then I should see "Priority" in "Warehouse" table
+     * Example: Then I should not see "Apple" in "Basket" table
+     *
+     * @Then /^I should (?P<type>(see|not see)) "(?P<content>([\w\s]+))" in "(?P<tableContent>([\w\s]+))" table$/
+     */
+    public function assertContentInTable($type, $content, $tableContent)
+    {
+        /** @var Table $table */
+        $table = $this->findElementContains('Table', $tableContent);
+        $result = $table->has('named', ['content', $content]);
+        if ($type === 'see') {
+            self::assertTrue($result, "There is no text '$content' in table '$tableContent'");
+        } else {
+            self::assertFalse($result, "There is a text '$content' in table '$tableContent'");
+        }
     }
 
     /**
@@ -473,7 +490,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I click edit Call to Jennyfer in grid
      * Example: And I click delete Sign a contract with Charlie in grid
      *
-     * @Given /^(?:|I )click (?P<action>(Clone|(?!on)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickActionInRow($content, $action)
     {
