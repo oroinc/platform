@@ -95,6 +95,10 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      */
     public function close()
     {
-        $this->phpExcel->createWriter($this->excelObj, 'Excel2007')->save($this->filePath);
+        if ($this->excelObj) {
+            $this->phpExcel->createWriter($this->excelObj, 'Excel2007')->save($this->filePath);
+            $this->excelObj = null;
+            $this->header = null;
+        }
     }
 }

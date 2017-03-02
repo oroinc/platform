@@ -105,6 +105,7 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
         if ($this->fileHandle) {
             fclose($this->fileHandle);
             $this->fileHandle = null;
+            $this->header = null;
         }
     }
 
