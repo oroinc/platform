@@ -78,6 +78,10 @@
         @include element-state('focus') {
             border-color: lighten(get-color('primary', 'base'), 5%);
         }
+
+        [class*=" fa-"] {
+            margin-right: $offset-x-s;
+        }
     }
 
     &--primary {
