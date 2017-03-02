@@ -6,6 +6,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Psr\Log\NullLogger;
 
 /**
@@ -32,8 +34,15 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
+        // test
+        $session = $connection->createSession();
+        $context = new Context($session);
+        $context->setLogger(new NullLogger());
+        $consumer = new DbalMessageConsumer($session, new DbalDestination('default'));
+        $context->setMessageConsumer($consumer);
+
         $dbal->insert('message_queue', [
-            'consumer_id' => 'consumer-id',
+            'consumer_id' => $consumer->getId(),
             'delivered_at' => strtotime('-1 year'),
             'redelivered' => false,
             'queue' => 'queue',
@@ -43,10 +52,6 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
 
         //guard
         $this->assertGreaterThan(0, $id);
-
-        // test
-        $context = new Context($connection->createSession());
-        $context->setLogger(new NullLogger());
 
         $extension = new RedeliverOrphanMessagesDbalExtension();
         $extension->onBeforeReceive($context);
