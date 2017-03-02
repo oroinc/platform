@@ -6,6 +6,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ContextRequestHelper
 {
+    /**
+     * @param Request $request
+     * @param array   $allowedKeys
+     * @return array
+     */
     public function getFromRequest(Request $request, array $allowedKeys = [])
     {
         $context = (array)$request->query->get('context', []);

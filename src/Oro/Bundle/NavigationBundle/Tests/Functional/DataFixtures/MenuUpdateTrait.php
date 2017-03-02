@@ -3,13 +3,16 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 trait MenuUpdateTrait
 {
     use EntityTrait;
+
     /**
-     * @param $data
+     * @param array  $data
+     * @param string $entityClass
      * @return object
      */
     protected function getMenuUpdate($data, $entityClass)

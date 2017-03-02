@@ -95,10 +95,7 @@
                                         'nodeId': entity.root.name,
                                         'context' : context,
                                         'updateAllowed' : true,
-                                        'onRootSelectRoute' : menuViewRoute,
-                                        'onSelectRoute' : menuUpdateRoute,
-                                        'onMoveRoute' : 'oro_navigation_menuupdate_move',
-                                        'view' : 'oronavigation/js/app/views/tree-manage-view'
+                                        'view' : 'oronavigation/js/app/views/tree-manage-view',
                                         'onRootSelectRoute' : routePrefix ~ 'view',
                                         'onSelectRoute' : routePrefix ~ 'update',
                                         'onMoveRoute' : routePrefix ~ 'ajax_move'
@@ -111,7 +108,6 @@
                                         },
                                         {
                                             'move': {
-                                                'routeName': menuJsMoveRoute,
                                                 'view': 'oroui/js/app/views/jstree/move-action-view',
                                                 'routeName': routePrefix ~ 'move',
                                                 'routeParams': {menuName: entity.root.name, context: context}

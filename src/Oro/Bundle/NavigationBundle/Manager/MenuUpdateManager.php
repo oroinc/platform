@@ -97,10 +97,10 @@ class MenuUpdateManager
     }
 
     /**
-     * @param ItemInterface $menu
-     * @param string        $key
-     * @param Scope         $scope
-     * @return null|MenuUpdateInterface
+     * @param string $menuName
+     * @param string $key
+     * @param Scope  $scope
+     * @return null|object|MenuUpdateInterface
      */
     public function findMenuUpdate($menuName, $key, Scope $scope)
     {

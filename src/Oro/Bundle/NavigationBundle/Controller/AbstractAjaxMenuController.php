@@ -252,8 +252,8 @@ abstract class AbstractAjaxMenuController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param string  $menuName
+     * @param array  $context
+     * @param string $scopeType
      * @return Scope
      */
     protected function findOrCreateScope($context, $scopeType)

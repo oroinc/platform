@@ -45,7 +45,8 @@ class ContextNormalizer
     /**
      * Denormalization using this method can be applied only to array context
      *
-     * @param array $context
+     * @param string $scopeType
+     * @param array  $context
      * @return object[]
      * @throws \LogicException
      */
