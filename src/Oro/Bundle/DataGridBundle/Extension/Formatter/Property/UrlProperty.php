@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
-use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;

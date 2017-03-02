@@ -12,7 +12,7 @@ require([
             var $groupFieldInput = $('input[name="oro_report_form[dateGrouping][fieldName]"]');
 
             function showHideInputs($enableCheckbox) {
-                if ($enableCheckbox.is(":checked")) {
+                if ($enableCheckbox.is(':checked')) {
                     $emptyPeriodsCheckbox.removeAttr('disabled');
                     $groupFieldInput.inputWidget('disable', true);
                 } else {

@@ -67,9 +67,7 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
         $form = $event->getForm();
-        if (!$data instanceof Report
-            || !$form->has(ReportType::DATE_GROUPING_FORM_NAME)
-        ) {
+        if (!$data instanceof Report || !$form->has(ReportType::DATE_GROUPING_FORM_NAME)) {
             return;
         }
 

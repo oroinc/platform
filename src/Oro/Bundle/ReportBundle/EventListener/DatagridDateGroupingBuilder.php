@@ -34,10 +34,12 @@ class DatagridDateGroupingBuilder
 
     /**
      * @param string $calendarDateEntity
+     * @param null $joinIdHelper
      */
-    public function __construct($calendarDateEntity)
+    public function __construct($calendarDateEntity, $joinIdHelper = null)
     {
         $this->calendarDateClass = $calendarDateEntity;
+        $this->joinIdHelper = $joinIdHelper;
     }
 
     /**
@@ -60,7 +62,7 @@ class DatagridDateGroupingBuilder
             throw new InvalidDatagridConfigException();
         }
 
-        $joinHelper = new JoinIdentifierHelper($report->getEntity());
+        $joinHelper = $this->getJoinIdHelper($report->getEntity());
         $dateGroupDefinition = $reportDefinition[DateGroupingType::DATE_GROUPING_NAME];
 
         $dateFieldName = $joinHelper->getFieldName($dateGroupDefinition[DateGroupingType::FIELD_NAME_ID]);
@@ -87,6 +89,7 @@ class DatagridDateGroupingBuilder
             $dateGroupDefinition[DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID],
             $notNullableField
         );
+        $this->changeGroupBySection($config);
     }
 
     /**
@@ -118,7 +121,7 @@ class DatagridDateGroupingBuilder
             'target_entity' => $rootEntityClass,
             'not_nullable_field' => $notNullableField,
             'joined_column' => $dateFieldName,
-            'joined_table' => $dateFieldTableAlias
+            'joined_table' => $dateFieldTableAlias,
         ];
         if (!array_key_exists(static::DATE_PERIOD_FILTER, $filters['columns'])) {
             $filters['columns'][static::DATE_PERIOD_FILTER] = [
@@ -189,7 +192,7 @@ class DatagridDateGroupingBuilder
             'data_name' => $this->getCalendarDateFieldReferenceString(),
         ];
         $sorters['columns'][static::CALENDAR_DATE_GRID_COLUMN_NAME] = [
-            'data_name' => $this->getCalendarDateFieldReferenceString()
+            'data_name' => $this->getCalendarDateFieldReferenceString(),
         ];
         if (!array_key_exists('default', $sorters)) {
             $sorters['default'] = [];
@@ -234,6 +237,18 @@ class DatagridDateGroupingBuilder
     }
 
     /**
+     * @param DatagridConfiguration $config
+     */
+    protected function changeGroupBySection(DatagridConfiguration $config)
+    {
+        $source = $config->offsetGet(static::SOURCE_KEY_NAME);
+        $groupBy = explode(',', $source['query']['groupBy']);
+        $groupBy[] = 'calendarDate.date';
+        $source['query']['groupBy'] = implode(',', $groupBy);
+        $config->offsetSet(static::SOURCE_KEY_NAME, $source);
+    }
+
+    /**
      * @param string $dateFieldTableAlias
      * @param string $dateFieldName
      * @return string
@@ -274,14 +289,7 @@ class DatagridDateGroupingBuilder
      */
     protected function isGridConfigValid(DatagridConfiguration $config)
     {
-        return ($config->offsetExists(static::SOURCE_KEY_NAME)
-            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query_config'])
-            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['column_aliases'])
-            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['table_aliases'])
-            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query'])
-            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['select'])
-            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['from'])
-            && count($config->offsetGet(static::SOURCE_KEY_NAME)['query']['from']) > 0
+        return ($this->isSourceSectionValid($config)
             && $config->offsetExists(static::SORTERS_KEY_NAME)
             && isset($config->offsetGet(static::SORTERS_KEY_NAME)['columns'])
             && $config->offsetExists(static::FIELDS_ACL_KEY_NAME)
@@ -290,6 +298,23 @@ class DatagridDateGroupingBuilder
             && $config->offsetExists(static::FILTERS_KEY_NAME)
             && isset($config->offsetGet(static::FILTERS_KEY_NAME)['columns'])
         );
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @return bool
+     */
+    protected function isSourceSectionValid(DatagridConfiguration $config)
+    {
+        return ($config->offsetExists(static::SOURCE_KEY_NAME)
+            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query_config'])
+            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['column_aliases'])
+            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['table_aliases'])
+            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query'])
+            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['select'])
+            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['groupBy'])
+            && isset($config->offsetGet(static::SOURCE_KEY_NAME)['query']['from'])
+            && count($config->offsetGet(static::SOURCE_KEY_NAME)['query']['from']) > 0);
     }
 
     /**
@@ -340,5 +365,18 @@ class DatagridDateGroupingBuilder
         }
 
         return $tableAliases[$tableAliasKey];
+    }
+
+    /**
+     * @param string|null $entity
+     * @return null|JoinIdentifierHelper
+     */
+    protected function getJoinIdHelper($entity = null)
+    {
+        if (!$this->joinIdHelper) {
+            $this->joinIdHelper = new JoinIdentifierHelper($entity);
+        }
+
+        return $this->joinIdHelper;
     }
 }

@@ -69,12 +69,13 @@ define(function(require) {
          */
         build: function(collection) {
             var gridViews;
+            var $gridViews;
             var options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
                 var gridViewsOptions = _.extend({collection: collection}, options);
 
                 if (this.showInNavbar) {
-                    var $gridViews = $(gridGridViewsSelector);
+                    $gridViews = $(gridGridViewsSelector);
                     gridViewsOptions.title = $gridViews.text();
 
                     gridViews = new GridViewsView(gridViewsOptions);
