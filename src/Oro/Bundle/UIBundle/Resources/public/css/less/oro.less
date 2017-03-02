@@ -1919,7 +1919,11 @@ footer {
     padding:0 4px 0 0;
   }
   .top-row {
-    overflow: hidden;
+    &:after {
+      clear: both;
+      display: block;
+      content:"";
+    }
   }
   .sub-title {
     font-size: 17px;
@@ -3418,5 +3422,11 @@ label .popover-content {
   &.overflows .toggle-more,
   &.overflows .toggle-collapse {
     display: block;
+  }
+}
+
+.customer-content {
+  .grid-views .btn-link {
+    line-height: 21px;
   }
 }
