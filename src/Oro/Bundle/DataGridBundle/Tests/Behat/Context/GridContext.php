@@ -280,8 +280,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var Grid $grid */
         $grid = $this->elementFactory->findElementContains('Grid', $content);
+
         /** @var TableHeader $gridHeader */
-        $gridHeader = $grid->getElement('TableHeader');
+        $gridHeader = $grid->getElement('GridHeader');
         $row = $grid->getRowByContent($content);
 
         $crawler = new Crawler($row->getHtml());
