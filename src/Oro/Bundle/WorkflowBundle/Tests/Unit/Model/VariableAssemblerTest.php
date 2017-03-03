@@ -2,9 +2,20 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer;
+use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+
+use Oro\Component\Action\Exception\AssemblerException;
 
 class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,22 +31,20 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $attributeNormalizer = $this->createMock('Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer');
-        $serializer = $this->createMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
+        $attributeNormalizer = $this->createMock(AttributeNormalizer::class);
+        $serializer = $this->createMock(WorkflowAwareSerializer::class);
 
-        $this->variableNormalizer = $this->createMock(
-            'Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer'
-        );
+        $this->variableNormalizer = $this->createMock(WorkflowVariableNormalizer::class);
         $this->variableNormalizer->addAttributeNormalizer($attributeNormalizer);
         $this->variableNormalizer->setSerializer($serializer);
 
-        $doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
-        $aclManager = $this->createMock('Oro\Bundle\WorkflowBundle\Acl\AclManager');
-        $restrictionManager = $this->createMock('Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager');
-        $attributeManager = $this->createMock('Oro\Bundle\ActionBundle\Model\AttributeManager');
-        $variableManager = $this->createMock('Oro\Bundle\WorkflowBundle\Model\VariableManager');
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $aclManager = $this->createMock(AclManager::class);
+        $restrictionManager = $this->createMock(RestrictionManager::class);
+        $attributeManager = $this->createMock(AttributeManager::class);
+        $variableManager = $this->createMock(VariableManager::class);
 
-        $this->workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+        $this->workflow = $this->getMockBuilder(Workflow::class)
             ->setMethods(['getName', 'getVariables', 'getDefinition'])
             ->setConstructorArgs([
                 $doctrineHelper,
@@ -84,7 +93,7 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getWorkflowDefinition()
     {
-        return $this->createMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition');
+        return $this->createMock(WorkflowDefinition::class);
     }
 
     /**
@@ -95,33 +104,33 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
         return [
             'no_options' => [
                 ['name' => []],
-                'Oro\Component\Action\Exception\AssemblerException',
+                AssemblerException::class,
                 '/Invalid variable type \"\w?\", allowed types are/',
             ],
             'no_type' => [
                 ['name' => ['label' => 'test', 'value' => 'test']],
-                'Oro\Component\Action\Exception\AssemblerException',
+                AssemblerException::class,
                 '/Invalid variable type \"\w?\", allowed types are/',
             ],
             'invalid_type' => [
                 ['name' => ['label' => 'Label', 'type' => 'text', 'value' => 'text']],
-                'Oro\Component\Action\Exception\AssemblerException',
+                AssemblerException::class,
                 'Invalid variable type "text", allowed types are "bool", "boolean", "int", "integer", ' .
                 '"float", "string", "array", "object"',
             ],
             'invalid_type_class' => [
                 ['name' => ['label' => 'Label', 'type' => 'string', 'options' => ['class' => 'stdClass']]],
-                'Oro\Component\Action\Exception\AssemblerException',
+                AssemblerException::class,
                 'Option "class" cannot be used in variable "name"',
             ],
             'missing_object_class' => [
                 ['name' => ['label' => 'Label', 'type' => 'object']],
-                'Oro\Component\Action\Exception\AssemblerException',
+                AssemblerException::class,
                 'Option "class" is required in variable "name"',
             ],
             'invalid_class' => [
                 ['name' => ['label' => 'Label', 'type' => 'object', 'options' => ['class' => 'InvalidClass']]],
-                'Oro\Component\Action\Exception\AssemblerException',
+                AssemblerException::class,
                 'Class "InvalidClass" referenced by "class" option in variable "name" not found',
             ],
         ];

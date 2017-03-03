@@ -193,9 +193,9 @@ class AttributeAssembler extends BaseAbstractAssembler
 
         $attributeType = $attribute->getType();
         if ('object' === $attributeType || 'entity' === $attributeType) {
-            $this->assertAttributeHasClassOption($attribute);
+            $this->assertParameterHasClassOption($attribute);
         } else {
-            $this->assertAttributeHasNoOptions($attribute, 'class');
+            $this->assertParameterHasNoOptions($attribute, ['class']);
         }
     }
 
@@ -214,60 +214,6 @@ class AttributeAssembler extends BaseAbstractAssembler
                     'Invalid attribute type "%s", allowed types are "%s"',
                     $attributeType,
                     implode('", "', $allowedTypes)
-                )
-            );
-        }
-    }
-
-    /**
-     * @param BaseAttribute $attribute
-     * @param string|array $optionNames
-     * @throws AssemblerException If attribute is invalid
-     */
-    protected function assertAttributeHasOptions(BaseAttribute $attribute, $optionNames)
-    {
-        $optionNames = (array)$optionNames;
-
-        foreach ($optionNames as $optionName) {
-            if (!$attribute->hasOption($optionName)) {
-                throw new AssemblerException(
-                    sprintf('Option "%s" is required in attribute "%s"', $optionName, $attribute->getName())
-                );
-            }
-        }
-    }
-
-    /**
-     * @param BaseAttribute $attribute
-     * @param string|array $optionNames
-     * @throws AssemblerException If attribute is invalid
-     */
-    protected function assertAttributeHasNoOptions(BaseAttribute $attribute, $optionNames)
-    {
-        $optionNames = (array)$optionNames;
-
-        foreach ($optionNames as $optionName) {
-            if ($attribute->hasOption($optionName)) {
-                throw new AssemblerException(
-                    sprintf('Option "%s" cannot be used in attribute "%s"', $optionName, $attribute->getName())
-                );
-            }
-        }
-    }
-
-    /**
-     * @param BaseAttribute $attribute
-     * @throws AssemblerException If attribute is invalid
-     */
-    protected function assertAttributeHasClassOption(BaseAttribute $attribute)
-    {
-        $this->assertAttributeHasOptions($attribute, 'class');
-        if (!class_exists($attribute->getOption('class'))) {
-            throw new AssemblerException(
-                sprintf(
-                    'Class "%s" referenced by "class" option in attribute "%s" not found',
-                    $attribute->getOption('class'),
-                    $attribute->getName()
                 )
             );
         }
