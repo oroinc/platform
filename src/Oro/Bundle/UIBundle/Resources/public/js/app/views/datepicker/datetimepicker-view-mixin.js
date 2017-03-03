@@ -165,6 +165,10 @@ define(function(require) {
          * Destroys picker widget
          */
         destroyTimePickerWidget: function() {
+            if (!this.$frontTimeField.data('timepicker-settings')) {
+                // the widget was already removed.
+                return;
+            }
             // this will trigger hide event before remove
             // that is not done by default implementation
             this.$frontTimeField.timepicker('hide');

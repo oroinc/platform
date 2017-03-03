@@ -35,10 +35,9 @@
     <td class="column-manager__item">
         <div class="column-manager__container">
             <span class="column-manager__handle handle"></span>
-            <label for="column-<%= cid  %>"
-                   data-checkbox
+            <label data-checkbox
                    class="custom-checkbox ">
-                <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
+                <input type="checkbox" data-role="renderable"
                 <% if (disabledVisibilityChange) { %> disabled <% } %>
                 <% if (renderable) { %> checked <% } %>
                     class="custom-checkbox__input"

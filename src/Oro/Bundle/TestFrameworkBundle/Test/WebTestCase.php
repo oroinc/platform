@@ -132,11 +132,6 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
 
-            try {
-                self::getContainer()->get('oro_test.config_cache')->deleteAll();
-            } catch (\BadMethodCallException $e) {
-            }
-
             self::resetClient();
         }
     }
@@ -170,11 +165,6 @@ abstract class WebTestCase extends BaseWebTestCase
         if (self::$resetCallback) {
             call_user_func(self::$resetCallback);
             self::$resetCallback = null;
-        }
-
-        try {
-            self::getContainer()->get('oro_test.config_cache')->deleteAll();
-        } catch (\BadMethodCallException $e) {
         }
 
         self::resetClient();
