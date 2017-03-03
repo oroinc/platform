@@ -120,6 +120,17 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertContains($workflow->getLabel(), $crawler->html());
         $this->assertContains('Var1Value', $crawler->html());
+
+        // update variable value
+        $form = $crawler->selectButton('Save')->form([
+            'oro_workflow_variables[var1]' => 'Var1NewValue',
+        ]);
+
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form);
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $this->assertContains('Var1NewValue', $crawler->html());
     }
 
     public function testActivateFormAction()
