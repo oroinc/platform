@@ -19,7 +19,9 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         return new DynamicFieldsExtension(
             $this->configManager,
             $this->entityClassResolver,
-            new DatagridGuesserMock()
+            new DatagridGuesserMock(),
+            $this->fieldsHelper,
+            $this->getFeatureCheckerMock()
         );
     }
 
@@ -47,6 +49,24 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
+    public function testIsApplicableWhenHasNoConfig()
+    {
+        $datagridConfig = DatagridConfiguration::create([
+            'extended_entity_name' => self::ENTITY_NAME,
+            'source' => [
+                'type' => 'orm',
+            ],
+        ]);
+
+        $this->extendConfigProvider
+            ->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn(false);
+
+        $this->assertFalse($this->getExtension()->isApplicable($datagridConfig));
+    }
+
     /**
      * @return array
      */
@@ -64,7 +84,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 
     /**
      * @dataProvider isExtendDataProvider
-     * @param $isExtend
+     * @param bool $isExtend
      */
     public function testIsApplicableIfEntityIsExtendable($isExtend)
     {
@@ -113,6 +133,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 
         $config = $this->getDatagridConfiguration();
         $initialConfig = $config->toArray();
+
         $this->getExtension()->processConfigs($config);
         $this->assertEquals(
             array_merge(
@@ -189,35 +210,25 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             new FieldConfigId('view', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
         );
 
-        $this->configManager->expects($this->once())
-            ->method('hasConfig')
-            ->with($className)
-            ->will($this->returnValue(true));
+        $this->fieldsHelper->expects($this->once())
+            ->method('getFields')
+            ->willReturn([$fieldId]);
 
         $this->entityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($entityFieldConfig));
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getIds')
-            ->with($className)
-            ->will($this->returnValue([$fieldId]));
-        $this->extendConfigProvider->expects($this->once())
-            ->method('getConfigById')
-            ->with($this->identicalTo($fieldId))
-            ->will($this->returnValue($extendConfig));
+
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($extendConfig));
-        $this->datagridConfigProvider->expects($this->once())
-            ->method('getConfigById')
-            ->with($this->identicalTo($fieldId))
-            ->will($this->returnValue($datagridFieldConfig));
+
         $this->datagridConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($datagridFieldConfig));
+
         $this->viewConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
