@@ -71,6 +71,8 @@
     }
 }
 
+// Mixin for tabs
+// Null property doesn't rendering
 @mixin nav-tabs(
         // Selectors
         $nav-tabs: '.nav-tabs',
