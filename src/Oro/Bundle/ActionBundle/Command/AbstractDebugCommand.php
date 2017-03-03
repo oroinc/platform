@@ -53,8 +53,10 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
         try {
             $service = $this->getContainer()->get($types[$name]);
         } catch (\TypeError $e) {
-            $output->writeln(sprintf('<error>Can not load Service "%s": %s</error>', $types[$name], $e->getMessage()));
-
+            $this->printErrorServiceLoadException($output, $e, $types[$name]);
+            return 1;
+        } catch (\ErrorException $e) { //php 5.6 compatibility
+            $this->printErrorServiceLoadException($output, $e, $types[$name]);
             return 1;
         }
 
@@ -94,12 +96,24 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
                 $description = $docCommentParser->getShortComment(get_class($service));
                 $table->addRow([$key, $description]);
             } catch (\TypeError $e) {
-                $output->writeln(sprintf('<error>Can not load Service "%s": %s</error>', $type, $e->getMessage()));
+                $this->printErrorServiceLoadException($output, $e, $type);
+            } catch (\ErrorException $e) { //php 5.6 compatibility
+                $this->printErrorServiceLoadException($output, $e, $type);
             }
         }
         $table->render();
 
         return 0;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param \TypeError|\ErrorException $e
+     * @param string $type
+     */
+    private function printErrorServiceLoadException(OutputInterface $output, $e, $type)
+    {
+        $output->writeln(sprintf('<error>Can not load Service "%s": %s</error>', $type, $e->getMessage()));
     }
 
     /**
