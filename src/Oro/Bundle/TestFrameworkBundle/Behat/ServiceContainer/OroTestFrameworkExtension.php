@@ -168,26 +168,30 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function injectMessageQueueIsolator(ContainerBuilder $container)
     {
         $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
-        $applicableIsolator = null;
+        $applicableIsolatorId = null;
 
         foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
             /** @var IsolatorInterface $isolator */
             $isolator = $container->get($id);
 
             if ($isolator->isApplicable($applicationContainer) && $isolator instanceof MessageQueueIsolatorInterface) {
-                $applicableIsolator = $isolator;
+                $applicableIsolatorId = $id;
+                break;
             }
         }
 
-        if (null === $applicableIsolator) {
+        if (null === $applicableIsolatorId) {
             throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
         }
 
         foreach ($container->findTaggedServiceIds(self::MESSAGE_QUEUE_ISOLATOR_AWARE_TAG) as $id => $attributes) {
-            $service = $container->get($id);
+            if (!$container->hasDefinition($id)) {
+                continue;
+            }
+            $definition = $container->getDefinition($id);
 
-            if ($service instanceof MessageQueueIsolatorAwareInterface) {
-                $service->setMessageQueueIsolator($applicableIsolator);
+            if (is_a($definition->getClass(), MessageQueueIsolatorAwareInterface::class, true)) {
+                $definition->addMethodCall('setMessageQueueIsolator', [new Reference($applicableIsolatorId)]);
             }
         }
     }
