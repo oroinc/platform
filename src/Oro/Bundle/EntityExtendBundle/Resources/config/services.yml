@@ -55,12 +55,19 @@ services:
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 
+    oro_entity_extend.datagrid.extension.fields_helper:
+        class: Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper
+        arguments:
+            - "@oro_entity_config.config_manager"
+            - "@oro_featuretoggle.checker.feature_checker"
+
     oro_entity_extend.datagrid.extension.additional_fields:
         class: %oro_entity_extend.datagrid.extension.additional_fields.class%
         arguments:
             - "@oro_entity_config.config_manager"
             - "@oro_entity.orm.entity_class_resolver"
             - "@oro_datagrid.datagrid.guesser"
+            - "@oro_entity_extend.datagrid.extension.fields_helper"
         tags:
             - { name: oro_datagrid.extension }
 
@@ -70,6 +77,8 @@ services:
             - "@oro_entity_config.config_manager"
             - "@oro_entity.orm.entity_class_resolver"
             - "@oro_datagrid.datagrid.guesser"
+            - "@oro_entity_extend.datagrid.extension.fields_helper"
+            - "@oro_featuretoggle.checker.feature_checker"
         tags:
             - { name: oro_datagrid.extension }
 
@@ -80,6 +89,7 @@ services:
             - "@router"
             - "@translator"
             - "@oro_entity.doctrine_helper"
+            - "@oro_featuretoggle.checker.feature_checker"
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 

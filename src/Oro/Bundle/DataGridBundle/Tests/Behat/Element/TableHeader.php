@@ -5,12 +5,12 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Symfony\Component\DomCrawler\Crawler;
 
-class GridHeader extends Element
+class TableHeader extends Element
 {
     /**
      * Try to guess header and return number of column starting from 1
      *
-     * @param string $headerText Header of grid column
+     * @param string $headerText Header of table column
      * @return int Number of column starting from 1
      */
     public function getColumnNumber($headerText)
