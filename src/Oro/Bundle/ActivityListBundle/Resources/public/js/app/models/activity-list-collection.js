@@ -13,7 +13,7 @@ define([
         route: '',
         routeParameters: {},
         filter:   {},
-        pager: {
+        defaultPager: {
             count:    1, //total activities count
             current:  1, //current page
             pagesize: 1, //items per page
@@ -24,6 +24,10 @@ define([
             date: null,
             ids: [],
             action: null //'next' or 'prev' or '' (refresh action)
+        },
+
+        initialize: function() {
+            this.pager = _.clone(this.defaultPager);
         },
 
         url: function() {
@@ -75,6 +79,10 @@ define([
         },
         setPageSize: function(pagesize) {
             this.pager.pagesize = pagesize;
+        },
+
+        setSortingField: function(sortingField) {
+            this.pager.sortingField = sortingField;
         },
 
         getPageTotal: function() {
