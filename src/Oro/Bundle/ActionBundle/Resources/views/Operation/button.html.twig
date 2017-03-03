@@ -20,7 +20,7 @@
                     disabled="disabled"
                 {% endif %}
             >
-                {% if not noIcon|default(false) %}
+                {% if params.buttonOptions.icon is defined or params.buttonOptions.iCss is defined %}
                     <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text"></i>
                 {% endif %}
                 {{ linkLabel|trim }}

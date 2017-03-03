@@ -20,6 +20,11 @@ MessageQueue Component
 - Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
 - Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
 
+Action Component
+----------------
+- Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
+- Added Class `Oro\Component\Action\Model\DoctrineTypeMappingExtension`. That can be used as base for services definitions
+
 ActionBundle
 ------------
 - `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
@@ -35,6 +40,7 @@ ActionBundle
     - removed property `protected $optionsHelper`
     - removed property `protected $buttonProvider`
     - removed property `protected $searchContextProvider`
+- Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
 
 ActivityListBundle
 ------------------
@@ -258,8 +264,11 @@ EntityExtendBundle
     - removed property `protected $eventDispatcher`
     - removed property `protected $securityFacade`
 - Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
-- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
 - Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension`
+- Class `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension`
+    - the construction signature of was changed. Added fourth argument `FieldsHelper $fieldsHelper`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension`
 
 EntityMergeBundle
 -----------------
@@ -632,6 +641,11 @@ SecurityBundle
 - Class `Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $securityFacade`
+- Interface `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`
+    - signature of method `getAllowedPermissions` changed, added third argument `string|null aclGroup` default `null`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    - signature of method `getPermissionsForType` changed, added second argument `string|null aclGroup` default `null`
+
 
 SegmentBundle
 -------------
