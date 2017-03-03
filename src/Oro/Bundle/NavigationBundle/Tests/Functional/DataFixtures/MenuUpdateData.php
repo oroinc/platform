@@ -8,7 +8,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateTrait;
 use Oro\Bundle\ScopeBundle\Tests\DataFixtures\LoadScopeData;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;

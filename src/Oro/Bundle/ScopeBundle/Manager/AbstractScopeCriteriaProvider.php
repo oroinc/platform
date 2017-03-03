@@ -6,6 +6,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 use Oro\Bundle\ScopeBundle\Exception\NotSupportedCriteriaValueException;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
+
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 abstract class AbstractScopeCriteriaProvider implements ScopeCriteriaProviderInterface

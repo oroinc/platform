@@ -307,7 +307,6 @@ class MenuUpdateManager
                 $currentUpdate->setParentKey(null);
             }
 
-            // TODO check if $index is non-numeric
             $currentUpdate->setPriority($position + $index);
         }
 
@@ -416,7 +415,6 @@ class MenuUpdateManager
     }
 
     /**
-     * todo consider to remove type from manager
      * @return string
      */
     public function getScopeType()

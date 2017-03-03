@@ -9,6 +9,7 @@ use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class MenuUpdateCacheFlusherTest extends \PHPUnit_Framework_TestCase

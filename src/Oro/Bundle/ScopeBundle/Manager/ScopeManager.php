@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
+
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ScopeManager
 {
     const BASE_SCOPE = 'base_scope';

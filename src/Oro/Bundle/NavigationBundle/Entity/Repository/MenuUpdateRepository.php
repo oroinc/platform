@@ -17,6 +17,9 @@ class MenuUpdateRepository extends EntityRepository
      */
     private $queryResultCache;
 
+    /**
+     * @param CacheProvider $queryResultCache
+     */
     public function setQueryResultCache(CacheProvider $queryResultCache)
     {
         $this->queryResultCache = $queryResultCache;

@@ -47,6 +47,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
         array $expectedMenuUpdateReferences
     ) {
         $scopeIds = $this->getScopeIdsByReferences($scopeReferences);
+        /** @var MenuUpdate[] $actualMenuUpdates */
         $actualMenuUpdates = $this->repository->findMenuUpdatesByScopeIds($menuName, $scopeIds);
         $this->assertCount(count($expectedMenuUpdateReferences), $actualMenuUpdates);
         $menuUpdateIds = [];

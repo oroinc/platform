@@ -267,8 +267,7 @@ class Router
                 sprintf(
                     'Cannot parse route name from request parameter "%s". Value of key "%s" is not valid URL',
                     self::ACTION_PARAMETER,
-                    'redirectUrl',
-                    json_encode($arrayData)
+                    'redirectUrl'
                 )
             );
         }

@@ -128,7 +128,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $form->submit([]);
 
         $expected = new MenuUpdate();
-        $expectedTitle = (new LocalizedFallbackValue);
+        $expectedTitle = new LocalizedFallbackValue;
         $expected->addTitle($expectedTitle);
         $expected->addDescription(new LocalizedFallbackValue);
 
