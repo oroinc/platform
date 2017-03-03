@@ -307,6 +307,7 @@ class MenuUpdateManager
                 $currentUpdate->setParentKey(null);
             }
 
+            // TODO check if $index is non-numeric
             $currentUpdate->setPriority($position + $index);
         }
 
