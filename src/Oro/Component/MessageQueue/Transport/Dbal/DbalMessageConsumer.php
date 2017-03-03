@@ -2,6 +2,7 @@
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
@@ -130,10 +131,39 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
 
-        $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
-            'id' => Type::INTEGER,
-        ]);
+        $this->dbal->beginTransaction();
 
+        $sql = sprintf(
+            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
+            $this->connection->getTableName()
+        );
+
+        $row = $this->dbal->executeQuery(
+            $sql,
+            ['id' => $message->getId(),],
+            ['id' => Type::INTEGER,]
+        )->fetch();
+        $affectedRows = null;
+        if (count($row)) {
+            try {
+                $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
+                    'id' => Type::INTEGER,
+                ]);
+                $this->dbal->commit();
+            } catch (\Exception $e) {
+                sleep(1);
+                try {
+                    $affectedRows = $this->dbal->delete(
+                        $this->connection->getTableName(),
+                        ['id' => $message->getId()],
+                        ['id' => Type::INTEGER,]
+                    );
+                    $this->dbal->commit();
+                } catch (\Exception $e) {
+                    $this->dbal->rollBack();
+                }
+            }
+        }
         if (1 !== $affectedRows) {
             throw new \LogicException(sprintf(
                 'Expected record was removed but it is not. id: "%s"',
@@ -151,15 +181,49 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
 
-        $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()]);
+        $this->dbal->beginTransaction();
 
+        $sql = sprintf(
+            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
+            $this->connection->getTableName()
+        );
+
+        $row = $this->dbal->executeQuery(
+            $sql,
+            [
+                'id' => $message->getId(),
+            ],
+            [
+                'id' => Type::INTEGER,
+            ]
+        )->fetch();
+        $affectedRows = null;
+        if (count($row)) {
+            try {
+                $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
+                    'id' => Type::INTEGER,
+                ]);
+                $this->dbal->commit();
+            } catch (\Exception $e) {
+                sleep(1);
+                try {
+                    $affectedRows = $this->dbal->delete(
+                        $this->connection->getTableName(),
+                        ['id' => $message->getId()],
+                        ['id' => Type::INTEGER,]
+                    );
+                    $this->dbal->commit();
+                } catch (\Exception $e) {
+                    $this->dbal->rollBack();
+                }
+            }
+        }
         if (1 !== $affectedRows) {
             throw new \LogicException(sprintf(
                 'Expected record was removed but it is not. id: "%s"',
                 $message->getId()
             ));
         }
-
         if ($requeue) {
             $dbalMessage = [
                 'body' => $message->getBody(),
@@ -307,5 +371,13 @@ class DbalMessageConsumer implements MessageConsumerInterface
         }
 
         return $message;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->consumerId;
     }
 }

@@ -83,6 +83,7 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeFlashMessage($title)
     {
         $actualFlashMessages = [];
+        /** @var Element|null $flashMessage */
         $flashMessage = $this->spin(function (OroMainContext $context) use ($title, &$actualFlashMessages) {
             $flashMessages = $context->findAllElements('Flash Message');
 
@@ -97,7 +98,7 @@ class OroMainContext extends MinkContext implements
                 }
             }
 
-            return false;
+            return null;
         }, 10);
 
         self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
@@ -107,9 +108,14 @@ class OroMainContext extends MinkContext implements
             implode(',', array_keys($actualFlashMessages))
         ));
 
+        /** @var NodeElement $closeButton */
         $closeButton = $flashMessage->find('css', 'button.close');
-        if ($closeButton->isVisible()) {
-            $closeButton->press();
+        if (null !== $closeButton) {
+            try {
+                $closeButton->press();
+            } catch (\Exception $e) {
+                //No worries, flash message can disappeared till time next call
+            }
         }
     }
 

@@ -137,6 +137,9 @@ services:
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
             - '@oro_security.security_facade'
+        calls:
+            - [addUnsupportedGridPrefix, ['oro_report']]
+            - [addUnsupportedGridPrefix, ['oro_segment']]
         tags:
             - { name: oro_datagrid.extension }
 
@@ -147,6 +150,9 @@ services:
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_tag.helper.taggable_helper'
             - '@oro_entity.routing_helper'
+        calls:
+            - [addUnsupportedGridPrefix, ['oro_report']]
+            - [addUnsupportedGridPrefix, ['oro_segment']]
         tags:
             - { name: oro_datagrid.extension }
 
