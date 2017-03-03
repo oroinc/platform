@@ -220,6 +220,59 @@ class EmailController extends Controller
     }
 
     /**
+     * Used on `My Emails` page to show emails thread with only emails being related to currently logged user.
+     *
+     * @Route("/view/user-thread/{id}", name="oro_email_user_thread_view", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_view")
+     * @Template("OroEmailBundle:Email/Thread:userEmails.html.twig")
+     */
+    public function viewUserThreadAction(Email $entity)
+    {
+        $this->getEmailManager()->setSeenStatus($entity, true, true);
+
+        return ['entity' => $entity];
+    }
+
+    /**
+     * Used on `My Emails` page to show emails thread with only emails being related to currently logged user.
+     *
+     * @Route("/widget/user-thread/{id}", name="oro_email_user_thread_widget", requirements={"id"="\d+"})
+     * @Template("OroEmailBundle:Email/widget:thread.html.twig")
+     */
+    public function userThreadWidgetAction(Email $entity)
+    {
+        $emails = [];
+        if ($this->getRequest()->get('showSingleEmail', false)) {
+            $emails[] = $entity;
+        } else {
+            $emails = $this->get('oro_email.email.thread.provider')->getUserThreadEmails(
+                $this->get('doctrine')->getManager(),
+                $entity,
+                $this->getUser(),
+                $this->get('oro_email.mailbox.manager')->findAvailableMailboxes(
+                    $this->getUser(),
+                    $this->get('security.token_storage')->getToken()->getOrganizationContext()
+                )
+            );
+        }
+
+        $emails = array_filter($emails, function ($email) {
+            return $this->get('security.context')->isGranted('VIEW', $email);
+        });
+        $this->loadEmailBody($emails);
+
+        return [
+            'entity' => $entity,
+            'thread' => $emails,
+            'target' => $this->getTargetEntity(),
+            'hasGrantReattach' => $this->isAttachmentCreationGranted(),
+            'routeParameters' => $this->getTargetEntityConfig(),
+            'renderContexts' => $this->getRequest()->get('renderContexts', true),
+            'defaultReplyButton' => $this->get('oro_config.user')->get('oro_email.default_button_reply')
+        ];
+    }
+
+    /**
      * @Route("/view-items", name="oro_email_items_view")
      * @Template
      */

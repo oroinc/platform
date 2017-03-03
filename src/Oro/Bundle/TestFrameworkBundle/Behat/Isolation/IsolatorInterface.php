@@ -57,4 +57,10 @@ interface IsolatorInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Return tag for Isolator that can be used for skip isolation
+     * @return string
+     */
+    public function getTag();
 }

@@ -96,6 +96,10 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     ) {
         $idFieldName = $this->getEntityIdentifierPropertyPath($config);
         if ($idFieldName) {
+            $parentResourceClass = $config->getParentResourceClass();
+            if ($parentResourceClass) {
+                $entityClass = $parentResourceClass;
+            }
             $titles = $this->getTitles($data, $entityClass, $idFieldName, $config);
             $this->setTitles($data, $entityClass, $idFieldName, $config, $titles, $titleFieldName);
         }

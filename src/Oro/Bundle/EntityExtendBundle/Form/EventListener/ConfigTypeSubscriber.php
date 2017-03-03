@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvents;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigTypeSubscriber implements EventSubscriberInterface
@@ -59,8 +60,9 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
         // and the value of the attribute was changed
         $configProvider = $this->configManager->getProvider($configId->getScope());
         if ($configProvider->getPropertyConfig()->isSchemaUpdateRequired($form->getName(), $configId)) {
+            $config = $this->configManager->getConfig($configId);
             $newVal = $form->getData();
-            $oldVal = $this->configManager->getConfig($configId)->get($form->getName());
+            $oldVal = $config->get($form->getName());
             if (call_user_func($this->schemaUpdateRequired, $newVal, $oldVal)) {
                 $extendConfigProvider = $this->configManager->getProvider('extend');
                 $extendConfig         = $extendConfigProvider->getConfig($configId->getClassName());
@@ -72,6 +74,15 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
                         $newVal,
                     ];
                     $extendConfig->set('pending_changes', $pendingChanges);
+                }
+
+                if ($configId instanceof FieldConfigId &&
+                    $configId->getScope() === 'extend' &&
+                    $config->is('owner', ExtendScope::OWNER_CUSTOM) &&
+                    $config->is('state', ExtendScope::STATE_ACTIVE)
+                ) {
+                    $config->set('state', ExtendScope::STATE_UPDATE);
+                    $this->configManager->persist($config);
                 }
 
                 if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {

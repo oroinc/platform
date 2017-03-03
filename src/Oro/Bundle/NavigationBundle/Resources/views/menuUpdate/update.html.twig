@@ -159,7 +159,7 @@
     widgetContainer: '.menuitem-data'
     } %}
 
-    <div class="left-panel-container"
+    <div class="left-panel-container tree-component-container"
          data-page-component-module="orodatagrid/js/app/components/grid-sidebar-component"
          data-page-component-options="{{ componentOptions|json_encode }}">
         <div class="placeholder">
@@ -175,6 +175,7 @@
                     </div>
                     <div class="menu-item">
                         {% set treeOptions = {
+                            'view' : 'oronavigation/js/app/views/tree-manage-view',
                             'data' : tree,
                             'nodeId': entity.key,
                             'menu' : entity.menu,
@@ -185,12 +186,16 @@
                             'onMoveRoute' : 'oro_navigation_menuupdate_move'
                         } %}
                         {{ UI.renderJsTree(
-                        {
-                            'module': 'oronavigation/js/app/components/tree-manage-component',
-                            'label': 'oro.navigation.menu.menu_list_default.label'|trans,
-                            'treeOptions': treeOptions
-                        },
-                        ['expand', 'collapse']
+                            {
+                                'label': 'oro.navigation.menu.menu_list_default.label'|trans,
+                                'treeOptions': treeOptions
+                            },
+                            {
+                                'move': {
+                                    'routeName': menuJsMoveRoute,
+                                    'routeParams': {menuName: menuName, scopeId: scope.id}
+                                }
+                            }
                         ) }}
                     </div>
                 </div>
@@ -198,7 +203,6 @@
                     <div class="system-content-wrapper">
                         {{ parent() }}
                     </div>
-
                 </div>
             </div>
         </div>

@@ -9,13 +9,19 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Table;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\TableHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class GridContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
@@ -104,6 +110,31 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iCheckFirstRecordsInGrid($number = 2)
     {
         $this->getGrid()->checkFirstRecords($number);
+    }
+
+    /**
+     * Checks first records in provided column number
+     * Example: And I check first 5 records in 1 column
+     *
+     * @When /^(?:|I )check first (?P<number>(?:|one|two|\d+)) record(s|) in (?P<column>(?:|one|two|\d+)) column$/
+     */
+    public function iCheckRecordsInColumn($number, $column)
+    {
+        $this->getGrid()->checkFirstRecords(
+            $this->getCount($number),
+            $this->getCount($column)
+        );
+    }
+
+    /**
+     * Unchecks first records in provided column number
+     * Example: And I uncheck first 2 records in 1 column
+     *
+     * @When /^(?:|I )uncheck first (?P<number>(?:[^"]|\\")*) records in (?P<column>(?:[^"]|\\")*) column$/
+     */
+    public function iUncheckFirstRecordsInColumn($number, $column)
+    {
+        $this->getGrid()->checkFirstRecords($number, $column);
     }
 
     /**
@@ -243,13 +274,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Country | Ukraine             |
      *            | State   | Kharkivs'ka Oblast' |
      *
-     * @Then /^(?:|I )should see (?P<content>([\w\s]+)) in grid with following data:$/
+     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
      */
     public function assertRowValues($content, TableNode $table)
     {
         /** @var Grid $grid */
         $grid = $this->elementFactory->findElementContains('Grid', $content);
-        /** @var GridHeader $gridHeader */
+
+        /** @var TableHeader $gridHeader */
         $gridHeader = $grid->getElement('GridHeader');
         $row = $grid->getRowByContent($content);
 
@@ -291,11 +323,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert record position in table
+     * It is find record by text and assert its position
+     * Example: Then Zyta Zywiec must be first record in appropriate table
+     * Example: And John Doe must be first record in appropriate table
+     *
+     * @Then /^(?P<content>([\w\s]+)) must be (?P<rowNumber>(first|second|[\d]+)) record in appropriate table$/
+     */
+    public function assertRowContentInTable($content, $rowNumber)
+    {
+        /** @var Table $table */
+        $table = $this->findElementContains('Table', $content);
+        $row = $table->getRowByNumber($this->getNumberFromString($rowNumber));
+        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
+    }
+
+    /**
      * String filter
      * Example: When I filter First Name as Contains "Aadi"
      * Example: And filter Name as is equal to "User"
      *
-     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s]+))"$/
+     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s\.\_\%]+))"$/
      */
     public function applyStringFilter($filterName, $type, $value)
     {
@@ -358,6 +406,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )reset "(?P<filterName>([\w\s\:]+))" filter on grid "(?P<grid>([\w\s]+))"$/
+     *
+     * @param string $filterName
+     * @param string $grid
+     */
+    public function resetFilterOfGrid($filterName, $grid)
+    {
+        $grid = $grid ?: 'Grid';
+
+        $filterItem = $this->getGridFilters($grid)->getFilterItem($grid . 'FilterItem', $filterName);
+        $filterItem->reset();
+    }
+
+    /**
      * @When /^(?:|I )check All Visible records in grid$/
      */
     public function iCheckAllVisibleRecordsInGrid()
@@ -374,6 +436,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Asserts that no record with provided content in grid
+     * Example: And there is no "Glorious workflow" in grid
+     *
+     * @Then /^there is no "(?P<record>([\w\s\%]+))" in grid$/
+     * @param string $record
+     */
+    public function thereIsNoInGrid($record)
+    {
+        $gridRow = $this->findElementContains('GridRow', $record);
+        self::assertFalse($gridRow->isIsset(), sprintf('Grid still has record with "%s" content', $record));
+    }
+
+    /**
      * @Then there is no records in grid
      * @Then all records should be deleted
      */
@@ -383,16 +458,38 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^there is no records in grid "(?P<grid>([\w\s]+))"$/
+     *
+     * @param string $grid
+     */
+    public function thereIsNoRecordsInGridWithName($grid)
+    {
+        self::assertCount(0, $this->getGrid($grid)->getRows());
+    }
+
+    /**
      * Click on row action. Row will founded by it's content
      * Example: And click view Charlie in grid
      * Example: When I click edit Call to Jennyfer in grid
      * Example: And I click delete Sign a contract with Charlie in grid
      *
-     * @Given /^(?:|I )click (?P<action>((?!on)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click (?P<action>(Clone|(?!on)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickActionInRow($content, $action)
     {
         $this->getGrid()->clickActionLink($content, $action);
+    }
+
+    /**
+     * @Given /^(?:|I )click (?P<action>[\w\s]*) on (?P<content>(?:[^"]|\\")*) in grid "(?P<grid>([\w\s]+))"$/
+     *
+     * @param string $content
+     * @param string $action
+     * @param string $grid
+     */
+    public function clickActionInRowOfGrid($content, $action, $grid)
+    {
+        $this->getGrid($grid)->clickActionLink($content, $action);
     }
 
     /**
@@ -453,6 +550,31 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check that record with provided name exists in grid
+     * Example: Then I should see First test group in grid
+     *
+     * @Then /^(?:|I )should see (?P<recordName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iShouldSeeRecordInGrid($recordName)
+    {
+        $this->getGrid()->getRowByContent($recordName);
+    }
+
+    /**
+     * Check that given collection of records exists in grid
+     * Example: Then I should see following records in grid:
+     *            | Alice1  |
+     *            | Alice10 |
+     * @Then /^(?:|I )should see following records in grid:$/
+     */
+    public function iShouldSeeFollowingRecordsInGrid(TableNode $table)
+    {
+        foreach ($table->getRows() as list($value)) {
+            $this->iShouldSeeRecordInGrid($value);
+        }
+    }
+
+    /**
      * @param string $stringNumber
      * @return int
      */
@@ -469,11 +591,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @return GridElement
+     * @param string|null $grid
+     * @return Grid
      */
-    private function getGrid()
+    private function getGrid($grid = null)
     {
-        return $this->elementFactory->createElement('Grid');
+        $grid = $grid ?: 'Grid';
+
+        return $this->elementFactory->createElement($grid);
     }
 
     /**
@@ -485,14 +610,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @param string|null $grid
      * @return GridFilters
      */
-    private function getGridFilters()
+    private function getGridFilters($grid = null)
     {
-        $filters = $this->elementFactory->createElement('GridFilters');
+        $grid = $grid ?: 'Grid';
+
+        $filters = $this->elementFactory->createElement($grid . 'Filters');
         if (!$filters->isVisible()) {
-            $this->elementFactory->createElement('GridToolbarActions')->getActionByTitle('Filters')->click();
+            $gridToolbarActions = $this->elementFactory->createElement($grid . 'ToolbarActions');
+            if ($gridToolbarActions->isVisible()) {
+                $gridToolbarActions->getActionByTitle('Filters')->click();
+            } else {
+                $filterStateElementName = $grid . 'FiltersState';
+                $filterState = $this->elementFactory->createElement($filterStateElementName);
+                self::assertNotNull($filterState);
+
+                $filterState->click();
+            }
         }
+
         return $filters;
     }
 }

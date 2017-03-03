@@ -18,9 +18,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEnt
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-/**
- * @dbIsolation
- */
 class LimitedAccessTest extends WebTestCase
 {
     /** @var TestEntity */

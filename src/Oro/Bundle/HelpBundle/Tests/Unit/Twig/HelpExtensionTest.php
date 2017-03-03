@@ -2,37 +2,31 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\HelpBundle\Model\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Twig\HelpExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class HelpExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $linkProvider;
 
-    /**
-     * @var HelpExtension
-     */
+    /** @var HelpExtension */
     protected $extension;
 
     protected function setUp()
     {
-        $this->linkProvider = $this->getMockBuilder('Oro\Bundle\HelpBundle\Model\HelpLinkProvider')
+        $this->linkProvider = $this->getMockBuilder(HelpLinkProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new HelpExtension($this->linkProvider);
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_help.model.help_link_provider', $this->linkProvider)
+            ->getContainer($this);
 
-    public function testGetFunctions()
-    {
-        /** @var \Twig_SimpleFunction $helpLinkFunction */
-        list($helpLinkFunction) = $this->extension->getFunctions();
-
-        $this->assertInstanceOf('Twig_SimpleFunction', $helpLinkFunction);
-        $this->assertEquals('get_help_link', $helpLinkFunction->getName());
-        $this->assertEquals(array($this->extension, 'getHelpLinkUrl'), $helpLinkFunction->getCallable());
+        $this->extension = new HelpExtension($container);
     }
 
     public function testGetHelpLinkUrl()
@@ -44,7 +38,10 @@ class HelpExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getHelpLinkUrl')
             ->will($this->returnValue($expects));
 
-        $this->assertEquals($expects, $this->extension->getHelpLinkUrl());
+        $this->assertEquals(
+            $expects,
+            self::callTwigFunction($this->extension, 'get_help_link', [])
+        );
     }
 
     public function testGetName()

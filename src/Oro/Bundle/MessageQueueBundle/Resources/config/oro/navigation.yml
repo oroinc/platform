@@ -2,10 +2,10 @@ navigation:
     menu_config:
         items:
             oro_message_queue_job:
-                label: 'oro.message_queue_job.menu.label'
-                route: 'oro_message_queue_root_jobs'
+                label:    'oro.message_queue_job.menu.label'
+                route:    'oro_message_queue_root_jobs'
+                position: 60
                 extras:
-                    position:    60
                     description: 'Job queue'
                     routes:      ['oro_message_queue_*']
 

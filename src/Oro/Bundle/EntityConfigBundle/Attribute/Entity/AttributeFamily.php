@@ -275,7 +275,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|AttributeGroup[]
      */
     public function getAttributeGroups()
     {

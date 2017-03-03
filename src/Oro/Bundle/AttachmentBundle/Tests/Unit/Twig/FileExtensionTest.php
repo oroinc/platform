@@ -2,16 +2,22 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestTemplate;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Twig\FileExtension;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class FileExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var FileExtension
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var FileExtension */
     protected $extension;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -28,48 +34,32 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\AttachmentManager')
+        $this->manager = $this->getMockBuilder(AttachmentManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->attachmentConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->attachmentConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $configManager->expects($this->once())
+        $configManager->expects($this->any())
             ->method('getProvider')
             ->with('attachment')
             ->will($this->returnValue($this->attachmentConfigProvider));
 
-        $this->extension = new FileExtension($this->manager, $configManager, $this->doctrine);
+        $container = self::getContainerBuilder()
+            ->add('oro_attachment.manager', $this->manager)
+            ->add('oro_entity_config.config_manager', $configManager)
+            ->add('doctrine', $this->doctrine)
+            ->getContainer($this);
+
+        $this->extension = new FileExtension($container);
+
         $this->attachment = new TestAttachment();
-    }
-
-    public function testGetFunctions()
-    {
-        $result = $this->extension->getFunctions();
-        $functions = [
-            'file_url',
-            'file_size',
-            'resized_image_url',
-            'filtered_image_url',
-            'oro_configured_image_url',
-            'oro_attachment_icon',
-            'oro_type_is_image',
-            'oro_is_preview_available',
-            'oro_file_icons_config',
-            'oro_file_view',
-            'oro_image_view'
-        ];
-
-        /** @var $function \Twig_SimpleFunction */
-        foreach ($result as $function) {
-            $this->assertTrue(in_array($function->getName(), $functions));
-        }
     }
 
     public function testGetName()
@@ -85,7 +75,11 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFileUrl')
             ->with($parentEntity, $parentField, $this->attachment, 'download', true);
 
-        $this->extension->getFIleUrl($parentEntity, $parentField, $this->attachment, 'download', true);
+        self::callTwigFunction(
+            $this->extension,
+            'file_url',
+            [$parentEntity, $parentField, $this->attachment, 'download', true]
+        );
     }
 
     public function testGetResizedImageUrl()
@@ -94,7 +88,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getResizedImageUrl')
             ->with($this->attachment, 110, 120);
 
-        $this->extension->getResizedImageUrl($this->attachment, 110, 120);
+        self::callTwigFunction($this->extension, 'resized_image_url', [$this->attachment, 110, 120]);
     }
 
     public function testGetAttachmentIcon()
@@ -103,7 +97,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getAttachmentIconClass')
             ->with($this->attachment);
 
-        $this->extension->getAttachmentIcon($this->attachment);
+        self::callTwigFunction($this->extension, 'oro_attachment_icon', [$this->attachment]);
     }
 
     public function testGetEmptyFileView()
@@ -112,7 +106,15 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->assertEquals('', $this->extension->getFileView($environment, $parentEntity, $this->attachment));
+
+        $this->assertEquals(
+            '',
+            self::callTwigFunction(
+                $this->extension,
+                'oro_file_view',
+                [$environment, $parentEntity, $this->attachment]
+            )
+        );
     }
 
     public function testGetFileView()
@@ -132,7 +134,12 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($this->attachment);
         $this->manager->expects($this->once())
             ->method('getFileUrl');
-        $this->extension->getFileView($environment, $parentEntity, $parentField, $this->attachment);
+
+        self::callTwigFunction(
+            $this->extension,
+            'oro_file_view',
+            [$environment, $parentEntity, $parentField, $this->attachment]
+        );
     }
 
     public function testGetEmptyImageView()
@@ -140,7 +147,11 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $environment = $this->getMockBuilder('\Twig_Environment')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->assertEquals('', $this->extension->getImageView($environment, $this->attachment));
+
+        $this->assertEquals(
+            '',
+            self::callTwigFunction($this->extension, 'oro_image_view', [$environment, $this->attachment])
+        );
     }
 
     public function testGetImageView()
@@ -160,7 +171,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())
             ->method('getFileUrl');
 
-        $this->extension->getImageView($environment, $parentEntity, $this->attachment);
+        self::callTwigFunction($this->extension, 'oro_image_view', [$environment, $parentEntity, $this->attachment]);
     }
 
     public function testGetImageViewConfigured()
@@ -189,7 +200,11 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())
             ->method('getFileUrl');
 
-        $this->extension->getImageView($environment, $parentEntity, $this->attachment, new TestClass(), 'testField');
+        self::callTwigFunction(
+            $this->extension,
+            'oro_image_view',
+            [$environment, $parentEntity, $this->attachment, new TestClass(), 'testField']
+        );
     }
 
     public function testGetFilteredImageUrl()
@@ -198,7 +213,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getFilteredImageUrl')
             ->with($this->attachment, 'testFilter');
 
-        $this->extension->getFilteredImageUrl($this->attachment, 'testFilter');
+        self::callTwigFunction($this->extension, 'filtered_image_url', [$this->attachment, 'testFilter']);
     }
 
     public function testGetTypeIsImage()
@@ -207,7 +222,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isImageType')
             ->with('image/jpeg');
 
-        $this->extension->getTypeIsImage('image/jpeg');
+        self::callTwigFunction($this->extension, 'oro_type_is_image', ['image/jpeg']);
     }
 
     public function testIsPreviewAvailable()
@@ -216,7 +231,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('isImageType')
             ->with('image/jpeg');
 
-        $this->extension->isPreviewAvailable('image/jpeg');
+        self::callTwigFunction($this->extension, 'oro_is_preview_available', ['image/jpeg']);
     }
 
     public function testGetFileIconsConfig()
@@ -224,7 +239,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())
             ->method('getFileIcons');
 
-        $this->extension->getFileIconsConfig();
+        self::callTwigFunction($this->extension, 'oro_file_icons_config', []);
     }
 
     public function testGetConfiguredImageUrl()
@@ -245,7 +260,11 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getResizedImageUrl')
             ->with($this->attachment, 45, 45);
 
-        $this->extension->getConfiguredImageUrl($parent, 'testField', $this->attachment);
+        self::callTwigFunction(
+            $this->extension,
+            'oro_configured_image_url',
+            [$parent, 'testField', $this->attachment]
+        );
     }
 
     public function testGetImageViewWIthIntegerAttachmentParameter()
@@ -276,6 +295,10 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())
             ->method('getFileUrl');
 
-        $this->extension->getImageView($environment, $parentEntity, $attachmentId);
+        self::callTwigFunction(
+            $this->extension,
+            'oro_image_view',
+            [$environment, $parentEntity, $attachmentId]
+        );
     }
 }

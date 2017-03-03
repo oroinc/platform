@@ -12,24 +12,19 @@ use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
+/**
+ * @dbIsolationPerTest
+ */
 class AuditUpdatedEntitiesTest extends WebTestCase
 {
     use AuditChangedEntitiesExtensionTrait;
 
+    /**
+     * @dbIsolationPerTest
+     */
     protected function setUp()
     {
-        parent::setUp();
-
-        $this->initClient([], [], true);
-        $this->startTransaction();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->rollbackTransaction();
-        self::$loadedFixtures = [];
+        $this->initClient();
     }
 
     public function testShouldNotCreateAuditEntityForUpdatedEntityWithoutChanges()

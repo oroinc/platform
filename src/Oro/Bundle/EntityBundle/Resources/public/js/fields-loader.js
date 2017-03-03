@@ -55,7 +55,6 @@ define([
             $.ajax({
                 url: routing.generate(routeName, routeParams),
                 success: $.proxy(this._onLoaded, this),
-                error: this._onError,
                 beforeSend: $.proxy(this._trigger, this, 'start'),
                 complete: $.proxy(this._trigger, this, 'complete')
             });
@@ -102,21 +101,6 @@ define([
 
         _onLoaded: function(data) {
             this.setFieldsData(data);
-        },
-
-        _onError: function(jqXHR) {
-            var err = jqXHR.responseJSON;
-            var msg = __('Sorry, an unexpected error has occurred.');
-            if (tools.debug) {
-                if (err.message) {
-                    msg += ': ' + err.message;
-                } else if (err.errors && $.isArray(err.errors)) {
-                    msg += ': ' + err.errors.join();
-                } else if ($.type(err) === 'string') {
-                    msg += ': ' + err;
-                }
-            }
-            messenger.notificationFlashMessage('error', msg);
         },
 
         /**

@@ -7,9 +7,6 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
-/**
- * @dbIsolation
- */
 class ProcessDefinitionRepositoryTest extends WebTestCase
 {
     /**

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Embeddable()
  */
-class Price implements CurrencyAwareInterface
+class Price implements CurrencyAwareInterface, \JsonSerializable
 {
     use CurrencyAwareTrait;
 
@@ -50,5 +50,16 @@ class Price implements CurrencyAwareInterface
         $this->value = $value;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'value' => $this->value,
+            'currency' => $this->currency
+        ];
     }
 }

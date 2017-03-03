@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\OrderBy;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Query\Mode;
@@ -117,7 +117,7 @@ abstract class AbstractIndexer implements IndexerInterface
             ->orderBy($orderingsExpr)
         ;
         
-        $iterator = new BufferedQueryResultIterator($queryBuilder);
+        $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(static::BATCH_SIZE);
 
         $itemsCount = 0;
@@ -166,5 +166,13 @@ abstract class AbstractIndexer implements IndexerInterface
         }
 
         return is_array($entity) ? $entity : [$entity];
+    }
+
+    /**
+     * @return int
+     */
+    public function getBatchSize()
+    {
+        return self::BATCH_SIZE;
     }
 }

@@ -4,9 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @dbIsolation
- */
 class CleanupCommandTest extends WebTestCase
 {
     protected function setUp()
@@ -34,18 +31,18 @@ class CleanupCommandTest extends WebTestCase
      */
     public function paramProvider()
     {
-        $currentDate = new \DateTime("now", new \DateTimeZone('UTC'));
+        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
         $maxDateFromFixtures = new \DateTime('2015-02-01 00:20:00', new \DateTimeZone('UTC'));
         $interval = $maxDateFromFixtures->diff($currentDate);
         return [
             'should show help'                             => [
-                '$expectedContent' => "Usage:\n  oro:cron:integration:cleanup [options]",
+                '$expectedContent' => 'Usage: oro:cron:integration:cleanup [options]',
                 '$params'          => ['--help'],
                 '$rowsCount'       => 5
             ],
             'should show success output and records count for failed statuses' => [
-                '$expectedContent' => "Integration statuses will be deleted: 1" . PHP_EOL
-                    . "Integration statuses history cleanup completed",
+                '$expectedContent' => 'Integration statuses will be deleted: 1'
+                    . ' Integration statuses history cleanup completed',
                 '$params'          => ['-i' => ((int)$interval->format('%a') + 3) . ' day'],
                 '$rowsCount'       => 4
             ],
@@ -55,8 +52,8 @@ class CleanupCommandTest extends WebTestCase
                 '$rowsCount'       => 4
             ],
             'should show success output and records count for completed statuses' => [
-                '$expectedContent' => "Integration statuses will be deleted: 2" . PHP_EOL
-                    . "Integration statuses history cleanup completed",
+                '$expectedContent' => 'Integration statuses will be deleted: 2'
+                    . ' Integration statuses history cleanup completed',
                 '$params'          => [],
                 '$rowsCount'       => 2
             ]

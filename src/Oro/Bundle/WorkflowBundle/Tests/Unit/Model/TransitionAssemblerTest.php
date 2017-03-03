@@ -43,8 +43,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected static $actions = [
-        'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]],
-        'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]
+        'preactions' => [['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]],
+        'actions' => [['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]],
     ];
 
     /**
@@ -53,7 +53,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     protected static $transitionDefinitions = [
         'empty_definition' => [],
         'with_preactions' => [
-            'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]
+            'preactions' => [['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]],
         ],
         'with_pre_condition' => [
             'preconditions' => ['@true' => null]
@@ -62,15 +62,15 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'conditions' => ['@true' => null]
         ],
         'with_actions' => [
-            'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]
+            'actions' => [['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]],
         ],
         'full_definition' => [
             'page_template' => 'Test:Page:template',
             'dialog_template' => 'Test:Dialog:template',
-            'preactions' => ['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]],
+            'preactions' => [['@assign_value' => ['parameters' => ['$attribute', 'preaction_value']]]],
             'preconditions' => ['@true' => null],
             'conditions' => ['@true' => null],
-            'actions' => ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]],
+            'actions' => [['@assign_value' => ['parameters' => ['$attribute', 'action_value']]]],
         ]
     ];
 
@@ -366,6 +366,69 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $configuration
+     * @param array $expectedActionConfig
+     *
+     * @dataProvider assembleWithDestinationProvider
+     */
+    public function testAssembleAndDestination(array $configuration, array $expectedActionConfig)
+    {
+        $steps = ['target_step' => $this->createStep()];
+
+        $this->formOptionsAssembler->expects($this->once())->method('assemble')->willReturn([]);
+
+        $this->actionFactory->expects($this->any())
+            ->method('create')
+            ->with(ConfigurableAction::ALIAS, $this->isType('array'))
+            ->willReturnCallback(
+                function ($type, $config) use ($expectedActionConfig) {
+                    $this->assertEquals($expectedActionConfig, $config);
+                }
+            );
+
+        $this->assembler->assemble(['transition' => $configuration], self::$transitionDefinitions, $steps, []);
+    }
+
+    /**
+     * @return array
+     */
+    public function assembleWithDestinationProvider()
+    {
+        return [
+            'without destination' => [
+                'configuration' => [
+                    'transition_definition' => 'empty_definition',
+                    'step_to' => 'target_step',
+                ],
+                'actionConfig' => [],
+            ],
+            'with destination' => [
+                'configuration' => [
+                    'transition_definition' => 'empty_definition',
+                    'step_to' => 'target_step',
+                    'display_type' => 'page',
+                    'destination_page' => 'dest',
+                ],
+                'actionConfig' => [
+                    ['@resolve_destination_page' => 'dest'],
+                ],
+            ],
+            'with actions and destination' => [
+                'configuration' => [
+                    'transition_definition' => 'with_actions',
+                    'step_to' => 'target_step',
+                    'display_type' => 'page',
+                    'destination_page' => 'dest',
+                ],
+                'actionConfig' => [
+                    ['@resolve_destination_page' => 'dest'],
+                    ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @param string $templateType
      * @param array $configuration
      * @param $actualTransition
@@ -394,7 +457,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'target_step',
                     'form_type' => 'custom_workflow_transition',
-                    'display_type' => 'page',
+                    'display_type' => 'dialog',
                     'form_options' => [
                         'attribute_fields' => [
                             'attribute_on_be' => ['type' => 'text']

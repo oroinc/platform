@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
@@ -95,7 +96,7 @@ class EmailOriginHelper
 
         return $origin;
     }
-    
+
     /**
      * Find existing email origin entity by email string or create and persist new one.
      *
@@ -103,6 +104,7 @@ class EmailOriginHelper
      * @param OrganizationInterface $organization
      * @param string                $originName
      * @param boolean               $enableUseUserEmailOrigin
+     * @param boolean               $secured Check origin can be used by current user
      *
      * @return EmailOrigin
      */
@@ -110,25 +112,91 @@ class EmailOriginHelper
         $email,
         OrganizationInterface $organization = null,
         $originName = InternalEmailOrigin::BAP,
-        $enableUseUserEmailOrigin = true
+        $enableUseUserEmailOrigin = true,
+        $secured = false
     ) {
         $originKey = $originName . $email . $enableUseUserEmailOrigin;
         if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
             $organization = $this->securityFacade->getOrganization();
         }
         if (!array_key_exists($originKey, $this->origins)) {
-            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-                $this->getEntityManager(),
-                $this->emailAddressHelper->extractPureEmailAddress($email)
+            $emailOwners = $this->emailOwnerProvider
+                ->findEmailOwners(
+                    $this->getEntityManager(),
+                    $this->emailAddressHelper->extractPureEmailAddress($email)
+                );
+            $origin = $this->findEmailOrigin(
+                $this->chooseEmailOwner($emailOwners, $secured),
+                $organization,
+                $originName,
+                $enableUseUserEmailOrigin
             );
-
-            $origin = $this
-                ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
 
             $this->origins[$originKey] = $origin;
         }
 
         return $this->origins[$originKey];
+    }
+
+    /**
+     * Get first accessible email owner
+     *
+     * @param EmailOwnerInterface[] $emailOwners
+     * @param bool $secured
+     *
+     * @return null
+     */
+    protected function chooseEmailOwner($emailOwners, $secured)
+    {
+        $selectedEmailOwner = null;
+        foreach ($emailOwners as $emailOwner) {
+            if ($secured && !$this->hasOriginAccess($emailOwner)) {
+                continue;
+            }
+            $selectedEmailOwner = $emailOwner;
+            break;
+        }
+
+        return $selectedEmailOwner;
+    }
+
+    /**
+     * Check on access to email owner data by logged in user
+     *
+     * @param EmailOwnerInterface $emailOwner
+     *
+     * @return bool
+     */
+    protected function hasOriginAccess($emailOwner)
+    {
+        $access = false;
+        if ($emailOwner instanceof User
+            && $this->securityFacade->getLoggedUserId() === $emailOwner->getId()) {
+            $access = true;
+        } elseif ($emailOwner instanceof Mailbox) {
+            $ownerIds = [];
+            $authorizedUsers = $emailOwner->getAuthorizedUsers();
+            foreach ($authorizedUsers as $user) {
+                $ownerIds[] = $user->getId();
+            }
+
+            $authorizedRoles = $emailOwner->getAuthorizedRoles();
+            foreach ($authorizedRoles as $role) {
+                $users = $this->getEntityManager()->getRepository('OroUserBundle:Role')
+                    ->getUserQueryBuilder($role)
+                    ->getQuery()->getResult();
+
+                foreach ($users as $user) {
+                    $ownerIds[] = $user->getId();
+                }
+            }
+
+            if (in_array($this->securityFacade->getLoggedUserId(), $ownerIds, true)) {
+                $access = true;
+            }
+        }
+
+        return $access;
     }
 
     /**
@@ -139,7 +207,7 @@ class EmailOriginHelper
     protected function isEmptyOrigin($origin)
     {
         return (null === $origin || ($origin instanceof Collection && $origin->isEmpty())) &&
-        null !== $this->emailModel;
+            null !== $this->emailModel;
     }
 
     /**
@@ -183,7 +251,7 @@ class EmailOriginHelper
     {
         return function ($item) use ($organization) {
             return $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
-            && (!$organization || $item->getOrganization() === $organization);
+                && (!$organization || $item->getOrganization() === $organization);
         };
     }
 
@@ -196,7 +264,7 @@ class EmailOriginHelper
     {
         return function ($item) use ($organization) {
             return ($item->getOrganization() === $organization || !$organization) &&
-            $item instanceof InternalEmailOrigin;
+                $item instanceof InternalEmailOrigin;
         };
     }
 

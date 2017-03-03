@@ -188,6 +188,7 @@ oro:
             exclusive_active_groups.label: "Exclusive Active Groups"
             exclusive_record_groups.label: "Exclusive Record Groups"
             scopes.label:                 Workflow Scopes
+            applications.label:           "Applications"
 
             attribute:
                 property_path.tooltip:    "This is the field of the workflow entity or its related entities that will be appear on the view form of the transition. Use these if you want user to add or edit some entity data in the transition."
@@ -199,6 +200,10 @@ oro:
                 step_from.tooltip:        "The workflow step, for which the transition button should appear on the entity page."
                 step_to.tooltip:          "The step to which the workflow will progress after the transition is performed."
                 display_type.tooltip:     "Transition attributes can appear in one of two available forms: In the popup window, which is a default transition behavior suitable for most cases, or on the separate page, which should be used with care and only for attribute-heavy transitions."
+                destination_page:
+                    default.label: 'Original Page'
+                    name.label: 'Entity Index Page'
+                    view.label: 'Entity View Page'
                 message.tooltip:          "If you want to show a warning popup message to the user before transition is executed, put the text of the warning into this field."
                 icon.tooltip:             "An icon that will appear on the transition button before the transition name."
                 button_color.tooltip:     "This control specifies the visual style of the transition button."
@@ -292,6 +297,7 @@ oro:
             from_step.label: From step
             to_step.label: To step
             view_form.label: View form
+            destination_page.label: Destination Page
             warning_message.label: Warning message
             button_icon.label: Button icon
             button_style.label: Button style
@@ -302,3 +308,5 @@ oro:
             name.label: Name
             position.label: Position
             final.label: Final
+            exclusive_active_groups.tooltip: "Only one of same exclusive active group workflows can be activated in the system at the same time"
+            exclusive_record_groups.tooltip: "Only one workflow can be started for a related entity within a same exclusive record group"

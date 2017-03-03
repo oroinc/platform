@@ -1,0 +1,5 @@
+oro_behat_extension:
+  pages:
+    Business Unit View:
+      class: Oro\Bundle\BusinessEntitiesBundle\Tests\Behat\Page\BusinessUnitView
+      route: oro_business_unit_view

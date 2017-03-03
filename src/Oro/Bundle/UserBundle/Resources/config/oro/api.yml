@@ -1,7 +1,14 @@
 api:
+    entity_aliases:
+        Oro\Bundle\UserBundle\Api\Model\UserProfile:
+            alias: userprofile
+            plural_alias: userprofile
+
     entities:
-        Oro\Bundle\UserBundle\Entity\Group: ~
+        Oro\Bundle\UserBundle\Entity\Group:
+            documentation_resource: '@OroUserBundle/Resources/doc/api/group.md'
         Oro\Bundle\UserBundle\Entity\Role:
+            documentation_resource: '@OroUserBundle/Resources/doc/api/role.md'
             delete_handler: oro_user.role.handler.delete
 
         Oro\Bundle\UserBundle\Entity\User:
@@ -34,3 +41,22 @@ api:
         Oro\Bundle\UserBundle\Entity\Email:
             # this entity does not have own Data API resource
             actions: false
+
+        Oro\Bundle\UserBundle\Api\Model\UserProfile:
+            fields:
+                id:
+                    description: The unique identifier of an user
+            actions:
+                get:
+                    description: Get current logged in user
+                    documentation: Get information about current logged in user.
+                get_list: false
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+                get_subresource: false
+                get_relationship: false
+                update_relationship: false
+                add_relationship: false
+                delete_relationship: false

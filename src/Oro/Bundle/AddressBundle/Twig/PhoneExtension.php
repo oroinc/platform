@@ -2,21 +2,29 @@
 
 namespace Oro\Bundle\AddressBundle\Twig;
 
-use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface;
 
 class PhoneExtension extends \Twig_Extension
 {
-    /**
-     * @var PhoneProvider
-     */
-    protected $provider;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @param PhoneProvider $provider
+     * @param ContainerInterface $container
      */
-    public function __construct(PhoneProvider $provider)
+    public function __construct(ContainerInterface $container)
     {
-        $this->provider = $provider;
+        $this->container = $container;
+    }
+
+    /**
+     * @return PhoneProviderInterface
+     */
+    protected function getPhoneProvider()
+    {
+        return $this->container->get('oro_address.provider.phone');
     }
 
     /**
@@ -40,7 +48,7 @@ class PhoneExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->provider->getPhoneNumber($object);
+        return $this->getPhoneProvider()->getPhoneNumber($object);
     }
 
     /**
@@ -54,7 +62,8 @@ class PhoneExtension extends \Twig_Extension
         }
 
         $result = [];
-        foreach ($this->provider->getPhoneNumbers($object) as $row) {
+        $phones = $this->getPhoneProvider()->getPhoneNumbers($object);
+        foreach ($phones as $row) {
             $result[] = ['phone' => $row[0], 'object' => $row[1]];
         }
 

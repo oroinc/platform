@@ -8,6 +8,13 @@ config:
         'jquery.form':
             deps:
                 - 'jquery'
+        'lightgallery':
+            deps:
+                - 'jquery'
+        'lightgallery.print':
+            deps:
+                - 'lightgallery'
+                - 'jquery'
         'bootstrap-popover':
             deps:
                 - 'bootstrap-tooltip'
@@ -68,12 +75,16 @@ config:
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'cryptojs/core': 'bundles/bowerassets/crypto-js/core.js'
         'cryptojs/sha256': 'bundles/bowerassets/crypto-js/sha256.js'
+        'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
+        'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
 
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
 
+        'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
+        'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
 
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -82,3 +93,4 @@ config:
         - oroui/js/app/modules/layout-module
         - oroui/blank/js/app/modules/views-module
         - oroui/js/input-widget-manager
+        - oroui/js/app/modules/viewport-module

@@ -1315,6 +1315,7 @@ footer {
     width: 23px;
     height: 19px;
     float: left;
+
     &:hover,
     &:focus {
       border: 0;
@@ -1329,6 +1330,7 @@ footer {
     float: none;
     display: table-cell;
   }
+
   .nav-pills {
     padding:0 10px;
   }
@@ -1344,6 +1346,7 @@ footer {
     }
   }
 }
+
 .launchers-dropdown-menu {
   min-width: 35px;
   &.detach .nav {
@@ -2961,13 +2964,6 @@ span.validation-failed {
 .create-select-entity.grid .entity-select-btn {
   display: none;
 }
-.fa-bars:before {
-  content: "\f0c9";
-  font-size: 14px;
-  font-family: 'FontAwesome';
-  line-height: 21px;
-  font-style: normal;
-}
 .oro-tabs {
   .nav-tabs {
     padding-left: 1px; // compensate tabs margin-left: -1px
@@ -3400,5 +3396,27 @@ label .popover-content {
 .float-holder {
   label.add-on {
     margin-bottom: 0;
+  }
+}
+
+.collapse-block {
+  [data-collapse-container] {
+    overflow: hidden;
+    max-height: 69.4px; // 4 (lines) * 13px (font-size) * 1.2 (line-height) + 7px (padding)
+  }
+
+  &.expanded [data-collapse-container] {
+    overflow: scroll;
+    max-height: none;
+  }
+
+  .toggle-more, .toggle-less, .toggle-collapse {
+    display: none;
+  }
+  &.expanded .toggle-less,
+  &.expanded .toggle-collapse,
+  &.overflows .toggle-more,
+  &.overflows .toggle-collapse {
+    display: block;
   }
 }

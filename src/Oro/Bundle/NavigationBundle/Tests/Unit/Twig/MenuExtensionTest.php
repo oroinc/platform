@@ -3,72 +3,67 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuItem;
+use Knp\Menu\Provider\MenuProviderInterface;
+use Knp\Menu\Twig\Helper;
+
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $helper
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $helper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $provider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $breadcrumbManager;
 
-    /**
-     * @var MenuExtension $menuExtension
-     */
-    protected $menuExtension;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $menuConfiguration;
+
+    /** @var MenuExtension */
+    protected $extension;
 
     protected function setUp()
     {
-        $this->breadcrumbManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager')
+        $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
+        $this->helper = $this->getMockBuilder(Helper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider = $this->createMock(MenuProviderInterface::class);
+        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = $this->getMockBuilder('Knp\Menu\Twig\Helper')
-            ->disableOriginalConstructor()
-            ->setMethods(array('render'))
-            ->getMock();
+        $container = self::getContainerBuilder()
+            ->add('knp_menu.helper', $this->helper)
+            ->add('oro_menu.builder_chain', $this->provider)
+            ->add('oro_navigation.chain_breadcrumb_manager', $this->breadcrumbManager)
+            ->add('oro_menu.configuration', $this->menuConfiguration)
+            ->getContainer($this);
 
-        $this->provider = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->menuExtension = new MenuExtension($this->helper, $this->provider, $this->breadcrumbManager);
-    }
-
-    public function testGetFunctions()
-    {
-        $functions = $this->menuExtension->getFunctions();
-        $this->assertArrayHasKey('oro_menu_render', $functions);
-        $this->assertInstanceOf('Twig_Function_Method', $functions['oro_menu_render']);
-        $this->assertAttributeEquals('render', 'method', $functions['oro_menu_render']);
-
-        $this->assertArrayHasKey('oro_menu_get', $functions);
-        $this->assertInstanceOf('Twig_Function_Method', $functions['oro_menu_get']);
-        $this->assertAttributeEquals('getMenu', 'method', $functions['oro_menu_get']);
+        $this->extension = new MenuExtension($container);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(MenuExtension::MENU_NAME, $this->menuExtension->getName());
+        $this->assertEquals(MenuExtension::MENU_NAME, $this->extension->getName());
     }
 
     public function testRenderBreadCrumbs()
     {
-        $environment = $this->getMockBuilder('\Twig_Environment')
+        $environment = $this->getMockBuilder(\Twig_Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $template = $this->getMockBuilder('\Twig_TemplateInterface')
+        $template = $this->getMockBuilder(\Twig_TemplateInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -80,6 +75,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('loadTemplate')
             ->will($this->returnValue($template));
 
+        $result = 'test';
         $template->expects($this->once())
             ->method('render')
             ->with(
@@ -89,9 +85,12 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                     ),
                     'useDecorators' => true
                 )
-            );
-        ;
-        $this->menuExtension->renderBreadCrumbs($environment, 'test_menu');
+            )->willReturn($result);
+
+        self::assertEquals(
+            $result,
+            self::callTwigFunction($this->extension, 'oro_breadcrumbs', [$environment, 'test_menu'])
+        );
     }
 
     public function testWrongBredcrumbs()
@@ -105,7 +104,9 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getBreadcrumbs')
             ->will($this->returnValue(null));
 
-        $this->assertNull($this->menuExtension->renderBreadCrumbs($environment, 'test_menu'));
+        $this->assertNull(
+            self::callTwigFunction($this->extension, 'oro_breadcrumbs', [$environment, 'test_menu'])
+        );
     }
 
     public function testGetMenuAsString()
@@ -113,7 +114,10 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
         $options = array();
         $menu = 'test';
         $menuInstance = $this->assertGetMenuString($menu, 'path', $options);
-        $this->assertSame($menuInstance, $this->menuExtension->getMenu($menu, array('path'), $options));
+        $this->assertSame(
+            $menuInstance,
+            self::callTwigFunction($this->extension, 'oro_menu_get', [$menu, ['path'], $options])
+        );
     }
 
     /**
@@ -123,14 +127,15 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetMenuException()
     {
         $options = array();
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
             ->setMethods(array('getChild'))
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
             ->method('getChild')
             ->with('path')
             ->will($this->returnValue(null));
-        $this->menuExtension->getMenu($menuInstance, array('path'), $options);
+
+        self::callTwigFunction($this->extension, 'oro_menu_get', [$menuInstance, ['path'], $options]);
     }
 
     /**
@@ -139,14 +144,14 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderException()
     {
-        $this->menuExtension->render(array());
+        self::callTwigFunction($this->extension, 'oro_menu_render', [[]]);
     }
 
     public function testRenderMenuInstance()
     {
         $options = array();
         $renderer = 'test';
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
             ->setMethods(array('getExtra'))
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
@@ -180,7 +185,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     public function testRenderMenuInstanceWithExtra($options)
     {
         $renderer = 'test';
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
             ->setMethods(array('getExtra'))
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
@@ -194,7 +199,9 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
         $runtimeOptions = array(
             'template' => 'test_runtime.tpl'
         );
-        $this->menuExtension->setMenuConfiguration($options);
+        $this->menuConfiguration->expects(self::once())
+            ->method('getTemplates')
+            ->willReturn($options);
         $this->assertRender($menuInstance, $menuInstance, $runtimeOptions, $renderer);
     }
 
@@ -232,7 +239,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFilterUnallowedItems($items, $expected)
     {
-        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')
+        $menu = $this->getMockBuilder(ItemInterface::class)
             ->getMockForAbstractClass();
 
         $menu->expects($this->atLeastOnce())
@@ -250,7 +257,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->menuExtension->render($menu);
+        self::callTwigFunction($this->extension, 'oro_menu_render', [$menu]);
     }
 
     protected function collectResultItemsData($item)
@@ -437,7 +444,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getMenuItem($label, $isAllowed = true, $children = array(), $uri = '')
     {
-        $menu = $this->getMockBuilder('Knp\Menu\MenuItem')
+        $menu = $this->getMockBuilder(MenuItem::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getLabel', 'getUri', 'hasChildren', 'getChildren', 'getIterator', 'count'))
             ->getMock();
@@ -483,12 +490,16 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('render')
             ->with($menuInstance, $options, $renderer)
             ->will($this->returnValue('MENU'));
-        $this->assertEquals('MENU', $this->menuExtension->render($menu, $options, $renderer));
+
+        $this->assertEquals(
+            'MENU',
+            self::callTwigFunction($this->extension, 'oro_menu_render', [$menu, $options, $renderer])
+        );
     }
 
     protected function assertGetMenuString($menu, $path, $options)
     {
-        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+        $menuInstance = $this->getMockBuilder(ItemInterface::class)
             ->setMethods(array('getChild', 'getExtra'))
             ->getMockForAbstractClass();
         $menuInstance->expects($this->once())
@@ -499,6 +510,7 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with($menu, $options)
             ->will($this->returnValue($menuInstance));
+
         return $menuInstance;
     }
 }
