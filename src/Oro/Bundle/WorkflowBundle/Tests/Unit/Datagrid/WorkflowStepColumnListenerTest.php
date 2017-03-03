@@ -366,7 +366,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                     'field_type' => WorkflowStepSelectType::NAME,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
-                                        'multiple' => true
+                                        'multiple' => true,
+                                        'translatable_options' => false
                                     ]
                                 ],
                                 'label' => 'oro.workflow.workflowstep.grid.label'
@@ -460,7 +461,8 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                                     'field_type' => WorkflowStepSelectType::NAME,
                                     'field_options' => [
                                         'workflow_entity_class' => self::ENTITY_FULL_NAME,
-                                        'multiple' => true
+                                        'multiple' => true,
+                                        'translatable_options' => false
                                     ]
                                 ],
                                 'label' => 'oro.workflow.workflowstep.grid.label'
