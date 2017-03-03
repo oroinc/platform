@@ -16,6 +16,7 @@
         "ext-gd": "*",
         "ext-xml": "*",
         "ext-zip": "*",
+        "ext-openssl": "*",
         "ext-mcrypt": "*",
         "symfony/symfony": "2.8.*, !=2.8.10, <=2.8.13",
         "twig/twig": "1.29.*",

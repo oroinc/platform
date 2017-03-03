@@ -98,7 +98,7 @@ class SegmentWidgetOptionsListener
             '_controller' => 'OroDataAuditBundle:Api/Rest/Audit:getFields'
         ];
         $subRequest = $this->request->duplicate(['_format' => 'json'], null, $path);
-        $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::MASTER_REQUEST);
+        $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
 
         return $response->getContent();
     }

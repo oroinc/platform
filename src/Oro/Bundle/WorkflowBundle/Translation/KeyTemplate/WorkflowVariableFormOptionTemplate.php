@@ -13,4 +13,12 @@ class WorkflowVariableFormOptionTemplate extends WorkflowVariableTemplate
     {
         return parent::getTemplate() . '.{{ option_name }}';
     }
+
+    /**
+     * @return array
+     */
+    public function getRequiredKeys()
+    {
+        return array_merge(parent::getRequiredKeys(), ['option_name']);
+    }
 }

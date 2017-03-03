@@ -137,3 +137,12 @@ services:
               - '@translator'
           tags:
               - { name: kernel.event_listener, event: oro_security.event.load_fields_metadata.after, method: onLoad }
+
+    oro_currency.extension.doctrine_type_mapping:
+        class: 'Oro\Component\Action\Model\DoctrineTypeMappingExtension'
+        public: false
+        calls:
+            - [addDoctrineTypeMapping, ['currency', 'string']]
+            - [addDoctrineTypeMapping, ['money_value', 'float']]
+        tags:
+            - { name: oro.action.extension.doctrine_type_mapping }
