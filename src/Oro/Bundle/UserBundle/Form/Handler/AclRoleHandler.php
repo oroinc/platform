@@ -328,7 +328,7 @@ class AclRoleHandler
      */
     protected function getRolePrivileges(AbstractRole $role)
     {
-        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
+        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role), $this->getAclGroup());
     }
 
     /**
