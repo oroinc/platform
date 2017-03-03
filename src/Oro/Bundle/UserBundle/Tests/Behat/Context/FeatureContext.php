@@ -50,7 +50,7 @@ class FeatureContext extends OroFeatureContext implements
      *
      * @Given I am logged out
      */
-    public function iAmLoggedOut($loginAndPassword = 'admin')
+    public function iAmLoggedOut()
     {
         $uri = $this->getContainer()->get('router')->generate('oro_user_security_logout');
         $this->visitPath($uri);
