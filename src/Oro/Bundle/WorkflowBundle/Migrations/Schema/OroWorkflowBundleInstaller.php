@@ -71,6 +71,7 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('updated', 'datetime', ['notnull' => false]);
         $table->addColumn('data', 'text', ['notnull' => false]);
         $table->addIndex(['workflow_name'], 'idx_169789ae1bbc6e3d', []);
+        $table->addIndex(['entity_class', 'entity_id'], 'oro_workflow_item_entity_idx', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['current_step_id'], 'idx_169789aed9bf9b19', []);
         $table->addUniqueIndex(['entity_id', 'workflow_name'], 'oro_workflow_item_entity_definition_unq');

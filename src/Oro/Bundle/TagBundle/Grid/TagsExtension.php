@@ -64,7 +64,7 @@ class TagsExtension extends AbstractTagsExtension
         return
             parent::isApplicable($config) &&
             !$this->isDisabled() &&
-            !$this->isReportOrSegmentGrid($config) &&
+            !$this->isUnsupportedGridPrefix($config) &&
             $this->isGridRootEntityTaggable($config) &&
             null !== $config->offsetGetByPath(self::PROPERTY_ID_PATH) &&
             $this->isAccessGranted();

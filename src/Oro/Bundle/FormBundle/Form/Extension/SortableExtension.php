@@ -11,7 +11,9 @@ use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 class SortableExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
+    const POSITION_FIELD_NAME = '_position';
+
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
@@ -22,9 +24,10 @@ class SortableExtension extends AbstractTypeExtension
             return;
         }
 
-        $builder->add('_position', 'hidden', [
+        $builder->add(self::POSITION_FIELD_NAME, 'hidden', [
             'property_path' => $options['sortable_property_path'],
-            'data' => '0',
+            'block_name' => 'hidden',
+            'empty_data' => '0',
             'attr' => [
                 'class' => 'position-input',
             ],

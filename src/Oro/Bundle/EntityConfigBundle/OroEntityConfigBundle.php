@@ -28,14 +28,14 @@ class OroEntityConfigBundle extends Bundle
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createAnnotationMappingDriver(
                 ['Oro\Bundle\EntityConfigBundle\Audit\Entity'],
-                [__DIR__ . DIRECTORY_SEPARATOR . 'Audit' . DIRECTORY_SEPARATOR . 'Entity']
+                [$this->getPath() . DIRECTORY_SEPARATOR . 'Audit' . DIRECTORY_SEPARATOR . 'Entity']
             )
         );
 
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createAnnotationMappingDriver(
                 ['Oro\Bundle\EntityConfigBundle\Attribute\Entity'],
-                [__DIR__ . DIRECTORY_SEPARATOR . 'Attribute' . DIRECTORY_SEPARATOR . 'Entity']
+                [$this->getPath() . DIRECTORY_SEPARATOR . 'Attribute' . DIRECTORY_SEPARATOR . 'Entity']
             )
         );
 
