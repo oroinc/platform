@@ -3,238 +3,183 @@ layout:
         - '@setBlockTheme':
             themes: 'button.html.twig'
 
-        - '@add':
-            id: style_book_button_element_group_element
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_default
-                label: Default Button
+        - '@setOption':
+            id: page_title
+            optionName: defaultValue
+            optionValue: 'oro_frontend_style_book.groups.buttons.title'
 
-        - '@add':
-            id: style_book_button_element_wrapp
-            parentId: style_book_button_element_group_element
-            blockType: group_element_item
+        - '@addTree':
+            items:
+                group_element_button_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_default
+                      label: Default Button
+                group_element_item_button:
+                    blockType: group_element_item
+                style_book_button_element:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element
-            parentId: style_book_button_element_wrapp
-            blockType: block
+                group_element_button_action_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_acction
+                      label: Action Button
+                group_element_item_button_action:
+                    blockType: group_element_item
+                style_book_button_element_action:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_group_element_action
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_acction
-                label: Action Button
+                group_element_button_info_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_info
+                      label: Info Button
+                group_element_item_button_info:
+                    blockType: group_element_item
+                style_book_button_element_info:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_wrapp_action
-            parentId: style_book_button_element_group_element_action
-            blockType: group_element_item
+                group_element_button_primary_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_primary
+                      label: Primary Button
+                group_element_item_button_primary:
+                    blockType: group_element_item
+                style_book_button_element_primary:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_action
-            parentId: style_book_button_element_wrapp_action
-            blockType: block
+                group_element_button_link_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_link
+                      label: Link Button
+                group_element_item_button_link:
+                    blockType: group_element_item
+                style_book_button_element_link:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_group_element_info
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_info
-                label: Info Button
+                group_element_button_large_size_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_large_size
+                      label: Large Button (type 1, --large)
+                group_element_item_button_large_size:
+                    blockType: group_element_item
+                style_book_button_element_large_size:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_wrapp_info
-            parentId: style_book_button_element_group_element_info
-            blockType: group_element_item
+                group_element_button_size_l_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_size_l
+                      label: Large Button (type 2, --size-l)
+                group_element_item_button_size_l:
+                    blockType: group_element_item
+                style_book_button_element_size_l:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_info
-            parentId: style_book_button_element_wrapp_info
-            blockType: block
+                group_element_button_size_m_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_size_m
+                      label: Medium Button (--size-m)
+                group_element_item_button_size_m:
+                    blockType: group_element_item
+                style_book_button_element_size_m:
+                    blockType: block
 
+                group_element_button_size_s_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_size_s
+                      label: Small Button (--size-s)
+                group_element_item_button_size_s:
+                    blockType: group_element_item
+                style_book_button_element_size_s:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_group_element_primary
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_primary
-                label: Primary Button
+                group_element_button_element_group_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_group
+                      label: Drop-Down Button Group
+                group_element_item_button_element_group:
+                    blockType: group_element_item
+                style_book_button_element_group:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_wrapp_primary
-            parentId: style_book_button_element_group_element_primary
-            blockType: group_element_item
+                group_element_button_element_inline_group_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_inline_group
+                      label: Inline Icon Button Group
+                group_element_item_button_element_inline_group:
+                    blockType: group_element_item
+                style_book_button_element_inline_group:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_primary
-            parentId: style_book_button_element_wrapp_primary
-            blockType: block
+                group_element_button_element_btn_group_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_inline_btn_group
+                      label: Horizontal Text Button Group
+                group_element_item_button_btn_group:
+                    blockType: group_element_item
+                style_book_button_element_btn_group:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_group_element_link
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_link
-                label: Link Button
+                group_element_button_element_btn_group_vertical_view:
+                    blockType: group_element
+                    options:
+                      anchor: button_inline_group_vertical
+                      label: Vertical Text Button Group
+                group_element_item_button_btn_group_vertical:
+                    blockType: group_element_item
+                style_book_button_element_btn_group_vertical:
+                    blockType: block
 
-        - '@add':
-            id: style_book_button_element_wrapp_link
-            parentId: style_book_button_element_group_element_link
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_link
-            parentId: style_book_button_element_wrapp_link
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_large_size
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_large_size
-                label: Large Button (type 1, --large)
-
-        - '@add':
-            id: style_book_button_element_wrapp_large_size
-            parentId: style_book_button_element_group_element_large_size
-            blockType: group_element_item
-        - '@add':
-            id: style_book_button_element_large_size
-            parentId: style_book_button_element_wrapp_large_size
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_size_l
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_size_l
-                label: Large Button (type 2, --size-l)
-
-        - '@add':
-            id: style_book_button_element_wrapp_size_l
-            parentId: style_book_button_element_group_element_size_l
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_size_l
-            parentId: style_book_button_element_wrapp_size_l
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_size_m
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_size_m
-                label: Medium Button (--size-m)
-
-        - '@add':
-            id: style_book_button_element_wrapp_size_m
-            parentId: style_book_button_element_group_element_size_m
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_size_m
-            parentId: style_book_button_element_wrapp_size_m
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_size_s
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_size_s
-                label: Small Button (--size-s)
-
-        - '@add':
-            id: style_book_button_element_wrapp_size_s
-            parentId: style_book_button_element_group_element_size_s
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_size_s
-            parentId: style_book_button_element_wrapp_size_s
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_group
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_group
-                label: Drop-Down Button Group
-
-        - '@add':
-            id: style_book_button_element_wrapp_group
-            parentId: style_book_button_element_group_element_group
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_group
-            parentId: style_book_button_element_wrapp_group
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_inline_group
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_inline_group
-                label: Inline Icon Button Group
-
-        - '@add':
-            id: style_book_button_element_wrapp_inline_group
-            parentId: style_book_button_element_group_element_inline_group
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_inline_group
-            parentId: style_book_button_element_wrapp_inline_group
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_btn_group
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_inline_btn_group
-                label: Horizontal Text Button Group
-
-        - '@add':
-            id: style_book_button_element_wrapp_btn_group
-            parentId: style_book_content
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_btn_group
-            parentId: style_book_button_element_wrapp_btn_group
-            blockType: block
-
-        - '@add':
-            id: style_book_button_element_group_element_group_vertical
-            parentId: style_book_content
-            blockType: group_element
-            options:
-                anchor: button_inline_group_vertical
-                label: Vertical Text Button Group
-
-        - '@add':
-            id: style_book_button_element_wrapp_btn_group_vertical
-            parentId: style_book_button_element_group_element_group_vertical
-            blockType: group_element_item
-
-        - '@add':
-            id: style_book_button_element_btn_group_vertical
-            parentId: style_book_button_element_wrapp_btn_group_vertical
-            blockType: block
+            tree:
+                style_book_content:
+                    group_element_button_view:
+                        group_element_item_button:
+                            style_book_button_element: ~
+                    group_element_button_action_view:
+                        group_element_item_button_action:
+                            style_book_button_element_action: ~
+                    group_element_button_info_view:
+                        group_element_item_button_info:
+                            style_book_button_element_info: ~
+                    group_element_button_primary_view:
+                        group_element_item_button_primary:
+                            style_book_button_element_primary: ~
+                    group_element_button_link_view:
+                        group_element_item_button_link:
+                            style_book_button_element_link: ~
+                    group_element_button_large_size_view:
+                        group_element_item_button_large_size:
+                            style_book_button_element_large_size: ~
+                    group_element_button_size_l_view:
+                        group_element_item_button_size_l:
+                            style_book_button_element_size_l: ~
+                    group_element_button_size_m_view:
+                        group_element_item_button_size_m:
+                            style_book_button_element_size_m: ~
+                    group_element_button_size_s_view:
+                        group_element_item_button_size_s:
+                            style_book_button_element_size_s: ~
+                    group_element_button_element_group_view:
+                        group_element_item_button_element_group:
+                            style_book_button_element_group: ~
+                    group_element_button_element_inline_group_view:
+                        group_element_item_button_element_inline_group:
+                            style_book_button_element_inline_group: ~
+                    group_element_button_element_btn_group_view:
+                        group_element_item_button_btn_group:
+                            style_book_button_element_btn_group: ~
+                    group_element_button_element_btn_group_vertical_view:
+                        group_element_item_button_btn_group_vertical:
+                            style_book_button_element_btn_group_vertical: ~
 
     conditions: 'context["action"]=="forms"'
