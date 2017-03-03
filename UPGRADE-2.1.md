@@ -418,6 +418,7 @@ LayoutBundle
     - removed property `protected $configManager`
     - removed property `protected $profilerEnabled`
 - Changed default value option name for `page_title` block type, from `text` to `defaultValue`
+- Added alias `layout` for `oro_layout.layout_manager` service to make it more convenient to access it from container
 
 LocaleBundle
 ------------
