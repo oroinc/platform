@@ -71,4 +71,124 @@
     }
 }
 
+@mixin nav-tabs(
+        // Selectors
+        $nav-tabs: '.nav-tabs',
+        $nav-tabs-item: '.nav-item',
+        $nav-tabs-active: '.active',
+        $nav-tabs-link: '.nav-link',
+
+        // tabs wrapper
+        $nav-tabs-background: null,
+        $nav-tabs-offset: null,
+        $nav-tabs-inner-offset: null,
+        $nav-tabs-border: null,
+        $nav-tabs-border-width: null,
+        $nav-tabs-border-style: null,
+        $nav-tabs-border-color: null,
+        $nav-tabs-align-items: null,
+        $nav-tabs-justify-content: flex-start,
+        $nav-tabs-wrap: nowrap,
+        $nav-tabs-gap: 0,
+
+        // tabs item
+        $nav-tabs-item-flex: null,
+        
+        // tabs link
+        $nav-tabs-link-background: null,
+        $nav-tabs-link-inner-offset: null,
+        $nav-tabs-link-text-align: center,
+        $nav-tabs-link-color: null,
+        $nav-tabs-link-border: null,
+        $nav-tabs-link-border-width: null,
+        $nav-tabs-link-border-style: null,
+        $nav-tabs-link-border-color: null,
+        
+        // tabs link hover
+        $nav-tabs-link-hover-background: null,
+        $nav-tabs-link-hover-inner-offset: null,
+        $nav-tabs-link-hover-color: null,
+        $nav-tabs-link-hover-border: null,
+        $nav-tabs-link-hover-border-width: null,
+        $nav-tabs-link-hover-border-style: null,
+        $nav-tabs-link-hover-border-color: null,
+
+        // tabs link active
+        $nav-tabs-link-active-background: null,
+        $nav-tabs-link-active-inner-offset: null,
+        $nav-tabs-link-active-color: null,
+        $nav-tabs-link-active-border: null,
+        $nav-tabs-link-active-border-width: null,
+        $nav-tabs-link-active-border-style: null,
+        $nav-tabs-link-active-border-color: null,
+    ) {
+    #{$nav-tabs} {
+        margin: $nav-tabs-offset;
+        padding: $nav-tabs-inner-offset;
+        
+        display: flex;
+        flex-wrap: $nav-tabs-wrap;
+        align-items: $nav-tabs-align-items;
+        justify-content: $nav-tabs-justify-content;
+        
+        background: $nav-tabs-background;
+        border: $nav-tabs-border;
+        border-width: $nav-tabs-border-width;
+        border-style: $nav-tabs-border-style;
+        border-color: $nav-tabs-border-color;
+
+        &:after {
+            // Disable bootstrap clearfix
+            content: none;
+        }
+    }
+
+    #{$nav-tabs-item} {
+        flex: $nav-tabs-item-flex;
+
+        &:not(:first-child) {
+            margin-left: $nav-tabs-gap;
+        }
+    }
+    
+    #{$nav-tabs-link} {
+        padding: $nav-tabs-link-inner-offset;
+
+        background: $nav-tabs-link-background;
+        border: $nav-tabs-link-border;
+        border-width: $nav-tabs-link-border-width;
+        border-style: $nav-tabs-link-border-style;
+        border-color: $nav-tabs-link-border-color;
+
+        color: $nav-tabs-link-color;
+        text-align: $nav-tabs-link-text-align;
+
+        @include hover-focus {
+            padding: $nav-tabs-link-hover-inner-offset;
+
+            background: $nav-tabs-link-hover-background;
+            border: $nav-tabs-link-hover-border;
+            border-width: $nav-tabs-link-hover-border-width;
+            border-style: $nav-tabs-link-hover-border-style;
+            border-color: $nav-tabs-link-hover-border-color;
+
+            color: $nav-tabs-link-hover-color;
+        }
+    }
+
+    #{$nav-tabs-item}#{$nav-tabs-active} #{$nav-tabs-link} {
+        padding: $nav-tabs-link-active-inner-offset;
+
+        background: $nav-tabs-link-active-background;
+        border: $nav-tabs-link-active-border;
+        border-width: $nav-tabs-link-active-border-width;
+        border-style: $nav-tabs-link-active-border-style;
+        border-color: $nav-tabs-link-active-border-color;
+
+        color: $nav-tabs-link-active-color;
+    }
+
+    @content;
+}
+
 @import 'mixins-for-components';
