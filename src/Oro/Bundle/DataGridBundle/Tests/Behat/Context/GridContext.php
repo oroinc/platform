@@ -9,7 +9,8 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Table;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\TableHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -273,13 +274,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Country | Ukraine             |
      *            | State   | Kharkivs'ka Oblast' |
      *
-     * @Then /^(?:|I )should see (?P<content>([\w\s]+)) in grid with following data:$/
+     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
      */
     public function assertRowValues($content, TableNode $table)
     {
         /** @var Grid $grid */
         $grid = $this->elementFactory->findElementContains('Grid', $content);
-        /** @var GridHeader $gridHeader */
+
+        /** @var TableHeader $gridHeader */
         $gridHeader = $grid->getElement('GridHeader');
         $row = $grid->getRowByContent($content);
 
@@ -321,11 +323,27 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Assert record position in table
+     * It is find record by text and assert its position
+     * Example: Then Zyta Zywiec must be first record in appropriate table
+     * Example: And John Doe must be first record in appropriate table
+     *
+     * @Then /^(?P<content>([\w\s]+)) must be (?P<rowNumber>(first|second|[\d]+)) record in appropriate table$/
+     */
+    public function assertRowContentInTable($content, $rowNumber)
+    {
+        /** @var Table $table */
+        $table = $this->findElementContains('Table', $content);
+        $row = $table->getRowByNumber($this->getNumberFromString($rowNumber));
+        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
+    }
+
+    /**
      * String filter
      * Example: When I filter First Name as Contains "Aadi"
      * Example: And filter Name as is equal to "User"
      *
-     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s]+))"$/
+     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s\.\_\%]+))"$/
      */
     public function applyStringFilter($filterName, $type, $value)
     {
@@ -421,7 +439,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Asserts that no record with provided content in grid
      * Example: And there is no "Glorious workflow" in grid
      *
-     * @Then /^there is no "(?P<record>([\w\s]+))" in grid$/
+     * @Then /^there is no "(?P<record>([\w\s\%]+))" in grid$/
      * @param string $record
      */
     public function thereIsNoInGrid($record)
