@@ -80,6 +80,9 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
     public function testViewAction()
     {
+        //Workaround until BAP-14050 is resolved
+        $this->translateStepLabels();
+
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_workflow_definition_view', ['name' => LoadWorkflowDefinitions::MULTISTEP]),
@@ -103,6 +106,9 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
     public function testConfigurationAction()
     {
+        //Workaround until BAP-14050 is resolved
+        $this->translateStepLabels();
+
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_workflow_definition_configure', ['name' => LoadWorkflowDefinitions::MULTISTEP]),
@@ -116,9 +122,6 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
 
-        $workflow = $this->workflowManager->getWorkflow(LoadWorkflowDefinitions::MULTISTEP);
-
-        $this->assertContains($workflow->getLabel(), $crawler->html());
         $this->assertContains('Var1Value', $crawler->html());
 
         // update variable value
@@ -198,5 +201,34 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     private function getObjectManager($className)
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+    }
+
+    /**
+     * Translates step labels for test workflow
+     */
+    private function translateStepLabels()
+    {
+        $translationsManager = $this->client->getContainer()->get('oro_translation.manager.translation');
+        $translationsManager->saveTranslation(
+            'oro.workflow.test_multistep_flow.step.starting_point.label',
+            'Step starting point',
+            'en',
+            'workflows'
+        );
+        $translationsManager->saveTranslation(
+            'oro.workflow.test_multistep_flow.step.second_point.label',
+            'Second step',
+            'en',
+            'workflows'
+        );
+        $translationsManager->saveTranslation(
+            'oro.workflow.test_multistep_flow.step.third_point.label',
+            'Third step',
+            'en',
+            'workflows'
+        );
+
+        $translationsManager->flush();
+        $this->client->getContainer()->get('translator.default')->rebuildCache();
     }
 }
