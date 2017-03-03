@@ -103,7 +103,12 @@ class Form extends Element
      */
     public function findField($locator)
     {
-        if ($field = parent::findField($locator)) {
+        $selector = is_array($locator)
+            ? $locator
+            : ['type' => 'named', 'locator' => ['field', $locator]];
+        $field = $this->find($selector['type'], $selector['locator']);
+
+        if ($field) {
             if ($field->hasAttribute('type') && 'file' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('FileField', $field);
             }

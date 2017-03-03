@@ -20,6 +20,11 @@ MessageQueue Component
 - Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
 - Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
 
+Action Component
+----------------
+- Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
+- Added Class `Oro\Component\Action\Model\DoctrineTypeMappingExtension`. That can be used as base for services definitions
+
 ActionBundle
 ------------
 - `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
@@ -35,6 +40,7 @@ ActionBundle
     - removed property `protected $optionsHelper`
     - removed property `protected $buttonProvider`
     - removed property `protected $searchContextProvider`
+- Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
 
 ActivityListBundle
 ------------------

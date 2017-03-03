@@ -274,7 +274,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Country | Ukraine             |
      *            | State   | Kharkivs'ka Oblast' |
      *
-     * @Then /^(?:|I )should see (?P<content>([\w\s]+)) in grid with following data:$/
+     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
      */
     public function assertRowValues($content, TableNode $table)
     {
@@ -343,7 +343,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I filter First Name as Contains "Aadi"
      * Example: And filter Name as is equal to "User"
      *
-     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s]+))"$/
+     * @When /^(?:|I )filter (?P<filterName>([\w\s]+)) as (?P<type>([\w\s]+)) "(?P<value>([\w\s\.\_\%]+))"$/
      */
     public function applyStringFilter($filterName, $type, $value)
     {
@@ -439,7 +439,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Asserts that no record with provided content in grid
      * Example: And there is no "Glorious workflow" in grid
      *
-     * @Then /^there is no "(?P<record>([\w\s]+))" in grid$/
+     * @Then /^there is no "(?P<record>([\w\s\%]+))" in grid$/
      * @param string $record
      */
     public function thereIsNoInGrid($record)
