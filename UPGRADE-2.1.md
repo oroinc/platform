@@ -638,6 +638,11 @@ SecurityBundle
 - Class `Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $securityFacade`
+- Interface `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`
+    - signature of method `getAllowedPermissions` changed, added third argument `string|null aclGroup` default `null`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    - signature of method `getPermissionsForType` changed, added second argument `string|null aclGroup` default `null`
+
 
 SegmentBundle
 -------------
