@@ -14,6 +14,13 @@
                             );
 
     background: $select-bg;
+    
+    /* Hide expand button of select in IE11
+     * Remove when stop supporting IE11
+     */
+    &::-ms-expand {
+        display: none;
+    }
 
     @include element-state('hover') {
         text-decoration: none;
