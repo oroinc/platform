@@ -38,7 +38,7 @@ composer install
 Install application without fixture in prod mode:
 
 ```bash
-app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=OroCRM --env=prod --sample-data=n
+app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=ORO --env=prod --sample-data=n
 ```
 
 ### Run tests
@@ -304,7 +304,7 @@ Feature: User login
 
 Scenario: Success login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
@@ -312,7 +312,7 @@ Scenario: Success login
 
 Scenario Outline: Fail login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | <login>    |
       | Password | <password> |
   And I press "Log in"

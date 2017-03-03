@@ -16,6 +16,14 @@ MessageQueue Component
 - Class `Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand`
     - removed the constructor
     - removed property `protected $consumer`
+- Unify percentage value for `Job::$jobProgress`. Now 100% is stored as 1 instead of 100.
+- Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
+- Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
+
+Action Component
+----------------
+- Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
+- Added Class `Oro\Component\Action\Model\DoctrineTypeMappingExtension`. That can be used as base for services definitions
 
 ActionBundle
 ------------
@@ -35,6 +43,7 @@ ActionBundle
 - Added interfaces `Oro\Bundle\ActionBundle\Model\ParameterInterface` and `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`
 - Implemented `Oro\Bundle\ActionBundle\Model\EntityParameterInterface` interface in `Oro\Bundle\ActionBundle\Model\Attribute` class
 - Added `getInternalType()` method to `Oro\Bundle\ActionBundle\Model\Attribute` class
+- Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
 
 ActivityListBundle
 ------------------
@@ -72,6 +81,8 @@ AttachmentBundle
     - removed property `protected $manager`
     - removed property `protected $attachmentConfigProvider`
     - removed property `protected $doctrine`
+- Class `Oro\Bundle\AttachmentBundle\Manager\FileManager`
+    - method `writeStreamToStorage` was changed to `public`
 
 BatchBundle
 -----------
@@ -145,6 +156,10 @@ DataGridBundle
 - Class `Oro\Bundle\DataGridBundle\Controller\GridController`
    - renamed method `filterMetadata` to `filterMetadataAction`
 
+
+DistributionBundle
+------------------
+- The method `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handle` is deprecated. Use `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handleErrors` instead.
 
 EmailBundle
 -----------
@@ -251,6 +266,12 @@ EntityExtendBundle
     - removed property `protected $propertyAccessor`
     - removed property `protected $eventDispatcher`
     - removed property `protected $securityFacade`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension`
+- Class `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension`
+    - the construction signature of was changed. Added fourth argument `FieldsHelper $fieldsHelper`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension`
 
 EntityMergeBundle
 -----------------
@@ -457,6 +478,11 @@ LocaleBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $formatter`
 
+MessageQueueBundle
+------------------
+- The service `oro_message_queue.job.calculate_root_job_status_service` was renamed to `oro_message_queue.job.root_job_status_calculator` and marked as `private`
+- The service `oro_message_queue.job.calculate_root_job_progress_service` was renamed to `oro_message_queue.job.root_job_progress_calculator` and marked as `private`
+
 MigrationBundle
 ---------------
 - The parameter `oro_migration.twig.schema_dumper.class` was removed from DIC
@@ -618,6 +644,11 @@ SecurityBundle
 - Class `Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $securityFacade`
+- Interface `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`
+    - signature of method `getAllowedPermissions` changed, added third argument `string|null aclGroup` default `null`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    - signature of method `getPermissionsForType` changed, added second argument `string|null aclGroup` default `null`
+
 
 SegmentBundle
 -------------
@@ -872,6 +903,8 @@ WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $workflowManager`
+- Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand`.
+- Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand`.
 
 TestFrameworkBundle
 -------------------
@@ -909,3 +942,15 @@ QueryDesignerBundle
         `ManagerRegistry` $doctrine,
         `DatagridGuesser` $datagridGuesser,
         `EntityNameResolver` $entityNameResolver
+
+CronBundle
+-------------------
+ - Interface `Oro\Bundle\CronBundle\Command\CronCommandInterface`
+    - deprecated method `isActive`
+
+TagBundle
+---------
+- Class `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+    - removed method `isReportOrSegmentGrid`
+    - removed method `addReportOrSegmentGridPrefix`
+    - added UnsupportedGridPrefixesTrait

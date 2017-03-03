@@ -23,6 +23,9 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
         foreach ($allPrivileges as $privilege) {
             $category = $this->getPrivilegeCategory($privilege, $categories);
             $permissions = $privilege->getPermissions()->toArray();
+            if (0 === count($permissions)) {
+                continue;
+            }
             $permission = reset($permissions);
             $capabilitiesData[$category]['items'][] = [
                 'id'                      => $privilege->getIdentity()->getId(),
