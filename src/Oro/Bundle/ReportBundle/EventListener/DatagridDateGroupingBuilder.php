@@ -93,6 +93,8 @@ class DatagridDateGroupingBuilder
     }
 
     /**
+     * Adds required filter configuration with default values
+     *
      * @param DatagridConfiguration $config
      * @param string $rootEntityClass
      * @param string $dateFieldName
@@ -140,6 +142,8 @@ class DatagridDateGroupingBuilder
     }
 
     /**
+     * Checks if skipEmptyPeriods filter should be used and configures it
+     *
      * @param DatagridConfiguration $config
      * @param bool $useSkipEmptyPeriodsFilter
      * @param string $notNullableField
@@ -164,6 +168,8 @@ class DatagridDateGroupingBuilder
     }
 
     /**
+     * Adds two more columns to datagrid config related to grouping
+     *
      * @param DatagridConfiguration $config
      */
     protected function changeColumnsSection(DatagridConfiguration $config)
@@ -183,6 +189,8 @@ class DatagridDateGroupingBuilder
     }
 
     /**
+     * Configures sorter section for newly added date grouping columns
+     *
      * @param DatagridConfiguration $config
      */
     protected function changeSortersSection(DatagridConfiguration $config)
@@ -202,6 +210,10 @@ class DatagridDateGroupingBuilder
     }
 
     /**
+     * Replaces the "from" section of query to be the calendar date table, and moves the original "from"
+     * table to "left join" section. This kind of hack is required as the filter needs a left join which is not possible
+     * in doctrine
+     *
      * @param DatagridConfiguration $config
      * @param string $dateFieldTableAlias
      * @param string $dateFieldName
@@ -237,6 +249,8 @@ class DatagridDateGroupingBuilder
     }
 
     /**
+     * Add group by for calendarDate.date, which is required by postgresql
+     *
      * @param DatagridConfiguration $config
      */
     protected function changeGroupBySection(DatagridConfiguration $config)

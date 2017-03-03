@@ -122,6 +122,9 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider validConfigurationProvider
+     * @param Report $report
+     * @param [] $inputConfig
+     * @param [] $expectedConfig
      */
     public function testValidDateGroupingConfiguration($report, $inputConfig, $expectedConfig)
     {
@@ -134,7 +137,6 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertSame($this->config->toArray(), $expectedConfig);
     }
-
 
     /**
      * @return array

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\AbstractType;
 
 use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
 
@@ -25,7 +25,7 @@ class DateGroupingType extends AbstractType
         $builder
             ->add(
                 static::FIELD_NAME_ID,
-                'oro_date_field_choice',
+                DateFieldChoiceType::class,
                 [
                     'required' => true,
                     'label' => 'oro.report.form.date_grouping_field.label',

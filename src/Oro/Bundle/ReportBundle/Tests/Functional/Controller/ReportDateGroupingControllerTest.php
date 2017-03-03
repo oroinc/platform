@@ -32,8 +32,10 @@ class ReportDateGroupingControllerTest extends WebTestCase
         $form = $crawler->selectButton('Save and Close')->form();
         $form = $this->fillDefaultForm($form);
         $form['oro_report_form[dateGrouping][useDateGroupFilter]'] = true;
+
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
+
         $errors = $crawler->filterXPath(self::ERROR_UL_XPATH)->text();
         $message = $this->translator->trans('oro.report.date_grouping.date_field.mandatory', [], 'validators');
         $this->assertContains($message, $errors);
@@ -48,14 +50,17 @@ class ReportDateGroupingControllerTest extends WebTestCase
         $form['oro_report_form[dateGrouping][useDateGroupFilter]'] = true;
         $form['oro_report_form[dateGrouping][fieldName]'] = 'createdAt';
         $form['input_action'] = json_encode(['route' => 'oro_report_view', 'params' => ['id' => '$id']]);
+
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
+
         $this->assertContains("Report saved", $this->client->getResponse()->getContent());
         $pageComponentOptionsDiv = $crawler->filterXPath("//div[starts-with(@id, 'grid-oro_report_table')]");
         $options = json_decode($pageComponentOptionsDiv->attr('data-page-component-options'), true);
         $this->assertArrayHasKey('data', $options);
         $this->assertArrayHasKey('data', $options['data']);
         $this->assertGreaterThan(5, $options['data']['data']);
+
         $firstData = reset($options['data']['data']);
         $this->assertArrayHasKey('cDate', $firstData);
         $this->assertArrayHasKey('dateGrouping', $firstData);

@@ -25,10 +25,10 @@ class DateFieldChoiceType extends FieldChoiceType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'placeholder'            => 'oro.entity.form.choose_entity_field',
                 'entity_choice_selector' => null
-            )
+            ]
         );
     }
 

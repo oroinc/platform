@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\EventListener;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
 
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
@@ -56,8 +56,7 @@ class DateGroupingFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnPostSetDataReturnsNull()
     {
-        $this->form->expects($this->never())
-            ->method('get');
+        $this->form->expects($this->never())->method('get');
         $this->assertNull($this->dateGroupingFormSubscriber->onPostSetData($this->event));
     }
 
