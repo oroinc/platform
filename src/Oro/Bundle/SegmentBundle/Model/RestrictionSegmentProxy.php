@@ -55,6 +55,10 @@ class RestrictionSegmentProxy extends AbstractSegmentProxy
                 ]
             );
             $this->preparedDefinition = json_encode($this->preparedDefinition);
+
+            //@Todo: use this approach instead of merging in scope of #BAP-14132
+            //$decoded['columns'][] = ['name' => $identifier, 'distinct' => true];
+            //$this->preparedDefinition = json_encode($decoded);
         }
 
         return $this->preparedDefinition;

@@ -166,6 +166,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function addOrderByColumn($columnAlias, $columnSorting)
     {
-        // do nothing, order could not change results
+        //@Todo: implement in scope of #BAP-14132
+        //$this->qb->addOrderBy($columnAlias, $columnSorting);
     }
 }

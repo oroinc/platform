@@ -182,6 +182,7 @@ class SegmentFilter extends EntityFilter
         $expr              = $expressionBuilder->in($this->get(FilterUtility::DATA_NAME_KEY), $query->getDQL());
 
         $this->applyFilterToClause($ds, $expr);
+        $this->applyLimit($ds, $data, $queryBuilder);
 
         $params = $query->getParameters();
         /** @var Parameter $param */
@@ -190,6 +191,28 @@ class SegmentFilter extends EntityFilter
         }
 
         return true;
+    }
+
+    /**
+     * //@Todo: consider to change placement of this logic in scope of #BAP-14132
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param $data
+     * @param QueryBuilder $qb
+     */
+    private function applyLimit(FilterDatasourceAdapterInterface $ds, $data, QueryBuilder $qb)
+    {
+        /** @var Segment $segment */
+        $segment = $data['value'];
+        $recordsLimit = $segment->getRecordsLimit();
+
+        if ($recordsLimit) {
+            $idName = $this->get(FilterUtility::DATA_NAME_KEY);
+
+            $res = $qb->getQuery()->setMaxResults($recordsLimit)->getArrayResult();
+            $ids = array_column($res, 'id');
+
+            $ds->getQueryBuilder()->andWhere($ds->expr()->in($idName, $ids));
+        }
     }
 
     /**
