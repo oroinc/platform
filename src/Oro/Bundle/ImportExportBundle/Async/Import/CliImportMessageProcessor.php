@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Routing\Router;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
@@ -13,8 +18,6 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
 
 class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -48,13 +51,15 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
         ConfigManager $configManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Router $router
     ) {
         $this->cliImportHandler = $cliImportHandler;
         $this->jobRunner = $jobRunner;
         $this->producer = $producer;
         $this->configManager = $configManager;
         $this->logger = $logger;
+        $this->router = $router;
     }
 
     /**
@@ -90,23 +95,32 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                 $result = $this->cliImportHandler->handleImport(
                     $body['jobName'],
                     $body['processorAlias'],
-                    $body['inputFormat'],
-                    $body['inputFilePrefix'],
                     $body['options']
                 );
 
                 $summary = sprintf(
-                    'Import from file %s for the %s is completed, success: %s, counts: %d, errors: %d, message: %s',
-                    $body['fileName'],
-                    $result['success'],
-                    $result['counts'],
+                    'Import from file %s was completed,
+                    processed: %s, read: %d, errors: %d, added: %d, replaced: %d: ',
+                    basename($body['fileName']),
+                    $result['counts']['process'],
+                    $result['counts']['read'],
                     $result['errors'],
-                    $result['message']
+                    $result['counts']['add'],
+                    $result['counts']['replace']
                 );
 
                 $this->logger->info($summary);
 
                 if ($body['notifyEmail']) {
+                    if ($result['errors']) {
+                        $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
+                            'oro_importexport_error_log',
+                            ['jobCode' => $result['jobCode']]
+                        );
+                        $downloadLink = sprintf('<br><a href="%s" target="_blank">Download</a>', $url);
+                        $summary .= $downloadLink;
+                    }
+
                     $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
                     $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
                     $this->producer->send(
@@ -115,7 +129,7 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                             'fromEmail' => $fromEmail,
                             'fromName' => $fromName,
                             'toEmail' => $body['notifyEmail'],
-                            'subject' => $result['message'],
+                            'subject' => sprintf('Result of import file %s', basename($body['fileName'])),
                             'body' => $summary
                         ]
                     );

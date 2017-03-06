@@ -41,6 +41,7 @@ class CliImportHandler extends AbstractImportHandler
             'counts'         => $counts,
             'errors'         => $errors,
             'entityName'     => $entityName,
+            'jobCode'        => $jobResult->getJobCode(),
         ];
     }
 
@@ -72,6 +73,7 @@ class CliImportHandler extends AbstractImportHandler
             'counts'  => $counts,
             'errors'  => $errors,
             'message' => $message,
+            'jobCode' => $jobResult->getJobCode(),
         ];
     }
 
