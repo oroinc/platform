@@ -58,7 +58,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'recordsLimit',
-                'text',
+                'integer',
                 ['required' => false]
             )
             ->will($this->returnSelf());

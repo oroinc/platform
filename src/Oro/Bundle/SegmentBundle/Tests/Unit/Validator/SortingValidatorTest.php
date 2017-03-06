@@ -75,6 +75,22 @@ class SortingValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @test
      */
+    public function withRecordsLimitAndWithoutDefinition()
+    {
+        $this->segment
+            ->method('getRecordsLimit')
+            ->will($this->returnValue(10));
+        $this->segment
+            ->method('getDefinition')
+            ->will($this->returnValue(null));
+
+        $this->validator->validate($this->segment, $this->sortingConstraint);
+        $this->assertNoViolation();
+    }
+
+    /**
+     * @test
+     */
     public function withRecordsLimitAndWithoutSortedColumns()
     {
         $message = 'Please specify sorting for at least one column.';
@@ -91,6 +107,27 @@ class SortingValidatorTest extends AbstractConstraintValidatorTest
         $this->validator->validate($this->segment, $this->sortingConstraint);
         $this->buildViolation($message)
             ->assertRaised();
+    }
+
+    /**
+     * @test
+     */
+    public function withRecordsLimitAndWithSortedAndUnsortedColumns()
+    {
+        $this->segment
+            ->method('getRecordsLimit')
+            ->will($this->returnValue(10));
+        $this->segment
+            ->method('getDefinition')
+            ->will(
+                $this->returnValue(
+                    '{"columns":[{"name":"field","label":"Field","sorting":"asc","func":null},'.
+                    '{"name":"field2","label":"Field2","sorting":"","func":null}]}'
+                )
+            );
+
+        $this->validator->validate($this->segment, $this->sortingConstraint);
+        $this->assertNoViolation();
     }
 
     /**

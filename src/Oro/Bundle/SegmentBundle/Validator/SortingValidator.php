@@ -29,17 +29,22 @@ class SortingValidator extends ConstraintValidator
      */
     public function validate($segment, Constraint $constraint)
     {
-        if (!$segment instanceof Segment || !$segment->getRecordsLimit()) {
+        if (!$segment instanceof Segment || !$segment->getRecordsLimit() || !$segment->getDefinition()) {
             return;
         }
-        /** @var array[] $definition */
+        /** @var null|array[] $definition */
         $definition = json_decode($segment->getDefinition(), true);
+        $isSortedColumnExists = false;
         foreach ($definition['columns'] as $column) {
-            if (!array_key_exists('sorting', $column) || !$column['sorting']) {
-                $this->context->addViolation(
-                    $this->translator->trans($constraint->message)
-                );
+            if (array_key_exists('sorting', $column) && $column['sorting']) {
+                $isSortedColumnExists = true;
+                break 1;
             }
+        }
+        if (!$isSortedColumnExists) {
+            $this->context->addViolation(
+                $this->translator->trans($constraint->message)
+            );
         }
     }
 }

@@ -14,7 +14,7 @@ Oro\Bundle\SegmentBundle\Entity\Segment:
             - NotBlank:     ~
         recordsLimit:
             - Type:
-                type: digit
+                type: integer
             - GreaterThan:
                 value: 0
         entity:
