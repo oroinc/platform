@@ -55,12 +55,19 @@ services:
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 
+    oro_entity_extend.datagrid.extension.fields_helper:
+        class: Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper
+        arguments:
+            - "@oro_entity_config.config_manager"
+            - "@oro_featuretoggle.checker.feature_checker"
+
     oro_entity_extend.datagrid.extension.additional_fields:
         class: %oro_entity_extend.datagrid.extension.additional_fields.class%
         arguments:
             - "@oro_entity_config.config_manager"
             - "@oro_entity.orm.entity_class_resolver"
             - "@oro_datagrid.datagrid.guesser"
+            - "@oro_entity_extend.datagrid.extension.fields_helper"
         tags:
             - { name: oro_datagrid.extension }
 
@@ -70,6 +77,7 @@ services:
             - "@oro_entity_config.config_manager"
             - "@oro_entity.orm.entity_class_resolver"
             - "@oro_datagrid.datagrid.guesser"
+            - "@oro_entity_extend.datagrid.extension.fields_helper"
             - "@oro_featuretoggle.checker.feature_checker"
         tags:
             - { name: oro_datagrid.extension }
@@ -284,6 +292,7 @@ services:
         arguments:
             - "@oro_entity_extend.migration.options_manager"
             - "@oro_entity_extend.migration.entity_metadata_helper"
+            - '@oro_entity_config.provider_config_bag'
         tags:
             - { name: oro_migration.extension, extension_name: extend }
 

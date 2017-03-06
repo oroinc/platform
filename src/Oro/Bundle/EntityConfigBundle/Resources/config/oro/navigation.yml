@@ -28,14 +28,14 @@ navigation:
 
     titles:
         oro_entityconfig_index: ~
-        oro_entityconfig_view: '%%entityName%%'
-        oro_entityconfig_update: '%%entityName%%'
-        oro_entityconfig_field_update: '%%fieldName%% - %%entityName%%'
-        oro_attribute_create: oro.ui.create_entity
-        oro_attribute_save: oro.ui.create_entity
-        oro_attribute_update: %%attributeName%% - oro.ui.edit
+        oro_entityconfig_view: '%entityName%'
+        oro_entityconfig_update: '%entityName%'
+        oro_entityconfig_field_update: '%fieldName% - %entityName%'
+        oro_attribute_create: 'oro.ui.create_entity'
+        oro_attribute_save: 'oro.ui.create_entity'
+        oro_attribute_update: '%attributeName% - oro.ui.edit'
         oro_attribute_index: ~
         oro_attribute_family_index: ~
-        oro_attribute_family_view: '%%name%%'
-        oro_attribute_family_create: oro.ui.create_entity
-        oro_attribute_family_update:  %%familyName%% - oro.ui.edit
+        oro_attribute_family_view: '%name%'
+        oro_attribute_family_create: 'oro.ui.create_entity'
+        oro_attribute_family_update:  '%familyName% - oro.ui.edit'
