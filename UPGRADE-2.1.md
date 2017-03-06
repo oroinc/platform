@@ -850,6 +850,9 @@ WorkflowBundle
 - Added `variable_definitions` to workflow definition
 - Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler`
     - Changed `assemble` method signature from `assemble(array $configuration, array $definitionsConfiguration, $steps, $attributes)` to `assemble(array $configuration, $steps, $attributes)`, where `$configuration` is now the full workflow configuration
+- Class `Oro\Bundle\WorkflowBundle\Model\Workflow`:
+    - added `TransitionManager $transitionManager = null` as constructor's 6th parameter
+    - added `VariableManager $variableManager = null` as constructor's 7th parameter
 - Added new `CONFIGURE` permission for workflows
 - Interface `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer`:
     - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
