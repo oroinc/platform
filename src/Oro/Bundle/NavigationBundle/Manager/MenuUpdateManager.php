@@ -297,7 +297,8 @@ class MenuUpdateManager
         $parent = $this->findMenuItem($menu, $parentKey);
         $menuUpdates = [];
 
-        foreach ($treeItems as $index => $treeItem) {
+        $index = 0;
+        foreach ($treeItems as $treeItem) {
             $currentUpdate = $this->findOrCreateMenuUpdate($menu, $treeItem->getKey(), $scope);
             $menuUpdates[] = $currentUpdate;
 
@@ -308,6 +309,7 @@ class MenuUpdateManager
             }
 
             $currentUpdate->setPriority($position + $index);
+            $index++;
         }
 
         $order = [];
