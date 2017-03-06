@@ -7,7 +7,6 @@ oro.translation:
 
     action:
         disable: 'Disable'
-        reset_translation: 'Reset translation to the original value'
         enable: 'Enable'
         download: 'Download'
         install: 'Install'
@@ -19,6 +18,13 @@ oro.translation:
         install.title: 'Install "%language%" language'
         update.title: 'Update "%language%" language'
         rebuild_cache.label: 'Update Cache'
+        reset:
+            label: 'Reset Translation'
+            hint: 'Reset Translation to Original Value'
+            success: 'Selected translations were reset to their original values.'
+            failure: 'Failed to reset translations to its original values.'
+            nothing_to_reset: 'You should select at least one translation with translated value.'
+
     language:
         entity_label: 'Language'
         entity_plural_label: 'Languages'

@@ -209,6 +209,13 @@ class TranslationRepositoryTest extends WebTestCase
         $this->assertEquals($result, $this->repository->getTranslationsData($language->getId()));
     }
 
+    public function testDeleteAll()
+    {
+        $this->assertNotEmpty($this->repository->findOneBy([]));
+        $this->repository->deleteAll();
+        $this->assertEmpty($this->repository->findAll());
+    }
+
     /**
      * @return array
      */

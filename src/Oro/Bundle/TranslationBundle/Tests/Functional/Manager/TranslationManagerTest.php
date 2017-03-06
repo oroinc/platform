@@ -14,6 +14,9 @@ use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
+/**
+ * @dbIsolationPerTest
+ */
 class TranslationManagerTest extends WebTestCase
 {
     /** @var TranslationManager */
@@ -169,6 +172,39 @@ class TranslationManagerTest extends WebTestCase
 
         $translation = $this->repository->findTranslation($key, $locale, $domain);
         $this->assertNull($translation);
+    }
+
+    public function testResetTranslations()
+    {
+        $id = $this->getReference(LoadTranslations::TRANSLATION_KEY_1)->getId();
+        $this->assertEquals(1, $this->manager->resetTranslations($id));
+        $ids = [
+            $this->getReference(LoadTranslations::TRANSLATION_KEY_2)->getId(),
+            $this->getReference(LoadTranslations::TRANSLATION_KEY_3)->getId(),
+        ];
+        $this->assertEquals(2, $this->manager->resetTranslations($ids));
+
+        $allIds = $ids;
+        $allIds[] = $id;
+        $this->assertCount(3, $this->repository->findBy(['id' => $allIds]));
+        $this->manager->flush();
+
+        $this->assertCount(0, $this->repository->findBy(['id' => $allIds]));
+        $this->assertNotEmpty($this->repository->findTranslation(
+            LoadTranslations::TRANSLATION_KEY_4,
+            LoadLanguages::LANGUAGE2,
+            LoadTranslations::TRANSLATION_KEY_DOMAIN
+        ));
+    }
+
+    public function testResetAllTranslations()
+    {
+        $translation = $this->manager->saveTranslation('test_key', 'test_value', 'en', 'test_domain');
+        $this->manager->resetTranslations($this->getReference(LoadTranslations::TRANSLATION_KEY_1)->getId());
+        $this->manager->resetAllTranslations();
+        $this->manager->flush();
+        $this->assertEmpty($this->repository->findAll());
+        $this->assertEmpty($translation->getId());
     }
 
     public function testFindTranslationKey()

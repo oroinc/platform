@@ -304,27 +304,41 @@ operations:
                 type: 'success'
 
     oro_translation_translation_reset:
-        label: oro.translation.action.reset_translation
+        label: oro.translation.action.reset.hint
         frontend_options:
-            confirmation: oro.translation.action.confirmation.reset_translation.message
+            confirmation:
+                title: oro.translation.action.reset.title
+                message: oro.translation.action.reset.message
+                okText: oro.translation.action.reset.ok
         acl_resource: [TRANSLATE, $language]
         applications: [default]
         datagrids:
             - oro-translation-translations-grid
         button_options:
             icon: fa-refresh
+        datagrid_options:
+            mass_action:
+                type: reset_translations
+                label: oro.translation.action.reset.label
+                icon: refresh
+                route: oro_translation_mass_reset
+                handler: oro_translation.mass_actions.reset_translation_handler
+                data_identifier: translation.id
+                entity_name: 'Oro\Bundle\TranslationBundle\Entity\Translation'
+                acl_resource: TRANSLATE
+                confirmation: true
+                defaultMessages:
+                    confirm_title: oro.translation.action.reset.title
+                    confirm_content: oro.translation.action.reset.content
+                    confirm_ok: oro.translation.action.reset.ok
         preconditions:
             '@not_blank': $id
         actions:
             - '@call_service_method':
                 service: oro_translation.manager.translation
-                method: saveTranslation
+                method: resetTranslations
                 method_parameters:
-                    - $translationKey.key
-                    - null
-                    - $language.code
-                    - $translationKey.domain
-                    - $scope
+                    - $id
             - '@call_service_method':
                 service: oro_translation.manager.translation
                 method: flush
