@@ -210,10 +210,10 @@ class JobStorage
                 $this->getEntityManager()->getConfiguration()
             );
             $em->merge($job);
-            $em->flush();
+            $em->flush($job);
         } else {
             $this->getEntityManager()->persist($job);
-            $this->getEntityManager()->flush();
+            $this->getEntityManager()->flush($job);
         }
     }
 

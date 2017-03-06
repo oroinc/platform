@@ -1,3 +1,6 @@
+parameters:
+    oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
+
 services:
     oro_message_queue.consumption.extensions:
         class: 'Oro\Component\MessageQueue\Consumption\ChainExtension'
@@ -21,6 +24,14 @@ services:
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
 
+    oro_message_queue.consumption.interrupt_consumption_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension'
+        public: false
+        arguments:
+            - '%oro_message_queue.consumption.interrupt_filepath%'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
     oro_message_queue.consumption.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
         arguments:
@@ -30,4 +41,11 @@ services:
     oro_message_queue.command.consume_messages:
         class: 'Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand'
         tags:
-            - { name: console.command }
+            - { name: 'console.command' }
+
+    oro_message_queue.listener.update_schema:
+        class: 'Oro\Bundle\MessageQueueBundle\EventListener\UpdateSchemaListener'
+        arguments:
+            - '%oro_message_queue.consumption.interrupt_filepath%'
+        tags:
+            - { name: 'kernel.event_listener', event: 'oro.entity_extend.entity.schema.update', priority: -250, method: 'interruptConsumption' }
