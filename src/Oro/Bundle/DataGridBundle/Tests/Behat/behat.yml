@@ -1,12 +1,24 @@
 oro_behat_extension:
   elements:
+    Table:
+      selector: 'table'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Table
+
+    TableHeader:
+      selector: 'thead:nth-child(1)'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TableHeader
+
+    TableRow:
+      selector: 'tbody tr'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TableRow
+
     Grid:
       selector: 'div.grid-container'
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
 
     GridHeader:
       selector: '.grid-header:nth-child(1)'
-      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridHeader
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\TableHeader
 
     GridRow:
       selector: 'tbody tr'
