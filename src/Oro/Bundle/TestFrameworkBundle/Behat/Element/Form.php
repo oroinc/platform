@@ -182,9 +182,10 @@ class Form extends Element
 
     /**
      * @param array|string $value
+     * @param null|string $name
      * @return array|string
      */
-    public static function normalizeValue($value)
+    public static function normalizeValue($value, $name = null)
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
@@ -200,8 +201,17 @@ class Form extends Element
             return array_map('trim', explode(',', trim($value, '[]')));
         }
 
-        if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
+        if (strtotime(trim($value))) {
             return new \DateTime($value);
+        }
+
+        if ($name == 'Recurrence') {
+            $matches = null;
+            preg_match('/<(?P<strDate>.+)>/', $value, $matches);
+            if (!empty($matches['strDate'])) {
+                $strDate = new \DateTime($matches['strDate']);
+                $value = str_replace($matches[0], $strDate->format('M j, Y'), $value);
+            }
         }
 
         return $value;
