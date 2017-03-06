@@ -7,7 +7,7 @@ oro.translation:
 
     action:
         disable: 'Disable'
-        remove_translation: 'Remove translation'
+        reset_translation: 'Reset translation to the original value'
         enable: 'Enable'
         download: 'Download'
         install: 'Install'

@@ -9,4 +9,4 @@
 oro.translation:
     action:
         confirmation:
-            remove_translation.message: 'Delete translated value?'
+            reset_translation.message: 'Reset translated value?'

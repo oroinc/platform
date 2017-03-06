@@ -303,16 +303,16 @@ operations:
                 message: oro.translation.translation.message.rebuild_cache
                 type: 'success'
 
-    oro_translation_translation_remove:
-        label: oro.translation.action.remove_translation
+    oro_translation_translation_reset:
+        label: oro.translation.action.reset_translation
         frontend_options:
-            confirmation: oro.translation.action.confirmation.remove_translation.message
+            confirmation: oro.translation.action.confirmation.reset_translation.message
         acl_resource: [TRANSLATE, $language]
         applications: [default]
         datagrids:
             - oro-translation-translations-grid
         button_options:
-            icon: fa-trash-o
+            icon: fa-refresh
         preconditions:
             '@not_blank': $id
         actions:
