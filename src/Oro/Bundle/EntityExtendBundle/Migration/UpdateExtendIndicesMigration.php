@@ -219,6 +219,14 @@ class UpdateExtendIndicesMigration implements
      */
     protected function isEnabled($options)
     {
-        return !isset($options['datagrid']['is_visible']) || $options['datagrid']['is_visible'];
+        if (!isset($options['datagrid']['is_visible']) || $options['datagrid']['is_visible']) {
+            return true;
+        }
+
+        if (isset($options['extend']['unique']) && $options['extend']['unique']) {
+            return true;
+        }
+
+        return false;
     }
 }

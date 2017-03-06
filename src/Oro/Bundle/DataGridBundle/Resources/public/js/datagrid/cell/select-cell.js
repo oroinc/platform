@@ -50,6 +50,10 @@ define([
          * @inheritDoc
          */
         render: function() {
+            if (_.isEmpty(this.optionValues)) {
+                return;
+            }
+
             var render = SelectCell.__super__.render.apply(this, arguments);
 
             this.enterEditMode();

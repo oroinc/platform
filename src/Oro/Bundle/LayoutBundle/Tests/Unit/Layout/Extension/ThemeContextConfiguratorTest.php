@@ -62,4 +62,17 @@ class ThemeContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->contextConfigurator->setRequest(new Request());
         $this->contextConfigurator->setRequest(null);
     }
+
+    public function testConfigureContextWithRequestDefaultTheme()
+    {
+        $context = new LayoutContext();
+
+        $request = Request::create('');
+
+        $this->contextConfigurator->setRequest($request);
+        $this->contextConfigurator->configureContext($context);
+
+        $context->resolve();
+        $this->assertSame('default', $context->get('theme'));
+    }
 }

@@ -207,7 +207,7 @@ class RestJsonApiTestCase extends ApiTestCase
     protected function assertResponseContains($expectedContent, Response $response, $entity = null)
     {
         if ($entity) {
-            self::getReferenceRepository()->addReference('entity', $entity);
+            $this->getReferenceRepository()->addReference('entity', $entity);
         }
 
         $content = json_decode($response->getContent(), true);
@@ -219,7 +219,7 @@ class RestJsonApiTestCase extends ApiTestCase
             $expectedContent = Yaml::parse(file_get_contents($file));
         }
 
-        self::assertIsContained(
+        self::assertArrayContains(
             self::processTemplateData($expectedContent),
             $content
         );
@@ -245,7 +245,7 @@ class RestJsonApiTestCase extends ApiTestCase
         }
 
         array_walk_recursive($data, function (&$item, $key) use ($idReferences) {
-            if ($key == 'id') {
+            if ($key === 'id') {
                 if (isset($idReferences[(int)$item])) {
                     $item = '@'.$idReferences[$item].'->id';
                 }
@@ -256,106 +256,6 @@ class RestJsonApiTestCase extends ApiTestCase
             __DIR__.'/responses/'.$filename,
             Yaml::dump($data, 8)
         );
-    }
-
-    /**
-     * @param array $expected
-     * @param array $content
-     * @param array $path
-     * @param int   $deep
-     * @param bool  $repeatedly
-     */
-    protected static function assertIsContained(
-        array $expected,
-        array $content,
-        $path = [],
-        $deep = 0,
-        $repeatedly = false
-    ) {
-        $deep++;
-        foreach ($expected as $key => $value) {
-            $path[$deep] = $key;
-            self::assertArrayHasKey($key, $content);
-            if (is_array($value)) {
-                if (is_int($key)) {
-                    try {
-                        self::assertIsContained($value, $content[$key], $path, $deep);
-                    } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-                        if ($repeatedly) {
-                            throw $e;
-                        }
-                        //this can happen cause prostgres and mysql return elements in different order
-                        //find element path for failed element
-                        preg_match('/Failed assert "(?P<path>.*)" response property/', $e->getMessage(), $matches);
-                        $elementPath = explode('.', $matches['path']);
-                        $relatedPath = array_slice($elementPath, count($path));
-
-                        //sort array by key that assertIsContained was failed
-                        self::sortByNestedValue($expected, $relatedPath);
-                        self::sortByNestedValue($content, $relatedPath);
-
-                        //try again with sorted elements
-                        array_pop($path);
-                        $deep--;
-
-                        self::assertIsContained($expected, $content, $path, $deep, true);
-                    }
-                } else {
-                    self::assertIsContained($value, $content[$key], $path, $deep);
-                }
-            } else {
-                self::assertSame(
-                    $value,
-                    $content[$key],
-                    sprintf('Failed assert "%s" response property', implode('.', $path))
-                );
-            }
-        }
-    }
-
-    /**
-     * @param array $sourse
-     * @param array $relatedPath
-     */
-    protected static function sortByNestedValue(array &$sourse, array $relatedPath)
-    {
-        usort($sourse, function ($item1, $item2) use ($relatedPath) {
-            $value1 = self::getNestedElement($item1, $relatedPath);
-            $value2 = self::getNestedElement($item2, $relatedPath);
-            $onlyNumbersRegexp = '/^\d+$/';
-
-            if (preg_match($onlyNumbersRegexp, $value1) && preg_match($onlyNumbersRegexp, $value2)) {
-                $value1 = (int) $value1;
-                $value2 = (int) $value2;
-            }
-
-            if ($value1 == $value2) {
-                return 0;
-            };
-
-            return $value1 < $value2 ? -1 : 1;
-        });
-    }
-
-    /**
-     * Example:
-     * $path = [2, 'id'];
-     * $source = [
-     *    ['id' => 'a'],
-     *    ['id' => 'b'],
-     *    ['id' => 'c'],
-     *    ['id' => 'd'],
-     * ];
-     * echo $this->getNestedElement($source, $path); // "c"
-     * @param array $source
-     * @param array $path
-     * @return mixed
-     */
-    protected static function getNestedElement(array $source, array $path)
-    {
-        return array_reduce($path, function ($carry, $key) {
-            return $carry[$key];
-        }, $source);
     }
 
     /**

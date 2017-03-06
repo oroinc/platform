@@ -12,14 +12,6 @@ ACL implementation from Oro UserBundle.
 
 <a name="first-menu"></a>
 
-### Initialize Page Titles
-
-To load page titles from configs and controller annotations execute following command:
-
-```
-php app/console oro:navigation:init
-```
-
 ### Menu data sources
 
 Menu data can come from different sources:
@@ -160,12 +152,6 @@ Title can be defined with annotation together with route annotation:
 
 ```
 @TitleTemplate("Route title with %%parameter%%")
-```
-
-After titles update following command should be executed:
-
-```
-php app/console oro:navigation:init
 ```
 
 ## Rendering Menus
