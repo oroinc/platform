@@ -29,7 +29,13 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
      */
     protected $newKeyName;
 
-    public function __construct($configValueName, $configValueSection, $oldKeyName, $newKeyName)
+    /**
+     * @param string $configValueSection
+     * @param string $configValueName
+     * @param string $oldKeyName
+     * @param string $newKeyName
+     */
+    public function __construct($configValueSection, $configValueName, $oldKeyName, $newKeyName)
     {
         $this->configValueName = $configValueName;
         $this->configValueSection = $configValueSection;
@@ -63,7 +69,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $selectQuery = 'SELECT id, array_value FROM oro_config_value WHERE name = :name AND section = :section';
-        $selectQueryTypes = ['name' => 'string', 'section' => 'string'];
+        $selectQueryTypes = ['name' => Type::STRING, 'section' => Type::STRING];
         $selectQueryParameters = ['name' => $this->configValueName, 'section' => $this->configValueSection];
 
         $this->logQuery($logger, $selectQuery, $selectQueryParameters, $selectQueryTypes);
@@ -72,7 +78,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
         }
 
         $updateQuery = 'UPDATE oro_config_value SET array_value = :array_value WHERE id = :id';
-        $updateQueryTypes = ['array_value' => 'array', 'id' => 'integer'];
+        $updateQueryTypes = ['array_value' => TYPE::TARRAY, 'id' => TYPE::INTEGER];
 
         $selectStatement = $this->connection->prepare($selectQuery);
         $selectStatement->execute($selectQueryParameters);
