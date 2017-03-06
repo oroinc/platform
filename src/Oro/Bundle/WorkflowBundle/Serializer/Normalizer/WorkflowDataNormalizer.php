@@ -93,33 +93,6 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * @param Workflow $workflow
-     * @param ParameterInterface $attribute
-     * @param mixed $attributeValue
-     * @return mixed
-     */
-    protected function normalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
-    {
-        $normalizer = $this->findAttributeNormalizer('normalization', $workflow, $attribute, $attributeValue);
-
-        return $normalizer->normalize($workflow, $attribute, $attributeValue);
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param ParameterInterface $attribute
-     * @param mixed $attributeValue
-     * @return AttributeNormalizer
-     * @throws SerializerException
-     */
-    protected function denormalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
-    {
-        $normalizer = $this->findAttributeNormalizer('denormalization', $workflow, $attribute, $attributeValue);
-
-        return $normalizer->denormalize($workflow, $attribute, $attributeValue);
-    }
-
-    /**
-     * @param Workflow $workflow
      * @param          $attributeName
      *
      * @return bool
@@ -148,6 +121,33 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
             );
         }
         return $attribute;
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param ParameterInterface $attribute
+     * @param mixed $attributeValue
+     * @return mixed
+     */
+    protected function normalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    {
+        $normalizer = $this->findAttributeNormalizer('normalization', $workflow, $attribute, $attributeValue);
+
+        return $normalizer->normalize($workflow, $attribute, $attributeValue);
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param ParameterInterface $attribute
+     * @param mixed $attributeValue
+     * @return AttributeNormalizer
+     * @throws SerializerException
+     */
+    protected function denormalizeAttribute(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    {
+        $normalizer = $this->findAttributeNormalizer('denormalization', $workflow, $attribute, $attributeValue);
+
+        return $normalizer->denormalize($workflow, $attribute, $attributeValue);
     }
 
     /**

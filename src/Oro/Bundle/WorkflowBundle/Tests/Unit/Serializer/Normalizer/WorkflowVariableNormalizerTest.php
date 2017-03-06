@@ -39,6 +39,9 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     protected $normalizer;
 
+    /**
+     * Tests setup
+     */
     protected function setUp()
     {
         $this->attributeNormalizer = $this->createMock(
@@ -79,6 +82,9 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer = new WorkflowVariableNormalizer();
     }
 
+    /**
+     * Test variable normalization
+     */
     public function testNormalize()
     {
         $variableName = 'test_variable';
@@ -108,6 +114,9 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test variable denormalization
+     */
     public function testDenormalize()
     {
         $variableName = 'test_variable';
@@ -145,6 +154,9 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data, 'any_value'));
     }
 
+    /**
+     * @return array
+     */
     public function supportsNormalizationDataProvider()
     {
         return [
@@ -164,6 +176,9 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->normalizer->supportsDenormalization('any_value', $type));
     }
 
+    /**
+     * @return array
+     */
     public function supportsDenormalizationDataProvider()
     {
         return [
@@ -175,6 +190,9 @@ class WorkflowVariableNormalizerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @return array
+     */
     public function normalizeDirectionDataProvider()
     {
         return [

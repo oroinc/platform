@@ -585,6 +585,9 @@ class Workflow
     }
 
     /**
+     * Returns an array of variables. The class has an internal cache. Calling the method
+     * with $refresh parameter true will ignore cache, and assemble variables again
+     *
      * @param bool $refresh
      *
      * @return Collection|Variable[]

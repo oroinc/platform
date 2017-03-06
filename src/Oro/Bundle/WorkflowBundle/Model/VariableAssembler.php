@@ -119,9 +119,9 @@ class VariableAssembler extends BaseAbstractAssembler
         $this->assertVariableHasValidType($variable);
 
         if ('object' === $variable->getType()) {
-            $this->assertVariableHasClassOption($variable);
+            $this->assertParameterHasClassOption($variable);
         } else {
-            $this->assertVariableHasNoOptions($variable, ['class']);
+            $this->assertParameterHasNoOptions($variable, ['class']);
         }
     }
 
@@ -140,57 +140,6 @@ class VariableAssembler extends BaseAbstractAssembler
                     'Invalid variable type "%s", allowed types are "%s"',
                     $type,
                     implode('", "', $allowedTypes)
-                )
-            );
-        }
-    }
-
-    /**
-     * @param Variable $variable
-     * @param array $optionNames
-     * @throws AssemblerException If attribute is invalid
-     */
-    protected function assertVariableHasOptions(Variable $variable, array $optionNames)
-    {
-        foreach ($optionNames as $optionName) {
-            if (!$variable->hasOption($optionName)) {
-                throw new AssemblerException(
-                    sprintf('Option "%s" is required in variable "%s"', $optionName, $variable->getName())
-                );
-            }
-        }
-    }
-
-    /**
-     * @param Variable $variable
-     * @param array $optionNames
-     * @throws AssemblerException
-     */
-    protected function assertVariableHasNoOptions(Variable $variable, array $optionNames)
-    {
-        foreach ($optionNames as $optionName) {
-            if ($variable->hasOption($optionName)) {
-                throw new AssemblerException(
-                    sprintf('Option "%s" cannot be used in variable "%s"', $optionName, $variable->getName())
-                );
-            }
-        }
-    }
-
-    /**
-     * @param Variable $variable
-     * @throws AssemblerException
-     */
-    protected function assertVariableHasClassOption(Variable $variable)
-    {
-        $this->assertVariableHasOptions($variable, ['class']);
-
-        if (!class_exists($variable->getOption('class'))) {
-            throw new AssemblerException(
-                sprintf(
-                    'Class "%s" referenced by "class" option in variable "%s" not found',
-                    $variable->getOption('class'),
-                    $variable->getName()
                 )
             );
         }

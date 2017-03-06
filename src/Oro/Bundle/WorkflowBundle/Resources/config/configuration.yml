@@ -36,6 +36,7 @@ services:
 
     oro_workflow.configuration.handler.variable:
         class: 'Oro\Bundle\WorkflowBundle\Configuration\Handler\VariableHandler'
+        public: false
 
     oro_workflow.configuration.handler.transition:
         class: %oro_workflow.configuration.handler.transition.class%

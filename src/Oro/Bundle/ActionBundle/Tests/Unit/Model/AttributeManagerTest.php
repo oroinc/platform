@@ -117,7 +117,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param string $type
-     * @return \Oro\Bundle\ActionBundle\Model\Attribute
+     * @return Attribute
      */
     private function getAttributeObject($name, $type)
     {

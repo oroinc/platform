@@ -4,6 +4,8 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 class Attribute implements EntityParameterInterface
 {
+    const INTERNAL_TYPE_ATTRIBUTE = 'attribute';
+
     /**
      * @var string
      */
@@ -205,6 +207,6 @@ class Attribute implements EntityParameterInterface
      */
     public function getInternalType()
     {
-        return ParameterInterface::INTERNAL_TYPE_ATTRIBUTE;
+        return self::INTERNAL_TYPE_ATTRIBUTE;
     }
 }
