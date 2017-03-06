@@ -68,4 +68,6 @@ services:
 
     oro_test.config_cache:
         decorates: oro_config.cache
-        parent: oro.cache.abstract
+        parent: doctrine_cache.abstract.array
+        calls:
+            - [setNamespace, [ 'oro_config' ] ]

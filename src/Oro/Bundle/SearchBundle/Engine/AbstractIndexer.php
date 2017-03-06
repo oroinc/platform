@@ -167,4 +167,12 @@ abstract class AbstractIndexer implements IndexerInterface
 
         return is_array($entity) ? $entity : [$entity];
     }
+
+    /**
+     * @return int
+     */
+    public function getBatchSize()
+    {
+        return self::BATCH_SIZE;
+    }
 }

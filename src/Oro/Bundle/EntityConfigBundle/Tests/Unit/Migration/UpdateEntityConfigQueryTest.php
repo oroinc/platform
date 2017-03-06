@@ -5,27 +5,29 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
-use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigCascadeQuery;
+use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigQuery;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Psr\Log\LoggerInterface;
 
-class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
+class UpdateEntityConfigQueryTest extends \PHPUnit_Framework_TestCase
 {
     const FIELD_NAME = 'fieldName';
-    const CASCADE_TYPES_NEW_VALUE = ['all'];
 
     /** @var Connection|\PHPUnit_Framework_MockObject_MockObject */
     private $connection;
 
-    /** @var UpdateEntityConfigCascadeQuery */
+    /** @var UpdateEntityConfigQuery */
     private $query;
 
     /** @var string */
     private $relationFullName;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->connection = $this->createMock(Connection::class);
@@ -33,14 +35,6 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
             ->method('fetchAssoc')
             ->with('SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1', [TestEntity1::class])
             ->willReturn(['id' => '42', 'data' => 'data persisted payload serialized']);
-
-        $this->query = new UpdateEntityConfigCascadeQuery(
-            TestEntity1::class,
-            TestEntity2::class,
-            RelationType::MANY_TO_ONE,
-            self::FIELD_NAME,
-            self::CASCADE_TYPES_NEW_VALUE
-        );
 
         $this->relationFullName = sprintf(
             '%s|%s|%s|%s',
@@ -51,16 +45,24 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetDescription()
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @dataProvider getConfiguration
+     */
+    public function testGetDescription($key, $value)
     {
-        $statement = $this->setUpConnection();
+        $this->initializeQuery($key, $value);
+        $statement = $this->setUpConnection($key, $value);
         $statement->expects($this->never())->method('execute');
 
         $this->query->setConnection($this->connection);
 
         $description = sprintf(
-            'Update cascade value to "%s" for meta field "%s" from entity "%s" to entity "%s" with relation "%s".',
-            var_export(self::CASCADE_TYPES_NEW_VALUE, true),
+            'Update %s value to "%s" for meta field "%s" from entity "%s" to entity "%s" with relation "%s".',
+            $key,
+            var_export($value, true),
             self::FIELD_NAME,
             TestEntity1::class,
             TestEntity2::class,
@@ -82,9 +84,16 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUpdateCascadeValue()
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @dataProvider getConfiguration
+     */
+    public function testUpdateCascadeValue($key, $value)
     {
-        $statement = $this->setUpConnection();
+        $this->initializeQuery($key, $value);
+        $statement = $this->setUpConnection($key, $value);
         $statement->expects($this->once())->method('execute')->with(['data serialized payload to persist', '42']);
 
         $logger = new ArrayLogger;
@@ -106,8 +115,15 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testNoRelationAlert()
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @dataProvider getConfiguration
+     */
+    public function testNoRelationAlert($key, $value)
     {
+        $this->initializeQuery($key, $value);
         $this->connection->expects($this->at(1))
             ->method('convertToPHPValue')
             ->with('data persisted payload serialized', Type::TARRAY)
@@ -129,9 +145,10 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->at(3))
             ->method('warning')
             ->with(
-                'Cascade value for entity `{entity}` config field `{field}`' .
+                '{key} value for entity `{entity}` config field `{field}`' .
                 ' was not updated as relation `{relation}` is not defined in configuration.',
                 [
+                    'key' => ucfirst($key),
                     'entity' => TestEntity1::class,
                     'field' => self::FIELD_NAME,
                     'relation' => $this->relationFullName
@@ -143,9 +160,11 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $key
+     * @param $value
      * @return Statement|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function setUpConnection()
+    protected function setUpConnection($key, $value)
     {
         $this->connection->expects($this->at(1))
             ->method('convertToPHPValue')
@@ -154,9 +173,7 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
                 [
                     'extend' => [
                         'relation' => [
-                            $this->relationFullName => [
-                                'cascade' => ['old value']
-                            ]
+                            $this->relationFullName => [$key => $value]
                         ]
                     ]
                 ]
@@ -167,9 +184,7 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
                 [
                     'extend' => [
                         'relation' => [
-                            $this->relationFullName => [
-                                'cascade' => self::CASCADE_TYPES_NEW_VALUE
-                            ]
+                            $this->relationFullName => [$key => $value]
                         ]
                     ]
                 ],
@@ -184,5 +199,38 @@ class UpdateEntityConfigCascadeQueryTest extends \PHPUnit_Framework_TestCase
             ->willReturn($statement);
 
         return $statement;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfiguration()
+    {
+        return [
+            [
+                'on_delete',
+                'CASCADE'
+            ],
+            [
+                'cascade',
+                ['ALL']
+            ],
+        ];
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     */
+    protected function initializeQuery($key, $value)
+    {
+        $this->query = new UpdateEntityConfigQuery(
+            TestEntity1::class,
+            TestEntity2::class,
+            RelationType::MANY_TO_ONE,
+            self::FIELD_NAME,
+            $key,
+            $value
+        );
     }
 }

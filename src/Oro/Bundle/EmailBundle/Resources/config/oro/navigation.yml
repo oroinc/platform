@@ -62,12 +62,12 @@ navigation:
                     shortcut_compose_email: ~
 
     titles:
-        oro_email_view: "%%subject%% - My Emails - %%username%%"
+        oro_email_view: "%subject% - My Emails - %username%"
         oro_email_emailtemplate_index: ~
-        oro_email_emailtemplate_update: "Template %%name%% - Edit"
+        oro_email_emailtemplate_update: "Template %name% - Edit"
         oro_email_emailtemplate_create: "Create Email Template"
         oro_email_emailtemplate_clone: "Clone Email Template"
-        oro_email_user_emails: "My Emails - %%username%%"
-        oro_email_thread_view: "%%subject%% - My Emails"
-        oro_email_mailbox_update: "Mailbox %%label%% - Edit"
+        oro_email_user_emails: "My Emails - %username%"
+        oro_email_thread_view: "%subject% - My Emails"
+        oro_email_mailbox_update: "Mailbox %label% - Edit"
         oro_email_mailbox_create: "Create Mailbox"
