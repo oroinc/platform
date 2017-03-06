@@ -7,6 +7,11 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Doctrine\Common\Inflector\Inflector;
 
+/**
+ * Class Form
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @package Oro\Bundle\TestFrameworkBundle\Behat\Element
+ */
 class Form extends Element
 {
     /**
@@ -182,10 +187,9 @@ class Form extends Element
 
     /**
      * @param array|string $value
-     * @param null|string $name
      * @return array|string
      */
-    public static function normalizeValue($value, $name = null)
+    public static function normalizeValue($value)
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
@@ -201,16 +205,35 @@ class Form extends Element
             return array_map('trim', explode(',', trim($value, '[]')));
         }
 
-        if (strtotime(trim($value))) {
+        if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
             return new \DateTime($value);
         }
 
-        if ($name == 'Recurrence') {
-            $matches = null;
-            preg_match('/<(?P<strDate>.+)>/', $value, $matches);
-            if (!empty($matches['strDate'])) {
-                $strDate = new \DateTime($matches['strDate']);
-                $value = str_replace($matches[0], $strDate->format('M j, Y'), $value);
+        $value = self::checkAdditionalFunctions($value);
+
+        return $value;
+    }
+
+    /**
+     * Parse for string commands and execute they
+     * Example: "<DateTime:August 24 11:00 AM>" would be parsed to DateTime object with provided data
+     *          "Daily every 5 days, end by <Date:next month>" <> value will be replaced as well
+     *
+     * @param $value
+     * @return \DateTime|mixed
+     */
+    protected static function checkAdditionalFunctions($value)
+    {
+        $matches = [];
+        preg_match('/<(?P<function>[\w]+):(?P<value>.+)>/', $value, $matches);
+
+        if (!empty($matches['function']) && !empty($matches['value'])) {
+            if ('DateTime' === $matches['function']) {
+                $value = new \DateTime($matches['value']);
+            }
+            if ('Date' === $matches['function']) {
+                $parsed =  new \DateTime($matches['value']);
+                $value = str_replace($matches[0], $parsed->format('M j, Y'), $value);
             }
         }
 

@@ -19,16 +19,16 @@ class TimePicker extends Element
 
         if ($this->hasAttribute('data-validation')) {
             $timeSelect = $this->getPage()->findVisible('css', '.ui-timepicker-wrapper');
-            $time = $dateTime->format('H:i A');
+            $time = $dateTime->format('g:i A');
             /** @var NodeElement $li */
             foreach ($timeSelect->findAll('css', 'li') as $li) {
                 if ($time == $li->getText()) {
                     $li->mouseOver();
-                    $this->getPage()->find('css', '#oro-dropdown-mask')->click();
+                    $li->click();
                 }
             }
         } else {
-            parent::setValue(new InputValue(InputMethod::SET, $dateTime->format('H:i')));
+            parent::setValue(new InputValue(InputMethod::SET, $dateTime->format('g:i')));
             $this->clickSelectedTime();
         }
     }
