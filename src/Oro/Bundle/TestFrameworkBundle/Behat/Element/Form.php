@@ -15,10 +15,17 @@ class Form extends Element
      */
     public function fill(TableNode $table)
     {
+        $isEmbeddedForm = isset($this->options['embedded-id']);
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToIFrame($this->options['embedded-id']);
+        }
         foreach ($table->getRows() as $row) {
             $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
             $value = self::normalizeValue($row[1]);
             $this->fillField($locator, $value);
+        }
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToWindow();
         }
     }
 

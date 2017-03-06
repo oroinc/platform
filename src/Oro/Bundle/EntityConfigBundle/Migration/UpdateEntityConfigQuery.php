@@ -7,10 +7,7 @@ use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
-/**
- * Changes cascade option value for given relation in entity config
- */
-class UpdateEntityConfigCascadeQuery extends ParametrizedMigrationQuery
+class UpdateEntityConfigQuery extends ParametrizedMigrationQuery
 {
     /** @var string */
     protected $entityFrom;
@@ -27,19 +24,24 @@ class UpdateEntityConfigCascadeQuery extends ParametrizedMigrationQuery
     /** @var mixed */
     private $value;
 
+    /** @var mixed */
+    private $key;
+
     /**
      * @param string $entityFrom FQCN
      * @param string $entityTo FQCN
      * @param string $relationType one of \Oro\Bundle\EntityExtendBundle\Extend\RelationType constants
      * @param string $field
+     * @param string $key
      * @param mixed $value
      */
-    public function __construct($entityFrom, $entityTo, $relationType, $field, $value)
+    public function __construct($entityFrom, $entityTo, $relationType, $field, $key, $value)
     {
         $this->entityFrom = $entityFrom;
         $this->entityTo = $entityTo;
         $this->relationType = $relationType;
         $this->field = $field;
+        $this->key = $key;
         $this->value = $value;
     }
 
@@ -51,7 +53,8 @@ class UpdateEntityConfigCascadeQuery extends ParametrizedMigrationQuery
         $logger = new ArrayLogger();
         $logger->info(
             sprintf(
-                'Update cascade value to "%s" for meta field "%s" from entity "%s" to entity "%s" with relation "%s".',
+                'Update %s value to "%s" for meta field "%s" from entity "%s" to entity "%s" with relation "%s".',
+                $this->key,
                 var_export($this->value, true),
                 $this->field,
                 $this->entityFrom,
@@ -60,7 +63,7 @@ class UpdateEntityConfigCascadeQuery extends ParametrizedMigrationQuery
             )
         );
 
-        $this->updateConfig($logger, true);
+        $this->updateConfiguration($logger, true);
 
         return $logger->getMessages();
     }
@@ -70,14 +73,14 @@ class UpdateEntityConfigCascadeQuery extends ParametrizedMigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $this->updateConfig($logger);
+        $this->updateConfiguration($logger);
     }
 
     /**
      * @param LoggerInterface $logger
      * @param bool $dryRun
      */
-    protected function updateConfig(LoggerInterface $logger, $dryRun = false)
+    protected function updateConfiguration(LoggerInterface $logger, $dryRun = false)
     {
         $row = $this->fetchEntityConfigRow($logger);
 
@@ -87,9 +90,10 @@ class UpdateEntityConfigCascadeQuery extends ParametrizedMigrationQuery
 
         if (!isset($data['extend']['relation'][$fullRelationName])) {
             $logger->warning(
-                'Cascade value for entity `{entity}` config field `{field}`' .
+                '{key} value for entity `{entity}` config field `{field}`' .
                 ' was not updated as relation `{relation}` is not defined in configuration.',
                 [
+                    'key' => ucfirst($this->key),
                     'entity' => $this->entityFrom,
                     'field' => $this->field,
                     'relation' => $fullRelationName
@@ -99,7 +103,7 @@ class UpdateEntityConfigCascadeQuery extends ParametrizedMigrationQuery
             return;
         }
 
-        $data['extend']['relation'][$fullRelationName]['cascade'] = $this->value;
+        $data['extend']['relation'][$fullRelationName][$this->key] = $this->value;
 
         $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
 

@@ -64,31 +64,6 @@
         }
     }
 
-    &--create {
-        border-color: get-color('primary', 'base');
-        background-color: get-color('primary', 'base');
-        color: get-color('additional', 'ultra');
-
-        &:before {
-            content: '+';
-            display: inline-block;
-            margin-right: .3em;
-        }
-
-        @include element-state('hover') {
-            border-color: lighten(get-color('primary', 'base'), 5%);
-            background: lighten(get-color('primary', 'base'), 5%);
-        }
-
-        @include element-state('focus') {
-            border-color: lighten(get-color('primary', 'base'), 5%);
-        }
-        
-        &.no-icon:before {
-            display: none;
-        }
-    }
-
     &--info {
         border-color: get-color('primary', 'base');
         background-color: get-color('primary', 'base');
@@ -102,6 +77,10 @@
 
         @include element-state('focus') {
             border-color: lighten(get-color('primary', 'base'), 5%);
+        }
+
+        [class*=" fa-"] {
+            margin-right: $offset-x-s;
         }
     }
 
