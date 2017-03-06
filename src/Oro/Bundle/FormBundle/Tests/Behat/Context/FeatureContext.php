@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Behat\Context;
 
-use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 
@@ -63,26 +62,5 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
             $table->has('css', 'tbody tr i.handle'),
             "There is no drag-n-drop icon among rows in '$tableContent' table"
         );
-    }
-
-    /**
-     * Click on button or link on left panel in configuration menu
-     * Example: Given I click "Edit" on left panel
-     * Example: When I click "Save and Close" on left panel
-     *
-     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" on left panel$/
-     */
-    public function pressButtonOnLeftPanel($button)
-    {
-        $leftPanel = $this->getPage()->find('css', 'div.left-panel');
-        try {
-            $leftPanel->pressButton($button);
-        } catch (ElementNotFoundException $e) {
-            if ($this->getSession()->getPage()->hasLink($button)) {
-                $leftPanel->clickLink($button);
-            } else {
-                throw $e;
-            }
-        }
     }
 }
