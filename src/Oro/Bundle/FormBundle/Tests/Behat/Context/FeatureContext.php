@@ -34,7 +34,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     }
 
     /**
-     * @When /^I drag (?P<rowNum>([\d]+)) row on top in "(?P<tableContent>([\w\s]+))" table$/
+     * @When /^I drag (?P<rowNum>([\d]+)) row to the top in "(?P<tableContent>([\w\s]+))" table$/
      */
     public function dragRowOnTop($rowNum, $tableContent)
     {
