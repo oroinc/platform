@@ -5,6 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 
 class GridRow extends TableRow
 {
