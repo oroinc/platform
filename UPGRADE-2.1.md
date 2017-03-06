@@ -20,6 +20,11 @@ MessageQueue Component
 - Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
 - Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
 
+Action Component
+----------------
+- Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
+- Added Class `Oro\Component\Action\Model\DoctrineTypeMappingExtension`. That can be used as base for services definitions
+
 ActionBundle
 ------------
 - `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
@@ -35,6 +40,7 @@ ActionBundle
     - removed property `protected $optionsHelper`
     - removed property `protected $buttonProvider`
     - removed property `protected $searchContextProvider`
+- Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
 
 ActivityListBundle
 ------------------
@@ -241,6 +247,7 @@ EntityExtendBundle
     To create bidirectional relation you _MUST_ call `*InverseRelation` method respectively
     - call to `addOneToManyRelation` creates bidirectional relation according to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional)
     - deprecated `addOneToManyInverseRelation`
+    - throw exception when trying to use not allowed option while creating relation in migration
 - The parameter `oro_entity_extend.twig.extension.dynamic_fields.class` was removed from DIC
 - The parameter `oro_entity_extend.twig.extension.enum.class` was removed from DIC
 - The service `oro_entity_extend.twig.extension.dynamic_fields` was marked as `private`
@@ -257,6 +264,12 @@ EntityExtendBundle
     - removed property `protected $propertyAccessor`
     - removed property `protected $eventDispatcher`
     - removed property `protected $securityFacade`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension`
+- Class `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension`
+    - the construction signature of was changed. Added fourth argument `FieldsHelper $fieldsHelper`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension`
 
 EntityMergeBundle
 -----------------
@@ -302,26 +315,6 @@ FormBundle
 - The service `oro_form.twig.js_validation_extension` was removed
 - Class `Oro\Bundle\FormBundle\Twig\JsValidationExtension` was removed. Its functionality was moved to `Oro\Bundle\FormBundle\Twig\FormExtension`
 
-- Deprecation of class `Oro\Bundle\FormBundle\Model\UpdateHandler` use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` (`@oro_form.update_handler`) instead.
-    - changed `__constructor` signature: 
-        - first argument changed from `Symfony\Component\HttpFoundation\Request` to `Symfony\Component\HttpFoundation\RequestStack`
-        - fifth argument changed from `Symfony\Component\EventDispatcher\EventDispatcherInterface` to `Oro\Bundle\FormBundle\Form\Handler\FormHandler` as from handling encapsulation.
-        
-- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard `Oro\Bundle\FormBundle\Model\UpdateHandler`.
-So please consider to use it when for a new entity management development.
- 
-- Interface `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface` added for standard form handlers.
-- Class `Oro\Bundle\FormBundle\Form\Handler\FormHandler` added ('@oro_form.form.handler.default') as default form processing mechanism.
-- Tag `oro_form.form.handler` added to register custom form handlers under its `alias`.
-- Class `Oro\Bundle\FormBundle\Model\FormHandlerRegistry` added to collect tagged with `oro_form.form.handler` services.
-- Class `Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler` added as interface compatibility helper for callable.
-
-- Interface `Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface`  added for common update template data population.
-- Class `Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider` (`@oro_form.provider.from_template_data.default`) as default update template data provider.
-- Tag `oro_form.form_template_data_provider` added to register custom update template data providers.
-- Class `Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry` added to collect tagged with `oro_form.form_template_data_provider` services.
-- Class `Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider` added as interface compatibility helper for callable.
-
 HelpBundle
 ----------
 - The parameter `oro_help.twig.extension.class` was removed from DIC
@@ -329,7 +322,6 @@ HelpBundle
 - Class `Oro\Bundle\HelpBundle\Twig\HelpExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $linkProvider`
-
 
 ImapBundle
 ----------
@@ -423,6 +415,7 @@ LayoutBundle
     - removed property `protected $configManager`
     - removed property `protected $profilerEnabled`
 - Changed default value option name for `page_title` block type, from `text` to `defaultValue`
+- Added alias `layout` for `oro_layout.layout_manager` service to make it more convenient to access it from container
 
 LocaleBundle
 ------------
@@ -650,6 +643,11 @@ SecurityBundle
 - Class `Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $securityFacade`
+- Interface `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`
+    - signature of method `getAllowedPermissions` changed, added third argument `string|null aclGroup` default `null`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    - signature of method `getPermissionsForType` changed, added second argument `string|null aclGroup` default `null`
+
 
 SegmentBundle
 -------------
@@ -891,6 +889,13 @@ CronBundle
 -------------------
  - Interface `Oro\Bundle\CronBundle\Command\CronCommandInterface`
     - deprecated method `isActive`
+
+TagBundle
+---------
+- Class `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+    - removed method `isReportOrSegmentGrid`
+    - removed method `addReportOrSegmentGridPrefix`
+    - added UnsupportedGridPrefixesTrait
 
 Tree Component
 --------------
