@@ -45,6 +45,6 @@ navigation:
 
     titles:
         oro_tag_index:  ~
-        oro_tag_update: '%%tag.name%% Tag - Edit'
+        oro_tag_update: '%tag.name% Tag - Edit'
         oro_tag_create: 'Create Tag'
-        oro_tag_search: 'Records tagged as "%%tag.name%%"'
+        oro_tag_search: 'Records tagged as "%tag.name%"'
