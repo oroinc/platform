@@ -205,7 +205,7 @@ class SegmentFilter extends EntityFilter
         $segment = $data['value'];
         $recordsLimit = $segment->getRecordsLimit();
 
-        if ($recordsLimit) {
+        if ($recordsLimit && $this->isDynamic($segment)) {
             $idName = $this->get(FilterUtility::DATA_NAME_KEY);
 
             $res = $qb->getQuery()->setMaxResults($recordsLimit)->getArrayResult();

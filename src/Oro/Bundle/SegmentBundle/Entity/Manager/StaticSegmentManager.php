@@ -79,7 +79,7 @@ class StaticSegmentManager
             );
 
             $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
-            $qb->setMaxResults(3);
+            $qb->setMaxResults($segment->getRecordsLimit());
             $this->applyOrganizationLimit($segment, $qb);
             $query = $qb->getQuery();
 
