@@ -118,6 +118,10 @@ DashboardBundle
     - removed property `protected $converter`
     - removed property `protected $managerLink`
     - removed property `protected $entityProvider`
+- Class `Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor`
+    - construction signature was changed. The parameter `OwnerHelper $ownerHelper` was removed
+    - removed property `protected $ownerHelper`
+
 
 DataAuditBundle
 ---------------
