@@ -90,7 +90,12 @@ class OrganizationsSelectType extends AbstractType
 
                 if (!empty($data['organizations'])) {
                     $organizations = json_decode(reset($data['organizations']), true);
-                    $data['organizations'] = $organizations['organizations'];
+
+                    if (!$organizations['organizations'] && !empty($data['businessUnits'])) {
+                        $data['organizations'] = [$this->securityFacade->getOrganizationId()];
+                    } else {
+                        $data['organizations'] = $organizations['organizations'];
+                    }
                 }
 
                 $event->setData($data);
