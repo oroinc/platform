@@ -1,19 +1,19 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_10;
+namespace Oro\Bundle\LocaleBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEntityExtendBundle implements Migration
+class OroLocaleBundle implements Migration
 {
     /**
      * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(new UpdateBidirectionalExtendedRelationsQuery());
+        $queries->addQuery(new UpdateLocalizedFallbackValueRelationsQuery());
     }
 }
