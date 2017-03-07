@@ -23,10 +23,13 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
             ? $queryFilter['definition']['filters']
             : [];
 
-        $rootEntity = $queryFilter['entity'];
+        $rootEntity = isset($queryFilter['entity']) ? $queryFilter['entity'] : null;
+        if (!$rootEntity) {
+            return;
+        }
         $rootEntityAlias = $this->getRootAlias($queryBuilder);
 
-        return $this->process($queryBuilder, $rootEntity, $filters, $rootEntityAlias);
+        $this->process($queryBuilder, $rootEntity, $filters, $rootEntityAlias);
     }
 
     /**
