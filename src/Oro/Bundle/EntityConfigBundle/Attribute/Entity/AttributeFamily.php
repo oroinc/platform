@@ -116,7 +116,8 @@ class AttributeFamily extends ExtendAttributeFamily implements
      *     targetEntity="Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup",
      *     mappedBy="attributeFamily",
      *     cascade={"ALL"},
-     *     orphanRemoval=true
+     *     orphanRemoval=true,
+     *     indexBy="code"
      * )
      */
     private $attributeGroups;
@@ -294,15 +295,27 @@ class AttributeFamily extends ExtendAttributeFamily implements
     }
 
     /**
+     * @return null|AttributeGroup
+     * @throws \InvalidArgumentException
+     */
+    public function getAttributeGroup($code)
+    {
+        if (!isset($this->attributeGroups[$code])) {
+            throw new \InvalidArgumentException(
+                sprintf('Attribute group "%s" doesn\'t exist in attribute family.', $code)
+            );
+        }
+
+        return $this->attributeGroups[$code];
+    }
+
+    /**
      * @param AttributeGroup $attributeGroup
      * @return $this
      */
     public function addAttributeGroup(AttributeGroup $attributeGroup)
     {
-        if (!$this->attributeGroups->contains($attributeGroup)) {
-            $this->attributeGroups->add($attributeGroup);
-            $attributeGroup->setAttributeFamily($this);
-        }
+        $this->attributeGroups[$attributeGroup->getCode()] = $attributeGroup;
 
         return $this;
     }

@@ -64,20 +64,9 @@ class AttributeGroupType extends AbstractContainerType
         $attributeFamily = $options->get('attribute_family');
         $code = $options['group'];
         $entityValue = $options->get('entity', false);
+        $attributeGroup = $attributeFamily->getAttributeGroup($code);
         $excludeFromRest = $options['exclude_from_rest'];
 
-        $attributeGroups = $attributeFamily->getAttributeGroups()->filter(
-            function (AttributeGroup $attributeGroup) use ($code) {
-                return $attributeGroup->getCode() == $code;
-            }
-        );
-
-        if ($attributeGroups->count() === 0) {
-            return;
-        }
-
-        /** @var AttributeGroup $attributeGroup */
-        $attributeGroup = $attributeGroups->first();
         $options['visible'] = $attributeGroup->getIsVisible();
 
         if ($excludeFromRest) {
