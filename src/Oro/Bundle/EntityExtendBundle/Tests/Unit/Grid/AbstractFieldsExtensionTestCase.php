@@ -7,6 +7,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
+use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -32,17 +34,23 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
     /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $datagridConfigProvider;
 
+    /** @var FieldsHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $fieldsHelper;
+
     /**
      * @return AbstractFieldsExtension
      */
     abstract protected function getExtension();
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder(ConfigManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -73,6 +81,43 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                     ]
                 )
             );
+
+        $this->fieldsHelper = $this->getMockBuilder(FieldsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset(
+            $this->configManager,
+            $this->entityClassResolver,
+            $this->entityConfigProvider,
+            $this->extendConfigProvider,
+            $this->datagridConfigProvider,
+            $this->viewConfigProvider,
+            $this->fieldsHelper
+        );
+    }
+
+    /**
+     * @param bool $isEnabled
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getFeatureCheckerMock($isEnabled = true)
+    {
+        $checker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $checker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn($isEnabled);
+
+        return $checker;
     }
 
     /**
@@ -87,8 +132,9 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
 
     public function testProcessConfigsNoFields()
     {
-        $this->configManager->expects($this->once())->method('hasConfig')->willReturn(false);
-        $this->configManager->expects($this->never())->method('getConfig');
+        $this->fieldsHelper->expects($this->any())
+            ->method('getFields')
+            ->willReturn([]);
 
         $config = $this->getDatagridConfiguration();
         $this->getExtension()->processConfigs($config);
@@ -259,7 +305,10 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                                     ],
                                 ],
                             ],
-                            'select' => ['IDENTITY(c.testField) as testField'],
+                            'select' => [
+                                'IDENTITY(c.testField) as testField',
+                                'auto_rel_1.testRel',
+                            ],
                         ],
                     ],
                     'columns' => [
@@ -370,17 +419,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
             ),
             $config->toArray()
         );
-    }
-
-    public function testProcessConfigsForNotConfigurableEntity()
-    {
-        $this->configManager->expects($this->once())
-            ->method('hasConfig')
-            ->with(self::ENTITY_CLASS)
-            ->will($this->returnValue(false));
-
-        $config = $this->getDatagridConfiguration();
-        $this->getExtension()->processConfigs($config);
     }
 
     public function testProcessConfigsToOne()

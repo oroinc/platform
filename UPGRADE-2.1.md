@@ -20,6 +20,11 @@ MessageQueue Component
 - Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
 - Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
 
+Action Component
+----------------
+- Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
+- Added Class `Oro\Component\Action\Model\DoctrineTypeMappingExtension`. That can be used as base for services definitions
+
 ActionBundle
 ------------
 - `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
@@ -35,6 +40,10 @@ ActionBundle
     - removed property `protected $optionsHelper`
     - removed property `protected $buttonProvider`
     - removed property `protected $searchContextProvider`
+- Added interfaces `Oro\Bundle\ActionBundle\Model\ParameterInterface` and `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`
+- Implemented `Oro\Bundle\ActionBundle\Model\EntityParameterInterface` interface in `Oro\Bundle\ActionBundle\Model\Attribute` class
+- Added `getInternalType()` method to `Oro\Bundle\ActionBundle\Model\Attribute` class
+- Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
 
 ActivityListBundle
 ------------------
@@ -112,6 +121,10 @@ DashboardBundle
     - removed property `protected $converter`
     - removed property `protected $managerLink`
     - removed property `protected $entityProvider`
+- Class `Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor`
+    - construction signature was changed. The parameter `OwnerHelper $ownerHelper` was removed
+    - removed property `protected $ownerHelper`
+
 
 DataAuditBundle
 ---------------
@@ -241,6 +254,7 @@ EntityExtendBundle
     To create bidirectional relation you _MUST_ call `*InverseRelation` method respectively
     - call to `addOneToManyRelation` creates bidirectional relation according to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional)
     - deprecated `addOneToManyInverseRelation`
+    - throw exception when trying to use not allowed option while creating relation in migration
 - The parameter `oro_entity_extend.twig.extension.dynamic_fields.class` was removed from DIC
 - The parameter `oro_entity_extend.twig.extension.enum.class` was removed from DIC
 - The service `oro_entity_extend.twig.extension.dynamic_fields` was marked as `private`
@@ -257,6 +271,12 @@ EntityExtendBundle
     - removed property `protected $propertyAccessor`
     - removed property `protected $eventDispatcher`
     - removed property `protected $securityFacade`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension`
+- Class `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension`
+    - the construction signature of was changed. Added fourth argument `FieldsHelper $fieldsHelper`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension`
 
 EntityMergeBundle
 -----------------
@@ -402,6 +422,7 @@ LayoutBundle
     - removed property `protected $configManager`
     - removed property `protected $profilerEnabled`
 - Changed default value option name for `page_title` block type, from `text` to `defaultValue`
+- Added alias `layout` for `oro_layout.layout_manager` service to make it more convenient to access it from container
 
 LocaleBundle
 ------------
@@ -629,6 +650,11 @@ SecurityBundle
 - Class `Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $securityFacade`
+- Interface `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`
+    - signature of method `getAllowedPermissions` changed, added third argument `string|null aclGroup` default `null`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    - signature of method `getPermissionsForType` changed, added second argument `string|null aclGroup` default `null`
+
 
 SegmentBundle
 -------------
@@ -673,6 +699,10 @@ ThemeBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $themeRegistry`
 
+LayoutBundle
+-----------------
+- Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
 TranslationBundle
 -----------------
 - Added parameter `ConfigDatabaseChecker $databaseChecker` to the constructor of `Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader`
@@ -680,6 +710,8 @@ TranslationBundle
 - Class `Oro\Bundle\TranslationBundle\Twig\TranslationExtension`
     - the construction signature of was changed. Old signature `$debugTranslator, TranslationsDatagridRouteHelper $translationRouteHelper`. New signature `ContainerInterface $container, $debugTranslator`
     - removed property `protected $translationRouteHelper`
+- Added `array $filtersType = []` parameter to the `generate` method, that receives an array of filter types to be applies on the route in order to support 
+filters such as `contains` when generating routes
 
 UIBundle
 --------
@@ -820,6 +852,51 @@ WorkflowBundle
 - Added third argument `Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver $destinationPageResolver` to constructor of `Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension`
 - Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
     - first argument argument `WorkflowManager $workflowManager` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
+- Added `variable_definitions` to workflow definition
+- Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler`
+    - Changed `assemble` method signature from `assemble(array $configuration, array $definitionsConfiguration, $steps, $attributes)` to `assemble(array $configuration, $steps, $attributes)`, where `$configuration` is now the full workflow configuration
+- Class `Oro\Bundle\WorkflowBundle\Model\Workflow`:
+    - added `TransitionManager $transitionManager = null` as constructor's 6th parameter
+    - added `VariableManager $variableManager = null` as constructor's 7th parameter
+- Added new `CONFIGURE` permission for workflows
+- Interface `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\MultipleEntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `normalizeObject`
+        - `denormalizeObject`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalizeAttribute`
+        - `denormalizeAttribute`
+        - `findAttributeNormalizer`
+    - added protected method `getVariablesNamesFromConfiguration(array $configuration)`
+- Abstract class `Oro\Bundle\WorkflowBundle\Translation\AbstractWorkflowTranslationFieldsIterator`:
+    - added protected method `&variableFields(array &$configuration, \ArrayObject $context)`
 - Class `Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
 - The service `oro_workflow.twig.extension.workflow` was marked as `private`
@@ -870,3 +947,10 @@ CronBundle
 -------------------
  - Interface `Oro\Bundle\CronBundle\Command\CronCommandInterface`
     - deprecated method `isActive`
+
+TagBundle
+---------
+- Class `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+    - removed method `isReportOrSegmentGrid`
+    - removed method `addReportOrSegmentGridPrefix`
+    - added UnsupportedGridPrefixesTrait
