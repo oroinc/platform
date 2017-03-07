@@ -359,7 +359,12 @@ define([
         onfocusout: function(element, event) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
-                    var realField = $(element).closest('.select2-container').parent()
+                    var $selectContainer = $(element).closest('.select2-container');
+                    // prevent validation if selection still in progress
+                    if ($selectContainer.hasClass('select2-dropdown-open')) {
+                        return;
+                    }
+                    var realField = $selectContainer.parent()
                         .find('.select2[type=hidden], select.select2')[0];
                     this.element(realField ? realField : element);
                 } else {
