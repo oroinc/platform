@@ -291,6 +291,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return NodeDefinition
      */
     protected function getTransitionsNode()
