@@ -448,6 +448,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iCheckAllRecordsInGrid()
     {
+        if (!count($this->getGrid()->getRows())) {
+            self::fail('Grid has no records to check');
+        }
         $this->getGrid()->massCheck('All');
     }
 
