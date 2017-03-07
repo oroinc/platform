@@ -92,6 +92,8 @@ class SegmentController extends Controller
      */
     public function updateAction(Segment $entity)
     {
+        $this->get('oro_segment.static_segment_manager')->run($entity);
+        return;
         return $this->update($entity);
     }
 

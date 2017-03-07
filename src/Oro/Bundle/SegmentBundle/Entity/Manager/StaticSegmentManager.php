@@ -82,13 +82,17 @@ class StaticSegmentManager
             $qb->setMaxResults($segment->getRecordsLimit());
             $this->applyOrganizationLimit($segment, $qb);
             $query = $qb->getQuery();
+            $entitiesToSave = $query->getArrayResult();
 
-            $segmentQuery = $query->getSQL();
-            $segmentQuery = substr_replace($segmentQuery, $insertString, stripos($segmentQuery, 'from'), 0);
+            $classMetadata = $query->getEntityManager()->getClassMetadata($segment->getEntity());
+            $identifiers   = $classMetadata->getIdentifier();
+            $identifier = reset($identifiers);
 
-            $fieldToSelect = 'entity_id';
+
+
+            $fieldToSelect = 'entityId';
             if ($entityMetadata->getTypeOfField($entityMetadata->getSingleIdentifierFieldName()) === 'integer') {
-                $fieldToSelect = 'integer_entity_id';
+                $fieldToSelect = 'integerEntityId';
             }
 
             $dbQuery = 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) (%s)';

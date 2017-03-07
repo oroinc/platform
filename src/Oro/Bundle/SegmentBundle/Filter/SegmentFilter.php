@@ -177,12 +177,12 @@ class SegmentFilter extends EntityFilter
         $queryBuilder = $this->getSegmentQueryBuilder($data);
         $query        = $queryBuilder->getQuery();
 
+        $dql = $query->getDQL() . ' LIMIT 0,8';
         /**@var OrmExpressionBuilder $expressionBuilder */
         $expressionBuilder = $ds->expr();
         $expr              = $expressionBuilder->in($this->get(FilterUtility::DATA_NAME_KEY), $query->getDQL());
 
         $this->applyFilterToClause($ds, $expr);
-        $this->applyLimit($ds, $data, $queryBuilder);
 
         $params = $query->getParameters();
         /** @var Parameter $param */
@@ -190,29 +190,8 @@ class SegmentFilter extends EntityFilter
             $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
         }
 
+        $dql = $ds->getQueryBuilder()->getDql();
         return true;
-    }
-
-    /**
-     * //@Todo: consider to change placement of this logic in scope of #BAP-14132
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param $data
-     * @param QueryBuilder $qb
-     */
-    private function applyLimit(FilterDatasourceAdapterInterface $ds, $data, QueryBuilder $qb)
-    {
-        /** @var Segment $segment */
-        $segment = $data['value'];
-        $recordsLimit = $segment->getRecordsLimit();
-
-        if ($recordsLimit && $this->isDynamic($segment)) {
-            $idName = $this->get(FilterUtility::DATA_NAME_KEY);
-
-            $res = $qb->getQuery()->setMaxResults($recordsLimit)->getArrayResult();
-            $ids = array_column($res, 'id');
-
-            $ds->getQueryBuilder()->andWhere($ds->expr()->in($idName, $ids));
-        }
     }
 
     /**
@@ -231,7 +210,7 @@ class SegmentFilter extends EntityFilter
         } else {
             $queryBuilder = $this->staticSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         }
-        $field = $this->get(FilterUtility::DATA_NAME_KEY);
+        $queryBuilder->setMaxResults($segment->getRecordsLimit());
 
         return $queryBuilder;
     }

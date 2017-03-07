@@ -101,6 +101,8 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     ) {
         if ($isDistinct) {
             $columnExpr = 'DISTINCT ' . (string)$columnExpr;
+        } else { //Leave only for select
+            return;
         }
 
         if ($functionExpr !== null) {
@@ -166,7 +168,9 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function addOrderByColumn($columnAlias, $columnSorting)
     {
-        //@Todo: implement in scope of #BAP-14132
-        //$this->qb->addOrderBy($columnAlias, $columnSorting);
+        $columnNames = array_flip($this->columnAliases);
+        $columnName = $columnNames[$columnAlias];
+        $prefixedColumnName = $this->getTableAliasForColumn($columnName) . '.' . $columnName;
+        $this->qb->addOrderBy($prefixedColumnName, $columnSorting);
     }
 }

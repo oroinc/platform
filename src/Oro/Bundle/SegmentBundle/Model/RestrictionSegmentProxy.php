@@ -46,19 +46,8 @@ class RestrictionSegmentProxy extends AbstractSegmentProxy
             // only not composite identifiers are supported
             $identifier = reset($identifiers);
 
-            $this->preparedDefinition = array_merge(
-                $decoded,
-                [
-                    'columns' => [
-                        ['name' => $identifier, 'distinct' => true]
-                    ]
-                ]
-            );
-            $this->preparedDefinition = json_encode($this->preparedDefinition);
-
-            //@Todo: use this approach instead of merging in scope of #BAP-14132
-            //$decoded['columns'][] = ['name' => $identifier, 'distinct' => true];
-            //$this->preparedDefinition = json_encode($decoded);
+            $decoded['columns'][] = ['name' => $identifier, 'distinct' => true];
+            $this->preparedDefinition = json_encode($decoded);
         }
 
         return $this->preparedDefinition;
