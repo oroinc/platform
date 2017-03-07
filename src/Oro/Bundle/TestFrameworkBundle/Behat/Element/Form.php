@@ -15,10 +15,17 @@ class Form extends Element
      */
     public function fill(TableNode $table)
     {
+        $isEmbeddedForm = isset($this->options['embedded-id']);
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToIFrame($this->options['embedded-id']);
+        }
         foreach ($table->getRows() as $row) {
             $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
             $value = self::normalizeValue($row[1]);
             $this->fillField($locator, $value);
+        }
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToWindow();
         }
     }
 
@@ -103,7 +110,12 @@ class Form extends Element
      */
     public function findField($locator)
     {
-        if ($field = parent::findField($locator)) {
+        $selector = is_array($locator)
+            ? $locator
+            : ['type' => 'named', 'locator' => ['field', $locator]];
+        $field = $this->find($selector['type'], $selector['locator']);
+
+        if ($field) {
             if ($field->hasAttribute('type') && 'file' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('FileField', $field);
             }
@@ -232,11 +244,11 @@ class Form extends Element
     public function getFieldValidationErrors($fieldName)
     {
         $field = $this->findFieldByLabel($fieldName);
-
-        self::assertTrue($field->hasClass("error"), "Field $fieldName has no validation errors");
-
         $fieldId = $field->getAttribute('id');
-        $errorSpan = $field->getParent()->find('css', "span.validation-failed[for='$fieldId']");
+
+        $errorSpan = $this->find('css', "span.validation-failed[for='$fieldId']");
+
+        self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
         return $errorSpan->getText();
     }

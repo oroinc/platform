@@ -41,6 +41,19 @@ workflows:
                     delete: false
                 options:
                     class: DateTime
+
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    type: 'array'
+                    value: [1,2,3,4,5]
+                var3:
+                    type: 'string'
+                    value: null
+
         disable_operations:
             operation1: [entity1, entity2]
         transitions:

@@ -25,9 +25,9 @@ class MenuUpdateDatasource implements DatasourceInterface
     protected $menuConfiguration;
 
     /**
-     * @param BuilderChainProvider $chainProvider
-     * @param MenuManipulator      $menuManipulator
-     * @param string               $scopeType
+     * @param BuilderChainProvider  $chainProvider
+     * @param MenuManipulator       $menuManipulator
+     * @param string                $scopeType
      * @param MenuConfiguration    $menuConfiguration
      */
     public function __construct(

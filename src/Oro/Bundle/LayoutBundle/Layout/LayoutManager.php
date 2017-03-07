@@ -57,7 +57,7 @@ class LayoutManager extends BaseLayoutManager
      * @param null|string[] $vars
      * @return string
      */
-    public function render(array $parameters, $vars = null)
+    public function render(array $parameters, $vars = [])
     {
         $layoutContext = new LayoutContext($parameters, $vars);
 
