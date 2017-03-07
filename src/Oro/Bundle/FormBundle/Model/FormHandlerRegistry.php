@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Model;
 
-use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
-use Oro\Component\DependencyInjection\ServiceLinkRegistry;
-use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface;
-
 use Oro\Bundle\FormBundle\Exception\UnknownFormHandlerException;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
+
+use Oro\Component\DependencyInjection\Exception\UnknownAliasException;
+use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface;
+use Oro\Component\DependencyInjection\ServiceLinkRegistryAwareTrait;
 
 /**
  * Registry of form handler services by their aliases.
@@ -19,16 +19,7 @@ class FormHandlerRegistry implements ServiceLinkRegistryAwareInterface
 {
     const DEFAULT_HANDLER_NAME = 'default';
 
-    /** @var ServiceLinkRegistry */
-    private $serviceLinkRegistry;
-
-    /**
-     * @param ServiceLinkRegistry $serviceLinkAliasRegistry
-     */
-    public function setServiceLinkRegistry(ServiceLinkRegistry $serviceLinkAliasRegistry)
-    {
-        $this->serviceLinkRegistry = $serviceLinkAliasRegistry;
-    }
+    use ServiceLinkRegistryAwareTrait;
 
     /**
      * @param string $alias
@@ -55,15 +46,5 @@ class FormHandlerRegistry implements ServiceLinkRegistryAwareInterface
         }
 
         return $handler;
-    }
-
-    /**
-     * @param $alias
-     *
-     * @return bool
-     */
-    public function has($alias)
-    {
-        return $this->serviceLinkRegistry->has($alias);
     }
 }

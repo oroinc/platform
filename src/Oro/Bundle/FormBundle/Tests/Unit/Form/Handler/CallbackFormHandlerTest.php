@@ -20,7 +20,6 @@ class CallbackFormHandlerTest extends \PHPUnit_Framework_TestCase
 
         /** @var CallableStub|\PHPUnit_Framework_MockObject_MockObject $callable */
         $callable = $this->createMock(CallableStub::class);
-
         $callable->expects($this->once())->method('__invoke')->with($data, $form, $request)->willReturn(true);
 
         $handler = new CallbackFormHandler($callable);

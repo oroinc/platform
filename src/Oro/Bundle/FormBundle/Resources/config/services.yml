@@ -44,9 +44,10 @@ services:
         arguments:
             - '@oro_form.doctrine.orm.validator_initializer.inner'
 
-    oro_form.update_builder:
-        class: Oro\Bundle\FormBundle\Model\UpdateBuilder
+    oro_form.update_factory:
+        class: Oro\Bundle\FormBundle\Model\UpdateFactory
         arguments:
+            - '@form.factory'
             - '@oro_form.registry.form_handler'
             - '@oro_form.registry.form_template_data_provider'
 
@@ -57,7 +58,7 @@ services:
             - '@session'
             - '@oro_ui.router'
             - '@oro_entity.doctrine_helper'
-            - '@oro_form.update_builder'
+            - '@oro_form.update_factory'
 
     oro_form.provider.from_template_data.default:
         class: Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider

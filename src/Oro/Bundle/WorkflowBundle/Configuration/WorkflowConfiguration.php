@@ -26,6 +26,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const NODE_ATTRIBUTES = 'attributes';
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
+    const NODE_VARIABLE_DEFINITIONS = 'variable_definitions';
+    const NODE_VARIABLES = 'variables';
     const NODE_ENTITY_RESTRICTIONS = 'entity_restrictions';
     const NODE_EXCLUSIVE_ACTIVE_GROUPS = 'exclusive_active_groups';
     const NODE_EXCLUSIVE_RECORD_GROUPS = 'exclusive_record_groups';
@@ -123,6 +125,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->append($this->getApplicationsNode())
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
+            ->append($this->getVariableDefinitionsNode())
             ->append($this->getTransitionsNode())
             ->append($this->getTransitionDefinitionsNode())
             ->append($this->getEntityRestrictionsNode())
@@ -255,6 +258,41 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      *
      * @return NodeDefinition
      */
+    protected function getVariableDefinitionsNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::NODE_VARIABLE_DEFINITIONS);
+        $rootNode
+            ->children()
+                ->arrayNode(self::NODE_VARIABLES)
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->ignoreExtraKeys()
+                        ->children()
+                            ->scalarNode('name')
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('type')
+                                ->isRequired()
+                            ->end()
+                            ->variableNode('value')
+                                ->isRequired()
+                            ->end()
+                            ->arrayNode('options')
+                                ->prototype('variable')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return NodeDefinition
+     */
     protected function getTransitionsNode()
     {
         $treeBuilder = new TreeBuilder();
@@ -355,18 +393,16 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
-                 ->end()
+                ->end()
                 ->validate()
-                    ->always(
-                        function ($value) {
-                            if ($value['display_type'] == 'page' && empty($value['form_options'])) {
-                                throw new WorkflowException(
-                                    'Display type "page" require "form_options" to be set.'
-                                );
-                            }
-                            return $value;
+                    ->always(function ($value) {
+                        if ($value['display_type'] == 'page' && empty($value['form_options'])) {
+                            throw new WorkflowException(
+                                'Display type "page" require "form_options" to be set.'
+                            );
                         }
-                    )
+                        return $value;
+                    })
                 ->end()
             ->end();
 
@@ -468,6 +504,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
 
         return $triggersNode;
     }
+
     /**
      * @return NodeDefinition
      */

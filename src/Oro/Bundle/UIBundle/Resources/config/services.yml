@@ -46,7 +46,7 @@ services:
 
     # Other services
     oro_ui.router:
-        class: 'Oro\Bundle\UIBundle\Route\Router'
+        class: %oro_ui.router.class%
         arguments:  ['@request_stack', '@router', '@oro_security.security_facade']
 
     oro_ui.dynamic_asset_version_manager:

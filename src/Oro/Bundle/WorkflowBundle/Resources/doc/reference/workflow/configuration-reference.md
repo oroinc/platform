@@ -10,6 +10,8 @@ Table of Contents
    - [Example](#example)
  - [Attributes Configuration](#attributes-configuration)
    - [Example](#example-1)
+ - [Variables Configuration](#variables-configuration)
+   - [Example](#example-10)
  - [Steps configuration](#steps-configuration)
    - [Example](#example-2)
  - [Transitions Configuration](#transitions-configuration)
@@ -767,6 +769,75 @@ workflows:
                             call: $phone_call
 ```
 
+Variables Configuration
+========================
+
+A workflow can define configuration for variables. Despite their name and unlike attributes, variables can have values set when defining them, in fact it's required.
+When Workflow Item is created it can manipulate it's own data (Workflow Data) that is mapped by Variables.
+Each variable must to have a type and a value. When Workflow Item is saved it's data is serialized according to configuration of variables.
+
+A single variable can be described with the following configuration:
+
+* **unique name**
+    Workflow variables should have unique name in scope of Workflow that they belong to.
+    Transition definitions reference variables by this value.
+* **type** *string* Types of variables. The following types are supported:
+    * **boolean**
+    * **bool**
+        *alias for boolean*
+    * **integer**
+    * **int**
+        *alias for integer*
+    * **float**
+    * **string**
+    * **array**
+        elements of array should be scalars or objects that supports serialize/deserialize
+    * **object**
+        object should support serialize/deserialize, option "class" is required for this type
+* **label**
+    *translatable*: `oro.workflow.{workflow_name}.variable.{variable_name}.label`
+    Label can be shown in the UI
+* **options**
+    Options of a variable. Currently the following options are supported
+    * **class**
+        *string*
+        Fully qualified class name. Allowed only when type is object.
+    * **form_options**
+        *array*
+        Options defined here are passed to the `WorkflowVariablesType` form type.
+        Browse class *Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType* for more details.
+
+**Notice**
+Unlike attributes, variable configuration does contain information about how to render variables in the configuration form, with the `form_options` node under `options`.
+Browse class *Oro\Bundle\WorkflowBundle\Model\VariableAssembler* for more details.
+
+Example
+-------
+
+Defining a variable:
+```
+workflows:
+    my_workflow:
+        variable_definitions:
+            variables:
+               threshold:
+                    type: 'float'
+                    value: 5000
+                    options:
+                        form_options:
+                            tooltip: true
+```
+
+Using a variable:
+```
+...
+    preconditions:
+        '@and':
+            ...
+            - '@not':
+                - '@less_total_limit': [$entity, $.data.threshold]
+```
+
 Example Workflow Configuration
 ==============================
 
@@ -819,6 +890,11 @@ workflows:
                 type: entity
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
         transitions:
             start_call:
                 is_start: true                         # this transition used to start new workflow

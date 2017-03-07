@@ -3,20 +3,17 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
-use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
 use Oro\Component\Action\Action\ActionInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowDataSerializer;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,10 +34,9 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
-        $this->formFactory = $this->getMockBuilder(FormFactoryInterface::class)->getMockForAbstractClass();
-        $this->workflowDataSerializer = $this->getMockBuilder(WorkflowAwareSerializer::class)
-            ->getMockForAbstractClass();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->workflowDataSerializer = $this->createMock(WorkflowAwareSerializer::class);
         $this->helper = new TransitionWidgetHelper(
             $this->doctrineHelper,
             $this->formFactory,
@@ -223,9 +219,13 @@ class TransitionWidgetHelperTest extends \PHPUnit_Framework_TestCase
         $transition = $this->createMock(Transition::class);
         $transition->expects($this->once())->method('hasFormConfiguration')->willReturn($hasPageConfiguration);
         $transition->expects($this->once())->method('getDialogTemplate')->willReturn($dialogTemplate);
+
         $this->assertEquals($expected, $this->helper->getTransitionFormTemplate($transition));
     }
 
+    /**
+     * @return \Generator
+     */
     public function getTransitionFormTemplateDataProvider()
     {
         yield 'has configuration and not template' => [

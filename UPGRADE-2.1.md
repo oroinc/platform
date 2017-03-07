@@ -40,6 +40,9 @@ ActionBundle
     - removed property `protected $optionsHelper`
     - removed property `protected $buttonProvider`
     - removed property `protected $searchContextProvider`
+- Added interfaces `Oro\Bundle\ActionBundle\Model\ParameterInterface` and `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`
+- Implemented `Oro\Bundle\ActionBundle\Model\EntityParameterInterface` interface in `Oro\Bundle\ActionBundle\Model\Attribute` class
+- Added `getInternalType()` method to `Oro\Bundle\ActionBundle\Model\Attribute` class
 - Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
 
 ActivityListBundle
@@ -118,6 +121,10 @@ DashboardBundle
     - removed property `protected $converter`
     - removed property `protected $managerLink`
     - removed property `protected $entityProvider`
+- Class `Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor`
+    - construction signature was changed. The parameter `OwnerHelper $ownerHelper` was removed
+    - removed property `protected $ownerHelper`
+
 
 DataAuditBundle
 ---------------
@@ -315,17 +322,23 @@ FormBundle
 - The service `oro_form.twig.js_validation_extension` was removed
 - Class `Oro\Bundle\FormBundle\Twig\JsValidationExtension` was removed. Its functionality was moved to `Oro\Bundle\FormBundle\Twig\FormExtension`
 
-- Deprecation of class `Oro\Bundle\FormBundle\Model\UpdateHandler` use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` (`@oro_form.update_handler`) instead.
-- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard update handler.
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard `Oro\Bundle\FormBundle\Model\UpdateHandler`.
+So please consider to use it when for a new entity management development.
 
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandler`
+    - marked as deprecated, use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` (service `oro_form.update_handler`) instead
+    - changed `__constructor` signature: 
+        - first argument changed from `Symfony\Component\HttpFoundation\Request` to `Symfony\Component\HttpFoundation\RequestStack`
+        - fifth argument changed from `Symfony\Component\EventDispatcher\EventDispatcherInterface` to `Oro\Bundle\FormBundle\Form\Handler\FormHandler` as from handling encapsulation.
+ 
 - Interface `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface` added for standard form handlers.
-- Class `Oro\Bundle\FormBundle\Form\Handler\FormHandler` added ('@oro_form.form.handler.default') as default form processing mechanism.
+- Class `Oro\Bundle\FormBundle\Form\Handler\FormHandler` added (service 'oro_form.form.handler.default') as default form processing mechanism.
 - Tag `oro_form.form.handler` added to register custom form handlers under its `alias`.
 - Class `Oro\Bundle\FormBundle\Model\FormHandlerRegistry` added to collect tagged with `oro_form.form.handler` services.
 - Class `Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler` added as interface compatibility helper for callable.
 
 - Interface `Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface`  added for common update template data population.
-- Class `Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider` (`@oro_form.provider.from_template_data.default`) as default update template data provider.
+- Class `Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider` (service `oro_form.provider.from_template_data.default`) as default update template data provider.
 - Tag `oro_form.form_template_data_provider` added to register custom update template data providers.
 - Class `Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry` added to collect tagged with `oro_form.form_template_data_provider` services.
 - Class `Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider` added as interface compatibility helper for callable.
@@ -337,7 +350,6 @@ HelpBundle
 - Class `Oro\Bundle\HelpBundle\Twig\HelpExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $linkProvider`
-
 
 ImapBundle
 ----------
@@ -708,6 +720,10 @@ ThemeBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $themeRegistry`
 
+LayoutBundle
+-----------------
+- Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
 TranslationBundle
 -----------------
 - Added parameter `ConfigDatabaseChecker $databaseChecker` to the constructor of `Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader`
@@ -715,6 +731,8 @@ TranslationBundle
 - Class `Oro\Bundle\TranslationBundle\Twig\TranslationExtension`
     - the construction signature of was changed. Old signature `$debugTranslator, TranslationsDatagridRouteHelper $translationRouteHelper`. New signature `ContainerInterface $container, $debugTranslator`
     - removed property `protected $translationRouteHelper`
+- Added `array $filtersType = []` parameter to the `generate` method, that receives an array of filter types to be applies on the route in order to support 
+filters such as `contains` when generating routes
 
 UIBundle
 --------
@@ -855,6 +873,51 @@ WorkflowBundle
 - Added third argument `Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver $destinationPageResolver` to constructor of `Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension`
 - Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
     - first argument argument `WorkflowManager $workflowManager` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
+- Added `variable_definitions` to workflow definition
+- Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler`
+    - Changed `assemble` method signature from `assemble(array $configuration, array $definitionsConfiguration, $steps, $attributes)` to `assemble(array $configuration, $steps, $attributes)`, where `$configuration` is now the full workflow configuration
+- Class `Oro\Bundle\WorkflowBundle\Model\Workflow`:
+    - added `TransitionManager $transitionManager = null` as constructor's 6th parameter
+    - added `VariableManager $variableManager = null` as constructor's 7th parameter
+- Added new `CONFIGURE` permission for workflows
+- Interface `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\MultipleEntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `normalizeObject`
+        - `denormalizeObject`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalizeAttribute`
+        - `denormalizeAttribute`
+        - `findAttributeNormalizer`
+    - added protected method `getVariablesNamesFromConfiguration(array $configuration)`
+- Abstract class `Oro\Bundle\WorkflowBundle\Translation\AbstractWorkflowTranslationFieldsIterator`:
+    - added protected method `&variableFields(array &$configuration, \ArrayObject $context)`
 - Class `Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
 - The service `oro_workflow.twig.extension.workflow` was marked as `private`
@@ -926,6 +989,6 @@ injection of a collection of services that are registered in system, but there n
 all of them on every runtime. The registry has `@service_container` dependency (`Symfony\Component\DependencyInjection\ContainerInterface`)
 and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. It can register public services by `ServiceLinkRegistry::add`
 with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
-- Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by
-which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to
-provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).
+- Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
+which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
+provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).  

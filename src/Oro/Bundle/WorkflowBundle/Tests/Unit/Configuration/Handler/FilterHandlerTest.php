@@ -96,6 +96,16 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'unknown' => 'fv',
                             'actions' => []
                         ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_var' => [
+                                'name' => 'var_name',
+                                'type' => 'string',
+                                'value' => 'test',
+                                'options' => []
+                            ]
+                        ]
                     ]
                 ],
                 'expected' => [
@@ -155,6 +165,16 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'preactions' => [],
                             'preconditions' => [],
                             'actions' => []
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_var' => [
+                                'name' => 'var_name',
+                                'type' => 'string',
+                                'value' => 'test',
+                                'options' => []
+                            ]
                         ]
                     ]
                 ]

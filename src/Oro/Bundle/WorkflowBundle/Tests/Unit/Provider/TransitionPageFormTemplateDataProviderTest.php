@@ -18,24 +18,23 @@ class TransitionPageFormTemplateDataProviderTest extends \PHPUnit_Framework_Test
      */
     protected function setUp()
     {
-        parent::setUp();
         $this->provider = new TransitionPageFormTemplateDataProvider();
     }
 
     public function testGetData()
     {
         /** @var FormView|\PHPUnit_Framework_MockObject_MockObject $form */
-        $formView = $this->getMockBuilder(FormView::class)->disableOriginalConstructor();
+        $formView = $this->createMock(FormView::class);
 
         /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
-        $form = $this->getMockBuilder(FormInterface::class)->getMockForAbstractClass();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('createView')->willReturn($formView);
 
         /** @var StubEntity|\PHPUnit_Framework_MockObject_MockObject $entity */
-        $entity = $this->getMockBuilder(StubEntity::class)->disableOriginalConstructor()->getMock();
+        $entity = $this->createMock(StubEntity::class);
 
         /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $request = $this->createMock(Request::class);
 
         $this->assertSame(
             ['entity' => $entity, 'form' => $formView],

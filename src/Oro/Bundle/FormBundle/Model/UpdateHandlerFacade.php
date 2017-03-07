@@ -15,8 +15,8 @@ use Oro\Bundle\UIBundle\Route\Router;
 
 class UpdateHandlerFacade
 {
-    /** @var UpdateBuilder */
-    private $updateBuilder;
+    /** @var UpdateFactory */
+    private $updateFactory;
 
     /** @var RequestStack */
     private $requestStack;
@@ -35,28 +35,28 @@ class UpdateHandlerFacade
      * @param Session $session
      * @param Router $router
      * @param DoctrineHelper $doctrineHelper
-     * @param UpdateBuilder $updateBuilder
+     * @param UpdateFactory $updateFactory
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         Router $router,
         DoctrineHelper $doctrineHelper,
-        UpdateBuilder $updateBuilder
+        UpdateFactory $updateFactory
     ) {
         $this->requestStack = $requestStack;
         $this->session = $session;
         $this->router = $router;
         $this->doctrineHelper = $doctrineHelper;
-        $this->updateBuilder = $updateBuilder;
+        $this->updateFactory = $updateFactory;
     }
 
     /**
      * Handles update action of controller used to create or update entity on separate page or widget dialog.
      * Has reusable segments such as $formHandler and $resultProvider to be able use your custom services by alias
      *
-     * @param object $data Data of form
-     * @param FormInterface $form Form instance
+     * @param string|object $data Data of form or FQCN
+     * @param string|FormInterface $form Form instance or form_type name
      * @param string $saveMessage Message added to session flash bag in case if form will be saved successfully
      *      and if form is not submitted from widget.
      * @param Request|null $request optional Request instance otherwise will be used current request from RequestStack
@@ -81,56 +81,57 @@ class UpdateHandlerFacade
      */
     public function update(
         $data,
-        FormInterface $form,
+        $form,
         $saveMessage,
         Request $request = null,
         $formHandler = null,
         $resultProvider = null
     ) {
-        $update = $this->updateBuilder->create($data, $form, $saveMessage, $formHandler, $resultProvider);
+        $update = $this->updateFactory->createUpdate($data, $form, $formHandler, $resultProvider);
 
         $request = $request ?: $this->getCurrentRequest();
 
-        if ($update->handler->process($data, $form, $request)) {
-            return $this->constructResponse($update, $request);
+        if ($update->handle($request)) {
+            return $this->constructResponse($update, $request, $saveMessage);
         }
 
         return $this->getResult($update, $request);
     }
 
     /**
-     * @param Update $update
+     * @param UpdateInterface $update
      * @param Request $request
+     * @param string $saveMessage
      *
      * @return array|RedirectResponse
      */
-    protected function constructResponse(Update $update, Request $request)
+    protected function constructResponse(UpdateInterface $update, Request $request, $saveMessage)
     {
-        $entity = $update->data;
+        $entity = $update->getFormData();
         if ($request->get('_wid')) {
             $result = $this->getResult($update, $request);
             $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
             return $result;
         } else {
-            $this->session->getFlashBag()->add('success', $update->saveMessage);
+            $this->session->getFlashBag()->add('success', $saveMessage);
 
             return $this->router->redirect($entity);
         }
     }
 
     /**
-     * @param Update $update
+     * @param UpdateInterface $update
      * @param Request $request
      *
      * @return array
      */
-    protected function getResult(Update $update, Request $request)
+    protected function getResult(UpdateInterface $update, Request $request)
     {
-        $result = $update->resultDataProvider->getData($update->data, $update->form, $request);
+        $result = $update->getTemplateData($request);
 
         if (!array_key_exists('entity', $result)) {
-            $result['entity'] = $update->data;
+            $result['entity'] = $update->getFormData();
         }
         $result['isWidgetContext'] = (bool)$request->get('_wid', false);
 
