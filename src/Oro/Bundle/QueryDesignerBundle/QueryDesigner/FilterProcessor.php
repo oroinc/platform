@@ -13,17 +13,15 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
     /** @var string */
     protected $rootEntityAlias;
 
+    /**
+     * {@inheritDoc}
+     */
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
         $queryFilter = $widgetOptions->get('queryFilter', []);
         $filters = isset($queryFilter['definition']['filters'])
             ? $queryFilter['definition']['filters']
             : [];
-
-        if (!$filters) {
-            // nothing to do
-            return $queryBuilder;
-        }
 
         $rootEntity = $queryFilter['entity'];
         $rootEntityAlias = $this->getRootAlias($queryBuilder);
@@ -41,6 +39,10 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
      */
     public function process(QueryBuilder $qb, $rootEntity, array $filters, $rootEntityAlias)
     {
+        if (!$filters) {
+            // nothing to do
+            return $qb;
+        }
         $this->setRootEntity($rootEntity);
         $this->rootEntityAlias          = $rootEntityAlias;
         $this->definition['filters']    = $filters;
