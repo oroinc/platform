@@ -12,16 +12,16 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     use PageObjectDictionary;
 
     /**
-     * Click on button or link on left panel in configuration menu
-     * Example: Given I click "Edit" on left panel
-     * Example: When I click "Save and Close" on left panel
+     * Click link on sidebar in configuration menu
      *
-     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" on left panel$/
+     * Example: Given I click "Inventory" on configuration sidebar
+     *
+     * @When /^(?:|I )click "(?P<link>(?:[^"]|\\")*)" on configuration sidebar$/
      */
-    public function pressButtonOnLeftPanel($button)
+    public function clickLinkOnConfigurationSidebar($link)
     {
         /** @var SidebarConfigMenu $sidebarConfigMenu */
         $sidebarConfigMenu = $this->getPage()->getElement('SidebarConfigMenu');
-        $sidebarConfigMenu->clickLink($button);
+        $sidebarConfigMenu->clickLink($link);
     }
 }
