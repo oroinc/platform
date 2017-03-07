@@ -48,17 +48,14 @@ class TransitionCustomFormHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->formHandlerRegistry = $this->getMockBuilder(FormHandlerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formHandler = $this->getMockBuilder(FormHandlerInterface::class)->getMockForAbstractClass();
-        $this->form = $this->getMockBuilder(FormInterface::class)->getMockForAbstractClass();
-        $this->workflowItem = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
-        $this->workflowItemData = $this->getMockBuilder(WorkflowData::class)->disableOriginalConstructor()->getMock();
-        $this->transition = $this->getMockBuilder(Transition::class)->disableOriginalConstructor()->getMock();
-        $this->request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $this->entity = $this->getMockBuilder(StubEntity::class)->disableOriginalConstructor()->getMock();
+        $this->formHandlerRegistry = $this->createMock(FormHandlerRegistry::class);
+        $this->formHandler = $this->createMock(FormHandlerInterface::class);
+        $this->form = $this->createMock(FormInterface::class);
+        $this->workflowItem = $this->createMock(WorkflowItem::class);
+        $this->workflowItemData = $this->createMock(WorkflowData::class);
+        $this->transition = $this->createMock(Transition::class);
+        $this->request = $this->createMock(Request::class);
+        $this->entity = $this->createMock(StubEntity::class);
 
         $this->transitionCustomFormHandler = new TransitionCustomFormHandler($this->formHandlerRegistry);
     }

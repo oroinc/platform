@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle;
 
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\TransitionFormHandlerCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler as Compiler;
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 
 class OroWorkflowBundle extends Bundle
 {

@@ -90,9 +90,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['assemble'])
             ->getMock();
 
-        $this->conditionFactory = $this->getMockBuilder(ExpressionFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->conditionFactory = $this->createMock(ExpressionFactory::class);
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
 
         $this->formConfigurationAssembler = $this->getMockBuilder(FormOptionsConfigurationAssembler::class)

@@ -12,6 +12,10 @@ use Oro\Component\DependencyInjection\Tests\Unit\Stub\ServiceLinkRegistryAwareSt
 
 class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
+    const TAG_NAME = 'tag_name';
+    const SERVICE_NAME = 'service_name';
+    const METHOD_NAME = 'methodName';
+    
     /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject */
     private $containerBuilder;
 
@@ -20,7 +24,7 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
 
     protected function setUp()
     {
-        $this->pass = new TaggedServiceLinkRegistryCompilerPass('tag_name', 'service_name', 'methodName');
+        $this->pass = new TaggedServiceLinkRegistryCompilerPass(self::TAG_NAME, self::SERVICE_NAME, self::METHOD_NAME);
         $this->containerBuilder = $this->createMock(ContainerBuilder::class);
     }
 
@@ -32,7 +36,7 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
         $registryAwareServiceDefinition = $this->createMock(Definition::class);
 
         $this->containerBuilder->expects($this->at(0))
-            ->method('hasDefinition')->with('service_name')->willReturn(true);
+            ->method('hasDefinition')->with(self::SERVICE_NAME)->willReturn(true);
 
         $registryServiceId = 'service_name.links_registry.tag_name';
 
@@ -41,13 +45,11 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
 
         $this->containerBuilder->expects($this->at(2))
             ->method('register')->with($registryServiceId, ServiceLinkRegistry::class)->willReturn($registryDefinition);
-        $registryDefinition->expects($this->at(0))
-            ->method('setArguments')->with([new Reference('service_container')]);
-        $registryDefinition->expects($this->at(1))
-            ->method('setPublic')->with(false);
+        $registryDefinition->expects($this->at(0))->method('setArguments')->with([new Reference('service_container')]);
+        $registryDefinition->expects($this->at(1))->method('setPublic')->with(false);
 
         $this->containerBuilder->expects($this->at(3))
-            ->method('findTaggedServiceIds')->with('tag_name')
+            ->method('findTaggedServiceIds')->with(self::TAG_NAME)
             ->willReturn([
                 'tagged_service_one' => [['alias' => 'first']],
                 'tagged_service_two' => [['no alias property']]
@@ -66,12 +68,12 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
             ->method('addMethodCall')->with('add', ['tagged_service_two', 'tagged_service_two']);
 
         $this->containerBuilder->expects($this->at(6))->method('getDefinition')
-            ->with('service_name')
+            ->with(self::SERVICE_NAME)
             ->willReturn($registryAwareServiceDefinition);
 
         $registryAwareServiceDefinition->expects($this->once())
             ->method('addMethodCall')
-            ->with('methodName', [new Reference($registryServiceId)]);
+            ->with(self::METHOD_NAME, [new Reference($registryServiceId)]);
 
         $this->pass->process($this->containerBuilder);
     }
@@ -82,7 +84,7 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
         $registryAwareServiceDefinition = $this->createMock(Definition::class);
 
         $this->containerBuilder->expects($this->at(0))
-            ->method('hasDefinition')->with('service_name')->willReturn(true);
+            ->method('hasDefinition')->with(self::SERVICE_NAME)->willReturn(true);
 
         $registryServiceId = 'service_name.links_registry.tag_name';
 
@@ -91,17 +93,15 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
 
         $this->containerBuilder->expects($this->at(2))
             ->method('register')->with($registryServiceId, ServiceLinkRegistry::class)->willReturn($registryDefinition);
-        $registryDefinition->expects($this->at(0))
-            ->method('setArguments')->with([new Reference('service_container')]);
-        $registryDefinition->expects($this->at(1))
-            ->method('setPublic')->with(false);
+        $registryDefinition->expects($this->at(0))->method('setArguments')->with([new Reference('service_container')]);
+        $registryDefinition->expects($this->at(1))->method('setPublic')->with(false);
 
         $this->containerBuilder->expects($this->at(3))
-            ->method('findTaggedServiceIds')->with('tag_name')
+            ->method('findTaggedServiceIds')->with(self::TAG_NAME)
             ->willReturn([]);
 
         $this->containerBuilder->expects($this->at(4))->method('getDefinition')
-            ->with('service_name')
+            ->with(self::SERVICE_NAME)
             ->willReturn($registryAwareServiceDefinition);
 
         $registryAwareServiceDefinition->expects($this->once())
@@ -116,7 +116,7 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
             );
 
         //use default value of method
-        $pass = new TaggedServiceLinkRegistryCompilerPass('tag_name', 'service_name');
+        $pass = new TaggedServiceLinkRegistryCompilerPass(self::TAG_NAME, self::SERVICE_NAME);
 
         $pass->process($this->containerBuilder);
     }
@@ -124,7 +124,7 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
     public function testExceptionOnInvalidRegistryAwareServiceId()
     {
         $this->containerBuilder->expects($this->once())
-            ->method('hasDefinition')->with('service_name')->willReturn(false);
+            ->method('hasDefinition')->with(self::SERVICE_NAME)->willReturn(false);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Service definition `service_name` not found in container.');
@@ -135,7 +135,7 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
     public function testExceptionOnDoublePass()
     {
         $this->containerBuilder->expects($this->at(0))
-            ->method('hasDefinition')->with('service_name')->willReturn(true);
+            ->method('hasDefinition')->with(self::SERVICE_NAME)->willReturn(true);
 
         $registryServiceId = 'service_name.links_registry.tag_name';
 
@@ -148,8 +148,8 @@ class TaggedServiceLinkRegistryCompilerPassTest extends \PHPUnit_Framework_TestC
                 'Only one injection of `%s` per service is currently supported.' .
                 'Trying to add `%1$s` to `%2$s` service by `%3$s` tag.',
                 ServiceLinkRegistry::class,
-                'service_name',
-                'tag_name'
+                self::SERVICE_NAME,
+                self::TAG_NAME
             )
         );
 

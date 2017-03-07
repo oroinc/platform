@@ -39,16 +39,9 @@ class FormOptionsConfigurationAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->formRegistry = $this->getMockBuilder(FormRegistryInterface::class)
-            ->getMockForAbstractClass();
-
-        $this->formHandlerRegistry = $this->getMockBuilder(FormHandlerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formTemplateDataProviderRegistry = $this->getMockBuilder(FormTemplateDataProviderRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formRegistry = $this->createMock(FormRegistryInterface::class);
+        $this->formHandlerRegistry = $this->createMock(FormHandlerRegistry::class);
+        $this->formTemplateDataProviderRegistry = $this->createMock(FormTemplateDataProviderRegistry::class);
 
         $this->assembler = new FormOptionsConfigurationAssembler(
             $this->formRegistry,

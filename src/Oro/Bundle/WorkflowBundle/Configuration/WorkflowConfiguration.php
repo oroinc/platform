@@ -393,7 +393,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->defaultValue(self::DEFAULT_INIT_CONTEXT_ATTRIBUTE)
                     ->end()
                     ->append($this->getTransitionTriggers())
-                 ->end()
+                ->end()
                 ->validate()
                     ->always(function ($value) {
                         if ($value['display_type'] == 'page' && empty($value['form_options'])) {
