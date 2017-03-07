@@ -46,7 +46,7 @@ class GridRow extends TableRow
         self::assertTrue($pencilIcon->isVisible(), "Cell with '$header' is not inline editable");
         $pencilIcon->click();
 
-        $this->elementFactory->createElement('OroForm')->fillField(
+        $this->getElement('OroForm')->fillField(
             'value',
             new InputValue(InputMethod::TYPE, $value)
         );

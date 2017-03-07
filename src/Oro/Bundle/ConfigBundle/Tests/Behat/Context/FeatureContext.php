@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Behat\Context;
 
+use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
@@ -19,7 +20,8 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function pressButtonOnLeftPanel($button)
     {
-        $leftPanel = $this->getPage()->find('css', 'div.left-panel');
-        $leftPanel->clickLink($button);
+        /** @var SidebarConfigMenu $sidebarConfigMenu */
+        $sidebarConfigMenu = $this->getPage()->getElement('SidebarConfigMenu');
+        $sidebarConfigMenu->clickLink($button);
     }
 }

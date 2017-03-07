@@ -26,7 +26,8 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $this->waitForAjax();
         $priceList = $this->spin(function (FeatureContext $context) use ($value) {
             $priceList = $context->getPage()->find('named', ['content', $value]);
-            return $priceList ? $priceList : false;
+
+            return $priceList ?: false;
         });
         $priceList->click();
         $this->waitForAjax();
@@ -35,7 +36,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
     /**
      * @When /^I drag (?P<rowNum>([\d]+)) row to the top in "(?P<tableContent>([\w\s]+))" table$/
      */
-    public function dragRowOnTop($rowNum, $tableContent)
+    public function dragRowToTop($rowNum, $tableContent)
     {
         /** @var Table $table */
         $table = $this->findElementContains('Table', $tableContent);
@@ -47,7 +48,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
                 var lastRow = table.find("tbody tr").eq(' . ($rowNum - 1) . ');
                 table.find("tbody").prepend(lastRow);
                 table.find(".sortable-wrapper").sortable("option", "stop")();
-            })
+            });
         ');
     }
 

@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\ConfigBundle\Migration;
 
+use Psr\Log\LoggerInterface;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Psr\Log\LoggerInterface;
 
 class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
 {
     /**
      * @var string
      */
-    protected $configValueName;
+    protected $configValueSection;
 
     /**
      * @var string
      */
-    protected $configValueSection;
+    protected $configValueName;
 
     /**
      * @var string
@@ -37,8 +37,8 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
      */
     public function __construct($configValueSection, $configValueName, $oldKeyName, $newKeyName)
     {
-        $this->configValueName = $configValueName;
         $this->configValueSection = $configValueSection;
+        $this->configValueName = $configValueName;
         $this->oldKeyName = $oldKeyName;
         $this->newKeyName = $newKeyName;
     }
@@ -109,6 +109,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
                 $values[$key] = $this->convert($value);
             }
         }
+
         return $values;
     }
 
@@ -120,6 +121,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
     {
         $arrayType = Type::getType(Type::TARRAY);
         $platform = $this->connection->getDatabasePlatform();
+
         return $arrayType->convertToPHPValue($serializedValue, $platform);
     }
 }
