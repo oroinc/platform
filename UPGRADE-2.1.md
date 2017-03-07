@@ -40,6 +40,9 @@ ActionBundle
     - removed property `protected $optionsHelper`
     - removed property `protected $buttonProvider`
     - removed property `protected $searchContextProvider`
+- Added interfaces `Oro\Bundle\ActionBundle\Model\ParameterInterface` and `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`
+- Implemented `Oro\Bundle\ActionBundle\Model\EntityParameterInterface` interface in `Oro\Bundle\ActionBundle\Model\Attribute` class
+- Added `getInternalType()` method to `Oro\Bundle\ActionBundle\Model\Attribute` class
 - Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
 
 ActivityListBundle
@@ -696,6 +699,10 @@ ThemeBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $themeRegistry`
 
+LayoutBundle
+-----------------
+- Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
 TranslationBundle
 -----------------
 - Added parameter `ConfigDatabaseChecker $databaseChecker` to the constructor of `Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader`
@@ -703,6 +710,8 @@ TranslationBundle
 - Class `Oro\Bundle\TranslationBundle\Twig\TranslationExtension`
     - the construction signature of was changed. Old signature `$debugTranslator, TranslationsDatagridRouteHelper $translationRouteHelper`. New signature `ContainerInterface $container, $debugTranslator`
     - removed property `protected $translationRouteHelper`
+- Added `array $filtersType = []` parameter to the `generate` method, that receives an array of filter types to be applies on the route in order to support 
+filters such as `contains` when generating routes
 
 UIBundle
 --------
@@ -843,6 +852,51 @@ WorkflowBundle
 - Added third argument `Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver $destinationPageResolver` to constructor of `Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension`
 - Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
     - first argument argument `WorkflowManager $workflowManager` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
+- Added `variable_definitions` to workflow definition
+- Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler`
+    - Changed `assemble` method signature from `assemble(array $configuration, array $definitionsConfiguration, $steps, $attributes)` to `assemble(array $configuration, $steps, $attributes)`, where `$configuration` is now the full workflow configuration
+- Class `Oro\Bundle\WorkflowBundle\Model\Workflow`:
+    - added `TransitionManager $transitionManager = null` as constructor's 6th parameter
+    - added `VariableManager $variableManager = null` as constructor's 7th parameter
+- Added new `CONFIGURE` permission for workflows
+- Interface `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\MultipleEntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `normalizeObject`
+        - `denormalizeObject`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalizeAttribute`
+        - `denormalizeAttribute`
+        - `findAttributeNormalizer`
+    - added protected method `getVariablesNamesFromConfiguration(array $configuration)`
+- Abstract class `Oro\Bundle\WorkflowBundle\Translation\AbstractWorkflowTranslationFieldsIterator`:
+    - added protected method `&variableFields(array &$configuration, \ArrayObject $context)`
 - Class `Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
 - The service `oro_workflow.twig.extension.workflow` was marked as `private`
