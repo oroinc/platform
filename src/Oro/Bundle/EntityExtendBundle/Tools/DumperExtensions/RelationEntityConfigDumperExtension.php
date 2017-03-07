@@ -103,7 +103,8 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         // this completion is required when a bidirectional relation is created from a migration
         if (!array_key_exists('owner', $relation)
             && isset($relation['target_field_id'])
-            && $relation['target_field_id']) {
+            && $relation['target_field_id']
+        ) {
             $this->completeSelfRelation($fieldConfig);
         }
     }

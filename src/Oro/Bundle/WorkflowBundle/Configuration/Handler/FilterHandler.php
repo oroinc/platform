@@ -59,6 +59,14 @@ class FilterHandler implements ConfigurationHandlerInterface
     ];
 
     /** @var array */
+    protected static $variableKeys = [
+        'name',
+        'type',
+        'value',
+        'options'
+    ];
+
+    /** @var array */
     protected static $workflowKeys = [
         'name',
         'entity',
@@ -77,6 +85,7 @@ class FilterHandler implements ConfigurationHandlerInterface
         WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
         WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
         WorkflowConfiguration::NODE_APPLICATIONS,
+        WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS
     ];
 
     /**
@@ -93,6 +102,7 @@ class FilterHandler implements ConfigurationHandlerInterface
             self::$transitionDefinitionKeys,
             $configuration
         );
+        $this->filterConfigNode(WorkflowConfiguration::NODE_VARIABLES, self::$variableKeys, $configuration);
 
         return $this->filterKeys($configuration, self::$workflowKeys);
     }

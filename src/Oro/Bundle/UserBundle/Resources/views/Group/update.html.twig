@@ -2,7 +2,7 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% oro_title_set({params : { "%group%": form.vars.value.name } }) %}
+{% oro_title_set({params : { "%group%": form.vars.value.name, "%entityName%": 'oro.user.group.entity_label'|trans  } }) %}
 {% set gridName = 'group-users-grid' %}
 {% set formAction = entityId ? path('oro_user_group_update', { 'id': entityId}) : path('oro_user_group_create') %}
 

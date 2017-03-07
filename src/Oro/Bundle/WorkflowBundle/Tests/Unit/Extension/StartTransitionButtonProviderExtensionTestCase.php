@@ -248,7 +248,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
     ) {
         /** @var Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow */
         $workflow = $this->getMockBuilder(Workflow::class)
-            ->setMethods(['getTransitionManager'])
+            ->setMethods(['getTransitionManager', 'getVariables'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -260,6 +260,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
 
         $workflow->setDefinition($definition);
         $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
+        $workflow->expects($this->any())->method('getVariables')->willReturn(new ArrayCollection());
 
         return $workflow;
     }
