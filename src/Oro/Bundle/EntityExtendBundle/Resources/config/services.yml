@@ -425,6 +425,7 @@ services:
             - "@oro_entity_extend.acl_helper.link"
             - "@oro_entity.doctrine_helper"
             - "@oro_entity.entity_name_resolver"
+            - "@oro_featuretoggle.checker.feature_checker"
         lazy: true
 
     oro_entity_extend.acl_helper.link:
