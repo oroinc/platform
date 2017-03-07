@@ -13,6 +13,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
@@ -30,6 +31,7 @@ use Oro\Component\Testing\DbIsolationExtension;
  * Abstract class for functional and integration tests
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
@@ -199,7 +201,6 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if (!self::$clientInstance) {
-            $options['debug'] = false;
             self::$clientInstance = static::createClient($options, $server);
 
             if (self::isClassHasAnnotation(get_called_class(), 'dbReindex')) {
@@ -218,6 +219,14 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return $this->client = self::$clientInstance;
+    }
+
+    /** {@inheritdoc} */
+    protected static function createKernel(array $options = array())
+    {
+        $options['debug'] = false;
+
+        return parent::createKernel($options);
     }
 
     /**
@@ -436,16 +445,18 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param string $name
      * @param array $params
+     * @param bool $cleanUp strip new lines and multiple spaces, removes dependency on terminal columns
      *
      * @return string
      */
-    protected static function runCommand($name, array $params = [])
+    protected static function runCommand($name, array $params = [], $cleanUp = true)
     {
         /** @var KernelInterface $kernel */
         $kernel = self::getContainer()->get('kernel');
 
         $application = new Application($kernel);
         $application->setAutoExit(false);
+        $application->setTerminalDimensions(120, 50);
 
         $argv = ['application', $name];
         foreach ($params as $k => $v) {
@@ -469,7 +480,14 @@ abstract class WebTestCase extends BaseWebTestCase
         $application->run($input, $output);
 
         rewind($fp);
-        return stream_get_contents($fp);
+
+        $content = stream_get_contents($fp);
+
+        if ($cleanUp) {
+            $content = preg_replace(['/\s{2,}\n\s{2,}/', '/(\n|\s{2,})+/'], ['', ' '], $content);
+        }
+
+        return trim($content);
     }
 
     /**

@@ -3,8 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\NavigationBundle\Entity\Repository\TitleRepository;
-use Oro\Bundle\NavigationBundle\Entity\Title;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -187,17 +185,9 @@ class RouteChoiceType extends AbstractType
      */
     private function loadRouteTitles(array $routes)
     {
-        /** @var TitleRepository $repository */
-        $repository = $this->registry
-            ->getManagerForClass(Title::class)
-            ->getRepository(Title::class);
-        $titles = $repository->getTitles($routes);
-        $result = [];
-        foreach ($titles as $title) {
-            $result[$title['route']] = $this->translator->trans($title['shortTitle']);
-        }
+        //ToDo in BB-6555: use getTitles from cache
 
-        return $result;
+        return [];
     }
 
     /**

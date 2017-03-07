@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -11,34 +12,39 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 
 class MergeExtension extends \Twig_Extension
 {
-    /**
-     * @var AccessorInterface
-     */
-    protected $accessor;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var MergeRenderer
+     * @param ContainerInterface $container
      */
-    protected $fieldValueRenderer;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @var TranslatorInterface
+     * @return AccessorInterface
      */
-    protected $translator;
+    protected function getAccessor()
+    {
+        return $this->container->get('oro_entity_merge.accessor');
+    }
 
     /**
-     * @param AccessorInterface $accessor
-     * @param MergeRenderer $fieldValueRenderer
-     * @param TranslatorInterface $translator
+     * @return MergeRenderer
      */
-    public function __construct(
-        AccessorInterface $accessor,
-        MergeRenderer $fieldValueRenderer,
-        TranslatorInterface $translator
-    ) {
-        $this->accessor = $accessor;
-        $this->fieldValueRenderer = $fieldValueRenderer;
-        $this->translator = $translator;
+    protected function getFieldValueRenderer()
+    {
+        return $this->container->get('oro_entity_merge.twig.renderer');
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    protected function getTranslator()
+    {
+        return $this->container->get('translator');
     }
 
     /**
@@ -46,12 +52,12 @@ class MergeExtension extends \Twig_Extension
      */
     public function getFilters()
     {
-        return array(
+        return [
             new \Twig_SimpleFilter(
                 'oro_entity_merge_sort_fields',
-                array($this, 'sortMergeFields')
+                [$this, 'sortMergeFields']
             )
-        );
+        ];
     }
 
     /**
@@ -59,36 +65,40 @@ class MergeExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction(
                 'oro_entity_merge_render_field_value',
-                array($this, 'renderMergeFieldValue'),
-                array('is_safe' => array('html'))
+                [$this, 'renderMergeFieldValue'],
+                ['is_safe' => ['html']]
             ),
             new \Twig_SimpleFunction(
                 'oro_entity_merge_render_entity_label',
-                array($this, 'renderMergeEntityLabel'),
-                array('is_safe' => array('html'))
+                [$this, 'renderMergeEntityLabel'],
+                ['is_safe' => ['html']]
             ),
-        );
+        ];
     }
 
     /**
      * Render value of merge field
      *
      * @param FormView[] $fields
+     *
      * @return FormView[]
      */
     public function sortMergeFields(array $fields)
     {
+        $translator = $this->getTranslator();
         usort(
             $fields,
-            function ($first, $second) {
-                $firstLabel = isset($first->vars['label']) ?
-                    $this->translator->trans($first->vars['label']) : $first->vars['name'];
+            function ($first, $second) use ($translator) {
+                $firstLabel = isset($first->vars['label'])
+                    ? $translator->trans($first->vars['label'])
+                    : $first->vars['name'];
 
-                $secondLabel = isset($second->vars['label']) ?
-                    $this->translator->trans($second->vars['label']) : $second->vars['name'];
+                $secondLabel = isset($second->vars['label'])
+                    ? $translator->trans($second->vars['label'])
+                    : $second->vars['name'];
 
                 return strnatcasecmp($firstLabel, $secondLabel);
             }
@@ -101,23 +111,25 @@ class MergeExtension extends \Twig_Extension
      * Render value of merge field
      *
      * @param FieldData $fieldData
-     * @param int $entityOffset
+     * @param int       $entityOffset
+     *
      * @return string
      */
     public function renderMergeFieldValue(FieldData $fieldData, $entityOffset)
     {
         $entity = $fieldData->getEntityData()->getEntityByOffset($entityOffset);
         $metadata = $fieldData->getMetadata();
-        $value = $this->accessor->getValue($entity, $metadata);
+        $value = $this->getAccessor()->getValue($entity, $metadata);
 
-        return $this->fieldValueRenderer->renderFieldValue($value, $metadata, $entity);
+        return $this->getFieldValueRenderer()->renderFieldValue($value, $metadata, $entity);
     }
 
     /**
      * Render label of merge entity
      *
      * @param EntityData $entityData
-     * @param int $entityOffset
+     * @param int        $entityOffset
+     *
      * @return string
      */
     public function renderMergeEntityLabel(EntityData $entityData, $entityOffset)
@@ -125,7 +137,7 @@ class MergeExtension extends \Twig_Extension
         $entity = $entityData->getEntityByOffset($entityOffset);
         $metadata = $entityData->getMetadata();
 
-        return $this->fieldValueRenderer->renderEntityLabel($entity, $metadata);
+        return $this->getFieldValueRenderer()->renderEntityLabel($entity, $metadata);
     }
 
     /**

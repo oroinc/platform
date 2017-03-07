@@ -4,30 +4,41 @@ define(function(require) {
     var TabItemView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        className: 'nav-item',
+        tamplateClassName: 'nav-link'
+    }, config);
 
     TabItemView = BaseView.extend({
         tagName: 'li',
-        className: function() {
-            var classes = ['nav-item'];
-            if (this.model.get('active')) {
-                classes.push('active');
-            }
-            if (this.model.get('changed')) {
-                classes.push('changed');
-            }
-            return classes.join(' ');
-        },
-        template: _.template('<a href="#" class="nav-link"><%= label %></a>'),
+
+        className: config.className,
+
+        template: _.template('<a href="#" class="' + config.tamplateClassName + '" data-tab-link><%= label %></a>'),
+
         listen: {
-            'change:active model': 'updateClasses',
-            'change:changed model': 'updateClasses'
+            'change:active model': 'updateStates',
+            'change:changed model': 'updateStates'
         },
+
         events: {
-            'click a': 'onSelect'
+            'click [data-tab-link]': 'onSelect'
         },
-        updateClasses: function() {
-            this.$el[0].className = _.result(this, 'className');
+
+        initialize: function(options) {
+            TabItemView.__super__.initialize.apply(this, arguments);
+
+            this.updateStates();
         },
+
+        updateStates: function() {
+            this.$el.toggleClass('active', !!this.model.get('active'));
+            this.$el.toggleClass('changed', !!this.model.get('changed'));
+        },
+
         onSelect: function() {
             this.model.set('active', true);
         }

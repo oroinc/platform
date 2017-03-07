@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class StandardAttributeNormalizer implements AttributeNormalizer
@@ -21,7 +21,7 @@ class StandardAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function normalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         $normalType = $this->normalTypes[$attribute->getType()];
         $normalizeMethod = 'normalize' . ucfirst($normalType);
@@ -34,8 +34,8 @@ class StandardAttributeNormalizer implements AttributeNormalizer
      */
     protected function normalizeString($value)
     {
-        if (is_scalar($value) || is_object($value) && method_exists($value, '__toString')) {
-            return (string)$value;
+        if (is_scalar($value) || (is_object($value) && method_exists($value, '__toString'))) {
+            return (string) $value;
         }
         return null;
     }
@@ -81,10 +81,10 @@ class StandardAttributeNormalizer implements AttributeNormalizer
 
     /**
      * @param mixed $value
-     * @param Attribute $attribute
+     * @param ParameterInterface $attribute
      * @return string
      */
-    protected function normalizeObject($value, Attribute $attribute)
+    protected function normalizeObject($value, ParameterInterface $attribute)
     {
         $class = $attribute->getOption('class');
         if (!is_object($value) || !$value instanceof $class) {
@@ -96,7 +96,7 @@ class StandardAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function denormalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         $normalType = $this->normalTypes[$attribute->getType()];
         $denormalizeMethod = 'denormalize' . ucfirst($normalType);
@@ -157,10 +157,10 @@ class StandardAttributeNormalizer implements AttributeNormalizer
 
     /**
      * @param mixed $value
-     * @param Attribute $attribute
+     * @param ParameterInterface $attribute
      * @return object|null
      */
-    protected function denormalizeObject($value, Attribute $attribute)
+    protected function denormalizeObject($value, ParameterInterface $attribute)
     {
         $value = $this->unserialize($value);
         $class = $attribute->getOption('class');
@@ -173,7 +173,7 @@ class StandardAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function supportsNormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         return !empty($this->normalTypes[$attribute->getType()]);
     }
@@ -181,7 +181,7 @@ class StandardAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function supportsDenormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         return !empty($this->normalTypes[$attribute->getType()]);
     }

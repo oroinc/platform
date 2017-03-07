@@ -176,6 +176,35 @@ class OroElementFactory implements SuiteAwareInterface
     }
 
     /**
+     * @param string $name
+     * @param NodeElement|null $context
+     * @return Element[]
+     */
+    public function findAllElements($name, NodeElement $context = null)
+    {
+        if (!$this->hasElement($name)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not find element with "%s" name',
+                $name
+            ));
+        }
+
+        $elementSelector = $this->configuration[$name]['selector'];
+        if ($context) {
+            $elementSelector = $this->prepend($elementSelector, $context);
+        }
+
+        $elements = $this->mink->getSession()->getPage()->findAll(
+            $elementSelector['type'],
+            $elementSelector['locator']
+        );
+
+        return array_map(function (NodeElement $element) use ($name) {
+            return $this->wrapElement($name, $element);
+        }, $elements);
+    }
+
+    /**
      * @return Element
      */
     public function getPage()

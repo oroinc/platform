@@ -79,3 +79,19 @@ operations:
                     method_parameters: [false, false, true, false, true, true]
                     attribute: $.entityFields
             - '@assign_constant_value': [$.availableDestinations, Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver::AVAILABLE_DESTINATIONS]
+    oro_workflow_definition_configure:
+        label: oro.workflow.permission.update_configuration.label
+        routes:
+            - oro_workflow_definition_view
+        acl_resource: [CONFIGURE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
+        order: 10
+        groups:
+            - view_navButtons
+        button_options:
+            icon: fa-cog
+        actions:
+            - '@redirect':
+                parameters:
+                    route: oro_workflow_definition_configure
+                    route_parameters:
+                        name: $name

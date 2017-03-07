@@ -111,6 +111,6 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:level', ['--help']);
 
-        $this->assertContains("Usage:\n  oro:logger:level [options] [--] <level> <disable-after>", $result);
+        $this->assertContains("Usage: oro:logger:level [options] [--] <level> <disable-after>", $result);
     }
 }

@@ -97,6 +97,7 @@ define(function(require) {
             var collection = gridContentManager.getViewsCollection(options.gridName);
 
             if (!collection) {
+                gridViewsBuilder.normalizeGridViewModelsData(options.views, this.metadata.initialState);
                 collection = new GridViewsCollection(options.views, {gridName: options.gridName});
             }
 
@@ -108,6 +109,16 @@ define(function(require) {
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;
             return _.omit(options, ['views']);
+        },
+
+        normalizeGridViewModelsData: function(items, initialState) {
+            _.each(items, function(item) {
+                _.each(['columns', 'sorter'], function(attr) {
+                    if (_.isEmpty(item[attr])) {
+                        $.extend(true, item, _.pick(initialState, attr));
+                    }
+                });
+            });
         }
     };
 

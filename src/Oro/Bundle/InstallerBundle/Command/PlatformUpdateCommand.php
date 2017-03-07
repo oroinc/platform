@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Component\PhpUtils\PhpIniUtil;
+use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 
 class PlatformUpdateCommand extends AbstractCommand
@@ -70,19 +71,19 @@ class PlatformUpdateCommand extends AbstractCommand
                     ]
                 )
                 ->runCommand(LoadPermissionConfigurationCommand::NAME, ['--process-isolation' => true])
-                ->runCommand(
-                    'oro:workflow:definitions:load',
-                    ['--process-isolation' => true]
-                )
+                ->runCommand(LoadConfigurablePermissionCommand::NAME, ['--process-isolation' => true])
                 ->runCommand(
                     'oro:cron:definitions:load',
                     [
                         '--process-isolation' => true
                     ]
                 )
+                ->runCommand(
+                    'oro:workflow:definitions:load',
+                    ['--process-isolation' => true]
+                )
                 ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
                 ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
-                ->runCommand('oro:navigation:init', ['--process-isolation' => true])
                 ->runCommand('router:cache:clear', ['--process-isolation' => true])
                 ->runCommand('oro:message-queue:create-queues', ['--process-isolation' => true])
             ;
