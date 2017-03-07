@@ -292,6 +292,7 @@ services:
         arguments:
             - "@oro_entity_extend.migration.options_manager"
             - "@oro_entity_extend.migration.entity_metadata_helper"
+            - '@oro_entity_config.provider_config_bag'
         tags:
             - { name: oro_migration.extension, extension_name: extend }
 
