@@ -11,57 +11,81 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_text
-                        label: Text Input (One Line)
+                        label: Text Input
                 group_element_item_form_text:
                     blockType: group_element_item
+                    options:
+                        anchor: form_text
+                        label: One-Line
                 form_text:
                     blockType: form_field
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["text"]'
 
+                group_element_form_textarea:
+                    blockType: group_element_item
+                    options:
+                        anchor: form_textarea
+                        label: Multi-line
+                form_textarea:
+                    blockType: form_field
+                    options:
+                        form: '=data["style_book_form"].getStyleBookFormView()["textarea"]'
+
                 group_element_form_password:
-                    blockType: group_element
+                    blockType: group_element_item
                     options:
                         anchor: form_password
-                        label: Password Input
-                group_element_item_form_password:
-                    blockType: group_element_item
+                        label: Password
                 form_password:
                     blockType: form_field
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["password"]'
 
+                group_element_form_datetime:
+                    blockType: group_element
+                    options:
+                        anchor: form_datetime
+                        label: Date and Time Picker
+                group_element_item_form_datetime:
+                    blockType: group_element_item
+                form_datetime:
+                    blockType: form_field
+                    options:
+                        form: '=data["style_book_form"].getStyleBookFormView()["datetime"]'
+
+
+
                 group_element_form_select:
                     blockType: group_element
                     options:
                         anchor: form_select
-                        label: An Option (Drop-Down)
+                        label: Single Option Select
                 group_element_item_form_select:
                     blockType: group_element_item
+                    options:
+                        anchor: form_drop_down
+                        label: Via Drop-Down
                 form_select:
                     blockType: form_field
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["select"]'
 
                 group_element_form_checkbox:
-                    blockType: group_element
+                    blockType: group_element_item
                     options:
                         anchor: form_checkbox
-                        label: Opt In/Opt Out (Checkbox)
-                group_element_item_form_checkbox:
-                    blockType: group_element_item
+                        label: Via Checkbox
                 form_checkbox: 
                     blockType: form_field
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["checkbox"]'
 
                 group_element_form_radio:
-                    blockType: group_element
+                    blockType: group_element_item
                     options:
                         anchor: form_radio
-                        label: An Option (Radio)
-                group_element_item_form_radio:
-                    blockType: group_element_item
+                        label: Via a Radio
                 form_radio:
                     blockType: form_field
                     options:
@@ -71,61 +95,36 @@ layout:
                     blockType: group_element
                     options:
                         anchor: form_checkboxes
-                        label: Multiple Options (Checkbox)
+                        label: Multiple Option Select
                 group_element_item_form_checkboxes:
                     blockType: group_element_item
+                    options:
+                        anchor: form_checkbox_element
+                        label: Via Checkbox
                 form_checkboxes:
                     blockType: form_field
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["checkboxes"]'
 
                 group_element_form_radios:
-                    blockType: group_element
+                    blockType: group_element_item
                     options:
                         anchor: form_radios
-                        label: An Option (Radio)
-                group_element_item_form_radios:
-                    blockType: group_element_item
+                        label: Via Radio List
                 form_radios:
                     blockType: form_field
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["radios"]'
 
                 group_element_form_multiselect:
-                    blockType: group_element
+                    blockType: group_element_item
                     options:
                         anchor: form_multiselect
-                        label: Multiple Options (Drop-Down)
-                group_element_item_form_multiselect:
-                    blockType: group_element_item
+                        label: Via Drop-Down
                 form_multiselect:
                     blockType: form_field
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["multiselect"]'
-
-                group_element_form_datetime:
-                    blockType: group_element
-                    options:
-                        anchor: form_datetime
-                        label: Date and Time Input
-                group_element_item_form_datetime:
-                    blockType: group_element_item
-                form_datetime:
-                    blockType: form_field
-                    options:
-                        form: '=data["style_book_form"].getStyleBookFormView()["datetime"]'
-
-                group_element_form_textarea:
-                    blockType: group_element
-                    options:
-                        anchor: form_textarea
-                        label: Text Input (Multiline)
-                group_element_item_form_textarea:
-                    blockType: group_element_item
-                form_textarea: 
-                    blockType: form_field
-                    options:
-                        form: '=data["style_book_form"].getStyleBookFormView()["textarea"]'
 
                 group_element_grid_view_notification_flash:
                     blockType: group_element
@@ -135,6 +134,9 @@ layout:
                 group_element_item_notification_flash_holder:
                     blockType: group_element_item
                     options:
+                      anchor: notification_flash_error
+                      label: Error
+                      subTreeLvl: 1
                       description: oro_frontend_style_book.groups.grid.description_notification_flash_error
                 style_book_grid_element_notification_flash:
                     blockType: block
@@ -142,6 +144,9 @@ layout:
                 group_element_item_notification_flash_success_holder:
                     blockType: group_element_item
                     options:
+                      anchor: notification_flash_success
+                      label: Success
+                      subTreeLvl: 1
                       description: oro_frontend_style_book.groups.grid.description_notification_flash_success
                 style_book_grid_element_notification_flash_success:
                     blockType: block
@@ -149,6 +154,9 @@ layout:
                 group_element_item_notification_flash_warning_holder:
                     blockType: group_element_item
                     options:
+                      anchor: notification_flash_warning
+                      label: Warning
+                      subTreeLvl: 1
                       description: oro_frontend_style_book.groups.grid.description_notification_flash_warning
                 style_book_grid_element_notification_flash_warning:
                     blockType: block
@@ -161,6 +169,9 @@ layout:
                 group_element_item_notification_message_holder:
                     blockType: group_element_item
                     options:
+                        anchor: notification_message_error
+                        label: Error
+                        subTreeLvl: 1
                         description: oro_frontend_style_book.groups.grid.description_notification_message_error
                 style_book_grid_element_notification_message:
                     blockType: block
@@ -168,6 +179,9 @@ layout:
                 group_element_item_notification_message_warning_holder:
                     blockType: group_element_item
                     options:
+                        anchor: notification_message_warning
+                        label: Warning
+                        subTreeLvl: 1
                         description: oro_frontend_style_book.groups.grid.description_notification_message_warning
                 style_book_grid_element_notification_message_warning:
                   blockType: block
@@ -175,6 +189,9 @@ layout:
                 group_element_item_notification_message_success_holder:
                     blockType: group_element_item
                     options:
+                        anchor: notification_message_success
+                        label: Success
+                        subTreeLvl: 1
                         description: oro_frontend_style_book.groups.grid.description_notification_message_success
                 style_book_grid_element_notification_message_success:
                     blockType: block
@@ -187,55 +204,33 @@ layout:
                 group_element_item_callout_info_holder:
                     blockType: group_element_item
                     options:
+                        anchor: description_callout_info
+                        label: Info
+                        subTreeLvl: 1
                         description: oro_frontend_style_book.groups.grid.description_callout_info
                 style_book_grid_element_callout_info:
                     blockType: block
                 group_element_item_callout_warning_holder:
                     blockType: group_element_item
                     options:
+                        anchor: description_callout_warning
+                        label: Warning
+                        subTreeLvl: 1
                         description: oro_frontend_style_book.groups.grid.description_callout_warning
                 style_book_grid_element_callout_warning:
                     blockType: block
                 group_element_item_callout_danger_holder:
                     blockType: group_element_item
                     options:
+                        anchor: description_callout_danger
+                        label: Danger
+                        subTreeLvl: 1
                         description: oro_frontend_style_book.groups.grid.description_callout_danger
                 style_book_grid_element_callout_danger:
                     blockType: block
 
             tree:
                 style_book_content:
-                    group_element_form_text:
-                        group_element_item_form_text:
-                            form_text: ~
-                    group_element_form_password:
-                        group_element_item_form_password:
-                            form_password: ~
-                    group_element_form_select:
-                        group_element_item_form_select:
-                            form_select: ~
-                    group_element_form_checkbox:
-                        group_element_item_form_checkbox:
-                            form_checkbox:  ~
-                    group_element_form_radio:
-                        group_element_item_form_radio:
-                            form_radio: ~
-                    group_element_form_checkboxes:
-                        group_element_item_form_checkboxes:
-                            form_checkboxes: ~
-                    group_element_form_radios:
-                        group_element_item_form_radios:
-                            form_radios: ~
-                    group_element_form_multiselect:
-                        group_element_item_form_multiselect:
-                            form_multiselect: ~
-                    group_element_form_datetime:
-                        group_element_item_form_datetime:
-                            form_datetime: ~
-                    group_element_form_textarea:
-                        group_element_item_form_textarea:
-                            form_textarea: ~
-
                     group_element_grid_view_notification_flash:
                         group_element_item_notification_flash_holder:
                             style_book_grid_element_notification_flash: ~
@@ -259,5 +254,32 @@ layout:
                             style_book_grid_element_callout_warning: ~
                         group_element_item_callout_danger_holder:
                             style_book_grid_element_callout_danger: ~
+
+                    group_element_form_text:
+                        group_element_item_form_text:
+                            form_text: ~
+                        group_element_form_textarea:
+                            form_textarea: ~
+                        group_element_form_password:
+                            form_password: ~
+                    group_element_form_datetime:
+                        group_element_item_form_datetime:
+                            form_datetime: ~
+
+                    group_element_form_select:
+                        group_element_item_form_select:
+                            form_select: ~
+                        group_element_form_checkbox:
+                            form_checkbox:  ~
+                        group_element_form_radio:
+                            form_radio: ~
+                        group_element_form_radios:
+                            form_radios: ~
+
+                    group_element_form_checkboxes:
+                        group_element_item_form_checkboxes:
+                            form_checkboxes: ~
+                        group_element_form_multiselect:
+                            form_multiselect: ~
 
     conditions: 'context["action"]=="forms"'
