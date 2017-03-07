@@ -319,7 +319,7 @@ oro:
 
         # password tooltip for different rules
         password_complexity:
-            unrestricted: ~
+            unrestricted: ''
             min_length: The password must be at least {{ length }} characters long
             lower_case: The password must include a lower case letter
             upper_case: The password must include an upper case letter

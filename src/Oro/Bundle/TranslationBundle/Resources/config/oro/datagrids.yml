@@ -138,11 +138,11 @@ datagrids:
             status:
                 label: oro.translation.translation.status.label
                 frontend_type: boolean
-            originalValue:
-                label: oro.translation.translation.original_value.label
+            englishTranslation:
+                label: oro.translation.translation.english_translation.label
                 type: twig
                 frontend_type: html
-                template: OroTranslationBundle:Translation:Datagrid/originalValue.html.twig
+                template: OroTranslationBundle:Translation:Datagrid/englishTranslation.html.twig
             value:
                 label: oro.translation.translation.value.label
                 inline_editing:
