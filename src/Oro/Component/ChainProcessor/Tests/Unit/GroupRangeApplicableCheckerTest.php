@@ -18,9 +18,9 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $processorBag->addGroup('group1', 'action1', -10);
 
         $processorBag->addProcessor('processor1_no_action', []);
-        $processorBag->addProcessor('processor2_no_action', [], null, null, -65536);
+        $processorBag->addProcessor('processor2_no_action', [], null, null, -1);
         $processorBag->addProcessor('processor1_no_group', [], 'action1');
-        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -65280);
+        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
         $processorBag->addProcessor('processor1', [], 'action1', 'group1');
 
         $this->assertProcessors(
@@ -46,9 +46,9 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $processorBag->addGroup('group1', 'action1', -10);
 
         $processorBag->addProcessor('processor1_no_action', []);
-        $processorBag->addProcessor('processor2_no_action', [], null, null, -65536);
+        $processorBag->addProcessor('processor2_no_action', [], null, null, -1);
         $processorBag->addProcessor('processor1_no_group', [], 'action1');
-        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -65280);
+        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
         $processorBag->addProcessor('processor1', [], 'action1', 'group1');
 
         $this->assertProcessors(
@@ -74,9 +74,9 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $processorBag->addGroup('group1', 'action1', -10);
 
         $processorBag->addProcessor('processor1_no_action', []);
-        $processorBag->addProcessor('processor2_no_action', [], null, null, -65536);
+        $processorBag->addProcessor('processor2_no_action', [], null, null, -1);
         $processorBag->addProcessor('processor1_no_group', [], 'action1');
-        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -65280);
+        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
         $processorBag->addProcessor('processor1', [], 'action1', 'group1');
 
         $this->assertProcessors(
@@ -108,9 +108,9 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $processorBag->addGroup('group6', 'action1', -60);
 
         $processorBag->addProcessor('processor1_no_action', []);
-        $processorBag->addProcessor('processor2_no_action', [], null, null, -65536);
+        $processorBag->addProcessor('processor2_no_action', [], null, null, -1);
         $processorBag->addProcessor('processor1_no_group', [], 'action1');
-        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -65280);
+        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
         $processorBag->addProcessor('processor1', [], 'action1', 'group1');
         $processorBag->addProcessor('processor2', [], 'action1', 'group2');
         $processorBag->addProcessor('processor3', [], 'action1', 'group3');
@@ -149,9 +149,9 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $processorBag->addGroup('group6', 'action1', -60);
 
         $processorBag->addProcessor('processor1_no_action', []);
-        $processorBag->addProcessor('processor2_no_action', [], null, null, -65536);
+        $processorBag->addProcessor('processor2_no_action', [], null, null, -1);
         $processorBag->addProcessor('processor1_no_group', [], 'action1');
-        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -65280);
+        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
         $processorBag->addProcessor('processor1', [], 'action1', 'group1');
         $processorBag->addProcessor('processor2', [], 'action1', 'group2');
         $processorBag->addProcessor('processor3', [], 'action1', 'group3');
@@ -191,9 +191,9 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $processorBag->addGroup('group6', 'action1', -60);
 
         $processorBag->addProcessor('processor1_no_action', []);
-        $processorBag->addProcessor('processor2_no_action', [], null, null, -65536);
+        $processorBag->addProcessor('processor2_no_action', [], null, null, -1);
         $processorBag->addProcessor('processor1_no_group', [], 'action1');
-        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -65280);
+        $processorBag->addProcessor('processor2_no_group', [], 'action1', null, -1);
         $processorBag->addProcessor('processor1', [], 'action1', 'group1');
         $processorBag->addProcessor('processor2', [], 'action1', 'group2');
         $processorBag->addProcessor('processor3', [], 'action1', 'group3');
