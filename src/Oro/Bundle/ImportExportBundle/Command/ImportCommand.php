@@ -92,7 +92,7 @@ class ImportCommand extends ContainerAwareCommand
         );
 
         $output->writeln(
-            sprintf('%s scheduled successfully. The result will be sent to the email ')
+            sprintf('%s scheduled successfully. The result will be sent to the email ', $jobName)
         );
     }
 
