@@ -6,6 +6,7 @@ ActionBundle
 - `Oro\Bundle\ActionBundle\Condition\RouteExists` deprecated because of:
     - work with `RouteCollection` is performance consuming
     - it was used to check bundle presence, which could be done with `service_exists`
+- Class `Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass` was removed.
 
 ActivityListBundle
 ------------------
@@ -25,6 +26,10 @@ AddressBundle
 - Class `Oro\Bundle\AddressBundle\Twig\PhoneExtension`
     - construction signature was changed now it takes next arguments:
         - `ServiceLink` $providerLink
+
+CacheBundle
+-----------
+- Added tag `oro.config_cache_warmer.provider` to be able to register custom warmer configuration provider for `Oro\Bundle\CacheBundle\EventListener\CacheWarmerListener`. It must implement `Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface`
 
 DashboardBundle
 ---------------
