@@ -6,11 +6,17 @@ use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\Collection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\Merger\ConfigurationMerger;
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Bundle\CacheBundle\Provider\ConfigCacheWarmerInterface;
 
-class ConfigurationProvider implements ConfigurationProviderInterface
+class ConfigurationProvider implements ConfigurationProviderInterface, ConfigCacheWarmerInterface
 {
+    const CONFIG_FILE_PATH = 'Resources/config/oro/actions.yml';
+
     /** @var ConfigurationDefinitionInterface */
     protected $configurationDefinition;
 
@@ -56,12 +62,27 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         $this->rootNode = $rootNode;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function warmUpCache()
     {
         $this->clearCache();
         $this->cache->save($this->rootNode, $this->resolveConfiguration());
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUpResourceCache(ContainerBuilder $containerBuilder)
+    {
+        $this->clearCache();
+        $this->cache->save($this->rootNode, $this->resolveConfiguration(null, $containerBuilder));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function clearCache()
     {
         $this->cache->delete($this->rootNode);
@@ -91,13 +112,16 @@ class ConfigurationProvider implements ConfigurationProviderInterface
 
     /**
      * @param Collection $errors
+     * @param ContainerBuilder $containerBuilder
      * @return array
      * @throws InvalidConfigurationException
      */
-    protected function resolveConfiguration(Collection $errors = null)
+    protected function resolveConfiguration(Collection $errors = null, ContainerBuilder $containerBuilder = null)
     {
+        $rawConfiguration = array_merge($this->rawConfiguration, $this->loadConfiguration($containerBuilder));
+
         $merger = new ConfigurationMerger($this->kernelBundles);
-        $configs = $merger->mergeConfiguration($this->rawConfiguration);
+        $configs = $merger->mergeConfiguration($rawConfiguration);
         $data = [];
 
         try {
@@ -111,5 +135,29 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @param ContainerBuilder|null $containerBuilder
+     * @return array
+     */
+    protected function loadConfiguration(ContainerBuilder $containerBuilder = null)
+    {
+        $nodeName = $this->rootNode;
+        $configLoader = new CumulativeConfigLoader(
+            'oro_action',
+            new YamlCumulativeFileLoader(self::CONFIG_FILE_PATH)
+        );
+
+        $resources = $configLoader->load($containerBuilder);
+        $configs = [];
+
+        foreach ($resources as $resource) {
+            if (array_key_exists($nodeName, (array)$resource->data) && is_array($resource->data[$nodeName])) {
+                $configs[$resource->bundleClass] = $resource->data[$nodeName];
+            }
+        }
+
+        return $configs;
     }
 }
