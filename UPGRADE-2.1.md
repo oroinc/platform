@@ -20,6 +20,36 @@ MessageQueue Component
 - Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
 - Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
 
+ChainProcessor Component
+------------------------
+- Fixed an issue with invalid execution order of processors. The issue was that processors from different groups are intersected. During the fix the calculation of internal priorities of processors was changed, this may affect existing configuration of processors in case if you have common (not bound to any action) processors and ungrouped processors which should work with regular grouped processors.
+
+    The previous priority rules:
+
+    | Processor type | Processor priority | Group priority |
+    |----------------|--------------------|----------------|
+    | initial common processors | from -255 to 255 |  |
+    | initial ungrouped processors | from -255 to 255 |  |
+    | grouped processors | from -255 to 255 | from -254 to 252 |
+    | final ungrouped processors | from -65535 to -65280 |  |
+    | final common processors | from min int to -65536 |  |
+
+    The new priority rules:
+
+    | Processor type | Processor priority | Group priority |
+    |----------------|--------------------|----------------|
+    | initial common processors | greater than or equals to 0 |  |
+    | initial ungrouped processors | greater than or equals to 0 |  |
+    | grouped processors | from -255 to 255 | from -255 to 255 |
+    | final ungrouped processors | less than 0 |  |
+    | final common processors | less than 0 |  |
+
+    So, the new rules means that
+
+        - common and ungrouped processors with the priority greater than or equals to 0 will be executed before grouped processors
+        - common and ungrouped processors with the priority less than 0 will be executed after grouped processors
+        - now there are no any magic numbers for priorities of any processors
+
 Action Component
 ----------------
 - Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
