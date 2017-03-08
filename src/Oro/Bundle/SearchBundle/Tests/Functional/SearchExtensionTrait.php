@@ -60,4 +60,17 @@ trait SearchExtensionTrait
             );
         }
     }
+
+    /**
+     * Remove all data added in fixtures
+     */
+    protected function clearTestData()
+    {
+        $manager = $this->getContainer()->get('doctrine')->getManager();
+        $repository = $manager->getRepository('Oro\Bundle\TestFrameworkBundle\Entity\Item');
+        $repository->createQueryBuilder('qb')
+            ->delete()
+            ->getQuery()
+            ->execute();
+    }
 }

@@ -5,8 +5,8 @@ request:
     offset: ~
     max_results: ~
 response:
-    records_count: 1
-    count: 1
+    records_count: 9
+    count: 9
     rest:
         data:
             -
