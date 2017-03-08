@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -23,6 +22,7 @@ class RelationType extends AbstractType
     const ALLOWED_BIDIRECTIONAL_RELATIONS = [
         \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_ONE,
         \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_MANY,
+        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::ONE_TO_MANY,
     ];
 
     /** @var ConfigManager */
@@ -225,17 +225,27 @@ class RelationType extends AbstractType
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $this->config->getId();
 
+        // read_only when updating field (so bidirectional option already exists)
+        $readOnly = $this->config->get('bidirectional') !== null;
+
+        // if reusing relation ("Reuse existing relation" option on UI) or for one2many relation
+        // we would have always bidirectional relations
+        if ($this->config->get('relation_key') || $fieldConfigId->getFieldType() === RelationTypeBase::ONE_TO_MANY) {
+            $readOnly = true;
+            $data['bidirectional'] = true;
+        }
+
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
             $form->add(
                 'bidirectional',
-                ChoiceType::class,
+                'genemu_jqueryselect2_choice',
                 [
                     'choices' => ['No', 'Yes'],
                     'empty_value' => false,
                     'block' => 'general',
                     'subblock' => 'properties',
                     'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
-                    'disabled' => (null === $this->config->get('bidirectional')) ? null : 'disabled',
+                    'read_only' => $readOnly,
                     'data' => $this->getArrayValue($data, 'bidirectional'),
                 ]
             );
