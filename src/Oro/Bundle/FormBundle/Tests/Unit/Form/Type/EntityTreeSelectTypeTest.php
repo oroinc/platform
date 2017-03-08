@@ -90,8 +90,8 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                 ],
                 null,
                 [
-                    'pageComponentModule' => 'oroform/js/app/components/entity-tree-select-form-type-component',
                     'treeOptions' => [
+                        'view' => 'oroform/js/app/components/entity-tree-select-form-type-component',
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => null,
@@ -109,8 +109,8 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                 ],
                 null,
                 [
-                    'pageComponentModule' => 'oroform/js/app/components/entity-tree-select-form-type-component',
                     'treeOptions' => [
+                        'view' => 'oroform/js/app/components/entity-tree-select-form-type-component',
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => null,
@@ -127,8 +127,8 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                 ],
                 1,
                 [
-                    'pageComponentModule' => 'myModule',
                     'treeOptions' => [
+                        'view' => 'myModule',
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => 1,

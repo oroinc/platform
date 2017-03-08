@@ -478,11 +478,21 @@ class Query
      */
     public static function clearString($inputString)
     {
+        /**
+         * Replace all not not supported characters with whitespaces to support both MyISAM and InnoDB
+         *
+         * /[^\p{L}\d\s]/u <- returns all characters that are not:
+         * p{L} <- letter in any unicode language
+         * \d <- digit
+         * \s <- whitespace
+         *
+         * /[\s]{2,}/ <-- returns all multi-spaces
+         */
         $string = trim(
             preg_replace(
-                '/ +/',
+                '/[\s]{2,}/',
                 self::DELIMITER,
-                preg_replace('/[^\w:*@.]/u', self::DELIMITER, $inputString)
+                preg_replace('/[^\p{L}\d\s]/u', self::DELIMITER, $inputString)
             )
         );
 

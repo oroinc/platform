@@ -3,17 +3,14 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
-use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @group search
  * @dbIsolationPerTest
  */
-class SearchControllerTest extends WebTestCase
+class SearchControllerTest extends SearchBundleWebTestCase
 {
-    use SearchExtensionTrait;
 
     protected function setUp()
     {
@@ -28,11 +25,6 @@ class SearchControllerTest extends WebTestCase
         $this->loadFixtures([LoadSearchItemData::class]);
         $this->getSearchIndexer()->reindex(Item::class);
         $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
-    }
-
-    protected function tearDown()
-    {
-        $this->clearIndexTextTable();
     }
 
     /**

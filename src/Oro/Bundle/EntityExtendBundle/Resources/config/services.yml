@@ -292,6 +292,7 @@ services:
         arguments:
             - "@oro_entity_extend.migration.options_manager"
             - "@oro_entity_extend.migration.entity_metadata_helper"
+            - '@oro_entity_config.provider_config_bag'
         tags:
             - { name: oro_migration.extension, extension_name: extend }
 
@@ -424,6 +425,7 @@ services:
             - "@oro_entity_extend.acl_helper.link"
             - "@oro_entity.doctrine_helper"
             - "@oro_entity.entity_name_resolver"
+            - "@oro_featuretoggle.checker.feature_checker"
         lazy: true
 
     oro_entity_extend.acl_helper.link:

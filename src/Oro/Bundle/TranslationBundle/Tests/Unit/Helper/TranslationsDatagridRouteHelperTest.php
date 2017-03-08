@@ -41,10 +41,10 @@ class TranslationsDatagridRouteHelperTest extends \PHPUnit_Framework_TestCase
         $this->datagridRouteHelper->expects($this->once())->method('generate')->with(
             TranslationsDatagridRouteHelper::TRANSLATION_GRID_ROUTE_NAME,
             TranslationsDatagridRouteHelper::TRANSLATION_GRID_NAME,
-            ['f' => ['filterName' => ['value' => '10']]],
+            ['f' => ['filterName' => ['value' => '10', 'type' => '20']]],
             RouterInterface::ABSOLUTE_PATH
         )->willReturn('generatedValue');
 
-        $this->assertEquals('generatedValue', $this->helper->generate(['filterName' => 10]));
+        $this->assertEquals('generatedValue', $this->helper->generate(['filterName' => 10], 1, ['filterName' => 20]));
     }
 }

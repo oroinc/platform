@@ -2,38 +2,25 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration\Query;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Types\Type;
 
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
-abstract class AbstractEntityConfigQuery implements MigrationQuery, ConnectionAwareInterface
+abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
 {
-    /** @var Connection */
-    protected $connection;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
     /**
      * @return int
      */
     abstract public function getRowBatchLimit();
 
     /**
-     * @param array $row
-     *
-     * @return void
+     * @param array           $row
+     * @param LoggerInterface $logger
      */
-    abstract public function processRow(array $row);
+    abstract public function processRow(array $row, LoggerInterface $logger);
 
     /**
      * {@inheritdoc}
@@ -52,7 +39,7 @@ abstract class AbstractEntityConfigQuery implements MigrationQuery, ConnectionAw
                 ->fetchAll(\PDO::FETCH_ASSOC);
 
             foreach ($rows as $row) {
-                $this->processRow($row);
+                $this->processRow($row, $logger);
             }
         }
     }
@@ -79,9 +66,38 @@ abstract class AbstractEntityConfigQuery implements MigrationQuery, ConnectionAw
     }
 
     /**
+     * @param string $entityClassName
+     * @return array
+     */
+    protected function getEntityConfigFromDb($entityClassName)
+    {
+        return $this->createEntityConfigQb()
+            ->where('ec.class_name = :entity_class_name')
+            ->setParameter('entity_class_name', $entityClassName)
+            ->execute()
+            ->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * @param array                $entityData
+     * @param int                  $id
+     * @param LoggerInterface|null $logger
+     */
+    protected function updateEntityConfigData(array $entityData, $id, LoggerInterface $logger = null)
+    {
+        $query = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
+        $parameters = [$this->connection->convertToDatabaseValue($entityData, Type::TARRAY), $id];
+
+        if ($logger) {
+            $this->logQuery($logger, $query, $parameters);
+        }
+        $this->connection->executeUpdate($query, $parameters);
+    }
+
+    /**
      * @return int
      */
-    private function getEntityConfigCount()
+    protected function getEntityConfigCount()
     {
         return $this->createEntityConfigQb()
             ->select('COUNT(1)')
@@ -92,7 +108,7 @@ abstract class AbstractEntityConfigQuery implements MigrationQuery, ConnectionAw
     /**
      * @return QueryBuilder
      */
-    private function createEntityConfigQb()
+    protected function createEntityConfigQb()
     {
         return $this->connection->createQueryBuilder()
             ->select('*')

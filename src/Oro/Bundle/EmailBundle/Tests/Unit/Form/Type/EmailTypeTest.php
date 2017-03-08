@@ -7,39 +7,43 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
-use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
-use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailTypeTest extends TypeTestCase
 {
     /**
-     * @var \Symfony\Component\Security\Core\SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityContext;
 
     /**
-     * @var \Oro\Bundle\EmailBundle\Provider\EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $emailRenderer;
 
     /**
-     * @var \Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailModelBuilderHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $emailModelBuilderHelper;
 
@@ -184,7 +188,8 @@ class EmailTypeTest extends TypeTestCase
             $translator,
             $securityTokenStorage,
             $eventDispatcher,
-            $entityTitleResolver
+            $entityTitleResolver,
+            $this->createMock(FeatureChecker::class)
         );
 
         return [
