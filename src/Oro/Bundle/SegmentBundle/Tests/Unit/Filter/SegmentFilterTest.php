@@ -10,7 +10,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -35,6 +34,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser;
 
 class SegmentFilterTest extends OrmTestCase
 {

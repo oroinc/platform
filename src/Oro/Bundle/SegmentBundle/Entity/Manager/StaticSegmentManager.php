@@ -85,8 +85,8 @@ class StaticSegmentManager
 
             $segmentQuery = $query->getSQL();
             $segmentQuery = substr_replace($segmentQuery, $insertString, stripos($segmentQuery, 'from'), 0);
-            $fieldToSelect = 'entity_id';
 
+            $fieldToSelect = 'entity_id';
             if ($entityMetadata->getTypeOfField($entityMetadata->getSingleIdentifierFieldName()) === 'integer') {
                 $fieldToSelect = 'integer_entity_id';
             }
