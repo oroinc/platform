@@ -193,7 +193,6 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      * Asserts that provided capability permissions allowed on view page
      *
      * Example: And following capability permissions should be checked:
-     *           | Access dotmailer statistics     |
      *           | Manage Abandoned Cart Campaigns |
      *
      * @Then /^following capability permissions should be checked:$/

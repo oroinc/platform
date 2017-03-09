@@ -190,7 +190,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Swift_SwiftException
-     * @expectedExceptionMessage An email was not delivered.
+     * @expectedExceptionMessage The email was not delivered.
      */
     public function testProcessSendFailException()
     {

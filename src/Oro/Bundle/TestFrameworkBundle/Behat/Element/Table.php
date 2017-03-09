@@ -1,9 +1,8 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
+namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class Table extends Element
 {
