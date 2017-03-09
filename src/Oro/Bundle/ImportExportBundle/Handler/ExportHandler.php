@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -30,6 +32,11 @@ class ExportHandler extends AbstractHandler
     protected $configManager;
 
     /**
+     * @var WriterChain
+     */
+    protected $writerChain;
+
+    /**
      * @param MimeTypeGuesser $mimeTypeGuesser
      */
     public function setMimeTypeGuesser(MimeTypeGuesser $mimeTypeGuesser)
@@ -51,6 +58,14 @@ class ExportHandler extends AbstractHandler
     public function setConfigManager(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
+    }
+
+    /**
+     * @param WriterChain $writerChain
+     */
+    public function setWriterChain(WriterChain $writerChain)
+    {
+        $this->writerChain = $writerChain;
     }
 
     /**
@@ -113,6 +128,10 @@ class ExportHandler extends AbstractHandler
         } else {
             $url .= $this->router->generate('oro_importexport_error_log', ['jobCode' => $jobResult->getJobCode()]);
             $errorsCount = count($jobResult->getFailureExceptions());
+        }
+
+        if (($writer = $this->writerChain->getWriter($outputFormat)) && $writer instanceof ClosableInterface) {
+            $writer->close();
         }
 
         return [

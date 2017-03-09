@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Routing\RouterInterface;
 
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -127,6 +128,14 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
                 'oro_importexport_export_download',
                 ['fileName' => basename($filePath)]
             );
+        }
+
+        if ($writer instanceof ClosableInterface) {
+            $writer->close();
+        }
+
+        if ($reader instanceof ClosableInterface) {
+            $reader->close();
         }
 
         return [

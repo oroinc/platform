@@ -4,20 +4,19 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
-
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
-class DatagridExportConnector implements ItemReaderInterface, \Countable, ContextAwareInterface
+class DatagridExportConnector implements ItemReaderInterface, \Countable, ContextAwareInterface, ClosableInterface
 {
     /**
      * @var ServiceLink
@@ -184,5 +183,11 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         $this->grid->getParameters()->set(PagerInterface::PAGER_ROOT_PARAM, $pagerParameters);
 
         return $this->grid->getData();
+    }
+
+    public function close()
+    {
+        $this->sourceData = null;
+        $this->gridDataSource = null;
     }
 }
