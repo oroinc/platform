@@ -3,12 +3,11 @@
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
-
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
-
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
@@ -82,7 +81,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->translator,
             $this->securityTokenStorage,
             $this->dispatcher,
-            $this->entityTitleResolver
+            $this->entityTitleResolver,
+            $this->createMock(FeatureChecker::class)
         );
         $type->buildForm($builder, ['collectionModel' => false]);
     }
@@ -113,7 +113,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->translator,
             $this->securityTokenStorage,
             $this->dispatcher,
-            $this->entityTitleResolver
+            $this->entityTitleResolver,
+            $this->createMock(FeatureChecker::class)
         );
         $type->setDefaultOptions($resolver);
     }
@@ -126,7 +127,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->translator,
             $this->securityTokenStorage,
             $this->dispatcher,
-            $this->entityTitleResolver
+            $this->entityTitleResolver,
+            $this->createMock(FeatureChecker::class)
         );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
     }
@@ -139,7 +141,8 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->translator,
             $this->securityTokenStorage,
             $this->dispatcher,
-            $this->entityTitleResolver
+            $this->entityTitleResolver,
+            $this->createMock(FeatureChecker::class)
         );
         $this->assertEquals('oro_activity_contexts_select', $type->getName());
     }

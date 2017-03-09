@@ -232,7 +232,7 @@ abstract class BaseDriver implements DBALPersisterInterface
     }
 
     /**
-     * @param string       $fieldName
+     * @param string $fieldName
      * @param array|string $fieldValue
      * @return array|string
      */

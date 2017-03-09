@@ -149,8 +149,8 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testImportForm()
     {
-        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $tmpDirName = 'import_export';
+        $appDir = $this->getContainer()->getParameter('kernel.root_dir');
+        $tmpDirName = $this->getContainer()->getParameter('importexport.filesystems_storage');
         $fileDir = __DIR__ . '/Import/fixtures';
         $file = $fileDir . '/testLineEndings.csv';
 
@@ -209,7 +209,7 @@ class ImportExportControllerTest extends WebTestCase
             $files
         );
         $this->assertJsonResponseSuccess();
-        $tmpFiles = glob($cacheDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.csv');
+        $tmpFiles = glob($appDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.csv');
         $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
         $this->assertEquals(
             substr_count(file_get_contents($file), "\n"),

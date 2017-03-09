@@ -1,8 +1,7 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
+namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Symfony\Component\DomCrawler\Crawler;
 
 class TableHeader extends Element

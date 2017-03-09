@@ -20,6 +20,36 @@ MessageQueue Component
 - Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
 - Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
 
+ChainProcessor Component
+------------------------
+- Fixed an issue with invalid execution order of processors. The issue was that processors from different groups are intersected. During the fix the calculation of internal priorities of processors was changed, this may affect existing configuration of processors in case if you have common (not bound to any action) processors and ungrouped processors which should work with regular grouped processors.
+
+    The previous priority rules:
+
+    | Processor type | Processor priority | Group priority |
+    |----------------|--------------------|----------------|
+    | initial common processors | from -255 to 255 |  |
+    | initial ungrouped processors | from -255 to 255 |  |
+    | grouped processors | from -255 to 255 | from -254 to 252 |
+    | final ungrouped processors | from -65535 to -65280 |  |
+    | final common processors | from min int to -65536 |  |
+
+    The new priority rules:
+
+    | Processor type | Processor priority | Group priority |
+    |----------------|--------------------|----------------|
+    | initial common processors | greater than or equals to 0 |  |
+    | initial ungrouped processors | greater than or equals to 0 |  |
+    | grouped processors | from -255 to 255 | from -255 to 255 |
+    | final ungrouped processors | less than 0 |  |
+    | final common processors | less than 0 |  |
+
+    So, the new rules means that
+
+        - common and ungrouped processors with the priority greater than or equals to 0 will be executed before grouped processors
+        - common and ungrouped processors with the priority less than 0 will be executed after grouped processors
+        - now there are no any magic numbers for priorities of any processors
+
 Action Component
 ----------------
 - Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
@@ -322,6 +352,27 @@ FormBundle
 - The service `oro_form.twig.js_validation_extension` was removed
 - Class `Oro\Bundle\FormBundle\Twig\JsValidationExtension` was removed. Its functionality was moved to `Oro\Bundle\FormBundle\Twig\FormExtension`
 
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard `Oro\Bundle\FormBundle\Model\UpdateHandler`.
+So please consider to use it when for a new entity management development.
+
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandler`
+    - marked as deprecated, use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` (service `oro_form.update_handler`) instead
+    - changed `__constructor` signature: 
+        - first argument changed from `Symfony\Component\HttpFoundation\Request` to `Symfony\Component\HttpFoundation\RequestStack`
+        - fifth argument changed from `Symfony\Component\EventDispatcher\EventDispatcherInterface` to `Oro\Bundle\FormBundle\Form\Handler\FormHandler` as from handling encapsulation.
+ 
+- Interface `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface` added for standard form handlers.
+- Class `Oro\Bundle\FormBundle\Form\Handler\FormHandler` added (service 'oro_form.form.handler.default') as default form processing mechanism.
+- Tag `oro_form.form.handler` added to register custom form handlers under its `alias`.
+- Class `Oro\Bundle\FormBundle\Model\FormHandlerRegistry` added to collect tagged with `oro_form.form.handler` services.
+- Class `Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler` added as interface compatibility helper for callable.
+
+- Interface `Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface`  added for common update template data population.
+- Class `Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider` (service `oro_form.provider.from_template_data.default`) as default update template data provider.
+- Tag `oro_form.form_template_data_provider` added to register custom update template data providers.
+- Class `Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry` added to collect tagged with `oro_form.form_template_data_provider` services.
+- Class `Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider` added as interface compatibility helper for callable.
+
 HelpBundle
 ----------
 - The parameter `oro_help.twig.extension.class` was removed from DIC
@@ -580,6 +631,7 @@ SearchBundle
 `Oro\Bundle\SearchBundle\Engine\OrmIndexer` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
 - The parameter `oro_search.twig_extension.class` was removed from DIC
 - The service `oro_search.twig.search_extension` was marked as `private`
+- `Oro\Bundle\SearchBundle\Engine\PdoMysql` `getWords` method is deprecated. All non alphanumeric chars are removed in `Oro\Bundle\SearchBundle\Engine\BaseDriver` `filterTextFieldValue` from fulltext search for MySQL and PgSQL
 
 ScopeBundle
 -----------
@@ -954,3 +1006,20 @@ TagBundle
     - removed method `isReportOrSegmentGrid`
     - removed method `addReportOrSegmentGridPrefix`
     - added UnsupportedGridPrefixesTrait
+
+Tree Component
+--------------
+- `Oro\Component\Tree\Handler\AbstractTreeHandler`:
+    - added method `getTreeItemList`
+    
+DependencyInjection Component
+-----------------------------
+- Class `Oro\Component\DependencyInjection\ServiceLinkRegistry` together with 
+`Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface` for injection awareness. Can be used to provide 
+injection of a collection of services that are registered in system, but there no need to instantiate 
+all of them on every runtime. The registry has `@service_container` dependency (`Symfony\Component\DependencyInjection\ContainerInterface`) 
+and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. It can register public services by `ServiceLinkRegistry::add` 
+with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
+- Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
+which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
+provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).  

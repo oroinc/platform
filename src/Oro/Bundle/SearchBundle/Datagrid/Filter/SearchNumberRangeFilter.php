@@ -31,8 +31,13 @@ class SearchNumberRangeFilter extends SearchNumberFilter
                 return true;
 
             case NumberRangeFilterType::TYPE_NOT_BETWEEN:
-                $ds->addRestriction($builder->lte($fieldName, $value), FilterUtility::CONDITION_AND);
-                $ds->addRestriction($builder->gte($fieldName, $valueEnd), FilterUtility::CONDITION_AND);
+                $ds->addRestriction(
+                    Criteria::create()
+                        ->where($builder->lte($fieldName, $value))
+                        ->orWhere($builder->gte($fieldName, $valueEnd))
+                        ->getWhereExpression(),
+                    FilterUtility::CONDITION_AND
+                );
 
                 return true;
         }
