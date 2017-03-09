@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 
 class LanguageSelectType extends AbstractType
@@ -40,7 +41,7 @@ class LanguageSelectType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return OroChoiceType::NAME;
     }
 
     /**

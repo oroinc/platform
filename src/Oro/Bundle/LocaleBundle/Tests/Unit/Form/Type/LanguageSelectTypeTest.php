@@ -4,7 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\PreloadedExtension;
 
+use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -25,9 +27,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->provider = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->provider = $this->createMock(LocalizationChoicesProvider::class);
 
         $this->formType = new LanguageSelectType($this->provider);
     }
@@ -41,7 +41,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->formType->getParent());
+        $this->assertEquals(OroChoiceType::NAME, $this->formType->getParent());
     }
 
     public function testGetName()
@@ -66,5 +66,26 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
             ],
             $choices
         );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        $choiceType = $this->getMockBuilder(OroChoiceType::class)
+            ->setMethods(['configureOptions', 'getParent'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
+
+        return [
+            new PreloadedExtension(
+                [
+                    'oro_choice' => $choiceType,
+                ],
+                []
+            )
+        ];
     }
 }

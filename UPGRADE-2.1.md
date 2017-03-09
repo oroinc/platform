@@ -769,6 +769,11 @@ TranslationBundle
     - removed property `protected $translationRouteHelper`
 - Added `array $filtersType = []` parameter to the `generate` method, that receives an array of filter types to be applies on the route in order to support 
 filters such as `contains` when generating routes
+- Class `Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType`
+   - The signature of constructor was changed, added:
+        - third parameter is instance of `TranslationStatisticProvider`
+        - fourth parameter is instance of `TranslatorInterface`
+   - Changed parent from type from `locale` to `oro_choice`
 
 UIBundle
 --------
