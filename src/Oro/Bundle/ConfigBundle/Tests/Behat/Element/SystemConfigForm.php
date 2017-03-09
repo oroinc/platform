@@ -16,6 +16,7 @@ class SystemConfigForm extends Form
             $value = self::normalizeValue($value);
             $this->uncheckUseDefaultCheckbox($label);
             $input = $this->getSettingControlByLabel($label);
+
             $input->setValue($value);
         }
     }

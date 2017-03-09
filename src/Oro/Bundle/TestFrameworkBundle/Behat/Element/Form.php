@@ -204,6 +204,10 @@ class Form extends Element
             return new \DateTime($value);
         }
 
+        if (in_array($value, ['true', 'false', 'yes', 'no', 'on', 'off'])) {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+
         return $value;
     }
 
