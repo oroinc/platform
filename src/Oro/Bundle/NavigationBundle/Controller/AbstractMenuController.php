@@ -249,7 +249,7 @@ abstract class AbstractMenuController extends Controller
         $response = $this->get('oro_form.model.update_handler')->update(
             $menuUpdate,
             $form,
-            $this->get('translator')->trans('oro.navigation.menuupdate.saved_message')
+            $this->getSavedSuccessMessage()
         );
 
         if (is_array($response)) {
@@ -343,5 +343,13 @@ abstract class AbstractMenuController extends Controller
     protected function getContextFromRequest(Request $request, array $allowedKeys = [])
     {
         return $this->get('oro_scope.context_request_helper')->getFromRequest($request, $allowedKeys);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSavedSuccessMessage()
+    {
+        return $this->get('translator')->trans('oro.navigation.menuupdate.saved_message');
     }
 }

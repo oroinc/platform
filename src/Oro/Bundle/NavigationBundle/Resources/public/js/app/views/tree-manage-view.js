@@ -17,6 +17,16 @@ define(function(require) {
         menu: '',
 
         /**
+         * @property {String}
+         */
+        successMessage: '',
+
+        /**
+         * @property {String}
+         */
+        errorMessage: 'oro.ui.jstree.move_node_error',
+
+        /**
          * @property {Object}
          */
         context: {},
@@ -27,6 +37,7 @@ define(function(require) {
         initialize: function(options) {
             TreeManageView.__super__.initialize.call(this, options);
             this.menu = options.menu;
+            this.successMessage = options.successMessage || 'oro.navigation.menuupdate.moved_success_message';
             this.context = options.context;
         },
 
@@ -86,13 +97,13 @@ define(function(require) {
                             widget.render();
                         });
                     }
-                    var message = _.__('oro.navigation.menuupdate.moved_success_message', {nodeText: data.node.text});
+                    var message = _.__(self.successMessage, {nodeText: data.node.text});
                     messenger.notificationFlashMessage('success', message);
                 },
                 errorHandlerMessage: false,
                 error: function(xhr) {
                     self.rollback(data);
-                    var message = _.__('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
+                    var message = _.__(self.errorMessage, {nodeText: data.node.text});
                     if (xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }

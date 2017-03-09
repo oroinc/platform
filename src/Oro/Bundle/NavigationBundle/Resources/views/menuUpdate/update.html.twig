@@ -31,7 +31,7 @@
                 {#Delete button #}
                 {{ UI.deleteButton({
                     'label': 'oro.navigation.menuupdate.delete'|trans(),
-                    'successMessage': 'oro.navigation.menuupdate.deleted_message'|trans(),
+                    'successMessage': deletedMessage|default('oro.navigation.menuupdate.deleted_message')|trans(),
                     'dataUrl': path(routePrefix ~ 'ajax_delete', {context: context, menuName: menuName, key: app.request.get('key')}),
                     'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.menu, context: context}),
                     'aCss': 'no-hash remove-button',
@@ -51,7 +51,7 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path(routePrefix ~ 'ajax_hide', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': 'oro.navigation.menuupdate.hide_success_message'
+                            'successMessage': hiddenMessage|default('oro.navigation.menuupdate.hide_success_message')
                         }) }}
                     </div>
                 {% else %}
@@ -66,7 +66,7 @@
                             'dataMethod': 'PUT',
                             'dataUrl': path(routePrefix ~ 'ajax_show', {context: context, menuName: menuName, key: app.request.get('key')}),
                             'dataRedirect': app.request.uri,
-                            'successMessage': 'oro.navigation.menuupdate.show_success_message'
+                            'successMessage': showedMessage|default('oro.navigation.menuupdate.show_success_message')
                         }) }}
                     </div>
                 {% endif %}
@@ -88,7 +88,7 @@
                 'dataMethod': 'POST',
                 'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: menuName, parentKey: app.request.get('key'), 'isDivider': true}),
                 'dataRedirect': app.request.uri,
-                'successMessage': 'oro.navigation.menuupdate.divider_created'
+                'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')
             }) %}
 
             {% set parameters = {
@@ -183,7 +183,8 @@
                             'updateAllowed' : true,
                             'onRootSelectRoute' : routePrefix ~ 'view',
                             'onSelectRoute' : routePrefix ~ 'update',
-                            'onMoveRoute' : routePrefix ~ 'ajax_move'
+                            'onMoveRoute' : routePrefix ~ 'ajax_move',
+                            'successMessage': movedMessage|default('oro.ui.jstree.move_node_error')
                         } %}
                         {{ UI.renderJsTree(
                             {

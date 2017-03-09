@@ -41,7 +41,7 @@
                             'dataMethod': 'POST',
                             'dataRedirect': app.request.uri,
                             'dataUrl': path(routePrefix ~ 'ajax_create', {context: context, menuName: entity.name, parentKey: entity.name, 'isDivider': true}),
-                            'successMessage': 'oro.navigation.menuupdate.divider_created'
+                            'successMessage': dividerCreatedMessage|default('oro.navigation.menuupdate.divider_created')
                             }) %}
 
                             {% set parameters = {
@@ -98,7 +98,8 @@
                                         'view' : 'oronavigation/js/app/views/tree-manage-view',
                                         'onRootSelectRoute' : routePrefix ~ 'view',
                                         'onSelectRoute' : routePrefix ~ 'update',
-                                        'onMoveRoute' : routePrefix ~ 'ajax_move'
+                                        'onMoveRoute' : routePrefix ~ 'ajax_move',
+                                        'successMessage': movedMessage|default('oro.ui.jstree.move_node_error')
                                     } %}
 
                                     {{ UI.renderJsTree(
@@ -137,7 +138,7 @@
     {% set parameters = parameters|merge({
         'data': {
             'message': 'oro.navigation.menuupdate.reset_confirm'|trans({ '%menuKey%' : parameters.menuKey }),
-            'success-message': 'oro.navigation.menuupdate.reset_message'|trans({ '%menuKey%' : parameters.menuKey }),
+            'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : parameters.menuKey }),
             'ok-text': 'oro.navigation.menuupdate.reset_ok_text'|trans,
             'title': 'oro.navigation.menuupdate.reset_title'|trans,
             'url': url
