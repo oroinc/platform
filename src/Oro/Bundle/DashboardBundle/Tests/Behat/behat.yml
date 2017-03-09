@@ -2,4 +2,4 @@ oro_behat_extension:
   pages:
     Admin Dashboard:
       class: Oro\Bundle\DashboardBundle\Tests\Behat\Page\AdminDashboard
-      route: oro_dashboard_index
+      route: oro_default

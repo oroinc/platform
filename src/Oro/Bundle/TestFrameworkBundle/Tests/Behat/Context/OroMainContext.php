@@ -356,7 +356,7 @@ class OroMainContext extends MinkContext implements
      */
     public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
-        $uri = $this->getContainer()->get('router')->generate('oro_dashboard_index');
+        $uri = $this->getContainer()->get('router')->generate('oro_default');
         $this->visit($uri);
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
