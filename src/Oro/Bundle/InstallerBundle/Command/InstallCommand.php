@@ -15,6 +15,7 @@ use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\SecurityBundle\Command\LoadConfigurablePermissionCommand;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
@@ -451,13 +452,19 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 ]
             )
             ->runCommand(
-                'oro:workflow:definitions:load',
+                LoadConfigurablePermissionCommand::NAME,
                 [
                     '--process-isolation' => true
                 ]
             )
             ->runCommand(
                 'oro:cron:definitions:load',
+                [
+                    '--process-isolation' => true
+                ]
+            )
+            ->runCommand(
+                'oro:workflow:definitions:load',
                 [
                     '--process-isolation' => true
                 ]
@@ -532,13 +539,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $commandExecutor
                 ->runCommand('oro:translation:load', ['--process-isolation' => true]);
         }
-
-        $commandExecutor->runCommand(
-            'oro:navigation:init',
-            [
-                '--process-isolation' => true,
-            ]
-        );
 
         if (!$skipAssets) {
             $commandExecutor->runCommand(

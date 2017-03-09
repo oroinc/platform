@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout;
 
+use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
@@ -13,16 +14,22 @@ class LayoutManager extends BaseLayoutManager
     /** @var LayoutContextHolder */
     protected $contextHolder;
 
+    /** @var LayoutDataCollector */
+    protected $layoutDataCollector;
+
     /**
      * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     * @param LayoutContextHolder           $contextHolder
+     * @param LayoutContextHolder $contextHolder
+     * @param LayoutDataCollector $layoutDataCollector
      */
     public function __construct(
         LayoutFactoryBuilderInterface $layoutFactoryBuilder,
-        LayoutContextHolder $contextHolder
+        LayoutContextHolder $contextHolder,
+        LayoutDataCollector $layoutDataCollector
     ) {
         parent::__construct($layoutFactoryBuilder);
         $this->contextHolder = $contextHolder;
+        $this->layoutDataCollector = $layoutDataCollector;
     }
 
     /**
@@ -39,7 +46,10 @@ class LayoutManager extends BaseLayoutManager
 
         $this->contextHolder->setContext($context);
 
-        return $layoutBuilder->getLayout($context, $rootId);
+        $layout = $layoutBuilder->getLayout($context, $rootId);
+        $this->layoutDataCollector->setNotAppliedActions($layoutBuilder->getNotAppliedActions());
+
+        return $layout;
     }
 
     /**
@@ -47,7 +57,7 @@ class LayoutManager extends BaseLayoutManager
      * @param null|string[] $vars
      * @return string
      */
-    public function render(array $parameters, $vars = null)
+    public function render(array $parameters, $vars = [])
     {
         $layoutContext = new LayoutContext($parameters, $vars);
 

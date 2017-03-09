@@ -4,6 +4,8 @@ datagrids:
         options:
             entityHint: entity
         acl_resource: oro_entityconfig_manage
+        features:
+            entity_class_name_path: ce.className
         source:
             type: orm
             query:

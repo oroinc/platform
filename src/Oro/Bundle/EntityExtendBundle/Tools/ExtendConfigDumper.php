@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\Common\Cache\ClearableCache;
+use Doctrine\Common\Cache\FlushableCache;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
 use Symfony\Component\Filesystem\Filesystem;
@@ -120,6 +121,8 @@ class ExtendConfigDumper
      * @param callable|null $filter function (ConfigInterface $config) : bool
      * @param bool $updateCustom
      * @param bool $attributesOnly
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function updateConfig($filter = null, $updateCustom = false, $attributesOnly = false)
     {
@@ -172,7 +175,7 @@ class ExtendConfigDumper
 
             if ($schema) {
                 $schemas[$className]                 = $schema;
-                $schemas[$className]['relationData'] = $extendConfig->get('relation', false, []);
+                $schemas[$className]['relationData'] = $this->getRelationDataForEntity($extendConfigs, $extendConfig);
             }
         }
 
@@ -189,6 +192,38 @@ class ExtendConfigDumper
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Load relation data and add state of scope extend  of entity config
+     *
+     * @param ConfigInterface[] $extendConfigs
+     * @param ConfigInterface $entityExtendConfig
+     *
+     * @return mixed|null
+     */
+    protected function getRelationDataForEntity($extendConfigs, ConfigInterface $entityExtendConfig)
+    {
+        $relationData = $entityExtendConfig->get('relation', false, []);
+
+        if (is_array($relationData)) {
+            foreach ($relationData as $key => &$item) {
+                /** @var ConfigInterface $extendConfig */
+                foreach ($extendConfigs as $extendConfig) {
+                    if ($extendConfig->getId()->getClassName() === $item['target_entity']) {
+                        $values = $extendConfig->getValues();
+                        $item['state'] = null;
+                        if (isset($values['state'])) {
+                            $item['state'] = $extendConfig->getValues();
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $relationData;
     }
 
     /**
@@ -265,7 +300,9 @@ class ExtendConfigDumper
             /** @var ClassMetadataFactory $metadataFactory */
             $metadataFactory = $em->getMetadataFactory();
             $metadataCache   = $metadataFactory->getCacheDriver();
-            if ($metadataCache instanceof ClearableCache) {
+            if ($metadataCache instanceof FlushableCache) {
+                $metadataCache->flushAll();
+            } elseif ($metadataCache instanceof ClearableCache) {
                 $metadataCache->deleteAll();
             }
         }

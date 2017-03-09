@@ -38,20 +38,17 @@ class AbstractHandler
     /**
      * @param JobExecutor $jobExecutor
      * @param ProcessorRegistry $processorRegistry
-     * @param FileSystemOperator $fileSystemOperator
      * @param ConfigProvider $entityConfigProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
         JobExecutor $jobExecutor,
         ProcessorRegistry $processorRegistry,
-        FileSystemOperator $fileSystemOperator,
         ConfigProvider $entityConfigProvider,
         TranslatorInterface $translator
     ) {
         $this->jobExecutor        = $jobExecutor;
         $this->processorRegistry  = $processorRegistry;
-        $this->fileSystemOperator = $fileSystemOperator;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->translator = $translator;
     }

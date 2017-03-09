@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -11,6 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
 
 /**
  * Stop user from accessing the system if they are deactivated
@@ -66,7 +66,7 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
         }
 
         $this->tokenStorage->setToken(null);
-        $exception = new CredentialsExpiredException('Invalid password.');
+        $exception = new CredentialsResetException('Password reset.');
         $exception->setUser($user);
 
         $request = $event->getRequest();

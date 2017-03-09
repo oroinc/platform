@@ -127,7 +127,8 @@ class ConfigHelper
                 'is_extend' => true,
                 'origin' => ExtendScope::ORIGIN_CUSTOM,
                 'owner' => ExtendScope::OWNER_CUSTOM,
-                'state' => ExtendScope::STATE_NEW
+                'state' => ExtendScope::STATE_NEW,
+                'bidirectional' => false
             ]
         ];
 

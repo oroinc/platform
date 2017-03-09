@@ -16,8 +16,6 @@ use Symfony\Component\Process\Process;
 
 final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements IsolatorInterface
 {
-    const TIMEOUT = '240';
-
     /** @var string */
     protected $dbHost;
 
@@ -131,6 +129,12 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
     }
 
     /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
+    }
+
+    /** {@inheritdoc} */
     protected function makeDump()
     {
         $this->runProcess(sprintf(
@@ -153,7 +157,7 @@ final class UnixMysqlSyncIsolator extends AbstractOsRelatedIsolator implements I
             $this->dbUser,
             $this->dbName,
             $this->dbDump
-        ));
+        ), 240);
     }
 
     /** {@inheritdoc} */

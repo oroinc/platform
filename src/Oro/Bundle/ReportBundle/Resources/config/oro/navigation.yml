@@ -2,10 +2,10 @@ navigation:
     menu_config:
         items:
             manage_reports:
-                label: 'oro.report.menu.manage_reports.label'
-                route: 'oro_report_index'
+                label:    'oro.report.menu.manage_reports.label'
+                route:    'oro_report_index'
+                position: 10
                 extras:
-                    position: 10
                     routes: ['oro_report_update', 'oro_report_create']
                 attributes:
                     class: 'mobile-hide'
@@ -19,9 +19,9 @@ navigation:
 
     titles:
         oro_report_index:  ~
-        oro_report_view: '%%report.name%% - %%report.group%% - Reports'
+        oro_report_view: '%report.name% - %report.group% - Reports'
         oro_report_create: 'Create Report - Reports'
-        oro_report_update: '%%report.name%% - Edit - Reports'
+        oro_report_update: '%report.name% - Edit - Reports'
 
     navigation_elements:
         pinButton:

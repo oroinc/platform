@@ -3,8 +3,6 @@ parameters:
     oro_sidebar.entity.widget.class: Oro\Bundle\SidebarBundle\Entity\Widget
 
     oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
-    oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
-    oro_sidebar.request.handler.class: Oro\Bundle\SidebarBundle\EventListener\RequestHandler
 
 services:
     oro_sidebar.widget_definition.registry:
@@ -13,17 +11,16 @@ services:
             - %oro_sidebar.sidebar_widgets_definitions%
 
     oro_sidebar.twig.extension:
-        class: %oro_sidebar.twig.extension.class%
+        class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
+        public: false
         arguments:
-            - '@oro_sidebar.widget_definition.registry'
-            - '@translator'
-            - '@assets.packages'
+            - '@service_container'
         tags:
             - { name: twig.extension }
             - { name: oro_featuretogle.feature, feature: email }
 
     oro_sidebar.request.handler:
-        class: %oro_sidebar.request.handler.class%
+        class: Oro\Bundle\SidebarBundle\EventListener\RequestHandler
         arguments:
             - '@service_container'
         tags:

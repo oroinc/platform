@@ -6,7 +6,9 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Twig\Helper;
 use Knp\Menu\Provider\MenuProviderInterface;
 
-use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
 class MenuExtension extends \Twig_Extension
@@ -15,71 +17,67 @@ class MenuExtension extends \Twig_Extension
 
     const BREADCRUMBS_TEMPLATE = 'OroNavigationBundle:Menu:breadcrumbs.html.twig';
 
-    /**
-     * @var Helper $helper
-     */
-    private $helper;
+    /** @var ContainerInterface */
+    protected $container;
 
     /**
-     * @var MenuProviderInterface $provider
+     * @param ContainerInterface $container
      */
-    private $provider;
-
-    /**
-     * @var array $menuConfiguration
-     */
-    protected $menuConfiguration;
-
-    /**
-     * @var BreadcrumbManagerInterface
-     */
-    protected $breadcrumbManager;
-
-    /**
-     * @param Helper $helper
-     * @param MenuProviderInterface $provider
-     * @param BreadcrumbManager $breadcrumbManager
-     *
-     * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbManagerInterface
-     * @see \Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface
-     */
-    public function __construct(
-        Helper $helper,
-        MenuProviderInterface $provider,
-        BreadcrumbManager $breadcrumbManager
-    ) {
-        $this->helper = $helper;
-        $this->provider = $provider;
-        $this->breadcrumbManager = $breadcrumbManager;
-    }
-
-    /**
-     * @param array $configuration
-     */
-    public function setMenuConfiguration(array $configuration)
+    public function __construct(ContainerInterface $container)
     {
-        $this->menuConfiguration = $configuration;
+        $this->container = $container;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * @return Helper
+     */
+    protected function getMenuHelper()
+    {
+        return $this->container->get('knp_menu.helper');
+    }
+
+    /**
+     * @return MenuProviderInterface
+     */
+    protected function getMenuProvider()
+    {
+        return $this->container->get('oro_menu.builder_chain');
+    }
+
+    /**
+     * @return BreadcrumbManagerInterface
+     */
+    protected function getBreadcrumbManager()
+    {
+        return $this->container->get('oro_navigation.chain_breadcrumb_manager');
+    }
+
+    /**
+     * @return MenuConfiguration
+     */
+    protected function getMenuConfiguration()
+    {
+        return $this->container->get('oro_menu.configuration');
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
-        return array(
-            'oro_menu_render' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
-            'oro_menu_get' => new \Twig_Function_Method($this, 'getMenu'),
-            'oro_breadcrumbs' => new \Twig_Function_Method(
-                $this,
-                'renderBreadCrumbs',
-                array(
-                    'is_safe' => array('html'),
-                    'needs_environment' => true
-                )
+        return [
+            new \Twig_SimpleFunction(
+                'oro_menu_render',
+                [$this, 'render'],
+                ['is_safe' => ['html']]
+            ),
+            new \Twig_SimpleFunction('oro_menu_get', [$this, 'getMenu']),
+            new \Twig_SimpleFunction(
+                'oro_breadcrumbs',
+                [$this, 'renderBreadCrumbs'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
             )
-        );
+        ];
     }
 
     /**
@@ -92,10 +90,10 @@ class MenuExtension extends \Twig_Extension
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function render($menu, array $options = array(), $renderer = null)
+    public function render($menu, array $options = [], $renderer = null)
     {
         if (!$menu instanceof ItemInterface) {
-            $path = array();
+            $path = [];
             if (is_array($menu)) {
                 if (empty($menu)) {
                     throw new \InvalidArgumentException('The array cannot be empty');
@@ -110,11 +108,14 @@ class MenuExtension extends \Twig_Extension
         $menu = $this->filterUnallowedItems($menu);
         $menuType = $menu->getExtra('type');
         // rewrite config options with args
-        if (!empty($menuType) && !empty($this->menuConfiguration['templates'][$menuType])) {
-            $options = array_replace_recursive($this->menuConfiguration['templates'][$menuType], $options);
+        if (!empty($menuType)) {
+            $templates = $this->getMenuConfiguration()->getTemplates();
+            if (!empty($templates[$menuType])) {
+                $options = array_replace_recursive($templates[$menuType], $options);
+            }
         }
 
-        return $this->helper->render($menu, $options, $renderer);
+        return $this->getMenuHelper()->render($menu, $options, $renderer);
     }
 
     /**
@@ -137,8 +138,8 @@ class MenuExtension extends \Twig_Extension
                     }
                 }
 
-                if (count($filteredChildren) == $invisibleChildrenCount
-                    && (!$item->getUri() || $item->getUri() == '#')
+                if (count($filteredChildren) === $invisibleChildrenCount
+                    && (!$item->getUri() || $item->getUri() === '#')
                 ) {
                     $item->setExtra('isAllowed', false);
                 }
@@ -158,14 +159,15 @@ class MenuExtension extends \Twig_Extension
      */
     public function renderBreadCrumbs(\Twig_Environment $environment, $menuName, $useDecorators = true)
     {
-        if ($breadcrumbs = $this->breadcrumbManager->getBreadcrumbs($menuName, $useDecorators)) {
+        $breadcrumbs = $this->getBreadcrumbManager()->getBreadcrumbs($menuName, $useDecorators);
+        if ($breadcrumbs) {
             $template = $environment->loadTemplate(self::BREADCRUMBS_TEMPLATE);
 
             return $template->render(
-                array(
+                [
                     'breadcrumbs' => $breadcrumbs,
                     'useDecorators' => $useDecorators
-                )
+                ]
             );
         }
 
@@ -193,10 +195,10 @@ class MenuExtension extends \Twig_Extension
      *
      * @throws \InvalidArgumentException when the path is invalid
      */
-    public function getMenu($menu, array $path = array(), array $options = array())
+    public function getMenu($menu, array $path = [], array $options = [])
     {
         if (!$menu instanceof ItemInterface) {
-            $menu = $this->provider->get((string) $menu, $options);
+            $menu = $this->getMenuProvider()->get((string) $menu, $options);
         }
 
         foreach ($path as $child) {
@@ -207,15 +209,5 @@ class MenuExtension extends \Twig_Extension
         }
 
         return $menu;
-    }
-
-    /**
-     * @param BreadcrumbManagerInterface $breadcrumbManager
-     *
-     * @deprecated since 1.8 will be moved to constructor
-     */
-    public function setBreadcrumbManager(BreadcrumbManagerInterface $breadcrumbManager)
-    {
-        $this->breadcrumbManager = $breadcrumbManager;
     }
 }

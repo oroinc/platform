@@ -5,12 +5,16 @@ namespace Oro\Bundle\CronBundle\Command;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
-use Oro\Bundle\CronBundle\Entity\Schedule;
-use Oro\Bundle\CronBundle\Helper\CronHelper;
+
+use Psr\Log\LoggerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
+use Oro\Bundle\CronBundle\Entity\Schedule;
+use Oro\Bundle\CronBundle\Helper\CronHelper;
 
 class CronCommand extends ContainerAwareCommand
 {
@@ -30,38 +34,72 @@ class CronCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+
+        /** @var $logger LoggerInterface */
+        $logger = $this->getContainer()->get('logger');
+
         // check for maintenance mode - do not run cron jobs if it is switched on
         if ($this->getContainer()->get('oro_platform.maintenance')->isOn()) {
+            $message = 'System is in maintenance mode, aborting';
             $output->writeln('');
-            $output->writeln('<error>System is in maintenance mode, aborting</error>');
-
+            $output->writeln(sprintf('<error>%s</error>', $message));
+            $logger->error($message);
             return;
         }
 
         $schedules = $this->getAllSchedules();
+
+        /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {
             $cronExpression = $this->getCronHelper()->createCron($schedule->getDefinition());
             if ($cronExpression->isDue()) {
                 /** @var CronCommandInterface $command */
                 $command = $this->getApplication()->get($schedule->getCommand());
-                if ($command->isActive()) {
+
+                // TODO: Should be properly refactored at BAP-13973
+                if ($command instanceof CronCommandInterface && !$command->isActive()) {
                     $output->writeln(
-                        'Scheduling run for command ' . $schedule->getCommand(),
+                        'Skipping not enabled command ' . $schedule->getCommand(),
                         OutputInterface::VERBOSITY_DEBUG
                     );
-                    $this->getCommandRunner()->run($schedule->getCommand(), $schedule->getArguments());
-                } else {
-                    $output->writeln(
-                        'Skipping not enabled command '.$schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
+                    continue;
                 }
+
+                $output->writeln(
+                    'Scheduling run for command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                $this->getCommandRunner()->run(
+                    $schedule->getCommand(),
+                    $this->resolveOptions($schedule->getArguments())
+                );
             } else {
                 $output->writeln('Skipping not due command '.$schedule->getCommand(), OutputInterface::VERBOSITY_DEBUG);
             }
         }
 
         $output->writeln('All commands scheduled', OutputInterface::VERBOSITY_DEBUG);
+    }
+
+    /**
+     * Convert command arguments to options. It needed for correctly pass this arguments into ArrayInput:
+     * new ArrayInput(['name' => 'foo', '--bar' => 'foobar']);
+     *
+     * @param array $commandOptions
+     * @return array
+     */
+    protected function resolveOptions(array $commandOptions)
+    {
+        $options = [];
+        foreach ($commandOptions as $key => $option) {
+            $params = explode('=', $option, 2);
+            if (is_array($params) && count($params) === 2) {
+                $options[$params[0]] = $params[1];
+            } else {
+                $options[$key] = $option;
+            }
+        }
+        return $options;
     }
 
     /**

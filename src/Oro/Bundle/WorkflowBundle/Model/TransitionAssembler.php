@@ -34,34 +34,53 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected $actionFactory;
 
     /**
+     * @var FormOptionsConfigurationAssembler
+     */
+    protected $formOptionsConfigurationAssembler;
+
+    /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
      * @param ActionFactoryInterface $actionFactory
+     * @param FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
-        ActionFactoryInterface $actionFactory
+        ActionFactoryInterface $actionFactory,
+        FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
         $this->actionFactory = $actionFactory;
+        $this->formOptionsConfigurationAssembler = $formOptionsConfigurationAssembler;
     }
 
     /**
      * @param array $configuration
-     * @param array $definitionsConfiguration
      * @param Step[]|Collection $steps
      * @param Attribute[]|Collection $attributes
      * @return Collection
      * @throws AssemblerException
      */
-    public function assemble(array $configuration, array $definitionsConfiguration, $steps, $attributes)
+    public function assemble(array $configuration, $steps, $attributes)
     {
-        $definitions = $this->parseDefinitions($definitionsConfiguration);
+        $transitionsConfiguration = $this->getOption(
+            $configuration,
+            WorkflowConfiguration::NODE_TRANSITIONS,
+            []
+        );
+        $transitionDefinitionsConfiguration = $this->getOption(
+            $configuration,
+            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+            []
+        );
+
+        $definitions = $this->parseDefinitions($transitionDefinitionsConfiguration);
+        $variables = $this->parseVariableDefinitions($configuration);
 
         $transitions = new ArrayCollection();
-        foreach ($configuration as $name => $options) {
+        foreach ($transitionsConfiguration as $name => $options) {
             $this->assertOptions($options, array('transition_definition'));
             $definitionName = $options['transition_definition'];
             if (!isset($definitions[$definitionName])) {
@@ -69,7 +88,9 @@ class TransitionAssembler extends BaseAbstractAssembler
                     sprintf('Unknown transition definition %s', $definitionName)
                 );
             }
+
             $definition = $definitions[$definitionName];
+            $definition = $this->assignVariableValues($definition, $variables);
 
             $transition = $this->assembleTransition($name, $options, $definition, $steps, $attributes);
             $transitions->set($name, $transition);
@@ -98,6 +119,35 @@ class TransitionAssembler extends BaseAbstractAssembler
         }
 
         return $definitions;
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return array
+     */
+    protected function parseVariableDefinitions(array $configuration)
+    {
+        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
+
+        if (!isset($configuration[$definitionsNode][$variablesNode])) {
+            return [];
+        }
+
+        $variables = [];
+        foreach ($configuration[$definitionsNode][$variablesNode] as $name => $options) {
+            if (empty($options)) {
+                $options = [];
+            }
+
+            $variables[$name] = [
+                'type'  => $this->getOption($options, 'type'),
+                'value' => $this->getOption($options, 'value'),
+            ];
+        }
+
+        return $variables;
     }
 
     /**
@@ -131,6 +181,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
+            ->setDestinationPage($this->getOption($options, 'destination_page'))
             ->setPageTemplate($this->getOption($options, 'page_template'))
             ->setDialogTemplate($this->getOption($options, 'dialog_template'))
             ->setInitEntities($this->getOption($options, WorkflowConfiguration::NODE_INIT_ENTITIES, []))
@@ -155,10 +206,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setCondition($condition);
         }
 
-        if (!empty($definition['actions'])) {
-            $action = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['actions']);
-            $transition->setAction($action);
-        }
+        $this->processActions($transition, $definition['actions']);
 
         if (!empty($options['schedule'])) {
             $transition->setScheduleCron($this->getOption($options['schedule'], 'cron', null));
@@ -168,7 +216,31 @@ class TransitionAssembler extends BaseAbstractAssembler
             );
         }
 
+        if (!empty($options['form_options'][WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION])) {
+            $this->formOptionsConfigurationAssembler->assemble($options);
+        }
         return $transition;
+    }
+
+    /**
+     * @param Transition $transition
+     * @param array $actions
+     */
+    protected function processActions(Transition $transition, array $actions)
+    {
+        if ($transition->getDisplayType() === WorkflowConfiguration::TRANSITION_DISPLAY_TYPE_PAGE) {
+            $actions = array_merge([
+                [
+                    '@resolve_destination_page' => $transition->getDestinationPage(),
+                ],
+            ], $actions);
+        }
+
+        if (empty($actions)) {
+            return;
+        }
+
+        $transition->setAction($this->actionFactory->create(ConfigurableAction::ALIAS, $actions));
     }
 
     /**
@@ -240,5 +312,37 @@ class TransitionAssembler extends BaseAbstractAssembler
     {
         $formOptions = $this->getOption($options, 'form_options', array());
         return $this->formOptionsAssembler->assemble($formOptions, $attributes, 'transition', $transitionName);
+    }
+
+    /**
+     * @param array $definition
+     * @param array $variables
+     *
+     * @return array
+     */
+    protected function assignVariableValues($definition, $variables)
+    {
+        if (!$variables) {
+            return $definition;
+        }
+
+        $massAssignment = [];
+        foreach ($variables as $varName => $variable) {
+            $massAssignment[] = [
+                sprintf('$%s', $varName),
+                $variable['value']
+            ];
+        }
+        $assignValueActions = [
+            ['@assign_value' => $massAssignment]
+        ];
+
+        if (!empty($definition['preactions'])) {
+            $definition['preactions'] = array_merge($definition['preactions'], $assignValueActions);
+        } elseif ($variables) {
+            $definition['preactions'] = $assignValueActions;
+        }
+
+        return $definition;
     }
 }

@@ -16,6 +16,41 @@
     </div>
 {%- endblock form_row -%}
 
+{%- block form_label -%}
+    {% spaceless %}
+        {% if label is not sameas(false) %}
+            {% if not compound %}
+                {% set label_attr = label_attr|merge({'for': id}) %}
+            {% endif %}
+            {% if required %}
+                {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+            {% endif %}
+            {% if errors|length > 0 %}
+                {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' validation-error')|trim}) %}
+            {% endif %}
+            {% if label is empty %}
+                {% if label_format is not empty -%}
+                    {% set label = label_format|replace({'%name%': name, '%id%': id}) %}
+                {% else %}
+                    {% set label = name|humanize %}
+                {% endif %}
+            {% endif %}
+            {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
+
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {%- if translatable_label is defined and not translatable_label -%}
+                {{ label }}
+            {%- elseif raw_label is defined and raw_label -%}
+                {{ label|raw }}
+            {%- else -%}
+                {{ label|trans({}, translation_domain) }}
+            {%- endif -%}
+            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
+            </label>
+        {%- endif -%}
+    {% endspaceless %}
+{%- endblock form_label -%}
+
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
         <ul class="notifications notifications--error">
@@ -39,3 +74,11 @@
         {{- ' ' ~ attrname }}="{{ attrvalue }}"
     {% endfor %}
 {%- endblock attributes -%}
+
+{%- block choice_widget_collapsed %}
+    {% set attr = layout_attr_defaults({
+        'class': 'select select--full'
+    }, attr) %}
+
+    {{ parent() }}
+{% endblock %}

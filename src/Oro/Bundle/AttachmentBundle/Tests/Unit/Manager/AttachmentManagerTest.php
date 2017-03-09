@@ -2,19 +2,22 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestAttachment;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AttachmentManager  */
     protected $attachmentManager;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
     protected $router;
 
-    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit_Framework_MockObject_MockObject|AssociationManager */
     protected $associationManager;
 
     /** @var TestAttachment */
@@ -60,7 +63,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
-                'oro_attachment_file',
+                AttachmentManager::ATTACHMENT_FILE_ROUTE,
                 [
                     'codedString' => $expectsString,
                     'extension' => 'txt'

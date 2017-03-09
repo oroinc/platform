@@ -7,15 +7,14 @@ use Knp\Menu\ItemInterface;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
-
-    /** @var array */
-    protected $configuration;
 
     /** @var ResolverInterface */
     protected $resolver;
@@ -26,27 +25,25 @@ class ConfigurationBuilder implements BuilderInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
+    /** @var MenuConfiguration */
+    protected $menuConfiguration;
+
     /**
      * @param ResolverInterface        $resolver
      * @param FactoryInterface         $factory
      * @param EventDispatcherInterface $eventDispatcher
+     * @param MenuConfiguration        $menuConfiguration
      */
     public function __construct(
         ResolverInterface $resolver,
         FactoryInterface $factory,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        MenuConfiguration $menuConfiguration
     ) {
         $this->resolver = $resolver;
         $this->factory = $factory;
         $this->eventDispatcher = $eventDispatcher;
-    }
-
-    /**
-     * @param array $configuration
-     */
-    public function setConfiguration(array $configuration)
-    {
-        $this->configuration = $configuration;
+        $this->menuConfiguration = $menuConfiguration;
     }
 
     /**
@@ -58,10 +55,11 @@ class ConfigurationBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $menuConfig = $this->configuration;
+        $tree = $this->menuConfiguration->getTree();
+        $items = $this->menuConfiguration->getItems();
 
-        if (!empty($menuConfig['items']) && !empty($menuConfig['tree'])) {
-            foreach ($menuConfig['tree'] as $menuTreeName => $menuTreeElement) {
+        if (!empty($tree) && !empty($items)) {
+            foreach ($tree as $menuTreeName => $menuTreeElement) {
                 if ($menuTreeName == $alias) {
                     if (!empty($menuTreeElement['extras'])) {
                         $menu->setExtras($menuTreeElement['extras']);
@@ -73,7 +71,7 @@ class ConfigurationBuilder implements BuilderInterface
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'read_only', false);
                     $this->setExtraFromConfig($menu, $menuTreeElement, 'max_nesting_level', 0);
 
-                    $this->createFromArray($menu, $menuTreeElement['children'], $menuConfig['items'], $options);
+                    $this->createFromArray($menu, $menuTreeElement['children'], $items, $options);
                 }
             }
         }
@@ -113,7 +111,7 @@ class ConfigurationBuilder implements BuilderInterface
     ) {
         $isAllowed = false;
         foreach ($data as $itemCode => $itemData) {
-            if (in_array($itemCode, $itemCodes)) {
+            if (in_array($itemCode, $itemCodes, true)) {
                 throw new \InvalidArgumentException(sprintf(
                     'Item key "%s" duplicated in tree menu "%s".',
                     $itemCode,
@@ -130,10 +128,7 @@ class ConfigurationBuilder implements BuilderInterface
                     $itemOptions['name'] = $itemCode;
                 }
 
-                if (!empty($itemData['position'])) {
-                    $itemOptions['extras']['position'] = $itemData['position'];
-                }
-
+                $this->moveToExtras($itemOptions, 'position', true);
                 $this->moveToExtras($itemOptions, 'translateDomain');
                 $this->moveToExtras($itemOptions, 'translateParameters');
                 $this->moveToExtras($itemOptions, 'translate_disabled');
@@ -157,13 +152,16 @@ class ConfigurationBuilder implements BuilderInterface
     /**
      * @param array  $menuItem
      * @param string $optionName
+     * @param bool $preferValueFromExtras
      *
      * @return void
      */
-    private function moveToExtras(array &$menuItem, $optionName)
+    private function moveToExtras(array &$menuItem, $optionName, $preferValueFromExtras = false)
     {
         if (isset($menuItem[$optionName])) {
-            $menuItem['extras'][$optionName] = $menuItem[$optionName];
+            if (!isset($menuItem['extras'][$optionName]) || !$preferValueFromExtras) {
+                $menuItem['extras'][$optionName] = $menuItem[$optionName];
+            }
             unset($menuItem[$optionName]);
         }
     }

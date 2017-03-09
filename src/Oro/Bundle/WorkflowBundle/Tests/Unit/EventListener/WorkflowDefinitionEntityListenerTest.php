@@ -4,11 +4,13 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -27,7 +29,11 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new WorkflowDefinitionEntityListener($this->workflowRegistry);
+        $container = TestContainerBuilder::create()
+            ->add('oro_workflow.registry.system', $this->workflowRegistry)
+            ->getContainer($this);
+
+        $this->listener = new WorkflowDefinitionEntityListener($container);
     }
 
     public function testPrePersistNonActiveSkip()

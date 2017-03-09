@@ -35,7 +35,7 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /** @var PermissionConfigurationProvider */
+    /** @var PermissionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
 
     /** @var PermissionConfigurationBuilder */
@@ -55,7 +55,10 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
 
         CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
 
-        $this->configurationProvider = new PermissionConfigurationProvider(new PermissionListConfiguration(), $bundles);
+        $this->configurationProvider = $this->getMockBuilder(PermissionConfigurationProvider::class)
+            ->setConstructorArgs([new PermissionListConfiguration(), $bundles])
+            ->setMethods(['getConfigPath'])
+            ->getMock();
 
         $this->entityRepository = $this
             ->getMockBuilder('Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository')
@@ -110,10 +113,9 @@ class PermissionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEmpty($this->manager->getPermissionsFromConfig());
 
-        $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider');
-        $reflectionProperty = $reflection->getProperty('configPath');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->configurationProvider, 'permissions.yml');
+        $this->configurationProvider->expects($this->any())
+            ->method('getConfigPath')->willReturn('permissions.yml');
+
         $permissionNames = [];
 
         foreach ($this->manager->getPermissionsFromConfig() as $permission) {

@@ -7,7 +7,7 @@ services:
         class: %oro_workflow.security.acl.manager.class%
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '@oro_workflow.registry'
+            - '@oro_workflow.registry.system'
 
     oro_workflow.security.acl.voter.entity:
         class: %oro_workflow.security.acl.voter.entity.class%
@@ -16,6 +16,12 @@ services:
             - '@oro_workflow.permission_registry'
         tags:
             - { name: security.voter, priority: 500 }
+
+    oro_workflow.filter.privilege_workflow_filter:
+        class: 'Oro\Bundle\WorkflowBundle\Acl\Filter\AclPrivilegeWorkflowFilter'
+        public: false
+        tags:
+            - { name: oro.security.filter.acl_privilege }
 
     oro_workflow.acl.metadata_provider:
         public: false
@@ -33,7 +39,7 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.entity_owner_accessor'
             - '@oro_security.owner.ownership_decision_maker.chain'
-            - '@oro_workflow.registry'
+            - '@oro_workflow.manager.system'
             - '@oro_workflow.acl.metadata_provider'
             - '@oro_workflow.acl.extension.workflow_transition'
         tags:
@@ -47,4 +53,4 @@ services:
             - '@oro_security.owner.metadata_provider.chain'
             - '@oro_security.owner.entity_owner_accessor'
             - '@oro_security.owner.ownership_decision_maker.chain'
-            - '@oro_workflow.registry'
+            - '@oro_workflow.manager.system'

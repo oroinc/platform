@@ -4,29 +4,34 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 
-use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
-use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
-use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\Yaml\Yaml;
+
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
-use Oro\Component\Testing\DbIsolationExtension;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\Testing\DbIsolationExtension;
 
 /**
  * Abstract class for functional and integration tests
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
@@ -196,7 +201,6 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if (!self::$clientInstance) {
-            $options['debug'] = false;
             self::$clientInstance = static::createClient($options, $server);
 
             if (self::isClassHasAnnotation(get_called_class(), 'dbReindex')) {
@@ -217,6 +221,14 @@ abstract class WebTestCase extends BaseWebTestCase
         return $this->client = self::$clientInstance;
     }
 
+    /** {@inheritdoc} */
+    protected static function createKernel(array $options = array())
+    {
+        $options['debug'] = false;
+
+        return parent::createKernel($options);
+    }
+
     /**
      * @param string $login
      */
@@ -228,6 +240,17 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$clientInstance->setServerParameters([]);
             self::$clientInstance->getCookieJar()->clear();
         }
+    }
+
+    /**
+     * @param string $email
+     */
+    protected function updateUserSecurityToken($email)
+    {
+        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(['email' => $email]);
+
+        $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
+        $this->getContainer()->get('security.token_storage')->setToken($token);
     }
 
     /**
@@ -422,16 +445,18 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param string $name
      * @param array $params
+     * @param bool $cleanUp strip new lines and multiple spaces, removes dependency on terminal columns
      *
      * @return string
      */
-    protected static function runCommand($name, array $params = [])
+    protected static function runCommand($name, array $params = [], $cleanUp = true)
     {
         /** @var KernelInterface $kernel */
         $kernel = self::getContainer()->get('kernel');
 
         $application = new Application($kernel);
         $application->setAutoExit(false);
+        $application->setTerminalDimensions(120, 50);
 
         $argv = ['application', $name];
         foreach ($params as $k => $v) {
@@ -455,7 +480,14 @@ abstract class WebTestCase extends BaseWebTestCase
         $application->run($input, $output);
 
         rewind($fp);
-        return stream_get_contents($fp);
+
+        $content = stream_get_contents($fp);
+
+        if ($cleanUp) {
+            $content = preg_replace(['/\s{2,}\n\s{2,}/', '/(\n|\s{2,})+/'], ['', ' '], $content);
+        }
+
+        return trim($content);
     }
 
     /**

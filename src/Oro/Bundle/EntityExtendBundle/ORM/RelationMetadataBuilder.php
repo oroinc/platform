@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper;
 use Oro\Bundle\EntityExtendBundle\Exception\InvalidRelationEntityException;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -24,7 +25,9 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
     protected $nameGenerator;
 
     /**
-     * @param ConfigManager                   $configManager
+     * RelationMetadataBuilder constructor.
+     *
+     * @param ConfigManager $configManager
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      */
     public function __construct(
@@ -51,9 +54,14 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $relations = $extendConfig->get('relation', false, []);
         $schema    = $extendConfig->get('schema', false, []);
         foreach ($relations as $relationKey => $relation) {
+            $configRelationEntity = $this->configManager->getEntityConfig('extend', $relation['target_entity']);
+
             /** @var FieldConfigId $fieldId */
             $fieldId = $relation['field_id'];
-            if ($fieldId && isset($schema['relation'][$fieldId->getFieldName()])) {
+            if ($fieldId
+                && isset($schema['relation'][$fieldId->getFieldName()])
+                && ExtendScopeHelper::isAvailableForProcessing($configRelationEntity)
+            ) {
                 switch ($fieldId->getFieldType()) {
                     case RelationType::MANY_TO_ONE:
                         $this->buildManyToOneRelation($metadataBuilder, $fieldId, $relation);

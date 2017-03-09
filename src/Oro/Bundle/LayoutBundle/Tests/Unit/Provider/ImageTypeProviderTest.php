@@ -1,6 +1,6 @@
 <?php
 
-namespace LayoutBundle\Tests\Unit\Provider;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;

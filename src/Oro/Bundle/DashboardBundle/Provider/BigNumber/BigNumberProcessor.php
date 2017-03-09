@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
 class BigNumberProcessor
 {
@@ -13,25 +12,19 @@ class BigNumberProcessor
     /** @var BigNumberDateHelper */
     protected $dateHelper;
 
-    /** @var OwnerHelper */
-    protected $ownerHelper;
-
     /** @var object[] */
     protected $valueProviders = [];
 
     /**
      * @param BigNumberFormatter  $bigNumberFormatter
      * @param BigNumberDateHelper $dateHelper
-     * @param OwnerHelper         $ownerHelper
      */
     public function __construct(
         BigNumberFormatter $bigNumberFormatter,
-        BigNumberDateHelper $dateHelper,
-        OwnerHelper $ownerHelper
+        BigNumberDateHelper $dateHelper
     ) {
         $this->bigNumberFormatter = $bigNumberFormatter;
         $this->dateHelper         = $dateHelper;
-        $this->ownerHelper        = $ownerHelper;
     }
 
     /**
@@ -56,8 +49,7 @@ class BigNumberProcessor
         $getter           = $this->getGetter($providerAlias, $getterName);
         $lessIsBetter     = (bool)$lessIsBetter;
         $dateRange        = $lastWeek ? $this->dateHelper->getLastWeekPeriod() : $widgetOptions->get('dateRange');
-        $owners           = $this->ownerHelper->getOwnerIds($widgetOptions);
-        $value            = call_user_func($getter, $dateRange, $owners);
+        $value            = call_user_func($getter, $dateRange, $widgetOptions);
         $previousInterval = $widgetOptions->get('usePreviousInterval', []);
         $previousData     = [];
         $comparable       = $comparable == 'true' ? true : false;
@@ -68,7 +60,7 @@ class BigNumberProcessor
                     $previousInterval = $this->dateHelper->getLastWeekPeriod(-1);
                 }
 
-                $previousData['value']        = call_user_func($getter, $previousInterval, $owners);
+                $previousData['value']        = call_user_func($getter, $previousInterval, $widgetOptions);
                 $previousData['dateRange']    = $previousInterval;
                 $previousData['lessIsBetter'] = $lessIsBetter;
             }
