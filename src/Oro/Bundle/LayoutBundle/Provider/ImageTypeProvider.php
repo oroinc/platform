@@ -91,7 +91,8 @@ class ImageTypeProvider
                 $this->dimensions[$name] = new ThemeImageTypeDimension(
                     $name,
                     $dimension['width'],
-                    $dimension['height']
+                    $dimension['height'],
+                    array_key_exists('options', $dimension) ? $dimension['options'] : null
                 );
             }
         }

@@ -45,7 +45,7 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 [
                     self::DIMENSION_ORIGINAL => [null, null],
-                    self::DIMENSION_LARGE => [400, 400],
+                    self::DIMENSION_LARGE => [400, 400, ['option1' => true]],
                     self::DIMENSION_SMALL => [50, 50],
                 ]
             ),
@@ -66,6 +66,7 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $imageTypes);
         $this->assertValidImageType($imageTypes['main'], 'main', 'Main', 1, $theme1MainDimensions);
         $this->assertValidImageType($imageTypes['listing'], 'listing', 'Listing', 5, $theme2ListingDimensions);
+        $this->assertTrue($imageTypes['main']->getDimensions()['product_large']->getOption('option1'));
     }
 
     /**
@@ -111,6 +112,10 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         foreach ($dimensions as $name => $dimension) {
             list($width, $height) = $dimension;
             $config['images']['dimensions'][$name] = ['width' => $width, 'height' => $height];
+
+            if (isset($dimension[2])) {
+                $config['images']['dimensions'][$name]['options'] = $dimension[2];
+            }
         }
 
         $theme = new Theme($name);

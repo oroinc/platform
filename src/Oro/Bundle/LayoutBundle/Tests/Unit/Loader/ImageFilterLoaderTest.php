@@ -4,10 +4,13 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Loader;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
+use Prophecy\Argument;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
+use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 
 class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
@@ -57,6 +60,16 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
         $productLarge = new ThemeImageTypeDimension(self::PRODUCT_LARGE, self::LARGE_SIZE, self::LARGE_SIZE);
         $productSmall = new ThemeImageTypeDimension(self::PRODUCT_SMALL, self::SMALL_SIZE, self::SMALL_SIZE);
 
+        $customFilterProvider1 = $this->prophesize(CustomImageFilterProviderInterface::class);
+        $customFilterProvider1->isApplicable(Argument::any())->willReturn(true);
+        $customFilterProvider1->getFilterConfig()->willReturn(['customFilterData']);
+        $customFilterProvider2 = $this->prophesize(CustomImageFilterProviderInterface::class);
+        $customFilterProvider2->isApplicable(Argument::any())->willReturn(false);
+        $customFilterProvider2->getFilterConfig()->shouldNotBeCalled([]);
+
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider1->reveal());
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider2->reveal());
+
         $this->imageTypeProvider->getImageTypes()->willReturn([
             $this->prepareImageType([$productOriginal, $productLarge, $productSmall]),
             $this->prepareImageType([$productLarge, $productSmall]),
@@ -94,7 +107,8 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
             'quality' => ImageFilterLoader::IMAGE_QUALITY,
             'filters' => [
                 'strip' => []
-            ]
+            ],
+            'customFilterData'
         ];
 
         if ($width && $height) {
