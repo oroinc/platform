@@ -4,11 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
-use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
-
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
@@ -21,11 +19,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    /** @var LanguageCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
-    protected $languageFormatter;
-
-    /** @var FormattingCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
-    protected $formattingFormatter;
+    /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $languageProvider;
 
     /** @var LocalizationChoicesProvider */
     protected $provider;
@@ -40,43 +35,24 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->languageFormatter = $this->getMockBuilder(LanguageCodeFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formattingFormatter = $this->getMockBuilder(FormattingCodeFormatter::class)
+        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->provider = new LocalizationChoicesProvider(
             $this->configManager,
-            $this->languageFormatter,
-            $this->formattingFormatter,
-            $this->localizationManager
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->provider,
             $this->localizationManager,
-            $this->configManager,
-            $this->languageFormatter,
-            $this->formattingFormatter
+            $this->languageProvider
         );
     }
 
     public function testGetLanguageChoices()
     {
-        $this->assertConfigManagerCalled();
+        $data = ['zh_Hans' => 'chino simplificado'];
 
-        $choices = $this->provider->getLanguageChoices();
+        $this->languageProvider->expects($this->once())->method('getAvailableLanguages')->willReturn($data);
 
-        $this->assertInternalType('array', $choices);
-        $this->assertArrayHasKey('zh_Hans', $choices);
-        $this->assertArrayNotHasKey('de_DE', $choices);
-        $this->assertEquals('chino simplificado', $choices['zh_Hans']);
+        $this->assertEquals($data, $this->provider->getLanguageChoices());
     }
 
     public function testGetFormattingChoices()

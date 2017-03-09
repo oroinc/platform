@@ -534,6 +534,11 @@ LocaleBundle
 - Class `Oro\Bundle\LocaleBundle\Twig\NumberExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $formatter`
+- Class `Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider`
+     - the construction signature of was changed. Now the constructor awaits following params:
+          - `ConfigManager $configManager`
+          - `LocalizationManager $localizationManager`
+          - `LanguageProvider $languageProvider`
 
 MessageQueueBundle
 ------------------

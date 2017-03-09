@@ -6,40 +6,30 @@ use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
-use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
 class LocalizationChoicesProvider
 {
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var LanguageCodeFormatter */
-    protected $languageFormatter;
-
-    /** @var FormattingCodeFormatter */
-    protected $formattingFormatter;
-
     /** @var LocalizationManager */
     protected $localizationManager;
 
     /**
      * @param ConfigManager $configManager
-     * @param LanguageCodeFormatter $languageFormatter
-     * @param FormattingCodeFormatter $formattingFormatter
      * @param LocalizationManager $localizationManager
+     * @param LanguageProvider $languageProvider
      */
     public function __construct(
         ConfigManager $configManager,
-        LanguageCodeFormatter $languageFormatter,
-        FormattingCodeFormatter $formattingFormatter,
-        LocalizationManager $localizationManager
+        LocalizationManager $localizationManager,
+        LanguageProvider $languageProvider
     ) {
         $this->configManager = $configManager;
-        $this->languageFormatter = $languageFormatter;
-        $this->formattingFormatter = $formattingFormatter;
         $this->localizationManager = $localizationManager;
+        $this->languageProvider = $languageProvider;
     }
 
     /**
@@ -47,7 +37,7 @@ class LocalizationChoicesProvider
      */
     public function getLanguageChoices()
     {
-        return Intl::getLanguageBundle()->getLanguageNames($this->getSystemLanguage());
+        return $this->languageProvider->getAvailableLanguages();
     }
 
     /**
