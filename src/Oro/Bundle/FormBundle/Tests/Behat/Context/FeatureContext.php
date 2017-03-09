@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Behat\Context;
 
+use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 
@@ -24,11 +25,18 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $row = $table->getRowByNumber($rowNum);
         $row->find('css', 'button.entity-select-btn')->click();
         $this->waitForAjax();
+
+        /** @var NodeElement $priceList */
         $priceList = $this->spin(function (FeatureContext $context) use ($value) {
             $priceList = $context->getPage()->find('named', ['content', $value]);
 
-            return $priceList ?: false;
+            if ($priceList && $priceList->isVisible()) {
+                return $priceList;
+            }
+
+            return false;
         });
+
         $priceList->click();
         $this->waitForAjax();
     }
