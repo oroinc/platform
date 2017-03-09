@@ -229,6 +229,7 @@ config:
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
         'oroui/js/app/components/viewport-component': 'bundles/oroui/js/app/components/viewport-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
+        'oroui/js/app/components/widget-form-component': 'bundles/oroui/js/app/components/widget-form-component.js'
         'oroui/js/app/views/jstree/base-tree-view': 'bundles/oroui/js/app/views/jstree/base-tree-view.js'
         'oroui/js/app/views/jstree/base-tree-manage-view': 'bundles/oroui/js/app/views/jstree/base-tree-manage-view.js'
         'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
