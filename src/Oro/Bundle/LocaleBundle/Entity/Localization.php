@@ -319,4 +319,40 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
 
         return $localeHierarchy;
     }
+
+    /**
+     * @param bool $includeOwnId
+     * @return array
+     */
+    public function getChildrenIds($includeOwnId = false)
+    {
+        $ids = $this->processChildrenIds($this);
+        if ($includeOwnId && $this->getId()) {
+            $ids[] = $this->getId();
+        }
+
+        $ids = array_unique($ids);
+
+        sort($ids);
+
+        return $ids;
+    }
+
+    /**
+     * @param Localization $localization
+     * @return array
+     */
+    protected function processChildrenIds(Localization $localization)
+    {
+        $ids = [];
+        foreach ($localization->getChildLocalizations() as $child) {
+            foreach ($this->processChildrenIds($child) as $id) {
+                $ids[] = $id;
+            }
+
+            $ids[] = $child->getId();
+        }
+
+        return $ids;
+    }
 }
