@@ -49,7 +49,11 @@ class SystemConfigForm extends Form
             $useDefaultLabel = $container->find('css', "label:contains('$inputLabel')");
             $input = $useDefaultLabel->getParent()->find('css', 'input');
         } else {
-            $input = $container->find('css', '.control-subgroup input');
+            $input = $container->find('css', 'div.control-subgroup input, select');
+
+            if ($input == null) {
+                $input = $container->find('css', '.control-subgroup select');
+            }
         }
 
         self::assertNotNull($input, "Input element for $label not found");

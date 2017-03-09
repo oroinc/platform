@@ -47,4 +47,59 @@ class FeatureContext extends OroFeatureContext implements
         $this->oroMainContext->iFillFormWith($table, 'SystemConfigForm');
     }
 
+    /**
+     * Alias to assert existing WYSIWYG editor on current page
+     *
+     * @Given /^I should see WYSIWYG editor$/
+     */
+    public function iShouldSeeWYSIWYGEditor()
+    {
+        self::assertTrue(
+            $this->oroMainContext->elementIsVisible(
+                '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
+            ),
+            'WYSIWYG editor not found on current page'
+        );
+    }
+
+    /**
+     * Alias to assert that WYSIWYG editor not exist on current page
+     *
+     * @Given /^I should not see WYSIWYG editor$/
+     */
+    public function iShouldNotSeeWYSIWYGEditor()
+    {
+        self::assertFalse(
+            $this->oroMainContext->elementIsVisible(
+                '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
+            ),
+            'WYSIWYG editor still exists on page'
+        );
+    }
+
+    /**
+     * Alias for asserting that recent emails block is visible on navbar
+     *
+     * @Then /^recent emails block should not be visible$/
+     */
+    public function recentEmailsBlockShouldNotBeVisible()
+    {
+        self::assertFalse(
+            $this->oroMainContext->elementIsVisible('.email-notification-menu'),
+            'Recent emails block still visible'
+        );
+    }
+
+    /**
+     * Alias for asserting that recent emails block not visible or not exist
+     *
+     * @Then /^recent emails block must be visible$/
+     */
+    public function recentEmailsBlockMustBeVisible()
+    {
+        self::assertTrue(
+            $this->oroMainContext->elementIsVisible('.email-notification-menu'),
+            'Recent emails block not found on page'
+        );
+    }
 }

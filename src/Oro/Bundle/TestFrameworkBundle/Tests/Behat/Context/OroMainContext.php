@@ -803,30 +803,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Asserts that element on page exists and visible
-     *
-     * @Then element :selector must be visible
-     */
-    public function elementMustBeVisible($selector)
-    {
-        $element = $this->getPage()->findVisible('css', $selector);
-
-        self::assertNotNull($element);
-    }
-
-    /**
-     * Asserts that element not exists on page or not visible
-     *
-     * @Then element :selector should not be visible
-     */
-    public function elementShouldNotBeVisible($selector)
-    {
-        $element = $this->getPage()->findVisible('css', $selector);
-
-        self::assertNull($element);
-    }
-
-    /**
      * @param int|string $count
      * @return int
      */
@@ -850,5 +826,18 @@ class OroMainContext extends MinkContext implements
     protected function waitForAjax($time = 60000)
     {
         return $this->getSession()->getDriver()->waitForAjax($time);
+    }
+
+    /**
+     * Checks that element on page exists and visible
+     *
+     * @param string $selector
+     * @return bool
+     */
+    public function elementIsVisible($selector)
+    {
+        $element = $this->getPage()->findVisible('css', $selector);
+
+        return !is_null($element);
     }
 }
