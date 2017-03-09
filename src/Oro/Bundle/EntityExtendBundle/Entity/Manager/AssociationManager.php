@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\UnionQueryBuilder;
@@ -15,7 +14,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
 class AssociationManager
 {
@@ -31,22 +32,28 @@ class AssociationManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param ConfigManager      $configManager
      * @param ServiceLink        $aclHelperLink
      * @param DoctrineHelper     $doctrineHelper
      * @param EntityNameResolver $entityNameResolver
+     * @param FeatureChecker     $featureChecker
      */
     public function __construct(
         ConfigManager $configManager,
         ServiceLink $aclHelperLink,
         DoctrineHelper $doctrineHelper,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        FeatureChecker $featureChecker
     ) {
         $this->configManager      = $configManager;
         $this->aclHelperLink      = $aclHelperLink;
         $this->doctrineHelper     = $doctrineHelper;
         $this->entityNameResolver = $entityNameResolver;
+        $this->featureChecker     = $featureChecker;
     }
 
     /**
@@ -109,6 +116,10 @@ class AssociationManager
     public function getSingleOwnerFilter($scope, $attribute = 'enabled')
     {
         return function ($ownerClass, $targetClass, ConfigManager $configManager) use ($scope, $attribute) {
+            if (!$this->featureChecker->isResourceEnabled($targetClass, 'entities')) {
+                return false;
+            }
+
             return $configManager->getProvider($scope)
                 ->getConfig($targetClass)
                 ->is($attribute);
@@ -127,6 +138,10 @@ class AssociationManager
     public function getMultiOwnerFilter($scope, $attribute)
     {
         return function ($ownerClass, $targetClass, ConfigManager $configManager) use ($scope, $attribute) {
+            if (!$this->featureChecker->isResourceEnabled($targetClass, 'entities')) {
+                return false;
+            }
+
             $ownerClassNames = $configManager->getProvider($scope)
                 ->getConfig($targetClass)
                 ->get($attribute, false, []);

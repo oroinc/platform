@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
@@ -111,6 +112,13 @@ class WorkflowDataSerializeListener
         // entity attribute must not be serialized
         $workflowData->remove($workflowItem->getDefinition()->getEntityAttributeName());
 
+        // workflow attributes must not be serialized
+        $workflowConfig = $workflowItem->getDefinition()->getConfiguration();
+        $variableNames = $this->getVariablesNamesFromConfiguration($workflowConfig);
+        foreach ($variableNames as $variableName) {
+            $workflowData->remove($variableName);
+        }
+
         $serializedData = $this->serializer->serialize($workflowData, $this->format);
         $workflowItem->setSerializedData($serializedData);
         $workflowItem->getData()->setModified(false);
@@ -141,5 +149,22 @@ class WorkflowDataSerializeListener
     protected function isSupported($entity)
     {
         return $entity instanceof WorkflowItem;
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return array
+     */
+    protected function getVariablesNamesFromConfiguration($configuration)
+    {
+        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
+
+        if (!is_array($configuration) || !isset($configuration[$definitionsNode][$variablesNode])) {
+            return [];
+        }
+
+        return array_keys($configuration[$definitionsNode][$variablesNode]);
     }
 }
