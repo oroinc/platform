@@ -32,9 +32,6 @@ oro:
 
         action:
             assign_unassign: "Assign/unassign tags"
-            unassign_global: 
-                label: "Unassign other tags"
-                description: "Remove tags other than users' own"
 
         tagging:
             alias.label:         Alias
