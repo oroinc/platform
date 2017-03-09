@@ -66,7 +66,7 @@ class TranslationReader extends AbstractReader
                 $message = array_merge(
                     $message,
                     [
-                        'original_value' => isset($originalMessages[$key]) ? $originalMessages[$key]['value'] : '',
+                        'english_translation' => isset($originalMessages[$key]) ? $originalMessages[$key]['value'] : '',
                     ]
                 );
             });

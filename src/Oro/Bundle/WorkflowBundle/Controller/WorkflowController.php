@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
-use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvents;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvent;
+use Oro\Bundle\WorkflowBundle\Event\StartTransitionEvents;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
  * @Route("/workflow")
@@ -29,6 +29,7 @@ class WorkflowController extends Controller
      * @param string $workflowName
      * @param string $transitionName
      * @param Request $request
+     *
      * @return Response
      */
     public function startTransitionAction($workflowName, $transitionName, Request $request)
@@ -55,7 +56,9 @@ class WorkflowController extends Controller
             StartTransitionEvents::HANDLE_BEFORE_RENDER,
             $event
         );
+
         $routeParams = $event->getRouteParameters();
+        $routeProvider = $this->container->get('oro_workflow.provider.start_transition_route');
 
         return $this->render(
             $transition->getPageTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
@@ -63,11 +66,11 @@ class WorkflowController extends Controller
                 'transition' => $transition,
                 'workflow' => $workflow,
                 'transitionUrl' => $this->generateUrl(
-                    $this->getRouteProvider()->getExecutionRoute(),
+                    $routeProvider->getExecutionRoute(),
                     $routeParams
                 ),
                 'transitionFormUrl' => $this->generateUrl(
-                    $this->getRouteProvider()->getFormDialogRoute(),
+                    $routeProvider->getFormDialogRoute(),
                     $routeParams
                 )
             ]
@@ -83,7 +86,11 @@ class WorkflowController extends Controller
      *
      * @param string $transitionName
      * @param WorkflowItem $workflowItem
+     *
      * @return Response
+     *
+     * @throws \LogicException
+     * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      */
     public function transitionAction($transitionName, WorkflowItem $workflowItem)
     {
@@ -96,6 +103,7 @@ class WorkflowController extends Controller
             'transitionName' => $transition->getName(),
             'workflowItemId' => $workflowItem->getId(),
         ];
+        $routeProvider = $this->container->get('oro_workflow.provider.transition_route');
 
         return $this->render(
             $transition->getPageTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
@@ -103,22 +111,14 @@ class WorkflowController extends Controller
                 'transition' => $transition,
                 'workflow' => $workflow,
                 'transitionUrl' => $this->generateUrl(
-                    'oro_api_workflow_transit',
+                    $routeProvider->getExecutionRoute(),
                     $routeParams
                 ),
                 'transitionFormUrl' => $this->generateUrl(
-                    'oro_workflow_widget_transition_form',
+                    $routeProvider->getFormDialogRoute(),
                     $routeParams
                 )
             ]
         );
-    }
-
-    /**
-     * @return RouteProviderInterface
-     */
-    protected function getRouteProvider()
-    {
-        return $this->container->get('oro_workflow.provider.start_transition_route');
     }
 }

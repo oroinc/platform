@@ -5,13 +5,17 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
+use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
 
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 /**
@@ -20,17 +24,17 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var FormOptionsAssembler|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $formOptionsAssembler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ExpressionFactory|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $conditionFactory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var ActionFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $actionFactory;
 
@@ -76,27 +80,36 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         ]
     ];
 
+    /** @var FormOptionsConfigurationAssembler|\PHPUnit_Framework_MockObject_MockObject */
+    protected $formConfigurationAssembler;
+
     protected function setUp()
     {
-        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler')
+        $this->formOptionsAssembler = $this->getMockBuilder(FormOptionsAssembler::class)
             ->disableOriginalConstructor()
             ->setMethods(['assemble'])
             ->getMock();
 
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+        $this->conditionFactory = $this->createMock(ExpressionFactory::class);
+        $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+
+        $this->formConfigurationAssembler = $this->getMockBuilder(FormOptionsConfigurationAssembler::class)
             ->disableOriginalConstructor()
+            ->setMethods(['assemble'])
             ->getMock();
-        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
+
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
-            $this->actionFactory
+            $this->actionFactory,
+            $this->formConfigurationAssembler
         );
     }
 
     /**
      * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider missedTransitionDefinitionDataProvider
+     *
      * @param array $configuration
      */
     public function testAssembleNoRequiredTransitionDefinitionException($configuration)
@@ -136,6 +149,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectTransitionDefinitionDataProvider
+     *
      * @param array $configuration
      */
     public function testUnknownTransitionDefinitionAssembler($configuration)
@@ -173,6 +187,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider incorrectStepsDataProvider
+     *
      * @param array $steps
      */
     public function testUnknownStepException($steps)
@@ -221,12 +236,12 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $steps = ['target_step' => $this->createStep()];
         $attributes = ['attribute' => $this->createAttribute()];
 
-        $expectedPreAction      = null;
-        $expectedCondition      = null;
-        $expectedPreCondition   = $this->createCondition();
-        $expectedPostAction     = null;
+        $expectedPreAction = null;
+        $expectedCondition = null;
+        $expectedPreCondition = $this->createCondition();
+        $expectedPostAction = null;
         $defaultAclPrecondition = [];
-        $preConditions          = [];
+        $preConditions = [];
 
         $fullConfiguration = $configuration;
         $configuration = reset($configuration['transitions']);
@@ -367,9 +382,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         if (array_key_exists('schedule', $configuration)) {
             $scheduleDefinition = $configuration['schedule'];
-            $this->assertEquals((string) $scheduleDefinition['cron'], $actualTransition->getScheduleCron());
+            $this->assertEquals((string)$scheduleDefinition['cron'], $actualTransition->getScheduleCron());
             if (isset($scheduleDefinition['filter'])) {
-                $this->assertEquals((string) $scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
+                $this->assertEquals((string)$scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
             }
         }
 
@@ -457,7 +472,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     protected function assertTemplate($templateType, $configuration, $actualTransition)
     {
         $configKey = $templateType . '_template';
-        $getter    = 'get' . ucfirst($templateType) . 'Template';
+        $getter = 'get' . ucfirst($templateType) . 'Template';
 
         if (array_key_exists($configKey, $configuration)) {
             $this->assertEquals($configuration[$configKey], $actualTransition->$getter());
@@ -467,6 +482,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return array
      */
     public function configurationDataProvider()
@@ -550,6 +567,27 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                         'empty_definition' => self::$transitionDefinitions['empty_definition']
                     ]
                 ]
+            ],
+            'with form_configuration' => [
+                'configuration' => [
+                    'transitions' => [
+                        'test_transition' => [
+                            'transition_definition' => 'empty_definition',
+                            'step_to' => 'target_step',
+                            'form_options' => [
+                                WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                                    'handler' => 'handler',
+                                    'template' => 'template',
+                                    'data_provider' => 'data_provider',
+                                    'data_attribute' => 'data_attribute',
+                                ],
+                            ]
+                        ]
+                    ],
+                    'transition_definitions' => [
+                        'empty_definition' => self::$transitionDefinitions['empty_definition']
+                    ]
+                ]
             ]
         ];
     }
@@ -562,7 +600,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         ];
         $transitionDefinition = self::$transitionDefinitions['with_condition'];
 
-        $steps      = ['target_step' => $this->createStep()];
+        $steps = ['target_step' => $this->createStep()];
         $attributes = ['attribute' => $this->createAttribute()];
 
         $expectedCondition = $expectedPreCondition = $this->createCondition();
@@ -680,6 +718,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 if ($config === self::$actions['actions']) {
                     $expectedPostAction = $action;
                 }
+
                 return $action;
             });
 
@@ -719,8 +758,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
 
         $scheduleDefinition = $configuration['schedule'];
-        $this->assertEquals((string) $scheduleDefinition['cron'], $actualTransition->getScheduleCron());
-        $this->assertEquals((string) $scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
+        $this->assertEquals((string)$scheduleDefinition['cron'], $actualTransition->getScheduleCron());
+        $this->assertEquals((string)$scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
 
         $this->assertSame($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
         $this->assertSame($expectedPreAction, $actualTransition->getPreAction(), 'Incorrect preaction');
@@ -794,7 +833,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $steps = ['target_step' => $this->createStep()];
         $attributes = ['attribute' => $this->createAttribute()];
 
-        $expectedPreCondition   = $this->createCondition();
+        $expectedPreCondition = $this->createCondition();
 
         $preConditions = [
             '@and' => [

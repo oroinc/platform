@@ -23,7 +23,6 @@ define(function(require) {
      *             view_options:
      *                 permissions:
      *                     oro_tag_create: true
-     *                     oro_tag_unassign_global: true
      *           save_api_accessor:
      *               # usual save api configuration
      *               route: 'oro_api_post_taggable'
@@ -48,7 +47,6 @@ define(function(require) {
      * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
      * inline_editing.editor.permissions      | Permissions
      * inline_editing.editor.permissions.oro_tag_create | Allows user to create new tag
-     * inline_editing.editor.permissions.oro_tag_unassign_global | Allows user to edit tags assigned by all users
      *
      * ### Constructor parameters
      *
@@ -88,20 +86,13 @@ define(function(require) {
         },
 
         getInitialResultItem: function() {
-            var _this = this;
             return this.getModelValue().map(function(item) {
-                return _this.applyPermissionsToTag({
+                return {
                     id: item.id,
                     label: item.name,
                     owner: item.owner
-                });
+                };
             });
-        },
-
-        applyPermissionsToTag: function(tag) {
-            var isOwner = tag.owner === void 0 ? true : tag.owner;
-            tag.locked = this.permissions.oro_tag_unassign_global ? false : !isOwner;
-            return tag;
         },
 
         autoSize: function() {

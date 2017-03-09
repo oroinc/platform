@@ -366,11 +366,11 @@ The following table shows limitations for values of the priority attribute.
 
 | Processor type | Processor priority | Group priority |
 |----------------|--------------------|----------------|
-| initial common processors | from -255 to 255 |  |
-| initial ungrouped processors | from -255 to 255 |  |
-| grouped processors | from -255 to 255 | from -254 to 252 |
-| final ungrouped processors | from -65535 to -65280 |  |
-| final common processors | from min int to -65536 |  |
+| initial common processors | greater than or equals to 0 |  |
+| initial ungrouped processors | greater than or equals to 0 |  |
+| grouped processors | from -255 to 255 | from -255 to 255 |
+| final ungrouped processors | less than 0 |  |
+| final common processors | less than 0 |  |
 
 Applicable Checkers
 -------------------
