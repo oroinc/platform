@@ -998,6 +998,11 @@ TagBundle
     - removed method `addReportOrSegmentGridPrefix`
     - added UnsupportedGridPrefixesTrait
 
+TranslationBundle
+-----------------
+- Class `Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader`
+    - signature of constructor was changed. The second argument replaced with `LanguageRepository $languageRepository`
+
 Tree Component
 --------------
 - `Oro\Component\Tree\Handler\AbstractTreeHandler`:
@@ -1013,4 +1018,4 @@ and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. I
 with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
 - Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
 which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
-provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).  
+provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).
