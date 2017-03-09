@@ -22,7 +22,8 @@ define(function(require) {
 
         onGroupChange: function(model) {
             if (model.id === this.id) {
-                this.el.toggle();
+                this.el.siblings('.' + this.el[0].className).hide();
+                this.el.show();
             }
         }
     });

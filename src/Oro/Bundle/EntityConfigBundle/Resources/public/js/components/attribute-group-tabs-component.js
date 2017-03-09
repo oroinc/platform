@@ -22,7 +22,7 @@ define(function(require) {
             var first = groups[0];
             first.active = true;
             this.current = first.id;
-            this.trigger(this.current);
+            this.trigger(this.current, first.active);
 
             this.groups = new BaseCollection(groups);
 
@@ -36,16 +36,18 @@ define(function(require) {
         },
 
         onGroupChange: function(model) {
-            if (model.hasChanged('active') && model.get('active') === true) {
-                this.trigger(this.current);
+            if (model.get('active')) {
+                this.trigger(this.current, model.hasChanged('active'));
                 this.trigger(model.get('id'));
                 this.current = model.get('id');
             }
+            model.set({'click_state': false}, {silent: true});
         },
 
-        trigger: function(code) {
+        trigger: function(code, isActiveChanged) {
             mediator.trigger('entity-config:attribute-group:changed', {
-                id: code
+                id: code,
+                isActiveChanged: isActiveChanged
             });
         }
     });
