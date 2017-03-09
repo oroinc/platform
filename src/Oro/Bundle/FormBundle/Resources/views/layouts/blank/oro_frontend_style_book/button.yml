@@ -10,6 +10,9 @@ layout:
 
         - '@addTree':
             items:
+                style_book_forms_description:
+                    blockType: block
+
                 group_element_buttons:
                     blockType: group_element
                     options:
@@ -134,6 +137,8 @@ layout:
 
             tree:
                 style_book_content:
+                    style_book_forms_description: ~
+
                     group_element_buttons:
                         group_element_button_view:
                             style_book_button_element: ~
