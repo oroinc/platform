@@ -506,6 +506,53 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Expand grid view options.
+     * Example: I click Options in grid view
+     *
+     * @Given I click Options in grid view
+     */
+    public function clickViewOptions()
+    {
+        $this->elementFactory->createElement('GridViewOptionsLink')->click();
+    }
+
+    /**
+     * Click on item in grid view options.
+     * Example: Given I click on "Some item" in grid view options
+     * @param string $title
+     *
+     * @Given I click on :title in grid view options
+     */
+    public function clickLinkInViewOptions($title)
+    {
+        $this->elementFactory->createElement('GridViewOptions')->clickLink($title);
+    }
+
+    /**
+     * Check that item in grid view options exists.
+     * Example: Then I should see "Some item" in grid view options
+     * @param string $title
+     *
+     * @Then I should see :title in grid view options
+     */
+    public function iShouldSeeItemInViewOptions($title)
+    {
+        self::assertNotNull($this->elementFactory->createElement('GridViewOptions')->findLink($title));
+    }
+
+    /**
+     * Check that item in grid view options does not exist.
+     * Example: Then I should not see "Some item" in grid view options
+     * @param string $title
+     *
+     * @Then I should not see :title in grid view options
+     */
+    public function iShouldNotSeeItemInViewOptions($title)
+    {
+        self::assertNull($this->elementFactory->createElement('GridViewOptions')->findLink($title));
+    }
+
+    /**
      * @When /^(?:|I )confirm deletion$/
      */
     public function confirmDeletion()

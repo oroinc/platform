@@ -86,3 +86,19 @@ oro_behat_extension:
     Modal:
       selector: 'div.modal'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    GridViewOptions:
+      selector: '.grid-views .btn-toolbar .btn-group.actions-group'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    GridViewOptionsLink:
+      selector: '.grid-views .btn:contains("Options")'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+  suites:
+    OroDataGridBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+      paths:
+        - '@OroDataGridBundle/Tests/Behat/Features'
