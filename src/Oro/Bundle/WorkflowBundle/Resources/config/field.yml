@@ -1,0 +1,25 @@
+services:
+    oro_workflow.exclusion_provider:
+        class: '%oro_entity.exclusion_provider.chain.class%'
+        calls:
+            - [addProvider, ['@oro_entity.exclusion_provider']]
+
+    oro_workflow.entity_provider:
+        class: '%oro_entity.entity_provider.class%'
+        parent: oro_entity.entity_provider.abstract
+        calls:
+            - [setExclusionProvider, ['@oro_workflow.exclusion_provider']]
+
+    oro_workflow.entity_field_provider:
+        class: 'Oro\Bundle\WorkflowBundle\Field\FieldProvider'
+        parent: oro_entity.entity_field_provider.abstract
+        calls:
+            - [setEntityProvider, ['@oro_workflow.entity_provider']]
+            - [setExclusionProvider, ['@oro_workflow.exclusion_provider']]
+
+    oro_workflow.entity_field_list_provider:
+        class: '%oro_entity.entity_field_list_provider.class%'
+        arguments:
+            - '@oro_workflow.entity_field_provider'
+            - '@oro_workflow.entity_provider'
+            - '@oro_entity_config.helper.entity_config'

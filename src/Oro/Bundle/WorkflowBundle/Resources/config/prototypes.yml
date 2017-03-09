@@ -17,6 +17,12 @@ services:
         class: %oro_workflow.prototype.transition_manager.class%
         scope: prototype
 
+    oro_workflow.prototype.variable_manager:
+        class: 'Oro\Bundle\WorkflowBundle\Model\VariableManager'
+        scope: prototype
+        calls:
+            - ['setVariableAssembler', ['@oro_workflow.variable_assembler']]
+
     oro_workflow.prototype.workflow:
         class: %oro_workflow.prototype.workflow.class%
         scope: prototype
@@ -27,3 +33,4 @@ services:
             - '@oro_workflow.prototype.step_manager'
             - '@oro_workflow.prototype.attribute_manager'
             - '@oro_workflow.prototype.transition_manager'
+            - '@oro_workflow.prototype.variable_manager'

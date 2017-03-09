@@ -86,7 +86,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
                     'domain' => 'domain1',
                     'key' => 'key1',
                     'value' => 'domain1-locale1-message1',
-                    'original_value' => 'domain1-locale1-message1',
+                    'english_translation' => 'domain1-locale1-message1',
                 ],
             ],
             'offset1' => [
@@ -96,7 +96,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
                     'domain' => 'domain1',
                     'key' => 'key2',
                     'value' => 'domain1-default-message2',
-                    'original_value' => '',
+                    'english_translation' => '',
                 ],
             ],
             'offset2' => [
@@ -106,7 +106,7 @@ class TranslationReaderTest extends \PHPUnit_Framework_TestCase
                     'domain' => 'domain2',
                     'key' => 'key1',
                     'value' => 'domain2-locale1-message1',
-                    'original_value' => 'domain2-locale1-message1',
+                    'english_translation' => 'domain2-locale1-message1',
                 ],
             ],
             'offset3' => [

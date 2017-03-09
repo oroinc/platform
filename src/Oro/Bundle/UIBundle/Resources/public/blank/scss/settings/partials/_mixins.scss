@@ -122,6 +122,7 @@
         
         // tabs link hover
         $nav-tabs-link-hover-inner-offset: null,
+        $nav-tabs-link-hover-text-decoration: null,
         $nav-tabs-link-hover-background: null,
         $nav-tabs-link-hover-border-width: null,
         $nav-tabs-link-hover-border-style: null,
@@ -162,8 +163,9 @@
             margin-left: $nav-tabs-gap;
         }
     }
-    
+
     #{$nav-tabs-link} {
+        display: block;
         padding: $nav-tabs-link-inner-offset;
 
         text-align: $nav-tabs-link-text-align;
@@ -175,6 +177,8 @@
 
         @include hover-focus {
             padding: $nav-tabs-link-hover-inner-offset;
+
+            text-decoration: $nav-tabs-link-hover-text-decoration;
 
             background: $nav-tabs-link-hover-background;
             color: $nav-tabs-link-hover-color;

@@ -3,15 +3,16 @@
 namespace Oro\Bundle\UserBundle\Security;
 
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\DependencyInjection\ServiceLink;
+
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
 
 class UserChecker extends BaseUserChecker
 {
@@ -67,7 +68,7 @@ class UserChecker extends BaseUserChecker
         }
 
         if ($user->getAuthStatus() && $user->getAuthStatus()->getId() === UserManager::STATUS_EXPIRED) {
-            $exception = new CredentialsExpiredException('Password expired.');
+            $exception = new CredentialsResetException('Password reset.');
             $exception->setUser($user);
 
             throw $exception;
