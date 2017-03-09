@@ -101,7 +101,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     ) {
         if ($isDistinct) {
             $columnExpr = 'DISTINCT ' . (string)$columnExpr;
-        } else { //Leave only for select
+        } else { //Restrict select with id field only
             return;
         }
 

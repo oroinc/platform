@@ -63,7 +63,6 @@ class OrmPagerExtension extends AbstractPagerExtension
         }
         $this->tryAdjustTotalCount();
         $this->pager->init();
-        return;
     }
 
     /**

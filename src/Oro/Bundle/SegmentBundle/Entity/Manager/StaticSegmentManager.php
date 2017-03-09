@@ -79,20 +79,16 @@ class StaticSegmentManager
             );
 
             $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
-            $qb->setMaxResults($segment->getRecordsLimit());
             $this->applyOrganizationLimit($segment, $qb);
             $query = $qb->getQuery();
-            $entitiesToSave = $query->getArrayResult();
+            $query->setMaxResults($segment->getRecordsLimit());
 
-            $classMetadata = $query->getEntityManager()->getClassMetadata($segment->getEntity());
-            $identifiers   = $classMetadata->getIdentifier();
-            $identifier = reset($identifiers);
+            $segmentQuery = $query->getSQL();
+            $segmentQuery = substr_replace($segmentQuery, $insertString, stripos($segmentQuery, 'from'), 0);
+            $fieldToSelect = 'entity_id';
 
-
-
-            $fieldToSelect = 'entityId';
             if ($entityMetadata->getTypeOfField($entityMetadata->getSingleIdentifierFieldName()) === 'integer') {
-                $fieldToSelect = 'integerEntityId';
+                $fieldToSelect = 'integer_entity_id';
             }
 
             $dbQuery = 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) (%s)';
