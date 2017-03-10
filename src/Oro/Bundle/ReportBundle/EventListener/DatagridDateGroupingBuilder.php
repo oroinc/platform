@@ -19,6 +19,7 @@ class DatagridDateGroupingBuilder
     const FILTERS_KEY_NAME = 'filters';
     const SOURCE_KEY_NAME = 'source';
     const SORTERS_KEY_NAME = 'sorters';
+    const PROPERTIES_KEY_NAME = 'properties';
     const FIELDS_ACL_KEY_NAME = 'fields_acl';
     const COLUMNS_KEY_NAME = 'columns';
     const CALENDAR_DATE_COLUMN_ALIAS = 'cDate';
@@ -90,6 +91,30 @@ class DatagridDateGroupingBuilder
             $notNullableField
         );
         $this->changeGroupBySection($config);
+        $this->removeViewLink($config);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     */
+    protected function removeViewLink(DatagridConfiguration $config)
+    {
+        if (!$config->offsetExists(static::PROPERTIES_KEY_NAME)) {
+            return;
+        }
+        $properties = $config->offsetGet(static::PROPERTIES_KEY_NAME);
+        if (empty($properties)) {
+            return;
+        }
+
+        if (array_key_exists('view_link', $properties)) {
+            unset($properties['view_link']);
+        }
+        if (array_key_exists('id', $properties)) {
+            unset($properties['id']);
+        }
+
+        $config->offsetSet(static::PROPERTIES_KEY_NAME, $properties);
     }
 
     /**

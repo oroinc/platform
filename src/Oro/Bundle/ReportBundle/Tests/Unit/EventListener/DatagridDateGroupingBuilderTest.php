@@ -258,6 +258,10 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                     'table_aliases' => ['' => 't1'],
                 ],
             ],
+            'properties' => [
+                'id' => null,
+                'view_link' => []
+            ]
         ];
     }
 
@@ -322,7 +326,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-            ],
+            ]
         ];
 
         if ($includeEmptyPeriods) {
@@ -364,6 +368,7 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit_Framework_TestCase
         ];
         $merged = array_merge_recursive($originalConfig, $additional);
         $merged['source']['query']['groupBy'] = 'c2,calendarDate.date';
+        $merged['properties'] = [];
 
         return $merged;
     }
