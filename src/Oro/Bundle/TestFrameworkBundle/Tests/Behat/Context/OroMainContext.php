@@ -28,6 +28,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
