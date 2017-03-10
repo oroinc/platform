@@ -164,7 +164,7 @@ define(function(require) {
                 .data('data', data);
 
             this.util.init(entity, data);
-            this.element.inputWidget('refresh');
+            this.element.change();//update select2 widget, inputWidget('refresh') works incorrect for data() with children(ex: related entity)
         },
 
         setValue: function(value) {
