@@ -29,7 +29,6 @@ define(function(require) {
             fieldId: null,
             ownFieldId: null,
             unassign: false,
-            unassignGlobal: false,
             tagOverlayId: null
         }),
 

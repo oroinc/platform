@@ -83,15 +83,6 @@
         </span>
     {% endif %}
 
-    {% if resource_granted('CONFIGURE', entity) and variables is defined and variables|length %}
-        {{ UI.button({
-            'path' : path('oro_workflow_definition_configure', { 'name': entity.name }),
-            'label': 'oro.workflow.workflowdefinition.configuration.label'|trans,
-            'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
-            'iCss': 'fa-cog',
-        }) }}
-    {% endif %}
-
     {% if not entity.system %}
         {% if resource_granted('EDIT', entity) %}
             {{ UI.editButton({

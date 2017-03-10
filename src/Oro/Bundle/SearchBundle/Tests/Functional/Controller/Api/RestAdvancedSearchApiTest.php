@@ -3,17 +3,15 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
-use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
+use Oro\Bundle\SearchBundle\Tests\Functional\Controller\SearchBundleWebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolationPerTest
  * @group search
  */
-class RestAdvancedSearchApiTest extends WebTestCase
+class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
 {
-    use SearchExtensionTrait;
 
     protected function setUp()
     {
@@ -28,11 +26,6 @@ class RestAdvancedSearchApiTest extends WebTestCase
         $this->loadFixtures([LoadSearchItemData::class]);
         $this->getSearchIndexer()->reindex(Item::class);
         $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
-    }
-
-    protected function tearDown()
-    {
-        $this->clearIndexTextTable();
     }
 
     /**

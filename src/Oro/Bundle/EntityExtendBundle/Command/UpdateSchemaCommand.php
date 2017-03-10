@@ -99,11 +99,14 @@ class UpdateSchemaCommand extends ContainerAwareCommand
      */
     protected function getClassesMetadata(InputInterface $input, EntityManager $em)
     {
-        /** @var ExtendEntityConfigProvider $attributeProvider */
         $extendEntityConfigProvider = $this->getContainer()
             ->get('oro_entity_config.provider.extend_entity_config_provider');
 
-        $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs($input->getOption('attributes-only'));
+        if ($input->getOption('attributes-only')) {
+            $extendEntityConfigProvider->enableAttributesOnly();
+        }
+
+        $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs();
         $metadata = [];
         foreach ($extendConfigs as $extendConfig) {
             if (!ExtendScopeHelper::isAvailableForProcessing($extendConfig)) {
