@@ -55,6 +55,24 @@ Feature: Managing users roles
       | Access job queue                |
       | Access entity management        |
 
+  Scenario: Disable configuring permissions and capabilities for user role
+    And I go to System/User Management/Roles
+    When I click View Edited test role in grid
+    Then the role has following active permissions:
+      | Email-User Relation | View:None | Create:None | Edit:None |
+    And I should see "Manage passwords"
+    When restricted VIEW permission for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default
+    And restricted CREATE permission for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default
+    And restricted password_management capability and group default
+    And I reload the page
+    Then the role has not following permissions:
+      | Email-User Relation | View | Create |
+    And I should not see "Manage passwords"
+    When restricted all permissions for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default
+    And I should see "Email-User Relation"
+    And I reload the page
+    Then I should not see "Email-User Relation"
+
   Scenario: Delete user role
     Given I go to System/User Management/Roles
     Then I should see Edited test role in grid

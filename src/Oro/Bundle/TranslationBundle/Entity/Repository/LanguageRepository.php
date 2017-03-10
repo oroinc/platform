@@ -6,11 +6,14 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
 class LanguageRepository extends EntityRepository
 {
     /**
      * @param bool $onlyEnabled
+     *
      * @return array
      */
     public function getAvailableLanguageCodes($onlyEnabled = false)
@@ -34,6 +37,29 @@ class LanguageRepository extends EntityRepository
     public function getAvailableLanguagesByCurrentUser(AclHelper $aclHelper)
     {
         $qb = $this->createQueryBuilder('language');
+
         return $aclHelper->apply($qb)->getResult();
+    }
+
+    /**
+     * @param string $languageCode
+     *
+     * @return array
+     */
+    public function getTranslationsForExport($languageCode)
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->select([
+                'tk.domain as domain',
+                'tk.key as key',
+                't.value as value',
+                't.value AS english_translation',
+                '(CASE WHEN t.value IS NULL THEN 0 ELSE 1 END) as is_translated',
+            ])
+            ->innerJoin(TranslationKey::class, 'tk', 'WITH', '1 = 1')
+            ->leftJoin(Translation::class, 't', 'WITH', 't.language = l AND t.translationKey = tk')
+            ->andWhere('l.code = :languageCode')->setParameter('languageCode', $languageCode);
+
+        return $qb->getQuery()->getArrayResult();
     }
 }

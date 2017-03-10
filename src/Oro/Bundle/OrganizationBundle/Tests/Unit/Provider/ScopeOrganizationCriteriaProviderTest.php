@@ -101,10 +101,6 @@ class ScopeOrganizationCriteriaProviderTest extends \PHPUnit_Framework_TestCase
                 'context' => ['organization' => $organization],
                 'criteria' => ['organization' => $organization],
             ],
-            'array_context_with_organization_key_invalid_value' => [
-                'context' => ['organization' => 123],
-                'criteria' => [],
-            ],
             'array_context_without_organization_key' => [
                 'context' => [],
                 'criteria' => [],

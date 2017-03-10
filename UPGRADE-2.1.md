@@ -168,15 +168,6 @@ DataGridBundle
 --------------
 - `Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult` is deprecated. Use `Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator` instead
 - Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
-- Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
-    - construction signature was changed now it takes next arguments:
-        - `ServiceLink` $managerLink,
-        - `NameStrategyInterface` $nameStrategy,
-        - `RouterInterface` $router,
-        - `SecurityFacade` $securityFacade,
-        - `DatagridRouteHelper` $datagridRouteHelper,
-        - `RequestStack` $requestStack,
-        - `LoggerInterface` $logger = null
 - The service `oro_datagrid.twig.datagrid` was marked as `private`
 - Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
@@ -1007,6 +998,11 @@ TagBundle
     - removed method `addReportOrSegmentGridPrefix`
     - added UnsupportedGridPrefixesTrait
 
+TranslationBundle
+-----------------
+- Class `Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader`
+    - signature of constructor was changed. The second argument replaced with `LanguageRepository $languageRepository`
+
 Tree Component
 --------------
 - `Oro\Component\Tree\Handler\AbstractTreeHandler`:
@@ -1022,4 +1018,4 @@ and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. I
 with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
 - Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
 which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
-provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).  
+provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).

@@ -125,6 +125,7 @@ class WorkflowDefinitionController extends Controller
      *      permission="CONFIGURE"
      * )
      *
+     * @param Request $request
      * @param WorkflowDefinition $workflowDefinition
      *
      * @return array
@@ -132,8 +133,12 @@ class WorkflowDefinitionController extends Controller
      */
     public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
-        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
         $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
+        if (!count($workflow->getVariables())) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
         $form = $this->createForm(WorkflowVariablesType::NAME, null, [
             'workflow' => $workflow,
@@ -176,7 +181,7 @@ class WorkflowDefinitionController extends Controller
             'entity' => $workflowDefinition,
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'translateLinks' => $translateLinks,
-            'variables' => $workflow->getVariables($workflowDefinition),
+            'variables' => $workflow->getVariables(true),
         ];
     }
 

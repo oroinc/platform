@@ -7,6 +7,9 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_scope.context_request_helper:
+        class: 'Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper'
+
     oro_scope.scope_manager:
         class: Oro\Bundle\ScopeBundle\Manager\ScopeManager
         arguments:
@@ -25,3 +28,9 @@ services:
         tags:
             - { name: doctrine.event_listener, event: preFlush }
             - { name: doctrine.event_listener, event: onClear }
+
+    oro_scope.context_normalizer:
+        class: Oro\Bundle\ScopeBundle\Manager\ContextNormalizer
+        arguments:
+            - '@oro_scope.scope_manager'
+            - '@doctrine'

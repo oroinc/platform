@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\NavigationBundle\Validator\Constraints;
 
+use Knp\Menu\ItemInterface;
+
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Builder\MenuUpdateBuilder;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
-
-use Knp\Menu\ItemInterface;
-
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidator;
 
 class MaxNestedLevelValidator extends ConstraintValidator
 {
@@ -40,10 +40,7 @@ class MaxNestedLevelValidator extends ConstraintValidator
     {
         $options = [
             'ignoreCache' => true,
-            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => [
-                'organization' => $entity->getScope()->getOrganization(),
-                'user' => $entity->getScope()->getUser()
-            ]
+            MenuUpdateBuilder::SCOPE_CONTEXT_OPTION => $entity->getScope()
         ];
 
         $menu = $this->builderChainProvider->get($entity->getMenu(), $options);
