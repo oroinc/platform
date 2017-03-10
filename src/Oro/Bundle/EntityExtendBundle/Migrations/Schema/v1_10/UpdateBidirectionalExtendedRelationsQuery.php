@@ -2,28 +2,16 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_10;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Query\AbstractEntityConfigQuery;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuery
 {
     const LIMIT = 100;
-
-    /**
-     * @var QueryBag
-     */
-    private $queries;
-
-    /**
-     * @param QueryBag $queries
-     */
-    public function __construct(QueryBag $queries)
-    {
-        $this->queries = $queries;
-    }
 
     /**
      * {@inheritdoc}
@@ -44,7 +32,7 @@ class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuer
     /**
      * {@inheritdoc}
      */
-    public function processRow(array $row)
+    public function processRow(array $row, LoggerInterface $logger)
     {
         $data = $this->connection->convertToPHPValue($row['data'], 'array');
 
@@ -79,15 +67,15 @@ class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuer
                 continue;
             }
 
-            $this->queries->addQuery(
-                new UpdateEntityConfigFieldValueQuery(
-                    $fieldConfig->getClassName(),
-                    $fieldConfig->getFieldName(),
-                    'extend',
-                    'bidirectional',
-                    $bidirectional
-                )
+            $query = new UpdateEntityConfigFieldValueQuery(
+                $fieldConfig->getClassName(),
+                $fieldConfig->getFieldName(),
+                'extend',
+                'bidirectional',
+                $bidirectional
             );
+            $query->setConnection($this->connection);
+            $query->execute($logger);
         }
     }
 }

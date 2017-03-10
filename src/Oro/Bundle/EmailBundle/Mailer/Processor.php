@@ -208,7 +208,7 @@ class Processor
         $messageId = $message->getId();
 
         if (!$this->mailer->send($message)) {
-            throw new \Swift_SwiftException('An email was not delivered.');
+            throw new \Swift_SwiftException('The email was not delivered.');
         }
 
         /**

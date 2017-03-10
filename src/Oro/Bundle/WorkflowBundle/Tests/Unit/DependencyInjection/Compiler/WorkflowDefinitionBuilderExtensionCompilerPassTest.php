@@ -11,7 +11,7 @@ class WorkflowDefinitionBuilderExtensionCompilerPassTest extends AbstractExtensi
     public function testProcess()
     {
         $this->assertServiceDefinitionMethodCalled('addExtension');
-        $this->assertConteinerBuilderCalled();
+        $this->assertContainerBuilderCalled();
 
         $this->getCompilerPass()->process($this->containerBuilder);
     }

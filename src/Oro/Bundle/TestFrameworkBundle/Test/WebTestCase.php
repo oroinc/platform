@@ -132,11 +132,6 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
 
-            try {
-                self::getContainer()->get('oro_test.config_cache')->deleteAll();
-            } catch (\BadMethodCallException $e) {
-            }
-
             self::resetClient();
         }
     }
@@ -170,11 +165,6 @@ abstract class WebTestCase extends BaseWebTestCase
         if (self::$resetCallback) {
             call_user_func(self::$resetCallback);
             self::$resetCallback = null;
-        }
-
-        try {
-            self::getContainer()->get('oro_test.config_cache')->deleteAll();
-        } catch (\BadMethodCallException $e) {
         }
 
         self::resetClient();
@@ -468,20 +458,20 @@ abstract class WebTestCase extends BaseWebTestCase
         $application->setAutoExit(false);
         $application->setTerminalDimensions(120, 50);
 
-        $argv = ['application', $name];
+        $args = ['application', $name];
         foreach ($params as $k => $v) {
             if (is_bool($v)) {
                 if ($v) {
-                    $argv[] = $k;
+                    $args[] = $k;
                 }
             } else {
                 if (!is_int($k)) {
-                    $argv[] = $k;
+                    $args[] = $k;
                 }
-                $argv[] = $v;
+                $args[] = $v;
             }
         }
-        $input = new ArgvInput($argv);
+        $input = new ArgvInput($args);
         $input->setInteractive(false);
 
         $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'br+');

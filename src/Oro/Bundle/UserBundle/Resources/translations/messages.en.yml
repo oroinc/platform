@@ -86,6 +86,7 @@ oro:
         entity_description:                 People or third party systems with a specific set of credentials (login and password) that can be used to access the application.
         entity_label:                       User
         entity_plural_label:                Users
+        configure.label:                    Configure
         api_keys.label:                     API keys
         api.label:                          API key
         birthday:
@@ -318,7 +319,7 @@ oro:
 
         # password tooltip for different rules
         password_complexity:
-            unrestricted: ~
+            unrestricted: ''
             min_length: The password must be at least {{ length }} characters long
             lower_case: The password must include a lower case letter
             upper_case: The password must include an upper case letter

@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
