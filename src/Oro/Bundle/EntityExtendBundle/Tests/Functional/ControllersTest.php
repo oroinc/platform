@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\UIBundle\Route\Router;
 
+/**
+ * @group dist
+ */
 class ControllersTest extends AbstractConfigControllerTest
 {
     const RELATION_FIELDS = [

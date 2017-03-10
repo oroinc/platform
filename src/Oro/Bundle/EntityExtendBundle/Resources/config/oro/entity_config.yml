@@ -344,7 +344,7 @@ entity_config:
                 bidirectional:
                     options:
                         auditable:          false
-                        allowed_type:       [manyToOne, manyToMany]
+                        allowed_type:       [manyToOne, manyToMany, oneToMany]
 
                 # the relation key in the following format:
                 # relation_type|owning_entity|target_entity|field_name_in_owning_entity
