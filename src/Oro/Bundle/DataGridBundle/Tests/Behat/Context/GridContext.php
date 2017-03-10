@@ -17,8 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class GridContext extends OroFeatureContext implements OroPageObjectAware
@@ -263,6 +262,33 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 self::assertEquals($value1, $value2);
                 break;
         }
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Assert that column value of specified row is equal to given value
+     * Example: I should see that Translated Value in 1 row is equal to "some value"
+     * @Then /^(?:|I )should see that (?P<column>([\w\s]+)) in (?P<rowNumber>([\d]+)) row is equal to "(?P<value>(.*))"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertColumnValueEquals($column, $rowNumber, $value)
+    {
+        $rowValue = $this->getGrid()->getRowByNumber($rowNumber)->getCellValue($column);
+        self::assertEquals($value, $rowValue);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Assert that column value of specified row is empty (or not empty)
+     * Example: I should see that Translated Value in 1 row is empty
+     * Example: I should see that Translated Value in 1 row is not empty
+     * @Then /^(?:|I )should see that (?P<column>([\w\s]+)) in (?P<rowNumber>([\d]+)) row is (?P<type>(empty|not empty))$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertColumnValueIsEmpty($column, $rowNumber, $type)
+    {
+        $rowValue = $this->getGrid()->getRowByNumber($rowNumber)->getCellValue($column);
+        $type === 'empty' ? self::assertEmpty($rowValue) : self::assertNotEmpty($rowValue);
     }
 
     /**

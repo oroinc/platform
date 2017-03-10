@@ -27,7 +27,10 @@ class Grid extends Table
     {
         $massActionsButton = $this->getMassActionButton();
         $massActionsButton->press();
+
         $massActionLink = $this->getMassActionLink($title);
+        self::assertNotNull($massActionLink, 'Mass action link not found on the page');
+        self::assertTrue($massActionLink->isVisible(), 'Mass action link is not visible');
         $massActionLink->click();
     }
 
