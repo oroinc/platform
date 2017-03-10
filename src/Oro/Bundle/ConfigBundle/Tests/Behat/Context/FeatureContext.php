@@ -102,4 +102,69 @@ class FeatureContext extends OroFeatureContext implements
             'Recent emails block not found on page'
         );
     }
+
+    /**
+     * Asserts per page value on current page with provided amount
+     *
+     * @Then /^per page amount must be (\d+)$/
+     */
+    public function perPageAmountMustBe($expectedAmount)
+    {
+        $perPage = $this->getPage()->find('css', '.grid-toolbar button[data-toggle="dropdown"]');
+
+        self::assertNotNull($perPage, 'Grid per page control elements not found on current page');
+        self::assertEquals($expectedAmount, $perPage->getText());
+    }
+
+    /**
+     * Asserts that grid has sticky (css:fixed) header
+     *
+     * @Then /^I see that grid has scrollable header$/
+     */
+    public function iSeeThatGridHasScrollableHeader()
+    {
+        self::assertTrue(
+            $this->oroMainContext->elementIsVisible('.floatThead.floatThead-fixed'),
+            'Grid header have no fixed classes'
+        );
+    }
+
+    /**
+     * Asserts that grid has no sticky header
+     *
+     * @Then /^I see that grid header is sticky$/
+     */
+    public function iSeeThatGridHeaderIsSticky()
+    {
+        self::assertFalse(
+            $this->oroMainContext->elementIsVisible('.floatThead.floatThead-fixed'),
+            'Grid header still have fixed classes'
+        );
+    }
+
+    /**
+     * Asserts that pagination controls exists and visible on current page (usually entity view)
+     *
+     * @Then /^I should see entity pagination controls$/
+     */
+    public function iShouldSeeEntityPaginationControls()
+    {
+        self::assertTrue(
+            $this->oroMainContext->elementIsVisible('#entity-pagination'),
+            'No entity pagination control found on current page'
+        );
+    }
+
+    /**
+     * Asserts that page has no visible pagination controls (usually entity view page)
+     *
+     * @Then /^I should see no pagination controls$/
+     */
+    public function iShouldSeeNoPaginationControls()
+    {
+        self::assertFalse(
+            $this->oroMainContext->elementIsVisible('#entity-pagination'),
+            'Entity pagination control still appearing on current page'
+        );
+    }
 }
