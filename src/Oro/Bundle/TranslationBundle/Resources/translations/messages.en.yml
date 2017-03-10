@@ -59,7 +59,7 @@ oro.translation:
         id.label: 'Id'
         language.label: 'Language'
         value.label: 'Translated Value'
-        original_value.label: 'Original Value'
+        english_translation.label: 'English translation'
         context.label: 'Context'
         status.label: 'Translated'
         message:
