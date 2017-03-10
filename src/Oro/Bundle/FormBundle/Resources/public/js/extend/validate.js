@@ -73,8 +73,14 @@ define([
         if ($widgetContainer) {
             $target = $widgetContainer;
         }
-        if ($target.parent().is('.input-append, .input-prepend')) {
-            $target = $target.parent();
+        var $parent = $target.parent();
+        if ($parent.is('.input-append, .input-prepend')) {
+            $target = $parent;
+        }
+        var $validateGroup;
+        if ($target.is(element) && ($validateGroup = $target.closest('.validate-group')).length) {
+            // the element inside validate group -- pass delegate validation to it
+            $target = $validateGroup;
         }
 
         return $target;
@@ -172,11 +178,11 @@ define([
      * @returns {jQuery}
      */
     $.validator.prototype.elementsOf = function(element) {
-        var $additionalElements = $(this.currentForm).find(':input[data-validate-element]');
-        return $(element).find('input, select, textarea')
+        var $element = $(element);
+        return $element.find('input, select, textarea')
             .not(':submit, :reset, :image, [disabled]')
             .not(this.settings.ignore)
-            .add($additionalElements);
+            .add($element.find(':input[data-validate-element]'));
     };
 
     // translates default messages
@@ -285,7 +291,13 @@ define([
             });
         })(errors);
 
-        this.showErrors(result);
+        result = _.omit(result, function(message, name) {
+            return !this.findByName(name)[0];
+        }, this);
+
+        if (!_.isEmpty(result)) {
+            this.showErrors(result);
+        }
     };
 
     $.validator.prototype.collectPristineValues = function() {

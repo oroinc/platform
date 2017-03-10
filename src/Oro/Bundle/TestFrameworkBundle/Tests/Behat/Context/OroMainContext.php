@@ -21,18 +21,27 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroPageObjectAware,
-    KernelAwareContext
+    KernelAwareContext,
+    MessageQueueIsolatorAwareInterface
 {
     use AssertTrait, KernelDictionary, PageObjectDictionary;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
 
     /**
      * @BeforeScenario
@@ -43,11 +52,21 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
+
+    /**
      * @BeforeStep
      * @param BeforeStepScope $scope
      */
     public function beforeStep(BeforeStepScope $scope)
     {
+        $this->messageQueueIsolator->waitWhileProcessingMessages(10);
+
         if (false === $this->getMink()->isSessionStarted('first_session')) {
             return;
         }

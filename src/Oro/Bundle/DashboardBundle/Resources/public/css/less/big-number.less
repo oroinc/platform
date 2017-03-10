@@ -27,7 +27,7 @@
     float: left;
     display: block;
     position: static;
-    &:nth-child(3n) {
+    &:nth-child(2n) {
       #sub-widget-with-separator();
     }
     &:last-child {
@@ -59,6 +59,11 @@
       }
       & > .date-range {
         float: right;
+
+        max-width: ~'calc(100% - 70px)';
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }

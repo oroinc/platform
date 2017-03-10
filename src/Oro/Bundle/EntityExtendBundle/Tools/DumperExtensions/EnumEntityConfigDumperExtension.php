@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -28,22 +29,28 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var ExtendEntityConfigProviderInterface */
+    protected $extendEntityConfigProvider;
+
     /**
-     * @param ConfigManager                   $configManager
-     * @param RelationBuilder                 $relationBuilder
-     * @param FieldTypeHelper                 $fieldTypeHelper
+     * @param ConfigManager $configManager
+     * @param RelationBuilder $relationBuilder
+     * @param FieldTypeHelper $fieldTypeHelper
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param ExtendEntityConfigProviderInterface $extendEntityConfigProvider
      */
     public function __construct(
         ConfigManager $configManager,
         RelationBuilder $relationBuilder,
         FieldTypeHelper $fieldTypeHelper,
-        ExtendDbIdentifierNameGenerator $nameGenerator
+        ExtendDbIdentifierNameGenerator $nameGenerator,
+        ExtendEntityConfigProviderInterface $extendEntityConfigProvider
     ) {
         $this->configManager   = $configManager;
         $this->relationBuilder = $relationBuilder;
         $this->fieldTypeHelper = $fieldTypeHelper;
         $this->nameGenerator   = $nameGenerator;
+        $this->extendEntityConfigProvider = $extendEntityConfigProvider;
     }
 
     /**
@@ -64,12 +71,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     {
         $enumConfigProvider   = $this->configManager->getProvider('enum');
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigs        = $extendConfigProvider->getConfigs();
+        $entityConfigs        = $this->extendEntityConfigProvider->getExtendEntityConfigs();
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('is_extend')) {
-                continue;
-            }
-
             $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
                 if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
@@ -115,12 +118,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
 
                 // create an entity is used to store enum values
-                $this->createEnumValueConfigEntityModel(
-                    $enumValueClassName,
-                    $enumCode,
-                    $isMultiple,
-                    $isPublic
-                );
+                $this->createEnumValueConfigEntityModel($enumValueClassName, $enumCode, $isMultiple, $isPublic);
 
                 // create a relation
                 if ($isMultiple) {
@@ -155,7 +153,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     public function postUpdate()
     {
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $entityConfigs        = $extendConfigProvider->getConfigs(null, true);
+        $entityConfigs        = $this->extendEntityConfigProvider->getExtendEntityConfigs();
         foreach ($entityConfigs as $entityConfig) {
             if ($entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
                 $entityClassName = $entityConfig->getId()->getClassName();
@@ -216,7 +214,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
      * @param string    $enumCode           The unique identifier of an enum
      * @param bool      $isMultiple         Indicates whether several options can be selected for this enum
      *                                      or it supports only one selected option
-     * @param bool|null $isPublic           Indicates whether this enum can be used by any entity or
+     * @param bool|null $isPublic Indicates whether this enum can be used by any entity or
      *                                      it is designed to use in one entity only
      *                                      NULL means unspecified. In this case this attribute will not be
      *                                      changed for existing enum entity and will be set to FALSE
@@ -263,7 +261,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'code'     => $enumCode,
                     'public'   => $isPublic,
                     'multiple' => $isMultiple
-                ]
+                ],
             ]
         );
         // create fields

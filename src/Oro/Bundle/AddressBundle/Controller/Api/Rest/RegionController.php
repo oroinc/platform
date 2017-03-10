@@ -30,7 +30,6 @@ class RegionController extends FOSRestController
      *         {"name"="id", "dataType"="string", "requirement"="\d+", "description"="region combined code"}
      *     }
      * )
-     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function getAction()

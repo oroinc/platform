@@ -132,7 +132,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testStringCleanup()
     {
-        $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again';
+        $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again RE FW Re';
 
         $clearedValue     = Query::clearString($testString);
         $textAllDataField = sprintf('%s %s', $testString, $clearedValue);
@@ -167,9 +167,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function dataProviderForClearString()
     {
         return [
-            ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re: FW: Test One äöü ßü abc 3 again'],
-            ['text with ___ \' special chars \/ "', 'text with ___ special chars'],
-            ['at @ * . test', 'at @ * . test'],
+            ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re FW Test One äöü ßü abc 3 again'],
+            ['text with ___ \' special chars \/ "', 'text with special chars'],
+            ['at @ * . test', 'at test'],
         ];
     }
 

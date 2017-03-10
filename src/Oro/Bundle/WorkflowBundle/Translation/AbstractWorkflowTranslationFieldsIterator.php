@@ -10,6 +10,8 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionAttributeLabelTe
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowAttributeLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableFormOptionTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableLabelTemplate;
 
 abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationFieldsIteratorInterface
 {
@@ -72,6 +74,56 @@ abstract class AbstractWorkflowTranslationFieldsIterator implements TranslationF
                 unset($attrValue, $context['transition_name']);
             }
             unset($transition);
+        }
+    }
+
+    /**
+     * @param array $configuration
+     * @param \ArrayObject $context
+     * @return \Generator
+     * @throws \InvalidArgumentException
+     */
+    protected function &variableFields(array &$configuration, \ArrayObject $context)
+    {
+        if ($this->hasArrayNode(WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS, $configuration)) {
+            $definitions = &$configuration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+
+            if ($this->hasArrayNode(WorkflowConfiguration::NODE_VARIABLES, $definitions)) {
+                foreach ($definitions[WorkflowConfiguration::NODE_VARIABLES] as $variableKey => &$rawVariable) {
+                    $context['variable_name'] = $this->resolveName($rawVariable, $variableKey);
+                    yield $this->makeKey(WorkflowVariableLabelTemplate::class, $context) => $rawVariable['label'];
+
+                    $formFields = $this->variableFormFields($rawVariable, $context);
+                    foreach ($formFields as $key => &$formField) {
+                        yield $key => $formField;
+                    }
+
+                    unset($context['variable_name'], $formField);
+                }
+                unset($rawVariable);
+            }
+        }
+    }
+
+    /**
+     * @param array $variableConfig
+     * @param \ArrayObject $context
+     * @return \Generator
+     */
+    private function &variableFormFields(array &$variableConfig, \ArrayObject $context)
+    {
+        if ($this->hasArrayNode('options', $variableConfig)) {
+            $options = &$variableConfig['options'];
+            if ($this->hasArrayNode('form_options', $options)) {
+                if (isset($options['form_options']['tooltip'])) {
+                    $context['option_name'] = 'tooltip';
+                    $key = $this->makeKey(WorkflowVariableFormOptionTemplate::class, $context);
+
+                    yield $key => $options['form_options']['tooltip'];
+                    unset($context['option_name']);
+                }
+            }
+            unset($options);
         }
     }
 

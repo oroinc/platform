@@ -114,9 +114,10 @@ define([
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value === value.type);
+                    return String(choice.value) === String(value.type);
                 });
-                selectedChoiceLabel = foundChoice.label;
+                foundChoice = foundChoice || _.first(this.choices);
+                selectedChoiceLabel = _.result(foundChoice, 'label') || '';
             }
             var $filter = $(this.template({
                 name: this.name,
