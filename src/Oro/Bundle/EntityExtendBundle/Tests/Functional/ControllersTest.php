@@ -2,13 +2,29 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\UIBundle\Route\Router;
 
-/**
- * @group dist
- */
 class ControllersTest extends AbstractConfigControllerTest
 {
+    const RELATION_FIELDS = [
+        RelationType::ONE_TO_MANY => [
+            'readonly' => true,
+            'bidirectional' => true,
+            'method' => 'createSelectOneToMany',
+        ],
+        RelationType::MANY_TO_MANY => [
+            'readonly' => false,
+            'bidirectional' => false,
+            'method' => 'createSelectOneToMany',
+        ],
+        RelationType::MANY_TO_ONE => [
+            'readonly' => false,
+            'bidirectional' => false,
+            'method' => 'createSelectManyToOne',
+        ],
+    ];
+
     public function testIndex()
     {
         $this->client->request('GET', $this->getUrl('oro_entityconfig_index'));
@@ -117,19 +133,18 @@ class ControllersTest extends AbstractConfigControllerTest
      */
     public function testCreateFieldRelation($id)
     {
-        $types = [
-            'oneToMany' => 'createSelectOneToMany',
-            'manyToOne' => 'createSelectManyToOne',
-            'manyToMany' => 'createSelectOneToMany'
-        ];
-        foreach ($types as $type => $method) {
+        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+
+        foreach (static::RELATION_FIELDS as $type => $relation) {
             $crawler = $this->client->request(
                 'GET',
                 $this->getUrl("oro_entityextend_field_create", array('id' => $id))
             );
+
+            $name = 'name' . strtolower($type);
             $continueButton = $crawler->selectButton('Continue');
             $form = $continueButton->form();
-            $form["oro_entity_extend_field_type[fieldName]"] = "name" . strtolower($type);
+            $form["oro_entity_extend_field_type[fieldName]"] = $name;
             $form["oro_entity_extend_field_type[type]"] = $type;
             $this->client->followRedirects(true);
             $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]);
@@ -137,15 +152,26 @@ class ControllersTest extends AbstractConfigControllerTest
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
             $saveButton = $crawler->selectButton('Save and Close');
+            $fieldUpdateUri = $this->client->getRequest()->getUri();
+            $readOnlyValue = $crawler->filter('[name="oro_entity_config_type[extend][relation][bidirectional]"]')
+                ->attr('readonly');
             $form = $saveButton->form();
-
+            $method = $relation['method'];
             $this->$method($form);
 
             $this->client->followRedirects(true);
             $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
             $result = $this->client->getResponse();
+
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
             $this->assertContains('Field saved', $result->getContent());
+
+            $isBidirectional = $configManager->getFieldConfig('extend', 'Extend\Entity\testExtendedEntity', $name)
+                ->get('bidirectional');
+
+            $this->assertEquals($relation['readonly'], (bool)$readOnlyValue);
+            $this->assertEquals($relation['bidirectional'], (bool)$isBidirectional);
+            $this->assertBidirectionalIsReadOnlyAfterSave($fieldUpdateUri);
         }
     }
 
@@ -162,5 +188,16 @@ class ControllersTest extends AbstractConfigControllerTest
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
+    }
+
+    /**
+     * @param string $fieldUpdateUri
+     */
+    private function assertBidirectionalIsReadOnlyAfterSave($fieldUpdateUri)
+    {
+        $crawler = $this->client->request('GET', $fieldUpdateUri);
+        $readOnlyValue = $crawler->filter('[name="oro_entity_config_type[extend][relation][bidirectional]"]')
+            ->attr('readonly');
+        $this->assertEquals('readonly', $readOnlyValue);
     }
 }
