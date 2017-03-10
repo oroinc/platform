@@ -353,3 +353,4 @@ services:
             - "@oro_locale.provider.current_localization"
         tags:
             - {name: oro_scope.provider, scopeType: web_content, priority: 1}
+            - {name: oro_scope.provider, scopeType: cms_content_block, priority: 1}
