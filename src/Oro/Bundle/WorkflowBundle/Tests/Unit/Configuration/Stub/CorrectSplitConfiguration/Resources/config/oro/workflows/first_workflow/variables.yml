@@ -11,3 +11,14 @@ workflows:
                 var3:
                     type: 'string'
                     value: ~
+                first_object:
+                    type: object
+                    options:
+                        class: DateTime
+                var_entity:
+                    type: entity
+                    property_path: first_object.date
+                    entity_acl:
+                        delete: false
+                    options:
+                        class: DateTime

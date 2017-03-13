@@ -62,6 +62,8 @@ class FilterHandler implements ConfigurationHandlerInterface
     protected static $variableKeys = [
         'name',
         'type',
+        'entity_acl',
+        'property_path',
         'value',
         'options'
     ];
