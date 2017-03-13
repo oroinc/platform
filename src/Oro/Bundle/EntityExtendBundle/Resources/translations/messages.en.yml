@@ -129,6 +129,7 @@ oro:
                         precision: "Precision"
                         scale: "Scale"
                         is_deleted: "Deleted"
+                        bidirectional: "Bidirectional"
             search:
                 field:
                     items:
