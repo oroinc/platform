@@ -20,6 +20,9 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ACLContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
 {
     use PageObjectDictionary, KernelDictionary;
@@ -132,8 +135,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      */
     public function iSelectFollowingPermissions(TableNode $table)
     {
-        /** @var UserRoleForm $userRoleForm */
-        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
+        $userRoleForm = $this->getRoleEditFormElement();
 
         foreach ($table->getRows() as $row) {
             $entityName = array_shift($row);
@@ -154,8 +156,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      */
     public function checkEntityPermission($name)
     {
-        /** @var UserRoleForm $userRoleForm */
-        $userRoleForm = $this->elementFactory->createElement('UserRoleForm');
+        $userRoleForm = $this->getRoleEditFormElement();
         $userRoleForm->setCheckBoxPermission($name);
     }
 
@@ -170,8 +171,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      */
     public function iSeeFollowingPermissions(TableNode $table)
     {
-        /** @var UserRoleViewForm $userRoleForm */
-        $userRoleForm = $this->elementFactory->createElement('UserRoleView');
+        $userRoleForm = $this->getRoleViewFormElement();
         $permissionsArray = $userRoleForm->getPermissions();
         foreach ($table->getRows() as $row) {
             $entityName = array_shift($row);
@@ -190,6 +190,30 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
     }
 
     /**
+     * Example: Then the role has not following active permissions:
+     *            | Language | View | Create | Edit | Assign | Translate |
+     *
+     * @Then /^the role has not following permissions:$/
+     *
+     * @param TableNode $table
+     */
+    public function iDontSeeFollowingPermissions(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleViewFormElement();
+        $permissionsArray = $userRoleForm->getPermissions();
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $value) {
+                self::assertFalse(
+                    isset($permissionsArray[$entityName][$value]),
+                    "Failed asserting that permission $value not present for $entityName"
+                );
+            }
+        }
+    }
+
+    /**
      * Asserts that provided capability permissions allowed on view page
      *
      * Example: And following capability permissions should be checked:
@@ -199,8 +223,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      */
     public function iShouldSeePermissionsChecked(TableNode $table)
     {
-        /** @var UserRoleViewForm $userRoleForm */
-        $userRoleForm = $this->elementFactory->createElement('UserRoleView');
+        $userRoleForm = $this->getRoleViewFormElement();
         $permissions = $userRoleForm->getEnabledCapabilityPermissions();
 
         foreach ($table->getRows() as $row) {
@@ -271,7 +294,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $grid->clickActionLink($role, 'Edit');
         $this->waitForAjax();
 
-        return $this->elementFactory->createElement('UserRoleForm');
+        return $this->getRoleEditFormElement();
     }
 
     /**
@@ -297,5 +320,21 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
             "Unexpected user '$user' for role permission changes",
             $this->getSession()->getDriver()
         );
+    }
+
+    /**
+     * @return UserRoleViewForm
+     */
+    protected function getRoleViewFormElement()
+    {
+        return $this->elementFactory->createElement('UserRoleView');
+    }
+
+    /**
+     * @return UserRoleForm
+     */
+    protected function getRoleEditFormElement()
+    {
+        return $this->elementFactory->createElement('UserRoleForm');
     }
 }

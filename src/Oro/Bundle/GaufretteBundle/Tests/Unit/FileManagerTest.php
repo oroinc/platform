@@ -65,6 +65,67 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->fileManager->getFilePath('test.txt');
     }
 
+    public function testFindAllFiles()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::identicalTo(''))
+            ->willReturn([
+                'keys' => ['file1', 'file2'],
+                'dirs' => ['dir1']
+            ]);
+
+        self::assertEquals(
+            ['file1', 'file2'],
+            $this->fileManager->findFiles()
+        );
+    }
+
+    public function testFindFilesByPrefix()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with('prefix')
+            ->willReturn([
+                'keys' => ['file1', 'file2'],
+                'dirs' => ['dir1']
+            ]);
+
+        self::assertEquals(
+            ['file1', 'file2'],
+            $this->fileManager->findFiles('prefix')
+        );
+    }
+
+    public function testFindFilesWhenNoFilesFound()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with('prefix')
+            ->willReturn([]);
+
+        self::assertSame(
+            [],
+            $this->fileManager->findFiles('prefix')
+        );
+    }
+
+    /**
+     * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
+     */
+    public function testFindFilesWhenAdapterReturnsOnlyKeys()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with('prefix')
+            ->willReturn(['file1', 'file2']);
+
+        self::assertEquals(
+            ['file1', 'file2'],
+            $this->fileManager->findFiles('prefix')
+        );
+    }
+
     public function testGetFileByFileName()
     {
         $fileName = 'testFile.txt';
