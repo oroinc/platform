@@ -39,18 +39,18 @@ class EntitySelectType extends AbstractType
             if ($form->getData()) {
                 /** @var ConverterInterface|EntitySelectHandler $converter */
                 $converter = $options['converter'];
-                $result    = [];
 
                 if ($converter instanceof EntitySelectHandler) {
                     $converter->initForEntity($fieldConfig->getId()->getClassName(), $fieldConfig->get('target_field'));
                 }
 
                 if (isset($options['configs']['multiple']) && $options['configs']['multiple']) {
+                    $result    = [];
                     foreach ($form->getData() as $item) {
                         $result[] = $converter->convertItem($item);
                     }
                 } else {
-                    $result[] = $converter->convertItem($form->getData());
+                    $result = $converter->convertItem($form->getData());
                 }
 
                 $vars['attr'] = ['data-selected-data' => json_encode($result)];

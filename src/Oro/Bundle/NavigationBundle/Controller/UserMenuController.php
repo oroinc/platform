@@ -8,8 +8,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
 
 /**
  * @Route("/menu/user")
@@ -19,19 +20,17 @@ class UserMenuController extends AbstractMenuController
     /**
      * @Route("/", name="oro_navigation_user_menu_index")
      * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @return array
      */
     public function indexAction()
     {
-        return parent::index();
+        return parent::index($this->getContext());
     }
 
     /**
      * @Route("/{menuName}", name="oro_navigation_user_menu_view")
      * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      *
@@ -39,28 +38,26 @@ class UserMenuController extends AbstractMenuController
      */
     public function viewAction($menuName)
     {
-        return parent::view($menuName, $this->getContext(), $this->getMenuTreeContext());
+        return parent::view($menuName, $this->getContext());
     }
 
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_user_menu_create")
      * @Template("OroNavigationBundle:UserMenu:update.html.twig")
-     * @AclAncestor("oro_navigation_manage_menus")
      *
-     * @param string      $menuName
+     * @param string $menuName
      * @param string|null $parentKey
      *
      * @return array|RedirectResponse
      */
     public function createAction($menuName, $parentKey = null)
     {
-        return parent::create($menuName, $parentKey, $this->getContext(), $this->getMenuTreeContext());
+        return parent::create($menuName, $parentKey, $this->getContext());
     }
 
     /**
      * @Route("/{menuName}/update/{key}", name="oro_navigation_user_menu_update")
      * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      * @param string $key
@@ -69,13 +66,11 @@ class UserMenuController extends AbstractMenuController
      */
     public function updateAction($menuName, $key)
     {
-        return parent::update($menuName, $key, $this->getContext(), $this->getMenuTreeContext());
+        return parent::update($menuName, $key, $this->getContext());
     }
 
     /**
      * @Route("/{menuName}/move", name="oro_navigation_user_menu_move")
-     * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param Request $request
      * @param string  $menuName
@@ -84,7 +79,7 @@ class UserMenuController extends AbstractMenuController
      */
     public function moveAction(Request $request, $menuName)
     {
-        return parent::move($request, $menuName);
+        return parent::move($request, $menuName, $this->getContext());
     }
 
     /**
@@ -92,55 +87,35 @@ class UserMenuController extends AbstractMenuController
      */
     private function getContext()
     {
-        return ['user' => $this->getUser()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    private function getMenuTreeContext()
-    {
-        return [
-            'organization' => $this->getCurrentOrganization(),
-            'user' => $this->getUser()
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getScopeType()
-    {
-        return $this->getParameter('oro_navigation.menu_update.scope_type');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMenuUpdateManager()
-    {
-        return $this->get('oro_navigation.manager.menu_update');
+        return [ScopeUserCriteriaProvider::SCOPE_KEY => $this->getUser()->getId()];
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function checkAcl()
+    protected function checkAcl(array $context)
     {
-        if (!$this->get('oro_security.security_facade')->isGranted('oro_user_user_update')) {
+        if (!$this->get('oro_security.security_facade')->isGranted(
+            'oro_user_user_update',
+            $context[ScopeUserCriteriaProvider::SCOPE_KEY]
+        )
+        ) {
             throw $this->createAccessDeniedException();
         }
+        parent::checkAcl($context);
     }
 
     /**
-     * @return null|\Oro\Bundle\OrganizationBundle\Entity\Organization
+     * {@inheritDoc}
      */
-    protected function getCurrentOrganization()
+    protected function getMenu($menuName, array $context)
     {
-        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return null;
+        if (array_key_exists(ScopeUserCriteriaProvider::SCOPE_KEY, $context)) {
+            /** @var User $user */
+            $user = $context[ScopeUserCriteriaProvider::SCOPE_KEY];
+            $context[ScopeOrganizationCriteriaProvider::SCOPE_KEY] = $user->getOrganization();
         }
 
-        return $token instanceof OrganizationContextTokenInterface ? $token->getOrganizationContext() : null;
+        return parent::getMenu($menuName, $context);
     }
 }

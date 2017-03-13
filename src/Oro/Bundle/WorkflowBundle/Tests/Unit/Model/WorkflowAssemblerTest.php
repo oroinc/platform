@@ -261,16 +261,18 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('assemble'))
             ->getMock();
+
         if ($expectations) {
-            $expectedTransitions = $expectedTransitions ?
-                $expectedTransitions :
-                $configuration[WorkflowConfiguration::NODE_TRANSITIONS];
-            $expectedDefinitions = $expectedDefinitions ?
-                $expectedDefinitions :
-                $configuration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS];
+            if ($expectedTransitions) {
+                $configuration[WorkflowConfiguration::NODE_TRANSITIONS] = $expectedTransitions;
+            }
+            if ($expectedDefinitions) {
+                $configuration[WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS] = $expectedDefinitions;
+            }
+
             $transitionAssembler->expects($this->once())
                 ->method('assemble')
-                ->with($expectedTransitions, $expectedDefinitions, $steps)
+                ->with($configuration, $steps)
                 ->will($this->returnValue($transitions));
         }
 

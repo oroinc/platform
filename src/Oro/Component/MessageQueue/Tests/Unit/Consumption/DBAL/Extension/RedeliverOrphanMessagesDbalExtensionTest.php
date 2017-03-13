@@ -24,7 +24,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
             ->expects($this->once())
             ->method('executeUpdate')
             ->with('UPDATE tableName SET consumer_id=NULL, delivered_at=NULL, redelivered=:isRedelivered '.
-                'WHERE delivered_at <= :deliveredAt AND consumer_id=:consumerId')
+                'WHERE delivered_at <= :deliveredAt AND consumer_id IS NOT NULL')
             ->will($this->returnValue(3));
 
         $connection = $this->createConnectionMock();
@@ -50,10 +50,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit_Framework_TestCa
             ->with('[RedeliverOrphanMessagesDbalExtension] Orphans were found and redelivered. number: 3');
 
         $consumer = $this->createMock(DbalMessageConsumer::class);
-        $consumer
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn(123);
+
         $context = new Context($session);
         $context->setLogger($logger);
         $context->setMessageConsumer($consumer);
