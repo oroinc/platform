@@ -25,7 +25,7 @@ define(
                         }
                     }
 
-                    if (!options.preventRemove) {
+                    if (!options.preventRemove && !widget.disposed) {
                         widget.remove();
                     }
                 }
