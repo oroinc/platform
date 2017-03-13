@@ -16,7 +16,6 @@
             <div {{ UI.renderPageComponentAttributes({
                 module: 'oroui/js/app/components/widget-form-component',
                 options: {
-                    _sourceElement: '#' ~ form.vars.id,
                     _wid: app.request.get('_wid'),
                     data: savedId|default(null)
                 }

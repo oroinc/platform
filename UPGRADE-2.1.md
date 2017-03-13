@@ -623,6 +623,7 @@ SearchBundle
 - The parameter `oro_search.twig_extension.class` was removed from DIC
 - The service `oro_search.twig.search_extension` was marked as `private`
 - `Oro\Bundle\SearchBundle\Engine\PdoMysql` `getWords` method is deprecated. All non alphanumeric chars are removed in `Oro\Bundle\SearchBundle\Engine\BaseDriver` `filterTextFieldValue` from fulltext search for MySQL and PgSQL
+- The `oro:search:reindex` command now works synchronously by default. Use the `--scheduled` parameter if you need the old, async behaviour
 
 ScopeBundle
 -----------
