@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -17,7 +18,11 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleForm;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
+use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ACLContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
 {
     use PageObjectDictionary, KernelDictionary;
@@ -59,7 +64,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
      * Example: And user have "User" permissions for "View" "Business Customer" entity
      * Example: And I set administrator permissions on Delete Cases to None
      *
-     * @Given /^(?P<user>(administrator|user)) have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entity$/
+     * @Given /^(?P<user>(administrator|user)) have "(?P<accessLevel>(?:[^"]|\\")*)" permissions for "(?P<action>(?:[^"]|\\")*)" "(?P<entity>(?:[^"]|\\")*)" entit(y|ies)$/
      * @Given /^(?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) is set to (?P<accessLevel>(?:[^"]|\\")*)$/
      * @When /^(?:|I )set (?P<user>(administrator|user)) permissions on (?P<action>(?:|View|Create|Edit|Delete|Assign|Share)) (?P<entity>(?:[^"]|\\")*) to (?P<accessLevel>(?:[^"]|\\")*)$/
      */
@@ -70,11 +75,18 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $this->getMink()->setDefaultSessionName('second_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
-        $singularizedEntity = ucfirst(Inflector::singularize($entity));
+        $singularizedEntities = array_map(function ($element) {
+            return trim(ucfirst(Inflector::singularize($element)));
+        }, explode(',', $entity));
+
         $this->loginAsAdmin();
 
         $userRoleForm = $this->openRoleEditForm($role);
-        $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
+
+        foreach ($singularizedEntities as $singularizedEntity) {
+            $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
+        }
+
         $userRoleForm->saveAndClose();
         $this->waitForAjax();
 
@@ -110,6 +122,118 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
 
         $this->getSession('second_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
+    }
+
+    /**
+     * Change group of permissions on create/edit pages
+     *
+     * Example: And select following permissions:
+     *       | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
+     *       | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User    |
+     *
+     * @Then /^(?:|I )select following permissions:$/
+     */
+    public function iSelectFollowingPermissions(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleEditFormElement();
+
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $cell) {
+                list($role, $value) = explode(':', $cell);
+                $userRoleForm->setPermission($entityName, $role, $value);
+            }
+        }
+    }
+
+    /**
+     * Set capability permission on create/edit pages by selecting checkbox
+     *
+     * Example: And I check "Access dotmailer statistics" entity permission
+     *
+     * @Then /^(?:|I )check "(?P<name>([\w\s]+))" entity permission$/
+     */
+    public function checkEntityPermission($name)
+    {
+        $userRoleForm = $this->getRoleEditFormElement();
+        $userRoleForm->setCheckBoxPermission($name);
+    }
+
+    /**
+     * Asserts that provided permissions allowed on role view page
+     *
+     * Example: Then the role has following active permissions:
+     *            | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
+     *            | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
+     *
+     * @Then /^the role has following active permissions:$/
+     */
+    public function iSeeFollowingPermissions(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleViewFormElement();
+        $permissionsArray = $userRoleForm->getPermissions();
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $cell) {
+                list($role, $value) = explode(':', $cell);
+                self::assertNotEmpty($permissionsArray[$entityName][$role]);
+                $expected = $permissionsArray[$entityName][$role];
+                self::assertEquals(
+                    $expected,
+                    $value,
+                    "Failed asserting that permission $expected equals $value for $entityName"
+                );
+            }
+        }
+    }
+
+    /**
+     * Example: Then the role has not following active permissions:
+     *            | Language | View | Create | Edit | Assign | Translate |
+     *
+     * @Then /^the role has not following permissions:$/
+     *
+     * @param TableNode $table
+     */
+    public function iDontSeeFollowingPermissions(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleViewFormElement();
+        $permissionsArray = $userRoleForm->getPermissions();
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $value) {
+                self::assertFalse(
+                    isset($permissionsArray[$entityName][$value]),
+                    "Failed asserting that permission $value not present for $entityName"
+                );
+            }
+        }
+    }
+
+    /**
+     * Asserts that provided capability permissions allowed on view page
+     *
+     * Example: And following capability permissions should be checked:
+     *           | Manage Abandoned Cart Campaigns |
+     *
+     * @Then /^following capability permissions should be checked:$/
+     */
+    public function iShouldSeePermissionsChecked(TableNode $table)
+    {
+        $userRoleForm = $this->getRoleViewFormElement();
+        $permissions = $userRoleForm->getEnabledCapabilityPermissions();
+
+        foreach ($table->getRows() as $row) {
+            $value = current($row);
+            self::assertContains(
+                ucfirst(strtolower($value)),
+                $permissions,
+                "$value not found in active permissions list: " . print_r($permissions, true)
+            );
+        }
     }
 
     /**
@@ -170,7 +294,7 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
         $grid->clickActionLink($role, 'Edit');
         $this->waitForAjax();
 
-        return $this->elementFactory->createElement('UserRoleForm');
+        return $this->getRoleEditFormElement();
     }
 
     /**
@@ -196,5 +320,21 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware, Kernel
             "Unexpected user '$user' for role permission changes",
             $this->getSession()->getDriver()
         );
+    }
+
+    /**
+     * @return UserRoleViewForm
+     */
+    protected function getRoleViewFormElement()
+    {
+        return $this->elementFactory->createElement('UserRoleView');
+    }
+
+    /**
+     * @return UserRoleForm
+     */
+    protected function getRoleEditFormElement()
+    {
+        return $this->elementFactory->createElement('UserRoleForm');
     }
 }

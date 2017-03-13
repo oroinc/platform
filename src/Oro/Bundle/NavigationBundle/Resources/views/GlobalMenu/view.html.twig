@@ -1,9 +1,6 @@
 {% extends 'OroNavigationBundle:menuUpdate:view.html.twig' %}
 
-{% set menuIndexRoute  = 'oro_navigation_global_menu_index' %}
-{% set menuViewRoute   = 'oro_navigation_global_menu_view' %}
-{% set menuCreateRoute = 'oro_navigation_global_menu_create' %}
-{% set menuUpdateRoute = 'oro_navigation_global_menu_update' %}
+{% set routePrefix = 'oro_navigation_global_menu_' %}
 
 {% oro_title_set({params : {"%title%": entity.name}}) %}
 {% set breadcrumbs = {

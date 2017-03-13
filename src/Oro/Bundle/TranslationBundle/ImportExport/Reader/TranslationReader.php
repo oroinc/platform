@@ -2,29 +2,30 @@
 
 namespace Oro\Bundle\TranslationBundle\ImportExport\Reader;
 
-use Symfony\Component\Translation\TranslatorBagInterface;
-
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationReader extends AbstractReader
 {
-    /** @var TranslatorBagInterface */
-    protected $translator;
-
     /** @var array */
     protected $messages;
 
+    /** @var LanguageRepository */
+    protected $languageRepository;
+
     /**
      * @param ContextRegistry $contextRegistry
-     * @param TranslatorBagInterface $translator
+     * @param LanguageRepository $languageRepository
      */
-    public function __construct(ContextRegistry $contextRegistry, TranslatorBagInterface $translator)
-    {
+    public function __construct(
+        ContextRegistry $contextRegistry,
+        LanguageRepository $languageRepository
+    ) {
         parent::__construct($contextRegistry);
 
-        $this->translator = $translator;
+        $this->languageRepository = $languageRepository;
     }
 
     /**
@@ -46,6 +47,7 @@ class TranslationReader extends AbstractReader
 
     /**
      * @param string $locale
+     *
      * @return array
      */
     protected function getLanguageMessages($locale)
@@ -62,11 +64,11 @@ class TranslationReader extends AbstractReader
 
             ksort($messages, SORT_STRING | SORT_FLAG_CASE);
 
-            array_walk($messages, function (array &$message, $key) use ($locale, $originalMessages, $defaultMessages) {
+            array_walk($messages, function (array &$message, $key) use ($locale, $defaultMessages) {
                 $message = array_merge(
                     $message,
                     [
-                        'original_value' => isset($originalMessages[$key]) ? $originalMessages[$key]['value'] : '',
+                        'english_translation' => isset($defaultMessages[$key]) ? $defaultMessages[$key]['value'] : '',
                     ]
                 );
             });
@@ -79,24 +81,16 @@ class TranslationReader extends AbstractReader
 
     /**
      * @param string $locale
+     *
      * @return array
      */
     protected function getMessages($locale)
     {
-        $catalogue = $this->translator->getCatalogue($locale);
+        $messages = $this->languageRepository->getTranslationsForExport($locale);
 
-        $messages = [];
-
-        foreach ($catalogue->getDomains() as $domain) {
-            foreach ($catalogue->all($domain) as $key => $value) {
-                $message = [
-                    'domain' => $domain,
-                    'key' => $key,
-                    'value' => $value,
-                ];
-
-                $messages[sprintf('%s.%s', $domain, $key)] = $message;
-            }
+        foreach ($messages as $index => $message) {
+            $messages[sprintf('%s.%s', $message['domain'], $message['key'])] = $message;
+            unset($messages[$index]);
         }
 
         return $messages;

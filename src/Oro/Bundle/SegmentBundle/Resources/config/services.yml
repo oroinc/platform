@@ -10,6 +10,7 @@ parameters:
     oro_segment.event_listener.doctrine_pre_remove.class:    Oro\Bundle\SegmentBundle\EventListener\DoctrinePreRemoveListener
     oro_segment.entity_name_provider.class:                  Oro\Bundle\SegmentBundle\Provider\EntityNameProvider
     oro_segment.grid.datagrid_configuration_builder.class:   Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder
+    oro_segment.validator.sorting_validator.class:           Oro\Bundle\SegmentBundle\Validator\SortingValidator
 
 services:
     oro_segment.entity_provider:
@@ -93,3 +94,18 @@ services:
     oro_segment.grid.datagrid_configuration_builder:
         class: %oro_segment.grid.datagrid_configuration_builder.class%
         parent: oro_report.grid.base_configuration_builder
+
+    oro_segment.twig.extension.segment:
+        class: Oro\Bundle\SegmentBundle\Twig\SegmentExtension
+        public: false
+        arguments:
+            - '@event_dispatcher'
+        tags:
+            - { name: twig.extension }
+
+    oro_segment.validator.sorting_validator:
+        class: %oro_segment.validator.sorting_validator.class%
+        arguments:
+            - '@translator'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_segment.sorting_validator }

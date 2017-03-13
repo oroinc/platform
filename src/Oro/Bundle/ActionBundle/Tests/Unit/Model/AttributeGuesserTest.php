@@ -10,6 +10,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -30,6 +31,9 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
     /* @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $formConfigProvider;
 
+    /* @var DoctrineTypeMappingProvider|\PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineTypeMappingProvider;
+
     protected function setUp()
     {
         $this->formRegistry = $this->getMockBuilder('Symfony\Component\Form\FormRegistry')
@@ -47,12 +51,15 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrineTypeMappingProvider = $this->createMock(DoctrineTypeMappingProvider::class);
+
         $this->guesser = new AttributeGuesser(
             $this->formRegistry,
             $this->managerRegistry,
             $this->entityConfigProvider,
             $this->formConfigProvider
         );
+        $this->guesser->setDoctrineTypeMappingProvider($this->doctrineTypeMappingProvider);
     }
 
     protected function tearDown()
@@ -62,7 +69,8 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
             $this->managerRegistry,
             $this->entityConfigProvider,
             $this->guesser,
-            $this->formConfigProvider
+            $this->formConfigProvider,
+            $this->doctrineTypeMappingProvider
         );
     }
 
@@ -178,6 +186,9 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->setEntityMetadata(array($rootClass => $metadata));
 
+        $this->doctrineTypeMappingProvider->expects($this->any())
+            ->method('getDoctrineTypeMappings')->willReturn([]);
+
         $this->assertNull($this->guesser->guessAttributeParameters($rootClass, $propertyPath));
     }
 
@@ -200,7 +211,15 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->setEntityMetadata(array($rootClass => $metadata));
         $this->setEntityConfigProvider($rootClass, 'field', false, true, $fieldLabel);
 
-        $this->guesser->addDoctrineTypeMapping('date', 'object', array('class' => 'DateTime'));
+        $this->doctrineTypeMappingProvider->expects($this->any())
+            ->method('getDoctrineTypeMappings')->willReturn(
+                [
+                    'date' => [
+                        'type' => 'object',
+                        'options' => ['class' => 'DateTime']
+                    ]
+                ]
+            );
 
         $this->assertAttributeOptions(
             $this->guesser->guessAttributeParameters($rootClass, $propertyPath),
@@ -231,6 +250,9 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->setEntityMetadata(array($rootClass => $metadata));
         $this->setEntityConfigProvider($rootClass, 'association', false, true, null, 'ref-one');
 
+        $this->doctrineTypeMappingProvider->expects($this->any())
+            ->method('getDoctrineTypeMappings')->willReturn([]);
+
         $result = $this->guesser->guessAttributeParameters($rootClass, $propertyPath);
         $this->assertAttributeOptions(
             $result,
@@ -258,7 +280,15 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->setEntityMetadata(array($rootClass => $metadata));
         $this->setEntityConfigProvider($rootClass, 'field', false, true, $fieldLabel, 'date');
 
-        $this->guesser->addDoctrineTypeMapping('date', 'object', array('class' => 'DateTime'));
+        $this->doctrineTypeMappingProvider->expects($this->any())
+            ->method('getDoctrineTypeMappings')->willReturn(
+                [
+                    'date' => [
+                        'type' => 'object',
+                        'options' => ['class' => 'DateTime']
+                    ]
+                ]
+            );
 
         $this->assertAttributeOptions(
             $this->guesser->guessAttributeParameters($rootClass, $propertyPath),
@@ -285,6 +315,9 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 
         $this->setEntityMetadata(array($rootClass => $metadata));
         $this->setEntityConfigProvider($rootClass, 'association', true, false);
+
+        $this->doctrineTypeMappingProvider->expects($this->any())
+            ->method('getDoctrineTypeMappings')->willReturn([]);
 
         $this->assertAttributeOptions(
             $this->guesser->guessAttributeParameters($rootClass, $propertyPath),

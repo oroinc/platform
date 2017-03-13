@@ -34,7 +34,11 @@ class FilterHandler implements ConfigurationHandlerInterface
         'frontend_options',
         'form_type',
         'display_type',
-        'form_options'
+        'destination_page',
+        'form_options',
+        WorkflowConfiguration::NODE_INIT_ENTITIES,
+        WorkflowConfiguration::NODE_INIT_ROUTES,
+        WorkflowConfiguration::NODE_INIT_DATAGRIDS,
     ];
 
     /** @var array */
@@ -51,6 +55,14 @@ class FilterHandler implements ConfigurationHandlerInterface
         'type',
         'entity_acl',
         'property_path',
+        'options'
+    ];
+
+    /** @var array */
+    protected static $variableKeys = [
+        'name',
+        'type',
+        'value',
         'options'
     ];
 
@@ -73,6 +85,7 @@ class FilterHandler implements ConfigurationHandlerInterface
         WorkflowConfiguration::NODE_EXCLUSIVE_ACTIVE_GROUPS,
         WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS,
         WorkflowConfiguration::NODE_APPLICATIONS,
+        WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS
     ];
 
     /**
@@ -89,6 +102,7 @@ class FilterHandler implements ConfigurationHandlerInterface
             self::$transitionDefinitionKeys,
             $configuration
         );
+        $this->filterConfigNode(WorkflowConfiguration::NODE_VARIABLES, self::$variableKeys, $configuration);
 
         return $this->filterKeys($configuration, self::$workflowKeys);
     }

@@ -11,6 +11,15 @@ define(['jquery'], function($) {
         return $(a).parents(m[3]).length < 1;
     };
 
+    $.Deferred.getStackHook = function() {
+        // Throw an error so we can extract the stack from the Error
+        try {
+            throw new Error('Exception in jQuery.Deferred');
+        } catch (err) {
+            return err.stack;
+        }
+    };
+
     $.fn.extend({
         focus: (function(originalFocus) {
             return function() {

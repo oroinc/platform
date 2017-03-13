@@ -14,8 +14,10 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -30,8 +32,11 @@ class OroTestFrameworkExtension implements TestworkExtension
 {
     const ISOLATOR_TAG = 'oro_behat.isolator';
     const SUITE_AWARE_TAG = 'suite_aware';
+    const CONFIG_PATH = '/Tests/Behat/behat.yml';
+    const MESSAGE_QUEUE_ISOLATOR_AWARE_TAG = 'message_queue_isolator_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
     const PAGES_CONFIG_ROOT = 'pages';
+    const SUITES_CONFIG_ROOT = 'suites';
 
     /**
      * @var ServiceProcessor
@@ -54,8 +59,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     public function process(ContainerBuilder $container)
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
+        $this->processBundleBehatConfigurations($container);
         $this->processBundleAutoload($container);
-        $this->processElements($container);
         $this->injectMessageQueueIsolator($container);
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
@@ -134,7 +139,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     private function processIsolationSubscribers(ContainerBuilder $container)
     {
-        $dumpers = [];
+        $isolators = [];
         $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
 
         foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
@@ -143,17 +148,17 @@ class OroTestFrameworkExtension implements TestworkExtension
 
             if ($isolator->isApplicable($applicationContainer)) {
                 $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-                $dumpers[$priority][] = new Reference($id);
+                $isolators[$priority][] = new Reference($id);
             }
         }
 
         // sort by priority and flatten
-        krsort($dumpers);
-        $dumpers = call_user_func_array('array_merge', $dumpers);
+        krsort($isolators);
+        $isolators = call_user_func_array('array_merge', $isolators);
 
         $container->getDefinition('oro_behat_extension.isolation.test_isolation_subscriber')->replaceArgument(
             0,
-            $dumpers
+            $isolators
         );
     }
 
@@ -163,24 +168,32 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function injectMessageQueueIsolator(ContainerBuilder $container)
     {
         $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
+        $applicableIsolatorId = null;
 
         foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
             /** @var IsolatorInterface $isolator */
             $isolator = $container->get($id);
 
             if ($isolator->isApplicable($applicationContainer) && $isolator instanceof MessageQueueIsolatorInterface) {
-                $container
-                    ->getDefinition('oro_test.context.fixture_loader')
-                    ->replaceArgument(4, new Reference($id));
-                $container
-                    ->getDefinition('oro_behat_extension.isolation.inital_massage_queue_isolator')
-                    ->replaceArgument(0, new Reference($id));
-
-                return;
+                $applicableIsolatorId = $id;
+                break;
             }
         }
 
-        throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
+        if (null === $applicableIsolatorId) {
+            throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
+        }
+
+        foreach ($container->findTaggedServiceIds(self::MESSAGE_QUEUE_ISOLATOR_AWARE_TAG) as $id => $attributes) {
+            if (!$container->hasDefinition($id)) {
+                continue;
+            }
+            $definition = $container->getDefinition($id);
+
+            if (is_a($definition->getClass(), MessageQueueIsolatorAwareInterface::class, true)) {
+                $definition->addMethodCall('setMessageQueueIsolator', [new Reference($applicableIsolatorId)]);
+            }
+        }
     }
 
     private function processSuiteAwareSubscriber(ContainerBuilder $container)
@@ -213,22 +226,43 @@ class OroTestFrameworkExtension implements TestworkExtension
     }
 
     /**
-     * @param $suiteConfigurations
-     * @return array
+     * @param ContainerBuilder $container
      */
-    private function getConfiguredBundles($suiteConfigurations)
+    private function processBundleBehatConfigurations(ContainerBuilder $container)
     {
-        $configuredBundles = [];
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $processor = new Processor();
+        $configuration = new BehatBundleConfiguration($container);
+        $suites = $container->getParameter('suite.configurations');
+        $pages = [];
+        $elements = [];
 
-        foreach ($suiteConfigurations as $suiteName => $configuration) {
-            $settings = $configuration['settings'];
-            $type = $configuration['type'];
+        /** @var BundleInterface $bundle */
+        foreach ($kernel->getBundles() as $bundle) {
+            $configFile = str_replace(
+                '/',
+                DIRECTORY_SEPARATOR,
+                $bundle->getPath().self::CONFIG_PATH
+            );
 
-            if ('symfony_bundle' === $type) {
-                $configuredBundles[] = isset($settings['bundle']) ? $settings['bundle'] : $suiteName;
+            if (!is_file($configFile)) {
+                continue;
             }
+
+            $config = Yaml::parse(file_get_contents($configFile));
+            $processedConfiguration = $processor->processConfiguration(
+                $configuration,
+                $config
+            );
+
+            $pages = array_merge($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
+            $elements = array_merge($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
+            $suites = array_merge($suites, $processedConfiguration[self::SUITES_CONFIG_ROOT]);
         }
-        return $configuredBundles;
+
+        $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
+        $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
+        $container->setParameter('suite.configurations', $suites);
     }
 
     /**
@@ -244,11 +278,9 @@ class OroTestFrameworkExtension implements TestworkExtension
         $suiteGenerator = $container->get('symfony2_extension.suite.generator');
         $commonContexts = $container->getParameter('oro_test.shared_contexts');
 
-        $configuredBundles = $this->getConfiguredBundles($suiteConfigurations);
-
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if (in_array($bundle->getName(), $configuredBundles, true)) {
+            if (array_key_exists($bundle->getName(), $suiteConfigurations)) {
                 continue;
             }
 
@@ -268,42 +300,6 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
 
         $container->setParameter('suite.configurations', $suiteConfigurations);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function processElements(ContainerBuilder $container)
-    {
-        $elementConfiguration = [];
-        $pagesConfiguration = [];
-        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
-
-        /** @var BundleInterface $bundle */
-        foreach ($kernel->getBundles() as $bundle) {
-            $mappingPath = str_replace(
-                '/',
-                DIRECTORY_SEPARATOR,
-                $bundle->getPath().'/Resources/config/oro/behat.yml'
-            );
-
-            if (!is_file($mappingPath)) {
-                continue;
-            }
-
-            $config = Yaml::parse(file_get_contents($mappingPath));
-
-            if (isset($config[self::ELEMENTS_CONFIG_ROOT])) {
-                $elementConfiguration = array_merge($elementConfiguration, $config[self::ELEMENTS_CONFIG_ROOT]);
-            }
-
-            if (isset($config[self::PAGES_CONFIG_ROOT])) {
-                $pagesConfiguration = array_merge($pagesConfiguration, $config[self::PAGES_CONFIG_ROOT]);
-            }
-        }
-
-        $container->getDefinition('oro_element_factory')->replaceArgument(2, $elementConfiguration);
-        $container->getDefinition('oro_page_factory')->replaceArgument(1, $pagesConfiguration);
     }
 
     /**

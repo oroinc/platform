@@ -1,0 +1,59 @@
+<div class="widget-content">
+    {% if saved is defined and saved %}
+        <script type="text/javascript">
+            require(['orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger', 'oroui/js/mediator'],
+                    function(__, widgetManager, messenger, mediator) {
+                        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                            messenger.notificationFlashMessage('success', __('oro.ui.jstree.move_success', {'nodes': '{{ nodesName }}'}));
+
+                            mediator.trigger('widget_success:' + widget.getWid());
+                            mediator.trigger('widget_success:' + widget.getAlias());
+
+                            widget.trigger('formSave', {{ changed|json_encode|raw }});
+
+                            widget.remove();
+                        });
+                    });
+        </script>
+    {% else %}
+        {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+
+        <div class="form-container">
+            {% set formAction = app.request.uri %}
+            <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post">
+                <fieldset class="form form-horizontal">
+                    {% set formErrors = form_errors(form) %}
+
+                    {% if formErrors %}
+                        <div class="alert alert-error">
+                            <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                            {{ formErrors|raw }}
+                        </div>
+                    {% endif %}
+                    <div class="span6">
+                        <div class="control-group control-group-hidden">
+                            <div class="control-label wrap">{{ 'oro.ui.jstree.move.source.label'|trans }}</div>
+                            <div class="controls">
+                                {% for source in form.vars.value.source %}
+                                    {% for parent in source.parents %}
+                                        {{ parent.label }}&nbsp;&gt;&nbsp;
+                                    {% endfor %}
+                                    {{ source.label }}
+                                    <br />
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {{ form_rest(form) }}
+                    </div>
+
+                    <div class="widget-actions form-actions" style="display: none;">
+                        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                        <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                    </div>
+                </fieldset>
+            </form>
+            {{ oro_form_js_validation(form) }}
+        </div>
+    {% endif %}
+</div>
+

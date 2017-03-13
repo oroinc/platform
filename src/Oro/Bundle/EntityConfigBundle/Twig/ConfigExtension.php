@@ -4,11 +4,12 @@ namespace Oro\Bundle\EntityConfigBundle\Twig;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
-use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 
+use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -19,34 +20,61 @@ class ConfigExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config';
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var ContainerInterface */
+    protected $container;
 
-    /** @var EntityClassNameHelper */
-    protected $entityClassNameHelper;
+    /** @var ConfigManager|null */
+    private $configManager;
 
-    /** @var RouterInterface */
+    /** @var RouterInterface|null */
     private $router;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @param ConfigManager         $configManager
-     * @param RouterInterface       $router
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param DoctrineHelper        $doctrineHelper
+     * @return ConfigManager
      */
-    public function __construct(
-        ConfigManager $configManager,
-        RouterInterface $router,
-        EntityClassNameHelper $entityClassNameHelper,
-        DoctrineHelper $doctrineHelper
-    ) {
-        $this->configManager         = $configManager;
-        $this->router                = $router;
-        $this->entityClassNameHelper = $entityClassNameHelper;
-        $this->doctrineHelper        = $doctrineHelper;
+    protected function getConfigManager()
+    {
+        if (null === $this->configManager) {
+            $this->configManager = $this->container->get('oro_entity_config.config_manager');
+        }
+
+        return $this->configManager;
+    }
+
+    /**
+     * @return EntityClassNameHelper
+     */
+    protected function getEntityClassNameHelper()
+    {
+        return $this->container->get('oro_entity.entity_class_name_helper');
+    }
+
+    /**
+     * @return RouterInterface
+     */
+    protected function getRouter()
+    {
+        if (null === $this->router) {
+            $this->router = $this->container->get('router');
+        }
+
+        return $this->router;
+    }
+
+    /**
+     * @return DoctrineHelper
+     */
+    protected function getDoctrineHelper()
+    {
+        return $this->container->get('oro_entity.doctrine_helper');
     }
 
     /**
@@ -82,13 +110,14 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassConfig($className, $scope = 'entity')
     {
-        if (!$this->configManager->hasConfig($className)) {
+        $configManager = $this->getConfigManager();
+        if (!$configManager->hasConfig($className)) {
             return [];
         }
 
         $entityConfig = new EntityConfigId($scope, $className);
 
-        return $this->configManager->getConfig($entityConfig)->all();
+        return $configManager->getConfig($entityConfig)->all();
     }
 
     /**
@@ -100,13 +129,14 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassConfigValue($className, $attrName, $scope = 'entity')
     {
-        if (!$this->configManager->hasConfig($className)) {
+        $configManager = $this->getConfigManager();
+        if (!$configManager->hasConfig($className)) {
             return null;
         }
 
         $entityConfig = new EntityConfigId($scope, $className);
 
-        return $this->configManager->getConfig($entityConfig)->get($attrName);
+        return $configManager->getConfig($entityConfig)->get($attrName);
     }
 
     /**
@@ -117,11 +147,12 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getFieldConfig($className, $fieldName, $scope = 'entity')
     {
-        if (!$this->configManager->hasConfig($className, $fieldName)) {
+        $configManager = $this->getConfigManager();
+        if (!$configManager->hasConfig($className, $fieldName)) {
             return [];
         }
 
-        return $this->configManager->getProvider($scope)->getConfig($className, $fieldName)->all();
+        return $configManager->getProvider($scope)->getConfig($className, $fieldName)->all();
     }
 
     /**
@@ -133,11 +164,12 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getFieldConfigValue($className, $fieldName, $attrName, $scope = 'entity')
     {
-        if (!$this->configManager->hasConfig($className, $fieldName)) {
+        $configManager = $this->getConfigManager();
+        if (!$configManager->hasConfig($className, $fieldName)) {
             return null;
         }
 
-        return $this->configManager->getProvider($scope)->getConfig($className, $fieldName)->get($attrName);
+        return $configManager->getProvider($scope)->getConfig($className, $fieldName)->get($attrName);
     }
 
     /**
@@ -147,15 +179,16 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassMetadataValue($className, $attrName)
     {
-        if (!$this->configManager->hasConfig($className)) {
+        $configManager = $this->getConfigManager();
+        if (!$configManager->hasConfig($className)) {
             return null;
         }
 
-        if (!isset($this->configManager->getEntityMetadata($className)->{$attrName})) {
+        if (!isset($configManager->getEntityMetadata($className)->{$attrName})) {
             return null;
         }
 
-        return $this->configManager->getEntityMetadata($className)->{$attrName};
+        return $configManager->getEntityMetadata($className)->{$attrName};
     }
 
     /**
@@ -167,11 +200,12 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassRoute($className, $routeType = 'view', $strict = false)
     {
-        if (!$this->configManager->hasConfig($className)) {
+        $configManager = $this->getConfigManager();
+        if (!$configManager->hasConfig($className)) {
             return null;
         }
 
-        $entityMetadata = $this->configManager->getEntityMetadata($className);
+        $entityMetadata = $configManager->getEntityMetadata($className);
         if (!$entityMetadata) {
             return null;
         }
@@ -191,7 +225,7 @@ class ConfigExtension extends \Twig_Extension
     protected function hasRoute($routeName)
     {
         try {
-            $this->router->generate($routeName);
+            $this->getRouter()->generate($routeName);
         } catch (RouteNotFoundException $e) {
             return false;
         } catch (RoutingException $e) {
@@ -211,16 +245,16 @@ class ConfigExtension extends \Twig_Extension
     {
         $route = $this->getClassRoute($className, 'view');
         if ($route) {
-            return $this->router->generate($route, ['id' => $id]);
+            return $this->getRouter()->generate($route, ['id' => $id]);
         }
 
         // Generate view link for the custom entity
         if (ExtendHelper::isCustomEntity($className)) {
-            return $this->router->generate(
+            return $this->getRouter()->generate(
                 'oro_entity_view',
                 [
                     'id'         => $id,
-                    'entityName' => $this->entityClassNameHelper->getUrlSafeClassName($className)
+                    'entityName' => $this->getEntityClassNameHelper()->getUrlSafeClassName($className)
                 ]
             );
         }
@@ -240,7 +274,7 @@ class ConfigExtension extends \Twig_Extension
         }
 
         $className = ClassUtils::getClass($entity);
-        $id = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        $id = $this->getDoctrineHelper()->getSingleEntityIdentifier($entity);
 
         return $this->getViewLink($className, $id);
     }

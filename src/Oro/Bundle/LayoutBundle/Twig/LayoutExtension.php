@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
 
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -11,7 +12,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
-class LayoutExtension extends \Twig_Extension
+class LayoutExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
     const RENDER_BLOCK_NODE_CLASS = 'Oro\Bundle\LayoutBundle\Twig\Node\SearchAndRenderBlockNode';
 
@@ -26,14 +27,15 @@ class LayoutExtension extends \Twig_Extension
     /** @var TextHelper */
     private $textHelper;
 
+    /** @var ContainerInterface */
+    private $container;
+
     /**
-     * @param TwigRendererInterface $renderer
-     * @param TextHelper            $textHelper
+     * @param ContainerInterface $container
      */
-    public function __construct(TwigRendererInterface $renderer, TextHelper $textHelper)
+    public function __construct(ContainerInterface $container)
     {
-        $this->renderer   = $renderer;
-        $this->textHelper = $textHelper;
+        $this->container = $container;
     }
 
     /**
@@ -41,6 +43,7 @@ class LayoutExtension extends \Twig_Extension
      */
     public function initRuntime(\Twig_Environment $environment)
     {
+        $this->renderer = $this->container->get('oro_layout.twig.renderer');
         $this->renderer->setEnvironment($environment);
     }
 
@@ -87,6 +90,10 @@ class LayoutExtension extends \Twig_Extension
             new \Twig_SimpleFunction(
                 'set_class_prefix_to_form',
                 [$this, 'setClassPrefixToForm']
+            ),
+            new \Twig_SimpleFunction(
+                'convert_value_to_string',
+                [$this, 'convertValueToString']
             )
         ];
     }
@@ -98,10 +105,25 @@ class LayoutExtension extends \Twig_Extension
     {
         return [
             // Normalizes and translates (if needed) labels in the given value.
-            new \Twig_SimpleFilter('block_text', [$this->textHelper, 'processText']),
+            new \Twig_SimpleFilter('block_text', [$this, 'processText']),
             // Merge additional context to BlockView
             new \Twig_SimpleFilter('merge_context', [$this, 'mergeContext']),
         ];
+    }
+
+    /**
+     * @param mixed       $value
+     * @param string|null $domain
+     *
+     * @return mixed
+     */
+    public function processText($value, $domain = null)
+    {
+        if (null === $this->textHelper) {
+            $this->textHelper = $this->container->get('oro_layout.text.helper');
+        }
+
+        return $this->textHelper->processText($value, $domain);
     }
 
     /**
@@ -171,5 +193,22 @@ class LayoutExtension extends \Twig_Extension
     public function getName()
     {
         return 'layout';
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    public function convertValueToString($value)
+    {
+        if (is_array($value)) {
+            $value = stripslashes(json_encode($value));
+        } elseif (is_object($value)) {
+            $value = get_class($value);
+        } elseif (!is_string($value)) {
+            $value = var_export($value, true);
+        }
+
+        return $value;
     }
 }

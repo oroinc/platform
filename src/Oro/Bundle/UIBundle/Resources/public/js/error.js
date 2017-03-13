@@ -11,7 +11,8 @@ define([
     var defaults = _.defaults(module.config(), {
         headerServerError: _.__('Server error'),
         headerUserError: _.__('User input error'),
-        message: _.__('oro.ui.error')
+        message: _.__('oro.ui.error'),
+        loginRoute: 'oro_user_security_login'
     });
 
     var ERROR_USER_INPUT = 'user_input_error';
@@ -27,7 +28,7 @@ define([
          */
         handle: function(event, xhr, settings) {
             if (this.isXHRStatus(xhr, 401)) {
-                this._processRedirect();
+                this._processRedirect(xhr.responseJSON || {});
             } else if (xhr.readyState === 4) {
                 var errorMessage = this.getErrorMessage(event, xhr, settings);
                 var isShowError = Boolean(errorMessage);
@@ -44,8 +45,9 @@ define([
             var status = 0;
             if (_.isObject(xhr)) {
                 status = xhr.status;
-                if ('responseJSON' in xhr && 'code' in xhr.responseJSON) {
-                    status = xhr.responseJSON.code;
+                var responseCode = _.result(xhr.responseJSON, 'code');
+                if (!_.isUndefined(responseCode)) {
+                    status = responseCode;
                 }
             }
             return status === testStatus;
@@ -135,17 +137,17 @@ define([
         /**
          * Redirects to login
          *
+         * @param {Object} response
          * @private
          */
-        _processRedirect: function() {
+        _processRedirect: function(response) {
             var hashUrl = '';
             // @TODO add extra parameter for redirect after login
             /*if (Navigation.isEnabled()) {
                 var navigation = Navigation.getInstance();
                 hashUrl = '#url=' + navigation.getHashUrl();
             }*/
-
-            window.location.href = routing.generate('oro_user_security_login') + hashUrl;
+            window.location.href = response.redirectUrl || (routing.generate(defaults.loginRoute) + hashUrl);
         }
     };
 

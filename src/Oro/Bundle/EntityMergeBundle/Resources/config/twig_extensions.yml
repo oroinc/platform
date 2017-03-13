@@ -1,14 +1,12 @@
 parameters:
-    oro_entity_merge.twig.extension.class: Oro\Bundle\EntityMergeBundle\Twig\MergeExtension
     oro_entity_merge.twig.renderer.class: Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer
 
 services:
     oro_entity_merge.twig.extension:
-        class: %oro_entity_merge.twig.extension.class%
+        class: Oro\Bundle\EntityMergeBundle\Twig\MergeExtension
+        public: false
         arguments:
-            - '@oro_entity_merge.accessor'
-            - '@oro_entity_merge.twig.renderer'
-            - '@translator'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 

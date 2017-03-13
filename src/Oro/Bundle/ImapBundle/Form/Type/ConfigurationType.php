@@ -16,6 +16,7 @@ use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -124,8 +125,12 @@ class ConfigurationType extends AbstractType
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('password', 'password', [
-                'label' => 'oro.imap.configuration.password.label', 'required' => true,
-                'attr' => ['class' => 'check-connection']
+                'label' => 'oro.imap.configuration.password.label',
+                'required' => true,
+                'attr' => [
+                    'class' => 'check-connection',
+                    'autocomplete' => 'new-password'
+                ]
             ]);
         if ($options['add_check_button']) {
             $builder->add('check_connection', 'oro_imap_configuration_check', [
@@ -341,6 +346,7 @@ class ConfigurationType extends AbstractType
         $resolver->setDefaults([
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'          => false,
+            'constraints'       => new Valid(),
             'add_check_button'  => true,
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];

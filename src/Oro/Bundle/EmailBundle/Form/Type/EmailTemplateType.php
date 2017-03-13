@@ -144,7 +144,6 @@ class EmailTemplateType extends AbstractType
                 'data_class'           => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
                 'intention'            => 'emailtemplate',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'   => true,
             )
         );
     }

@@ -56,6 +56,14 @@ workflows:
             second_point_transition:
                  step_to: third_point
                  transition_definition: second_point_transition_definition
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    type: 'string'
+                    value: null
 
     test_groups_flow1:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity

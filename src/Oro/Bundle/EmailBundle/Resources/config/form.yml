@@ -269,6 +269,18 @@ services:
         tags:
             - { name: form.type, alias: oro_email_email_address_from }
 
+    oro_email.form.type.email_origin_from:
+        class: 'Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType'
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_email.related_emails.provider'
+            - '@oro_email.email.model.builder.helper'
+            - '@oro_email.mailbox.manager'
+            - '@doctrine'
+            - '@oro_email.tools.email_origin_helper'
+        tags:
+            - { name: form.type, alias: oro_email_email_origin_from }
+
     oro_email.form.type.email_address_recipients:
         class: %oro_email.form.type.email_address_recipients.class%
         arguments:

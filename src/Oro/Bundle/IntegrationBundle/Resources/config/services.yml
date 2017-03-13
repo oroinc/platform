@@ -45,8 +45,6 @@ parameters:
 
     oro_integration.workflow.action.populate_integration_owner.class:     Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner
 
-    oro_integration.twig.integration.class:                                Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
-
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -294,7 +292,8 @@ services:
             - { name: oro_action.action, alias: populate_integration_owner }
 
     oro_integration.twig.integration:
-        class: %oro_integration.twig.integration.class%
+        class: Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
+        public: false
         arguments:
             - '@event_dispatcher'
         tags:
@@ -326,3 +325,8 @@ services:
         class: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration
         arguments:
             - '@oro_integration.manager.types_registry'
+
+    oro_integration.generator.prefixed_identifier_generator:
+        class: 'Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator'
+        abstract: true
+        public: false

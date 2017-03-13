@@ -264,6 +264,8 @@ services:
             - [setAclManager, ["@oro_security.acl.manager"]]
             - [setAclPrivilegeRepository, ["@oro_security.acl.privilege_repository"]]
             - [setManagerRegistry, ["@doctrine"]]
+            - [setConfigurableName, ['default']]
+            - [setConfigurableFilter, ["@oro_security.filter.configurable_permission_filter"]]
 
     oro_user.form.handler.acl_role:
         parent: oro_user.form.handler.abstract.acl_role

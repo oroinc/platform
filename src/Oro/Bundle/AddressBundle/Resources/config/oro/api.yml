@@ -1,6 +1,13 @@
 api:
     entities:
-        Oro\Bundle\AddressBundle\Entity\Address: ~
+        Oro\Bundle\AddressBundle\Entity\Address:
+            documentation_resource: '@OroAddressBundle/Resources/doc/api/address.md'
+        Oro\Bundle\AddressBundle\Entity\AddressType:
+            documentation_resource: '@OroAddressBundle/Resources/doc/api/address_type.md'
+        Oro\Bundle\AddressBundle\Entity\Region:
+            documentation_resource: '@OroAddressBundle/Resources/doc/api/region.md'
+        Oro\Bundle\AddressBundle\Entity\Country:
+            documentation_resource: '@OroAddressBundle/Resources/doc/api/country.md'
 
     relations:
         Oro\Bundle\AddressBundle\Entity\AbstractAddress:

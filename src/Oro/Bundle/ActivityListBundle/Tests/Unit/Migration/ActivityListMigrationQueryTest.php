@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigrationQuery;
 use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -97,7 +98,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $entityMetadataHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $extendExtension      = new ExtendExtension($extendOptionsManager, $entityMetadataHelper);
+        $extendExtension = new ExtendExtension($extendOptionsManager, $entityMetadataHelper, new PropertyConfigBag([]));
         $extendExtension->setNameGenerator($this->nameGenerator);
         $this->activityListExtension->setExtendExtension($extendExtension);
 

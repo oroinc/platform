@@ -33,7 +33,7 @@ define(function(require) {
 
         getTemplateData: function() {
             var data = MultiCheckboxView.__super__.getTemplateData.apply(this, arguments);
-            data.name = _.uniqueId(this.selectAttrs.name || 'multi-checkbox');
+            data.name = this.selectAttrs.name || _.uniqueId('multi-checkbox');
             data.values = this.value;
             data.options = this.items;
             return data;

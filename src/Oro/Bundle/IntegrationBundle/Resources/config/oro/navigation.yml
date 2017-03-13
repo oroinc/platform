@@ -2,15 +2,14 @@ navigation:
     menu_config:
         items:
             integrations_submenu:
-                label: 'oro.integration.menu.integrations_submenu.label'
-                uri: '#'
-                extras:
-                    position: 50
+                label:    'oro.integration.menu.integrations_submenu.label'
+                uri:      '#'
+                position: 50
             integrations_list:
-                label: 'oro.integration.menu.integrations_list.label'
-                route: oro_integration_index
+                label:    'oro.integration.menu.integrations_list.label'
+                route:    'oro_integration_index'
+                position: 10
                 extras:
-                    position: 10
                     routes:  'oro_integration_*'
 
         tree:
@@ -24,5 +23,5 @@ navigation:
 
     titles:
         oro_integration_index:  ~
-        oro_integration_update: '%%integration.name%%'
+        oro_integration_update: '%integration.name%'
         oro_integration_create: 'Create Integration'

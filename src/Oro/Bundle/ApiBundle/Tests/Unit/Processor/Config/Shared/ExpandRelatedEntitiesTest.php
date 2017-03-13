@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\ExpandRelatedEntities;
@@ -257,6 +258,98 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 ]
             ],
             $this->context->getResult()
+        );
+    }
+
+    public function testProcessForManageableEntityWithPropertyPath()
+    {
+        $entityDefinition = $this->createConfigObject([
+            'fields' => [
+                'account' => [
+                    'property_path' => 'customerAssociation.account',
+                ],
+                'customerAssociation' => [
+                    'fields' => [
+                        'account' => null,
+                    ],
+                ],
+            ],
+        ]);
+        $this->context->setResult($entityDefinition);
+        $this->context->setExtras(
+            [
+                new ExpandRelatedEntitiesConfigExtra(
+                    ['account']
+                ),
+                new TestConfigSection('test_section')
+            ]
+        );
+
+        $this->configProvider->expects($this->any())
+            ->method('getConfig')
+            ->with(
+                'Account',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [
+                    new TestConfigSection('test_section'),
+                    new ExpandRelatedEntitiesConfigExtra(
+                        ['customerAssociation.account']
+                    ),
+                ]
+            )
+            ->will($this->returnValue($this->createRelationConfigObject([])));
+
+        $metadata = new ClassMetadata(self::TEST_CLASS_NAME);
+        $metadata->associationMappings = [
+            'customerAssociation' => [
+                'fieldName' => 'customerAssociation',
+                'type' => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'CustomerAssociation',
+            ],
+        ];
+        $customerAssociationMetadata = new ClassMetadata('CustomerAssociation');
+        $customerAssociationMetadata->associationMappings = [
+            'account' => [
+                'fieldName' => 'account',
+                'type' => ClassMetadata::MANY_TO_ONE,
+                'targetEntity' => 'Account',
+            ]
+        ];
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->will($this->returnValue(true));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityMetadataForClass')
+            ->will($this->returnValueMap([
+                [self::TEST_CLASS_NAME, true, $metadata],
+                ['CustomerAssociation', true, $customerAssociationMetadata],
+            ]));
+
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'account' => [
+                        'property_path' => 'customerAssociation.account',
+                        'target_class' => 'Account',
+                        'target_type' => 'to-one',
+                    ],
+                    'customerAssociation' => [
+                        'fields' => [
+                            'account' => null,
+                        ],
+                    ],
+                ],
+            ],
+            $this->context->getResult()
+        );
+        $this->assertTrue($entityDefinition->getField('account')->hasTargetEntity());
+        $this->assertTrue(
+            $entityDefinition->getField('customerAssociation')->getTargetEntity()
+                ->getField('account')->hasTargetEntity()
         );
     }
 
