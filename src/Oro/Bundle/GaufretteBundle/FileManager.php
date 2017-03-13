@@ -86,6 +86,23 @@ class FileManager
     }
 
     /**
+     * Finds files that name beginning with the given prefix.
+     *
+     * @param string $prefix
+     *
+     * @return string[] The names of the found files
+     */
+    public function findFiles($prefix = '')
+    {
+        $result = $this->filesystem->listKeys($prefix);
+        if (!empty($result) && array_key_exists('keys', $result)) {
+            $result = $result['keys'];
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns a File object for the file stored in the Gaufrette file system.
      *
      * @param string $fileName
