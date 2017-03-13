@@ -171,4 +171,28 @@ class Element extends NodeElement
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
     }
+
+    /**
+     * @param \Closure $lambda
+     * @param int $timeLimit
+     * @return null|mixed Return false if closure throw error or return not true value.
+     *                     Return value that return closure
+     */
+    protected function spin(\Closure $lambda, $timeLimit = 60)
+    {
+        $time = $timeLimit;
+
+        while ($time > 0) {
+            try {
+                if ($result = $lambda($this)) {
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+            usleep(50000);
+            $time -= 0.05;
+        }
+        return null;
+    }
 }

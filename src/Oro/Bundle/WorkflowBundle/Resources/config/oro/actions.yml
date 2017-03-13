@@ -2,6 +2,7 @@ operations:
     DELETE:
         exclude_entities:
             - Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+
     clone_workflow:
         extends: CLONE
         entities:
@@ -81,15 +82,27 @@ operations:
             - '@assign_constant_value': [$.availableDestinations, Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver::AVAILABLE_DESTINATIONS]
 
     oro_workflow_definition_configure:
-        label: oro.workflow.permission.update_configuration.label
+        label: oro.workflow.workflowdefinition.configuration.label
         routes:
             - oro_workflow_definition_view
+        datagrids:
+            - workflow-definitions-grid
         acl_resource: [CONFIGURE, entity:Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition]
         order: 10
-        groups:
-            - view_navButtons
         button_options:
             icon: fa-cog
+        preactions:
+            - '@call_service_method':
+                service: oro_workflow.manager.system
+                method: getWorkflow
+                method_parameters: [$.data.name]
+                attribute: $.workflow
+            - '@call_method':
+                object: $.workflow
+                method: getVariables
+                attribute: $.variables
+        preconditions:
+            '@has_elements': $.variables
         actions:
             - '@redirect':
                 parameters:

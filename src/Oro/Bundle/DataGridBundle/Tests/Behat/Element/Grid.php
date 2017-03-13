@@ -6,6 +6,8 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use WebDriver\Exception\ElementNotVisible;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
+
 /**
  * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
  * @method GridRow getRowByContent($content) @see Table::getRowByContent($content)

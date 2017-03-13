@@ -352,7 +352,7 @@ trait MenuUpdateTrait
      */
     public function setPriority($priority)
     {
-        $this->priority = $priority;
+        $this->priority = (int) $priority;
 
         return $this;
     }

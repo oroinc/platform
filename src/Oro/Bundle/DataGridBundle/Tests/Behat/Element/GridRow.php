@@ -5,6 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 
 class GridRow extends TableRow
 {
@@ -44,7 +46,7 @@ class GridRow extends TableRow
         self::assertTrue($pencilIcon->isVisible(), "Cell with '$header' is not inline editable");
         $pencilIcon->click();
 
-        $this->elementFactory->createElement('OroForm')->fillField(
+        $this->getElement('OroForm')->fillField(
             'value',
             new InputValue(InputMethod::TYPE, $value)
         );
