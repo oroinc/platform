@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
+use Doctrine\DBAL\Schema\Table;
 use Oro\Component\MessageQueue\Transport\DestinationInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidDestinationException;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -84,7 +85,7 @@ class DbalSession implements SessionInterface
      */
     public function declareTopic(DestinationInterface $destination)
     {
-        // does nothing, installer creates all required tables
+        $this->declareQueue($destination);
     }
 
     /**
@@ -92,7 +93,30 @@ class DbalSession implements SessionInterface
      */
     public function declareQueue(DestinationInterface $destination)
     {
-        // does nothing, installer creates all required tables
+        $sm = $this->connection->getDBALConnection()->getSchemaManager();
+
+        if ($sm->tablesExist([$this->connection->getTableName()])) {
+            return;
+        }
+
+        $table = new Table($this->connection->getTableName());
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true,]);
+        $table->addColumn('body', 'text', ['notnull' => false,]);
+        $table->addColumn('headers', 'text', ['notnull' => false,]);
+        $table->addColumn('properties', 'text', ['notnull' => false,]);
+        $table->addColumn('consumer_id', 'string', ['notnull' => false,]);
+        $table->addColumn('redelivered', 'boolean', ['notnull' => false,]);
+        $table->addColumn('queue', 'string');
+        $table->addColumn('priority', 'smallint');
+        $table->addColumn('delayed_until', 'integer', ['notnull' => false,]);
+
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['consumer_id']);
+        $table->addIndex(['queue']);
+        $table->addIndex(['priority']);
+        $table->addIndex(['delayed_until']);
+
+        $sm->createTable($table);
     }
 
     /**
