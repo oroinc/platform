@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Route;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Route\Router;
+use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -10,39 +15,34 @@ use Oro\Bundle\UIBundle\Route\Router;
  */
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
     protected $request;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ParameterBag|\PHPUnit_Framework_MockObject_MockObject */
     protected $requestQuery;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $requestStack;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var SymfonyRouter|\PHPUnit_Framework_MockObject_MockObject */
     protected $symfonyRouter;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
-    /**
-     * @var Router
-     */
+    /** @var Router */
     protected $router;
 
     protected function setUp()
     {
-        $this->requestQuery = $this->createMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->requestQuery = $this->createMock(ParameterBag::class);
+        $this->request = $this->createMock(Request::class);
         $this->request->query = $this->requestQuery;
 
-        $this->symfonyRouter = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->router = new Router($this->request, $this->symfonyRouter, $this->securityFacade);
+        /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject $requestStack */
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
+
+        $this->symfonyRouter = $this->createMock(SymfonyRouter::class);
+        $this->securityFacade = $this->createMock(SecurityFacade::class);
+        $this->router = new Router($requestStack, $this->symfonyRouter, $this->securityFacade);
     }
 
     public function testSaveAndStayRedirectAfterSave()

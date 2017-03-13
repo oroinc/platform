@@ -14,7 +14,7 @@ class OroNavigationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -27,7 +27,6 @@ class OroNavigationBundleInstaller implements Installation
         $this->createOroNavigationItemTable($schema);
         $this->createOroNavigationItemPinbarTable($schema);
         $this->createOroNavigationPageStateTable($schema);
-        $this->createOroNavigationTitleTable($schema);
         $this->createOroNavigationMenuUpdateTable($schema);
         $this->createOroNavigationMenuUpdateTitleTable($schema);
         $this->createOroNavigationMenuUpdateDescriptionTable($schema);
@@ -123,23 +122,6 @@ class OroNavigationBundleInstaller implements Installation
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['page_hash'], 'UNIQ_8B43985B567C7E62');
         $table->addIndex(['user_id'], 'IDX_8B43985BA76ED395', []);
-    }
-
-    /**
-     * Create oro_navigation_title table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroNavigationTitleTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_navigation_title');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('route', 'string', ['length' => 255]);
-        $table->addColumn('title', 'text', []);
-        $table->addColumn('short_title', 'text', []);
-        $table->addColumn('is_system', 'boolean', []);
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['route'], 'unq_route');
     }
 
     /**

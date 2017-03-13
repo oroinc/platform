@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\MinkExtension\Context\MinkContext;
@@ -17,20 +18,30 @@ use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroPageObjectAware,
-    KernelAwareContext
+    KernelAwareContext,
+    MessageQueueIsolatorAwareInterface
 {
     use AssertTrait, KernelDictionary, PageObjectDictionary;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
 
     /**
      * @BeforeScenario
@@ -41,6 +52,48 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
+
+    /**
+     * @BeforeStep
+     * @param BeforeStepScope $scope
+     */
+    public function beforeStep(BeforeStepScope $scope)
+    {
+        $this->messageQueueIsolator->waitWhileProcessingMessages(10);
+
+        if (false === $this->getMink()->isSessionStarted('first_session')) {
+            return;
+        }
+
+        $session = $this->getMink()->getSession('first_session');
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        $url = $session->getCurrentUrl();
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            $driver->waitPageToLoad();
+
+            return;
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        }
+
+        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
+        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
+            return;
+        }
+
+        $driver->waitForAjax();
+    }
+
+    /**
      * Example: Then I should see "Attachment created successfully" flash message
      * Example: Then I should see "The email was sent" flash message
      *
@@ -48,31 +101,41 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title)
     {
-        /** @var NodeElement|false $messageElement */
-        $messageElement = $this->spin(function (OroMainContext $context) use ($title) {
-            $flashMessage = $context->findElementContains('Flash Message', $title);
+        $actualFlashMessages = [];
+        /** @var Element|null $flashMessage */
+        $flashMessage = $this->spin(function (OroMainContext $context) use ($title, &$actualFlashMessages) {
+            $flashMessages = $context->findAllElements('Flash Message');
 
-            if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                return $flashMessage;
+            foreach ($flashMessages as $flashMessage) {
+                if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                    $actualFlashMessageText = $flashMessage->getText();
+                    $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
+
+                    if (false !== stripos($actualFlashMessageText, $title)) {
+                        return $flashMessage;
+                    }
+                }
             }
 
-            return false;
-        });
+            return null;
+        }, 10);
 
-        self::assertNotFalse($messageElement, 'Flash message not found on page');
-        $flashMessage = $messageElement->getText();
-
-        $closeButton = $messageElement->find('css', 'button.close');
-
-        if ($closeButton->isVisible()) {
-            $closeButton->press();
-        }
-
-        self::assertContains($title, $flashMessage, sprintf(
-            'Expect that "%s" flash message contains "%s" string, but it isn\'t',
-            $flashMessage,
-            $title
+        self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
+        self::assertNotNull($flashMessage, sprintf(
+            'Expected "%s" message but got "%s" messages',
+            $title,
+            implode(',', array_keys($actualFlashMessages))
         ));
+
+        /** @var NodeElement $closeButton */
+        $closeButton = $flashMessage->find('css', 'button.close');
+        if (null !== $closeButton) {
+            try {
+                $closeButton->press();
+            } catch (\Exception $e) {
+                //No worries, flash message can disappeared till time next call
+            }
+        }
     }
 
     /**
@@ -117,12 +180,13 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @param \Closure $lambda
+     * @param int $timeLimit
      * @return false|mixed Return false if closure throw error or return not true value.
      *                     Return value that return closure
      */
-    public function spin(\Closure $lambda)
+    public function spin(\Closure $lambda, $timeLimit = 60)
     {
-        $time = 60;
+        $time = $timeLimit;
 
         while ($time > 0) {
             try {
@@ -486,6 +550,18 @@ class OroMainContext extends MinkContext implements
     public function openEntityEditPage($title, $entity)
     {
         $pageName = preg_replace('/\s+/', ' ', ucwords($entity)).' Edit';
+        $this->getPage($pageName)->open(['title' => $title]);
+    }
+
+    /**
+     * Example: Given I open "Charlie" Account view page
+     * Example: When I open "Supper sale" opportunity view page
+     *
+     * @Given /^(?:|I )open "(?P<title>[\w\s]+)" (?P<entity>[\w\s]+) view page$/
+     */
+    public function openEntityViewPage($title, $entity)
+    {
+        $pageName = preg_replace('/\s+/', ' ', ucwords($entity)).' View';
         $this->getPage($pageName)->open(['title' => $title]);
     }
 

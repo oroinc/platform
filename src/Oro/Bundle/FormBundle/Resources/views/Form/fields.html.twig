@@ -700,10 +700,8 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {{ UI.renderJsTree(
         {
-            'module': form.vars.pageComponentModule,
             'treeOptions': form.vars.treeOptions
-        },
-        ['expand', 'collapse']
+        }
     ) }}
 
     {{ form_widget(form) }}

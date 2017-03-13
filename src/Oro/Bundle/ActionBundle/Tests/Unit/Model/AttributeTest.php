@@ -59,4 +59,13 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($attribute->isEntityUpdateAllowed());
         $this->assertTrue($attribute->isEntityDeleteAllowed());
     }
+
+    public function testInstanceAndInternalType()
+    {
+        $attribute = new Attribute();
+        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\EntityParameterInterface', $attribute);
+        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\ParameterInterface', $attribute);
+
+        $this->assertEquals('attribute', $attribute->getInternalType());
+    }
 }

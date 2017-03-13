@@ -10,6 +10,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
+use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
@@ -58,6 +59,9 @@ class ImportExportController extends Controller
                 $data           = $importForm->getData();
                 $file           = $data->getFile();
                 $processorAlias = $data->getProcessorAlias();
+                if ($file->getClientOriginalExtension() === 'csv') {
+                    $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
+                }
                 $fileName = $this->getFileManager()->saveImportingFile($file);
 
                 return $this->forward(
@@ -475,5 +479,13 @@ class ImportExportController extends Controller
     protected function getSecurityFacade()
     {
         return $this->get('oro_security.security_facade');
+    }
+
+    /**
+     * @return CsvFileHandler
+     */
+    protected function getCsvFileHandler()
+    {
+        return $this->get('oro_importexport.handler.csv.file');
     }
 }

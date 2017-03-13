@@ -12,7 +12,7 @@ use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 class PasswordTooltipProvider
 {
     const BASE = 'oro.user.password_complexity.';
-    const UNRESTRICTED = 'oro.user.password_complexity.unrestricted';
+    const UNRESTRICTED = self::BASE . 'unrestricted';
     const MIN_LENGTH = 'min_length';
     const LOWER_CASE = 'lower_case';
     const UPPER_CASE = 'upper_case';
@@ -37,6 +37,10 @@ class PasswordTooltipProvider
     /** @var TranslatorInterface */
     protected $translator;
 
+    /**
+     * @param PasswordComplexityConfigProvider $configProvider
+     * @param TranslatorInterface $translator
+     */
     public function __construct(PasswordComplexityConfigProvider $configProvider, TranslatorInterface $translator)
     {
         $this->configProvider = $configProvider;
@@ -56,7 +60,7 @@ class PasswordTooltipProvider
 
         if (count($parts) > 0) {
             // compose a translation key from enabled rules
-            $transKey = self::BASE . join(self::SEPARATOR, $parts);
+            $transKey = self::BASE . implode(self::SEPARATOR, $parts);
         }
 
         return $this->translator->trans($transKey, ['{{ length }}' => $this->configProvider->getMinLength()]);

@@ -1315,6 +1315,7 @@ footer {
     width: 23px;
     height: 19px;
     float: left;
+
     &:hover,
     &:focus {
       border: 0;
@@ -1329,6 +1330,7 @@ footer {
     float: none;
     display: table-cell;
   }
+
   .nav-pills {
     padding:0 10px;
   }
@@ -1344,6 +1346,7 @@ footer {
     }
   }
 }
+
 .launchers-dropdown-menu {
   min-width: 35px;
   &.detach .nav {
@@ -3403,13 +3406,14 @@ label .popover-content {
   }
 
   &.expanded [data-collapse-container] {
-    overflow: scroll;
+    overflow: auto;
     max-height: none;
   }
 
   .toggle-more, .toggle-less, .toggle-collapse {
     display: none;
   }
+
   &.expanded .toggle-less,
   &.expanded .toggle-collapse,
   &.overflows .toggle-more,

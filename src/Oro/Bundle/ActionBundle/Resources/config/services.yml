@@ -124,11 +124,17 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
+            # set doctine typr mapping provider
+            - [setDoctrineTypeMappingProvider, ['@oro_action.provider.doctrine_type_mapping']]
 
     oro_action.options_assembler:
         class: %oro_action.options_assembler.class%
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
+
+
+    oro_action.provider.doctrine_type_mapping:
+        class: 'Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider'
 
     oro_action.form.handler.operation_button:
         class: Oro\Bundle\ActionBundle\Handler\OperationFormHandler

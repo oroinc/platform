@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
+use Behat\Behat\EventDispatcher\Event\AfterOutlineTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
-use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
 use Behat\Mink\Mink;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class RunTimeSubscriber implements EventSubscriberInterface
+class RunTimeSubscriber implements EventSubscriberInterface, MessageQueueIsolatorAwareInterface
 {
     /**
      * @var Mink
@@ -20,6 +21,11 @@ class RunTimeSubscriber implements EventSubscriberInterface
      * @var KernelInterface
      */
     protected $kernel;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
 
     /**
      * @param Mink $mink
@@ -36,19 +42,14 @@ class RunTimeSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            BeforeStepTested::BEFORE  => ['beforeStep', 50],
             AfterScenarioTested::AFTER => ['afterScenario', 50],
+            AfterOutlineTested::AFTER => ['afterOutline', 50],
         ];
     }
 
     /**
-     * @param BeforeStepTested $scope
+     * @param AfterScenarioTested $scope
      */
-    public function beforeStep(BeforeStepTested $scope)
-    {
-        $this->waitForAjaxBeforeStep($scope);
-    }
-
     public function afterScenario(AfterScenarioTested $scope)
     {
         if ($scope->getTestResult()->isPassed()) {
@@ -66,33 +67,30 @@ class RunTimeSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param BeforeStepTested $scope
+     * @param AfterOutlineTested $scope
      */
-    protected function waitForAjaxBeforeStep(BeforeStepTested $scope)
+    public function afterOutline(AfterOutlineTested $scope)
     {
-        if (false === $this->mink->isSessionStarted('first_session')) {
+        if ($scope->getTestResult()->isPassed()) {
             return;
         }
 
-        $session = $this->mink->getSession('first_session');
-        /** @var OroSelenium2Driver $driver */
-        $driver = $session->getDriver();
+        $screenshot = sprintf(
+            '%s/%s-%s-%s-line.png',
+            $this->kernel->getLogDir(),
+            $scope->getFeature()->getTitle(),
+            $scope->getOutline()->getTitle(),
+            $scope->getOutline()->getLine()
+        );
 
-        $url = $session->getCurrentUrl();
+        file_put_contents($screenshot, $this->mink->getSession()->getScreenshot());
+    }
 
-        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
-            $driver->waitPageToLoad();
-
-            return;
-        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
-            return;
-        }
-
-        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
-        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
-            return;
-        }
-
-        $driver->waitForAjax();
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 }
