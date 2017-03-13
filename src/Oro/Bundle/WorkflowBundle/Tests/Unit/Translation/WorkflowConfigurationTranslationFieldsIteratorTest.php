@@ -73,6 +73,13 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                             'label' => 'step_1_label'
                         ],
                         'step_2' => []
+                    ],
+                    'variable_definitions' => [
+                        'variables' => [
+                            'var1' => [
+                                'label' => 'my_var'
+                            ]
+                        ]
                     ]
                 ],
                 'expected' => [
@@ -89,7 +96,8 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                     'oro.workflow.test_workflow.step.step_1.label' => 'step_1_label',
                     'oro.workflow.test_workflow.step.step_2.label' => null,
                     'oro.workflow.test_workflow.transition.transition_2.warning_message' => null,
-                    'oro.workflow.test_workflow.transition.transition_four.warning_message' => null
+                    'oro.workflow.test_workflow.transition.transition_four.warning_message' => null,
+                    'oro.workflow.test_workflow.variable.var1.label' => 'my_var'
                 ]
             ]
         ];
@@ -105,7 +113,7 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
     {
         $iterator = new WorkflowConfigurationTranslationFieldsIterator($workflowName, $config);
 
-        foreach ($iterator as $key => $value) {
+        foreach ($iterator as $value) {
             $iterator->writeCurrent('*modified*' . $value);
         }
 
@@ -113,6 +121,7 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function iterateWriteCases()
@@ -161,6 +170,14 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                             'label' => 'step_1_label'
                         ],
                         'step_2' => []
+                    ],
+                    'variable_definitions' => [
+                        'variables' => [
+                            'var1' => [
+                                'label' => 'my_var'
+                            ],
+                            'var2' => []
+                        ]
                     ]
                 ],
                 'expected' => [
@@ -208,6 +225,16 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                             'label' => '*modified*'
                         ]
                     ],
+                    'variable_definitions' => [
+                        'variables' => [
+                            'var1' => [
+                                'label' => '*modified*my_var'
+                            ],
+                            'var2' => [
+                                'label' => '*modified*'
+                            ]
+                        ]
+                    ]
                 ]
             ]
         ];

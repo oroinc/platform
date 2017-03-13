@@ -189,23 +189,13 @@ class ProcessorBag implements ProcessorBagInterface
 
             $startCommonProcessors = [];
             $endCommonProcessors   = [];
-            if (isset($this->initialData['processors'][''])) {
+            if (!empty($this->initialData['processors'][''])) {
                 foreach ($this->initialData['processors'][''] as $priority => $priorityData) {
                     foreach ($priorityData as $processor) {
-                        if ($priority < -65535) {
+                        if ($priority < 0) {
                             $endCommonProcessors[$priority][] = $processor;
-                        } elseif ($priority < -255) {
-                            throw new \RangeException(
-                                sprintf(
-                                    'The value %d is not valid priority of a common processor. '
-                                    . 'It must be between -255 and 255 for common processors are executed'
-                                    . ' before other processors and less than -65535 for common processors '
-                                    . 'are executed after other processors.',
-                                    $priority
-                                )
-                            );
                         } else {
-                            $startCommonProcessors[$this->calculatePriority($priority)][] = $processor;
+                            $startCommonProcessors[$priority][] = $processor;
                         }
                     }
                 }
@@ -284,32 +274,7 @@ class ProcessorBag implements ProcessorBagInterface
     }
 
     /**
-     * Calculates a real priority of a processor based on its priority and a priority of its group.
-     *
-     * The calculated priority is between -65535(-0xFFFF) and 65535(0xFFFF).
-     * This allows to add ungrouped and common processors before and after processors grouped inside an action.
-     * To add ungrouped processors after grouped ones set priority between -65535(-0xFFFF) and -65280(-0xFF00).
-     *
-     * The following internal ranges is used:
-     * from min int to -65536 = common processors are executed after other processors
-     *                          as a default behavior is to execute common processors before other processors,
-     *                          you have to use these magic numbers as a priority for common processors that
-     *                          should be executed after other processors
-     * from -65535 to -65280  = ungrouped processors are executed after grouped processors
-     *                          as a default behavior is to execute ungrouped processors before grouped processors,
-     *                          you have to use these magic numbers as a priority for ungrouped processors that
-     *                          should be executed after grouped processors
-     * from -65279 to 65023   = grouped processors
-     *                          actually you will use numbers between -255 and 255 for processors' priority
-     *                          and numbers between -254 and 252 for groups' priority
-     * from 65025 to 65535    = ungrouped processors are executed before grouped processors
-     *                          actually for such processors you will use numbers between -255 and 255
-     *                          for processors' priority, because ungrouped processors are executed
-     *                          before grouped processors by default
-     * from 65536 to 66046    = common processors are executed before other processors
-     *                          actually for such processors you will use numbers between -255 and 255
-     *                          for processors' priority, because common processors are executed
-     *                          before other processors by default
+     * Calculates an internal priority of a processor based on its priority and a priority of its group.
      *
      * @param int      $processorPriority
      * @param int|null $groupPriority
@@ -318,39 +283,32 @@ class ProcessorBag implements ProcessorBagInterface
      */
     protected function calculatePriority($processorPriority, $groupPriority = null)
     {
-        if (null !== $groupPriority && ($groupPriority < -254 || $groupPriority > 252)) {
-            throw new \RangeException(
-                sprintf(
-                    'The value %d is not valid priority of a group. It must be between -254 and 252.',
-                    $groupPriority
-                )
-            );
-        }
-        $isValidProcessorPriority = ($processorPriority >= -255 && $processorPriority <= 255);
-        if (!$isValidProcessorPriority && null === $groupPriority) {
-            $isValidProcessorPriority = ($processorPriority >= -65535 && $processorPriority <= -65280);
-        }
-        if (!$isValidProcessorPriority) {
-            throw new \RangeException(
-                sprintf(
-                    'The value %d is not valid priority of a processor. '
-                    . 'It must be between -255 and 255. Also it can be between -65535 and -65280 '
-                    . 'if you need to execute ungrouped processor after grouped processors '
-                    . 'and less than -65535 if you need to execute common processor after other processors.',
-                    $processorPriority
-                )
-            );
-        }
-
         if (null === $groupPriority) {
-            $groupPriority = ($processorPriority >= -65535 && $processorPriority <= -65280)
-                ? 0
-                : 255;
-        } elseif ($groupPriority >= 0) {
-            $groupPriority++;
+            if ($processorPriority < 0) {
+                $processorPriority += self::getIntervalPriority(-255, -255) + 1;
+            } else {
+                $processorPriority += self::getIntervalPriority(255, 255) + 2;
+            }
+        } else {
+            if ($groupPriority < -255 || $groupPriority > 255) {
+                throw new \RangeException(
+                    sprintf(
+                        'The value %d is not valid priority of a group. It must be between -255 and 255.',
+                        $groupPriority
+                    )
+                );
+            }
+            if ($processorPriority < -255 || $processorPriority > 255) {
+                throw new \RangeException(
+                    sprintf(
+                        'The value %d is not valid priority of a processor. It must be between -255 and 255.',
+                        $processorPriority
+                    )
+                );
+            }
         }
 
-        return $processorPriority + ($groupPriority * 256);
+        return self::getIntervalPriority($processorPriority, $groupPriority);
     }
 
     /**
@@ -368,5 +326,16 @@ class ProcessorBag implements ProcessorBagInterface
         $items = call_user_func_array('array_merge', $items);
 
         return $items;
+    }
+
+    /**
+     * @param int $processorPriority
+     * @param int $groupPriority
+     *
+     * @return int
+     */
+    private static function getIntervalPriority($processorPriority, $groupPriority)
+    {
+        return ($groupPriority * 511) + $processorPriority - 1;
     }
 }

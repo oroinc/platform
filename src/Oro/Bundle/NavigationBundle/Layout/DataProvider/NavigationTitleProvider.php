@@ -7,6 +7,8 @@ use Oro\Bundle\NavigationBundle\Provider\TitleService;
 
 class NavigationTitleProvider
 {
+    const FRONTEND_MENU_NAME = 'frontend_menu';
+
     /** @var TitleService */
     private $titleService;
 
@@ -25,7 +27,6 @@ class NavigationTitleProvider
         $this->userConfigManager = $userConfigManager;
     }
 
-
     /**
      * Load title template from config values
      *
@@ -34,9 +35,9 @@ class NavigationTitleProvider
      *
      * @return string
      */
-    public function getTitle($routeName, $params = [])
+    public function getTitle($routeName, array $params = [])
     {
-        $this->titleService->loadByRoute($routeName);
+        $this->titleService->loadByRoute($routeName, self::FRONTEND_MENU_NAME);
         $this->titleService->setParams($params);
 
         $title = $this->titleService->render([], null, null, null, true);

@@ -67,7 +67,11 @@ class PdoMysql extends BaseDriver
     {
         $fieldValue = $searchCondition['fieldValue'];
         $condition = $searchCondition['condition'];
-        $words = $this->getWords($this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue), $condition);
+
+        $words = array_filter(
+            explode(' ', $this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue)),
+            'strlen'
+        );
 
         switch ($condition) {
             case Query::OPERATOR_LIKE:
@@ -125,6 +129,7 @@ class PdoMysql extends BaseDriver
     }
 
     /**
+     * @deprecated
      * Get array of words retrieved from $value string
      *
      * @param  string $value
@@ -215,7 +220,11 @@ class PdoMysql extends BaseDriver
         $valueParameter = 'value' . $index;
 
         $result = "MATCH_AGAINST($joinAlias.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
-        $qb->setParameter($valueParameter, implode('* ', $words) . '*');
+        if ($words) {
+            $qb->setParameter($valueParameter, implode('* ', $words) . '*');
+        } else {
+            $qb->setParameter($valueParameter, '');
+        }
 
         if ($this->isConcreteField($fieldName)) {
             $result = $qb->expr()->andX(

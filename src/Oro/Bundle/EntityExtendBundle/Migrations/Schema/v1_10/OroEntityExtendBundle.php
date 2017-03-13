@@ -14,6 +14,6 @@ class OroEntityExtendBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(new UpdateBidirectionalExtendedRelationsQuery($queries));
+        $queries->addQuery(new UpdateBidirectionalExtendedRelationsQuery());
     }
 }

@@ -4,13 +4,12 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid as GridElement;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilters;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Table;
-use Oro\Bundle\DataGridBundle\Tests\Behat\Element\TableHeader;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -323,19 +322,36 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * Assert record position in table
-     * It is find record by text and assert its position
-     * Example: Then Zyta Zywiec must be first record in appropriate table
-     * Example: And John Doe must be first record in appropriate table
-     *
-     * @Then /^(?P<content>([\w\s]+)) must be (?P<rowNumber>(first|second|[\d]+)) record in appropriate table$/
+     * @Then /^I should see that "(?P<content>([\w\s]+))" is in (?P<rowNum>([\d]+)) row$/
      */
-    public function assertRowContentInTable($content, $rowNumber)
+    public function assertRowContentInTable($content, $rowNum)
     {
         /** @var Table $table */
         $table = $this->findElementContains('Table', $content);
-        $row = $table->getRowByNumber($this->getNumberFromString($rowNumber));
-        self::assertRegExp(sprintf('/%s/i', $content), $row->getText());
+        $row = $table->getRowByNumber($rowNum);
+        self::assertTrue(
+            $row->has('named', ['content', $content]),
+            "There is no content '$content' in $rowNum row"
+        );
+    }
+
+    /**
+     * Assert that text is in table with some content
+     * Example: Then I should see "Priority" in "Warehouse" table
+     * Example: Then I should not see "Apple" in "Basket" table
+     *
+     * @Then /^I should (?P<type>(see|not see)) "(?P<content>([\w\s]+))" in "(?P<tableContent>([\w\s]+))" table$/
+     */
+    public function assertContentInTable($type, $content, $tableContent)
+    {
+        /** @var Table $table */
+        $table = $this->findElementContains('Table', $tableContent);
+        $result = $table->has('named', ['content', $content]);
+        if ($type === 'see') {
+            self::assertTrue($result, "There is no text '$content' in table '$tableContent'");
+        } else {
+            self::assertFalse($result, "There is a text '$content' in table '$tableContent'");
+        }
     }
 
     /**
@@ -473,7 +489,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I click edit Call to Jennyfer in grid
      * Example: And I click delete Sign a contract with Charlie in grid
      *
-     * @Given /^(?:|I )click (?P<action>(Clone|(?!on)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
      */
     public function clickActionInRow($content, $action)
     {
@@ -503,6 +519,53 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $this->getGrid()->getRowByContent($content)->click();
         // Keep this check for sure that ajax is finish
         $this->getSession()->getDriver()->waitForAjax();
+    }
+
+    /**
+     * Expand grid view options.
+     * Example: I click Options in grid view
+     *
+     * @Given I click Options in grid view
+     */
+    public function clickViewOptions()
+    {
+        $this->elementFactory->createElement('GridViewOptionsLink')->click();
+    }
+
+    /**
+     * Click on item in grid view options.
+     * Example: Given I click on "Some item" in grid view options
+     * @param string $title
+     *
+     * @Given I click on :title in grid view options
+     */
+    public function clickLinkInViewOptions($title)
+    {
+        $this->elementFactory->createElement('GridViewOptions')->clickLink($title);
+    }
+
+    /**
+     * Check that item in grid view options exists.
+     * Example: Then I should see "Some item" in grid view options
+     * @param string $title
+     *
+     * @Then I should see :title in grid view options
+     */
+    public function iShouldSeeItemInViewOptions($title)
+    {
+        self::assertNotNull($this->elementFactory->createElement('GridViewOptions')->findLink($title));
+    }
+
+    /**
+     * Check that item in grid view options does not exist.
+     * Example: Then I should not see "Some item" in grid view options
+     * @param string $title
+     *
+     * @Then I should not see :title in grid view options
+     */
+    public function iShouldNotSeeItemInViewOptions($title)
+    {
+        self::assertNull($this->elementFactory->createElement('GridViewOptions')->findLink($title));
     }
 
     /**

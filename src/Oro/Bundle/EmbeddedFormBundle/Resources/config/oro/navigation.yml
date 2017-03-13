@@ -18,6 +18,6 @@ navigation:
 
     titles:
         oro_embedded_form_list: ~
-        oro_embedded_form_view: '%%form.title%%'
+        oro_embedded_form_view: '%form.title%'
         oro_embedded_form_create: oro.ui.create_entity
-        oro_embedded_form_update: '%%form.title%% - Edit'
+        oro_embedded_form_update: '%form.title% - Edit'
