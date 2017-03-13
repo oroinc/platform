@@ -13,6 +13,9 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class DatagridDateGroupingBuilder
 {
     const ACTIONS_KEY_NAME = 'actions';
