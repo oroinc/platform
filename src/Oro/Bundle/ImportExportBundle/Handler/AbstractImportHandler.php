@@ -131,11 +131,13 @@ abstract class AbstractImportHandler extends AbstractHandler
             $counts['process'] = 0;
             $counts['read'] = $context->getReadCount();
             $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['replace'] = $context->getReplaceCount();
+            $counts['process'] += $counts['replace'] =  $context->getReplaceCount();
             $counts['process'] += $counts['update'] = $context->getUpdateCount();
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
             $counts['error_entries'] = $context->getErrorEntriesCount();
             $counts['errors'] += count($context->getErrors());
+            // for cases when data wasn't imported
+            $jobResult->isSuccessful() || $counts['add'] = $counts['replace'] = $counts['update'] = $counts['delete'] = 0;
 
             return $counts;
         }
