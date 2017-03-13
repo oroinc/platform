@@ -26,6 +26,9 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
@@ -792,6 +795,28 @@ class OroMainContext extends MinkContext implements
             $this->createElement($element)->isVisible(),
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
+    }
+
+    /**
+     * Presses button with specified id|name|title|alt|value in some named section
+     * Example: When I press "Add" in "General Information" section
+     * Example: And I press "Add" in "General Information" section
+     *
+     * @When /^(?:|I )press "(?P<button>(?:[^"]|\\")*)" in "(?P<section>[^"]+)" section$/
+     */
+    public function pressButtonInSection($button, $section)
+    {
+        $button = $this->fixStepArgument($button);
+        $section = $this->fixStepArgument($section);
+        $page = $this->getSession()->getPage();
+
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
+
+        if ($sectionContainer->hasButton($button)) {
+            $sectionContainer->pressButton($button);
+        } else {
+            $sectionContainer->clickLink($button);
+        }
     }
 
     /**.
