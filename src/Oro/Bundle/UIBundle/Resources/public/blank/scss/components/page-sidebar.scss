@@ -6,6 +6,7 @@
 
     order: $page-sidebar-order;
     flex: $page-sidebar-flex;
+    box-sizing: border-box;
 
     &--right {
         padding: $page-sidebar-right-inner-offset;
