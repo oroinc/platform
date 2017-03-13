@@ -143,6 +143,7 @@ services:
             - "@oro_entity_extend.relation_builder"
             - "@oro_entity_extend.extend.field_type_helper"
             - "@oro_entity_extend.db_id_name_generator"
+            - "@oro_entity_config.provider.extend_entity_config_provider"
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 

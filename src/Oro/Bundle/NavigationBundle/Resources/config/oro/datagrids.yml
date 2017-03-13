@@ -1,7 +1,7 @@
 datagrids:
     menu-global-grid:
         source:
-            type: menu-update-default-provider
+            type: menu-update
         columns:
             name:
                 label: oro.navigation.menuitem.name.label
@@ -22,8 +22,5 @@ datagrids:
             toolbarOptions:
                 hide: true
 
-    menu-user-grid:
+    menu-by-scope-grid:
         extends: menu-global-grid
-        properties:
-            view_link:
-                route: oro_navigation_user_menu_view

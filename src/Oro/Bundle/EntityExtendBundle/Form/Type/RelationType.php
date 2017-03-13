@@ -8,16 +8,23 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 
 class RelationType extends AbstractType
 {
+    const ALLOWED_BIDIRECTIONAL_RELATIONS = [
+        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_ONE,
+        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_MANY,
+        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::ONE_TO_MANY,
+    ];
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -50,13 +57,7 @@ class RelationType extends AbstractType
             ->getConfigById($options['config_id']);
         $this->formFactory = $builder->getFormFactory();
 
-        $builder->add(
-            'target_entity',
-            new TargetType($this->configManager, $options['config_id']),
-            [
-                'constraints' => [new Assert\NotBlank()]
-            ]
-        );
+        $this->addTargetEntityField($builder, $options);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSubmitData']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmitData']);
@@ -64,8 +65,9 @@ class RelationType extends AbstractType
 
     /**
      * @param FormEvent $event
+     * @param string $eventName
      */
-    public function preSubmitData(FormEvent $event)
+    public function preSubmitData(FormEvent $event, $eventName)
     {
         $form = $event->getForm();
         $data = $event->getData();
@@ -74,6 +76,8 @@ class RelationType extends AbstractType
         }
 
         if ($this->config->get('owner') === ExtendScope::OWNER_CUSTOM) {
+            $this->addBidirectionalField($form, $data);
+
             $targetEntity = $this->getArrayValue($data, 'target_entity');
             $relationType = $this->config->getId()->getFieldType();
 
@@ -112,7 +116,7 @@ class RelationType extends AbstractType
             }
         }
 
-        if ($event->getName() == FormEvents::PRE_SUBMIT) {
+        if ($eventName == FormEvents::PRE_SUBMIT) {
             $form->getParent()->setData(array_merge($form->getParent()->getData(), $data));
         }
     }
@@ -120,7 +124,7 @@ class RelationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -195,5 +199,56 @@ class RelationType extends AbstractType
         return isset($data[$key])
             ? $data[$key]
             : $defaultValue;
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
+    private function addTargetEntityField(FormBuilderInterface $builder, array $options)
+    {
+        $builder->add(
+            'target_entity',
+            new TargetType($this->configManager, $options['config_id']),
+            [
+                'constraints' => [new Assert\NotBlank()]
+            ]
+        );
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param array|null $data
+     */
+    private function addBidirectionalField(FormInterface $form, array $data = null)
+    {
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $this->config->getId();
+
+        // read_only when updating field (so bidirectional option already exists)
+        $readOnly = $this->config->get('bidirectional') !== null;
+
+        // if reusing relation ("Reuse existing relation" option on UI) or for one2many relation
+        // we would have always bidirectional relations
+        if ($this->config->get('relation_key') || $fieldConfigId->getFieldType() === RelationTypeBase::ONE_TO_MANY) {
+            $readOnly = true;
+            $data['bidirectional'] = true;
+        }
+
+        if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
+            $form->add(
+                'bidirectional',
+                'genemu_jqueryselect2_choice',
+                [
+                    'choices' => ['No', 'Yes'],
+                    'empty_value' => false,
+                    'block' => 'general',
+                    'subblock' => 'properties',
+                    'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
+                    'read_only' => $readOnly,
+                    'data' => $this->getArrayValue($data, 'bidirectional'),
+                ]
+            );
+        }
     }
 }
