@@ -42,6 +42,10 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
+    const DEFAULT_FORM_CONFIGURATION_TEMPLATE = 'OroWorkflowBundle:actions:update.html.twig';
+    const DEFAULT_FORM_CONFIGURATION_HANDLER = 'default';
+
+    const NODE_FORM_OPTIONS_CONFIGURATION = 'configuration';
 
     const TRANSITION_DISPLAY_TYPE_DIALOG = 'dialog';
     const TRANSITION_DISPLAY_TYPE_PAGE = 'page';
@@ -300,6 +304,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return NodeDefinition
      */
     protected function getTransitionsNode()
@@ -364,6 +370,22 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                                 return $this->mergeConfigs([
                                     'form_init' => 'init_actions',
                                 ], $config);
+                            })
+                        ->end()
+                        ->append($this->getTransitionFormOptionsConfiguration())
+                        ->beforeNormalization()
+                            ->always(function ($config) {
+                                if (isset($config[self::NODE_FORM_OPTIONS_CONFIGURATION])) {
+                                    if (empty($config[self::NODE_FORM_OPTIONS_CONFIGURATION]['handler'])) {
+                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['handler'] =
+                                            self::DEFAULT_FORM_CONFIGURATION_HANDLER;
+                                    }
+                                    if (empty($config[self::NODE_FORM_OPTIONS_CONFIGURATION]['template'])) {
+                                        $config[self::NODE_FORM_OPTIONS_CONFIGURATION]['template'] =
+                                            self::DEFAULT_FORM_CONFIGURATION_TEMPLATE;
+                                    }
+                                }
+                                return $config;
                             })
                         ->end()
                     ->end()
@@ -601,6 +623,34 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
             ->end()
             ->prototype('scalar')
             ->end();
+
+        return $rootNode;
+    }
+
+    /**
+     * @return ArrayNodeDefinition|NodeDefinition
+     */
+    protected function getTransitionFormOptionsConfiguration()
+    {
+        $treeBuilder = new TreeBuilder();
+        $rootNode = $treeBuilder->root(self::NODE_FORM_OPTIONS_CONFIGURATION);
+        $rootNode
+                ->children()
+                    ->scalarNode('handler')
+                        ->defaultValue(self::DEFAULT_FORM_CONFIGURATION_HANDLER)
+                    ->end()
+                    ->scalarNode('data_attribute')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode('template')
+                        ->defaultValue(self::DEFAULT_FORM_CONFIGURATION_TEMPLATE)
+                    ->end()
+                    ->scalarNode('data_provider')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                ->end();
 
         return $rootNode;
     }

@@ -34,18 +34,26 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected $actionFactory;
 
     /**
+     * @var FormOptionsConfigurationAssembler
+     */
+    protected $formOptionsConfigurationAssembler;
+
+    /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
      * @param ActionFactoryInterface $actionFactory
+     * @param FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
-        ActionFactoryInterface $actionFactory
+        ActionFactoryInterface $actionFactory,
+        FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
         $this->actionFactory = $actionFactory;
+        $this->formOptionsConfigurationAssembler = $formOptionsConfigurationAssembler;
     }
 
     /**
@@ -208,11 +216,14 @@ class TransitionAssembler extends BaseAbstractAssembler
             );
         }
 
+        if (!empty($options['form_options'][WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION])) {
+            $this->formOptionsConfigurationAssembler->assemble($options);
+        }
         return $transition;
     }
 
     /**
-     * @param ransition $transition
+     * @param Transition $transition
      * @param array $actions
      */
     protected function processActions(Transition $transition, array $actions)
