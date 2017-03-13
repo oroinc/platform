@@ -57,7 +57,6 @@ class SegmentType extends AbstractQueryDesignerType
             [
                 'data_class'         => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                 'intention'          => 'segment',
-                'cascade_validation' => true
             ]
         );
 
