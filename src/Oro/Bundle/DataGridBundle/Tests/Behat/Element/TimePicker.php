@@ -20,6 +20,7 @@ class TimePicker extends Element
         if ($this->hasAttribute('data-validation')) {
             $timeSelect = $this->getPage()->findVisible('css', '.ui-timepicker-wrapper');
             $time = $this->formatTime($dateTime);
+            var_dump($time);
 
             /** @var NodeElement $li */
             foreach ($timeSelect->findAll('css', 'li') as $li) {
@@ -51,12 +52,12 @@ class TimePicker extends Element
     protected function formatTime(\DateTime $dateTime)
     {
         $formatedTime = clone $dateTime;
-        switch ((int) $minutes = $dateTime->format('i')) {
-            case ($minutes >= 15 && $minutes < 45):
-                $minutes = '30';
-                break;
-            default:
-                $minutes = '00';
+
+        $minutes = (int) $dateTime->format('i');
+        if ($minutes >= 15 && $minutes < 45) {
+            $minutes = '30';
+        } else {
+            $minutes = '00';
         }
 
         $formatedTime->setTime($formatedTime->format('G'), $minutes);
