@@ -422,7 +422,9 @@ define(function(require) {
             if (this._isCurrentViewSystem()) {
                 // in this case we need to set default to false on current default view
                 isDefault = 0;
-                id = defaultModel.id;
+                if (defaultModel) {
+                    id = defaultModel.id;
+                }
             }
             return $.post(
                 routing.generate('oro_datagrid_api_rest_gridview_default', {
@@ -432,7 +434,9 @@ define(function(require) {
                 }),
                 {},
                 function(response) {
-                    defaultModel.set({is_default: false});
+                    if (defaultModel) {
+                        defaultModel.set({is_default: false});
+                    }
                     currentViewModel.set({is_default: true});
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }

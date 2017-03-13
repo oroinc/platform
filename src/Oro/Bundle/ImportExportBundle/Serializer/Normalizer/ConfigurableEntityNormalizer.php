@@ -62,12 +62,16 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $fieldName = $field['name'];
             if (array_key_exists($fieldName, $data)) {
                 $value = $data[$fieldName];
-                if ($data[$fieldName] !== null
+                if ($value !== null
                     && ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field))
                 ) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {
                         $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
                     } elseif ($this->fieldHelper->isSingleRelation($field)) {
+                        // if data for object value is empty array we should not create empty object
+                        if ([] === $value) {
+                            continue;
+                        }
                         $entityClass = $field['related_entity_name'];
                     } else {
                         $entityClass = 'DateTime';

@@ -4,14 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\ScopeBundle\Entity\Scope;
-
 /**
  * This event is triggered after create/update/delete of MenuUpdate in specified scope
  */
-class MenuUpdateScopeChangeEvent extends Event
+class MenuUpdateChangeEvent extends Event
 {
-    const NAME = 'oro_menu.menu_update_scope_change';
+    const NAME = 'oro_menu.menu_update_change';
 
     /**
      * @var string
@@ -19,18 +17,18 @@ class MenuUpdateScopeChangeEvent extends Event
     private $menuName;
 
     /**
-     * @var Scope
+     * @var array
      */
-    private $scope;
+    private $context;
 
     /**
      * @param string $menuName
-     * @param Scope $scope
+     * @param array $context
      */
-    public function __construct($menuName, Scope $scope)
+    public function __construct($menuName, array $context)
     {
         $this->menuName = $menuName;
-        $this->scope = $scope;
+        $this->context = $context;
     }
 
     /**
@@ -42,10 +40,10 @@ class MenuUpdateScopeChangeEvent extends Event
     }
 
     /**
-     * @return Scope
+     * @return array
      */
-    public function getScope()
+    public function getContext()
     {
-        return $this->scope;
+        return $this->context;
     }
 }
