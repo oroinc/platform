@@ -40,10 +40,8 @@ define(function(require) {
         },
 
         onSelect: function() {
-            this.model.set({
-                'active': true,
-                'click_state': true
-            });
+            this.model.set('active', true);
+            this.model.trigger('select', this.model);
         }
     });
 
