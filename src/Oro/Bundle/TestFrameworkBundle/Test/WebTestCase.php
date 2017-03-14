@@ -458,20 +458,20 @@ abstract class WebTestCase extends BaseWebTestCase
         $application->setAutoExit(false);
         $application->setTerminalDimensions(120, 50);
 
-        $argv = ['application', $name];
+        $args = ['application', $name];
         foreach ($params as $k => $v) {
             if (is_bool($v)) {
                 if ($v) {
-                    $argv[] = $k;
+                    $args[] = $k;
                 }
             } else {
                 if (!is_int($k)) {
-                    $argv[] = $k;
+                    $args[] = $k;
                 }
-                $argv[] = $v;
+                $args[] = $v;
             }
         }
-        $input = new ArgvInput($argv);
+        $input = new ArgvInput($args);
         $input->setInteractive(false);
 
         $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'br+');

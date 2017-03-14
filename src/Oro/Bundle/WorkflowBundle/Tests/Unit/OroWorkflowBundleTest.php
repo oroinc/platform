@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler as Compiler;
 use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
 
 class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
@@ -20,7 +21,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    'Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddAttributeNormalizerCompilerPass'
+                    Compiler\AddAttributeNormalizerCompilerPass::class
                 )
             );
 
@@ -28,7 +29,7 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    'Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\AddWorkflowValidationLoaderCompilerPass'
+                    Compiler\AddWorkflowValidationLoaderCompilerPass::class
                 )
             );
 
@@ -36,7 +37,31 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
             ->method('addCompilerPass')
             ->with(
                 $this->isInstanceOf(
-                    'Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler\WorkflowChangesEventsCompilerPass'
+                    Compiler\WorkflowChangesEventsCompilerPass::class
+                )
+            );
+
+        $containerBuilder->expects($this->at(3))
+            ->method('addCompilerPass')
+            ->with(
+                $this->isInstanceOf(
+                    Compiler\EventTriggerExtensionCompilerPass::class
+                )
+            );
+
+        $containerBuilder->expects($this->at(4))
+            ->method('addCompilerPass')
+            ->with(
+                $this->isInstanceOf(
+                    Compiler\WorkflowConfigurationHandlerCompilerPass::class
+                )
+            );
+
+        $containerBuilder->expects($this->at(5))
+            ->method('addCompilerPass')
+            ->with(
+                $this->isInstanceOf(
+                    Compiler\WorkflowDefinitionBuilderExtensionCompilerPass::class
                 )
             );
 

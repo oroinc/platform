@@ -107,3 +107,5 @@ services:
             - '@oro_query_designer.query_designer.restriction_builder'
         calls:
             - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
+        tags:
+            - { name: oro_dashboard.widget_provider.filter }

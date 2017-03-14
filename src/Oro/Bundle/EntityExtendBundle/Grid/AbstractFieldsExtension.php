@@ -118,6 +118,8 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
                     $selectExpr = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
                     $filterDataName = sprintf('%s.%s', $alias, $fieldName);
+                    // adding $filterDataName to select list to allow sorting by this column and avoid GROUP BY error
+                    $selectExpr = [$selectExpr, $sorterDataName];
                     break;
                 case 'multiEnum':
                     $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);

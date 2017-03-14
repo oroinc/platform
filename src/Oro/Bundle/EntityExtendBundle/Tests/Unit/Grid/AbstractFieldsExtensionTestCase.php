@@ -305,7 +305,10 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                                     ],
                                 ],
                             ],
-                            'select' => ['IDENTITY(c.testField) as testField'],
+                            'select' => [
+                                'IDENTITY(c.testField) as testField',
+                                'auto_rel_1.testRel',
+                            ],
                         ],
                     ],
                     'columns' => [

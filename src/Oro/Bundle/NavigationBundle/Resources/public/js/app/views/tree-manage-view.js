@@ -17,9 +17,19 @@ define(function(require) {
         menu: '',
 
         /**
-         * @property {Number}
+         * @property {String}
          */
-        scopeId: 0,
+        successMessage: '',
+
+        /**
+         * @property {String}
+         */
+        errorMessage: 'oro.ui.jstree.move_node_error',
+
+        /**
+         * @property {Object}
+         */
+        context: {},
 
         /**
          * @param {Object} options
@@ -27,7 +37,8 @@ define(function(require) {
         initialize: function(options) {
             TreeManageView.__super__.initialize.call(this, options);
             this.menu = options.menu;
-            this.scopeId = options.scopeId;
+            this.successMessage = options.successMessage || 'oro.navigation.menuupdate.moved_success_message';
+            this.context = options.context;
         },
 
         /**
@@ -44,11 +55,11 @@ define(function(require) {
             var routeParams;
             if (this.onRootSelectRoute && selected.node.parent === '#') {
                 route = this.onRootSelectRoute;
-                routeParams = {menuName: this.menu, scopeId: this.scopeId};
+                routeParams = {menuName: this.menu, context: this.context};
             } else {
                 route = this.onSelectRoute;
                 routeParams = {
-                    scopeId: this.scopeId,
+                    context: this.context,
                     menuName: this.menu,
                     key: selected.node.id
                 };
@@ -72,7 +83,7 @@ define(function(require) {
                 async: false,
                 type: 'PUT',
                 url: routing.generate(self.onMoveRoute, {
-                    scopeId: this.scopeId,
+                    context: this.context,
                     menuName: this.menu
                 }),
                 data: {
@@ -86,13 +97,13 @@ define(function(require) {
                             widget.render();
                         });
                     }
-                    var message = _.__('oro.navigation.menuupdate.moved_success_message', {nodeText: data.node.text});
+                    var message = _.__(self.successMessage, {nodeText: data.node.text});
                     messenger.notificationFlashMessage('success', message);
                 },
                 errorHandlerMessage: false,
                 error: function(xhr) {
                     self.rollback(data);
-                    var message = _.__('oro.ui.jstree.move_node_error', {nodeText: data.node.text});
+                    var message = _.__(self.errorMessage, {nodeText: data.node.text});
                     if (xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }

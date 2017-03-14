@@ -19,3 +19,4 @@ Table of content
 * [Debug Information](./Resources/doc/debug_information.md)
 * [Using PHP Templating instead of Twig](./Resources/doc/php_templates.md)
 * [Layout cache](./Resources/doc/layout_cache.md)
+* [Returning custom status code](./Resources/doc/custom_status_code.md)

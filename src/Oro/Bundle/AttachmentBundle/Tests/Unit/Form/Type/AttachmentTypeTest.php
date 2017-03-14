@@ -27,7 +27,6 @@ class AttachmentTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'data_class' => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
-                    'cascade_validation' => true,
                     'parentEntityClass' => '',
                     'checkEmptyFile' => false,
                     'allowDelete' => true
