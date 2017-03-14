@@ -11,8 +11,8 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\FormattingSelectTypeStub;
-use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LanguageSelectTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizedFallbackValueCollectionTypeStub;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
@@ -24,10 +24,14 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 
     const DATA_CLASS = Localization::class;
 
-    /**
-     * @var LocalizationType
-     */
+    /** @var LocalizationType */
     protected $formType;
+
+    /** @var array */
+    protected static $languages = [
+        '1' => 'ru',
+        '2' => 'en_US'
+    ];
 
     /**
      * {@inheritdoc}
@@ -38,16 +42,6 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 
         $this->formType = new LocalizationType();
         $this->formType->setDataClass(static::DATA_CLASS);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->formType);
-
-        parent::tearDown();
     }
 
     public function testGetName()
@@ -91,24 +85,24 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                 'submittedData' => [
                     'name' => 'NAME',
                     'titles' => [['string' => 'TITLE']],
-                    'languageCode' => 'ru',
+                    'language' => '1',
                     'formattingCode' => 'ru',
                 ],
-                'expectedData' => $this->createLocalization('NAME', 'TITLE', 'ru', 'ru'),
+                'expectedData' => $this->createLocalization('NAME', 'TITLE', '1', 'ru'),
             ],
             'with entity' => [
                 'defaultData' => $localizationItem,
                 'submittedData' => [
                     'name' => 'new_localization_item_name',
                     'titles' => [['string' => 'new_localization_item_title']],
-                    'languageCode' => 'en_US',
+                    'language' => '2',
                     'formattingCode' => 'en_US',
                     'parentLocalization' => 1,
                 ],
                 'expectedData' => $this->createLocalization(
                     'new_localization_item_name',
                     'new_localization_item_title',
-                    'en_US',
+                    '2',
                     'en_US',
                     $parent
                 )
@@ -119,7 +113,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     /**
      * @param string $name
      * @param string $title
-     * @param string $languageCode
+     * @param string $languageId
      * @param string $formattingCode
      * @param Localization $parentLocalization
      *
@@ -128,7 +122,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     protected function createLocalization(
         $name,
         $title,
-        $languageCode,
+        $languageId,
         $formattingCode,
         Localization $parentLocalization = null
     ) {
@@ -137,7 +131,10 @@ class LocalizationTypeTest extends FormIntegrationTestCase
             Localization::class,
             [
                 'name' => $name,
-                'languageCode' => $languageCode,
+                'language' => $this->getEntity(
+                    Language::class,
+                    ['id' => (int)$languageId, 'code' => (string)self::$languages[$languageId]]
+                ),
                 'formattingCode' => $formattingCode,
                 'parentLocalization' => $parentLocalization,
             ]
@@ -153,11 +150,16 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
+        $languages = [];
+        foreach (self::$languages as $id => $code) {
+            $languages[$id] = $this->getEntity(Language::class, ['id' => (int)$id, 'code' => (string)$code]);
+        }
+
         return [
             new PreloadedExtension(
                 [
                     LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionTypeStub(),
-                    LanguageSelectType::NAME => new LanguageSelectTypeStub(),
+                    LanguageSelectType::NAME => new EntityType($languages, LanguageSelectType::NAME),
                     FormattingSelectType::NAME => new FormattingSelectTypeStub(),
                     LocalizationParentSelectType::NAME => new EntityType(
                         [

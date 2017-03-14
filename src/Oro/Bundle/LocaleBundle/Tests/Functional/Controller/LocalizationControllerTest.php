@@ -55,7 +55,7 @@ class LocalizationControllerTest extends WebTestCase
         $formValues = $form->getPhpValues();
         $formValues['oro_localization']['name'] = self::NAME;
         $formValues['oro_localization']['titles']['values']['default'] = self::DEFAULT_TITLE;
-        $formValues['oro_localization']['languageCode'] = self::LANGUAGE_CODE;
+        $formValues['oro_localization']['language'] = self::LANGUAGE_CODE;
         $formValues['oro_localization']['formattingCode'] = self::FORMATTING_CODE;
 
         $this->client->followRedirects(true);
@@ -110,7 +110,7 @@ class LocalizationControllerTest extends WebTestCase
             }
         }
 
-        $formValues['oro_localization']['languageCode'] = self::UPDATED_LANGUAGE_CODE;
+        $formValues['oro_localization']['language'] = self::UPDATED_LANGUAGE_CODE;
         $formValues['oro_localization']['formattingCode'] = self::UPDATED_FORMATTING_CODE;
         $formValues['oro_localization']['parentLocalization'] = $parent->getId();
 

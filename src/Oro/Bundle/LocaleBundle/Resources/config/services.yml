@@ -305,8 +305,9 @@ services:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
         arguments:
             - '@oro_config.manager'
-            - '@oro_locale.manager.localization'
+            - '@oro_locale.formatter.language_code'
             - '@oro_translation.provider.language'
+            - '@oro_locale.manager.localization'
 
     oro_locale.decorator.localization_cache:
         class: 'Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator'

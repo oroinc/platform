@@ -22,8 +22,8 @@ oro.translation:
     language:
         form.select:
             empty_value: 'Please select...'
-            group.crowdin: 'Crowdin'
-            group.intl: 'INTL'
+            group.crowdin: 'Translations Available'
+            group.intl: 'All Languages'
         entity_label: 'Language'
         entity_plural_label: 'Languages'
 

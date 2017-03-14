@@ -66,7 +66,7 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
             if (!$localization) {
                 $localization = new Localization();
                 $localization
-                    ->setLanguageCode($language->getCode())
+                    ->setLanguage($language)
                     ->setFormattingCode($item['formatting'])
                     ->setName($name)
                     ->setDefaultTitle($name);

@@ -4,8 +4,10 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -19,6 +21,9 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
+    /** @var LanguageCodeFormatter|\PHPUnit_Framework_MockObject_MockObject */
+    protected $languageFormatter;
+
     /** @var LanguageProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $languageProvider;
 
@@ -27,32 +32,46 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->languageFormatter = $this->createMock(LanguageCodeFormatter::class);
+        $this->languageFormatter->expects($this->any())
+            ->method('formatLocale')
+            ->willReturnCallback(
+                function ($code) {
+                    return 'formatted_' . $code;
+                }
+            );
 
-        $this->languageProvider = $this->getMockBuilder(LanguageProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->languageProvider = $this->createMock(LanguageProvider::class);
 
         $this->provider = new LocalizationChoicesProvider(
             $this->configManager,
-            $this->localizationManager,
-            $this->languageProvider
+            $this->languageFormatter,
+            $this->languageProvider,
+            $this->localizationManager
         );
     }
 
     public function testGetLanguageChoices()
     {
-        $data = ['zh_Hans' => 'chino simplificado'];
+        $data = [
+            $this->getEntity(Language::class, ['id' => 105, 'code' => 'en']),
+            $this->getEntity(Language::class, ['id' => 110, 'code' => 'de'])
+        ];
 
-        $this->languageProvider->expects($this->once())->method('getAvailableLanguages')->willReturn($data);
+        $this->languageProvider->expects($this->once())
+            ->method('getAvailableLanguagesByCurrentUser')
+            ->willReturn($data);
 
-        $this->assertEquals($data, $this->provider->getLanguageChoices());
+        $this->assertEquals(
+            [
+                105 => 'formatted_en',
+                110 => 'formatted_de'
+            ],
+            $this->provider->getLanguageChoices()
+        );
     }
 
     public function testGetFormattingChoices()
@@ -90,9 +109,6 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function assertConfigManagerCalled()
     {
-        $this->configManager->expects($this->once())
-            ->method('get')
-            ->with('oro_locale.language')
-            ->willReturn('es');
+        $this->configManager->expects($this->once())->method('get')->with('oro_locale.language')->willReturn('es');
     }
 }

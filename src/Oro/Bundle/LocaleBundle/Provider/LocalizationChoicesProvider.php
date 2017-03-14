@@ -6,6 +6,7 @@ use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
@@ -14,22 +15,31 @@ class LocalizationChoicesProvider
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var LanguageCodeFormatter */
+    protected $languageFormatter;
+
+    /** @var LanguageProvider */
+    protected $languageProvider;
+
     /** @var LocalizationManager */
     protected $localizationManager;
 
     /**
      * @param ConfigManager $configManager
-     * @param LocalizationManager $localizationManager
+     * @param LanguageCodeFormatter $languageFormatter
      * @param LanguageProvider $languageProvider
+     * @param LocalizationManager $localizationManager
      */
     public function __construct(
         ConfigManager $configManager,
-        LocalizationManager $localizationManager,
-        LanguageProvider $languageProvider
+        LanguageCodeFormatter $languageFormatter,
+        LanguageProvider $languageProvider,
+        LocalizationManager $localizationManager
     ) {
         $this->configManager = $configManager;
-        $this->localizationManager = $localizationManager;
+        $this->languageFormatter = $languageFormatter;
         $this->languageProvider = $languageProvider;
+        $this->localizationManager = $localizationManager;
     }
 
     /**
@@ -37,7 +47,13 @@ class LocalizationChoicesProvider
      */
     public function getLanguageChoices()
     {
-        return $this->languageProvider->getAvailableLanguages();
+        $result = [];
+
+        foreach ($this->languageProvider->getAvailableLanguagesByCurrentUser() as $language) {
+            $result[$language->getId()] = $this->languageFormatter->formatLocale($language->getCode());
+        }
+
+        return $result;
     }
 
     /**

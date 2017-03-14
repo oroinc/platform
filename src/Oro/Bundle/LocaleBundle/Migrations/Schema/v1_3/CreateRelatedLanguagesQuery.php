@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\LocaleBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 
 class CreateRelatedLanguagesQuery extends ParametrizedMigrationQuery
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -31,19 +29,12 @@ class CreateRelatedLanguagesQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * {@inheritdoc}
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $result = $this->connection->fetchAll(
-            $this->getAdminUserAndOrganizationQuery($logger),
-            ['role' => User::ROLE_ADMINISTRATOR],
-            ['role' => Type::STRING]
-        );
-
-        $result = reset($result);
-        $userId = $result['id'];
-        $organizationId = $result['organization_id'];
+        list($userId, $organizationId) = $this->getAdminUserAndOrganization($logger);
         $createdAt = date('Y-m-d H:i:s');
 
         $langsToProcess = array_map(
@@ -54,9 +45,10 @@ class CreateRelatedLanguagesQuery extends ParametrizedMigrationQuery
                     'user_owner_id' => sprintf("'%s'", $userId),
                     'enabled' => sprintf("'%s'", 1),
                     'created_at' => sprintf("'%s'", $createdAt),
+                    'updated_at' => sprintf("'%s'", $createdAt),
                 ];
             },
-            $this->connection->fetchAll($this->getRelatedLanguagesQuery($logger))
+            $this->getRelatedLanguages($logger)
         );
 
         foreach ($langsToProcess as $values) {
@@ -71,55 +63,33 @@ class CreateRelatedLanguagesQuery extends ParametrizedMigrationQuery
     /**
      * @param LoggerInterface $logger
      *
-     * @return string
+     * @return array
      */
-    protected function getRelatedLanguagesQuery(LoggerInterface $logger)
+    protected function getRelatedLanguages(LoggerInterface $logger)
     {
-        $qb = $this->connection->createQueryBuilder();
+        $sql = 'SELECT DISTINCT language_code FROM oro_localization ' .
+            'WHERE language_code NOT IN (SELECT code FROM oro_language)';
 
-        $query = $qb->select(['distinct lz.language_code'])
-            ->from('oro_localization', 'lz')
-            ->where($qb->expr()->notIn('lz.language_code', $this->getInstalledLanguagesQuery($logger)))
-            ->getSQL();
+        $this->logQuery($logger, $sql);
 
-        $this->logQuery($logger, $query);
-
-        return $query;
+        return $this->connection->fetchAll($sql);
     }
 
     /**
      * @param LoggerInterface $logger
      *
-     * @return string
+     * @return array
      */
-    protected function getInstalledLanguagesQuery(LoggerInterface $logger)
+    protected function getAdminUserAndOrganization(LoggerInterface $logger)
     {
-        $query = $this->connection->createQueryBuilder()
-            ->select(['l.code'])
-            ->from('oro_language', 'l')
-            ->getSQL();
-        $this->logQuery($logger, $query);
+        $sql = 'SELECT user_owner_id, organization_id FROM oro_language WHERE code = :code LIMIT 1';
+        $params = ['code' => 'en'];
+        $types = ['class' => 'string'];
 
-        return $query;
-    }
+        $this->logQuery($logger, $sql, $params, $types);
 
-    /**
-     * @param LoggerInterface $logger
-     *
-     * @return string
-     */
-    protected function getAdminUserAndOrganizationQuery(LoggerInterface $logger)
-    {
-        $query = $this->connection->createQueryBuilder()
-            ->select(['u.id', 'u.organization_id'])
-            ->from('oro_user', 'u')
-            ->innerJoin('u', 'oro_user_access_role', 'rel', 'rel.user_id = u.id')
-            ->innerJoin('rel', 'oro_access_role', 'r', 'r.id = rel.role_id')
-            ->where('r.role = :role')
-            ->setMaxResults(1)
-            ->getSQL();
-        $this->logQuery($logger, $query);
+        $data = $this->connection->fetchAssoc($sql, $params, $types);
 
-        return $query;
+        return [$data['user_owner_id'], $data['organization_id']];
     }
 }

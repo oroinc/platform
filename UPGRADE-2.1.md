@@ -526,10 +526,8 @@ LocaleBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $formatter`
 - Class `Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider`
-     - the construction signature of was changed. Now the constructor awaits following params:
-          - `ConfigManager $configManager`
-          - `LocalizationManager $localizationManager`
-          - `LanguageProvider $languageProvider`
+    - changed `__constructor` signature: 
+        - the third argument changed from `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` to `Oro\Bundle\TranslationBundle\Provider\LanguageProvider`
 
 MessageQueueBundle
 ------------------

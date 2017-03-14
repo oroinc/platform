@@ -4,10 +4,14 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LocalizationTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
@@ -18,7 +22,7 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyAccessors(new Localization(), [
             ['id', 1],
             ['name', 'test_name'],
-            ['languageCode', 'language_test_code'],
+            ['language', new Language()],
             ['formattingCode', 'formatting_test_code'],
             ['parentLocalization', new Localization()],
             ['createdAt', new \DateTime()],
@@ -28,6 +32,17 @@ class LocalizationTest extends \PHPUnit_Framework_TestCase
             ['childLocalizations', new Localization()],
             ['titles', new LocalizedFallbackValue()],
         ]);
+    }
+
+    public function getLanguageCode()
+    {
+        $localization = new Localization();
+
+        $this->assertNull($localization->getLanguageCode());
+
+        $localization->setLanguage((new Language())->setCode('test'));
+
+        $this->assertEquals('test', $localization->getLanguageCode());
     }
 
     /**
