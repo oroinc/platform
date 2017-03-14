@@ -477,6 +477,13 @@ services:
         tags:
             - { name: layout.data_provider, alias: title_provider }
 
+    oro_navigation.data_provider.breadcrumb:
+        class: Oro\Bundle\NavigationBundle\Layout\DataProvider\BreadcrumbProvider
+        arguments:
+          - '@oro_navigation.chain_breadcrumb_manager.link'
+        tags:
+            - { name: layout.data_provider, alias: breadcrumb_provider }
+
     oro_navigation.scope_criteria_provider.user:
         parent: oro_user.scope_criteria_provider.user
         tags:
