@@ -129,6 +129,34 @@ class DatagridDataConverterTest extends \PHPUnit_Framework_TestCase
                     'Primary Email_c3' => null,
                 ]
             ],
+            'Columns with same labels and empty values' => [
+                'columns' => [
+                    'c1' => [
+                        'label' => 'Primary Email',
+                        'frontend_type' => 'string'
+                    ],
+                    'c2' => [
+                        'label' => 'Primary Email',
+                        'frontend_type' => 'string'
+                    ],
+                    'c3' => [
+                        'label' => 'Primary Email',
+                        'frontend_type' => 'string'
+                    ]
+                ],
+                'exported_record' => [
+                    'c1' => null,
+                    'c2' => 'test2@test.com',
+                    'c3' => '',
+                    'id' => 3
+                ],
+                'grid_parameters' => [],
+                'expectedResult' => [
+                    'Primary Email' => null,
+                    'Primary Email_c2' => 'test2@test.com',
+                    'Primary Email_c3' => '',
+                ]
+            ],
             'Columns with different labels' => [
                 'columns' => [
                     'c1' => [
