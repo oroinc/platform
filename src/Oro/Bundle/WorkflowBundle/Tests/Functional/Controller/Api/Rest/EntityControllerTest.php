@@ -15,7 +15,7 @@ class EntityControllerTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->provider = $this->client->getContainer()->get('oro_entity.entity_field_list_provider');
+        $this->provider = $this->client->getContainer()->get('oro_workflow.entity_field_list_provider');
     }
 
     public function testGetAction()
@@ -24,7 +24,25 @@ class EntityControllerTest extends WebTestCase
 
         $actual = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
+        $this->assertNotEmpty($actual);
         $this->assertEquals($this->getExpectedData(), $actual);
+        foreach ($actual as $entityData) {
+            $this->assertArrayHasKey('name', $entityData);
+            $this->assertNotEmpty($entityData['fields']);
+            foreach ($entityData['fields'] as $fieldData) {
+                if (array_key_exists('relation_type', $fieldData)) {
+                    $this->assertArrayHasKey('name', $fieldData);
+                    $this->assertNotRegExp(
+                        '/many$/',
+                        $fieldData['relation_type'],
+                        sprintf('Unsupported *toMany relation present %s:%s', $entityData['name'], $fieldData['name'])
+                    );
+
+                    $this->assertArrayHasKey('type', $fieldData);
+                    $this->assertNotEquals('multiEnum', $fieldData['type']);
+                }
+            }
+        }
     }
 
     /**
@@ -42,7 +60,7 @@ class EntityControllerTest extends WebTestCase
 
                 return $data;
             },
-            $this->provider->getFields(false, false, true, false)
+            $this->provider->getFields(false, false, true, false, true, true)
         );
     }
 }

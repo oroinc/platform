@@ -11,25 +11,50 @@ class MainMenu extends Element
     /**
      * @param string $path
      * @throws ElementNotFoundException
+     * @return NodeElement
      */
     public function openAndClick($path)
     {
         $items = explode('/', $path);
-        $linkLocator = array_pop($items);
+        $linkLocator = trim(array_pop($items));
         $that = $this;
 
         while ($item = array_shift($items)) {
             /** @var NodeElement $link */
-            $link = $that->findLink(trim($item));
-
-            if (null === $link) {
-                throw new ElementNotFoundException($this->getDriver(), 'link', 'id|title|alt|text', trim($item));
-            }
-
+            $link = $this->findVisibleLink($that, trim($item));
             $link->mouseOver();
-            $that = $link->getParent();
+            $that = $this->elementFactory->wrapElement(
+                'MainMenuDropdown',
+                $link->getParent()->find('css', '.dropdown-menu')
+            );
         }
 
-        $that->clickLink(trim($linkLocator));
+        $link = $this->findVisibleLink($that, trim($linkLocator));
+        $link->click();
+
+        return $link;
+    }
+
+    /**
+     * @param Element $element
+     * @param $item
+     * @return NodeElement
+     */
+    protected function findVisibleLink(Element $element, $item)
+    {
+        /** @var NodeElement $link */
+        $link = $element->spin(function (NodeElement $element) use ($item) {
+            $link = $element->findLink(trim($item));
+
+            if ($link && $link->isVisible()) {
+                return $link;
+            }
+
+            return null;
+        }, 5);
+
+        self::assertNotNull($link, sprintf('Menu item "%s" not found', $item));
+
+        return $link;
     }
 }

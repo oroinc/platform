@@ -35,7 +35,6 @@ parameters:
     oro_email.email.activity.manager.class:       Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
     oro_email.known_email_address_checker_factory.class: Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory
-    oro_email.twig.extension.email.class:         Oro\Bundle\EmailBundle\Twig\EmailExtension
     oro_email.email.manager.class:                Oro\Bundle\EmailBundle\Entity\Manager\EmailManager
     oro_email.email.flag.manager.class:           Oro\Bundle\EmailBundle\Manager\EmailFlagManager
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
@@ -140,6 +139,9 @@ parameters:
     oro_email.listener.activity_list_pre_query_build_listener.class: Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener
     oro_email.model.email_activity_updates.class: Oro\Bundle\EmailBundle\Model\EmailActivityUpdates
     oro_email.event_listener.smtp_settings_change.class: Oro\Bundle\EmailBundle\EventListener\SmtpSettingsChangeListener
+
+    #decorate swiftmailer class
+    swiftmailer.class:  Oro\Bundle\EmailBundle\Util\MailerWrapper
 
 services:
     oro_email.entity.cache.warmer:
@@ -307,9 +309,9 @@ services:
 
     oro_email.listener.auto_response_listener:
         class: %oro_email.listener.auto_response_listener.class%
+        public: false
         arguments:
-            - '@oro_email.link.autoresponserule_manager'
-            - '@oro_message_queue.client.message_producer'
+            - '@service_container'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -425,6 +427,7 @@ services:
             - %locale%
 
     oro_email.link.autoresponserule_manager:
+        deprecated: The "%service_id%" service is deprecated since 2.1.
         tags:
             - { name: oro_service_link,  service: oro_email.autoresponserule_manager }
 
@@ -447,6 +450,8 @@ services:
         arguments:
             - '@mailer'
             - '@service_container'
+        calls:
+            - [setLogger, ['@oro_email.logger.link']]
 
     # Email template API
     oro_email.manager.emailtemplate.api:
@@ -747,15 +752,10 @@ services:
             - '@oro_email.mailbox.manager'
 
     oro_email.twig.extension.email:
-        class: %oro_email.twig.extension.email.class%
+        class: Oro\Bundle\EmailBundle\Twig\EmailExtension
+        public: false
         arguments:
-            - '@oro_email.email_holder_helper'
-            - '@oro_email.email.address.helper'
-            - '@oro_email.manager.email_attachment_manager'
-            - '@doctrine.orm.entity_manager'
-            - '@oro_email.mailbox.process_storage'
-            - '@oro_security.security_facade'
-            - '@oro_email.related_emails.provider.link'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -1191,6 +1191,10 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_email.migrate_email_body' }
+
+    oro_email.logger.link:
+        tags:
+            - { name: oro_service_link, service: logger }
 
     oro_email.provider.smtp_settings:
         class: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider

@@ -37,8 +37,7 @@ Sample:
                editor: {
                    view_options: {
                        permissions: {
-                           oro_tag_create: resource_granted('oro_tag_create'),
-                           oro_tag_unassign_global: resource_granted('oro_tag_unassign_global')
+                           oro_tag_create: resource_granted('oro_tag_create')
                        }
                    }
                }

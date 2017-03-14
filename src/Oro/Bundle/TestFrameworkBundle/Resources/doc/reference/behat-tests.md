@@ -38,7 +38,7 @@ composer install
 Install application without fixture in prod mode:
 
 ```bash
-app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=OroCRM --env=prod --sample-data=n
+app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=ORO --env=prod --sample-data=n
 ```
 
 ### Run tests
@@ -155,7 +155,7 @@ Every bundle has its own test suite and can be run separately:
 #### Suites autoload
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
-During initialization, Extension will create [test suite](http://docs.behat.org/en/v3.0/guides/5.suites.html) with bundle name if any ```Tests/Behat/Features``` directory exits.
+During initialization, Extension will create test suite with bundle name if any ```Tests/Behat/Features``` directory exits.
 Thus, if bundle has no Features directory - no test suite would be created for it.
 
 If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
@@ -172,27 +172,42 @@ default: &default
       bundle: AcmeDemoBundle
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
-        - Acme\DemoBundle\Tests\Behat\Context\FeatureContext
+        - OroDataGridBundle::GridContext
+        - AcmeDemoBundle::FeatureContext
       paths:
-        - src/Acme/DemoBundle/Tests/Behat/Features
+        - 'vendor/Acme/DemoBundle/Tests/Behat/Features'
+```
+
+Or in bundle behat configuration ```{BundleName}/Tests/Behat/behat.yml```:
+
+```yml
+oro_behat_extension:
+  suites:
+    AcmeDemoBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroDataGridBundle::GridContext
+        - AcmeDemoBundle::FeatureContext
+      paths:
+        - '@AcmeDemoBundle/Tests/Behat/Features'
 ```
 
 Every bundle that has configured suite in configuration file will not be autoloaded by extension.
 
-#### Page elements
+#### Elements
 
-Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/oro/behat.yml``` in way:
+Every Bundle can have own number of elements. All elements must be discribed in ```{BundleName}/Tests/Behat/behat.yml``` in way:
 
 ```yml
-elements:
-  Login:
-    selector: '#login-form'
-    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
-    options:
-      mapping:
-        Username: '_username'
-        Password: '_password'
+oro_behat_extension:
+  elements:
+    Login:
+      selector: '#login-form'
+      class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
+      options:
+        mapping:
+          Username: '_username'
+          Password: '_password'
 ```
 
 1. ```Login``` is an element name. It must be unique.
@@ -211,7 +226,43 @@ elements:
  ```
  
 3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
+You can omnit class, if so ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element``` will use by default.
 4. ```options``` it's an array of extra options that will be set in options property of Element class
+
+#### Page element
+
+Page element encapsulate whole web page with it's url and path to this page.
+Every Page element should extends from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Page```
+Typical Page config is looks like:
+```yml
+oro_behat_extension:
+  pages:
+    User Profile View:
+      class: Oro\Bundle\UserBundle\Tests\Behat\Page\UserProfileView
+      route: 'oro_user_profile_view'
+```
+And Page class:
+```php
+<?php
+
+namespace Oro\Bundle\UserBundle\Tests\Behat\Page;
+
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Page;
+
+class UserProfileView extends Page
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function open(array $parameters = [])
+    {
+        $userMenu = $this->elementFactory->createElement('UserMenu');
+        $userMenu->find('css', 'i.fa-sort-desc')->click();
+
+        $userMenu->clickLink('My User');
+    }
+}
+```
 
 #### Feature isolation
 
@@ -219,6 +270,13 @@ Every feature can interact with application, perform CRUD operation and thereby 
 So, it is why features are isolated to each other.
 The isolation is reached by dumping the database and cache dir before tests execution
 and restoring the cache and database after execution of each feature.
+Every isolator must implement ```Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface``` and ```oro_behat.isolator``` tag with priority.
+See [TestFrameworkBundle/Behat/ServiceContainer/config/isolators.yml](../../../Behat/ServiceContainer/config/isolators.yml)
+
+#### Disable feature isolation
+
+You can disable feature isolation by adding ```--skip-isolators=database,cache``` option to behat console command
+In this case feature should run much faster, but you should care by yourself about database and cache consistency.
 
 ### Write your first feature
 
@@ -246,7 +304,7 @@ Feature: User login
 
 Scenario: Success login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
@@ -254,7 +312,7 @@ Scenario: Success login
 
 Scenario Outline: Fail login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | <login>    |
       | Password | <password> |
   And I press "Log in"

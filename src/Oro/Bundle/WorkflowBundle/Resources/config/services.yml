@@ -24,6 +24,10 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_workflow.started_workflows.bag:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag'
+        public: false
+
     oro_workflow.manager:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
         arguments:
@@ -31,6 +35,23 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.changes.event.dispatcher'
             - '@oro_workflow.entity_connector'
+            - '@oro_workflow.started_workflows.bag'
+        calls:
+            - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_workflow }
+
+    # use only for system calls, cli, background listeners, etc, when main definition filters aren't available
+    oro_workflow.manager.system:
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManager'
+        public: false
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.changes.event.dispatcher'
+            - '@oro_workflow.entity_connector'
+            - '@oro_workflow.started_workflows.bag'
         calls:
             - [addApplicabilityFilter, ['@oro_workflow.applicability_filter.exclusive_record_group']]
             - [setLogger, ['@logger']]
@@ -78,6 +99,12 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow }
 
+    oro_workflow.registry.definition_filter.applications:
+        class: Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionApplicationsRegistryFilter
+        public: false
+        arguments:
+            - '@oro_action.provider.current_application'
+
     oro_workflow.registry.definition_filter.features:
         class: 'Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter'
         public: false
@@ -91,14 +118,42 @@ services:
             - '@oro_scope.scope_manager'
             - '@doctrine'
 
+    oro_workflow.registry.definition_filters:
+        class: Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters
+        arguments:
+            - '@request_stack'
+        calls:
+            - ['addFilter', ['@oro_workflow.registry.definition_filter.features']]
+            - ['addFilter', ['@oro_workflow.registry.definition_filter.scopes']]
+            - ['addFilter', ['@oro_workflow.registry.definition_filter.applications']]
+
+    oro_workflow.registry.definition_filters.system:
+        parent: oro_workflow.registry.definition_filters
+        calls:
+            - ['setType', ['system']]
+
     oro_workflow.registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
         arguments:
             - '@doctrine'
             - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.registry.definition_filters'
+
+    # use only for system calls, cli, background listeners, etc, when main definition filters aren't available
+    oro_workflow.registry.system:
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry'
+        arguments:
+            - '@doctrine'
+            - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.registry.definition_filters.system'
+
+    oro_workflow.registry.workflow_manager:
+        class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry'
+        arguments:
+            - '@oro_action.provider.current_application'
         calls:
-            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.features']]
-            - ['addDefinitionFilter', ['@oro_workflow.registry.definition_filter.scopes']]
+            - ['addManager', ['@oro_workflow.manager', 'default']]
+            - ['addManager', ['@oro_workflow.manager.system', 'system']]
 
     oro_workflow.permission_registry:
         class: 'Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry'
@@ -147,7 +202,6 @@ services:
     oro_workflow.handler.transition.form:
         class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler'
         arguments:
-            - '@request_stack'
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.database_checker:
@@ -180,6 +234,13 @@ services:
 
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
+        arguments:
+            - '@oro_workflow.changes.event.dispatcher'
+            - '@doctrine'
+            - '@oro_workflow.manager'
+
+    oro_workflow.handler.workflow_variables:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler'
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
@@ -348,6 +409,9 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
+        calls:
+            - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 100 }
 
@@ -356,6 +420,9 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.start_transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
+        calls:
+            - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 110 }
 
@@ -364,6 +431,9 @@ services:
         arguments:
             - '@oro_workflow.registry'
             - '@oro_workflow.provider.transition_route'
+            - '@oro_action.resolver.destination_page_resolver'
+        calls:
+            - ['setApplicationProvider', ['@oro_action.provider.current_application']]
         tags:
            - { name: oro.action.extension.button_provider, priority: 120 }
 
@@ -441,5 +511,35 @@ services:
     oro_workflow.workflow_data.provider:
         class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider'
         arguments:
-            - '@oro_workflow.manager'
+            - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.transition_data.provider'
+
+    oro_workflow.variable_guesser:
+            class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
+            calls:
+                # mapping from variable type to form parameters
+                # an additional array with form options can be added
+                - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
+                - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+                - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+                - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+                - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+                - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
+                - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', {allow_add: true, allow_delete: true, prototype: true}]]
+
+    oro_workflow.transition_form.data_provider.transition_page_form:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\TransitionPageFormTemplateDataProvider'
+        tags:
+            - { name: oro_form.form_template_data_provider, alias: transition_page_form }
+
+    oro_workflow.handler.transition.form.page_form:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionCustomFormHandler'
+        arguments:
+            - '@oro_form.registry.form_handler'
+
+    oro_workflow.helper.transition_widget:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@form.factory'
+            - '@oro_workflow.serializer.data.serializer'

@@ -28,6 +28,7 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@oro_security.security_facade'
             - '@oro_security.acl_helper'
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
@@ -73,3 +74,13 @@ services:
         class: %oro_report.calendar_date_manager.class%
         arguments:
             - '@oro_entity.doctrine_helper'
+
+    oro_report.validator.report_definition_validator:
+        class: Oro\Bundle\ReportBundle\Validator\ReportDefinitionValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_report.report_definition_validator }
+
+    oro_report.validator.report_column_dublicate_validator:
+        class: Oro\Bundle\ReportBundle\Validator\ReportColumnDublicateValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_report.report_column_dublicate_validator }

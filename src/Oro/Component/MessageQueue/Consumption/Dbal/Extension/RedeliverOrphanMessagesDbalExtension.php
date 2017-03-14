@@ -51,10 +51,9 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 
         $sql = sprintf(
             'UPDATE %s SET consumer_id=NULL, delivered_at=NULL, redelivered=:isRedelivered '.
-            'WHERE delivered_at <= :deliveredAt',
+            'WHERE delivered_at <= :deliveredAt AND consumer_id IS NOT NULL',
             $connection->getTableName()
         );
-
         $affectedRows = $dbal->executeUpdate(
             $sql,
             [

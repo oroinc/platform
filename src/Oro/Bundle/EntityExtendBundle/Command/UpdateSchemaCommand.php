@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScopeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
@@ -62,15 +63,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        /** @var ExtendEntityConfigProvider $attributeProvider */
-        $extendEntityConfigProvider = $this->getContainer()
-            ->get('oro_entity_config.provider.extend_entity_config_provider');
-
-        $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs($input->getOption('attributes-only'));
-        $metadata = [];
-        foreach ($extendConfigs as $extendConfig) {
-            $metadata[] = $em->getClassMetadata($extendConfig->getId()->getClassName());
-        }
+        $metadata = $this->getClassesMetadata($input, $em);
 
         $schemaTool = new SaveSchemaTool($em);
         $sqls       = $schemaTool->getUpdateSchemaSql($metadata, true);
@@ -96,5 +89,33 @@ class UpdateSchemaCommand extends ContainerAwareCommand
             $enumSynchronizer = $this->getContainer()->get('oro_entity_extend.enum_synchronizer');
             $enumSynchronizer->sync();
         }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param EntityManager $em
+     *
+     * @return array
+     */
+    protected function getClassesMetadata(InputInterface $input, EntityManager $em)
+    {
+        $extendEntityConfigProvider = $this->getContainer()
+            ->get('oro_entity_config.provider.extend_entity_config_provider');
+
+        if ($input->getOption('attributes-only')) {
+            $extendEntityConfigProvider->enableAttributesOnly();
+        }
+
+        $extendConfigs = $extendEntityConfigProvider->getExtendEntityConfigs();
+        $metadata = [];
+        foreach ($extendConfigs as $extendConfig) {
+            if (!ExtendScopeHelper::isAvailableForProcessing($extendConfig)) {
+                continue;
+            }
+
+            $metadata[] = $em->getClassMetadata($extendConfig->getId()->getClassName());
+        }
+
+        return $metadata;
     }
 }

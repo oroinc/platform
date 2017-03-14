@@ -12,14 +12,12 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
+use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslationUsers;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
-/**
- * @dbIsolation
- */
 class LanguageRepositoryTest extends WebTestCase
 {
     /** @var EntityManager */
@@ -35,7 +33,7 @@ class LanguageRepositoryTest extends WebTestCase
     {
         $this->initClient();
 
-        $this->loadFixtures([LoadLanguages::class]);
+        $this->loadFixtures([LoadTranslations::class]);
 
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Language::class);
         $this->repository = $this->em->getRepository(Language::class);
@@ -83,5 +81,31 @@ class LanguageRepositoryTest extends WebTestCase
             ],
             $this->repository->getAvailableLanguagesByCurrentUser($aclHelper)
         );
+    }
+
+    public function testGetTranslationsForExport()
+    {
+        $expected = [
+            [
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'key' => LoadTranslations::TRANSLATION_KEY_1,
+                'value' => LoadTranslations::TRANSLATION_KEY_1,
+                'english_translation' => LoadTranslations::TRANSLATION_KEY_1,
+                'is_translated' => 1,
+            ],
+            [
+                'domain' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
+                'key' => LoadTranslations::TRANSLATION_KEY_2,
+                'value' => LoadTranslations::TRANSLATION_KEY_2,
+                'english_translation' => LoadTranslations::TRANSLATION_KEY_2,
+                'is_translated' => 1,
+            ],
+        ];
+
+        $result = $this->repository->getTranslationsForExport(LoadLanguages::LANGUAGE1);
+
+        foreach ($expected as $translation) {
+            $this->assertTrue(in_array($translation, $result));
+        }
     }
 }

@@ -183,6 +183,7 @@ config:
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
         'oroui/js/tools/api-accessor': 'bundles/oroui/js/tools/api-accessor.js'
         'oroui/js/tools/search-api-accessor': 'bundles/oroui/js/tools/search-api-accessor.js'
+        'oroui/js/tools/layout-helper': 'bundles/oroui/js/tools/layout-helper.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
@@ -192,6 +193,7 @@ config:
         'oroui/js/app/modules/input-widgets': 'bundles/oroui/js/app/modules/input-widgets.js'
         'oroui/js/app/modules/viewport-module': 'bundles/oroui/js/app/modules/viewport-module.js'
         'oroui/js/app/modules/ajax-error-module': 'bundles/oroui/js/app/modules/ajax-error-module.js'
+        'oroui/js/app/modules/jstree-actions-module': 'bundles/oroui/js/app/modules/jstree-actions-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -228,8 +230,9 @@ config:
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
         'oroui/js/app/components/viewport-component': 'bundles/oroui/js/app/components/viewport-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
-        'oroui/js/app/components/basic-tree-component': 'bundles/oroui/js/app/components/basic-tree-component.js'
-        'oroui/js/app/components/basic-tree-manage-component': 'bundles/oroui/js/app/components/basic-tree-manage-component.js'
+        'oroui/js/app/components/widget-form-component': 'bundles/oroui/js/app/components/widget-form-component.js'
+        'oroui/js/app/views/jstree/base-tree-view': 'bundles/oroui/js/app/views/jstree/base-tree-view.js'
+        'oroui/js/app/views/jstree/base-tree-manage-view': 'bundles/oroui/js/app/views/jstree/base-tree-manage-view.js'
         'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
@@ -246,6 +249,7 @@ config:
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 
+        'oroui/js/jstree-action-manager': 'bundles/oroui/js/jstree-action-manager.js'
         'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
         'oroui/js/app/views/input-widget/abstract': 'bundles/oroui/js/app/views/input-widget/abstract.js'
         'oroui/js/app/views/input-widget/uniform-file': 'bundles/oroui/js/app/views/input-widget/uniform-file.js'
@@ -268,7 +272,8 @@ config:
         'oroui/js/app/views/jstree/abstract-action-view': 'bundles/oroui/js/app/views/jstree/abstract-action-view.js'
         'oroui/js/app/views/jstree/expand-action-view': 'bundles/oroui/js/app/views/jstree/expand-action-view.js'
         'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
-        'oroui/js/app/views/jstree/subcategories-action-view': 'bundles/oroui/js/app/views/jstree/subcategories-action-view.js'
+        'oroui/js/app/views/jstree/subtree-action-view': 'bundles/oroui/js/app/views/jstree/subtree-action-view.js'
+        'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module
@@ -276,6 +281,7 @@ config:
         - oroui/js/app/modules/widgets-module
         - oroui/js/app/modules/ajax-error-module
         - oroui/js/app/modules/input-widgets
+        - oroui/js/app/modules/jstree-actions-module
         - oroui/js/app/modules/viewport-module
 
 build:

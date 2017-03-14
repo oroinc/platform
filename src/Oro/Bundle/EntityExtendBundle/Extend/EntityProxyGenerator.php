@@ -87,7 +87,7 @@ class EntityProxyGenerator
                 if (!$extendConfig->is('is_extend')) {
                     continue;
                 }
-                if ($extendConfig->in('state', [ExtendScope::STATE_NEW])) {
+                if ($extendConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
                     continue;
                 }
 

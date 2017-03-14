@@ -11,7 +11,6 @@ parameters:
     oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
     oro_menu.builder_chain.class:                              Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
     oro_menu.configuration_builder.class:                      Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
-    oro_menu.twig.extension.class:                             Oro\Bundle\NavigationBundle\Twig\MenuExtension
 
     oro_navigation.navigation_item_menu.builder.class:         Oro\Bundle\NavigationBundle\Menu\NavigationItemBuilder
     oro_navigation.navigation_history_menu.builder.class:      Oro\Bundle\NavigationBundle\Menu\NavigationHistoryBuilder
@@ -25,22 +24,14 @@ parameters:
 
     oro_navigation.event.response_history.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
     oro_navigation.event.response_hashnav.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
-    oro_navigation.event.master_request_route_listener.class:  Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener
 
     oro_navigation.menu.matcher.voter.request:                 Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter
     oro_navigation.menu.matcher.voter.routepattern:            Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
 
     oro_navigation.title_service.class:                        Oro\Bundle\NavigationBundle\Provider\TitleService
-    oro_navigation.title_provider.class:                       Oro\Bundle\NavigationBundle\Provider\TitleProvider
     oro_navigation.title_translator.class:                     Oro\Bundle\NavigationBundle\Provider\TitleTranslator
-    oro_navigation.title_service.twig.extension.class:         Oro\Bundle\NavigationBundle\Twig\TitleExtension
-    oro_navigation.title_service.annotations_reader.class:     Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
-    oro_navigation.title_service.config_reader.class:          Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
-    oro_navigation.title_service.event.request.listener.class: Oro\Bundle\NavigationBundle\Event\RequestTitleListener
 
     oro_navigation.translation.extractor.class:                Oro\Bundle\NavigationBundle\Title\TranslationExtractor
-
-    oro_navigation.twig_hash_nav_extension.class:              Oro\Bundle\NavigationBundle\Twig\HashNavExtension
 
     oro_navigation.form.type.pagestate.class:                  Oro\Bundle\NavigationBundle\Form\Type\PageStateType
     oro_navigation.form.handler.pagestate.class:               Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler
@@ -63,6 +54,7 @@ services:
             - '@oro_security.security_facade.link'
         calls:
             - [ setCache, [ '@oro_menu.cache' ] ]
+            - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: oro_navigation.menu_extension, priority: 100 }
 
@@ -88,6 +80,11 @@ services:
         tags:
             - { name: knp_menu.provider }
 
+    oro_menu.configuration:
+        class: Oro\Bundle\NavigationBundle\Config\MenuConfiguration
+        arguments:
+            - '@oro_navigation.configuration.provider'
+
     oro_menu.configuration_resolver:
         class: %oro_menu.configuration_resolver.class%
         arguments:
@@ -99,6 +96,7 @@ services:
             - '@oro_menu.configuration_resolver'
             - '@oro_menu.factory'
             - '@event_dispatcher'
+            - '@oro_menu.configuration'
         tags:
             - { name: oro_menu.builder }
 
@@ -108,13 +106,9 @@ services:
             - '@translator'
 
     oro_menu.twig.extension:
-        class: %oro_menu.twig.extension.class%
+        class: Oro\Bundle\NavigationBundle\Twig\MenuExtension
         arguments:
-            - '@knp_menu.helper'
-            - '@oro_menu.builder_chain'
-            - '@oro_navigation.breadcrumb_manager'
-        calls:
-          - [ setBreadcrumbManager, [ '@oro_navigation.chain_breadcrumb_manager' ]]
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -239,7 +233,7 @@ services:
             - [ setNavigationHistoryItemType, ['history']]
 
     oro_navigation.event.master_request_route_listener:
-        class: %oro_navigation.event.master_request_route_listener.class%
+        class: Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
@@ -253,19 +247,11 @@ services:
     oro_navigation.title_service:
         class: %oro_navigation.title_service.class%
         arguments:
-          - '@oro_navigation.title_annotations_reader'
-          - '@oro_navigation.title_config_reader'
+          - '@oro_navigation.title_reader.registry'
           - '@oro_navigation.title_translator'
-          - '@doctrine.orm.entity_manager'
           - '@oro_config.user'
           - '@oro_navigation.chain_breadcrumb_manager.link'
-          - '@oro_navigation.title_provider'
-
-    oro_navigation.title_provider:
-        class: %oro_navigation.title_provider.class%
-        public: false
-        arguments:
-          - '@oro_entity.doctrine_helper'
+        lazy: true
 
     oro_navigation.title_translator:
         class: %oro_navigation.title_translator.class%
@@ -274,31 +260,49 @@ services:
           - '@translator.default'
           - '@oro_config.user'
 
+    oro_navigation.cache.title_annotations:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_annotations' ] ]
+
+    oro_navigation.cached_reader.title_annotations:
+        parent: annotations.cached_reader
+        arguments:
+            - '@annotation_reader'
+            - '@oro_navigation.cache.title_annotations'
+            - '%kernel.debug%'
+
+    oro_navigation.title_reader.registry:
+        class: Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry
+
     oro_navigation.title_annotations_reader:
-        class:                        %oro_navigation.title_service.annotations_reader.class%
-        arguments:                    ["@kernel", "@annotation_reader"]
+        class: Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
+        arguments:
+            - '@request_stack'
+            - '@oro_navigation.cached_reader.title_annotations'
+        tags:
+            - { name: oro_navigation.title_reader, priority: 10}
 
     oro_navigation.title_config_reader:
-        class:                        %oro_navigation.title_service.config_reader.class%
+        class: Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
+        arguments:
+            - '@oro_navigation.configuration.provider'
+        tags:
+            - { name: oro_navigation.title_reader, priority: 0}
 
     oro_navigation.title_service.twig.extension:
-        class: %oro_navigation.title_service.twig.extension.class%
+        class: Oro\Bundle\NavigationBundle\Twig\TitleExtension
+        public: false
         arguments:
-            - '@oro_navigation.title_service'
+            - '@service_container'
         tags:
             - { name: twig.extension }
-
-    kernel.listener.title_service.request_listener:
-        class: %oro_navigation.title_service.event.request.listener.class%
-        tags:
-            - { name: kernel.event_listener, priority: -255, event: kernel.request, method: onKernelRequest }
-        arguments:
-            - '@oro_navigation.title_service'
 
     oro_navigation.translation.extractor:
         class: %oro_navigation.translation.extractor.class%
         arguments:
-            - '@oro_navigation.title_service'
+            - '@oro_navigation.title_reader.registry'
             - '@router'
         tags:
             - { name: translation.extractor, alias: navigation_translation_extractor }
@@ -338,7 +342,7 @@ services:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }
 
     oro_navigation.twig.hash_nav_extension:
-        class:        %oro_navigation.twig_hash_nav_extension.class%
+        class: Oro\Bundle\NavigationBundle\Twig\HashNavExtension
         tags:
             - { name: twig.extension }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
@@ -375,6 +379,14 @@ services:
         tags:
             - { name: oro_menu.builder, priority: 100 }
 
+    oro_navigation.manager.menu_update:
+        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
+        arguments:
+            - "@doctrine"
+            - "@oro_navigation.menu_helper.menu_update"
+            - '%oro_navigation.entity.menu_update.class%'
+            - '%oro_navigation.menu_update.scope_type%'
+
     oro_navigation.menu_manipulator:
         class: Knp\Menu\Util\MenuManipulator
         public: false
@@ -385,17 +397,9 @@ services:
             - '@oro_menu.builder_chain'
             - '@oro_navigation.menu_manipulator'
             - '%oro_navigation.menu_update.scope_type%'
+            - '@oro_menu.configuration'
         tags:
-            - { name: oro_datagrid.datasource, type: menu-update-default-provider }
-
-    oro_navigation.manager.menu_update:
-        class: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager
-        arguments:
-            - "@doctrine"
-            - "@oro_menu.builder_chain"
-            - "@oro_navigation.menu_helper.menu_update"
-        calls:
-            - [ setEntityClass, [ '%oro_navigation.entity.menu_update.class%' ]]
+            - { name: oro_datagrid.datasource, type: menu-update }
 
     oro_navigation.widget_provider.actions.edit_menus:
         parent: oro_ui.widget_provider.action_button.abstract
@@ -446,8 +450,10 @@ services:
         arguments:
             - '@oro_navigation.repository.menu_update'
             - '@oro_navigation.menu_update.cache'
+            - '@oro_scope.scope_manager'
+            - '%oro_navigation.menu_update.scope_type%'
         tags:
-            - { name: kernel.event_listener, event: oro_menu.menu_update_scope_change, method: onMenuUpdateScopeChange }
+            - { name: kernel.event_listener, event: oro_menu.menu_update_change, method: onMenuUpdateScopeChange }
 
     oro_navigation.repository.menu_update:
         class: 'Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository'
@@ -475,3 +481,35 @@ services:
         parent: oro_user.scope_criteria_provider.user
         tags:
             - {name: oro_scope.provider, scopeType: '%oro_navigation.menu_update.scope_type%', priority: 20}
+
+    oro_navigation.configuration.provider:
+        class: Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider
+        arguments:
+            - '@oro_navigation.configuration_provider.cache'
+
+    oro_navigation.configuration_provider.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_navigation_configuration' ] ]
+
+    oro_navigation.event_listener.container_listener:
+        class: Oro\Bundle\NavigationBundle\EventListener\ContainerListener
+        arguments:
+            - '@oro_navigation.configuration.provider'
+            - '@oro_navigation.config.dumper'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+    oro_navigation.config.dumper:
+        class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
+        public: false
+        arguments:
+            - '%kernel.cache_dir%'
+            - '%kernel.debug%'
+            - 'oro_navigation'
+
+    oro_navigation.event_listener.scope_grid_listener:
+        class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBuild }

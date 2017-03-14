@@ -11,7 +11,8 @@ define([
     var defaults = _.defaults(module.config(), {
         headerServerError: _.__('Server error'),
         headerUserError: _.__('User input error'),
-        message: _.__('oro.ui.error')
+        message: _.__('oro.ui.error'),
+        loginRoute: 'oro_user_security_login'
     });
 
     var ERROR_USER_INPUT = 'user_input_error';
@@ -26,15 +27,30 @@ define([
          * @param {Object} settings
          */
         handle: function(event, xhr, settings) {
-            if (xhr.status === 401) {
-                this._processRedirect();
+            if (this.isXHRStatus(xhr, 401)) {
+                this._processRedirect(xhr.responseJSON || {});
             } else if (xhr.readyState === 4) {
-                if (this.isShowError(event, xhr, settings)) {
-                    this.showError(xhr);
-                } else {
+                var errorMessage = this.getErrorMessage(event, xhr, settings);
+                var isShowError = Boolean(errorMessage);
+
+                if (!isShowError) {
                     this.showErrorInConsole(xhr);
+                } else {
+                    this.showError(xhr, errorMessage);
                 }
             }
+        },
+
+        isXHRStatus: function(xhr, testStatus) {
+            var status = 0;
+            if (_.isObject(xhr)) {
+                status = xhr.status;
+                var responseCode = _.result(xhr.responseJSON, 'code');
+                if (!_.isUndefined(responseCode)) {
+                    status = responseCode;
+                }
+            }
+            return status === testStatus;
         },
 
         /**
@@ -43,33 +59,40 @@ define([
          * @param {Object} settings
          * @return {Boolean}
          */
-        isShowError: function(event, xhr, settings) {
-            var errorOutput = true;
+        getErrorMessage: function(event, xhr, settings) {
+            var errorMessage = true;
 
-            if (settings.errorOutput !== undefined) {
-                errorOutput = settings.errorOutput;
-                if (_.isFunction(errorOutput)) {
-                    errorOutput = errorOutput(event, xhr, settings);
+            if (settings.errorHandlerMessage !== undefined) {
+                errorMessage = settings.errorHandlerMessage;
+                if (_.isFunction(errorMessage)) {
+                    errorMessage = errorMessage(event, xhr, settings);
                 }
             }
 
-            return Boolean(errorOutput);
+            return errorMessage;
         },
 
         /**
          * @param {Object|Error} context
+         * @param {String|null} errorMessage
          */
-        showError: function(context) {
-            this.showErrorInUI(context);
+        showError: function(context, errorMessage) {
+            this.showErrorInUI(_.isString(errorMessage) ? errorMessage : context);
             this.showErrorInConsole(context);
         },
 
         /**
-         * @param {Object|Error} context
+         * @param {Object|Error|String} context
          */
         showErrorInUI: function(context) {
             if (tools.debug && context instanceof Error) {
                 this.showFlashError(context.toString());
+            } else if (_.isString(context)) {
+                this.showFlashError(context);
+            } else if (_.isObject(context) && context.responseJSON && context.responseJSON.message) {
+                this.showFlashError(context.responseJSON.message);
+            } else if (this.isXHRStatus(context, 403)) {
+                this.showFlashError(_.__('oro.ui.forbidden_error'));
             } else {
                 this.showFlashError(defaults.message);
             }
@@ -114,17 +137,17 @@ define([
         /**
          * Redirects to login
          *
+         * @param {Object} response
          * @private
          */
-        _processRedirect: function() {
+        _processRedirect: function(response) {
             var hashUrl = '';
             // @TODO add extra parameter for redirect after login
             /*if (Navigation.isEnabled()) {
                 var navigation = Navigation.getInstance();
                 hashUrl = '#url=' + navigation.getHashUrl();
             }*/
-
-            window.location.href = routing.generate('oro_user_security_login') + hashUrl;
+            window.location.href = response.redirectUrl || (routing.generate(defaults.loginRoute) + hashUrl);
         }
     };
 

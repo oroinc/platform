@@ -5,10 +5,10 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 
-/**
- * @dbIsolation
- */
+use Symfony\Component\DomCrawler\Form;
+
 class ControllersResetTest extends WebTestCase
 {
     protected function setUp()
@@ -16,9 +16,7 @@ class ControllersResetTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
         $this->client->followRedirects();
-        $this->loadFixtures([
-            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'
-        ]);
+        $this->loadFixtures([LoadUserData::class]);
     }
 
     public function testSetPasswordAction()
@@ -142,5 +140,69 @@ class ControllersResetTest extends WebTestCase
 
         $this->assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
         $this->assertEquals(UserManager::STATUS_ACTIVE, $user2->getAuthStatus()->getId());
+    }
+
+    public function testResetAction()
+    {
+        /** @var User $user */
+        $user = $this->getReference('user_with_confirmation_token');
+        $oldPassword = $user->getPassword();
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_reset_reset', ['token' => LoadUserData::CONFIRMATION_TOKEN]),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $this->assertContains('name="oro_user_reset_form[plainPassword][first]"', $result->getContent());
+        $this->assertContains('name="oro_user_reset_form[plainPassword][second]"', $result->getContent());
+
+        /** @var Form $form */
+        $form = $crawler->selectButton('Reset')->form();
+
+        $form['oro_user_reset_form[plainPassword][first]'] = 'new_password';
+        $form['oro_user_reset_form[plainPassword][second]'] = 'wrong_password';
+
+        // This is instead of submit($form) to be able to pass noHashNavigationHeader
+        $crawler = $this->client->request(
+            $form->getMethod(),
+            $form->getUri(),
+            $form->getPhpValues(),
+            $form->getPhpFiles(),
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $this->assertContains('The passwords must match.', $result->getContent());
+
+        // @codingStandardsIgnoreStart
+        $errorDiv = $crawler->filterXPath(
+            "//*/form[contains(@class, 'form-reset')]/*/div[contains(@class, 'input-prepend')][2][contains(@class, 'error')]"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(1, $errorDiv->count());
+
+        $form = $crawler->selectButton('Reset')->form();
+
+        $form['oro_user_reset_form[plainPassword][first]'] = 'new_password';
+        $form['oro_user_reset_form[plainPassword][second]'] = 'new_password';
+
+        $this->client->submit($form);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains('Your password was successfully reset. You may log in now.', $result->getContent());
+
+        $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
+
+        $newPassword = $user->getPassword();
+        $this->assertNotEquals($oldPassword, $newPassword);
     }
 }

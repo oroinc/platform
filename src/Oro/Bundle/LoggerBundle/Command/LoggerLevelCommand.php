@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Psr\Log\LogLevel;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -88,6 +91,12 @@ class LoggerLevelCommand extends ContainerAwareCommand
         );
 
         $configManager->flush();
+
+        /** @var CacheProvider $cache */
+        $cache = $this->getContainer()->get('oro_logger.cache');
+        if ($cache->contains(Configuration::LOGS_LEVEL_KEY)) {
+            $cache->delete(Configuration::LOGS_LEVEL_KEY);
+        }
 
         if ($user) {
             $message = sprintf(

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -33,6 +34,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser;
 
 class SegmentFilterTest extends OrmTestCase
 {
@@ -414,5 +416,56 @@ class SegmentFilterTest extends OrmTestCase
         );
 
         return $em;
+    }
+
+    public function testDynamicApplyWithLimit()
+    {
+        $dynamicSegment = (new Segment())
+            ->setType(new SegmentType(SegmentType::TYPE_DYNAMIC))
+            ->setEntity(CmsUser::class)
+            ->setRecordsLimit(20);
+
+        $filterData = ['value' => $dynamicSegment];
+        $em         = $this->getEM();
+
+        $qb = $em->createQueryBuilder()
+            ->select(['t1.name'])
+            ->from('OroSegmentBundle:CmsUser', 't1');
+
+        $queryBuilderMock = $this->getMockBuilder(QueryBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $queryMock = $this->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getEntityManager', 'getArrayResult'])
+            ->getMockForAbstractClass();
+
+        $queryBuilderMock->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($queryMock);
+
+        $queryMock->expects($this->once())
+            ->method('getEntityManager')
+            ->willReturn($em);
+
+        $queryMock->expects($this->once())
+            ->method('getArrayResult')
+            ->willReturn([['id' => 1], ['id' => 2]]);
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+
+        $this->dynamicSegmentQueryBuilder
+            ->expects(static::once())
+            ->method('getQueryBuilder')
+            ->with($dynamicSegment)
+            ->willReturn($queryBuilderMock);
+
+        $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
+        $this->filter->apply($ds, $filterData);
+
+        $expectedResult = 'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE t1.id IN(1, 2)';
+
+        $this->assertSame($expectedResult, $ds->getQueryBuilder()->getDQL());
     }
 }

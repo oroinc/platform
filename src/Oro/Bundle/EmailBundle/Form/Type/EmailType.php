@@ -67,7 +67,11 @@ class EmailType extends AbstractType
             ->add('entityId', 'hidden', ['required' => false])
             ->add(
                 'from',
-                'oro_email_email_address_from',
+                'hidden'
+            )
+            ->add(
+                'origin',
+                'oro_email_email_origin_from',
                 [
                     'required' => true,
                     'label' => 'oro.email.from_email_address.label',
@@ -178,6 +182,13 @@ class EmailType extends AbstractType
             is_array($data) && empty($data['entityClass']) ||
             is_object($data) && null === $data->getEntityClass()) {
             return;
+        }
+
+        if (is_array($data) && isset($data['origin'])) {
+            $value = $data['origin'];
+            $values =  explode('|', $value);
+            $data['from'] = $values[1];
+            $event->setData($data);
         }
 
         $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];

@@ -4,11 +4,17 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Oro\Bundle\TranslationBundle\Twig\TranslationExtension;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
 class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /** @var TranslationsDatagridRouteHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $translationRouteHelper;
+
+    /** @var TranslationExtension */
+    protected $extension;
 
     /**
      * {@inheritdoc}
@@ -18,56 +24,37 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
         $this->translationRouteHelper = $this->getMockBuilder(TranslationsDatagridRouteHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->translationRouteHelper);
-    }
+        $container = self::getContainerBuilder()
+            ->add('oro_translation.helper.translation_route', $this->translationRouteHelper)
+            ->getContainer($this);
 
-    /**
-     * @param bool $debugTranslator
-     *
-     * @return TranslationExtension
-     */
-    protected function createExtension($debugTranslator = false)
-    {
-        return new TranslationExtension($debugTranslator, $this->translationRouteHelper);
+        $this->extension = new TranslationExtension($container, true);
     }
 
     public function testGetName()
     {
-        $extension = $this->createExtension();
-        $this->assertEquals(TranslationExtension::NAME, $extension->getName());
+        $this->assertEquals(TranslationExtension::NAME, $this->extension->getName());
     }
 
-    public function testFunctions()
+    /**
+     * @dataProvider isDebugTranslatorDataProvider
+     *
+     * @param bool $debugTranslator
+     */
+    public function testIsDebugTranslator($debugTranslator)
     {
-        $extension = $this->createExtension(true);
-        $functions = $extension->getFunctions();
-        $this->assertCount(2, $functions);
+        $extension = new TranslationExtension(self::getContainerBuilder()->getContainer($this), $debugTranslator);
 
-        /** @var \Twig_SimpleFunction $debugTranslator */
-        $debugTranslator = current($functions);
-        $this->assertInstanceOf('\Twig_SimpleFunction', $debugTranslator);
-        $this->assertEquals('oro_translation_debug_translator', $debugTranslator->getName());
-        $this->assertTrue(call_user_func($debugTranslator->getCallable()));
+        $this->assertEquals($debugTranslator, $extension->isDebugTranslator());
+    }
 
-        $this->translationRouteHelper->expects($this->once())->method('generate')->willReturn("");
-
-        /** @var \Twig_SimpleFunction $translationGridLink */
-        $translationGridLink = next($functions);
-        $this->assertInstanceOf('\Twig_SimpleFunction', $translationGridLink);
-        $this->assertEquals('translation_grid_link', $translationGridLink->getName());
-        $this->assertInternalType(
-            "string",
-            call_user_func_array(
-                $translationGridLink->getCallable(),
-                [[]]
-            )
-        );
+    /**
+     * @return \Generator
+     */
+    public function isDebugTranslatorDataProvider()
+    {
+        yield 'translator debug enabled' => ['debugTranslator' => true];
+        yield 'translator debug disabled' => ['debugTranslator' => false];
     }
 }

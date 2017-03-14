@@ -10,6 +10,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMake
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclAnnotationProviderPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipTreeProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveAclSchemaListenerPass;
@@ -50,6 +51,7 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new OwnerMetadataProvidersPass());
         $container->addCompilerPass(new OwnershipTreeProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
+        $container->addCompilerPass(new AclPrivilegeFilterPass());
         if ($container instanceof ExtendedContainerBuilder) {
             $container->addCompilerPass(new RemoveAclSchemaListenerPass());
             $container->moveCompilerPassBefore(

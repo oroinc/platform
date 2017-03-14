@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
+use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Symfony\Component\Form\AbstractType;
+
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ImportType extends AbstractType
 {
@@ -32,32 +32,18 @@ class ImportType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'file',
-            'file',
-            array(
-                'required' => true,
-                'constraints' => [
-                    new File(
-                        [
-                            'mimeTypes' => ['text/plain', 'text/csv'],
-                            'mimeTypesMessage' => 'This file type is not allowed.'
-                        ]
-                    ),
-                ]
-            )
-        );
+        $builder->add('file', 'file');
 
         $processorChoices = $this->getImportProcessorsChoices($options['entityName']);
 
         $builder->add(
             'processorAlias',
             'choice',
-            array(
+            [
                 'choices' => $processorChoices,
                 'required' => true,
-                'preferred_choices' => $processorChoices ? array(reset($processorChoices)) : array(),
-            )
+                'preferred_choices' => $processorChoices ? [reset($processorChoices)] : [],
+            ]
         );
     }
 
@@ -67,7 +53,7 @@ class ImportType extends AbstractType
             ProcessorRegistry::TYPE_IMPORT,
             $entityName
         );
-        $result = array();
+        $result = [];
         foreach ($aliases as $alias) {
             $result[$alias] = $this->generateProcessorLabel($alias);
         }
@@ -80,20 +66,20 @@ class ImportType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'data_class' => 'Oro\Bundle\ImportExportBundle\Form\Model\ImportData',
-            )
+            [
+                'data_class' =>  ImportData::class,
+            ]
         );
-        $resolver->setRequired(array('entityName'));
+        $resolver->setRequired(['entityName']);
         $resolver->setAllowedTypes(
-            array(
+            [
                 'entityName' => 'string'
-            )
+            ]
         );
     }
 

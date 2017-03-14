@@ -13,12 +13,30 @@ use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
-class FeatureContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
+class FeatureContext extends OroFeatureContext implements
+    OroPageObjectAware,
+    KernelAwareContext,
+    MessageQueueIsolatorAwareInterface
 {
     use PageObjectDictionary, KernelDictionary;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
 
     /**
      * This step used for system configuration field
@@ -194,15 +212,34 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $pages = $table->getColumn(0);
 
         $firstPage = array_shift($pages);
-        $menu->openAndClick($firstPage);
+        $clicked = $menu->openAndClick($firstPage);
+
         $this->waitForAjax();
+        $this->messageQueueIsolator->waitWhileProcessingMessages(5);
+
+        $actualPage = $this->getLastPersistedPage($em);
+
+        $clickedUrl = $clicked->getAttribute('href');
+        $actualUrl = $actualPage->getUrl();
+
+        self::assertEquals(
+            $clickedUrl,
+            $actualUrl,
+            sprintf(
+                "Clicked (%s) and persisted (%s) to the db links are different",
+                $clickedUrl,
+                $actualUrl
+            )
+        );
+
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
+            $this->messageQueueIsolator->waitWhileProcessingMessages(5);
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
             $actualTitle = $crawler->filter('head title')->first()->text();
 
-            $menu->openAndClick($page);
+            $clickedElement = $menu->openAndClick($page);
             $this->waitForAjax();
             $actualCount++;
 
@@ -210,7 +247,30 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
                 return $actualCount === $context->getPageTransitionCount($em);
             });
 
-            self::assertNotFalse($result, 'New page was not persisted in the database');
+            self::assertNotFalse(
+                $result,
+                "New page '$actualTitle' was not persisted in the database"
+            );
+
+            $clickedUrl = $clickedElement->getAttribute('href');
+            $actualUrl = '';
+
+            $pageEquals = $this->spin(
+                function (FeatureContext $context) use ($em, $clickedUrl, &$actualUrl) {
+                    $actualUrl = $context->getLastPersistedPage($em)->getUrl();
+
+                    return $clickedUrl === $actualUrl;
+                }
+            );
+
+            self::assertNotFalse(
+                $pageEquals,
+                sprintf(
+                    "Clicked (%s) and persisted (%s) to the db links are different",
+                    $clickedUrl,
+                    $actualUrl
+                )
+            );
 
             $result = $this->spin(function (FeatureContext $context) use ($actualTitle) {
                 $lastHistoryLink = $context->getLastHistoryLink();
@@ -247,6 +307,21 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
 
             return $item->getVisitCount();
         }, $repository->findAll()));
+    }
+
+    /**
+     * Get last visited page (last updated item from history table)
+     *
+     * @param EntityManager $em
+     * @return NavigationHistoryItem
+     */
+    protected function getLastPersistedPage(EntityManager $em)
+    {
+        /** @var HistoryItemRepository $repository */
+        $repository = $em->getRepository('OroNavigationBundle:NavigationHistoryItem');
+        $lastAddedPage = $repository->findOneBy([], ['visitedAt' => 'DESC']);
+
+        return $lastAddedPage;
     }
 
     /**

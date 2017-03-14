@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class InitalMessageQueueIsolator implements IsolatorInterface
+class InitalMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolatorAwareInterface
 {
     /**
      * @var MessageQueueIsolatorInterface
@@ -22,9 +22,8 @@ class InitalMessageQueueIsolator implements IsolatorInterface
      */
     private $kernel;
 
-    public function __construct(MessageQueueIsolatorInterface $messageQueueIsolator, KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel)
     {
-        $this->messageQueueIsolator = $messageQueueIsolator;
         $this->kernel = $kernel;
     }
 
@@ -75,5 +74,21 @@ class InitalMessageQueueIsolator implements IsolatorInterface
     public function getName()
     {
         return 'Inital Message Queue Isolator';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTag()
+    {
+        return 'inital_message_queue';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 }

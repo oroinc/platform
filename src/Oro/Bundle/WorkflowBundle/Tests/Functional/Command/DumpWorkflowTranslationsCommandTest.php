@@ -10,9 +10,6 @@ use Oro\Bundle\WorkflowBundle\Command\DumpWorkflowTranslationsCommand;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
 
-/**
- * @dbIsolation
- */
 class DumpWorkflowTranslationsCommandTest extends WebTestCase
 {
     /**
@@ -43,8 +40,8 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
             [
                 LoadWorkflowTranslations::WORKFLOW4,
                 '--locale' => LoadLanguages::LANGUAGE2,
-                '--no-ansi'
-            ]
+            ],
+            false
         );
 
         $this->assertNotEmpty($result);

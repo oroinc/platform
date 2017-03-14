@@ -75,6 +75,46 @@ class ExtendOptionsManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->manager->getExtendOptions());
     }
 
+    public function testMergeColumnOptionsWhenThereIsNoExisting()
+    {
+        $options = ['scope' => ['new_option' => true]];
+        $this->manager->mergeColumnOptions('test_table', 'test_column', $options);
+        $objectKey = sprintf(ExtendOptionsManager::COLUMN_OPTION_FORMAT, 'test_table', 'test_column');
+        $expectedOptions = [$objectKey => $options];
+        $this->assertEquals($expectedOptions, $this->manager->getExtendOptions());
+    }
+
+    /**
+     * @dataProvider dataProviderForMergeColumnOptions
+     */
+    public function testMergeColumnOptions(array $existingOptions, array $newOptions, array $expectedOptions)
+    {
+        $objectKey = sprintf(ExtendOptionsManager::COLUMN_OPTION_FORMAT, 'test_table', 'test_column');
+        $this->setProtectedProperty($this->manager, 'options', [$objectKey => $existingOptions]);
+
+        $this->manager->mergeColumnOptions('test_table', 'test_column', $newOptions);
+        $this->assertEquals([$objectKey => $expectedOptions], $this->manager->getExtendOptions());
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForMergeColumnOptions()
+    {
+        return [
+            [
+                'existing' => ['scope' => ['new_option' => true]],
+                'new' => ['scope' => ['new_option' => false]],
+                'expected' => ['scope' => ['new_option' => false]]
+            ],
+            [
+                'existing' => ['scope' => ['array_case' => ['op1' => 1, 'op2' => 2]]],
+                'new' => ['scope' => ['array_case' => ['op2' => 3]]],
+                'expected' => ['scope' => ['array_case' => ['op1' => 1, 'op2' => 3]]],
+            ],
+        ];
+    }
+
     public function setTableOptionsProvider()
     {
         return $this->getSetOptionsData('test_table');

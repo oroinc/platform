@@ -15,10 +15,17 @@ class Form extends Element
      */
     public function fill(TableNode $table)
     {
+        $isEmbeddedForm = isset($this->options['embedded-id']);
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToIFrame($this->options['embedded-id']);
+        }
         foreach ($table->getRows() as $row) {
             $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
-            $value = $this->normalizeValue($row[1]);
+            $value = self::normalizeValue($row[1]);
             $this->fillField($locator, $value);
+        }
+        if ($isEmbeddedForm) {
+            $this->getDriver()->switchToWindow();
         }
     }
 
@@ -29,8 +36,8 @@ class Form extends Element
             $field = $this->findField($locator);
             self::assertNotNull($field, "Field with '$locator' locator not found");
 
-            $expectedValue = $this->normalizeValue($row[1]);
-            $fieldValue = $this->normalizeValue($field->getValue());
+            $expectedValue = self::normalizeValue($row[1]);
+            $fieldValue = self::normalizeValue($field->getValue());
             self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $locator));
         }
     }
@@ -103,7 +110,12 @@ class Form extends Element
      */
     public function findField($locator)
     {
-        if ($field = parent::findField($locator)) {
+        $selector = is_array($locator)
+            ? $locator
+            : ['type' => 'named', 'locator' => ['field', $locator]];
+        $field = $this->find($selector['type'], $selector['locator']);
+
+        if ($field) {
             if ($field->hasAttribute('type') && 'file' === $field->getAttribute('type')) {
                 return $this->elementFactory->wrapElement('FileField', $field);
             }
@@ -172,11 +184,11 @@ class Form extends Element
      * @param array|string $value
      * @return array|string
      */
-    protected function normalizeValue($value)
+    public static function normalizeValue($value)
     {
         if (is_array($value)) {
             foreach ($value as $key => $item) {
-                $value[$key] = $this->normalizeValue($item);
+                $value[$key] = self::normalizeValue($item);
             }
 
             return $value;
@@ -185,7 +197,7 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return explode(',', trim($value, '[]'));
+            return array_map('trim', explode(',', trim($value, '[]')));
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -221,5 +233,23 @@ class Form extends Element
         } while ($field === null && $i < $deep);
 
         return $field;
+    }
+
+    /**
+     * Retrieves validation error message text for provided field name
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function getFieldValidationErrors($fieldName)
+    {
+        $field = $this->findFieldByLabel($fieldName);
+        $fieldId = $field->getAttribute('id');
+
+        $errorSpan = $this->find('css', "span.validation-failed[for='$fieldId']");
+
+        self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
+
+        return $errorSpan->getText();
     }
 }

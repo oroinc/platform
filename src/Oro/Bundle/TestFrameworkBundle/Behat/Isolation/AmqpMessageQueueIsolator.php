@@ -121,6 +121,14 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getTag()
+    {
+        return 'message-queue';
+    }
+
+    /**
      * @return AMQPStreamConnection
      */
     private function createAmqpStreamConnection()
@@ -132,7 +140,8 @@ class AmqpMessageQueueIsolator implements IsolatorInterface, MessageQueueIsolato
             $messageQueueParameters['host'],
             $messageQueueParameters['port'],
             $messageQueueParameters['user'],
-            $messageQueueParameters['password']
+            $messageQueueParameters['password'],
+            $messageQueueParameters['vhost']
         );
     }
 

@@ -14,9 +14,6 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesFo
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitionScopes;
 
-/**
- * @dbIsolation
- */
 class WorkflowDefinitionRepositoryTest extends WebTestCase
 {
     /** @var WorkflowDefinitionRepository */
@@ -98,5 +95,14 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
         $this->assertGreaterThanOrEqual(2, count($workflows));
         $this->assertContains(['name' => 'test_active_flow1'], $workflows);
         $this->assertContains(['name' => 'test_active_flow2'], $workflows);
+    }
+
+    public function testGetAllRelatedEntityClasses()
+    {
+        $result = $this->repository->getAllRelatedEntityClasses();
+
+        $this->assertInternalType('array', $result);
+        $this->assertGreaterThanOrEqual(1, count($result));
+        $this->assertContains(WorkflowAwareEntity::class, $result);
     }
 }

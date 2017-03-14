@@ -1,5 +1,6 @@
 imports:
     - {resource: 'first_workflow/attributes.yml'}
+    - {resource: 'first_workflow/variables.yml'}
 
 workflows:
     first_workflow:
@@ -46,6 +47,7 @@ workflows:
                     class: foo
                 form_type: custom_workflow_transition
                 display_type: page
+                destination_page: index
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
                 init_entities:
@@ -81,7 +83,22 @@ workflows:
                     -
                         cron: 1 * * * *
                         filter: e.text = "string"
-
+            transition_with_form_options_configuration:
+                step_to: first_step
+                transition_definition: first_transition_definition
+                form_options:
+                    configuration:
+                        handler: 'handler'
+                        template: 'template'
+                        data_provider: 'data_provider'
+                        data_attribute: 'form_data'
+            transition_with_form_options_configuration_defaults:
+                step_to: first_step
+                transition_definition: first_transition_definition
+                form_options:
+                    configuration:
+                        data_provider: 'data_provider'
+                        data_attribute: 'form_data'
         transition_definitions:
             first_transition_definition:
                 preactions:

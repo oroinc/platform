@@ -49,10 +49,6 @@ parameters:
 
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
-    oro_security.twig.security_extension.class:                Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
-    oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
-    oro_security.twig.acl.permission_extension.class:          Oro\Bundle\SecurityBundle\Twig\Acl\PermissionExtension
-
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
     oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
@@ -70,11 +66,9 @@ parameters:
     oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
     oro_security.authentication.provider.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
 
-    oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
     oro_security.listener.refresh_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener
     oro_security.listener.api_listener.class:                  Oro\Bundle\SecurityBundle\EventListener\ApiEventListener
     oro_security.listener.search_listener.class:               Oro\Bundle\SecurityBundle\EventListener\SearchListener
-    oro_security.listener.console_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
 
@@ -196,16 +190,20 @@ services:
         calls:
             - [ setNamespace, [ 'oro_acl_underlying' ]]
 
+    oro_security.entity_security_metadata_provider_link:
+        tags:
+            - { name: oro_service_link, service: oro_security.entity_security_metadata_provider }
+
     oro_security.acl.voter_link:
         tags:
-            - { name: oro_service_link,  service: ?security.acl.voter.basic_permissions }
+            - { name: oro_service_link, service: ?security.acl.voter.basic_permissions }
 
     oro_security.acl.permission_granting_strategy:
         public: false
         class: %oro_security.acl.permission_granting_strategy.class%
         calls:
              - [setAuditLogger, ["@?security.acl.audit_logger"]]
-             - [setSecurityMetadataProvider, ["@oro_security.entity_security_metadata_provider"]]
+             - [setSecurityMetadataProvider, ["@oro_security.entity_security_metadata_provider_link"]]
              - [setContext, ["@oro_security.acl.voter_link"]]
 
     oro_security.acl.permission_map:
@@ -226,6 +224,34 @@ services:
             - '@oro_security.configuration.provider.permission_configuration'
             - '@oro_security.configuration.builder.permission_configuration'
             - '@oro_security.cache.provider.permission'
+
+    oro_security.cache.provider.configurable_permission:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_security_configurable_permission' ] ]
+
+    oro_security.acl.configurable_permission_provider:
+        class: Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider
+        arguments:
+            - '@oro_security.configuration.provider.configurable_permission_configuration'
+            - '@oro_security.cache.provider.configurable_permission'
+
+    oro_security.filter.privilege_capability_filter:
+        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeCapabilityFilter'
+        public: false
+        tags:
+            - { name: oro.security.filter.acl_privilege }
+
+    oro_security.filter.privilege_entity_filter:
+        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeEntityFilter'
+        public: false
+        tags:
+            - { name: oro.security.filter.acl_privilege }
+
+    oro_security.filter.configurable_permission_filter:
+        class: 'Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter'
+        arguments:
+            - '@oro_security.acl.configurable_permission_provider'
 
     oro_security.acl.object_identity_factory:
         class: %oro_security.acl.object_identity_factory.class%
@@ -315,7 +341,6 @@ services:
             - [ setNamespace, [ 'oro_acl_entities' ] ]
 
     oro_security.action_metadata_provider:
-        public: false
         class: %oro_security.action_metadata_provider.class%
         arguments:
             - '@oro_security.acl.annotation_provider'
@@ -324,7 +349,7 @@ services:
 
     oro_security.action_metadata_provider.cache:
         public: false
-        parent: oro.file_cache.abstract
+        parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_acl_actions' ] ]
 
@@ -351,15 +376,12 @@ services:
     oro_security.acl.annotation_listener:
         class: Oro\Bundle\SecurityBundle\Annotation\AclListener
         arguments:
-            - '@oro_security.acl.annotation_provider'
-            - '@oro_security.action_metadata_provider'
-            - '@oro_security.acl.annotation.metadata.dumper'
+            - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
     oro_security.acl.annotation.metadata.dumper:
         class: Oro\Component\Config\Dumper\CumulativeConfigMetadataDumper
-        public: false
         arguments:
             - %kernel.cache_dir%
             - %kernel.debug%
@@ -444,23 +466,10 @@ services:
             - { name: monolog.logger, channel: security }
 
     oro_security.twig.security_extension:
-        class: %oro_security.twig.security_extension.class%
+        class: Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
+        public: false
         arguments:
-            - '@oro_security.security_facade'
-        tags:
-            - { name: twig.extension }
-
-    oro_security.twig.security_organization_extension:
-        class: %oro_security.twig.security_organization_extension%
-        arguments:
-            - '@security.context'
-        tags:
-            - { name: twig.extension }
-
-    oro_security.twig.acl.permission_extension:
-        class: %oro_security.twig.acl.permission_extension.class%
-        arguments:
-            - '@oro_security.acl.permission_manager'
+            - '@service_container'
         tags:
             - { name: twig.extension }
 
@@ -604,7 +613,7 @@ services:
         public: false
 
     oro_security.listener.context_listener:
-        class: %oro_security.listener.context_listener.class%
+        class: Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
         arguments:
             - '@service_container'
         tags:
@@ -630,13 +639,9 @@ services:
             - { name: doctrine.event_listener, event: onClear }
 
     oro_security.listener.console_context_listener:
-        class: %oro_security.listener.console_context_listener.class%
+        class: Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
         arguments:
-            - '@doctrine'
-            - '@security.context'
-            - '@oro_user.manager'
-        calls:
-            - [setContainer, ['@service_container']]
+            - '@service_container'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 250 }
 
@@ -679,10 +684,19 @@ services:
     oro_security.configuration.permission_list_configuration:
         class: %oro_security.configuration.permission_list_configuration.class%
 
+    oro_security.configurable_configuration.permission_list_configuration:
+        class: 'Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionListConfiguration'
+
     oro_security.configuration.provider.permission_configuration:
         class: %oro_security.configuration.provider.permission_configuration.class%
         arguments:
             - '@oro_security.configuration.permission_list_configuration'
+            - %kernel.bundles%
+
+    oro_security.configuration.provider.configurable_permission_configuration:
+        class: 'Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider'
+        arguments:
+            - '@oro_security.configurable_configuration.permission_list_configuration'
             - %kernel.bundles%
 
     oro_security.configuration.builder.permission_configuration:
@@ -710,7 +724,6 @@ services:
         class: Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
         arguments:
             - '@oro_security.security_facade'
-            - '@oro_entity.orm.entity_class_resolver'
             - '@oro_entity.doctrine_helper'
             - '@oro_entity_config.provider.security'
             - '@logger'
