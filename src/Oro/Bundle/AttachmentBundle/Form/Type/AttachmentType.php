@@ -62,7 +62,6 @@ class AttachmentType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'         => 'Oro\Bundle\AttachmentBundle\Entity\Attachment',
-                'cascade_validation' => true,
                 'parentEntityClass'  => '',
                 'checkEmptyFile'     => false,
                 'allowDelete'        => true,

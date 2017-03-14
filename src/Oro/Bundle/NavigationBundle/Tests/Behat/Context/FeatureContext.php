@@ -13,12 +13,30 @@ use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
-class FeatureContext extends OroFeatureContext implements OroPageObjectAware, KernelAwareContext
+class FeatureContext extends OroFeatureContext implements
+    OroPageObjectAware,
+    KernelAwareContext,
+    MessageQueueIsolatorAwareInterface
 {
     use PageObjectDictionary, KernelDictionary;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
 
     /**
      * This step used for system configuration field
@@ -197,6 +215,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $clicked = $menu->openAndClick($firstPage);
 
         $this->waitForAjax();
+        $this->messageQueueIsolator->waitWhileProcessingMessages(5);
 
         $actualPage = $this->getLastPersistedPage($em);
 
@@ -216,6 +235,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
         $actualCount = $this->getPageTransitionCount($em);
 
         foreach ($pages as $page) {
+            $this->messageQueueIsolator->waitWhileProcessingMessages(5);
             $crawler = new Crawler($this->getSession()->getPage()->getHtml());
             $actualTitle = $crawler->filter('head title')->first()->text();
 

@@ -47,7 +47,11 @@ class MenuUpdateDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
-        $grid->setDatasource(clone $this);
+        $datasource = clone $this;
+        if (isset($config['scope_type'])) {
+            $datasource->scopeType = $config['scope_type'];
+        }
+        $grid->setDatasource($datasource);
     }
 
     /**
