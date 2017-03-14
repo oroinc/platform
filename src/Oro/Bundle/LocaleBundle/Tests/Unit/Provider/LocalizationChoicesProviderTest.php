@@ -54,7 +54,12 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetLanguageChoices()
+    /**
+     * "@dataProvider getLanguageChoicesDataProvider
+     *
+     * @param bool $onlyEnabled
+     */
+    public function testGetLanguageChoices($onlyEnabled)
     {
         $data = [
             $this->getEntity(Language::class, ['id' => 105, 'code' => 'en']),
@@ -62,7 +67,8 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguagesByCurrentUser')
+            ->method('getLanguages')
+            ->with($onlyEnabled)
             ->willReturn($data);
 
         $this->assertEquals(
@@ -70,8 +76,17 @@ class LocalizationChoicesProviderTest extends \PHPUnit_Framework_TestCase
                 105 => 'formatted_en',
                 110 => 'formatted_de'
             ],
-            $this->provider->getLanguageChoices()
+            $this->provider->getLanguageChoices($onlyEnabled)
         );
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getLanguageChoicesDataProvider()
+    {
+        yield 'all languages' => ['onlyEnabled' => false];
+        yield 'only enabled languages' => ['onlyEnabled' => true];
     }
 
     public function testGetFormattingChoices()

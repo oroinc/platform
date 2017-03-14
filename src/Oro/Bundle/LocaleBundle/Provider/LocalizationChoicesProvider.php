@@ -43,13 +43,15 @@ class LocalizationChoicesProvider
     }
 
     /**
+     * @param bool $onlyEnabled
+     *
      * @return array
      */
-    public function getLanguageChoices()
+    public function getLanguageChoices($onlyEnabled = false)
     {
         $result = [];
 
-        foreach ($this->languageProvider->getAvailableLanguagesByCurrentUser() as $language) {
+        foreach ($this->languageProvider->getLanguages($onlyEnabled) as $language) {
             $result[$language->getId()] = $this->languageFormatter->formatLocale($language->getCode());
         }
 

@@ -53,7 +53,7 @@ class LanguageSelectType extends AbstractType
     {
         $resolver->setDefaults([
             'empty_value' => '',
-            'choices' => $this->provider->getLanguageChoices(),
+            'choices' => $this->provider->getLanguageChoices(true),
             'translatable_options' => false,
             'configs' => [
                 'placeholder' => 'oro.locale.localization.form.placeholder.select_language',

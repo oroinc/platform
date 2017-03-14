@@ -74,7 +74,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     {
         $data =  ['1' => 'English', '2' => 'Spain'];
 
-        $this->provider->expects($this->once())->method('getLanguageChoices')->willReturn($data);
+        $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
 
         $form = $this->factory->create($this->formType);
 
@@ -99,7 +99,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     {
         $data =  ['42' => 'English', '2' => 'Spain'];
 
-        $this->provider->expects($this->once())->method('getLanguageChoices')->willReturn($data);
+        $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
 
         $form = $this->factory->create($this->formType);
         $form->submit($submittedData);

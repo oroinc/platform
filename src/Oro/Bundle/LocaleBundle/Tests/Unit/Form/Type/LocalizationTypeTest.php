@@ -29,6 +29,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
 
     /** @var array */
     protected static $languages = [
+        '0' => 'en',
         '1' => 'ru',
         '2' => 'en_US'
     ];
@@ -76,7 +77,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      */
     public function submitDataProvider()
     {
-        $localizationItem = $this->createLocalization('name', 'title', 'en', 'en');
+        $localizationItem = $this->createLocalization('name', 'title', 0, 'en');
         $parent = $this->getEntity(Localization::class, ['id' => 1]);
 
         return [
