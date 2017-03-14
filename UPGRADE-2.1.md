@@ -74,6 +74,7 @@ ActionBundle
 - Implemented `Oro\Bundle\ActionBundle\Model\EntityParameterInterface` interface in `Oro\Bundle\ActionBundle\Model\Attribute` class
 - Added `getInternalType()` method to `Oro\Bundle\ActionBundle\Model\Attribute` class
 - Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
+- Added second optional argument `Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria $criteria = null` to method `Oro\Bundle\ActionBundle\Model\OperationRegistry`
 
 ActivityListBundle
 ------------------
