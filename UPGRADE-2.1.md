@@ -178,6 +178,7 @@ DataGridBundle
     - removed property `protected $datagridRouteHelper`
     - removed property `protected $requestStack`
     - removed property `protected $logger`
+- Added method `public function getName()::string` to interface `Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface`
 - Class `Oro\Bundle\DataGridBundle\Controller\GridController`
    - renamed method `filterMetadata` to `filterMetadataAction`
 - Added abstract entity class `Oro\Bundle\DataGridBundle\Entity\AbstractGridView`
@@ -188,7 +189,6 @@ DataGridBundle
     - added argument `Request $request` for methods:
         - `public function postAction(Request $request)`
         - `public function putAction(Request $request, $id)`
-        - `protected function checkCreatePublicAccess(Request $request)`
     - changed type hint of first argument of method `checkEditPublicAccess()` from `GridView $gridView` to `AbstractGridView $gridView`
 - Changed type hint for first argument of `Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager::setDefaultGridView()` from `User $user` to `AbstractUser $user`
 - Class `Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager`

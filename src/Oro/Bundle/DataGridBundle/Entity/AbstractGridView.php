@@ -142,7 +142,7 @@ abstract class AbstractGridView implements ViewInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {

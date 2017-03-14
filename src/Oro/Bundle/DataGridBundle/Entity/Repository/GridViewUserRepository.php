@@ -7,8 +7,8 @@ use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridViewUser;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class GridViewUserRepository extends EntityRepository
@@ -47,11 +47,11 @@ class GridViewUserRepository extends EntityRepository
     }
 
     /**
-     * @param AbstractGridView $view
+     * @param ViewInterface $view
      * @param UserInterface $user
      * @return AbstractGridViewUser
      */
-    public function findByGridViewAndUser(AbstractGridView $view, UserInterface $user)
+    public function findByGridViewAndUser(ViewInterface $view, UserInterface $user)
     {
         return $this->findOneBy(
             [
