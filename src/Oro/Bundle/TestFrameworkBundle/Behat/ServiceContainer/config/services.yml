@@ -98,6 +98,16 @@ services:
         tags:
             - { name: 'context.initializer' }
 
+    oro_behat_session_alias_provider:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProvider
+
+    oro_behat_session_alias_initializer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\SessionAliasAwareInitializer'
+        arguments:
+            - '@oro_behat_session_alias_provider'
+        tags:
+            - { name: 'context.initializer' }
+
     oro_behat_fixture_loader_initializer:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\FixtureLoaderInitializer
         arguments:
