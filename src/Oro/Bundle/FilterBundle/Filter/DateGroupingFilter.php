@@ -286,8 +286,9 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         $datesArray = $subQueryBuilder->getQuery()->getArrayResult();
+        $datesArray = $this->arrayFlatten($datesArray);
 
-        return $this->arrayFlatten($datesArray);
+        return !empty($datesArray) ? $datesArray : [''];
     }
 
     /**

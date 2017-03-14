@@ -239,7 +239,7 @@ class DatagridDateGroupingBuilder
 
     /**
      * Replaces the "from" section of query to be the calendar date table, and moves the original "from"
-     * table to "left join" section. This kind of hack is required as the filter needs a left join which is not possible
+     * table to "left join" section. This kind of hack is required as the filter needs a right join which is not possible
      * in doctrine
      *
      * @param DatagridConfiguration $config
