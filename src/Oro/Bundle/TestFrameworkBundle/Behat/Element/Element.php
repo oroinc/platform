@@ -51,6 +51,15 @@ class Element extends NodeElement
             $this->selectorManipulator->getSelectorAsXpath($session->getSelectorsHandler(), $selector),
             $session
         );
+
+        $this->init();
+    }
+
+    /**
+     * Initialize element
+     */
+    protected function init()
+    {
     }
 
     /**

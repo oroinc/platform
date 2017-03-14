@@ -20,7 +20,6 @@ class TimePicker extends Element
         if ($this->hasAttribute('data-validation')) {
             $timeSelect = $this->getPage()->findVisible('css', '.ui-timepicker-wrapper');
             $time = $this->formatTime($dateTime);
-            var_dump($time);
 
             /** @var NodeElement $li */
             foreach ($timeSelect->findAll('css', 'li') as $li) {

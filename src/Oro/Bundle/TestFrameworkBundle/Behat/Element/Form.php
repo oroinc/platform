@@ -25,9 +25,26 @@ class Form extends Element
             $this->getDriver()->switchToIFrame($this->options['embedded-id']);
         }
         foreach ($table->getRows() as $row) {
-            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
-            $value = self::normalizeValue($row[1]);
-            $this->fillField($locator, $value);
+            list($label, $value) = $row;
+            $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
+            $value = self::normalizeValue($value);
+
+            $field = $this->findField($locator);
+            if (null === $field) {
+                throw new ElementNotFoundException(
+                    $this->getDriver(),
+                    'form field',
+                    'id|name|label|value|placeholder',
+                    $locator
+                );
+            }
+            if (isset($this->options['mapping'][$label]['element'])) {
+                $this->elementFactory->wrapElement(
+                    $this->options['mapping'][$label]['element'],
+                    $field
+                );
+            }
+            $field->setValue($value);
         }
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToWindow();
