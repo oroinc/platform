@@ -3,22 +3,21 @@
 namespace Oro\Bundle\NavigationBundle\Layout\DataProvider;
 
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 class BreadcrumbProvider
 {
     /**
-     * @var ServiceLink
+     * @var BreadcrumbManagerInterface
      */
-    private $breadcrumbManagerLink;
+    private $breadcrumbManager;
 
     /**
-     * @param ServiceLink $breadcrumbManagerLink
+     * @param BreadcrumbManagerInterface $breadcrumbManager
      */
     public function __construct(
-        ServiceLink $breadcrumbManagerLink
+        BreadcrumbManagerInterface $breadcrumbManager
     ) {
-        $this->breadcrumbManagerLink = $breadcrumbManagerLink;
+        $this->breadcrumbManager = $breadcrumbManager;
     }
 
     /**
@@ -30,9 +29,6 @@ class BreadcrumbProvider
      */
     public function getBreadcrumbs($menuName)
     {
-        /** @var BreadcrumbManagerInterface $breadcrumbManager */
-        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
-
-        return $breadcrumbManager->getBreadcrumbs($menuName, false);
+        return $this->breadcrumbManager->getBreadcrumbs($menuName, false);
     }
 }

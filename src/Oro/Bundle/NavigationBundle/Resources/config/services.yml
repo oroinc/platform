@@ -480,7 +480,7 @@ services:
     oro_navigation.data_provider.breadcrumb:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\BreadcrumbProvider
         arguments:
-          - '@oro_navigation.chain_breadcrumb_manager.link'
+          - '@oro_navigation.chain_breadcrumb_manager'
         tags:
             - { name: layout.data_provider, alias: breadcrumb_provider }
 

@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Layout\DataProvider;
 
 use Oro\Bundle\NavigationBundle\Layout\DataProvider\BreadcrumbProvider;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
-use Oro\Component\DependencyInjection\ServiceLink;
 
 class BreadcrumbProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,19 +13,18 @@ class BreadcrumbProviderTest extends \PHPUnit_Framework_TestCase
     private $provider;
 
     /**
-     * @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject
+     * @var BreadcrumbManagerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $breadcrumbManagerLink;
+    private $breadcrumbManager;
 
     public function setUp()
     {
-        $this->breadcrumbManagerLink = $this->createMock(ServiceLink::class);
-        $this->provider              = new BreadcrumbProvider($this->breadcrumbManagerLink);
+        $this->breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
+        $this->provider          = new BreadcrumbProvider($this->breadcrumbManager);
     }
 
     public function testGetBreadcrumbs()
     {
-        $breadcrumbManager = $this->createMock(BreadcrumbManagerInterface::class);
         $menuName          = 'customer_usermenu';
         $breadcrumbs       = [
             [
@@ -40,14 +38,10 @@ class BreadcrumbProviderTest extends \PHPUnit_Framework_TestCase
                 'item'  => null
             ]
         ];
-        $breadcrumbManager->expects($this->once())
+        $this->breadcrumbManager->expects($this->once())
             ->method('getBreadcrumbs')
             ->with($menuName, false)
             ->willReturn($breadcrumbs);
-
-        $this->breadcrumbManagerLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($breadcrumbManager);
 
         $result = $this->provider->getBreadcrumbs($menuName);
         $this->assertEquals($breadcrumbs, $result);
