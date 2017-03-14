@@ -57,7 +57,6 @@ class ReportType extends AbstractQueryDesignerType
             array(
                 'data_class'         => 'Oro\Bundle\ReportBundle\Entity\Report',
                 'intention'          => 'report',
-                'cascade_validation' => true
             )
         );
 
