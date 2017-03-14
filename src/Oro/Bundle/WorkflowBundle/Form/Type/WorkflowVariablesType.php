@@ -63,7 +63,10 @@ class WorkflowVariablesType extends AbstractType
         foreach ($variables as $variable) {
             /** @var TypeGuess $typeGuess */
             $typeGuess = $this->variableGuesser->guessVariableForm($variable);
-            $builder->add($variable->getName(), $typeGuess->getType(), $typeGuess->getOptions());
+
+            if ($typeGuess instanceof TypeGuess) {
+                $builder->add($variable->getName(), $typeGuess->getType(), $typeGuess->getOptions());
+            }
         }
     }
 
