@@ -386,7 +386,7 @@ class ImportExportController extends Controller
             throw new AccessDeniedException('Insufficient permission');
         }
 
-        $job = $this->getDoctrine()->getManager()->getRepository(Job::class)->find($jobId);
+        $job = $this->getDoctrine()->getManagerForClass(Job::class)->getRepository(Job::class)->find($jobId);
 
         if (!$job) {
             throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
