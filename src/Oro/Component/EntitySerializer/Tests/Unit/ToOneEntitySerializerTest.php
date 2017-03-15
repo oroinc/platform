@@ -521,4 +521,123 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             $result
         );
     }
+
+    public function testManyToOneWithRenamedIdentifierField()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' c1_.name AS name_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN category_table c1_ ON p0_.category_name = c1_.name'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'name_2'          => 'category_name',
+                    'category_name_3' => 'category_name',
+                    'owner_id_4'      => 10,
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'name'     => null,
+                    'category' => [
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id' => [
+                                'property_path' => 'name'
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'       => 1,
+                    'name'     => 'product_name',
+                    'category' => [
+                        'id' => 'category_name'
+                    ],
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testManyToOneCollapsedWithRenamedIdentifierField()
+    {
+        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
+            . ' c1_.name AS name_2,'
+            . ' p0_.category_name AS category_name_3, p0_.owner_id AS owner_id_4'
+            . ' FROM product_table p0_'
+            . ' LEFT JOIN category_table c1_ ON p0_.category_name = c1_.name'
+            . ' WHERE p0_.id = ?',
+            [
+                [
+                    'id_0'            => 1,
+                    'name_1'          => 'product_name',
+                    'name_2'          => 'category_name',
+                    'category_name_3' => 'category_name',
+                    'owner_id_4'      => 10,
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'       => null,
+                    'name'     => null,
+                    'category' => [
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => [
+                                'property_path' => 'name'
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'       => 1,
+                    'name'     => 'product_name',
+                    'category' => 'category_name',
+                ]
+            ],
+            $result
+        );
+    }
 }

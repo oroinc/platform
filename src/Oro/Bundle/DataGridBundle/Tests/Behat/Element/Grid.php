@@ -134,7 +134,7 @@ class Grid extends Table
                 ->createElement('GridFloatingMenu')
                 ->find('named', ['link', ucfirst($action)]);
         } else {
-            $link = $row->find('named', ['link', $action]);
+            $link = $row->find('named', ['link', ucfirst($action)]);
         }
 
         self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $row->getText(), $action));
