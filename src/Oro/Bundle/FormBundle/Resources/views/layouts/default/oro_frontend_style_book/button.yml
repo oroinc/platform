@@ -3,11 +3,6 @@ layout:
         - '@setBlockTheme':
             themes: 'button.html.twig'
 
-        - '@setOption':
-            id: page_title
-            optionName: defaultValue
-            optionValue: 'oro_frontend_style_book.groups.buttons.title'
-
         - '@addTree':
             items:
                 group_element_button_action_view:
