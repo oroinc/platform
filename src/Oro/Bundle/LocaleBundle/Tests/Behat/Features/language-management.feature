@@ -5,58 +5,58 @@ Feature: Language management
 
   Scenario: Add Germany language
     Given I login as administrator
-    When go to System/Localization/Languages
-    Then should see English in grid with following data:
+    When I go to System/Localization/Languages
+    Then I should see English in grid with following data:
       | Status | Enabled |
-    When click "Add Language"
-    And select "German (Germany) - de_DE" from "Language"
-    And click "Add Language"
-    Then should see "Language has been added" flash message
-    And should see "German (Germany)" in grid with following data:
+    When I press "Add Language"
+    And I select "German (Germany) - de_DE" from "Language"
+    And I press "Add Language"
+    Then I should see "Language has been added" flash message
+    And I should see "German (Germany)" in grid with following data:
       | Status  | Disabled         |
       | Updates | Can be installed |
 
   Scenario: Enable Germany language
     Given I login as administrator
-    When go to System/Localization/Languages
-    And click Enable "German (Germany)" in grid
-    Then should see "Language has been enabled" flash message
-    And should see German in grid with following data:
+    When I go to System/Localization/Languages
+    And I click Enable "German (Germany)" in grid
+    Then I should see "Language has been enabled" flash message
+    And I should see German in grid with following data:
       | Status  | Enabled          |
       | Updates | Can be installed |
 
   Scenario: Install translations for Germany language from Crowdin
     Given I login as administrator
-    When go to System/Localization/Languages
-    And click Install "German (Germany)" in grid
-    And press "Install"
+    When I go to System/Localization/Languages
+    And I click Install "German (Germany)" in grid
+    And I press "Install"
     And should see "German (Germany)" in grid with following data:
       | Status  | Enabled    |
       | Updates | Up to date |
 
   Scenario: Check installed translations for Germany language
     Given I login as administrator
-    When go to System/Localization/Translations
-    And check "English" in Language filter
-    And keep in mind number of records in list
-    And reset Language filter
-    And check "German (Germany)" in Language filter
+    When I go to System/Localization/Translations
+    And I check "English" in Language filter
+    And I keep in mind number of records in list
+    And I reset Language filter
+    And I check "German (Germany)" in Language filter
     Then the number of records remained the same
-    When check "Yes" in "Translated: All" filter strictly
+    When I check "Yes" in "Translated: All" filter strictly
     Then the number of records greater than or equal to 1
 
   Scenario: Create localization with German language
     Given I login as administrator
-    When go to System/Localization/Localizations
-    And press "Create Localization"
-    And fill "Localization Form" with:
+    When I go to System/Localization/Localizations
+    And I press "Create Localization"
+    And I fill "Localization Form" with:
       | Name       | German Localization Name  |
       | Title      | German Localization Title |
       | Language   | German (Germany)          |
       | Formatting | German (Germany)          |
-    And save and close form
-    Then should see "Localization has been saved" flash message
-    And should see Localization with:
+    And I save and close form
+    Then I should see "Localization has been saved" flash message
+    And I should see Localization with:
       | Name       | German Localization Name  |
       | Title      | German Localization Title |
       | Language   | German (Germany)          |
