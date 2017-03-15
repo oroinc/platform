@@ -99,6 +99,12 @@ layout:
                 style_book_button_element_size_s:
                     blockType: block
 
+                group_element_buttons_group:
+                    blockType: group_element
+                    options:
+                        anchor: buttons group
+                        label: Buttons Group
+
                 group_element_button_element_group_view:
                     blockType: group_element_item
                     options:
@@ -142,22 +148,8 @@ layout:
                     group_element_buttons:
                         group_element_button_view:
                             style_book_button_element: ~
-                        group_element_button_action_view:
-                            style_book_button_element_action: ~
-                        group_element_button_info_view:
-                            style_book_button_element_info: ~
-                        group_element_button_primary_view:
-                            style_book_button_element_primary: ~
-                        group_element_button_link_view:
-                            style_book_button_element_link: ~
-                        group_element_button_large_size_view:
-                            style_book_button_element_large_size: ~
-                        group_element_button_size_l_view:
-                            style_book_button_element_size_l: ~
-                        group_element_button_size_m_view:
-                            style_book_button_element_size_m: ~
-                        group_element_button_size_s_view:
-                            style_book_button_element_size_s: ~
+
+                    group_element_buttons_group:
                         group_element_button_element_group_view:
                             style_book_button_element_group: ~
                         group_element_button_element_inline_group_view:

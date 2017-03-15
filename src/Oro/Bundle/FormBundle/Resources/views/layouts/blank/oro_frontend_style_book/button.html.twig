@@ -6,39 +6,7 @@
 {% endblock %}
 
 {% block _style_book_button_element_widget %}
-    <button class="btn btn-default" type="button">An Ordinary Button</button>
-{% endblock %}
-
-{% block _style_book_button_element_action_widget %}
-    <button class="btn btn--action" type="submit">Action Button</button>
-{% endblock %}
-
-{% block _style_book_button_element_info_widget %}
-    <button class="btn btn--info" type="submit">Info Button</button>
-{% endblock %}
-
-{% block _style_book_button_element_primary_widget %}
-    <button class="btn btn--primary" type="submit">Primary Button</button>
-{% endblock %}
-
-{% block _style_book_button_element_link_widget %}
-    <a href="#" class="btn btn--link">Link Button</a>
-{% endblock %}
-
-{% block _style_book_button_element_large_size_widget %}
-    <button class="btn btn--default btn--large" type="submit">Default Button, Large</button>
-{% endblock %}
-
-{% block _style_book_button_element_size_l_widget %}
-    <button class="btn btn--default btn--size-l" type="submit">Default Button, L(arge)</button>
-{% endblock %}
-
-{% block _style_book_button_element_size_m_widget %}
-    <button class="btn btn--default btn--size-m" type="submit">Default Button, M(edium)</button>
-{% endblock %}
-
-{% block _style_book_button_element_size_s_widget %}
-    <button class="btn btn--default btn--size-s" type="submit">Default Button, S(mall)</button>
+    <button class="btn" type="button">An Ordinary Button</button>
 {% endblock %}
 
 {% block _style_book_button_element_group_widget %}
@@ -56,9 +24,17 @@
 {% endblock %}
 
 {% block _style_book_button_element_inline_group_widget %}
-    <button class="action btn"><i class="fa-filter hide-text"></i></button>
-    <button class="action btn"><i class="fa-repeat hide-text"></i></button>
-    <button class="action btn"><i class="fa-refresh hide-text"></i></button>
+<div class="btn-group">
+    <button class="btn">
+        <i class="fa-filter hide-text"></i>
+    </button>
+    <button class="btn">
+        <i class="fa-repeat hide-text"></i>
+    </button>
+    <button class="btn">
+        <i class="fa-refresh hide-text"></i>
+    </button>
+</div>
 {% endblock %}
 
 {% block _style_book_button_element_btn_group_widget %}
