@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -107,7 +108,12 @@ class ImportStrategyHelper
             $obj = new FieldVote($obj, $property);
         }
 
-        return $this->securityFacade->isGranted($attributes, $obj);
+        try {
+            return $this->securityFacade->isGranted($attributes, $obj);
+        } catch (InvalidDomainObjectException $exception) {
+            // if object do not have identity we skipp check
+            return true;
+        }
     }
 
     /**

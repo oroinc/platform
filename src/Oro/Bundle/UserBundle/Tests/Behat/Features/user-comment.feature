@@ -22,10 +22,10 @@ Feature: User user comment
     And press "Add Comment"
     When I fill "Comment Form" with:
       | Message    | Amazing cat |
-      | Attachment | cat.jpg     |
+      | Attachment | cat0.jpg    |
     And press "Add"
     Then I should see "Amazing cat"
-    When I click on "cat.jpg" attachment thumbnail
+    When I click on "cat0.jpg" attachment thumbnail
     Then I should see large image
     And I close large image preview
-    And download link for "cat.jpg" attachment should work
+    And download link for "cat0.jpg" attachment should work

@@ -783,7 +783,7 @@ class OroMainContext extends MinkContext implements
                     $labelElement->getParent()->find('css', 'div.controls div.control-label')
                 );
 
-                if (true === $controlLabel->compareValues(Form::normalizeValue($value))) {
+                if (true === $controlLabel->compareValues(Form::normalizeValue($value, $label))) {
                     continue 2;
                 }
             }
