@@ -108,7 +108,7 @@ class JobRunner
             return;
         }
 
-        if (! $job->getStartedAt()) {
+        if (! $job->getStartedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED) {
             $this->jobProcessor->startChildJob($job);
         }
         $jobRunner = new JobRunner($this->jobProcessor, $job->getRootJob());

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
@@ -217,7 +218,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $childJob1->setData($resultOfImportJob1);
         $childJob2->setData($resultOfImportJob2);
 
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->getContainer()->get('doctrine.orm.message_queue_job_entity_manager');
         $em->refresh($rootJob);
         $messageData = [
             'rootImportJobId' => $rootJob->getId(),
