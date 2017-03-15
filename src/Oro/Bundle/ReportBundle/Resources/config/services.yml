@@ -50,7 +50,7 @@ services:
             - [setDateGroupingBuilder, ['@oro_report.grid.date_grouping_builder']]
 
     oro_report.grid.date_grouping_builder:
-        class: Oro\Bundle\ReportBundle\EventListener\DatagridDateGroupingBuilder
+        class: Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder
         arguments:
             - "%oro_report.calendar_date.entity.class%"
 

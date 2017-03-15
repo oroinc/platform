@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ReportBundle\EventListener;
+namespace Oro\Bundle\ReportBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
@@ -239,8 +239,8 @@ class DatagridDateGroupingBuilder
 
     /**
      * Replaces the "from" section of query to be the calendar date table, and moves the original "from"
-     * table to "left join" section. This kind of hack is required as the filter needs a right join which is not possible
-     * in doctrine
+     * table to "left join" section. This kind of hack is required as the filter needs a right join
+     * which is not possible in doctrine
      *
      * @param DatagridConfiguration $config
      * @param string $dateFieldTableAlias
