@@ -54,8 +54,6 @@ layout:
                     options:
                         form: '=data["style_book_form"].getStyleBookFormView()["datetime"]'
 
-
-
                 group_element_form_select:
                     blockType: group_element
                     options:
