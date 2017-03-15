@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ReportBundle\Entity\Report;
-use Oro\Bundle\ReportBundle\EventListener\DatagridDateGroupingBuilder;
+use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
 

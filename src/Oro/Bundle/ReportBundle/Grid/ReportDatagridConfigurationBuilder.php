@@ -4,7 +4,6 @@ namespace Oro\Bundle\ReportBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
-use Oro\Bundle\ReportBundle\EventListener\DatagridDateGroupingBuilder;
 
 class ReportDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
 {
@@ -33,7 +32,7 @@ class ReportDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
      * @param DatagridDateGroupingBuilder $dateGroupingBuilder
      * @return $this
      */
-    public function setDateGroupingBuilder($dateGroupingBuilder)
+    public function setDateGroupingBuilder(DatagridDateGroupingBuilder $dateGroupingBuilder)
     {
         $this->dateGroupingBuilder = $dateGroupingBuilder;
 
