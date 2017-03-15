@@ -11,11 +11,6 @@ layout:
                       anchor: notifications
                       label: Notifications
 
-                group_element_grid_view_notification_flash:
-                    blockType: group_element
-                    options:
-                      anchor: notification_flash
-                      label: Flash Notification
                 group_element_item_notification_flash_holder:
                     blockType: group_element_item
                     options:
@@ -51,6 +46,7 @@ layout:
                     options:
                         anchor: notification_message
                         label: Notification Message
+
                 group_element_item_notification_message_holder:
                     blockType: group_element_item
                     options:
@@ -116,8 +112,7 @@ layout:
 
             tree:
                 style_book_content:
-                    group_element_grid_view_notifications:
-                        group_element_grid_view_notification_flash:
+                        group_element_grid_view_notifications:
                             group_element_item_notification_flash_holder:
                                 style_book_grid_element_notification_flash: ~
                             group_element_item_notification_flash_success_holder:
