@@ -99,7 +99,7 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
 
             foreach ($sourceEntityData['change_set'] as $sourceFieldName => $sourceChange) {
-                if (false == isset($sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'])) {
+                if (!isset($sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'])) {
                     continue;
                 }
 
@@ -214,30 +214,34 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
     ) {
         list($old, $new) = $sourceChange;
 
-        foreach ($new['inserted'] as $insertedEntityData) {
-            $entityId = $insertedEntityData['entity_id'];
+        if (isset($new['inserted']) && is_array($new['inserted'])) {
+            foreach ($new['inserted'] as $insertedEntityData) {
+                $entityId = $insertedEntityData['entity_id'];
 
-            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-            $change[1]['inserted'][] = [
-                'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
-            ];
+                $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+                $change[1]['inserted'][] = [
+                    'entity_class' => $sourceEntityClass,
+                    'entity_id' => $sourceEntityId,
+                    'change_set' => [],
+                ];
 
-            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+                $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+            }
         }
 
-        foreach ($new['deleted'] as $deletedEntityData) {
-            $entityId = $deletedEntityData['entity_id'];
+        if (isset($new['deleted']) && is_array($new['deleted'])) {
+            foreach ($new['deleted'] as $deletedEntityData) {
+                $entityId = $deletedEntityData['entity_id'];
 
-            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-            $change[1]['deleted'][] = [
-                'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
-            ];
+                $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+                $change[1]['deleted'][] = [
+                    'entity_class' => $sourceEntityClass,
+                    'entity_id' => $sourceEntityId,
+                    'change_set' => [],
+                ];
 
-            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+                $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+            }
         }
     }
 

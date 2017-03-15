@@ -20,6 +20,7 @@ use Symfony\Component\DomCrawler\Crawler;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class GridContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -490,6 +491,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iCheckAllRecordsInGrid()
     {
+        if (!count($this->getGrid()->getRows())) {
+            self::fail('Grid has no records to check');
+        }
         $this->getGrid()->massCheck('All');
     }
 
