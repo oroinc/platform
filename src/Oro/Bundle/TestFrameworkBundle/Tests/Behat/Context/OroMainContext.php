@@ -375,11 +375,15 @@ class OroMainContext extends MinkContext implements
      * @Given /^(?:|I )login to dashboard as "(?P<loginAndPassword>(?:[^"]|\\")*)" user$/
      * @Given /^(?:|I )login as administrator$/
      * @Given /^(?:|I )login to dashboard as administrator$/
+     *
+     * @param string $loginAndPassword
      */
     public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
-        $uri = $this->getContainer()->get('router')->generate('oro_default');
-        $this->visit($uri);
+        $router = $this->getContainer()->get('router');
+
+        $this->visit($router->generate('oro_user_security_logout'));
+        $this->visit($router->generate('oro_default'));
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');

@@ -286,9 +286,15 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
      *
      * @param string $operationName
      * @param string|null $expected
+     * @param OperationFindCriteria $criteria
+     * @param array $filterResult
      */
-    public function testFindByName($operationName, $expected)
-    {
+    public function testFindByName(
+        $operationName,
+        $expected,
+        OperationFindCriteria $criteria = null,
+        array $filterResult = []
+    ) {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn(
@@ -299,7 +305,20 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $operation = $this->registry->findByName($operationName);
+        $filter = $this->createMock(OperationRegistryFilterInterface::class);
+
+        if ($criteria) {
+            $filter->expects($this->once())
+                ->method('filter')
+                ->with($this->isType('array'), $criteria)
+                ->willReturn($filterResult);
+        } else {
+            $filter->expects($this->never())->method($this->anything());
+        }
+
+        $this->registry->addFilter($filter);
+
+        $operation = $this->registry->findByName($operationName, $criteria);
 
         $this->assertEquals($expected, $operation ? $operation->getName() : $operation);
     }
@@ -317,6 +336,17 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             'valid operation name' => [
                 'operationName' => 'operation1',
                 'expected' => 'operation1'
+            ],
+            'with filter criteria and operation not found' => [
+                'operationName' => 'operation1',
+                'expected' => null,
+                'criteria' => new OperationFindCriteria(null, null, null)
+            ],
+            'with filter criteria and operation found' => [
+                'operationName' => 'operation1',
+                'expected' => 'operation1',
+                'criteria' => new OperationFindCriteria(null, null, null),
+                'filterResult' => ['operation1']
             ],
         ];
     }
