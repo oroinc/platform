@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 
@@ -20,7 +24,17 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->guesser = new VariableGuesser();
+        $formRegistry = $this->createMock(FormRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $formConfigProvider = $this->createMock(ConfigProvider::class);
+
+        $this->guesser = new VariableGuesser(
+            $formRegistry,
+            $managerRegistry,
+            $entityConfigProvider,
+            $formConfigProvider
+        );
         $this->guesser->addFormTypeMapping('string', 'Symfony\Component\Form\Extension\Core\Type\TextType');
 
         $this->variable = $this->createMock(Variable::class);

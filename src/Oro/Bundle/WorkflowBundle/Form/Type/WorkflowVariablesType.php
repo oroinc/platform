@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -63,7 +64,24 @@ class WorkflowVariablesType extends AbstractType
         foreach ($variables as $variable) {
             /** @var TypeGuess $typeGuess */
             $typeGuess = $this->variableGuesser->guessVariableForm($variable);
-            $builder->add($variable->getName(), $typeGuess->getType(), $typeGuess->getOptions());
+            if (!$typeGuess instanceof TypeGuess) {
+                continue;
+            }
+
+            $fieldName = $variable->getName();
+            $builder->add($fieldName, $typeGuess->getType(), $typeGuess->getOptions());
+
+            if ('entity' === $variable->getType()) {
+                $builder->get($fieldName)
+                    ->addModelTransformer(new CallbackTransformer(
+                        function ($entity) {
+                            return $entity;
+                        },
+                        function ($entity) {
+                            return $entity->getId();
+                        }
+                    ));
+            }
         }
     }
 

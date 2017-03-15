@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
@@ -101,6 +102,11 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         foreach ($childrenOptions as $childName => $childOptions) {
             $this->assertTrue($form->has($childName));
             $childForm = $form->get($childName);
+
+            if (!is_array($childOptions)) {
+                continue;
+            }
+
             foreach ($childOptions as $optionName => $optionValue) {
                 $this->assertTrue($childForm->getConfig()->hasOption($optionName));
                 $this->assertEquals($optionValue, $childForm->getConfig()->getOption($optionName));
@@ -197,6 +203,32 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     ]
                 ]
             ],
+//            'entity_variables' => [
+//                'submitData' => ['var_entity' => 1],
+//                'formData' => $this->createWorkflowData(['var_entity' => 1]),
+//                'form_options' => [
+//                    'workflow' => $this->createWorkflowWithVariables([
+//                        [
+//                            'name' => 'var_entity',
+//                            'label' => 'Variable Entity Label',
+//                            'value' => 1,
+//                            'type' => 'entity',
+//                            'options' => [
+//                                'class' => 'Oro\Bundle\UserBundle\Entity\User'
+//                            ]
+//                        ]
+//                    ])
+//                ],
+//                'childrenOptions' => [
+//                    'var_entity' => $this->createMock(Form::class)
+//                ],
+//                'guessedData' => [
+//                    [
+//                        'form_type' => TextType::class,
+//                        'form_options' => []
+//                    ]
+//                ]
+//            ],
         ];
     }
 
