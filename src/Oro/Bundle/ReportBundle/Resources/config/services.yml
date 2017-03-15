@@ -46,6 +46,13 @@ services:
     oro_report.grid.datagrid_configuration_builder:
         class: %oro_report.grid.datagrid_configuration_builder.class%
         parent: oro_report.grid.base_configuration_builder
+        calls:
+            - [setDateGroupingBuilder, ['@oro_report.grid.date_grouping_builder']]
+
+    oro_report.grid.date_grouping_builder:
+        class: Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder
+        arguments:
+            - "%oro_report.calendar_date.entity.class%"
 
     oro_report.listener.segment_subscriber:
         class: %oro_report.listener.segment_subscriber.class%
@@ -84,3 +91,15 @@ services:
         class: Oro\Bundle\ReportBundle\Validator\ReportColumnDublicateValidator
         tags:
             - { name: validator.constraint_validator, alias: oro_report.report_column_dublicate_validator }
+
+    oro_report.validator.report_date_grouping_validator:
+        class: Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator
+        tags:
+            - { name: validator.constraint_validator, alias: oro_report.report_date_grouping_validator }
+
+    oro_report.datagrid.extension.empty_link_remover:
+        class: Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension
+        arguments:
+            - "%oro_report.calendar_date.entity.class%"
+        tags:
+            - { name: oro_datagrid.extension }
