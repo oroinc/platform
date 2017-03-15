@@ -105,6 +105,7 @@ define(function(require) {
             if (this.options.activityListOptions.pager) {
                 collection.setPageSize(this.options.activityListOptions.pager.pagesize);
                 collection.setCount(this.options.activityListCount);
+                collection.setSortingField(this.options.activityListOptions.pager.sortingField);
             }
 
             activityOptions.collection = collection;

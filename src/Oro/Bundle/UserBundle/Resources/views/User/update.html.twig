@@ -2,7 +2,7 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
 
 {% set fullname = form.vars.value|oro_format_name|default('N/A') %}
-{% oro_title_set({params : {"%username%": fullname }}) %}
+{% oro_title_set({params : {"%username%": fullname, "%entityName%": 'oro.user.entity_label'|trans }}) %}
 
 {% set formAction = form.vars.value.id ? path('oro_user_update', { id: form.vars.value.id}) : path('oro_user_create') %}
 

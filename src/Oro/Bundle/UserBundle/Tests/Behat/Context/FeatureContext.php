@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
@@ -96,5 +97,18 @@ class FeatureContext extends OroFeatureContext implements
         $this->oroMainContext->assertPage('Login');
         $this->getSession('second_session')->stop();
         $this->getMink()->setDefaultSessionName('first_session');
+    }
+
+    /**
+     * Alias for setting parameters on configuration forms
+     * Example:     When I set configuration to:
+     *                | Minimal password length      | 10   |
+     *                | Require a number             | true |
+     *
+     * @When /^(?:|I )set configuration to:$/
+     */
+    public function iSetConfiguration(TableNode $tableNode)
+    {
+        $this->oroMainContext->iFillFormWith($tableNode, 'SystemConfigForm');
     }
 }

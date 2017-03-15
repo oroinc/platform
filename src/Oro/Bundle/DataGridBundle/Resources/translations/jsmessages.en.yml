@@ -112,9 +112,7 @@ oro:
         mass_action:
             title: Mass Actions
             delete:
-                selected_message: >
-                    You have selected {{ selected }} records.<br/>
-                    Are you sure you want to delete them?
+                selected_message: You have selected {{ selected }} record.<br/> Are you sure you want to delete it?|You have selected {{ selected }} records.<br/> Are you sure you want to delete them?
                 max_limit_message: >
                     The maximum number of records that can be deleted at once is {{ max_limit }}.<br/>
                     Are you sure you want to delete first {{ max_limit }} records in the selection?

@@ -39,7 +39,8 @@ class WorkflowAwareEntity implements TestFrameworkEntityInterface
 
     /**
      * @param string $name
-     * @return WorkflowAwareEntity
+     *
+     * @return $this
      */
     public function setName($name)
     {
