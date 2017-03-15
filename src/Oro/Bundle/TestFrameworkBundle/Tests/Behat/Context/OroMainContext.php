@@ -68,7 +68,7 @@ class OroMainContext extends MinkContext implements
      */
     public function beforeStep(BeforeStepScope $scope)
     {
-        $this->messageQueueIsolator->waitWhileProcessingMessages(10);
+        $this->messageQueueIsolator->waitWhileProcessingMessages(30);
 
         if (false === $this->getMink()->isSessionStarted('first_session')) {
             return;
