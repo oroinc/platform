@@ -1,5 +1,10 @@
 oro_behat_extension:
   elements:
+    Page:
+      selector:
+        type: xpath
+        locator: '//html'
+
     Entity Edit Button:
       selector: 'a.edit-button'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

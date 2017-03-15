@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ReportBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Report;
-use Oro\Bundle\ReportBundle\EventListener\DatagridDateGroupingBuilder;
+use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
