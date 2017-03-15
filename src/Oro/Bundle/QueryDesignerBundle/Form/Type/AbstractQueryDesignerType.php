@@ -13,6 +13,8 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 abstract class AbstractQueryDesignerType extends AbstractType
 {
+    const DATE_GROUPING_FORM_NAME = 'dateGrouping';
+
     /**
      * {@inheritdoc}
      */
@@ -65,7 +67,8 @@ abstract class AbstractQueryDesignerType extends AbstractType
             array(
                 'grouping_column_choice_type' => 'hidden',
                 'column_column_choice_type'   => 'hidden',
-                'filter_column_choice_type'   => 'oro_entity_field_select'
+                'filter_column_choice_type'   => 'oro_entity_field_select',
+                'date_grouping_choice_type'   => 'oro_entity_field_select'
             );
     }
 
@@ -127,6 +130,23 @@ abstract class AbstractQueryDesignerType extends AbstractType
                         'entity'             => $entity,
                         'auto_initialize'    => false
                     )
+                )
+            );
+        }
+
+        $dateGroupingChoiceType = $config->getOption('date_grouping_choice_type');
+        if ($dateGroupingChoiceType) {
+            $form->add(
+                $factory->createNamed(
+                    AbstractQueryDesignerType::DATE_GROUPING_FORM_NAME,
+                    'oro_query_designer_date_grouping',
+                    null,
+                    [
+                        'mapped' => false,
+                        'column_choice_type' => $dateGroupingChoiceType,
+                        'entity' => $entity,
+                        'auto_initialize' => false
+                    ]
                 )
             );
         }

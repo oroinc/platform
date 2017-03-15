@@ -101,6 +101,7 @@
                                                 <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
                                             {% endif %}
                                         </div>
+                                        {% block after_breadcrumbs %}{% endblock %}
                                     {% endif %}
                                     {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                 {% endblock breadcrumbs %}
@@ -152,8 +153,25 @@
                         'priority' : 1000,
                         'subblocks': [
                             {
-                                'spanClass': 'empty',
+                                'spanClass': 'empty activities-container',
                                 'data': [activitiesData]
+                            }
+                        ]
+                    }]) %}
+                {% endif %}
+
+                {%- set marketingActivitiesData -%}
+                    {% placeholder view_content_data_marketing_activities with {entity: entity} %}
+                {%- endset -%}
+
+                {% if marketingActivitiesData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'oro.marketingactivity.sections.marketingactivities'|trans,
+                        'priority' : 1050,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty marketing-activities-container',
+                                'data': [marketingActivitiesData]
                             }
                         ]
                     }]) %}

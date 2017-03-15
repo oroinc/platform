@@ -31,7 +31,7 @@ Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
         className:
             - NotBlank:  ~
             - Regex:
-                pattern: "/^[a-z]+[a-z0-9]*$/i"
+                pattern: "/^([0-9]+[a-zA-Z]+|[a-zA-Z]+)[0-9a-zA-Z]*$/i"
                 message: "This value should contain only alphabetic symbols and numbers."
             - oro_entity_extend:NotSqlKeyword: {groups: Sql}
             - oro_entity_extend:NotPhpKeyword: {groups: Php}

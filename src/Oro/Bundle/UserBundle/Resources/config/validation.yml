@@ -17,7 +17,7 @@ Oro\Bundle\UserBundle\Entity\User:
             - Email:        ~
         plainPassword:
             - NotBlank:
-                groups:     [Registration]
+                groups:     [Registration, ResetPassword]
             - Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity: ~
         enabled:
             - NotNull:      ~
@@ -39,6 +39,8 @@ Oro\Bundle\UserBundle\Entity\User:
             - LessThanOrEqual:
                 value: now UTC
                 message: This value cannot be in the future.
+        emails:
+            - Valid: ~
 
 Oro\Bundle\UserBundle\Entity\Role:
     constraints:

@@ -310,6 +310,25 @@ class WorkflowDefinition implements DomainObjectInterface
     }
 
     /**
+     * @return array
+     */
+    public function getVirtualAttributes()
+    {
+        $virtualAttributes = [];
+
+        $attributes = $this->getConfiguration()['attributes'];
+        foreach ($attributes as $attributeName => $attributeOptions) {
+            if (!isset($attributeOptions['options']['virtual']) || !$attributeOptions['options']['virtual']) {
+                continue;
+            }
+
+            $virtualAttributes[$attributeName] = $attributeOptions;
+        }
+
+        return $virtualAttributes;
+    }
+
+    /**
      * Set name
      *
      * @param string $name
