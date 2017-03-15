@@ -118,7 +118,9 @@ class OperationRegistry
             }
         }
 
-        if ($criteria && !$this->filter([$operation], $criteria)) {
+        if ($operation && $criteria &&
+            (!$this->isApplicable($this->configuration[$name], $criteria) || !$this->filter([$operation], $criteria))
+        ) {
             $operation = null;
         }
 
