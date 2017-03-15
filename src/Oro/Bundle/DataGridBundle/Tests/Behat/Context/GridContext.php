@@ -166,6 +166,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then the number of records greater than or equal to :number
+     *
+     * @param int $number
+     */
+    public function theNumberOfRecordsGreaterThanOrEqual($number)
+    {
+        self::assertGreaterThanOrEqual(
+            $number,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
+    }
+
+    /**
      * @Then the number of records remained the same
      * @Then no records were deleted
      */
@@ -274,6 +287,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | State   | Kharkivs'ka Oblast' |
      *
      * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in grid with following data:$/
      */
     public function assertRowValues($content, TableNode $table)
     {
@@ -399,14 +413,42 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I check "Task, Email" in Activity Type filter
      *
      * @When /^(?:|I )check "(?P<filterItems>.+)" in (?P<filterName>([\w\s]+)) filter$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" in "(?P<filterName>.+)" filter$/
      */
     public function iCheckCheckboxesInFilter($filterName, $filterItems)
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
+
+        $this->checkItemsInFilter($filterItem, $filterItems);
+    }
+
+    /**
+     * Select value in select filter
+     * Example: When I check "Task, Email" in "Activity Type" filter strictly
+     *
+     * @When /^(?:|I )check "(?P<filterItems>.+)" in "(?P<filterLabel>.+)" filter strictly$/
+     *
+     * @param string $filterLabel
+     * @param string $filterItems
+     */
+    public function iCheckItemsInFilterStrictly($filterLabel, $filterItems)
+    {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterLabel, true);
+
+        $this->checkItemsInFilter($filterItem, $filterItems);
+    }
+
+    /**
+     * @param MultipleChoice $filter
+     * @param string $filterItems
+     */
+    protected function checkItemsInFilter(MultipleChoice $filter, $filterItems)
+    {
         $filterItems = array_map('trim', explode(',', $filterItems));
 
-        $filterItem->checkItems($filterItems);
+        $filter->checkItems($filterItems);
     }
 
     /**
@@ -490,6 +532,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And I click delete Sign a contract with Charlie in grid
      *
      * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) "(?P<content>(.+))" in grid$/
      */
     public function clickActionInRow($content, $action)
     {
