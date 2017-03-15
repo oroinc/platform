@@ -19,6 +19,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  * @ORM\Table(name="oro_workflow_definition")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @Config(
+ *      mode="hidden",
  *      routeName="oro_workflow_definition_index",
  *      routeView="oro_workflow_definition_view",
  *      defaultValues={
