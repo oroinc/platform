@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Migrations\Schema\v1_3;
 
+use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
+use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 
 class CreateRelatedLanguagesQuery extends ParametrizedMigrationQuery
@@ -82,9 +84,16 @@ class CreateRelatedLanguagesQuery extends ParametrizedMigrationQuery
      */
     protected function getAdminUserAndOrganization(LoggerInterface $logger)
     {
-        $sql = 'SELECT user_owner_id, organization_id FROM oro_language WHERE code = :code LIMIT 1';
-        $params = ['code' => 'en'];
-        $types = ['class' => 'string'];
+        $sql = $this->connection->createQueryBuilder()
+            ->select(['u.id AS user_owner_id', 'u.organization_id'])
+            ->from('oro_user', 'u')
+            ->innerJoin('u', 'oro_user_access_role', 'rel', 'rel.user_id = u.id')
+            ->innerJoin('rel', 'oro_access_role', 'r', 'r.id = rel.role_id')
+            ->where('r.role = :role')
+            ->setMaxResults(1)
+            ->getSQL();
+        $params = ['role' => User::ROLE_ADMINISTRATOR];
+        $types = ['role' => Type::STRING];
 
         $this->logQuery($logger, $sql, $params, $types);
 
