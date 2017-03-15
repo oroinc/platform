@@ -52,6 +52,8 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
             )
         );
 
+        $configManager->set(Configuration::getConfigKeyByName('languages'), [$defaultLanguage]);
+
         $user = $this->getUser($manager);
 
         foreach ($languages as $languageCode) {
@@ -62,6 +64,17 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
         }
 
         $manager->flush();
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getLocale()
+    {
+        $localeSettings = $this->container->get('oro_locale.settings');
+
+        return $localeSettings->getLocale();
     }
 
     /**
