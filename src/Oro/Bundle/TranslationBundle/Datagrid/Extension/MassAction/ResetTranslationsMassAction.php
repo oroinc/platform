@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Datagrid\Extension\MassActions;
+namespace Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 class ResetTranslationsMassAction extends AbstractMassAction
 {
     /** @var array */
-    protected $requiredOptions = ['handler', 'data_identifier'];
+    protected $requiredOptions = ['data_identifier'];
 
     /**
      * {@inheritDoc}
@@ -16,7 +16,7 @@ class ResetTranslationsMassAction extends AbstractMassAction
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['handler'])) {
-            $options['handler'] = 'oro_translation.mass_actions.reset_translation_handler';
+            $options['handler'] = 'oro_translation.mass_action.reset_translation_handler';
         }
 
         if (empty($options['route'])) {

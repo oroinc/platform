@@ -10,6 +10,6 @@ oro.translation:
     action:
         reset:
             message: 'Reset translated value?'
-            title: 'Reset Confirmation'
-            content: 'Are you sure you want to reset selected translations to their original values?'
-            ok: 'Reset'
+            confirm_title: 'Reset Confirmation'
+            confirm_content: 'Are you sure you want to reset selected translations to their original values?'
+            confirm_ok: 'Reset'

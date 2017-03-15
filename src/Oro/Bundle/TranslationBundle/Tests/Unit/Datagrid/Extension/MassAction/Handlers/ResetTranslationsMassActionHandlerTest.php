@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Datagrid\Extension\MassAction\
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
-use Oro\Bundle\TranslationBundle\Datagrid\Extension\MassActions\Handlers\ResetTranslationsMassActionHandler;
+use Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassActionHandler;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Component\Translation\TranslatorInterface;
 

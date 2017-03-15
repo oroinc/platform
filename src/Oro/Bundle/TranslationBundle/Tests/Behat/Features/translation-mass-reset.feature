@@ -2,6 +2,8 @@ Feature: Mass reset translations
   Scenario: Reset several translations
     Given I login as administrator
     When I go to System/Localization/Translations
+    # Next step required to see mass action button without horizontal scroll
+    And I hide all columns in grid except Translated Value, Key
     And I check first 2 records in grid
     And I click "Reset Translation" link from mass action dropdown
     Then I should see "Reset Confirmation"

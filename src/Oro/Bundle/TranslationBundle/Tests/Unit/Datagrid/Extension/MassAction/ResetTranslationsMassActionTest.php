@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Datagrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
-use Oro\Bundle\TranslationBundle\Datagrid\Extension\MassActions\ResetTranslationsMassAction;
+use Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction;
 use Oro\Component\Config\Common\ConfigObject;
 
 class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
@@ -23,10 +23,12 @@ class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
             ConfigObject::NAME_KEY => 'test-config',
             'data_identifier' => 'id',
         ]));
+
         /** @var ActionConfiguration $options */
-        $options = $this->action->getOptions();
+        $options = $this->action->
+        getOptions();
         $this->assertArraySubset([
-            'handler' => 'oro_translation.mass_actions.reset_translation_handler',
+            'handler' => 'oro_translation.mass_action.reset_translation_handler',
             'route' => 'oro_translation_mass_reset',
             'frontend_handle' => 'ajax',
             'route_parameters' => [],
@@ -40,7 +42,6 @@ class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
      */
     public function testRequiredOptions()
     {
-        $action = new ResetTranslationsMassAction();
         $this->action->setOptions(ActionConfiguration::create([
             ConfigObject::NAME_KEY => 'test-config',
         ]));
@@ -48,7 +49,6 @@ class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOptions()
     {
-        $action = new ResetTranslationsMassAction();
         $customOptions = [
             ConfigObject::NAME_KEY => 'test-config',
             'data_identifier' => 'id',
@@ -57,6 +57,7 @@ class ResetTranslationsMassActionTest extends \PHPUnit_Framework_TestCase
             'route_parameters' => ['param1' => 'value1', 'param2' => 'value2'],
             'frontend_handle' => 'test-frontend-handler',
         ];
+
         $this->action->setOptions(ActionConfiguration::create($customOptions));
         $this->assertArraySubset($customOptions, $this->action->getOptions()->toArray(), true);
     }

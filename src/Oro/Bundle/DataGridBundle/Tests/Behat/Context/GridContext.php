@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -664,6 +665,48 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check visibility checkbox for specified column
+     * Show this column in grid
+     *
+     * @Given /^(?:|I) show column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I) mark as visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iShowColumnInGrid($columnName)
+    {
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->checkColumnVisibility($columnName);
+    }
+
+    /**
+     * Uncheck visibility checkbox for specified column
+     * Hide this column in grid
+     *
+     * @Given /^(?:|I) hide column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I) mark as not visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iHideColumnInGrid($columnName)
+    {
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->uncheckColumnVisibility($columnName);
+    }
+
+    /**
+     * Hide all columns in grid except mentioned
+     *
+     * @When /^I hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^I hide all columns in grid$/
+     */
+    public function iHideAllColumnsInGrid($exceptions = '')
+    {
+        $exceptions = explode(',', $exceptions);
+        $exceptions = array_map('trim', $exceptions);
+        $exceptions = array_filter($exceptions);
+
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->hideAllColumns($exceptions);
+    }
+
+    /**
      * @param string $stringNumber
      * @return int
      */
@@ -721,5 +764,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         return $filters;
+    }
+
+    /**
+     * @return GridColumnManager
+     */
+    private function getGridColumnManager()
+    {
+        return $this->createElement('GridColumnManager');
     }
 }

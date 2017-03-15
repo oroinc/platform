@@ -103,11 +103,17 @@ class TranslationControllerTest extends WebTestCase
             'values' => '',
         ]));
 
+        $translator = $this->getContainer()->get('translator');
+
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
         $result = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('successful', $result);
         $this->assertFalse($result['successful']);
         $this->assertArrayHasKey('message', $result);
+        $this->assertEquals(
+            $translator->trans('oro.translation.action.reset.nothing_to_reset'),
+            $result['message']
+        );
     }
 
     /**

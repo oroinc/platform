@@ -178,6 +178,7 @@ class TranslationManagerTest extends WebTestCase
     {
         $id = $this->getReference(LoadTranslations::TRANSLATION_KEY_1)->getId();
         $this->assertEquals(1, $this->manager->resetTranslations($id));
+
         $ids = [
             $this->getReference(LoadTranslations::TRANSLATION_KEY_2)->getId(),
             $this->getReference(LoadTranslations::TRANSLATION_KEY_3)->getId(),
@@ -186,6 +187,8 @@ class TranslationManagerTest extends WebTestCase
 
         $allIds = $ids;
         $allIds[] = $id;
+
+        // Removing scheduled, but it will be done after TranslationManager::flush()
         $this->assertCount(3, $this->repository->findBy(['id' => $allIds]));
         $this->manager->flush();
 
@@ -200,9 +203,11 @@ class TranslationManagerTest extends WebTestCase
     public function testResetAllTranslations()
     {
         $translation = $this->manager->saveTranslation('test_key', 'test_value', 'en', 'test_domain');
+
         $this->manager->resetTranslations($this->getReference(LoadTranslations::TRANSLATION_KEY_1)->getId());
         $this->manager->resetAllTranslations();
         $this->manager->flush();
+
         $this->assertEmpty($this->repository->findAll());
         $this->assertEmpty($translation->getId());
     }

@@ -307,9 +307,9 @@ operations:
         label: oro.translation.action.reset.hint
         frontend_options:
             confirmation:
-                title: oro.translation.action.reset.title
+                title: oro.translation.action.reset.confirm_title
                 message: oro.translation.action.reset.message
-                okText: oro.translation.action.reset.ok
+                okText: oro.translation.action.reset.confirm_ok
         acl_resource: [TRANSLATE, $language]
         applications: [default]
         datagrids:
@@ -322,15 +322,15 @@ operations:
                 label: oro.translation.action.reset.label
                 icon: refresh
                 route: oro_translation_mass_reset
-                handler: oro_translation.mass_actions.reset_translation_handler
+                handler: oro_translation.mass_action.reset_translation_handler
                 data_identifier: translation.id
                 entity_name: 'Oro\Bundle\TranslationBundle\Entity\Translation'
-                acl_resource: TRANSLATE
+                acl_resource: oro_translation_language_translate
                 confirmation: true
                 defaultMessages:
-                    confirm_title: oro.translation.action.reset.title
-                    confirm_content: oro.translation.action.reset.content
-                    confirm_ok: oro.translation.action.reset.ok
+                    confirm_title: oro.translation.action.reset.confirm_title
+                    confirm_content: oro.translation.action.reset.confirm_content
+                    confirm_ok: oro.translation.action.reset.confirm_ok
         preconditions:
             '@not_blank': $id
         actions:

@@ -123,20 +123,19 @@ class TranslationManager
 
     /**
      * Resets translations to its default values
-     * @param array|int $ids Ids of translations to reset
+     *
+     * @param int|int[] $ids Id or array of ids of translations to reset
      * @return int Affected translations count
      */
     public function resetTranslations($ids)
     {
         if (!is_array($ids)) {
-            $id = (int)$ids;
-            if (!$id) {
-                throw new \InvalidArgumentException('At least single id required');
-            }
-            $ids = [$id];
+            $ids = [$ids];
         }
+
         /** @var TranslationRepository $repo */
         $repo = $this->getEntityRepository(Translation::class);
+
         /** @var Translation[] $translations */
         $translations = $repo->findBy(['id' => $ids]);
         foreach ($translations as $translation) {
@@ -148,20 +147,24 @@ class TranslationManager
             );
             $this->translations[$cacheKey] = $translation;
         }
+
         return count($translations);
     }
 
     /**
      * Resets all translations to its default values
+     *
      * @return int Affected translations count
      */
     public function resetAllTranslations()
     {
         /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
         $this->translations = [];
         $this->domainProvider->clearCache();
+
+        $repo = $this->getEntityRepository(Translation::class);
         $repo->clear();
+
         return $repo->deleteAll();
     }
 

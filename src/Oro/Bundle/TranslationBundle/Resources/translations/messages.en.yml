@@ -20,9 +20,9 @@ oro.translation:
         rebuild_cache.label: 'Update Cache'
         reset:
             label: 'Reset Translation'
-            hint: 'Reset Translation to Original Value'
+            hint: 'Reset Translation'
             success: 'Selected translations were reset to their original values.'
-            failure: 'Failed to reset translations to its original values.'
+            failure: 'Failed to reset translations to their original values.'
             nothing_to_reset: 'You should select at least one translation with translated value.'
 
     language:

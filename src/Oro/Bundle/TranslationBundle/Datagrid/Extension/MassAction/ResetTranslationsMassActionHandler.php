@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Datagrid\Extension\MassActions\Handlers;
+namespace Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
@@ -13,12 +13,17 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
     /**
      * @var TranslationManager
      */
-    protected $translationManager;
+    private $translationManager;
+
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
+    /**
+     * @param TranslationManager $translationManager
+     * @param TranslatorInterface $translator
+     */
     public function __construct(TranslationManager $translationManager, TranslatorInterface $translator)
     {
         $this->translationManager = $translationManager;
@@ -41,6 +46,7 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
             $ids = $this->extractTranslationIds($data['values']);
             $affectedCount = $this->translationManager->resetTranslations($ids);
         }
+
         $this->translationManager->flush();
 
         return new MassActionResponse(
@@ -56,13 +62,10 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
      */
     protected function extractTranslationIds($values)
     {
-        $ids = [];
-        foreach (explode(',', $values) as $id) {
-            $id = (int)$id;
-            if ($id) {
-                $ids[] = $id;
-            }
-        }
-        return $ids;
+        $explodedValues = explode(',', $values);
+        $filteredValues = array_filter($explodedValues);
+        $castedValues = array_map('intval', $filteredValues);
+
+        return array_values($castedValues);
     }
 }
