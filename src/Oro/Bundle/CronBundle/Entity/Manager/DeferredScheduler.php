@@ -5,12 +5,10 @@ namespace Oro\Bundle\CronBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-
+use Oro\Bundle\CronBundle\Entity\Schedule;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-
-use Oro\Bundle\CronBundle\Entity\Schedule;
 
 /**
  * Provide late management for Schedule entities
@@ -100,23 +98,18 @@ class DeferredScheduler implements LoggerAwareInterface
     {
         $schedules = $this->getRepository()->findBy(['command' => $command, 'definition' => $cronDefinition]);
 
-        $argsSchedule = new Schedule();
-        $argsSchedule->setArguments($arguments);
+        $this->removeSchedules($schedules, $arguments);
+    }
 
-        $schedules = array_filter(
-            $schedules,
-            function (Schedule $schedule) use ($argsSchedule) {
-                return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
-            }
-        );
+    /**
+     * @param string $command
+     * @param array  $arguments
+     */
+    public function removeScheduleForCommand($command, array $arguments = [])
+    {
+        $schedules = $this->getRepository()->findBy(['command' => $command]);
 
-        if (count($schedules) !== 0) {
-            foreach ($schedules as $schedule) {
-                $this->forRemove[] = $schedule;
-                $this->dirty = true;
-                $this->notify('deleted', $schedule);
-            }
-        }
+        $this->removeSchedules($schedules, $arguments);
     }
 
     /**
@@ -186,6 +179,31 @@ class DeferredScheduler implements LoggerAwareInterface
             $objectManager->flush();
             $this->dirty = false;
             $this->logger->info('>>> schedule modification persisted.');
+        }
+    }
+
+    /**
+     * @param array $schedules
+     * @param array $arguments
+     */
+    private function removeSchedules(array $schedules, array $arguments)
+    {
+        $argsSchedule = new Schedule();
+        $argsSchedule->setArguments($arguments);
+
+        $schedules = array_filter(
+            $schedules,
+            function (Schedule $schedule) use ($argsSchedule) {
+                return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
+            }
+        );
+
+        if (count($schedules) !== 0) {
+            foreach ($schedules as $schedule) {
+                $this->forRemove[] = $schedule;
+                $this->dirty = true;
+                $this->notify('deleted', $schedule);
+            }
         }
     }
 }
