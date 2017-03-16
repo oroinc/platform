@@ -299,22 +299,15 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getConfiguration')
             ->willReturn(
                 [
-                    'operation1' => [
-                        'label' => 'Label1'
-                    ]
+                    'operation1' => $this->createOperationConfig(['label' => 'Label1', 'entities' => ['stdClass']])
                 ]
             );
 
         $filter = $this->createMock(OperationRegistryFilterInterface::class);
-
-        if ($criteria) {
-            $filter->expects($this->once())
-                ->method('filter')
-                ->with($this->isType('array'), $criteria)
-                ->willReturn($filterResult);
-        } else {
-            $filter->expects($this->never())->method($this->anything());
-        }
+        $filter->expects($this->any())
+            ->method('filter')
+            ->with($this->isType('array'), $criteria)
+            ->willReturn($filterResult);
 
         $this->registry->addFilter($filter);
 
@@ -345,7 +338,13 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             'with filter criteria and operation found' => [
                 'operationName' => 'operation1',
                 'expected' => 'operation1',
-                'criteria' => new OperationFindCriteria(null, null, null),
+                'criteria' => new OperationFindCriteria('stdClass', null, null),
+                'filterResult' => ['operation1']
+            ],
+            'with filter criteria and operation found but not applicable' => [
+                'operationName' => 'operation1',
+                'expected' => null,
+                'criteria' => new OperationFindCriteria('DateTime', null, null),
                 'filterResult' => ['operation1']
             ],
         ];

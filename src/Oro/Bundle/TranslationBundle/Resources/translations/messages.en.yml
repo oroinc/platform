@@ -26,6 +26,10 @@ oro.translation:
             nothing_to_reset: 'You should select at least one translation with translated value.'
 
     language:
+        form.select:
+            empty_value: 'Please select...'
+            group.crowdin: 'Available Translations:'
+            group.intl: 'All Languages:'
         entity_label: 'Language'
         entity_plural_label: 'Languages'
 
