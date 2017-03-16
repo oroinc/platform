@@ -50,9 +50,9 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $subJob->setCreatedAt(new \DateTime());
         $subJob->setRootJob($rootJob);
 
-        $this->getEntityManager()->persist($rootJob);
-        $this->getEntityManager()->persist($subJob);
-        $this->getEntityManager()->flush();
+        $this->getEntityManager(Job::class)->persist($rootJob);
+        $this->getEntityManager(Job::class)->persist($subJob);
+        $this->getEntityManager(Job::class)->flush();
 
         $message = new NullMessage();
         $message->setBody(json_encode(['jobId' => $subJob->getId(), 'ids' => $ids]));
@@ -90,9 +90,9 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $subJob->setCreatedAt(new \DateTime());
         $subJob->setRootJob($rootJob);
 
-        $this->getEntityManager()->persist($rootJob);
-        $this->getEntityManager()->persist($subJob);
-        $this->getEntityManager()->flush();
+        $this->getEntityManager(Job::class)->persist($rootJob);
+        $this->getEntityManager(Job::class)->persist($subJob);
+        $this->getEntityManager(Job::class)->flush();
 
         $message = new NullMessage();
         $message->setBody(json_encode(['jobId' => $subJob->getId(), 'ids' => $ids, 'size' => 3]));
@@ -129,11 +129,12 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
     }
 
     /**
+     * @param $classManager
      * @return \Doctrine\ORM\EntityManager
      */
-    private function getEntityManager()
+    private function getEntityManager($classManager = EmailAttachment::class)
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass(EmailAttachment::class);
+        return $this->getContainer()->get('doctrine')->getManagerForClass($classManager);
     }
 
     /**

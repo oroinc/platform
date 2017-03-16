@@ -51,6 +51,15 @@ class Element extends NodeElement
             $this->selectorManipulator->getSelectorAsXpath($session->getSelectorsHandler(), $selector),
             $session
         );
+
+        $this->init();
+    }
+
+    /**
+     * Initialize element
+     */
+    protected function init()
+    {
     }
 
     /**
@@ -157,11 +166,14 @@ class Element extends NodeElement
     }
 
     /**
-     * @return DocumentElement
+     * @return self
      */
     protected function getPage()
     {
-        return $this->session->getPage();
+        return $this->elementFactory->wrapElement(
+            'Page',
+            $this->session->getPage()
+        );
     }
 
     /**

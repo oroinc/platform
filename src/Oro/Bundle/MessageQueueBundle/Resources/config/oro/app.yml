@@ -1,0 +1,7 @@
+doctrine:
+    orm:
+        entity_managers:
+            message_queue_job:
+                connection: default
+                mappings:
+                    OroMessageQueueBundle: ~

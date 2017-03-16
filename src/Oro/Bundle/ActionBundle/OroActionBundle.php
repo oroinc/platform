@@ -11,6 +11,8 @@ use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ButtonProviderPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConditionPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DoctrineTypeMappingProviderPass;
+use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DuplicatorFilterPass;
+use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\DuplicatorMatcherPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\MassActionProviderPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\OperationRegistryFilterPass;
 
@@ -30,5 +32,7 @@ class OroActionBundle extends Bundle
         $container->addCompilerPass(new ButtonProviderPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new DoctrineTypeMappingProviderPass());
         $container->addCompilerPass(new OperationRegistryFilterPass());
+        $container->addCompilerPass(new DuplicatorFilterPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new DuplicatorMatcherPass(), PassConfig::TYPE_AFTER_REMOVING);
     }
 }

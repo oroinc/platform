@@ -131,7 +131,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                     'property_path' => 'realField21'
                                 ]
                             ],
-                            'sorters'    => [
+                            'sorters'       => [
                                 'fields' => [
                                     'field21' => null
                                 ]
@@ -150,14 +150,14 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                             'property_path' => 'realField321',
                                         ]
                                     ],
-                                    'sorters'    => [
+                                    'sorters'       => [
                                         'fields' => [
                                             'field321' => null
                                         ]
                                     ]
                                 ]
                             ],
-                            'sorters'    => [
+                            'sorters'       => [
                                 'fields' => [
                                     'field32' => null
                                 ]
@@ -200,7 +200,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                     'property_path' => 'realField21',
                                 ]
                             ],
-                            'sorters'    => [
+                            'sorters'       => [
                                 'fields' => [
                                     'field21' => [
                                         'property_path' => 'sorterRealField21'
@@ -315,7 +315,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                 'definition'      => [
                     'fields' => [
                         'toOne1'  => [
-                            'fields' => [
+                            'fields'  => [
                                 'toOne1_toOne11'  => [
                                     'sorters' => [
                                         'fields' => [
@@ -333,7 +333,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                                     ]
                                 ],
                             ],
-                            'sorters'    => [
+                            'sorters' => [
                                 'fields' => [
                                     'toOne1_id'       => null,
                                     'toOne1_field1'   => null,
@@ -367,5 +367,65 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
                 ]
             ],
         ];
+    }
+
+    public function testSortersByRenamedIdField()
+    {
+        $config = [
+            'exclusion_policy'       => 'all',
+            'identifier_field_names' => ['renamedIdField'],
+            'fields'                 => [
+                'field1'         => [
+                    'property_path' => 'realField1'
+                ],
+                'renamedIdField' => [
+                    'property_path' => 'field2'
+                ],
+                'field10'        => [
+                    'property_path' => 'realField10'
+                ],
+                'anotherField11' => [
+                    'property_path' => 'field11'
+                ],
+            ]
+        ];
+        $sorters = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1'  => null,
+                'field2'  => null,
+                'field10' => [
+                    'property_path' => 'sorterField10'
+                ],
+                'field11' => [
+                    'property_path' => 'sorterField11'
+                ],
+            ]
+        ];
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1'         => [
+                        'property_path' => 'realField1'
+                    ],
+                    'renamedIdField' => [
+                        'property_path' => 'field2'
+                    ],
+                    'field10'        => [
+                        'property_path' => 'sorterField10'
+                    ],
+                    'field11'        => [
+                        'property_path' => 'sorterField11'
+                    ],
+                ]
+            ],
+            $this->context->getSorters()
+        );
     }
 }

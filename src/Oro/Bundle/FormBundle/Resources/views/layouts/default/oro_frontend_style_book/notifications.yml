@@ -1,0 +1,139 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'notifications.twig'
+
+        - '@addTree':
+            items:
+                group_element_grid_view_notifications:
+                    blockType: group_element
+                    options:
+                      anchor: notifications
+                      label: Notifications
+
+                group_element_item_notification_flash_holder:
+                    blockType: group_element_item
+                    options:
+                      anchor: notification_flash_error
+                      label: Error
+                      subTreeLvl: 1
+                      description: oro_frontend_style_book.groups.grid.description_notification_flash_error
+                style_book_grid_element_notification_flash:
+                    blockType: block
+
+                group_element_item_notification_flash_success_holder:
+                    blockType: group_element_item
+                    options:
+                      anchor: notification_flash_success
+                      label: Success
+                      subTreeLvl: 1
+                      description: oro_frontend_style_book.groups.grid.description_notification_flash_success
+                style_book_grid_element_notification_flash_success:
+                    blockType: block
+
+                group_element_item_notification_flash_warning_holder:
+                    blockType: group_element_item
+                    options:
+                      anchor: notification_flash_warning
+                      label: Warning
+                      subTreeLvl: 1
+                      description: oro_frontend_style_book.groups.grid.description_notification_flash_warning
+                style_book_grid_element_notification_flash_warning:
+                    blockType: block
+
+                group_element_grid_view_notification_message:
+                    blockType: group_element
+                    options:
+                        anchor: notification_message
+                        label: Notification Message
+
+                group_element_item_notification_message_holder:
+                    blockType: group_element_item
+                    options:
+                        anchor: notification_message_error
+                        label: Error
+                        subTreeLvl: 1
+                        description: oro_frontend_style_book.groups.grid.description_notification_message_error
+                style_book_grid_element_notification_message:
+                    blockType: block
+
+                group_element_item_notification_message_warning_holder:
+                    blockType: group_element_item
+                    options:
+                        anchor: notification_message_warning
+                        label: Warning
+                        subTreeLvl: 1
+                        description: oro_frontend_style_book.groups.grid.description_notification_message_warning
+                style_book_grid_element_notification_message_warning:
+                  blockType: block
+
+                group_element_item_notification_message_success_holder:
+                    blockType: group_element_item
+                    options:
+                        anchor: notification_message_success
+                        label: Success
+                        subTreeLvl: 1
+                        description: oro_frontend_style_book.groups.grid.description_notification_message_success
+                style_book_grid_element_notification_message_success:
+                    blockType: block
+
+                group_element_grid_view_callout_info:
+                    blockType: group_element
+                    options:
+                        anchor: callout_info
+                        label: Inline Сallout Information
+                group_element_item_callout_info_holder:
+                    blockType: group_element_item
+                    options:
+                        anchor: description_callout_info
+                        label: Info
+                        subTreeLvl: 1
+                        description: oro_frontend_style_book.groups.grid.description_callout_info
+                style_book_grid_element_callout_info:
+                    blockType: block
+                group_element_item_callout_warning_holder:
+                    blockType: group_element_item
+                    options:
+                        anchor: description_callout_warning
+                        label: Warning
+                        subTreeLvl: 1
+                        description: oro_frontend_style_book.groups.grid.description_callout_warning
+                style_book_grid_element_callout_warning:
+                    blockType: block
+                group_element_item_callout_danger_holder:
+                    blockType: group_element_item
+                    options:
+                        anchor: description_callout_danger
+                        label: Danger
+                        subTreeLvl: 1
+                        description: oro_frontend_style_book.groups.grid.description_callout_danger
+                style_book_grid_element_callout_danger:
+                    blockType: block
+
+            tree:
+                style_book_content:
+                        group_element_grid_view_notifications:
+                            group_element_item_notification_flash_holder:
+                                style_book_grid_element_notification_flash: ~
+                            group_element_item_notification_flash_success_holder:
+                                style_book_grid_element_notification_flash_success: ~
+                            group_element_item_notification_flash_warning_holder:
+                                style_book_grid_element_notification_flash_warning: ~
+
+                        group_element_grid_view_notification_message:
+                            group_element_item_notification_message_holder:
+                                style_book_grid_element_notification_message: ~
+                            group_element_item_notification_message_success_holder:
+                                style_book_grid_element_notification_message_success: ~
+                            group_element_item_notification_message_warning_holder:
+                                style_book_grid_element_notification_message_warning: ~
+
+                        group_element_grid_view_callout_info:
+                            group_element_item_callout_info_holder:
+                                style_book_grid_element_callout_info: ~
+                            group_element_item_callout_warning_holder:
+                                style_book_grid_element_callout_warning: ~
+                            group_element_item_callout_danger_holder:
+                                style_book_grid_element_callout_danger: ~
+
+    conditions: 'context["action"]=="forms"'

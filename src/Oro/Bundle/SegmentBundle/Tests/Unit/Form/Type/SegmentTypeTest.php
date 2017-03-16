@@ -96,7 +96,6 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
                     'filter_column_choice_type'   => 'oro_entity_field_select',
                     'data_class'                  => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                     'intention'                   => 'segment',
-                    'cascade_validation'          => true
                 ]
             );
 
