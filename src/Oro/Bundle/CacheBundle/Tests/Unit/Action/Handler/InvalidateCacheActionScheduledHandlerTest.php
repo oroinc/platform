@@ -52,7 +52,7 @@ class InvalidateCacheActionScheduledHandlerTest extends \PHPUnit_Framework_TestC
     public function testHandleForAddingSchedule()
     {
         $time = new \DateTime();
-        $time->setTimestamp(0);
+        $time->setTimestamp(1);
 
         $dataStorage = new InvalidateCacheDataStorage([
             InvalidateCacheActionScheduledHandler::PARAM_HANDLER_SERVICE_NAME => 'service',
