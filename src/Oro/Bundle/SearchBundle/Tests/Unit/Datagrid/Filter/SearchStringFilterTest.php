@@ -135,7 +135,7 @@ class SearchStringFilterTest extends \PHPUnit_Framework_TestCase
             ],
             'not contains force like' => [
                 'filterType' => TextFilterType::TYPE_NOT_CONTAINS,
-                'comparisonOperator' => Comparison::NOT_CONTAINS,
+                'comparisonOperator' => Comparison::NOT_LIKE,
                 [
                     FilterUtility::FORCE_LIKE_KEY => true,
                 ]
