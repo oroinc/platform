@@ -127,73 +127,20 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider transitionMethodsProvider
-     * @param string $dialogTemplate
-     * @param string $pageTemplate
-     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $managerExpect
-     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $loggerExpect
-     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $helperExpect
-     */
-    public function testHandle($dialogTemplate, $pageTemplate, $managerExpect, $loggerExpect, $helperExpect)
+    public function testHandle()
     {
         $this->workflowManager
-            ->expects($managerExpect)
+            ->expects($this->once())
             ->method('transit');
 
         $this->logger
-            ->expects($loggerExpect)
+            ->expects($this->never())
             ->method('error');
 
         $this->transitionHelper
-            ->expects($helperExpect)
+            ->expects($this->once())
             ->method('createCompleteResponse');
 
-        $this->transition
-            ->method('getDialogTemplate')
-            ->willReturn($dialogTemplate);
-
-        $this->transition
-            ->method('getPageTemplate')
-            ->willReturn($pageTemplate);
-
         $this->transitionHandler->handle($this->transition, $this->workflowItem);
-    }
-
-    /**
-     * @return array
-     */
-    public function transitionMethodsProvider()
-    {
-        return [
-            'dialogTemplate' => [
-                'template',
-                null,
-                $this->never(),
-                $this->never(),
-                $this->never(),
-            ],
-            'pageTemplate' => [
-                null,
-                'template',
-                $this->never(),
-                $this->never(),
-                $this->never(),
-            ],
-            'page and dialog template' => [
-                'template',
-                'template',
-                $this->never(),
-                $this->never(),
-                $this->never(),
-            ],
-            'no templates' => [
-                null,
-                null,
-                $this->once(),
-                $this->never(),
-                $this->once(),
-            ],
-        ];
     }
 }

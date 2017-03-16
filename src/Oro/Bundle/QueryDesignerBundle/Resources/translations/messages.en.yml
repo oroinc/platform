@@ -21,6 +21,9 @@ oro:
                 save:           Save
                 cancel:         Cancel
             grouping_columns:   Grouping Columns
+            date_grouping:
+                field_name: Date grouping field
+                not_nullable_field: Not nullable field
             column:             Column
             label:              Label
             function:           Function

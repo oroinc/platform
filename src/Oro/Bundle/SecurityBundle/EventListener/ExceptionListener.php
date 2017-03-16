@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as BaseExceptionListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ExceptionListener extends BaseExceptionListener
 {
@@ -15,32 +14,10 @@ class ExceptionListener extends BaseExceptionListener
      */
     protected function logException(\Exception $exception, $message)
     {
-        if (!$this->logger) {
-            return;
+        if (null !== $this->logger && $exception instanceof  AccessDeniedHttpException) {
+            $this->logger->warning($message, ['exception' => $exception]);
+        } else {
+            parent::logException($exception, $message);
         }
-
-        call_user_func(
-            [$this->logger, $this->getLogLevel($exception)],
-            $message,
-            ['exception' => $exception]
-        );
-    }
-
-    /**
-     * @param \Exception $exception
-     *
-     * @return string
-     */
-    protected function getLogLevel(\Exception $exception)
-    {
-        if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
-            return 'critical';
-        }
-
-        if ($exception instanceof AccessDeniedHttpException) {
-            return 'warning';
-        }
-
-        return 'error';
     }
 }
