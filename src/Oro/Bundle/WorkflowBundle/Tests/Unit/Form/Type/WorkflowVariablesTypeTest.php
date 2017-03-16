@@ -3,9 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 
@@ -37,9 +37,10 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     {
         parent::setUp();
 
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->variableGuesser = $this->createMock(VariableGuesser::class);
 
-        $this->type = new WorkflowVariablesType($this->variableGuesser);
+        $this->type = new WorkflowVariablesType($this->variableGuesser, $managerRegistry);
     }
 
     public function testBuildForm()
@@ -203,32 +204,6 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     ]
                 ]
             ],
-//            'entity_variables' => [
-//                'submitData' => ['var_entity' => 1],
-//                'formData' => $this->createWorkflowData(['var_entity' => 1]),
-//                'form_options' => [
-//                    'workflow' => $this->createWorkflowWithVariables([
-//                        [
-//                            'name' => 'var_entity',
-//                            'label' => 'Variable Entity Label',
-//                            'value' => 1,
-//                            'type' => 'entity',
-//                            'options' => [
-//                                'class' => 'Oro\Bundle\UserBundle\Entity\User'
-//                            ]
-//                        ]
-//                    ])
-//                ],
-//                'childrenOptions' => [
-//                    'var_entity' => $this->createMock(Form::class)
-//                ],
-//                'guessedData' => [
-//                    [
-//                        'form_type' => TextType::class,
-//                        'form_options' => []
-//                    ]
-//                ]
-//            ],
         ];
     }
 

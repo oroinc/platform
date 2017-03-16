@@ -103,5 +103,6 @@ services:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType'
         arguments:
             - '@oro_workflow.variable_guesser'
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_workflow_variables }

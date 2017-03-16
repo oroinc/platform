@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
@@ -21,11 +24,18 @@ class WorkflowVariablesType extends AbstractType
     protected $variableGuesser;
 
     /**
-     * @param VariableGuesser $variableGuesser
+     * @var ManagerRegistry
      */
-    public function __construct(VariableGuesser $variableGuesser)
+    protected $managerRegistry;
+
+    /**
+     * @param VariableGuesser $variableGuesser
+     * @param ManagerRegistry $managerRegistry
+     */
+    public function __construct(VariableGuesser $variableGuesser, ManagerRegistry $managerRegistry)
     {
         $this->variableGuesser = $variableGuesser;
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -78,7 +88,23 @@ class WorkflowVariablesType extends AbstractType
                             return $entity;
                         },
                         function ($entity) {
-                            return $entity->getId();
+                            $metadata = $this->getMetadataForClass(get_class($entity));
+                            if (!$metadata) {
+                                return '';
+                            }
+
+                            $identifierFields = $metadata->getIdentifierFieldNames();
+                            if (!isset($identifierFields[0])) {
+                                return '';
+                            }
+
+                            $identifier = $identifierFields[0];
+                            $method = sprintf('get%s', ucfirst($identifier));
+                            try {
+                                return $entity->{$method}();
+                            } catch (\RuntimeException $e) {
+                                return '';
+                            }
                         }
                     ));
             }
@@ -93,9 +119,32 @@ class WorkflowVariablesType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefined(['workflow'])
-            ->setDefaults(['data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData'])
-            ->setAllowedTypes(['workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow'])
+        $resolver
+            ->setDefined(['workflow'])
+            ->setDefaults([
+                'data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData'
+            ])
+            ->setAllowedTypes([
+                'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow'
+            ])
             ->setRequired(['workflow']);
+    }
+
+    /**
+     * @param null|string $class
+     * @return null|ClassMetadata
+     */
+    protected function getMetadataForClass($class)
+    {
+        if (null === $class) {
+            return null;
+        }
+
+        $entityManager = $this->managerRegistry->getManagerForClass($class);
+        if (!$entityManager) {
+            return null;
+        }
+
+        return $entityManager->getClassMetadata($class);
     }
 }
