@@ -171,7 +171,6 @@ class UserType extends AbstractType
                         : ['Registration', 'Roles', 'Default'];
                 },
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'   => true,
                 'ownership_disabled'   => $this->isMyProfilePage
             ]
         );

@@ -298,7 +298,6 @@ class EmailModelBuilder
     protected function applyRequest(EmailModel $emailModel)
     {
         $this->applyEntityData($emailModel);
-        $this->applyFrom($emailModel);
         $this->applySubject($emailModel);
         $this->applyFrom($emailModel);
         $this->applyRecipients($emailModel);

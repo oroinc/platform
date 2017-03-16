@@ -41,6 +41,9 @@ parameters:
 Features
 --------
 
+At current moment special characters are not supported in ORM search engines. 
+Every character that is not a unicode letter or number is replaced with whitespace before the query.
+
 Another one feature of ORM engine is fulltext index processing. Configuration defines fulltext manager
 _Oro\Bundle\SearchBundle\Engine\FulltextIndexManager_ that used during installation and inside special listener -
 it allows system to create fulltext indexes bypassing Doctrine processing.

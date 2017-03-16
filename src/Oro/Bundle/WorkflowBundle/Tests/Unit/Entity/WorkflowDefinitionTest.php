@@ -33,6 +33,31 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         unset($this->workflowDefinition);
     }
 
+    public function testGetVirtualAttributes()
+    {
+        $this->workflowDefinition->setConfiguration([
+            'attributes' => [
+                'normal_attribute' => [],
+                'virtual_attribute' => [
+                    'options' => [
+                        'virtual' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(
+            [
+                'virtual_attribute' => [
+                    'options' => [
+                        'virtual' => true,
+                    ],
+                ],
+            ],
+            $this->workflowDefinition->getVirtualAttributes()
+        );
+    }
+
     public function testAccessors()
     {
         $this->assertPropertyCollections($this->workflowDefinition, [

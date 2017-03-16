@@ -6,6 +6,8 @@ use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use WebDriver\Exception\ElementNotVisible;
 
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
+
 /**
  * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
  * @method GridRow getRowByContent($content) @see Table::getRowByContent($content)
@@ -129,7 +131,7 @@ class Grid extends Table
                 ->createElement('GridFloatingMenu')
                 ->find('named', ['link', ucfirst($action)]);
         } else {
-            $link = $row->find('named', ['link', $action]);
+            $link = $row->find('named', ['link', ucfirst($action)]);
         }
 
         self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $row->getText(), $action));

@@ -1,7 +1,7 @@
 oro_behat_extension:
   elements:
     SystemConfigForm:
-      selector: form
+      selector: "div[id^='configuration-options-block']"
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm
 
     SidebarConfigMenu:

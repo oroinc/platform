@@ -46,10 +46,6 @@ class TransitionHandler
      */
     public function handle(Transition $transition, WorkflowItem $workflowItem)
     {
-        if ($transition->getPageTemplate() || $transition->getDialogTemplate()) {
-            return null;
-        }
-
         $responseCode = null;
         $responseMessage = null;
 

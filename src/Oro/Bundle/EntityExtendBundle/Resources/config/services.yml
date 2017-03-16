@@ -143,6 +143,7 @@ services:
             - "@oro_entity_extend.relation_builder"
             - "@oro_entity_extend.extend.field_type_helper"
             - "@oro_entity_extend.db_id_name_generator"
+            - "@oro_entity_config.provider.extend_entity_config_provider"
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
@@ -425,6 +426,7 @@ services:
             - "@oro_entity_extend.acl_helper.link"
             - "@oro_entity.doctrine_helper"
             - "@oro_entity.entity_name_resolver"
+            - "@oro_featuretoggle.checker.feature_checker"
         lazy: true
 
     oro_entity_extend.acl_helper.link:
@@ -542,3 +544,9 @@ services:
             - '@oro_entity.database_checker.state_manager'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand, priority: 255 }
+
+    oro_entity_extend.enum_entity_name_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }

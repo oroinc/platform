@@ -34,7 +34,6 @@ class CountryRegionsController extends FOSRestController
      *      description="Get regions by country id",
      *      resource=true
      * )
-     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function getAction(Country $country = null)
