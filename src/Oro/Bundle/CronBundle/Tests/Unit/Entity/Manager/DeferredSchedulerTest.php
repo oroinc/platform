@@ -154,4 +154,36 @@ class DeferredSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $this->deferredScheduler->flush();
     }
+
+    public function testRemoveScheduleForCommand()
+    {
+        $matchedArguments = ['--arg1=str', '--arg2=3'];
+        $matchedSchedule = (new Schedule())->setArguments($matchedArguments);
+        $nonMatchedSchedule = (new Schedule())->setArguments(['--arg2=string', '--arg2=41']);
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects(static::once())
+            ->method('findBy')
+            ->with(['command' => 'oro:test:command'])
+            ->willReturn([$matchedSchedule, $nonMatchedSchedule]);
+
+        $this->objectManager->expects(static::once())
+            ->method('getRepository')
+            ->with($this->scheduleClass)
+            ->willReturn($repository);
+        $this->objectManager->expects($this->once())
+            ->method('contains')
+            ->with($matchedSchedule)
+            ->willReturn(true);
+        $this->objectManager->expects(static::once())
+            ->method('remove')
+            ->with($matchedSchedule);
+
+        $this->registry->expects(static::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->objectManager);
+
+        $this->deferredScheduler->removeScheduleForCommand('oro:test:command', $matchedArguments);
+        $this->deferredScheduler->flush();
+    }
 }

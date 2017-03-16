@@ -56,7 +56,7 @@ class CallServiceMethod extends AbstractAction
 
         if (!method_exists($service, $method)) {
             throw new InvalidParameterException(
-                sprintf('Could not found public method "%s" in service "%s"', $method, $service)
+                sprintf('Could not found public method "%s" in service "%s"', $method, $this->options['service'])
             );
         }
 
