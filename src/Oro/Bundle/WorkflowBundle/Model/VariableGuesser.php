@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\Validator\Constraint;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
@@ -16,6 +17,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class VariableGuesser
 {
+    const DEFAULT_CONSTRAINT_NAMESPACE = 'Symfony\\Component\\Validator\\Constraints\\';
+
     /**
      * @var FormRegistry
      */
@@ -112,8 +115,7 @@ class VariableGuesser
     {
         $type = $variable->getType();
         if ('entity' === $type) {
-            list($formType, $formOptions) = $this->getEntityForm($variable->getOption('class'));
-            $formOptions['data'] = $variable->getValue();
+            list($formType, $formOptions) = $this->getEntityForm($variable);
 
             return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
         }
@@ -125,6 +127,19 @@ class VariableGuesser
         $formType = $this->formTypeMapping[$type]['type'];
         $formOptions = array_merge_recursive($this->formTypeMapping[$type]['options'], $variable->getFormOptions());
 
+        $formOptions = $this->setVariableFormOptions($variable, $formOptions);
+
+        return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+    }
+
+    /**
+     * @param Variable $variable
+     * @param array    $formOptions
+     *
+     * @return array
+     */
+    protected function setVariableFormOptions(Variable $variable, $formOptions)
+    {
         if (null !== $variable->getLabel()) {
             $formOptions['label'] = $variable->getLabel();
         }
@@ -132,16 +147,34 @@ class VariableGuesser
             $formOptions['data'] = $variable->getValue();
         }
 
-        return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+        if (!isset($formOptions['constraints']) || !is_array($formOptions['constraints'])) {
+            return $formOptions;
+        }
+
+        foreach ($formOptions['constraints'] as $constraint => $constraintOptions) {
+            if ($constraintOptions instanceof Constraint) {
+                continue;
+            }
+
+            unset($formOptions['constraints'][$constraint]);
+            if (false === strpos($constraint, '\\')) {
+                $constraint = sprintf('%s%s', self::DEFAULT_CONSTRAINT_NAMESPACE, $constraint);
+            }
+            $formOptions['constraints'][] = new $constraint($constraintOptions);
+        }
+
+        return $formOptions;
     }
 
     /**
-     * @param string $entityClass
+     * @param Variable $variable
      *
      * @return array
+     *
      */
-    protected function getEntityForm($entityClass)
+    protected function getEntityForm(Variable $variable)
     {
+        $entityClass = $variable->getOption('class');
         $formType = null;
         $formOptions = [];
         if ($this->formConfigProvider->hasConfig($entityClass)) {
@@ -156,6 +189,8 @@ class VariableGuesser
                 'multiple' => false,
             ];
         }
+
+        $formOptions = $this->setVariableFormOptions($variable, $formOptions);
 
         return [$formType, $formOptions];
     }
