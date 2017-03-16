@@ -78,7 +78,7 @@ class GroupChoiceField extends Element
     {
         $choices = array_intersect_key(
             $this->choices,
-            array_flip(preg_grep(sprintf('/%s/i', $label), array_keys($this->choices)))
+            array_flip(preg_grep(sprintf('/%s/i', preg_quote($label)), array_keys($this->choices)))
         );
         self::assertCount(1, $choices, sprintf('Too many results for "%s" label', $label));
 
