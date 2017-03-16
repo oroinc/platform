@@ -10,3 +10,4 @@ styles:
         - 'bundles/oroform/blank/scss/variables/form-row-config.scss'
         - 'bundles/oroform/blank/scss/styles.scss'
     filters: ['cssrewrite', 'cssmin']
+    output: 'css/layout/blank/stylebook.css'
