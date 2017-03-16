@@ -10,12 +10,25 @@
 
         padding: $primary-menu-item-inner-offset;
 
-        &--current {}
+        &--current,
+        &.active {
+            > .primary-menu__link {
+                font-weight: $primary-menu-link-font-weight-current;
+            }
+
+            > .primary-menu {
+                display: block;
+            }
+        }
 
         &--offset-m {
             &:not(:first-child) {
                 margin-left: $offset-x-m;
             }
+        }
+
+        .primary-menu {
+            display: none;
         }
     }
 
