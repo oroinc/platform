@@ -175,12 +175,12 @@ class VariableGuesser
     protected function getEntityForm(Variable $variable)
     {
         $entityClass = $variable->getOption('class');
-        $formType = null;
-        $formOptions = [];
-        if ($this->formConfigProvider->hasConfig($entityClass)) {
+        $formType = $variable->getOption('form_type');
+        $formOptions = $variable->getOption('form_options', []);
+        if ($this->formConfigProvider->hasConfig($entityClass) && !$formType) {
             $formConfig = $this->formConfigProvider->getConfig($entityClass);
             $formType = $formConfig->get('form_type');
-            $formOptions = $formConfig->get('form_options', false, []);
+            $formOptions = array_merge($formConfig->get('form_options', false, []), $formOptions);
         }
         if (!$formType) {
             $formType = 'entity';
