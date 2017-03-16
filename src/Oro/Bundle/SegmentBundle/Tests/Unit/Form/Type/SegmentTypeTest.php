@@ -58,13 +58,22 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(3))
             ->method('add')
             ->with(
+                'recordsLimit',
+                'integer',
+                ['required' => false]
+            )
+            ->will($this->returnSelf());
+
+        $builder->expects($this->at(4))
+            ->method('add')
+            ->with(
                 'description',
                 'textarea',
                 ['required' => false]
             )
             ->will($this->returnSelf());
 
-        $builder->expects($this->at(4))
+        $builder->expects($this->at(5))
             ->method('add')
             ->with(
                 'definition',

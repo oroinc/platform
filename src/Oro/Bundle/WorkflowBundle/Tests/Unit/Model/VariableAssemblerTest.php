@@ -207,10 +207,11 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        if ($guessedParameters && array_key_exists('property_path', $variableConfig)) {
+        if ($guessedParameters && array_key_exists('property_path', array_values($variableConfig)[0])) {
+            $var = array_values($variableConfig)[0];
             $this->variableGuesser->expects($this->any())
                 ->method('guessVariableParameters')
-                ->with('stdClass', $variableConfig['property_path'])
+                ->with('stdClass', $var['property_path'])
                 ->willReturn($guessedParameters);
         }
 
@@ -284,17 +285,6 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
                     ['class' => 'DateTime']
                 ),
             ],
-//            'entity' => [
-//                [
-//                    'entity_one' => [
-//                        'label' => 'label',
-//                        'type' => 'entity',
-//                        'value' => 1,
-//                        'options' => ['class' => 'stdClass'],
-//                    ],
-//                ],
-//                $this->getVariable('entity_one', 'label', 'entity', null, ['class' => 'stdClass']),
-//            ],
             'entity_minimal' => [
                 [
                     'variable_one' => [
@@ -335,35 +325,22 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
                     ['update' => false]
                 )
             ],
-//            'entity_minimal_guessed_parameters' => [
-//                [
-//                    'variable_one' => [
-//                        'property_path' => 'entity.field'
-//                    ]
-//                ],
-//                $this->getVariable('variable_one', 'label', 'entity', null, ['class' => 'stdClass'], 'entity.field'),
-//                'guessedParameters' => [
-//                    'label' => 'label',
-//                    'type' => 'entity',
-//                    'options' => ['class' => 'stdClass'],
-//                ],
-//            ],
-//            'entity_full_guessed_parameters' => [
-//                [
-//                    'variable_one' => [
-//                        'label' => 'label',
-//                        'type' => 'entity',
-//                        'options' => ['class' => 'stdClass'],
-//                        'property_path' => 'entity.field'
-//                    ]
-//                ],
-//                $this->getVariable('variable_one', 'label', 'entity', null, ['class' => 'stdClass'], 'entity.field'),
-//                'guessedParameters' => [
-//                    'label' => 'guessed label',
-//                    'type' => 'object',
-//                    'options' => ['class' => 'GuessedClass'],
-//                ],
-//            ],
+            'entity_full_guessed_parameters' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => ['class' => 'stdClass'],
+                        'property_path' => 'entity.field'
+                    ]
+                ],
+                $this->getVariable('variable_one', 'label', 'entity', null, ['class' => 'stdClass'], 'entity.field'),
+                'guessedParameters' => [
+                    'label' => 'guessed label',
+                    'type' => 'object',
+                    'options' => ['class' => 'GuessedClass'],
+                ],
+            ],
         ];
     }
 

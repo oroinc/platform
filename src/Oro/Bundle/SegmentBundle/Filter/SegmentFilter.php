@@ -174,41 +174,50 @@ class SegmentFilter extends EntityFilter
             throw new \LogicException('The SegmentFilter supports ORM data source only.');
         }
 
-        $queryBuilder = $this->getSegmentQueryBuilder($data);
+        /** @var Segment $segment */
+        $segment = $data['value'];
+
+        $queryBuilder = $this->getSegmentQueryBuilder($segment);
         $query        = $queryBuilder->getQuery();
+
+        if (!$this->isDynamic($segment) || !$segment->getRecordsLimit()) {
+            $subquery = $query->getDQL();
+            $params = $query->getParameters();
+            /** @var Parameter $param */
+            foreach ($params as $param) {
+                $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
+            }
+        } else {
+            $classMetadata = $query->getEntityManager()->getClassMetadata($segment->getEntity());
+            $identifiers   = $classMetadata->getIdentifier();
+            $identifier = reset($identifiers);
+            $idsResult = $query->getArrayResult();
+            $subquery = array_column($idsResult, $identifier);
+        }
 
         /**@var OrmExpressionBuilder $expressionBuilder */
         $expressionBuilder = $ds->expr();
-        $expr              = $expressionBuilder->in($this->get(FilterUtility::DATA_NAME_KEY), $query->getDQL());
-
+        $expr              = $expressionBuilder->in($this->get(FilterUtility::DATA_NAME_KEY), $subquery);
         $this->applyFilterToClause($ds, $expr);
-
-        $params = $query->getParameters();
-        /** @var Parameter $param */
-        foreach ($params as $param) {
-            $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
-        }
 
         return true;
     }
 
     /**
-     * @param mixed $data
-     *
+     * @param Segment $segment
      * @return QueryBuilder
+     *
      */
-    protected function getSegmentQueryBuilder($data)
+    protected function getSegmentQueryBuilder(Segment $segment)
     {
-        /** @var Segment $segment */
-        $segment = $data['value'];
-
         /** @var QueryBuilder $queryBuilder */
         if ($this->isDynamic($segment)) {
             $queryBuilder = $this->dynamicSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         } else {
             $queryBuilder = $this->staticSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
         }
-        $field = $this->get(FilterUtility::DATA_NAME_KEY);
+
+        $queryBuilder->setMaxResults($segment->getRecordsLimit());
 
         return $queryBuilder;
     }
