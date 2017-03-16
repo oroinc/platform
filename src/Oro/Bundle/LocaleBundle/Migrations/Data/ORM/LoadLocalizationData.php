@@ -109,9 +109,13 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         if (!$language) {
             return null;
         }
+
         $localization = new Localization();
         $title = Intl::getLocaleBundle()->getLocaleName($locale, $locale);
-        $localization->setLanguage($language)->setFormattingCode($locale)->setName($title)->setDefaultTitle($title);
+        $localization->setLanguage($language)
+            ->setFormattingCode($locale)
+            ->setName($title)
+            ->setDefaultTitle($title);
         $manager->persist($localization);
         $manager->flush($localization);
 
