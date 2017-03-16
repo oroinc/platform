@@ -48,8 +48,7 @@ class VariableAssembler extends BaseAbstractAssembler
         VariableGuesser $variableGuesser,
         TranslatorInterface $translator,
         ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
         $this->dataNormalizer = $dataNormalizer;
         $this->variableGuesser = $variableGuesser;
         $this->translator = $translator;
