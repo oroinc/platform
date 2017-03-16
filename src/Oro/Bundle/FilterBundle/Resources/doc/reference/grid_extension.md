@@ -156,6 +156,24 @@ Provides filtering data by datetime values
 Validated by [DateTimeRangeFilterType](./filter_form_types.md#oro_type_datetime_range_filter-form-type)
 Rendered by [Oro.Filter.DateTimeFilter](./javascript_widgets.md#orofilterdatetimefilter)
 
+### DateGrouping filter
+
+Provides grouping dates using list of predefined choices: Day, Month, Quarter, Year
+
+`type: datetime`
+
+Validated by [DateGroupingFilterType](./filter_form_types.md#oro_type_dage_grouping_filter-form-type) on backend
+and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterdategroupingfilter)
+
+### SkipEmptyPeriods filter
+
+Provides skipping empty data using list of predefined choices: Yes, No
+
+`type: choice`
+
+Validated by [SkipEmptyPeriodsFilterType](./filter_form_types.md#oro_type_skip_empty_periods_filter-form-type) on backend
+and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterskipemptyperiodsfilter)
+
 Customization
 -------------
 To implement your filter you have to do following:

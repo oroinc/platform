@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailSettingsType extends AbstractType
 {
@@ -36,7 +37,6 @@ class EmailSettingsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'         => 'Oro\Bundle\UserBundle\Entity\User',
-            'cascade_validation' => true,
             'ownership_disabled' => true,
             'dynamic_fields_disabled' => true,
             'label' => false,
@@ -53,13 +53,19 @@ class EmailSettingsType extends AbstractType
             $builder->add(
                 'imapAccountType',
                 'oro_imap_choice_account_type',
-                ['label' => false]
+                [
+                    'label' => false,
+                    'constraints' => [new Valid()]
+                ]
             );
         } else {
             $builder->add(
                 'imapConfiguration',
                 'oro_imap_configuration',
-                ['label' => false]
+                [
+                    'label' => false,
+                    'constraints' => [new Valid()]
+                ]
             );
         }
     }
