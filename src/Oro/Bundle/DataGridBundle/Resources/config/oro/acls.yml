@@ -13,14 +13,6 @@ acls:
         bindings: ~
         category: "application"
 
-    oro_datagrid_gridview_update_public:
-        label: oro.grid.action.gridview_edit_public.label
-        description: oro.grid.action.gridview_edit_public.description
-        type: action
-        group_name: ""
-        bindings: ~
-        category: "application"
-
     oro_datagrid_gridview_export:
         label: oro.grid.action.gridview_export.label
         description: oro.grid.action.gridview_export.description

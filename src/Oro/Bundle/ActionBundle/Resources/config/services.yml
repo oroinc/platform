@@ -124,11 +124,17 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
+            # set doctine typr mapping provider
+            - [setDoctrineTypeMappingProvider, ['@oro_action.provider.doctrine_type_mapping']]
 
     oro_action.options_assembler:
         class: %oro_action.options_assembler.class%
         calls:
             - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
+
+
+    oro_action.provider.doctrine_type_mapping:
+        class: 'Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider'
 
     oro_action.form.handler.operation_button:
         class: Oro\Bundle\ActionBundle\Handler\OperationFormHandler
@@ -190,20 +196,6 @@ services:
             - '@oro_action.provider.button_search_context'
         tags:
             - { name: layout.data_provider, alias: buttons }
-
-    oro_action.condition.route_exists:
-        class: 'Oro\Bundle\ActionBundle\Condition\RouteExists'
-        arguments:
-            - '@router'
-        tags:
-            - { name: oro_action.condition, alias: 'route_exists' }
-
-    oro_action.condition.service_exists:
-        class: 'Oro\Bundle\ActionBundle\Condition\ServiceExists'
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: oro_action.condition, alias: 'service_exists' }
 
     oro_action.provider.button_search_context:
         class: 'Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider'

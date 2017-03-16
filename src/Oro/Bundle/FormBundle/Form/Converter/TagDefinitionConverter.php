@@ -16,7 +16,7 @@ class TagDefinitionConverter
         $tags = [];
 
         foreach (explode(',', $allowedElements) as $allowedElement) {
-            if (strpos(trim($allowedElement), '@') !== false) {
+            if (false !== strpos($allowedElement, '@')) {
                 continue;
             }
 
@@ -57,7 +57,7 @@ class TagDefinitionConverter
             }
             $tags = ['*'];
 
-            if (strpos($tagsConfiguration, '@') === false) {
+            if (false === strpos($tagsConfiguration, '@')) {
                 $tags = explode('/', $tagsConfiguration);
             }
 

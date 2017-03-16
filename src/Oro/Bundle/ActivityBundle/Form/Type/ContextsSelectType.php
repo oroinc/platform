@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityBundle\Form\Type;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -14,11 +13,13 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class ContextsSelectType extends AbstractType
 {
@@ -42,6 +43,9 @@ class ContextsSelectType extends AbstractType
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param EntityManager            $entityManager
      * @param ConfigManager            $configManager
@@ -49,6 +53,7 @@ class ContextsSelectType extends AbstractType
      * @param TokenStorageInterface    $securityTokenStorage
      * @param EventDispatcherInterface $dispatcher
      * @param EntityNameResolver       $entityNameResolver
+     * @param FeatureChecker           $featureChecker
      */
     public function __construct(
         EntityManager $entityManager,
@@ -56,7 +61,8 @@ class ContextsSelectType extends AbstractType
         TranslatorInterface $translator,
         TokenStorageInterface $securityTokenStorage,
         EventDispatcherInterface $dispatcher,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        FeatureChecker $featureChecker
     ) {
         $this->entityManager      = $entityManager;
         $this->configManager      = $configManager;
@@ -64,6 +70,7 @@ class ContextsSelectType extends AbstractType
         $this->tokenStorage       = $securityTokenStorage;
         $this->dispatcher         = $dispatcher;
         $this->entityNameResolver = $entityNameResolver;
+        $this->featureChecker     = $featureChecker;
     }
 
     /**
@@ -134,15 +141,18 @@ class ContextsSelectType extends AbstractType
      */
     protected function getResult($text, $object)
     {
+        $entityClass = ClassUtils::getClass($object);
+
         return [
             'text' => $text,
+            'hidden' => !$this->featureChecker->isResourceEnabled($entityClass, 'entities'),
             /**
              * Selected Value Id should additionally encoded because it should be used as string key
              * to compare with value
              */
             'id'   => json_encode(
                 [
-                    'entityClass' => ClassUtils::getClass($object),
+                    'entityClass' => $entityClass,
                     'entityId'    => $object->getId(),
                 ]
             )

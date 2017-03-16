@@ -14,7 +14,7 @@ oro.locale:
         name.label: 'Name'
         title.label: 'Title'
         titles.label: 'Titles'
-        language_code.label: 'Language'
+        language.label: 'Language'
         formatting_code.label: 'Formatting'
         child_localizations.label: 'Child localizations'
         parent_localization.label: 'Parent localization'

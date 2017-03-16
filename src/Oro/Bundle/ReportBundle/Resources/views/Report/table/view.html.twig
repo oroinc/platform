@@ -33,6 +33,12 @@
     {{ parent() }}
 {% endblock pageHeader %}
 
+{% block after_breadcrumbs %}
+    <div class="pull-left">
+        <div class="grid-views-holder"></div>
+    </div>
+{% endblock %}
+
 {% block content_data %}
     {% if gridName is defined %}
         {% if chartView is defined %}
@@ -42,11 +48,12 @@
         {% endif %}
         {% set renderParams = renderParams|default({})|merge({
             enableFullScreenLayout: true,
-            enableViews: false
+            enableViews: true,
+            showViewsInCustomElement: '.page-title > .navbar-extra .pull-left-extra .grid-views-holder'
         }) %}
         {% set gridParams =  {
-            '_grid_view': {'_disabled': true},
-            '_tags'     : {'_disabled': true}
+            '_grid_view': {},
+            '_tags'     : {'_disabled': true},
         } %}
         {% if oro_config_value('oro_report.display_sql_query') %}
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}

@@ -4,13 +4,20 @@ define(function(require) {
     var TabItemView;
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var module = require('module');
+    var config = module.config();
+
+    config = _.extend({
+        className: 'nav-item',
+        tamplateClassName: 'nav-link'
+    }, config);
 
     TabItemView = BaseView.extend({
         tagName: 'li',
 
-        className: 'nav-item',
+        className: config.className,
 
-        template: _.template('<a href="#" class="nav-link"><%= label %></a>'),
+        template: _.template('<a href="#" class="' + config.tamplateClassName + '" data-tab-link><%= label %></a>'),
 
         listen: {
             'change:active model': 'updateStates',
@@ -18,7 +25,7 @@ define(function(require) {
         },
 
         events: {
-            'click a': 'onSelect'
+            'click [data-tab-link]': 'onSelect'
         },
 
         initialize: function(options) {
