@@ -157,7 +157,7 @@ class VariableGuesser
             }
 
             unset($formOptions['constraints'][$constraint]);
-            if (false !== strpos($constraint, '\\')) {
+            if (false === strpos($constraint, '\\')) {
                 $constraint = sprintf('%s%s', self::DEFAULT_CONSTRAINT_NAMESPACE, $constraint);
             }
             $formOptions['constraints'][] = new $constraint($constraintOptions);
