@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var EmailAttachmentView;
-    var $ = require('jquery');
     var EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
     var BaseView = require('oroui/js/app/views/base/view');
 
@@ -22,7 +21,7 @@ define(function(require) {
 
         getTemplateFunction: function() {
             if (!this.template) {
-                this.template = $('#email-attachment-item').html();
+                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-item.html');
             }
 
             return EmailAttachmentView.__super__.getTemplateFunction.call(this);

@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Component\MessageQueue\Consumption\Dbal;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 class DbalPidFileManager
 {
     /**
@@ -14,11 +16,17 @@ class DbalPidFileManager
     private $pidFileExtension = '.pid';
 
     /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
      * @param string $pidDir
      */
     public function __construct($pidDir)
     {
         $this->pidDir = $pidDir;
+        $this->filesystem = new Filesystem();
     }
 
     /**
@@ -32,7 +40,11 @@ class DbalPidFileManager
 
         $fHandler = @fopen($filename, 'x');
         if (false === $fHandler) {
-            throw new \LogicException(sprintf('Pid file already exists. file:"%s"', $filename));
+            if ($this->filesystem->exists($filename)) {
+                throw new \LogicException(sprintf('The pid file already exists. file:"%s"', $filename));
+            } else {
+                throw new \LogicException(sprintf('Cannot write the pid file. file:"%s"', $filename));
+            }
         }
 
         $pid = getmypid();
@@ -53,7 +65,7 @@ class DbalPidFileManager
      */
     public function removePidFile($consumerId)
     {
-        @unlink($this->generateFilenameByConsumerId($consumerId));
+        $this->filesystem->remove($this->generateFilenameByConsumerId($consumerId));
     }
 
     /**
@@ -88,7 +100,8 @@ class DbalPidFileManager
 
     private function ensurePidDirExists()
     {
-        @mkdir($this->pidDir, 0777, true);
+        $this->filesystem->mkdir($this->pidDir, 0777, true);
+        $this->filesystem->chmod($this->pidDir, 0777);
     }
 
     /**

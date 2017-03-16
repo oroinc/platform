@@ -99,9 +99,11 @@ class OperationRegistry
 
     /**
      * @param string $name
+     * @param OperationFindCriteria $criteria
+     *
      * @return null|Operation
      */
-    public function findByName($name)
+    public function findByName($name, OperationFindCriteria $criteria = null)
     {
         $this->loadConfiguration();
 
@@ -114,6 +116,12 @@ class OperationRegistry
 
                 $this->operations[$name] = $operation;
             }
+        }
+
+        if ($operation && $criteria &&
+            (!$this->isApplicable($this->configuration[$name], $criteria) || !$this->filter([$operation], $criteria))
+        ) {
+            $operation = null;
         }
 
         return $operation;
