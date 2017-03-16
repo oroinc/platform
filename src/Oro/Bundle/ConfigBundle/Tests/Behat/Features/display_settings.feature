@@ -1,4 +1,5 @@
 @fixture-cases.yml
+@fixture-activities.yml
 Feature: Display settings manage
   In order to control system display behavior
   As Administrator
@@ -81,3 +82,38 @@ Feature: Display settings manage
     Then I go to Activities/Cases
     And I click view 1 in grid
     Then I should see no pagination controls
+
+  Scenario: Set activity list configuration
+    When I go to Customers/Contacts
+    And I click View Charlie in grid
+    Then there is 10 records in activity list
+    And activity list must be sorted descending by updated date
+    When I go to System/Configuration
+    And I click "Display settings"
+    And I set configuration to:
+      | Sort direction            | Ascending |
+      | Items Per Page By Default | 25        |
+    And I save form
+    When I go to Customers/Contacts
+    And I click View Charlie in grid
+    Then there is 13 records in activity list
+    And activity list must be sorted ascending by updated date
+    When I go to System/Configuration
+    And I click "Display settings"
+    And I set configuration to:
+      | Sort by field             | Created date |
+      | Sort direction            | Descending   |
+      | Items Per Page By Default | 10           |
+    And I save form
+    When I go to Customers/Contacts
+    And click View Charlie in grid
+    Then I see following records in activity list with provided order:
+      | -1 days |
+      | -2 days |
+      | -3 days |
+      | -4 days |
+      | -5 days |
+      | -6 days |
+      | -7 days |
+      | -8 days |
+      | -9 days |

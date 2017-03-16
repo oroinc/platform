@@ -6,6 +6,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
@@ -166,5 +167,46 @@ class FeatureContext extends OroFeatureContext implements
             $this->oroMainContext->elementIsVisible('#entity-pagination'),
             'Entity pagination control still appearing on current page'
         );
+    }
+
+    /**
+     * Asserts that activity list items are be sorted in provided order
+     *
+     * @Given /^activity list must be sorted (ascending|descending) by updated date$/
+     */
+    public function activityListMustBeSortedBy($order)
+    {
+        /** @var ActivityList $list */
+        $list = $this->elementFactory->createElement('ActivityList');
+
+        $actual = [];
+        foreach ($list->getItems() as $item) {
+            $actual[] = $item->getCreatedAtDate();
+        }
+
+        $expected = $actual;
+        $order = $order == 'ascending' ? SORT_ASC : SORT_DESC;
+
+        array_multisort($expected, $order);
+
+        self::assertEquals($expected, $actual, "Failed asserting that activity list sorted $order");
+    }
+
+    /**
+     * Asserts records in activity list with provided table one by one
+     *
+     * @Then /^I see following records in activity list with provided order:$/
+     */
+    public function iSeeFollowingRecordsWithOrder(TableNode $table)
+    {
+        /** @var ActivityList $list */
+        $list = $this->elementFactory->createElement('ActivityList');
+
+        foreach ($list->getItems() as $key => $item) {
+            if (count($table->getRows()) >= $key) {
+                break;
+            }
+            self::assertEquals($table->getRow($key)[0], $item->getTitle());
+        }
     }
 }
