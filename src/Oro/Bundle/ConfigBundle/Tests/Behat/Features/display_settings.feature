@@ -117,3 +117,22 @@ Feature: Display settings manage
       | -7 days |
       | -8 days |
       | -9 days |
+
+  Scenario: Change sidebar settings
+    Given right sidebar is visible
+    When I go to System/Configuration
+    And click "Display settings"
+    And I set configuration to:
+      | Enable left sidebar  | Yes |
+      | Enable right sidebar | No  |
+    And save form
+    Then right sidebar is out of sight
+    And left sidebar is visible
+    When I go to System/Configuration
+    And click "Display settings"
+    And I set configuration to:
+      | Enable left sidebar  | Yes |
+      | Enable right sidebar | Yes |
+    And save form
+    Then left sidebar is visible
+    And right sidebar is visible

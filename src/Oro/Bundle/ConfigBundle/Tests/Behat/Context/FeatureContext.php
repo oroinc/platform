@@ -209,4 +209,22 @@ class FeatureContext extends OroFeatureContext implements
             self::assertEquals($table->getRow($key)[0], $item->getTitle());
         }
     }
+
+    /**
+     * Asserts visibility of provided sidebar
+     *
+     * Example: Then right sidebar is out of sight
+     *
+     * @Given /^(left|right) sidebar is (visible|out of sight)$/
+     */
+    public function leftSidebarIsVisible($position, $visibility)
+    {
+        $sidebarPanel = $this->getPage()->findVisible('css', "div[id^='sidebar-$position']");
+
+        if ($visibility == 'visible') {
+            self::assertNotNull($sidebarPanel, "Failed asserting that $position sidebar is visible");
+        } else {
+            self::assertNull($sidebarPanel, "Failed asserting that $position sidebar is invisible");
+        }
+    }
 }
