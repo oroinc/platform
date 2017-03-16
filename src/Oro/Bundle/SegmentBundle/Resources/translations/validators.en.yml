@@ -1,1 +1,6 @@
 "Segment name already in use": "Segment name already in use"
+
+oro:
+    segment:
+        validation:
+            sorting: "Please specify sorting for at least one column."

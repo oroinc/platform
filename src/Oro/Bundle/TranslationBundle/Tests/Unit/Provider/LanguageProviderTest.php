@@ -78,4 +78,13 @@ class LanguageProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($this->provider->getAvailableLanguagesByCurrentUser(), $data);
     }
+
+    public function testGetLanguages()
+    {
+        $data = [new Language()];
+
+        $this->repository->expects($this->once())->method('getLanguages')->willReturn($data);
+
+        $this->assertSame($data, $this->provider->getLanguages());
+    }
 }

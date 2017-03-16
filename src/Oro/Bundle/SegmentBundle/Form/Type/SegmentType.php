@@ -28,6 +28,7 @@ class SegmentType extends AbstractQueryDesignerType
                     'tooltip'     => 'oro.segment.type.tooltip_text'
                 ]
             )
+            ->add('recordsLimit', 'integer', ['required' => false])
             ->add('description', 'textarea', ['required' => false]);
 
         parent::buildForm($builder, $options);
@@ -56,7 +57,6 @@ class SegmentType extends AbstractQueryDesignerType
             [
                 'data_class'         => 'Oro\Bundle\SegmentBundle\Entity\Segment',
                 'intention'          => 'segment',
-                'cascade_validation' => true
             ]
         );
 

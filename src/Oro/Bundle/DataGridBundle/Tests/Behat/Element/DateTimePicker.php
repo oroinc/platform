@@ -16,8 +16,8 @@ class DateTimePicker extends Element
     {
         $this->getDatePicker()->click();
 
-        $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getYearPicker()->selectOption($dateTime->format('Y'));
+        $this->getMonthPicker()->selectOption($dateTime->format('M'));
         $this->getCalendarDate($dateTime->format('j'))->click();
 
         $this->getTimePicker()->setValue($dateTime);

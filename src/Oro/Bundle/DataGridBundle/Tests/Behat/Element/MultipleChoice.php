@@ -62,7 +62,7 @@ class MultipleChoice extends AbstractGridFilterItem
     {
         /** @var NodeElement $input */
         foreach ($items as $input) {
-            if (preg_match(sprintf('/%s/i', $text), $input->getText())) {
+            if (stripos($input->getText(), $text) !== false) {
                 return $input;
             }
         }

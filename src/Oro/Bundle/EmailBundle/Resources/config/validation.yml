@@ -14,6 +14,8 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
             - NotBlank:     ~
         organization:
             - NotBlank: ~
+        translations:
+            - Valid: ~
 
 Oro\Bundle\EmailBundle\Form\Model\Email:
     constraints:
@@ -33,5 +35,14 @@ Oro\Bundle\EmailBundle\Form\Model\Email:
 
 Oro\Bundle\EmailBundle\Entity\Mailbox:
     properties:
+        label:
+            - NotBlank: ~
         origin:
+            - Valid: ~
             - Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOrigin: ~
+        processSettings:
+            - Valid: ~
+        email:
+            - NotBlank: ~
+            - Email: ~
+
