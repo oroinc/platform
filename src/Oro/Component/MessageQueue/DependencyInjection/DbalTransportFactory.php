@@ -33,8 +33,8 @@ class DbalTransportFactory implements TransportFactoryInterface
             ->children()
                 ->scalarNode('connection')->defaultValue('default')->cannotBeEmpty()->end()
                 ->scalarNode('table')->defaultValue('oro_message_queue')->cannotBeEmpty()->end()
-                ->integerNode('orphan_time')->min(30)->defaultValue(300)->cannotBeEmpty()->end()
-                ->integerNode('polling_interval')->min(50)->defaultValue(1000)->cannotBeEmpty()->end()
+                ->integerNode('orphan_time')->min(30)->defaultValue(300)->end()
+                ->integerNode('polling_interval')->min(50)->defaultValue(1000)->end()
         ;
     }
 
