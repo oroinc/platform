@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
+use Oro\Bundle\TranslationBundle\Entity\Language;
 use Symfony\Component\Serializer\Serializer;
 
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -82,7 +83,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
                 'name' => null,
                 'parentLocalization' => null,
                 'formattingCode' => null,
-                'languageCode' => null,
+                'language' => ['id' => null, 'code' => null],
                 'createdAt' => new \DateTime('@1486059637'),
                 'updatedAt' => new \DateTime('@1486059637'),
                 'updatedAtSet' => true,
@@ -141,7 +142,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
             'name' => null,
             'parentLocalization' => null,
             'formattingCode' => null,
-            'languageCode' => null,
+            'language' => ['id' => null, 'code' => null],
             'createdAt' => new \DateTime('@1486059637'),
             'updatedAt' => new \DateTime('@1486059637'),
             'updatedAtSet' => true,
@@ -161,9 +162,10 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
         $localization = new Localization();
         $localization->setName('test_name');
         $localization->setFormattingCode('en');
-        $localization->setLanguageCode('EN');
+        $localization->setLanguage($this->getEntity(Language::class, ['id' => 42, 'code' => 'EN']));
         $localization->setCreatedAt(new \DateTime('@1486059637'));
         $localization->setUpdatedAt(new \DateTime('@1486059637'));
+        $localization->setParentLocalization($this->getEntity(Localization::class, ['id' => 100]));
 
         $localizedFallbackValue1 = new LocalizedFallbackValue();
         $localizedFallbackValue1->setText('test_text1');
@@ -183,9 +185,9 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'id' => null,
             'name' => 'test_name',
-            'parentLocalization' => null,
+            'parentLocalization' => 100,
             'formattingCode' => 'en',
-            'languageCode' => 'EN',
+            'language' => ['id' => 42, 'code' => 'EN'],
             'createdAt' => new \DateTime('@1486059637'),
             'updatedAt' => new \DateTime('@1486059637'),
             'updatedAtSet' => true,
@@ -210,11 +212,23 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider deserializationProvider
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     *
+     * @param array $array
+     * @param string $id
+     * @param Language $language
+     * @param string $formattingCode
+     * @param string $name
+     * @param string $parentLocalization
+     * @param array $titles
+     * @param array $hierarchy
+     * @param \DateTime $createdAt
+     * @param \DateTime $updatedAt
+     * @param \DateTime $updatedAtSet
      */
     public function testDeserializeEmptyClass(
         $array,
         $id,
-        $languageCode,
+        $language,
         $formattingCode,
         $name,
         $parentLocalization,
@@ -228,7 +242,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
         $localization = $this->serializer->deserialize($array, Localization::class, 'array');
 
         $this->assertEquals($id, $localization->getId());
-        $this->assertEquals($languageCode, $localization->getLanguageCode());
+        $this->assertEquals($language, $localization->getLanguage());
         $this->assertEquals($name, $localization->getName());
         $this->assertEquals($parentLocalization, $localization->getParentLocalization());
         $this->assertEquals($formattingCode, $localization->getFormattingCode());
@@ -254,7 +268,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
             'Empty object' => [
                 'array' => [
                     'id' => null,
-                    'languageCode' => null,
+                    'language' => null,
                     'formattingCode' => null,
                     'name' => null,
                     'parentLocalization' => null,
@@ -265,7 +279,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
                     'updatedAtSet' => null
                 ],
                 'id' => null,
-                'languageCode' => null,
+                'language' => null,
                 'formattingCode' => null,
                 'name' => null,
                 'parentLocalization' => null,
@@ -278,7 +292,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
             'Filled object' => [
                 'array' => [
                     'id' => 1,
-                    'languageCode' => 'en',
+                    'language' => ['id' => 42, 'code' => 'en'],
                     'formattingCode' => 'en',
                     'name' => 'test_name',
                     'parentLocalization' => null,
@@ -289,7 +303,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
                     'updatedAtSet' => null
                 ],
                 'id' => 1,
-                'languageCode' => 'en',
+                'language' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'en']),
                 'formattingCode' => 'en',
                 'name' => 'test_name',
                 'parentLocalization' => null,
@@ -302,7 +316,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
             'Filled object with titles' => [
                 'array' => [
                     'id' => 2,
-                    'languageCode' => 'EN',
+                    'language' => ['id' => 42, 'code' => 'EN'],
                     'formattingCode' => 'en',
                     'name' => 'test_name',
                     'parentLocalization' => null,
@@ -328,7 +342,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
                     'updatedAtSet' => null
                 ],
                 'id' => 2,
-                'languageCode' => 'EN',
+                'language' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'EN']),
                 'formattingCode' => 'en',
                 'name' => 'test_name',
                 'parentLocalization' => null,
@@ -356,7 +370,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
             'With parentLocalization' => [
                 'array' => [
                     'id' => 2,
-                    'languageCode' => null,
+                    'language' => null,
                     'formattingCode' => null,
                     'name' => 'Child',
                     'parentLocalization' => 1,
@@ -367,7 +381,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
                     'updatedAtSet' => null
                 ],
                 'id' => 2,
-                'languageCode' => null,
+                'language' => null,
                 'formattingCode' => null,
                 'name' => 'Child',
                 'parentLocalization' => $this->getEntity(Localization::class, ['id' => 1]),
@@ -380,7 +394,7 @@ class LocalizationArraySerializerTest extends \PHPUnit_Framework_TestCase
             'Empty array' => [
                 'array' => [],
                 'id' => null,
-                'languageCode' => null,
+                'language' => null,
                 'formattingCode' => null,
                 'name' => null,
                 'parentLocalization' => null,

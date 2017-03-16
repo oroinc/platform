@@ -1,0 +1,82 @@
+{% block _style_book_forms_description_widget %}
+    <div class="content-section">
+        <p class="content-section__text">{{ 'oro_frontend_style_book.groups.grid.text_content'|trans }}</p>
+        <p class="content-section__text">{{ 'oro_frontend_style_book.groups.grid.text_content_first'|trans }}</p>
+    </div>
+{% endblock %}
+
+{% block _style_book_button_element_action_widget %}
+    <button class="btn btn--action" type="submit">Action Button</button>
+{% endblock %}
+
+{% block _style_book_button_element_info_widget %}
+    <button class="btn btn--info" type="submit">Info Button</button>
+{% endblock %}
+
+{% block _style_book_button_element_primary_widget %}
+    <button class="btn btn--primary" type="submit">Primary Button</button>
+{% endblock %}
+
+{% block _style_book_button_element_link_widget %}
+    <a href="#" class="btn btn--link">Link Button</a>
+{% endblock %}
+
+{% block _style_book_button_element_large_size_widget %}
+    <button class="btn btn--default btn--large" type="submit">Default Button, Large</button>
+{% endblock %}
+
+{% block _style_book_button_element_size_l_widget %}
+    <button class="btn btn--default btn--size-l" type="submit">Default Button, L(arge)</button>
+{% endblock %}
+
+{% block _style_book_button_element_size_m_widget %}
+    <button class="btn btn--default btn--size-m" type="submit">Default Button, M(edium)</button>
+{% endblock %}
+
+{% block _style_book_button_element_size_s_widget %}
+    <button class="btn btn--default btn--size-s" type="submit">Default Button, S(mall)</button>
+{% endblock %}
+
+{% block _style_book_button_element_inline_group_widget %}
+    <div class="btn-group">
+        <button class="btn btn--default btn--size-s">
+            <i class="fa-filter hide-text"></i>
+        </button>
+        <button class="btn btn--default btn--size-s">
+            <i class="fa-repeat hide-text"></i>
+        </button>
+        <button class="btn btn--default btn--size-s">
+            <i class="fa-refresh hide-text"></i>
+        </button>
+    </div>
+{% endblock %}
+
+{% block _style_book_button_element_group_widget %}
+    <div class="btn-group">
+        <a href="javascript: void(0);" class="btn btn--info">Button with a drop-down</a>
+        <a href="#" data-toggle="dropdown" class="btn dropdown-toggle btn--info">
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Action A</a></li>
+            <li><a class="dropdown-item" href="#">Action B</a></li>
+            <li><a class="dropdown-item" href="#">Action C</a></li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block _style_book_button_element_btn_group_widget %}
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn--default">Left</button>
+        <button type="button" class="btn btn--default">Middle</button>
+        <button type="button" class="btn btn--default">Right</button>
+    </div>
+{% endblock %}
+
+{% block _style_book_button_element_btn_group_vertical_widget %}
+    <div class="btn-group-vertical" role="group">
+        <button type="button" class="btn btn--default">Top</button>
+        <button type="button" class="btn btn--default">Middle</button>
+        <button type="button" class="btn btn--default">Bottom</button>
+    </div>
+{% endblock %}

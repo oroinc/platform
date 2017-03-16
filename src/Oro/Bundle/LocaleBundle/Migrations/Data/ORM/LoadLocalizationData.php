@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -12,8 +13,10 @@ use Symfony\Component\Intl\Intl;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Migrations\Data\ORM\LoadLanguageData;
 
-class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
+class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     use ContainerAwareTrait;
 
@@ -27,15 +30,11 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
             throw new \LogicException(sprintf('There are no locale with code "%s"!', $locale));
         }
 
-        $language = $this->getLanguageCode($locale);
-        if (!$this->isSupportedLanguage($language)) {
-            throw new \LogicException(sprintf('There are no language with code "%s"!', $language));
-        }
-
+        $language = $manager->getRepository(Language::class)->findOneBy(['code' => $locale]);
         $localization = $this->getDefaultLocalization($manager, $locale, $language);
         if (!$localization) {
             $localization = new Localization();
-            $localization->setLanguageCode($language)->setFormattingCode($locale);
+            $localization->setLanguage($language)->setFormattingCode($locale);
 
             $manager->persist($localization);
         }
@@ -64,15 +63,15 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     /**
      * @param ObjectManager $manager
      * @param string $locale
-     * @param string $language
+     * @param Language $language
      * @return Localization
      */
-    protected function getDefaultLocalization(ObjectManager $manager, $locale, $language)
+    protected function getDefaultLocalization(ObjectManager $manager, $locale, Language $language)
     {
         return $manager->getRepository('OroLocaleBundle:Localization')
             ->findOneBy(
                 [
-                    'languageCode' => $language,
+                    'language' => $language,
                     'formattingCode' => $locale
                 ]
             );
@@ -86,17 +85,6 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $localeSettings = $this->container->get('oro_locale.settings');
 
         return $localeSettings->getLocale();
-    }
-
-    /**
-     * @param string $locale
-     * @return string
-     */
-    protected function getLanguageCode($locale)
-    {
-        list($language) = explode('_', $locale);
-
-        return $language;
     }
 
     /**
@@ -119,5 +107,13 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $languages = Intl::getLanguageBundle()->getLanguageNames();
 
         return array_key_exists($language, $languages);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [LoadLanguageData::class];
     }
 }

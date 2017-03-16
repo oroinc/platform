@@ -19,7 +19,7 @@
     {% set localizationInfo %}
         {{ UI.renderProperty('oro.locale.localization.name.label'|trans, entity.name) }}
         {{ UI.renderProperty('oro.locale.localization.title.label'|trans, entity.defaultTitle) }}
-        {{ UI.renderProperty('oro.locale.localization.language_code.label'|trans, entity.languageCode|oro_language_code_title) }}
+        {{ UI.renderProperty('oro.locale.localization.language.label'|trans, entity.languageCode|oro_locale_code_title) }}
         {{ UI.renderProperty('oro.locale.localization.formatting_code.label'|trans, entity.formattingCode|oro_formatting_code_title) }}
 
         {% if entity.parentLocalization %}

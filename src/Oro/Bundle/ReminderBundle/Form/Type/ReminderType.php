@@ -39,7 +39,6 @@ class ReminderType extends AbstractType
                 'data_class'           => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder',
                 'intention'            => 'reminder',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'   => true,
                 'error_bubbling'       => false,
             )
         );

@@ -18,7 +18,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->client->useHashNavigation(true);
+        $this->client->useHashNavigation(false);
 
         self::warmUpEntityCache();
     }

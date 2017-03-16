@@ -55,8 +55,16 @@ class ConfigNormalizer
                                 );
                             }
                         } elseif ($this->isCollapsedWithoutPropertyPath($fieldConfig)) {
-                            $targetFields = array_keys($fieldConfig[ConfigUtil::FIELDS]);
-                            $fieldConfig[ConfigUtil::PROPERTY_PATH] = $field . '.' . reset($targetFields);
+                            $targetFieldConfig = reset($fieldConfig[ConfigUtil::FIELDS]);
+                            if (is_array($targetFieldConfig)
+                                && !empty($targetFieldConfig[ConfigUtil::PROPERTY_PATH])
+                            ) {
+                                $targetField = $targetFieldConfig[ConfigUtil::PROPERTY_PATH];
+                            } else {
+                                $targetFields = array_keys($fieldConfig[ConfigUtil::FIELDS]);
+                                $targetField = reset($targetFields);
+                            }
+                            $fieldConfig[ConfigUtil::PROPERTY_PATH] = $field . '.' . $targetField;
                         }
 
                         $config[ConfigUtil::FIELDS][$field] = $this->normalizeConfig($fieldConfig, $field);
