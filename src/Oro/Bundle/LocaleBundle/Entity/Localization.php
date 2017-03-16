@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
@@ -86,11 +87,12 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     protected $titles;
 
     /**
-     * @var string
+     * @var Language
      *
-     * @ORM\Column(name="language_code", type="string", length=16, nullable=false)
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
+     * @ORM\JoinColumn(name="language_id", referencedColumnName="id", nullable=false, onDelete="RESTRICT")
      */
-    protected $languageCode;
+    protected $language;
 
     /**
      * @var string
@@ -142,15 +144,23 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     }
 
     /**
-     * @param string $languageCode
+     * @param Language $language
      *
      * @return $this
      */
-    public function setLanguageCode($languageCode)
+    public function setLanguage($language)
     {
-        $this->languageCode = $languageCode;
+        $this->language = $language;
 
         return $this;
+    }
+
+    /**
+     * @return Language
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 
     /**
@@ -158,7 +168,7 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      */
     public function getLanguageCode()
     {
-        return $this->languageCode;
+        return $this->language ? $this->language->getCode() : null;
     }
 
     /**
@@ -318,5 +328,41 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
         }
 
         return $localeHierarchy;
+    }
+
+    /**
+     * @param bool $includeOwnId
+     * @return array
+     */
+    public function getChildrenIds($includeOwnId = false)
+    {
+        $ids = $this->processChildrenIds($this);
+        if ($includeOwnId && $this->getId()) {
+            $ids[] = $this->getId();
+        }
+
+        $ids = array_unique($ids);
+
+        sort($ids);
+
+        return $ids;
+    }
+
+    /**
+     * @param Localization $localization
+     * @return array
+     */
+    protected function processChildrenIds(Localization $localization)
+    {
+        $ids = [];
+        foreach ($localization->getChildLocalizations() as $child) {
+            foreach ($this->processChildrenIds($child) as $id) {
+                $ids[] = $id;
+            }
+
+            $ids[] = $child->getId();
+        }
+
+        return $ids;
     }
 }
