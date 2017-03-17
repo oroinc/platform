@@ -20,6 +20,17 @@
         padding-left: 39px;
     }
 
+    &[type="number"] {
+        -moz-appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            margin: 0;
+
+            @include appearance();
+        }
+    }
+
     @include element-state('hover') {
         box-shadow: $input-box-shadow-hover-state;
     }
