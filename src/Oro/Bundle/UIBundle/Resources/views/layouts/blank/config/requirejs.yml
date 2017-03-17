@@ -78,6 +78,8 @@ config:
         'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
 
+        'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
@@ -89,6 +91,8 @@ config:
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
+
+        'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/blank/js/app/modules/views-module

@@ -30,6 +30,7 @@ define(function(require) {
                 enableViews: options.enableViews,
                 $gridEl: options.$el,
                 showInNavbar: options.showViewsInNavbar,
+                showInCustomElement: options.showViewsInCustomElement,
                 buildViews: function(grid) {
                     var gridViews = gridViewsBuilder.build.call(this, grid.collection);
                     deferred.resolve(gridViews);
@@ -68,15 +69,20 @@ define(function(require) {
          */
         build: function(collection) {
             var gridViews;
+            var $gridViews;
             var options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
                 var gridViewsOptions = _.extend({collection: collection}, options);
 
                 if (this.showInNavbar) {
-                    var $gridViews = $(gridGridViewsSelector);
+                    $gridViews = $(gridGridViewsSelector);
                     gridViewsOptions.title = $gridViews.text();
 
                     gridViews = new GridViewsView(gridViewsOptions);
+                    $gridViews.html(gridViews.render().$el);
+                } else if (this.showInCustomElement) {
+                    gridViews = new GridViewsView(gridViewsOptions);
+                    $gridViews = $(this.showInCustomElement);
                     $gridViews.html(gridViews.render().$el);
                 } else {
                     gridViews = new GridViewsView(gridViewsOptions);

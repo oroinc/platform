@@ -15,9 +15,8 @@
 {% block attribute_group_rest_attribute_group_widget %}
     {% set attr = layout_attr_defaults(attr, {
         'data-page-component-module': 'oroentityconfig/js/attribute-group-tab-content-component',
-        'data-page-component-options': {'id': group}|json_encode
+        '~data-page-component-options': {'id': group}|json_encode
     }) %}
-
     <div {{ block('block_attributes') }} style="display: none;" class="tab-content">
         {{ block_widget(block) }}
     </div>
@@ -79,5 +78,5 @@
 {% endblock %}
 
 {% block attribute_group_rest_attribute_widget %}
-    <div class="clearfix">{{ block('attribute_label_widget') }} {{ block_widget(block) }}</div>
+    <div class="tab-content__wrapper">{{ block('attribute_label_widget') }} {{ block_widget(block) }}</div>
 {% endblock %}
