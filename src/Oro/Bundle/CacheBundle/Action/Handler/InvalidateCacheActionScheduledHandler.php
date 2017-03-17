@@ -78,14 +78,12 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
      */
     private function convertDatetimeToCron(\DateTime $datetime)
     {
-        $dateArray = getdate(strtotime($datetime->format('Y-m-d H:i:s')));
-
         return sprintf(
             '%d %d %d %d *',
-            $dateArray['minutes'],
-            $dateArray['hours'],
-            $dateArray['mday'],
-            $dateArray['mon']
+            $datetime->format('i'),
+            $datetime->format('H'),
+            $datetime->format('d'),
+            $datetime->format('m')
         );
     }
 }
