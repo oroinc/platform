@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -345,6 +348,197 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider configurationEntityIdentifierProvider
+     *
+     * @param array    $configuration
+     * @param Variable $expectedVariable
+     * @param array    $options
+     */
+    public function testEntityIdentifierAssemble($configuration, $expectedVariable, $options = [])
+    {
+        $configuration = [
+            'variable_definitions' => [
+                'variables' => $configuration,
+            ],
+        ];
+
+        $assembler = $this->getMockEntityAssembler($expectedVariable->getValue(), $options);
+        $variables = $assembler->assemble($this->workflow, $configuration);
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $variables);
+        $this->assertCount(1, $variables);
+        $this->assertTrue($variables->containsKey($expectedVariable->getName()));
+        $this->assertEquals($expectedVariable, $variables->get($expectedVariable->getName()));
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
+    public function configurationEntityIdentifierProvider()
+    {
+        $language = new \stdClass();
+        $language->code = 'en';
+
+        return [
+            'entity_id_field' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'value' => 'en',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'code'
+                        ],
+                    ]
+                ],
+                $this->getVariable(
+                    'variable_one',
+                    'label',
+                    'entity',
+                    $language,
+                    ['class' => 'stdClass', 'identifier' => 'code']
+                ),
+                [
+                    'isIdentifierComposite' => false,
+                    'identifier' => ['id'],
+                    'isUniqueField' => true
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider configurationInvalidEntityIdentifierProvider
+     *
+     * @param array    $configuration
+     * @param Variable $expectedVariable
+     * @param array    $options
+     * @param string  $exception
+     * @param string   $message
+     */
+    public function testInvalidEntityIdentifierAssemble(
+        $configuration,
+        $expectedVariable,
+        $options,
+        $exception,
+        $message
+    ) {
+        $this->expectException($exception);
+        $this->expectExceptionMessage($message);
+
+        $configuration = [
+            'variable_definitions' => [
+                'variables' => $configuration,
+            ],
+        ];
+
+        $assembler = $this->getMockEntityAssembler($expectedVariable->getValue(), $options);
+        $variables = $assembler->assemble($this->workflow, $configuration);
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $variables);
+        $this->assertCount(1, $variables);
+        $this->assertTrue($variables->containsKey($expectedVariable->getName()));
+        $this->assertEquals($expectedVariable, $variables->get($expectedVariable->getName()));
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
+    public function configurationInvalidEntityIdentifierProvider()
+    {
+        $language = new \stdClass();
+        $language->code = 'en';
+
+        return [
+            'entity_no_manager' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'value' => 'en',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'code'
+                        ],
+                    ]
+                ],
+                $this->getVariable(
+                    'variable_one',
+                    'label',
+                    'entity',
+                    $language,
+                    ['class' => 'stdClass', 'identifier' => 'code']
+                ),
+                [
+                    'getManagerForClass' => false,
+                    'isIdentifierComposite' => false,
+                    'identifier' => ['id'],
+                    'isUniqueField' => true
+                ],
+                AssemblerException::class,
+                'Can\'t get entity manager for class stdClass',
+            ],
+            'entity_composite_id' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'value' => 'en',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'code'
+                        ],
+                    ]
+                ],
+                $this->getVariable(
+                    'variable_one',
+                    'label',
+                    'entity',
+                    $language,
+                    ['class' => 'stdClass', 'identifier' => 'code']
+                ),
+                [
+                    'isIdentifierComposite' => true,
+                    'identifier' => ['id'],
+                    'isUniqueField' => true
+                ],
+                AssemblerException::class,
+                'Entity with class stdClass has a composite identifier',
+            ],
+            'entity_not_unique_id' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'value' => 'en',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'code'
+                        ],
+                    ]
+                ],
+                $this->getVariable(
+                    'variable_one',
+                    'label',
+                    'entity',
+                    $language,
+                    ['class' => 'stdClass', 'identifier' => 'code']
+                ),
+                [
+                    'isIdentifierComposite' => false,
+                    'identifier' => ['id'],
+                    'isUniqueField' => false
+                ],
+                AssemblerException::class,
+                'Field code is not unique in entity with class stdClass',
+            ],
+        ];
+    }
+
+    /**
      * @param string $name
      * @param string $label
      * @param string $type
@@ -375,5 +569,63 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setEntityAcl($entityAcl);
 
         return $variable;
+    }
+
+    /**
+     * @param $expectedEntity
+     * @param $options
+     *
+     * @return VariableAssembler|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getMockEntityAssembler($expectedEntity, $options)
+    {
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->isIdentifierComposite = $options['isIdentifierComposite'];
+        $classMetadata->expects($this->any())
+            ->method('getIdentifier')
+            ->willReturn($options['identifier']);
+        $classMetadata->expects($this->any())
+            ->method('isUniqueField')
+            ->willReturn($options['isUniqueField']);
+
+        $fakeRepository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findOneBy'])
+            ->getMock();
+        $fakeRepository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturn($expectedEntity);
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($fakeRepository);
+
+        $this->variableNormalizer->expects($this->any())
+            ->method('denormalizeVariable')
+            ->willReturn($expectedEntity);
+
+        /** @var VariableAssembler|\PHPUnit_Framework_MockObject_MockObject $assembler */
+        $assembler = $this->getMockBuilder(VariableAssembler::class)
+            ->setConstructorArgs([
+                $this->variableNormalizer,
+                $this->variableGuesser,
+                $this->translator,
+                $this->managerRegistry
+            ])
+            ->setMethods(['getManagerForClass'])
+            ->getMock();
+
+        $getManagerForClass = isset($options['getManagerForClass']) ? $options['getManagerForClass'] : true;
+        $managerForClass = $getManagerForClass ? $entityManager : null;
+
+        $assembler->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($managerForClass);
+
+        return $assembler;
     }
 }

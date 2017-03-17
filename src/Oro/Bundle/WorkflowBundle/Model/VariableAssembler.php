@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -267,6 +268,7 @@ class VariableAssembler extends BaseAbstractAssembler
      * @param array    $options
      *
      * @return null|mixed|\Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer
+     * @throws AssemblerException
      */
     private function denormalizeVariable(Workflow $workflow, Variable $variable, array $options)
     {
@@ -294,13 +296,31 @@ class VariableAssembler extends BaseAbstractAssembler
 
         if ('entity' === $type) {
             $manager = $this->getManagerForClass($class);
-            $identifier = $options['value'];
-
-            try {
-                return $manager->find($class, $identifier);
-            } catch (\Exception $e) {
-                return null;
+            if (!$manager) {
+                throw new AssemblerException(sprintf('Can\'t get entity manager for class %s', $class));
             }
+
+            $identifier = $this->getOption($options['options'], 'identifier');
+            if (!$identifier) {
+                return $manager->find($class, $options['value']);
+            }
+
+            /** @var ClassMetadataInfo $metadata */
+            $metadata = $manager->getClassMetadata($class);
+            if ($metadata->isIdentifierComposite) {
+                throw new AssemblerException(sprintf(
+                    'Entity with class %s has a composite identifier', $class
+                ));
+            }
+            if (!in_array($identifier, $metadata->getIdentifier(), true) && !$metadata->isUniqueField($identifier)) {
+                throw new AssemblerException(sprintf(
+                    'Field %s is not unique in entity with class %s', $identifier, $class
+                ));
+            }
+
+            $repository = $manager->getRepository($class);
+
+            return $repository->findOneBy([$identifier => $options['value']]);
         }
 
         return null;
