@@ -114,7 +114,7 @@ datagrid:
                     success:         oro.integration.delete_sync_integration_window.success
         action_configuration: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration::getIsSyncAvailableCondition()
         options:
-            entityHint: channel
+            entityHint: channels
             entity_pagination: true
             mass_actions:
                 delete:

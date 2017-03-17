@@ -2,7 +2,7 @@ datagrid:
     # Entity config entities grid
     entityconfig-grid:
         options:
-            entityHint: entity
+            entityHint: entities
             toolbarOptions:
                 pageSize:
                     default_per_page: 100
@@ -130,7 +130,7 @@ datagrid:
     # Audit entity log grid
     entity-audit-grid:
         options:
-            entityHint: history
+            entityHint: histories
         acl_resource: oro_entityconfig_manage
         source:
             type: orm

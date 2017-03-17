@@ -71,5 +71,5 @@ datagrid:
                 icon: trash
                 link: delete_link
         options:
-            entityHint: embedded form
+            entityHint: embedded forms
             entity_pagination: true

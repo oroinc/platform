@@ -85,7 +85,7 @@ datagrid:
 
     email-notification-grid:
         options:
-            entityHint: transactional email
+            entityHint: transactional emails
             entity_pagination: true
         acl_resource: oro_notification_emailnotification_view
         source:
