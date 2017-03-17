@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Action\DataStorage;
+namespace Oro\Bundle\CacheBundle\DataStorage;
 
-interface InvalidateCacheDataStorageInterface
+interface DataStorageInterface
 {
     /**
      * @param string $name

@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\CacheBundle\Action\Handler;
 
-use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorageInterface;
+use Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToStringTransformerInterface;
 use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
+use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 
 class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHandlerInterface
@@ -17,21 +18,38 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
     private $deferredScheduler;
 
     /**
-     * @param DeferredScheduler $deferredScheduler
+     * @var InvalidateCacheScheduleArgumentsBuilderInterface
      */
-    public function __construct(DeferredScheduler $deferredScheduler)
-    {
+    private $scheduleArgumentsBuilder;
+
+    /**
+     * @var DateTimeToStringTransformerInterface
+     */
+    private $cronFormatTransformer;
+
+    /**
+     * @param DeferredScheduler                                $deferredScheduler
+     * @param InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgumentsBuilder
+     * @param DateTimeToStringTransformerInterface             $cronFormatTransformer
+     */
+    public function __construct(
+        DeferredScheduler $deferredScheduler,
+        InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgumentsBuilder,
+        DateTimeToStringTransformerInterface $cronFormatTransformer
+    ) {
         $this->deferredScheduler = $deferredScheduler;
+        $this->scheduleArgumentsBuilder = $scheduleArgumentsBuilder;
+        $this->cronFormatTransformer = $cronFormatTransformer;
     }
 
     /**
-     * @param InvalidateCacheDataStorageInterface $dataStorage
+     * @param DataStorageInterface $dataStorage
      */
-    public function handle(InvalidateCacheDataStorageInterface $dataStorage)
+    public function handle(DataStorageInterface $dataStorage)
     {
         $scheduleTime = $dataStorage->get(self::PARAM_INVALIDATE_TIME);
         $command = InvalidateCacheScheduleCommand::NAME;
-        $args = $this->buildCommandArguments($dataStorage);
+        $args = $this->scheduleArgumentsBuilder->build($dataStorage);
 
         $this->deferredScheduler->removeScheduleForCommand($command, $args);
 
@@ -39,51 +57,10 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
             $this->deferredScheduler->addSchedule(
                 $command,
                 $args,
-                $this->convertDatetimeToCron($scheduleTime)
+                $this->cronFormatTransformer->transform($scheduleTime)
             );
         }
 
         $this->deferredScheduler->flush();
-    }
-
-    /**
-     * @param InvalidateCacheDataStorageInterface $dataStorage
-     *
-     * @return array
-     */
-    private function buildCommandArguments(InvalidateCacheDataStorageInterface $dataStorage)
-    {
-        $excludeParameters = [
-            self::PARAM_INVALIDATE_TIME,
-            self::PARAM_HANDLER_SERVICE_NAME,
-        ];
-
-        $parameters = [];
-        foreach ($dataStorage->all() as $key => $value) {
-            if (!in_array($key, $excludeParameters, true)) {
-                $parameters[$key] = $value;
-            }
-        }
-
-        return [
-            sprintf('%s=%s', self::PARAM_HANDLER_SERVICE_NAME, $dataStorage->get(self::PARAM_HANDLER_SERVICE_NAME)),
-            sprintf('%s=%s', InvalidateCacheScheduleCommand::ARGUMENT_PARAMETERS, serialize($parameters))
-        ];
-    }
-
-    /**
-     * @param \DateTime $datetime
-     *
-     * @return string
-     */
-    private function convertDatetimeToCron(\DateTime $datetime)
-    {
-        return sprintf(
-            '%d %d %d %d *',
-            $datetime->format('i'),
-            $datetime->format('H'),
-            $datetime->format('d'),
-            $datetime->format('m')
-        );
     }
 }

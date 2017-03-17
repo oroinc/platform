@@ -46,3 +46,20 @@ services:
         class: 'Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler'
         arguments:
             - '@oro_cron.deferred_scheduler'
+            - '@oro_cache.action.handler.schedule_arguments_builder'
+            - '@oro_cache.action.transformer.datetime_to_cron_format'
+
+    oro_cache.action.handler.schedule_arguments_builder:
+        class: 'Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheScheduleArgumentsBuilder'
+        public: false
+
+    oro_cache.action.provider.invalidate_cache_time:
+        class: 'Oro\Bundle\CacheBundle\Action\Provider\InvalidateCacheTimeProvider'
+        arguments:
+            - '@oro_cache.action.handler.schedule_arguments_builder'
+            - '@oro_cron.schedule_manager'
+            - '@oro_cache.action.transformer.datetime_to_cron_format'
+
+    oro_cache.action.transformer.datetime_to_cron_format:
+        public: false
+        class: 'Oro\Bundle\CacheBundle\Action\Transformer\DateTimeToCronFormatTransformer'

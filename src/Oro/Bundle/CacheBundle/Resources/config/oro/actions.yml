@@ -45,7 +45,17 @@ operations:
             attribute_default_values:
                 invalidateCacheAt: $.invalidateCacheAt
         form_init:
-            #- '@assign_value': [$.invalidateCacheAt, '']
+            - '@call_method':
+                object: $.dataStorage
+                method: set
+                method_parameters:
+                    - $.paramHandlerServiceName
+                    - $.invalidateService
+            - '@call_service_method':
+                service: oro_cache.action.provider.invalidate_cache_time
+                method: getByDataStorage
+                method_parameters: [$.dataStorage]
+                attribute: $.invalidateCacheAt
         preactions:
             - '@create_object':
                 class: 'Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage'

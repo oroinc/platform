@@ -20,6 +20,9 @@ class OroCacheExtensionTest extends ExtensionTestCase
 
         $expectedDefinitions = [
             'oro_cache.action.handler.invalidate_scheduled',
+            'oro_cache.action.handler.schedule_arguments_builder',
+            'oro_cache.action.provider.invalidate_cache_time',
+            'oro_cache.action.transformer.datetime_to_cron_format',
         ];
 
         $this->assertDefinitionsLoaded($expectedDefinitions);

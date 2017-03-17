@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Entity\Schedule;
+use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -39,15 +40,24 @@ class DeferredScheduler implements LoggerAwareInterface
     /** @var string */
     private $scheduleClass;
 
+    /** @var SchedulesByArgumentsFilterInterface */
+    private $schedulesByArgumentsFilter;
+
     /**
      * @param ScheduleManager $scheduleManager
      * @param ManagerRegistry $registry
+     * @param SchedulesByArgumentsFilterInterface $schedulesByArgumentsFilter
      * @param string $scheduleClass
      */
-    public function __construct(ScheduleManager $scheduleManager, ManagerRegistry $registry, $scheduleClass)
-    {
+    public function __construct(
+        ScheduleManager $scheduleManager,
+        ManagerRegistry $registry,
+        SchedulesByArgumentsFilterInterface $schedulesByArgumentsFilter,
+        $scheduleClass
+    ) {
         $this->scheduleManager = $scheduleManager;
         $this->registry = $registry;
+        $this->schedulesByArgumentsFilter = $schedulesByArgumentsFilter;
         $this->scheduleClass = $scheduleClass;
         $this->setLogger(new NullLogger());
     }
@@ -188,15 +198,7 @@ class DeferredScheduler implements LoggerAwareInterface
      */
     private function removeSchedules(array $schedules, array $arguments)
     {
-        $argsSchedule = new Schedule();
-        $argsSchedule->setArguments($arguments);
-
-        $schedules = array_filter(
-            $schedules,
-            function (Schedule $schedule) use ($argsSchedule) {
-                return $schedule->getArgumentsHash() === $argsSchedule->getArgumentsHash();
-            }
-        );
+        $schedules = $this->schedulesByArgumentsFilter->filter($schedules, $arguments);
 
         if (count($schedules) !== 0) {
             foreach ($schedules as $schedule) {

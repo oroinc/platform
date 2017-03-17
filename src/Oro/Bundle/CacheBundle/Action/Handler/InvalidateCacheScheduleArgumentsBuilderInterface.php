@@ -4,10 +4,12 @@ namespace Oro\Bundle\CacheBundle\Action\Handler;
 
 use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 
-interface InvalidateCacheActionHandlerInterface
+interface InvalidateCacheScheduleArgumentsBuilderInterface
 {
     /**
      * @param DataStorageInterface $dataStorage
+     *
+     * @return string[]
      */
-    public function handle(DataStorageInterface $dataStorage);
+    public function build(DataStorageInterface $dataStorage);
 }
