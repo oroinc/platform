@@ -2,7 +2,7 @@ datagrids:
     base-oro-locale-localizations-grid:
         acl_resource: oro_locale_localization_view
         options:
-            entityHint: localization
+            entityHint: localizations
         source:
             type: orm
             query:

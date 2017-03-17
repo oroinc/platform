@@ -10,6 +10,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class LanguageProvider
 {
@@ -71,5 +72,13 @@ class LanguageProvider
     public function getLanguages($onlyEnabled = false)
     {
         return $this->repository->getLanguages($onlyEnabled);
+    }
+
+    /**
+     * @return null|object|Language
+     */
+    public function getDefaultLanguage()
+    {
+        return $this->repository->findOneBy(['code' => Translator::DEFAULT_LOCALE]);
     }
 }
