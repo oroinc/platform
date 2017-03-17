@@ -77,17 +77,15 @@ class ConfigurationProvider
             }
         }
 
-        $rawConfiguration = &$config[self::MENU_CONFIG_KEY];
-        if (is_array($rawConfiguration) && array_key_exists('tree', $rawConfiguration)) {
-            foreach ($rawConfiguration['tree'] as $type => &$menuPartConfig) {
-                if (isset($rawConfiguration['tree'][$type])
-                    && is_array($rawConfiguration['tree'][$type])
-                    && is_array($menuPartConfig)
-                ) {
-                    $this->reorganizeTree($rawConfiguration['tree'][$type], $menuPartConfig);
-                }
+        if (!array_key_exists(self::MENU_CONFIG_KEY, $config)) {
+            $config[self::MENU_CONFIG_KEY] = [];
+        }
+
+        if (array_key_exists('tree', $config[self::MENU_CONFIG_KEY])) {
+            foreach ($config[self::MENU_CONFIG_KEY]['tree'] as &$configPart) {
+                $configPart = $this->getReorganizedTree($configPart);
             }
-            unset($menuPartConfig);
+            unset($configPart);
         }
 
         // validate configuration
@@ -113,6 +111,8 @@ class ConfigurationProvider
 
     /**
      * Make sure that configuration is loaded
+     *
+     * @return ConfigurationProvider
      */
     private function ensureConfigurationLoaded()
     {
@@ -128,45 +128,73 @@ class ConfigurationProvider
     }
 
     /**
-     * @param array $config
-     * @param array $configPart
+     * @param array $tree
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @return array
      */
-    private function reorganizeTree(array &$config, array &$configPart)
+    private function getReorganizedTree(array $tree)
     {
-        if (!empty($configPart['children'])) {
-            foreach ($configPart['children'] as $childName => &$childConfig) {
-                if (isset($childConfig['merge_strategy']) && $childConfig['merge_strategy'] !== 'append') {
-                    if ($childConfig['merge_strategy'] === 'move') {
-                        $existingItem = $this->getMenuItemByName($config, $childName);
-                        if (!empty($existingItem['children'])) {
-                            $childChildren = isset($childConfig['children']) ? $childConfig['children'] : [];
-                            $childConfig['children'] = array_merge($existingItem['children'], $childChildren);
-                        }
-                    }
-                    $this->removeItem($config, $childName);
-                } elseif (is_array($childConfig)) {
-                    $this->reorganizeTree($config, $childConfig);
-                }
-            }
+        $newTree = $tree;
+        $newTree['children'] = [];
+
+        foreach ($tree['children'] as $childName => &$childData) {
+            $childData = is_array($childData) ? $childData : [];
+            $this->reorganizeTree($newTree, $newTree, $childName, $childData);
         }
+
+        return $newTree;
     }
 
     /**
-     * @param array $config
-     * @param       $childName
+     * @param array      $tree
+     * @param array      $treePart
+     * @param string     $childName
+     * @param array|null $childData
      *
-     * @return array|null
+     * @return $this
      */
-    private function getMenuItemByName(array $config, $childName)
+    private function reorganizeTree(array &$tree, array &$treePart, $childName, array &$childData)
     {
-        if (!empty($config['children'])) {
-            foreach ($config['children'] as $key => $configRow) {
-                if ($key === $childName) {
-                    return $config['children'][$childName];
-                } elseif (is_array($configRow)) {
-                    return $this->getMenuItemByName($configRow, $childName);
+        $data = $childData;
+        if (is_array($data)) {
+            $existingChildData = $this->getChildAndRemove($tree, $childName);
+            if (!empty($existingChildData['children']) && $this->getMergeStrategy($childData) === 'move') {
+                $children = array_key_exists('children', $data) ? $data['children'] : [];
+                $data['children'] = array_merge($children, $existingChildData['children']);
+            }
+        }
+
+        $treePart['children'][$childName] = $data;
+        if (array_key_exists('children', $childData)) {
+            foreach ($childData['children'] as $key => $value) {
+                $value = is_array($value) ? $value : [];
+                $this->reorganizeTree($tree, $treePart['children'][$childName], $key, $value);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array  $tree
+     * @param string $childName
+     *
+     * @return array
+     */
+    private function getChildAndRemove(array &$tree, $childName)
+    {
+        if (!array_key_exists('children', $tree)) {
+            return null;
+        }
+
+        foreach ($tree['children'] as $key => &$child) {
+            if ($key === $childName) {
+                unset($tree['children'][$key]);
+                return $child;
+            } elseif (is_array($child)) {
+                $result = $this->getChildAndRemove($child, $childName);
+                if ($result !== null) {
+                    return $result;
                 }
             }
         }
@@ -175,24 +203,21 @@ class ConfigurationProvider
     }
 
     /**
-     * @param array  $config
-     * @param string $childName
+     * @param array $treeItem
      *
-     * @return ConfigurationProvider
+     * @return string
      */
-    private function removeItem(array &$config, $childName)
+    private function getMergeStrategy(array $treeItem)
     {
-        if (!empty($config['children'])) {
-            foreach ($config['children'] as $key => &$configRow) {
-                if ($key === $childName) {
-                    unset($config['children'][$childName]);
-                } elseif (is_array($configRow)) {
-                    $this->removeItem($configRow, $childName);
-                }
-            }
+        $mergeStrategy = array_key_exists('merge_strategy', $treeItem) ? $treeItem['merge_strategy'] : 'move';
+        if ($mergeStrategy !== 'move' && $mergeStrategy !== 'replace') {
+            throw new \UnexpectedValueException(sprintf(
+                'Invalid "merge_strategy". Merge strategy should be "move" or "replace", but "%s" is given.',
+                $mergeStrategy
+            ));
         }
 
-        return $this;
+        return $mergeStrategy;
     }
 
     /**
