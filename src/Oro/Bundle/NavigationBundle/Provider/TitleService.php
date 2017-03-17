@@ -8,6 +8,9 @@ use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class TitleService implements TitleServiceInterface
 {
     /**
@@ -99,6 +102,7 @@ class TitleService implements TitleServiceInterface
         if (null !== $title && $isJSON) {
             try {
                 $data = $this->jsonDecode($title);
+                $this->checkRenderParams($data, $isShort);
                 $params = $data['params'];
                 if ($isShort) {
                     $title = $data['short_template'];
@@ -299,6 +303,27 @@ class TitleService implements TitleServiceInterface
         }
 
         return implode(' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ', $titleData);
+    }
+
+    /**
+     * @param array $data
+     * @param bool $isShort
+     *
+     * @throws \RuntimeException
+     */
+    protected function checkRenderParams(array $data, $isShort)
+    {
+        if (!isset($data['params'])) {
+            throw new \RuntimeException('Missing key "params" in JSON title.');
+        }
+
+        if ($isShort) {
+            if (!array_key_exists('short_template', $data)) {
+                throw new \RuntimeException('Missing key "short_template" in JSON title.');
+            }
+        } elseif (!array_key_exists('template', $data)) {
+            throw new \RuntimeException('Missing key "template" in JSON title.');
+        }
     }
 
     /**

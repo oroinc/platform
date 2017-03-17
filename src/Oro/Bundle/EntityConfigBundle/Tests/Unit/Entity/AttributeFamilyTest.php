@@ -47,6 +47,9 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new AttributeFamily();
         $group = (new AttributeGroup())->setCode('group_code');
+        $group2 = (new AttributeGroup())->setCode('group_code');
+        $this->setValue($group, 'id', 1);
+        $this->setValue($group2, 'id', 2);
 
         $attributeGroups = new ArrayCollection(['group_code' => $group]);
         $entity->setAttributeGroups($attributeGroups);
@@ -54,15 +57,15 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
 
         $entity->addAttributeGroup($group);
         $this->assertEquals($group, $entity->getAttributeGroup('group_code'));
+        $this->assertEquals($entity, $group->getAttributeFamily());
+
+        $entity->addAttributeGroup($group2);
+        $this->assertEquals($group2, $entity->getAttributeGroup('group_code'));
 
         $entity->removeAttributeGroup($group);
         $this->assertFalse($entity->getAttributeGroups()->contains($group));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Attribute group "group_code_2" doesn't exist in attribute family.
-     */
     public function testGetNotExistedAttributeGroup()
     {
         $entity = new AttributeFamily();
@@ -70,7 +73,7 @@ class AttributeFamilyTest extends \PHPUnit_Framework_TestCase
         $group->setCode('group_code');
         $entity->addAttributeGroup($group);
 
-        $this->assertEquals($group, $entity->getAttributeGroup('group_code_2'));
+        $this->assertNull($entity->getAttributeGroup('group_code_2'));
     }
 
     public function testGetHash()

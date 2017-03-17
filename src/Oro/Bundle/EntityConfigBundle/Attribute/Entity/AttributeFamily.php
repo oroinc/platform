@@ -295,15 +295,13 @@ class AttributeFamily extends ExtendAttributeFamily implements
     }
 
     /**
+     * @param string $code
      * @return null|AttributeGroup
-     * @throws \InvalidArgumentException
      */
     public function getAttributeGroup($code)
     {
         if (!isset($this->attributeGroups[$code])) {
-            throw new \InvalidArgumentException(
-                sprintf('Attribute group "%s" doesn\'t exist in attribute family.', $code)
-            );
+            return null;
         }
 
         return $this->attributeGroups[$code];
@@ -316,6 +314,7 @@ class AttributeFamily extends ExtendAttributeFamily implements
     public function addAttributeGroup(AttributeGroup $attributeGroup)
     {
         $this->attributeGroups[$attributeGroup->getCode()] = $attributeGroup;
+        $attributeGroup->setAttributeFamily($this);
 
         return $this;
     }

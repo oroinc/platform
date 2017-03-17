@@ -65,6 +65,11 @@ class AttributeGroupType extends AbstractContainerType
         $code = $options['group'];
         $entityValue = $options->get('entity', false);
         $attributeGroup = $attributeFamily->getAttributeGroup($code);
+
+        if (is_null($attributeGroup)) {
+            return;
+        }
+
         $excludeFromRest = $options['exclude_from_rest'];
 
         $options['visible'] = $attributeGroup->getIsVisible();
