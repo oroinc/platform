@@ -101,4 +101,4 @@ datagrids:
                 launcherOptions:
                     className: 'no-hash mobile-hide'
         options:
-            entityHint: segment
+            entityHint: segments

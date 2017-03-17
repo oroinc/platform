@@ -190,7 +190,7 @@ datagrids:
                 mailbox: { data_name: eu.origin }
             default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
-            entityHint: email
+            entityHint: emails
 
     simplified-email-grid:
         extends: base-email-grid
@@ -355,7 +355,7 @@ datagrids:
                 route: oro_email_email_reply
                 params: { id: email.id }
         options:
-            entityHint: email
+            entityHint: emails
             toolbarOptions:
                 hide: true
                 pagination:
@@ -597,7 +597,7 @@ datagrids:
             entity_pagination: true
         action_configuration: "@oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure"
         views_list : "@oro_email.emailtemplate.datagrid_view_list"
-        options: { entityHint: email template }
+        options: { entityHint: email templates }
 
     base-mailboxes-grid:
         source:
@@ -665,7 +665,7 @@ datagrids:
     email-for-context-grid:
         extends: email-grid
         options:
-            entityHint: email
+            entityHint: emails
             entity_pagination: true
             toolbarOptions:
                 pageSize:
