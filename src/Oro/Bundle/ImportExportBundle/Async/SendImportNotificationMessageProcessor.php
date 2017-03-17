@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
-
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,8 +18,6 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class SendImportNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -96,7 +96,7 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
             return self::REJECT;
         }
 
-        if (!isset($body['notifyEmail']) || !$body['notifyEmail']) {
+        if (! isset($body['notifyEmail']) || ! $body['notifyEmail']) {
             $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
             if (! $user instanceof User) {
                 $this->logger->error(
@@ -120,37 +120,33 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
                 break;
             default:
                 throw new NotSupportedException(
-                    sprintf(
-                        'Not found template for "%s" process of Import',
-                        $body['process']
-                    )
+                    sprintf('Not found template for "%s" process of Import', $body['process'])
                 );
                 break;
         }
 
-//        TODO refactor in https://magecore.atlassian.net/browse/BAP-13215
-        list($subject, $summary) = $this->importJobSummaryResultService->getSummaryResultForNotification(
-            $job,
-            $body['originFileName'],
-            $template
-        );
+        $data = $this->importJobSummaryResultService
+            ->getSummaryResultForNotification($job, $body['originFileName']);
 
-        $this->sendNotification($subject, $notifyEmail, $summary);
+        $this->sendNotification($notifyEmail, $template, $data);
 
         return self::ACK;
     }
 
-    protected function sendNotification($subject, $toEmail, $summary)
+    /**
+     * @param string $toEmail
+     * @param string $template
+     * @param array $body
+     */
+    protected function sendNotification($toEmail, $template, array $body)
     {
-        $fromEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-        $fromName = $this->configManager->get('oro_notification.email_notification_sender_name');
         $message = [
-            'fromEmail' => $fromEmail,
-            'fromName' => $fromName,
+            'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
+            'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
             'toEmail' => $toEmail,
-            'subject' => $subject,
-            'body' => $summary,
-            'contentType' => 'text/html'
+            'body' => $body,
+            'contentType' => 'text/html',
+            'template' => $template,
         ];
 
         $this->producer->send(

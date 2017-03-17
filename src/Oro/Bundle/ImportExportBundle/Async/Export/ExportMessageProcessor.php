@@ -1,26 +1,24 @@
 <?php
-namespace Oro\Bundle\ImportExportBundle\Async;
+namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\NotificationBundle\Async\Topics as EmailTopics;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -35,24 +33,9 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $jobRunner;
 
     /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
-
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
-
-    /**
      * @var DoctrineHelper
      */
     private $doctrineHelper;
-
-    /**
-     * @var SecurityFacade
-     */
-    private $securityFacade;
 
     /**
      * @var TokenStorageInterface
@@ -65,41 +48,45 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     private $logger;
 
     /**
-     * @var ImportExportResultSummarizer
+     * @var LoggerInterface
      */
-    private $importExportResultSummarizer;
+    private $jobStorage;
+
+    /**
+     * @var TokenSerializerInterface
+     */
+    private $tokenSerializer;
 
     /**
      * @param ExportHandler $exportHandler
      * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param ConfigManager $configManager
      * @param DoctrineHelper $doctrineHelper
-     * @param SecurityFacade $securityFacade
      * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
-     * @param ImportExportResultSummarizer $importExportResultSummarizer
+     * @param JobStorage $jobStorage
      */
     public function __construct(
         ExportHandler $exportHandler,
         JobRunner $jobRunner,
-        MessageProducerInterface $producer,
-        ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
-        SecurityFacade $securityFacade,
         TokenStorageInterface $tokenStorage,
         LoggerInterface $logger,
-        ImportExportResultSummarizer $importExportResultSummarizer
+        JobStorage $jobStorage
     ) {
         $this->exportHandler = $exportHandler;
         $this->jobRunner = $jobRunner;
-        $this->producer = $producer;
-        $this->configManager = $configManager;
         $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $securityFacade;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
-        $this->importExportResultSummarizer = $importExportResultSummarizer;
+        $this->jobStorage = $jobStorage;
+    }
+
+    /**
+     * @param TokenSerializerInterface $tokenSerializer
+     */
+    public function setTokenSerializer(TokenSerializerInterface $tokenSerializer)
+    {
+        $this->tokenSerializer = $tokenSerializer;
     }
 
     /**
@@ -111,7 +98,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
         $body = array_replace_recursive([
             'jobName' => null,
             'processorAlias' => null,
-            'userId' => null,
+            'securityToken' => null,
             'organizationId' => null,
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
             'outputFormat' => 'csv',
@@ -119,7 +106,7 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             'options' => [],
         ], $body);
 
-        if (! isset($body['jobName'], $body['processorAlias'], $body['userId'])) {
+        if (! isset($body['jobId'], $body['jobName'], $body['processorAlias'], $body['securityToken'])) {
             $this->logger->critical(
                 sprintf('[ExportMessageProcessor] Got invalid message: "%s"', $message->getBody()),
                 ['message' => $message]
@@ -128,36 +115,23 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
             return self::REJECT;
         }
 
-        /** @var User $user */
-        $user = $this->doctrineHelper->getEntityRepository(User::class)->find($body['userId']);
-        if (! $user) {
+        if (! $this->setSecurityToken($body['securityToken'])) {
             $this->logger->critical(
-                sprintf('[ExportMessageProcessor] Cannot find user by id "%s"', $body['userId']),
+                sprintf('[ExportMessageProcessor] Cannot set security token'),
                 ['message' => $message]
             );
 
             return self::REJECT;
         }
 
-        $jobUniqueName = sprintf(
-            'importexport_%s_%s_%s',
-            $body['exportType'],
-            $body['processorAlias'],
-            $body['userId']
-        );
-
-        $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
-        $this->tokenStorage->setToken($token);
-
         if (isset($body['organizationId'])) {
             $body['options']['organization'] = $this->doctrineHelper->getEntityRepository(Organization::class)
                 ->find($body['organizationId']);
         }
 
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobUniqueName,
-            function () use ($body, $jobUniqueName, $user) {
+        $result = $this->jobRunner->runDelayed(
+            $body['jobId'],
+            function (JobRunner $jobRunner, Job $job) use ($body) {
                 $exportResult = $this->exportHandler->getExportResult(
                     $body['jobName'],
                     $body['processorAlias'],
@@ -167,14 +141,14 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
                     $body['options']
                 );
 
-                $this->sendNotificationMessage($jobUniqueName, $exportResult, $user);
-
                 $this->logger->info(sprintf(
-                    '[ExportMessageProcessor] Export result. Success: %s. ReadsCount: %s. ErrorsCount: %s',
-                    $exportResult['success'],
+                    'Export result. Success: %s. ReadsCount: %s. ErrorsCount: %s',
+                    $exportResult['success'] ? 'Yes' : 'No',
                     $exportResult['readsCount'],
                     $exportResult['errorsCount']
                 ));
+
+                $this->saveJobResult($job, $exportResult);
 
                 return $exportResult['success'];
             }
@@ -184,34 +158,39 @@ class ExportMessageProcessor implements MessageProcessorInterface, TopicSubscrib
     }
 
     /**
-     * Send async email notification message with export result.
-     *
-     * @param string $jobUniqueName
-     * @param array $exportResult
-     * @param User $user
-     */
-    protected function sendNotificationMessage($jobUniqueName, array $exportResult, $user)
-    {
-        list($subject, $body) = $this->importExportResultSummarizer->processSummaryExportResultForNotification(
-            $jobUniqueName,
-            $exportResult
-        );
-
-        $this->producer->send(EmailTopics::SEND_NOTIFICATION_EMAIL, [
-            'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
-            'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
-            'toEmail' => $user->getEmail(),
-            'subject' => $subject,
-            'body' => $body,
-            'contentType' => 'text/html',
-        ]);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedTopics()
     {
         return [Topics::EXPORT];
+    }
+
+    /**
+     * @param string $serializedToken
+     *
+     * @return bool
+     */
+    private function setSecurityToken($serializedToken)
+    {
+        $token = $this->tokenSerializer->deserialize($serializedToken);
+
+        if (null === $token) {
+            return false;
+        }
+
+        $this->tokenStorage->setToken($token);
+
+        return true;
+    }
+
+    /**
+     * @param Job $job
+     * @param array $data
+     */
+    private function saveJobResult(Job $job, array $data)
+    {
+        $this->jobStorage->saveJob($job, function (Job $job) use ($data) {
+            $job->setData($data);
+        });
     }
 }

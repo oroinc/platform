@@ -1,11 +1,10 @@
 <?php
-namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
+namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async\Export;
 
-use Oro\Bundle\ImportExportBundle\Async\ExportMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
@@ -33,24 +32,42 @@ class ExportMessageProcessorTest extends WebTestCase
     /**
      * @dataProvider exportProcessDataProvider
      */
-    public function testShouldSendNotificationMessageWithExportResult(
+    public function testShouldProcessExport(
         $resultSuccess,
         $resultReadsCount,
         $resultErrorsCount,
-        $expectedEmailBody,
-        $expectedResult,
-        $expectedContentType
+        $expectedResult
     ) {
         /** @var User $user */
         $user = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(User::class)->find(1);
 
+        $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
+            'test_import_message',
+            'oro:import:http:oro_test.add_or_replace:test_import_message'
+        );
+        $childJob = $this->getJobProcessor()->findOrCreateChildJob(
+            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            $rootJob
+        );
+
         $message = new NullMessage();
         $message->setMessageId('abc');
         $message->setBody(json_encode([
+            'jobId' => $childJob->getId(),
             'jobName' => 'job_name',
             'processorAlias' => 'alias',
-            'userId' => $user->getId(),
+            'securityToken' =>
+                'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
         ]));
+
+
+        $exportResult = [
+            'success' => $resultSuccess,
+            'url' => 'http://localhost',
+            'readsCount' => $resultReadsCount,
+            'errorsCount' => $resultErrorsCount,
+            'entities' => 'User',
+        ];
 
         $exportHandler = $this->createExportHandlerMock();
         $exportHandler
@@ -64,14 +81,7 @@ class ExportMessageProcessorTest extends WebTestCase
                 $this->equalTo(null),
                 $this->equalTo([])
             )
-            ->willReturn([
-                'success' => $resultSuccess,
-                'url' => 'http://localhost',
-                'readsCount' => $resultReadsCount,
-                'errorsCount' => $resultErrorsCount,
-                'entities' => 'User',
-            ])
-        ;
+            ->willReturn($exportResult);
 
         $this->getContainer()->set('oro_importexport.handler.export', $exportHandler);
 
@@ -79,15 +89,8 @@ class ExportMessageProcessorTest extends WebTestCase
 
         $result = $processor->process($message, $this->createSessionMock());
         $this->assertEquals($expectedResult, $result);
-
-        $this->assertMessageSent(NotificationTopics::SEND_NOTIFICATION_EMAIL, [
-            'fromEmail' => $this->getConfigManager()->get('oro_notification.email_notification_sender_email'),
-            'fromName' => $this->getConfigManager()->get('oro_notification.email_notification_sender_name'),
-            'toEmail' => $user->getEmail(),
-            'subject' => 'Export result for job importexport_export_alias_1',
-            'body' => $expectedEmailBody,
-            'contentType' => $expectedContentType,
-        ]);
+        $this->assertCount(5, $childJob->getData());
+        $this->assertEquals($exportResult, $childJob->getData());
     }
 
     public function exportProcessDataProvider()
@@ -97,57 +100,17 @@ class ExportMessageProcessorTest extends WebTestCase
                 'resultSuccess' => true,
                 'readsCount' => 100,
                 'errorsCount' => 0,
-                'emailBody' => '<style>
-    @media (max-width: 480pt) {
-        .wrapper{
-            width: 100% !important;
-        }
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-</style><div class="wrapper"><p>
-                Export performed successfully.
-                100 User were exported.
-                <a href="http://localhost" target="_blank">Download</a></p></div>',
-                'processResult' => ExportMessageProcessor::ACK,
-                'contentType' => 'text/html',
+                'processResult' => ExportMessageProcessor::ACK
             ], [
                 'resultSuccess' => true,
                 'readsCount' => 0,
                 'errorsCount' => 0,
-                'emailBody' => '<style>
-    @media (max-width: 480pt) {
-        .wrapper{
-            width: 100% !important;
-        }
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-</style><div class="wrapper"><p>
-            Export operation failed, 0 error(s) found.
-            <a href="http://localhost" target="_blank">Error log</a></p></div>',
-                'processResult' => ExportMessageProcessor::ACK,
-                'contentType' => 'text/html',
+                'processResult' => ExportMessageProcessor::ACK
             ], [
                 'resultSuccess' => false,
                 'readsCount' => 0,
                 'errorsCount' => 5,
-                'emailBody' => '<style>
-    @media (max-width: 480pt) {
-        .wrapper{
-            width: 100% !important;
-        }
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-</style><div class="wrapper"><p>
-            Export operation failed, 5 error(s) found.
-            <a href="http://localhost" target="_blank">Error log</a></p></div>',
-                'processResult' => ExportMessageProcessor::REJECT,
-                'contentType' => 'text/html',
+                'processResult' => ExportMessageProcessor::REJECT
             ],
         ];
     }
@@ -174,5 +137,13 @@ class ExportMessageProcessorTest extends WebTestCase
     private function createSessionMock()
     {
         return $this->createMock(SessionInterface::class);
+    }
+
+    /**
+     * @return \Oro\Component\MessageQueue\Job\JobProcessor
+     */
+    private function getJobProcessor()
+    {
+        return $this->getContainer()->get('oro_message_queue.job.processor');
     }
 }

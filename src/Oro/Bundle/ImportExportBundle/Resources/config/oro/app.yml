@@ -1,11 +1,8 @@
-parameters:
-    importexport.filesystems_storage:  '../var/import_export'
-
 knp_gaufrette:
     adapters:
         importexport:
             local:
-                directory: '%kernel.root_dir%/%importexport.filesystems_storage%'
+                directory: '%kernel.root_dir%/import_export'
     filesystems:
         importexport:
             adapter:    importexport
