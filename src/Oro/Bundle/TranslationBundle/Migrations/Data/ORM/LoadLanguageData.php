@@ -52,6 +52,8 @@ class LoadLanguageData extends AbstractFixture implements ContainerAwareInterfac
             )
         );
 
+        $configManager->set(Configuration::getConfigKeyByName('languages'), [$defaultLanguage]);
+
         $user = $this->getUser($manager);
 
         foreach ($languages as $languageCode) {
