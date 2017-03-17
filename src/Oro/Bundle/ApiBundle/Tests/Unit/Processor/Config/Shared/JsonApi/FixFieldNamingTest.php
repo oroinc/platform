@@ -100,6 +100,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
             'exclusion_policy'       => 'all',
             'identifier_field_names' => ['name'],
             'fields'                 => [
+                'name' => null,
                 'id'   => null,
                 'type' => null,
             ]
@@ -111,8 +112,11 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'exclusion_policy'       => 'all',
-                'identifier_field_names' => ['name'],
+                'identifier_field_names' => ['id'],
                 'fields'                 => [
+                    'id'        => [
+                        'property_path' => 'name'
+                    ],
                     'classId'   => [
                         'property_path' => 'id'
                     ],

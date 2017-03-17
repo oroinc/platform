@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class NoteType extends AbstractType
 {
@@ -47,7 +48,6 @@ class NoteType extends AbstractType
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,
                 'csrf_protection'         => true,
-                'cascade_validation'      => true,
                 'contexts_options'        => [
                     'constraints' => [
                         new NotBlank()

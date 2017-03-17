@@ -4,20 +4,18 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityReader extends IteratorBasedReader
 {
@@ -90,11 +88,20 @@ class EntityReader extends IteratorBasedReader
      */
     public function setSourceEntityName($entityName, Organization $organization = null)
     {
+        $qb = $this->createSourceEntityQueryBuilder($entityName, $organization);
+        $this->setSourceQuery($this->applyAcl($qb));
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    protected function createSourceEntityQueryBuilder($entityName, Organization $organization = null)
+    {
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry
             ->getManagerForClass($entityName);
 
-        $queryBuilder = $entityManager
+        $qb = $entityManager
             ->getRepository($entityName)
             ->createQueryBuilder('o');
 
@@ -103,20 +110,18 @@ class EntityReader extends IteratorBasedReader
             // can't join with *-to-many relations because they affects query pagination
             if ($metadata->isAssociationWithSingleJoinColumn($fieldName)) {
                 $alias = '_' . $fieldName;
-                $queryBuilder->addSelect($alias);
-                $queryBuilder->leftJoin('o.' . $fieldName, $alias);
+                $qb->addSelect($alias);
+                $qb->leftJoin('o.' . $fieldName, $alias);
             }
         }
 
         foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
-            $queryBuilder->orderBy('o.' . $fieldName, 'ASC');
+            $qb->orderBy('o.' . $fieldName, 'ASC');
         }
 
-        $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
+        $this->addOrganizationLimits($qb, $entityName, $organization);
 
-        $this->applyAcl($queryBuilder);
-
-        $this->setSourceQueryBuilder($queryBuilder);
+        return $qb;
     }
 
     /**
@@ -176,7 +181,7 @@ class EntityReader extends IteratorBasedReader
     /**
      * @param QueryBuilder $queryBuilder
      *
-     * @return QueryBuilder
+     * @return Query
      */
     protected function applyAcl(QueryBuilder $queryBuilder)
     {
@@ -184,6 +189,6 @@ class EntityReader extends IteratorBasedReader
             return $this->aclHelper->apply($queryBuilder);
         }
 
-        return $queryBuilder;
+        return $queryBuilder->getQuery();
     }
 }

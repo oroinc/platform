@@ -74,6 +74,7 @@ ActionBundle
 - Implemented `Oro\Bundle\ActionBundle\Model\EntityParameterInterface` interface in `Oro\Bundle\ActionBundle\Model\Attribute` class
 - Added `getInternalType()` method to `Oro\Bundle\ActionBundle\Model\Attribute` class
 - Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
+- Added second optional argument `Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria $criteria = null` to method `Oro\Bundle\ActionBundle\Model\OperationRegistry`
 
 ActivityListBundle
 ------------------
@@ -168,15 +169,6 @@ DataGridBundle
 --------------
 - `Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult` is deprecated. Use `Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator` instead
 - Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
-- Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
-    - construction signature was changed now it takes next arguments:
-        - `ServiceLink` $managerLink,
-        - `NameStrategyInterface` $nameStrategy,
-        - `RouterInterface` $router,
-        - `SecurityFacade` $securityFacade,
-        - `DatagridRouteHelper` $datagridRouteHelper,
-        - `RequestStack` $requestStack,
-        - `LoggerInterface` $logger = null
 - The service `oro_datagrid.twig.datagrid` was marked as `private`
 - Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
@@ -534,6 +526,9 @@ LocaleBundle
 - Class `Oro\Bundle\LocaleBundle\Twig\NumberExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $formatter`
+- Class `Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider`
+    - changed `__constructor` signature: 
+        - the third argument changed from `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` to `Oro\Bundle\TranslationBundle\Provider\LanguageProvider`
 
 MessageQueueBundle
 ------------------
@@ -632,6 +627,7 @@ SearchBundle
 - The parameter `oro_search.twig_extension.class` was removed from DIC
 - The service `oro_search.twig.search_extension` was marked as `private`
 - `Oro\Bundle\SearchBundle\Engine\PdoMysql` `getWords` method is deprecated. All non alphanumeric chars are removed in `Oro\Bundle\SearchBundle\Engine\BaseDriver` `filterTextFieldValue` from fulltext search for MySQL and PgSQL
+- The `oro:search:reindex` command now works synchronously by default. Use the `--scheduled` parameter if you need the old, async behaviour
 
 ScopeBundle
 -----------
@@ -764,6 +760,11 @@ TranslationBundle
     - removed property `protected $translationRouteHelper`
 - Added `array $filtersType = []` parameter to the `generate` method, that receives an array of filter types to be applies on the route in order to support 
 filters such as `contains` when generating routes
+- Class `Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType`
+   - The signature of constructor was changed, added:
+        - third parameter is instance of `TranslationStatisticProvider`
+        - fourth parameter is instance of `TranslatorInterface`
+   - Changed parent from type from `locale` to `oro_choice`
 
 UIBundle
 --------
@@ -1007,19 +1008,24 @@ TagBundle
     - removed method `addReportOrSegmentGridPrefix`
     - added UnsupportedGridPrefixesTrait
 
+TranslationBundle
+-----------------
+- Class `Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader`
+    - signature of constructor was changed. The second argument replaced with `LanguageRepository $languageRepository`
+
 Tree Component
 --------------
 - `Oro\Component\Tree\Handler\AbstractTreeHandler`:
     - added method `getTreeItemList`
-    
+
 DependencyInjection Component
 -----------------------------
-- Class `Oro\Component\DependencyInjection\ServiceLinkRegistry` together with 
-`Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface` for injection awareness. Can be used to provide 
-injection of a collection of services that are registered in system, but there no need to instantiate 
-all of them on every runtime. The registry has `@service_container` dependency (`Symfony\Component\DependencyInjection\ContainerInterface`) 
-and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. It can register public services by `ServiceLinkRegistry::add` 
+- Class `Oro\Component\DependencyInjection\ServiceLinkRegistry` together with
+`Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface` for injection awareness. Can be used to provide
+injection of a collection of services that are registered in system, but there no need to instantiate
+all of them on every runtime. The registry has `@service_container` dependency (`Symfony\Component\DependencyInjection\ContainerInterface`)
+and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. It can register public services by `ServiceLinkRegistry::add`
 with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
 - Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
 which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
-provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).  
+provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).

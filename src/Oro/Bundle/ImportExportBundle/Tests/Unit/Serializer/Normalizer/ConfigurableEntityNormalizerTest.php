@@ -442,6 +442,9 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->normalizer->denormalize($data, $class, null, $context));
     }
 
+    /**
+     * @return array
+     */
     public function denormalizeDataProvider()
     {
         $expected = new Stub\DenormalizationStub();
@@ -462,6 +465,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                     'birthday' => new \DateTime('2011-11-11'),
                     'time' => new \DateTime('2011-11-11 12:12:12'),
                     'obj' => (object) ['key' => 'val'],
+                    'obj2' => [],
                     'collection' => [1, 2],
                     'unknown' => 'not_included'
                 ],
@@ -499,6 +503,13 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                     [
                         'name' => 'obj',
+                        'related_entity_name' => 'stdClass',
+                        'relation_type' => 'ref-one',
+                        'denormalizedValue' => 'dObj',
+                        'expectedEntityClass' => 'stdClass'
+                    ],
+                    [
+                        'name' => 'obj2',
                         'related_entity_name' => 'stdClass',
                         'relation_type' => 'ref-one',
                         'denormalizedValue' => 'dObj',

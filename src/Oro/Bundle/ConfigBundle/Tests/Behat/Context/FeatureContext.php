@@ -22,6 +22,19 @@ class FeatureContext extends OroFeatureContext implements
     use KernelDictionary, FixtureLoaderDictionary, PageObjectDictionary;
 
     /**
+     * Click link on sidebar in configuration menu
+     *
+     * Example: Given I click "Inventory" on configuration sidebar
+     *
+     * @When /^(?:|I )click "(?P<link>(?:[^"]|\\")*)" on configuration sidebar$/
+     */
+    public function clickLinkOnConfigurationSidebar($link)
+    {
+        $sidebarConfigMenu = $this->getPage()->find('css', 'div.system-configuration-container div.left-panel');
+        $sidebarConfigMenu->clickLink($link);
+    }
+
+    /**
      * @var OroMainContext
      */
     private $oroMainContext;

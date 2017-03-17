@@ -6,9 +6,9 @@ use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
 class LocalizationChoicesProvider
 {
@@ -18,8 +18,8 @@ class LocalizationChoicesProvider
     /** @var LanguageCodeFormatter */
     protected $languageFormatter;
 
-    /** @var FormattingCodeFormatter */
-    protected $formattingFormatter;
+    /** @var LanguageProvider */
+    protected $languageProvider;
 
     /** @var LocalizationManager */
     protected $localizationManager;
@@ -27,27 +27,35 @@ class LocalizationChoicesProvider
     /**
      * @param ConfigManager $configManager
      * @param LanguageCodeFormatter $languageFormatter
-     * @param FormattingCodeFormatter $formattingFormatter
+     * @param LanguageProvider $languageProvider
      * @param LocalizationManager $localizationManager
      */
     public function __construct(
         ConfigManager $configManager,
         LanguageCodeFormatter $languageFormatter,
-        FormattingCodeFormatter $formattingFormatter,
+        LanguageProvider $languageProvider,
         LocalizationManager $localizationManager
     ) {
         $this->configManager = $configManager;
         $this->languageFormatter = $languageFormatter;
-        $this->formattingFormatter = $formattingFormatter;
+        $this->languageProvider = $languageProvider;
         $this->localizationManager = $localizationManager;
     }
 
     /**
+     * @param bool $onlyEnabled
+     *
      * @return array
      */
-    public function getLanguageChoices()
+    public function getLanguageChoices($onlyEnabled = false)
     {
-        return Intl::getLanguageBundle()->getLanguageNames($this->getSystemLanguage());
+        $result = [];
+
+        foreach ($this->languageProvider->getLanguages($onlyEnabled) as $language) {
+            $result[$language->getId()] = $this->languageFormatter->formatLocale($language->getCode());
+        }
+
+        return $result;
     }
 
     /**

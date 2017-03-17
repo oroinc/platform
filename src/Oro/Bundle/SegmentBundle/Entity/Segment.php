@@ -138,6 +138,13 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     protected $organization;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="records_limit", type="integer", nullable=true)
+     */
+    protected $recordsLimit;
+
+    /**
      * {@inheritdoc}
      */
     public function getGridPrefix()
@@ -410,5 +417,25 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     public function isStaticType()
     {
         return $this->getType() && $this->getType()->getName() == SegmentType::TYPE_STATIC;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRecordsLimit()
+    {
+        return $this->recordsLimit;
+    }
+
+    /**
+     * @param int|null $recordsLimit
+     *
+     * @return $this
+     */
+    public function setRecordsLimit($recordsLimit)
+    {
+        $this->recordsLimit = $recordsLimit;
+
+        return $this;
     }
 }
