@@ -10,7 +10,6 @@ define(function(require) {
             optionPrefix: '',
             tagName: '',
             className: '',
-            customClass: '',
             hide: false,
             template: null,
             templateSelector: null,
@@ -91,13 +90,6 @@ define(function(require) {
             this.mergeOption(view, options, 'className', className, function(option, themeOption) {
                 return (option ? option + ' ' : '') + themeOption;
             });
-        },
-
-        customClassOption: function(view, options, customClass) {
-            if (customClass) {
-                options.className = '';
-                options.customClass = customClass;
-            }
         },
 
         templateOption: function(view, options, template) {

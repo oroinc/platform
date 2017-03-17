@@ -247,6 +247,9 @@ Single attribute can be described with next configuration:
     * **multiple**
         *boolean*
         Indicates whether several entities are supported. Allowed only when type is entity.
+    * **virtual**
+        *boolean*
+        Such attribute will not be saved in the database and available only on current transition. Default value is false.
 
 **Notice**
 Attribute configuration does not contain any information about how to render attribute on step forms,
@@ -266,6 +269,10 @@ workflows:
                 delete: false
             options:
                 class: Oro\Bundle\AccountBundle\Entity\Account
+        send_email:
+            type: checkbox
+            options:
+                virtual: true
         new_company_name:
             type: string
         opportunity:

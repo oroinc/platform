@@ -78,6 +78,8 @@ config:
         'lightgallery': 'bundles/bowerassets/lightgallery/dist/js/lightgallery-all.js'
         'lightgallery.print': 'bundles/oroui/js/lightgallery/lg-print.js'
 
+        'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
 
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'

@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class LanguageProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,5 +78,26 @@ class LanguageProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn($data);
 
         $this->assertSame($this->provider->getAvailableLanguagesByCurrentUser(), $data);
+    }
+
+    public function testGetLanguages()
+    {
+        $data = [new Language()];
+
+        $this->repository->expects($this->once())->method('getLanguages')->willReturn($data);
+
+        $this->assertSame($data, $this->provider->getLanguages());
+    }
+
+    public function testGetDefaultLanguage()
+    {
+        $language = new Language();
+
+        $this->repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['code' => Translator::DEFAULT_LOCALE])
+            ->willReturn($language);
+
+        $this->assertSame($language, $this->provider->getDefaultLanguage());
     }
 }

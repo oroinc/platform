@@ -801,3 +801,8 @@ services:
         public: true
         arguments:
             index_1: '@oro_security.acl.permission_granting_strategy'
+
+    oro_security.token_serializer:
+        class: Oro\Bundle\SecurityBundle\Authentication\TokenSerializer
+        arguments:
+            - '@doctrine'

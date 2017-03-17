@@ -9,18 +9,20 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 
 class LoadLocalizationData extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * @var array
-     */
+    /** @var array */
+    protected static $languages = ['en', 'en_CA', 'en_US', 'es', 'es_ES', 'es_MX'];
+
+    /** @var array */
     protected static $localizations = [
         [
             'language' => 'en_US',
@@ -47,17 +49,27 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     public function load(ObjectManager $manager)
     {
+        // Preload all required Languages
+        foreach (self::$languages as $item) {
+            $this->processLanguage($item, $manager);
+        }
+
         /* @var $repository LocalizationRepository */
         $repository = $manager->getRepository(Localization::class);
 
         $registry = [];
+
         foreach (self::$localizations as $item) {
             $code = $item['language'];
 
-            if (null === ($localization = $repository->findOneBy(['languageCode' => $code]))) {
+            /** @var Language $language */
+            $language = $this->getReference('language.' . $code);
+
+            $localization = $repository->findOneBy(['language' => $language]);
+            if (null === $localization) {
                 $localization = new Localization();
                 $localization
-                    ->setLanguageCode($item['language'])
+                    ->setLanguage($language)
                     ->setFormattingCode($item['formatting'])
                     ->setName($item['title'])
                     ->setDefaultTitle($item['title']);
@@ -78,6 +90,30 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $manager->clear();
 
         $this->updateEnabledLocalizations($manager);
+    }
+
+    /**
+     * @param string $langCode
+     * @param ObjectManager $manager
+     */
+    protected function processLanguage($langCode, ObjectManager $manager)
+    {
+        /* @var $repository LanguageRepository */
+        $repository = $manager->getRepository(Language::class);
+        $language = $repository->findOneBy(['code' => $langCode]);
+        if (!$language) {
+            $language = new Language();
+            $language->setCode($langCode)->setEnabled(1);
+
+            $manager->persist($language);
+            $manager->flush($language);
+        }
+
+        $reference = 'language.' . $language->getCode();
+
+        if (!$this->hasReference($reference)) {
+            $this->addReference($reference, $language);
+        }
     }
 
     /**
