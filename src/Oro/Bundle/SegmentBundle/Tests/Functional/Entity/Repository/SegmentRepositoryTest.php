@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
