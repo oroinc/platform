@@ -15,7 +15,7 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  * Segment
  *
  * @ORM\Table(name="oro_segment")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository")
  * @ORM\HasLifecycleCallbacks
  * @Config(
  *      routeName="oro_segment_index",
