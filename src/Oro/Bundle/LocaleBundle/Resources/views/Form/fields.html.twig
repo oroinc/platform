@@ -92,3 +92,19 @@
         {{ form_widget(form) }}
     </span>
 {% endblock %}
+
+{% block _localization_oro_locale___default_localization_value_widget %}
+    <span data-page-component-module="oroui/js/app/components/view-component"
+          data-page-component-options="{{ {view: 'orolocale/js/app/views/localization-select-view'}|json_encode }}"
+    >
+        {{ form_widget(form) }}
+    </span>
+{% endblock %}
+
+{% block _localization_oro_locale___enabled_localizations_value_widget %}
+    <span data-page-component-module="oroui/js/app/components/view-component"
+          data-page-component-options="{{ {view: 'orolocale/js/app/views/localizations-select-view'}|json_encode }}"
+    >
+        {{ form_widget(form) }}
+    </span>
+{% endblock %}
