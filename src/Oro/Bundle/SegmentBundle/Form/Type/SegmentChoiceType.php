@@ -8,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SegmentNameChoiceType extends AbstractType
+class SegmentChoiceType extends AbstractType
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -32,7 +32,7 @@ class SegmentNameChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('placeholder', 'oro.segment.form.segment_name_choice.placeholder');
+        $resolver->setDefault('placeholder', 'oro.segment.form.segment_choice.placeholder');
         $resolver->setRequired('entityClass');
         $resolver->setNormalizer(
             'choices',

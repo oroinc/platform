@@ -13,12 +13,17 @@ class SegmentRepository extends EntityRepository
     public function findByEntity($entityClass)
     {
         $qb = $this->createQueryBuilder('s')
-            ->select('s.name')
+            ->select('s.id, s.name')
             ->where('s.entity = :entity')
             ->setParameter('entity', $entityClass);
 
-        $result = $qb->getQuery()->getArrayResult();
+        $segments = $qb->getQuery()->getArrayResult();
 
-        return array_column($result, 'name');
+        $result = [];
+        foreach ($segments as $segment) {
+            $result[$segment['id']] = $segment['name'];
+        }
+
+        return $result;
     }
 }
