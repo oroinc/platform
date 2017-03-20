@@ -31,7 +31,7 @@ class Options implements \ArrayAccess, \Iterator
             $option = $this->options[$offset];
             if ($shouldBeEvaluated && $option instanceof Expression) {
                 throw new \InvalidArgumentException(
-                    sprintf('Option "%s" should be evaluated but expression now.', $offset)
+                    sprintf('Option "%s" value should be evaluated. It is currently an ExpressionLanguage component object.', $offset)
                 );
             }
             return $option;
