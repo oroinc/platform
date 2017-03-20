@@ -176,7 +176,8 @@ class VariableGuesser
     {
         $entityClass = $variable->getOption('class');
         $formType = $variable->getOption('form_type');
-        $formOptions = $variable->getOption('form_options', []);
+
+        $formOptions = $variable->hasOption('form_options') ? $variable->getOption('form_options') : [];
         if ($this->formConfigProvider->hasConfig($entityClass) && !$formType) {
             $formConfig = $this->formConfigProvider->getConfig($entityClass);
             $formType = $formConfig->get('form_type');

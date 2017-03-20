@@ -7,10 +7,13 @@ use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\ORMException;
 
+use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
@@ -87,21 +90,25 @@ class WorkflowVariablesType extends AbstractType
                         function ($entity) {
                             return $entity;
                         },
-                        function ($entity) {
+                        function ($entity) use ($variable) {
                             $metadata = $this->getMetadataForClass(get_class($entity));
                             if (!$metadata) {
                                 return '';
                             }
 
-                            $identifierFields = $metadata->getIdentifierFieldNames();
-                            if (!isset($identifierFields[0])) {
-                                return '';
+                            /** @var Variable $variable */
+                            $identifier = $variable->getOption('identifier', null);
+                            if (!$identifier) {
+                                $identifierFields = $metadata->getIdentifierFieldNames();
+                                if (!isset($identifierFields[0])) {
+                                    return '';
+                                }
+                                $identifier = $identifierFields[0];
                             }
 
-                            $identifier = $identifierFields[0];
-                            $method = sprintf('get%s', ucfirst($identifier));
+                            $accessor = PropertyAccess::createPropertyAccessor();
                             try {
-                                return $entity->{$method}();
+                                return $accessor->getValue($entity, $identifier);
                             } catch (\RuntimeException $e) {
                                 return '';
                             }
@@ -136,15 +143,12 @@ class WorkflowVariablesType extends AbstractType
      */
     protected function getMetadataForClass($class)
     {
-        if (null === $class) {
+        try {
+            $entityManager = $this->managerRegistry->getManagerForClass($class);
+        } catch (ORMException $e) {
             return null;
         }
 
-        $entityManager = $this->managerRegistry->getManagerForClass($class);
-        if (!$entityManager) {
-            return null;
-        }
-
-        return $entityManager->getClassMetadata($class);
+        return $entityManager ? $entityManager->getClassMetadata($class) : null;
     }
 }
