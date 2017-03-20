@@ -7,6 +7,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
+use Oro\Bundle\CalendarBundle\Tests\Behat\Element\EventForm;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
@@ -19,7 +21,7 @@ class FeatureContext extends OroFeatureContext implements
     FixtureLoaderAwareInterface,
     OroPageObjectAware
 {
-    use KernelDictionary, FixtureLoaderDictionary, PageObjectDictionary;
+    use KernelDictionary, FixtureLoaderDictionary, PageObjectDictionary, AllowedColorsMapping;
 
     /**
      * Click link on sidebar in configuration menu
@@ -238,6 +240,32 @@ class FeatureContext extends OroFeatureContext implements
             self::assertNotNull($sidebarPanel, "Failed asserting that $position sidebar is visible");
         } else {
             self::assertNull($sidebarPanel, "Failed asserting that $position sidebar is invisible");
+        }
+    }
+
+    /**
+     * Asserts provided color array with available blocks on page, one by one element
+     *
+     * @Then /^I should see following available (event|calendar) colors:$/
+     */
+    public function iShouldSeeFollowingAvailableEventColors($target, TableNode $table)
+    {
+        $targetElement = $target == 'event' ? 'Event Form' : 'Calendar';
+
+        /** @var EventForm $form */
+        $form = $this->elementFactory->createElement($targetElement);
+        $actual = $form->getAvailableColors();
+
+        $expectedNames = $table->getRow(0);
+        $expectedNames = explode(', ', reset($expectedNames));
+
+        foreach ($expectedNames as $expectedName) {
+            $currentActual = array_shift($actual);
+            self::assertEquals(
+                $this->getHexByColorName($expectedName),
+                $currentActual,
+                "Provided and found on page color arrays are different"
+            );
         }
     }
 }

@@ -136,3 +136,16 @@ Feature: Display settings manage
     And save form
     Then left sidebar is visible
     And right sidebar is visible
+
+  Scenario: Change calendar color settings
+    When I set configuration to:
+      | Event colors    | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
+      | Calendar colors | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
+    And save form
+    And go to Activities/ Calendar Events
+    And press "Create Calendar event"
+    Then I should see following available event colors:
+      | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black |
+    When I click My Calendar in user menu
+    Then I should see following available calendar colors:
+      | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
