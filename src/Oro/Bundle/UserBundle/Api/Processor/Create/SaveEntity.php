@@ -38,6 +38,11 @@ class SaveEntity implements ProcessorInterface
             return;
         }
 
+        // Generate random secure password for user.
+        if (!$user->getPassword()) {
+            $user->setPlainPassword(uniqid('json_api_user_password', true));
+        }
+
         $this->userManager->updateUser($user);
     }
 }
