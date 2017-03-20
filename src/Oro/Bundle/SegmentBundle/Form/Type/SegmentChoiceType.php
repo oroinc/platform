@@ -8,6 +8,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
+
 class SegmentChoiceType extends AbstractType
 {
     /** @var ManagerRegistry */
@@ -36,6 +38,7 @@ class SegmentChoiceType extends AbstractType
         $resolver->setNormalizer(
             'choices',
             function (OptionsResolver $options) {
+                /** @var SegmentRepository $repo */
                 $repo = $this->registry->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
 
                 return $repo->findByEntity($options['entityClass']);
