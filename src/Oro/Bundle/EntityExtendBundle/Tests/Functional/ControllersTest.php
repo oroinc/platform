@@ -14,16 +14,19 @@ class ControllersTest extends AbstractConfigControllerTest
         RelationType::ONE_TO_MANY => [
             'readonly' => true,
             'bidirectional' => true,
+            'entities_to_select' => 89,
             'method' => 'createSelectOneToMany',
         ],
         RelationType::MANY_TO_MANY => [
             'readonly' => false,
             'bidirectional' => false,
+            'entities_to_select' => 155,
             'method' => 'createSelectOneToMany',
         ],
         RelationType::MANY_TO_ONE => [
             'readonly' => false,
             'bidirectional' => false,
+            'entities_to_select' => 155,
             'method' => 'createSelectManyToOne',
         ],
     ];
@@ -158,6 +161,12 @@ class ControllersTest extends AbstractConfigControllerTest
             $fieldUpdateUri = $this->client->getRequest()->getUri();
             $readOnlyValue = $crawler->filter('[name="oro_entity_config_type[extend][relation][bidirectional]"]')
                 ->attr('readonly');
+
+            $numberOfEntities = $crawler->filter('[name="oro_entity_config_type[extend][relation][target_entity]"]')
+                ->children();
+
+            $this->assertCount($relation['entities_to_select'], $numberOfEntities);
+
             $form = $saveButton->form();
             $method = $relation['method'];
             $this->$method($form);
