@@ -4,7 +4,6 @@ namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
@@ -19,7 +18,7 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
@@ -29,11 +28,8 @@ class SegmentFilter extends EntityFilter
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var ServiceLink */
-    protected $dynamicSegmentQueryBuilderLink;
-
-    /** @var ServiceLink */
-    protected $staticSegmentQueryBuilderLink;
+    /** @var SegmentQueryBuilderRegistry */
+    protected $segmentQueryBuilderRegistry;
 
     /** @var EntityNameProvider */
     protected $entityNameProvider;
@@ -47,33 +43,30 @@ class SegmentFilter extends EntityFilter
     /**
      * Constructor
      *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManagerRegistry      $doctrine
-     * @param ServiceLink          $dynamicSegmentQueryBuilderLink
-     * @param ServiceLink          $staticSegmentQueryBuilderLink
-     * @param EntityNameProvider   $entityNameProvider
-     * @param ConfigProvider       $entityConfigProvider
-     * @param ConfigProvider       $extendConfigProvider
+     * @param FormFactoryInterface        $factory
+     * @param FilterUtility               $util
+     * @param ManagerRegistry             $doctrine
+     * @param SegmentQueryBuilderRegistry $segmentQueryBuilderRegistry
+     * @param EntityNameProvider          $entityNameProvider
+     * @param ConfigProvider              $entityConfigProvider
+     * @param ConfigProvider              $extendConfigProvider
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
         ManagerRegistry $doctrine,
-        ServiceLink $dynamicSegmentQueryBuilderLink,
-        ServiceLink $staticSegmentQueryBuilderLink,
+        SegmentQueryBuilderRegistry $segmentQueryBuilderRegistry,
         EntityNameProvider $entityNameProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider
     ) {
         parent::__construct($factory, $util);
 
-        $this->doctrine                       = $doctrine;
-        $this->dynamicSegmentQueryBuilderLink = $dynamicSegmentQueryBuilderLink;
-        $this->staticSegmentQueryBuilderLink  = $staticSegmentQueryBuilderLink;
-        $this->entityNameProvider             = $entityNameProvider;
-        $this->entityConfigProvider           = $entityConfigProvider;
-        $this->extendConfigProvider           = $extendConfigProvider;
+        $this->doctrine = $doctrine;
+        $this->segmentQueryBuilderRegistry = $segmentQueryBuilderRegistry;
+        $this->entityNameProvider = $entityNameProvider;
+        $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
     }
 
     /**
@@ -206,17 +199,19 @@ class SegmentFilter extends EntityFilter
     /**
      * @param Segment $segment
      * @return QueryBuilder
-     *
      */
     protected function getSegmentQueryBuilder(Segment $segment)
     {
         /** @var QueryBuilder $queryBuilder */
         if ($this->isDynamic($segment)) {
-            $queryBuilder = $this->dynamicSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
+            $segmentQueryBuilder = $this->segmentQueryBuilderRegistry
+                ->getQueryBuilder(SegmentType::TYPE_DYNAMIC);
         } else {
-            $queryBuilder = $this->staticSegmentQueryBuilderLink->getService()->getQueryBuilder($segment);
+            $segmentQueryBuilder = $this->segmentQueryBuilderRegistry
+                ->getQueryBuilder(SegmentType::TYPE_STATIC);
         }
 
+        $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
         $queryBuilder->setMaxResults($segment->getRecordsLimit());
 
         return $queryBuilder;

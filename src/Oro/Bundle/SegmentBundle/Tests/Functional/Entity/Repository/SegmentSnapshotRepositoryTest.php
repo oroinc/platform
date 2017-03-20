@@ -12,10 +12,13 @@ use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 
 class SegmentSnapshotRepositoryTest extends WebTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(array('Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData'));
+        $this->loadFixtures(['Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData']);
     }
 
     public function testRemoveByEntity()
@@ -28,7 +31,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         $entities = $this->getEntities($registry, 1, true);
         $entity = reset($entities);
 
-        $expectedCondition = $this->getExpectedResult($registry, array($entity));
+        $expectedCondition = $this->getExpectedResult($registry, [$entity]);
 
         $segmentSnapshotRepository->removeByEntity($entity);
 
@@ -61,24 +64,24 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
      */
     public function massRemoveByEntitiesProvider()
     {
-        return array(
-            'one entity with related segment snapshot' => array(
+        return [
+            'one entity with related segment snapshot' => [
                 'count'               => 1,
                 'withSegmentSnapshot' => true
-            ),
-            'one entity without related segment snapshot' => array(
+            ],
+            'one entity without related segment snapshot' => [
                 'count'               => 1,
                 'withSegmentSnapshot' => false
-            ),
-            'two entity with related segment snapshot' => array(
+            ],
+            'two entity with related segment snapshot' => [
                 'count'               => 2,
                 'withSegmentSnapshot' => true
-            ),
-            'two entity without related segment snapshot' => array(
+            ],
+            'two entity without related segment snapshot' => [
                 'count'               => 2,
                 'withSegmentSnapshot' => false
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -93,7 +96,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         $segmentQB = $segmentRepository->createQueryBuilder('s');
         $segmentQB->select('s.id, s.entity');
-        $expectedCondition = array();
+        $expectedCondition = [];
 
         foreach ($entities as $key => $entity) {
             $className = ClassUtils::getClass($entity);
@@ -161,12 +164,12 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                     'OroSegmentBundle:SegmentSnapshot',
                     'snp',
                     Join::WITH,
-                    'snp.entityId = CONCAT(entity.id, \'\')'
+                    'snp.integerEntityId = CONCAT(entity.id, \'\')'
                 );
         } else {
             $queryBuilder
                 ->leftJoin('OroSegmentBundle:SegmentSnapshot', 'snp')
-                ->where($queryBuilder->expr()->isNull('snp.entityId'));
+                ->where($queryBuilder->expr()->isNull('snp.integerEntityId'));
         }
 
         return $queryBuilder->setMaxResults($count)->getQuery()->getResult();
