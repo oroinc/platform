@@ -144,8 +144,19 @@ Feature: Display settings manage
     And save form
     And go to Activities/ Calendar Events
     And press "Create Calendar event"
-    Then I should see following available event colors:
+    Then I should see following available "Event Form" colors:
       | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black |
     When I click My Calendar in user menu
-    Then I should see following available calendar colors:
+    Then I should see following available "Calendar" colors:
       | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
+
+  Scenario: Change calendar color settings
+    When I go to System/Configuration
+    And I click "Display settings"
+    And set configuration to:
+      | Taxonomy Colors | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
+    And save form
+    And go to System/Tags Management/Taxonomies
+    And press "Create Taxonomy"
+    Then I should see following available "TaxonomyForm" colors:
+      | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |

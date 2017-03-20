@@ -246,14 +246,17 @@ class FeatureContext extends OroFeatureContext implements
     /**
      * Asserts provided color array with available blocks on page, one by one element
      *
-     * @Then /^I should see following available (event|calendar) colors:$/
+     * @Then /^I should see following available "(.+)" colors:$/
      */
     public function iShouldSeeFollowingAvailableEventColors($target, TableNode $table)
     {
-        $targetElement = $target == 'event' ? 'Event Form' : 'Calendar';
+        self::assertTrue(
+            $this->elementFactory->hasElement($target),
+            "Element with name $target not found"
+        );
 
         /** @var EventForm $form */
-        $form = $this->elementFactory->createElement($targetElement);
+        $form = $this->elementFactory->createElement($target);
         $actual = $form->getAvailableColors();
 
         $expectedNames = $table->getRow(0);
