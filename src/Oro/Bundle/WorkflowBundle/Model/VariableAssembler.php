@@ -309,12 +309,15 @@ class VariableAssembler extends BaseAbstractAssembler
             $metadata = $manager->getClassMetadata($class);
             if ($metadata->isIdentifierComposite) {
                 throw new AssemblerException(sprintf(
-                    'Entity with class %s has a composite identifier', $class
+                    'Entity with class %s has a composite identifier',
+                    $class
                 ));
             }
             if (!in_array($identifier, $metadata->getIdentifier(), true) && !$metadata->isUniqueField($identifier)) {
                 throw new AssemblerException(sprintf(
-                    'Field %s is not unique in entity with class %s', $identifier, $class
+                    'Field %s is not unique in entity with class %s',
+                    $identifier,
+                    $class
                 ));
             }
 
