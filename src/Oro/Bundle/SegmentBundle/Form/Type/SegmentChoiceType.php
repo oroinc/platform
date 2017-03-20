@@ -17,7 +17,6 @@ class SegmentChoiceType extends AbstractType
     protected $entityClass;
 
     /**
-     * SegmentNameChoiceType constructor.
      * @param ManagerRegistry $registry
      * @param string          $entityClass
      */
