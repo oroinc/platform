@@ -10,7 +10,7 @@ define(function(require) {
     var TabItemView = require('./tab-item-view');
 
     config = _.extend({
-        tamplateClassName: 'nav nav-tabs'
+        templateClassName: 'nav nav-tabs'
     }, config);
 
     TabCollectionView = BaseCollectionView.extend({
@@ -33,7 +33,7 @@ define(function(require) {
         },
 
         template: function() {
-            return '<ul class="' + config.tamplateClassName + '" data-name="tabs-list"></ul>';
+            return '<ul class="' + config.templateClassName + '" data-name="tabs-list"></ul>';
         },
 
         initialize: function(options) {

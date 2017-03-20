@@ -91,14 +91,24 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             $defaultItemParameters
                         ),
                         'call_list' => array_merge(['label' => 'Calls'], $defaultItemParameters),
-                        'to_replace' => array_merge(['label' => 'Replaced'], $defaultItemParameters),
+                        'to_replace' => array_merge(['label' => 'To replace'], $defaultItemParameters),
                         'to_move_top' => array_merge(['label' => 'To move'], $defaultItemParameters),
-                        'to_move_child' => array_merge(['label' => 'To move child'], $defaultItemParameters),
                         'shortcut_call_list' => array_merge(['label' => 'Show list'], $defaultItemParameters),
                         'quicklinks_request_quote' => array_merge(
                             ['label' => 'Request Quote'],
                             $defaultItemParameters
-                        )
+                        ),
+                        'default_tab' => array_merge(['label' => 'Default'], $defaultItemParameters),
+                        'to_replace_child' => array_merge(['label' => 'To replace child'], $defaultItemParameters),
+                        'to_move_top_child' => array_merge(['label' => 'To move top child'], $defaultItemParameters),
+                        'to_replace_new_child' => array_merge(
+                            ['label' => 'To replace new child'],
+                            $defaultItemParameters
+                        ),
+                        'to_move_top_new_child' => array_merge(
+                            ['label' => 'To move top new child'],
+                            $defaultItemParameters
+                        ),
                     ],
                     'tree' => [
                         'application_menu' => [
@@ -110,24 +120,37 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                                     'children' => [
                                         'call_list' => [
                                             'children' => [],
-                                            'merge_strategy' => 'append',
+                                            'merge_strategy' => 'move',
                                         ],
                                         'to_replace' => [
-                                            'children' => [],
-                                            'merge_strategy' => 'append',
+                                            'children' => [
+                                                'to_replace_new_child' => [
+                                                    'children' => [],
+                                                    'merge_strategy' => 'move',
+                                                ],
+                                            ],
+                                            'merge_strategy' => 'replace',
                                         ],
                                         'to_move_top' => [
                                             'children' => [
-                                                'to_move_child' => [
+                                                'to_move_top_child' => [
                                                     'children' => [],
-                                                    'merge_strategy' => 'append',
-                                                ]
+                                                    'merge_strategy' => 'move',
+                                                ],
+                                                'to_move_top_new_child' => [
+                                                    'children' => [],
+                                                    'merge_strategy' => 'move',
+                                                ],
                                             ],
-                                            'merge_strategy' => 'append',
+                                            'merge_strategy' => 'move',
                                         ],
                                     ],
-                                    'merge_strategy' => 'append',
-                                ]
+                                    'merge_strategy' => 'move',
+                                ],
+                                'default_tab' => [
+                                    'children' => [],
+                                    'merge_strategy' => 'move'
+                                ],
                             ],
                             'extras' => [],
                         ],
@@ -138,7 +161,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'children' => [
                                 'shortcut_call_list' => [
                                     'children' => [],
-                                    'merge_strategy' => 'append',
+                                    'merge_strategy' => 'move',
                                 ]
                             ],
                             'extras' => [],
@@ -148,7 +171,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
                             'children' => [
                                 'quicklinks_request_quote' =>[
                                     'children' => [],
-                                    'merge_strategy' => 'append',
+                                    'merge_strategy' => 'move',
                                 ],
                             ],
                             'extras' => [],

@@ -91,6 +91,8 @@ config:
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
         'oroui/blank/js/app/modules/views-module': 'oroui/blank/js/app/modules/views-module.js'
+
+        'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/blank/js/app/modules/views-module

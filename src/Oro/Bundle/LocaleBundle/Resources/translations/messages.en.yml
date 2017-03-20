@@ -31,6 +31,7 @@ oro.locale:
         form:
             placeholder:
                 select_parent_localization: 'Please select parent localization...'
+                select_localization: 'Please select localization...'
                 select_language: 'Please select language...'
                 select_formatting: 'Please select formatting...'
                 choose: 'Choose a localization...'

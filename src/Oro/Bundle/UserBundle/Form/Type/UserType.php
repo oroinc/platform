@@ -170,7 +170,6 @@ class UserType extends AbstractType
                         ? ['Roles', 'Default']
                         : ['Registration', 'Roles', 'Default'];
                 },
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'ownership_disabled'   => $this->isMyProfilePage
             ]
         );

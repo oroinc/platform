@@ -3,24 +3,25 @@
 namespace Oro\Bundle\ImportExportBundle\Job;
 
 use Akeneo\Bundle\BatchBundle\Connector\ConnectorRegistry;
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
+use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
+use Akeneo\Bundle\BatchBundle\Job\Job;
 
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\UnitOfWork;
+
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
-
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @todo: https://magecore.atlassian.net/browse/BAP-2600 move job results processing outside
@@ -31,9 +32,8 @@ class JobExecutor
 {
     const CONNECTOR_NAME = 'oro_importexport';
 
-    /** @deprecated since 2.1, please use  JOB_IMPORT_VALIDATION_FROM_CSV instead */
+    /** @deprecated since 2.1, please use JOB_IMPORT_VALIDATION_FROM_CSV instead */
     const JOB_VALIDATE_IMPORT_FROM_CSV = 'entity_import_validation_from_csv';
-
     const JOB_EXPORT_TO_CSV = 'entity_export_to_csv';
     const JOB_EXPORT_TEMPLATE_TO_CSV = 'entity_export_template_to_csv';
     const JOB_IMPORT_FROM_CSV = 'entity_import_from_csv';
@@ -378,6 +378,20 @@ class JobExecutor
         $this->batchJobRepository->getJobManager()->persist($jobInstance);
 
         return $jobInstance;
+    }
+
+    /**
+     * Create and persist job instance.
+     *
+     * @param string $jobType
+     * @param string $jobName
+     * @return Job JobInstance
+     */
+    public function getJob($jobType, $jobName)
+    {
+        $jobInstance = new JobInstance(self::CONNECTOR_NAME, $jobType, $jobName);
+
+        return  $this->batchJobRegistry->getJob($jobInstance);
     }
 
     /**
