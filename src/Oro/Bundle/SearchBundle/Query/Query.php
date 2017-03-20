@@ -234,6 +234,7 @@ class Query
      * Add "WHERE" parameter
      *
      * @deprecated Since 1.8 use criteria to add conditions
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * @param string $keyWord
      * @param string $fieldName
