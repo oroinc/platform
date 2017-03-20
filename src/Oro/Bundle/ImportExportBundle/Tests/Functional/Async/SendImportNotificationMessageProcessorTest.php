@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Symfony\Component\Routing\Router;
+
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolationPerTest
@@ -44,7 +47,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
             ->getContainer()
             ->get('router')
             ->generate(
-                'oro_importexport_import_error_log',
+                'oro_importexport_job_error_log',
                 ['jobId' => '_jobId_']
             );
 
@@ -95,26 +98,25 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                 'fromEmail' => $this->emailNotificationSenderEmail,
                 'fromName' => $this->emailNotificationSenderName,
                 'toEmail' => 'admin@example.com',
-                'subject' => 'Result of importing file import.csv',
-                'body' => '<style>
-    @media (max-width: 480pt) {
-        .wrapper{
-            width: 100% !important;
-        }
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-</style><div class="wrapper"><p>Import of the import.csv was completed. Part(s) 2
-        of 2 were imported.</p><p>
-        Errors: 0
-        processed: 12,
-        read: 12,
-        added: 7,
-        updated: 0,
-        replaced: 5
-    </p></div>',
+                'body' => [
+                    'data' => [
+                        'hasError' => false,
+                        'successParts' => 2,
+                        'totalParts' => 2,
+                        'errors' => 0,
+                        'process' => 12,
+                        'read' => 12,
+                        'add' => 7,
+                        'replace' => 5,
+                        'update' => 0,
+                        'delete' => 0,
+                        'error_entries' => 0,
+                        'fileName' => 'import.csv',
+                        'downloadLogUrl' => '',
+                    ],
+                ],
                 'contentType' => 'text/html',
+                'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]
         );
     }
@@ -160,29 +162,25 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                 'fromEmail' => $this->emailNotificationSenderEmail,
                 'fromName' => $this->emailNotificationSenderName,
                 'toEmail' => 'admin@example.com',
-                'subject' => 'Result of importing file import.csv',
-                'body' => sprintf(
-                    '<style>
-    @media (max-width: 480pt) {
-        .wrapper{
-            width: 100%% !important;
-        }
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-</style><div class="wrapper"><p>Import of the import.csv was completed. Part(s) 2
-        of 2 were imported.</p><p>
-        Errors: 5
-        processed: 12,
-        read: 12,
-        added: 2,
-        updated: 0,
-        replaced: 5
-    </p><a href="%s">Error log</a></div>',
-                    $this->url
-                ),
+                'body' => [
+                    'data' => [
+                        'hasError' => true,
+                        'successParts' => 2,
+                        'totalParts' => 2,
+                        'errors' => 5,
+                        'process' => 12,
+                        'read' => 12,
+                        'add' => 2,
+                        'replace' => 5,
+                        'update' => 0,
+                        'delete' => 0,
+                        'error_entries' => 0,
+                        'fileName' => 'import.csv',
+                        'downloadLogUrl' => '',
+                    ],
+                ],
                 'contentType' => 'text/html',
+                'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]
         );
     }
@@ -197,7 +195,6 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         array $resultOfImportJob2,
         array $notificationExpectedMessage
     ) {
-
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
             'oro:import:http:oro_test.add_or_replace:test_import_message'
@@ -217,7 +214,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $childJob1->setData($resultOfImportJob1);
         $childJob2->setData($resultOfImportJob2);
 
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->getContainer()->get('doctrine.orm.message_queue_job_entity_manager');
         $em->refresh($rootJob);
         $messageData = [
             'rootImportJobId' => $rootJob->getId(),
@@ -229,13 +226,13 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $message = new NullMessage();
         $message->setMessageId('test_import_message');
         $message->setBody(json_encode($messageData));
+
         $processor = $this->getSendImportNotificationMessageProcessor();
         $result = $processor->process($message, $this->createSessionMock());
-        $notificationExpectedMessage['body'] = str_replace(
-            '_jobId_',
-            $rootJob->getId(),
-            $notificationExpectedMessage['body']
-        );
+
+        $url = $this->getConfigManager()->get('oro_ui.application_url') .
+            $this->getRouter()->generate('oro_importexport_job_error_log', ['jobId' => $rootJob->getId()]);
+        $notificationExpectedMessage['body']['data']['downloadLogUrl'] = $url;
 
         $this->assertMessageSent(NotificationTopics::SEND_NOTIFICATION_EMAIL, $notificationExpectedMessage);
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
@@ -276,8 +273,16 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
     /**
      * @return JobStorage
      */
-    protected function getJobStorage()
+    private function getJobStorage()
     {
         return $this->getContainer()->get('oro_message_queue.job.storage');
+    }
+
+    /**
+     * @return Router
+     */
+    private function getRouter()
+    {
+        return $this->getContainer()->get('router');
     }
 }
