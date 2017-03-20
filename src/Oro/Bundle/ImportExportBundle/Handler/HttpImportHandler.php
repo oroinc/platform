@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\File\File;
 
 class HttpImportHandler extends AbstractImportHandler
 {
-
     /**
      * {@inheritdoc}
      */
@@ -70,6 +69,7 @@ class HttpImportHandler extends AbstractImportHandler
         array $options = []
     ) {
         $jobResult = $this->executeJob($jobName, $processorAlias, $options);
+
         $counts = $this->getValidationCounts($jobResult);
         $importInfo = '';
 

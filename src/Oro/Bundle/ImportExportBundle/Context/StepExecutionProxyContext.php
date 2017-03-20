@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Context;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class StepExecutionProxyContext implements ContextInterface
+class StepExecutionProxyContext implements ContextInterface, BatchContextInterface
 {
     /**
      * @var StepExecution
@@ -200,7 +200,8 @@ class StepExecutionProxyContext implements ContextInterface
     public function getConfiguration()
     {
         $stepName = $this->stepExecution->getStepName();
-        $rawConfiguration = $this->stepExecution->getJobExecution()->getJobInstance()->getRawConfiguration();
+        $jobInstance = $this->stepExecution->getJobExecution()->getJobInstance();
+        $rawConfiguration = $jobInstance ? $jobInstance->getRawConfiguration() : [];
 
         return !empty($rawConfiguration[$stepName]) ? $rawConfiguration[$stepName] : $rawConfiguration;
     }
@@ -236,5 +237,21 @@ class StepExecutionProxyContext implements ContextInterface
             unset($configuration[$name]);
             $this->stepExecution->getJobExecution()->getJobInstance()->setRawConfiguration($configuration);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchSize()
+    {
+        return $this->getOption('batch_size');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchNumber()
+    {
+        return $this->getOption('batch_number');
     }
 }

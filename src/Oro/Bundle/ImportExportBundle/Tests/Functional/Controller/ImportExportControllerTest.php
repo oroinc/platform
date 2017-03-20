@@ -1,14 +1,14 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImportExportControllerTest extends WebTestCase
 {
@@ -32,13 +32,15 @@ class ImportExportControllerTest extends WebTestCase
         $organization = $this->getSecurityFacade()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
 
-        $this->assertMessageSent(Topics::EXPORT, [
+        $this->assertMessageSent(Topics::PRE_EXPORT, [
             'jobName' => JobExecutor::JOB_EXPORT_TO_CSV,
             'processorAlias' => 'oro_account',
             'outputFilePrefix' => null,
             'options' => [],
             'userId' => $this->getCurrentUser()->getId(),
             'organizationId' => $organizationId,
+            'securityToken' =>
+                'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
         ]);
     }
 
@@ -62,7 +64,7 @@ class ImportExportControllerTest extends WebTestCase
         $organization = $this->getSecurityFacade()->getOrganization();
         $organizationId = $organization ? $organization->getId() : null;
 
-        $this->assertMessageSent(Topics::EXPORT, [
+        $this->assertMessageSent(Topics::PRE_EXPORT, [
             'jobName' => JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
             'processorAlias' => 'oro_account',
             'outputFilePrefix' => 'prefix',
@@ -72,6 +74,8 @@ class ImportExportControllerTest extends WebTestCase
             ],
             'userId' => $this->getCurrentUser()->getId(),
             'organizationId' => $organizationId,
+            'securityToken' =>
+                'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
         ]);
     }
 
@@ -107,6 +111,8 @@ class ImportExportControllerTest extends WebTestCase
                 'originFileName' => 'test_file_original',
                 'options' => $options,
                 'userId' => $this->getCurrentUser()->getId(),
+                'securityToken' =>
+                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
             ]
         );
     }
@@ -143,14 +149,16 @@ class ImportExportControllerTest extends WebTestCase
                 'originFileName' => 'test_file_original',
                 'options' => $options,
                 'userId' => $this->getCurrentUser()->getId(),
+                'securityToken' =>
+                    'organizationId=1;userId=1;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_ADMINISTRATOR'
+
             ]
         );
     }
 
     public function testImportForm()
     {
-        $appDir = $this->getContainer()->getParameter('kernel.root_dir');
-        $tmpDirName = $this->getContainer()->getParameter('importexport.filesystems_storage');
+        $tmpDirName = $this->getContainer()->getParameter('kernel.root_dir') . '/import_export';
         $fileDir = __DIR__ . '/Import/fixtures';
         $file = $fileDir . '/testLineEndings.csv';
 
@@ -209,7 +217,7 @@ class ImportExportControllerTest extends WebTestCase
             $files
         );
         $this->assertJsonResponseSuccess();
-        $tmpFiles = glob($appDir . DIRECTORY_SEPARATOR . $tmpDirName . DIRECTORY_SEPARATOR . '*.csv');
+        $tmpFiles = glob($tmpDirName . DIRECTORY_SEPARATOR . '*.csv');
         $tmpFile = new File($tmpFiles[count($tmpFiles)-1]);
         $this->assertEquals(
             substr_count(file_get_contents($file), "\n"),

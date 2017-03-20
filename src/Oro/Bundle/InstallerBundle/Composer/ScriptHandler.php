@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\InstallerBundle\Composer;
 
+use Composer\Script\Event;
 use Sensio\Bundle\DistributionBundle\Composer\ScriptHandler as SensioScriptHandler;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
-use Composer\Script\Event;
+use Symfony\Component\Yaml\Yaml;
 
 class ScriptHandler extends SensioScriptHandler
 {
@@ -54,6 +54,9 @@ class ScriptHandler extends SensioScriptHandler
         $permissionHandler = new PermissionsHandler();
         foreach ($directories as $directory) {
             $permissionHandler->setPermissions($directory);
+        }
+        if (file_exists($importExportDir = 'app/import_export')) {
+            $permissionHandler->setPermissions($importExportDir);
         }
     }
 
