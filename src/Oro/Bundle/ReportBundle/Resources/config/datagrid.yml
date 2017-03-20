@@ -93,4 +93,4 @@ datagrid:
                 launcherOptions:
                     className: 'no-hash mobile-hide'
         options:
-            entityHint: report
+            entityHint: reports

@@ -20,16 +20,18 @@ define([
                 this.refresh();
             }
             this._superApply(arguments);
+            if (!this.options.appendTo) {
+                this.menu.css('zIndex', '');
+                var zIndex = Math.max.apply(Math, this.element.parents().add(this.menu).map(function() {
+                    var zIndex = Number($(this).css('zIndex'));
+                    return isNaN(zIndex) ? 0 : zIndex;
+                }));
 
-            this.menu.css('zIndex', '');
-            var zIndex = Math.max.apply(Math, this.element.parents().add(this.menu).map(function() {
-                var zIndex = Number($(this).css('zIndex'));
-                return isNaN(zIndex) ? 0 : zIndex;
-            }));
+                this.menu.css('zIndex', zIndex + 2);
 
-            this.menu.css('zIndex', zIndex + 2);
-            mask.show(zIndex + 1)
-                .onhide($.proxy(this.close, this));
+                mask.show(zIndex + 1)
+                    .onhide($.proxy(this.close, this));
+            }
         },
 
         /**

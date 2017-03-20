@@ -101,12 +101,12 @@ datagrid:
                 acl_resource: oro_jobs
                 rowAction:    true
         options:
-            entityHint: job
+            entityHint: jobs
 
     oro-cron-schedules-grid:
         acl_resource: oro_cron_schedule_view
         options:
-            entityHint: schedule
+            entityHint: schedules
         source:
             type: orm
             query:

@@ -1,7 +1,7 @@
 datagrid:
     tag-grid:
         options:
-            entityHint: tag
+            entityHint: tags
             entity_pagination: true
         acl_resource: oro_tag_view
         source:
@@ -89,7 +89,7 @@ datagrid:
 
     tag-results-grid:
         options:
-            entityHint: result
+            entityHint: results
         acl_resource: oro_tag_view
         source:
             type: orm

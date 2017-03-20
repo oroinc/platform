@@ -2,7 +2,7 @@ datagrid:
     business-unit-grid:
         extended_entity_name: %oro_organization.business_unit.entity.class%
         options:
-            entityHint: business unit
+            entityHint: business units
             entity_pagination: true
         source:
             type: orm
@@ -184,7 +184,7 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            entityHint: user
+            entityHint: users
             rowSelection:
                 dataField: id
                 columnName: hasCurrentBusinessUnit
@@ -195,7 +195,7 @@ datagrid:
     bu-view-users-grid:
         extends: user-relation-grid
         options:
-            entityHint: user
+            entityHint: users
         acl_resource: oro_business_unit_view
         source:
             query:

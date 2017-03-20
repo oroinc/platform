@@ -2,7 +2,7 @@ datagrid:
     users-grid:
         extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: user
+            entityHint: users
             entity_pagination: true
         acl_resource: oro_user_user_view
         source:
@@ -148,7 +148,7 @@ datagrid:
     groups-grid:
         extended_entity_name: %oro_user.group.entity.class%
         options:
-            entityHint: group
+            entityHint: groups
             entity_pagination: true
         acl_resource: oro_user_group_view
         source:
@@ -208,7 +208,7 @@ datagrid:
     roles-grid:
         extended_entity_name: %oro_user.role.entity.class%
         options:
-            entityHint: role
+            entityHint: roles
             entity_pagination: true
         acl_resource: oro_user_role_view
         source:
@@ -570,7 +570,7 @@ datagrid:
     users-select-grid:
         extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: user
+            entityHint: users
         acl_resource: oro_user_user_view
         source:
             type: orm
@@ -642,7 +642,7 @@ datagrid:
     owner-users-select-grid:
         extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: user
+            entityHint: users
         source:
             type: orm
             skip_acl_apply: true
@@ -724,7 +724,7 @@ datagrid:
     users-for-context-grid:
         extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: user
+            entityHint: users
             entity_pagination: true
             toolbarOptions:
                 pageSize:

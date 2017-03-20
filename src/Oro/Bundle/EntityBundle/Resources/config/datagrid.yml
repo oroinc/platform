@@ -3,7 +3,7 @@ datagrid:
         acl_resource: ~
         options:
             base_datagrid_class: Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid
-            entityHint: entity
+            entityHint: entities
             export: true
             entity_pagination: true
         source:
@@ -63,7 +63,7 @@ datagrid:
     entity-relation-grid:
         acl_resource: ~
         options:
-            entityHint: entity
+            entityHint: entities
             routerEnabled: false
             rowSelection:
                 dataField: id
