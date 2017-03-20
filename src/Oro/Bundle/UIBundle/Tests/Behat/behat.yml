@@ -25,3 +25,10 @@ oro_behat_extension:
         type: xpath
         locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "btn-group")]'
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector
+
+    Application Settings Form:
+      selector: 'form[id^="application_settings"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Application URL: 'application_settings[oro_ui___application_url][value]'
