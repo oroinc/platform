@@ -18,6 +18,9 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
     /** @var Reader|\PHPUnit_Framework_MockObject_MockObject */
     private $reader;
 
+    /** @var RequestStack|\PHPUnit_Framework_MockObject_MockObject */
+    private $requestStack;
+
     /** @var AnnotationsReader */
     private $annotationReader;
 
@@ -26,15 +29,11 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $this->reader = $this->getMockBuilder(Reader::class)->disableOriginalConstructor()->getMock();
+        $this->request = $this->createMock(Request::class);
+        $this->reader = $this->createMock(Reader::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
-        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
-        $requestStack->expects($this->once())
-            ->method('getCurrentRequest')
-            ->willReturn($this->request);
-
-        $this->annotationReader = new AnnotationsReader($requestStack, $this->reader);
+        $this->annotationReader = new AnnotationsReader($this->requestStack, $this->reader);
     }
 
     public function testGetTitle()
@@ -46,8 +45,8 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
             ->method('getValue')
             ->willReturn('Title Template');
 
-        $this->request
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($this->request);
+        $this->request->expects($this->once())
             ->method('get')
             ->with('_controller')
             ->willReturn(AnnotationsReaderTest::class . '::testGetTitle');
@@ -67,8 +66,8 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
     {
         $route = 'test_route';
 
-        $this->request
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($this->request);
+        $this->request->expects($this->once())
             ->method('get')
             ->with('_controller')
             ->willReturn(AnnotationsReaderTest::class . '::testGetTitleEmpty');
@@ -88,8 +87,8 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
     {
         $route = 'test_route';
 
-        $this->request
-            ->expects($this->once())
+        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($this->request);
+        $this->request->expects($this->once())
             ->method('get')
             ->with('_controller')
             ->willReturn(null);
@@ -99,5 +98,13 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
             ->method('getMethodAnnotation');
 
         $this->assertNull($this->annotationReader->getTitle($route));
+    }
+
+    public function testGetTitleWithoutCurrentRequest()
+    {
+        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn(null);
+        $this->reader->expects($this->never())->method($this->anything());
+
+        $this->assertNull($this->annotationReader->getTitle('test_route'));
     }
 }

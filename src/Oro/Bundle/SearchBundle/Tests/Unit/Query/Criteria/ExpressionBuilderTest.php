@@ -61,4 +61,13 @@ class ExpressionBuilderTest extends \PHPUnit_Framework_TestCase
             $comparison
         );
     }
+
+    public function testNotLike()
+    {
+        $comparison = $this->builder->notLike('test_field', 'test_value');
+        $this->assertEquals(
+            new Comparison('test_field', Comparison::NOT_LIKE, new Value('test_value')),
+            $comparison
+        );
+    }
 }
