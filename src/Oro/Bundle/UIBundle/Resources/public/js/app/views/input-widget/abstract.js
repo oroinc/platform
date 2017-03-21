@@ -159,6 +159,7 @@ define(function(require) {
         refresh: function() {
             if (this.refreshOptions) {
                 this.widgetFunction(this.refreshOptions);
+                this.$container = this.findContainer();
             } else {
                 this.disposeWidget();
                 this.initializeWidget();

@@ -9,7 +9,7 @@ define(function(require) {
 
     config = _.extend({
         className: 'nav-item',
-        tamplateClassName: 'nav-link'
+        templateClassName: 'nav-link'
     }, config);
 
     TabItemView = BaseView.extend({
@@ -17,7 +17,7 @@ define(function(require) {
 
         className: config.className,
 
-        template: _.template('<a href="#" class="' + config.tamplateClassName + '" data-tab-link><%= label %></a>'),
+        template: _.template('<a href="#" class="' + config.templateClassName + '" data-tab-link><%= label %></a>'),
 
         listen: {
             'change:active model': 'updateStates',
@@ -41,6 +41,7 @@ define(function(require) {
 
         onSelect: function() {
             this.model.set('active', true);
+            this.model.trigger('select', this.model);
         }
     });
 

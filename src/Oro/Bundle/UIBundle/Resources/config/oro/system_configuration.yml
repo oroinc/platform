@@ -20,6 +20,7 @@ system_configuration:
                 label: oro.ui.system_configuration.fields.application_url.label
                 constraints:
                     - Url: ~
+                    - NotBlank: ~
         oro_ui.navbar_position:
             data_type: string
             type: choice

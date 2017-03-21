@@ -3,10 +3,13 @@
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
@@ -17,7 +20,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EntityReader extends IteratorBasedReader
+class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -54,7 +57,11 @@ class EntityReader extends IteratorBasedReader
     protected function initializeFromContext(ContextInterface $context)
     {
         if ($context->hasOption('entityName')) {
-            $this->setSourceEntityName($context->getOption('entityName'), $context->getOption('organization'));
+            $this->setSourceEntityName(
+                $context->getOption('entityName'),
+                $context->getOption('organization'),
+                $context->getOption('ids', [])
+            );
         } elseif ($context->hasOption('queryBuilder')) {
             $this->setSourceQueryBuilder($context->getOption('queryBuilder'));
         } elseif ($context->hasOption('query')) {
@@ -83,19 +90,25 @@ class EntityReader extends IteratorBasedReader
     }
 
     /**
-     * @param string       $entityName
+     * @param string $entityName
      * @param Organization $organization
+     * @param array $ids
      */
-    public function setSourceEntityName($entityName, Organization $organization = null)
+    public function setSourceEntityName($entityName, Organization $organization = null, array $ids = [])
     {
-        $qb = $this->createSourceEntityQueryBuilder($entityName, $organization);
+        $qb = $this->createSourceEntityQueryBuilder($entityName, $organization, $ids);
         $this->setSourceQuery($this->applyAcl($qb));
     }
 
+
     /**
+     * @param $entityName
+     * @param Organization|null $organization
+     * @param array $ids
+     *
      * @return QueryBuilder
      */
-    protected function createSourceEntityQueryBuilder($entityName, Organization $organization = null)
+    protected function createSourceEntityQueryBuilder($entityName, Organization $organization = null, array $ids = [])
     {
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry
@@ -115,13 +128,58 @@ class EntityReader extends IteratorBasedReader
             }
         }
 
-        foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
+        foreach ($identifierNames = $metadata->getIdentifierFieldNames() as $fieldName) {
             $qb->orderBy('o.' . $fieldName, 'ASC');
+        }
+        if (! empty($ids)) {
+            if (count($identifierNames) > 1) {
+                throw new \LogicException(sprintf(
+                    'not supported entity (%s) with composite primary key.',
+                    $entityName
+                ));
+            }
+            $identifierName = 'o.' . current($identifierNames);
+            $qb
+                ->andWhere($identifierName . ' IN (:ids)')
+                ->setParameter('ids', $ids);
         }
 
         $this->addOrganizationLimits($qb, $entityName, $organization);
 
         return $qb;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIds($entityName, array $options = [])
+    {
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry
+            ->getManagerForClass($entityName);
+
+        $metadata = $entityManager->getClassMetadata($entityName);
+
+        if (count($identifierNames = $metadata->getIdentifierFieldNames()) > 1) {
+            throw new \LogicException(sprintf(
+                'Not supported entity (%s) with composite primary key.',
+                $entityName
+            ));
+        }
+
+        $identifierName = $metadata->getSingleIdentifierFieldName();
+        $queryBuilder = $entityManager
+            ->getRepository($entityName)
+            ->createQueryBuilder('o ', 'o.' . $identifierName);
+        $queryBuilder->select(sprintf('partial o.{%s}', $identifierName));
+        $queryBuilder->orderBy('o.' . $identifierName, 'ASC');
+
+        $organization = isset($options['organization']) ? $options['organization'] : null;
+        $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
+        $this->applyAcl($queryBuilder);
+        $result = $queryBuilder->getQuery()->getResult(AbstractQuery::HYDRATE_ARRAY);
+
+        return array_keys($result);
     }
 
     /**

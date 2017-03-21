@@ -74,6 +74,8 @@ oro.translation:
         status.label: 'Translated'
         message:
             rebuild_cache: 'Translation Cache has been updated'
+        current.label: 'Current (Cached) Value'
+        rebuild_cache_required: "Translation cache update is required. <a href='%path%'>Click here</a> to update"
 
     translation_key:
         entity_label: 'Translation Key'

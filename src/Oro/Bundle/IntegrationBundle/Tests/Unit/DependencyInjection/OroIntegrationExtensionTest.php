@@ -24,6 +24,20 @@ class OroIntegrationExtensionTest extends ExtensionTestCase
         $expectedDefinitions = [
             'oro_integration.datagrid.action_configuration',
             'oro_integration.repository.channel',
+            'oro_integration.action_handler.channel_delete',
+            'oro_integration.action_handler.channel_disable',
+            'oro_integration.action_handler.channel_enable',
+            'oro_integration.action_handler.channel_error',
+            'oro_integration.action_handler.decorator.channel_delete_dispatcher',
+            'oro_integration.action_handler.decorator.channel_disable_dispatcher',
+            'oro_integration.action_handler.decorator.channel_enable_dispatcher',
+            'oro_integration.action_handler.decorator.channel_delete_transaction',
+            'oro_integration.action_handler.decorator.channel_disable_transaction',
+            'oro_integration.action_handler.decorator.channel_enable_transaction',
+            'oro_integration.factory.event.channel_delete',
+            'oro_integration.factory.event.channel_disable',
+            'oro_integration.factory.event.channel_enable',
+            'oro_integration.utils.edit_mode',
         ];
 
         $this->assertDefinitionsLoaded($expectedDefinitions);
