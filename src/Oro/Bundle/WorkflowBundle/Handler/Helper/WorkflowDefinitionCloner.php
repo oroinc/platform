@@ -5,10 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Handler\Helper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Helper\WorkflowDefinitionClonerHelper as WDCHelper;
 
 class WorkflowDefinitionCloner
 {
@@ -51,12 +53,14 @@ class WorkflowDefinitionCloner
      */
     private static function copyMainFields(WorkflowDefinition $definition, WorkflowDefinition $source)
     {
+        $mergedConfiguration = self::copyConfigurationVariables($definition, $source);
+
         $definition
             ->setName($source->getName())
             ->setLabel($source->getLabel())
             ->setRelatedEntity($source->getRelatedEntity())
             ->setEntityAttributeName($source->getEntityAttributeName())
-            ->setConfiguration($source->getConfiguration())
+            ->setConfiguration($mergedConfiguration)
             ->setStepsDisplayOrdered($source->isStepsDisplayOrdered())
             ->setSystem($source->isSystem())
             ->setPriority($source->getPriority())
@@ -65,6 +69,85 @@ class WorkflowDefinitionCloner
             ->setApplications($source->getApplications());
 
         return $definition;
+    }
+
+    /**
+     * Copy and retain variable configuration if:
+     *  - 'type' didn't change
+     *
+     * And in case of objects and entities:
+     *  - 'class' didn't change
+     *
+     * And in case of entities:
+     *  - 'options.identifier' didn't change
+     *
+     * @param WorkflowDefinition $definition
+     * @param WorkflowDefinition $source
+     *
+     * @return array
+     */
+    private static function copyConfigurationVariables(WorkflowDefinition $definition, WorkflowDefinition $source)
+    {
+        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
+
+        $newConfig = $source->getConfiguration();
+        $existingConfig = $definition->getConfiguration();
+        if (!isset($newConfig[$definitionsNode], $existingConfig[$definitionsNode])) {
+            return $newConfig;
+        }
+
+        $newDefinition = $newConfig[$definitionsNode];
+        $existingDefinition = $existingConfig[$definitionsNode];
+        if (!isset($newDefinition[$variablesNode], $existingDefinition[$variablesNode])) {
+            return $newConfig;
+        }
+
+        $newVariables = $newDefinition[$variablesNode];
+        $existingVariables = $existingDefinition[$variablesNode];
+
+        $newParsed = WDCHelper::parseVariableDefinitions($newVariables);
+        $existingParsed = WDCHelper::parseVariableDefinitions($existingVariables);
+
+        foreach ($newParsed as $name => $newVariable) {
+            // nothing to copy
+            if (!isset($existingParsed[$name])) {
+                continue;
+            }
+
+            $existingVariable = $existingParsed[$name];
+
+            // types don't match
+            $newType = WDCHelper::getOption('type', $newVariable);
+            if ($newType !== WDCHelper::getOption('type', $existingVariable)) {
+                continue;
+            }
+
+            if (in_array($newType, ['object', 'entity'], true)) {
+                // class is not defined or changed
+                $newClass = WDCHelper::getOption('options.class', $newVariable);
+                $existingClass = WDCHelper::getOption('options.class', $existingVariable);
+
+                if (!$newClass || !$existingClass || $newClass !== $existingClass) {
+                    continue;
+                }
+
+                // entity identifier is not defined or changed
+                if ('entity' === $newType) {
+                    $newIdentifier = WDCHelper::getOption('options.identifier', $newVariable);
+                    $existingIdentifier = WDCHelper::getOption('options.identifier', $existingVariable);
+
+                    if (!$newClass || !$existingClass || $newIdentifier !== $existingIdentifier) {
+                        continue;
+                    }
+                }
+            }
+
+            $newVariable['value'] = WDCHelper::getOption('value', $existingVariable);
+            $newConfig[$definitionsNode][$variablesNode][$name] = $newVariable;
+        }
+
+        return $newConfig;
     }
 
     /**
