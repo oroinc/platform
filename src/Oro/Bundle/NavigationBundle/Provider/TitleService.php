@@ -369,10 +369,15 @@ class TitleService implements TitleServiceInterface
      */
     public function getSerialized()
     {
+        $params = [];
+        foreach ($this->getParams() as $paramName => $paramValue) {
+            //Explicitly case object to string because json_encode can not serialize it correct
+            $params[$paramName] = is_object($paramValue) ? (string)$paramValue : $paramValue;
+        }
         $data = [
             'template'       => $this->getTemplate(),
             'short_template' => $this->getShortTemplate(),
-            'params'         => $this->getParams()
+            'params'         => $params
         ];
         if ($this->prefix) {
             $data['prefix'] = $this->prefix;
