@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
+use Symfony\Component\DomCrawler\Crawler;
+
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\UIBundle\Route\Router;
 
@@ -14,22 +16,22 @@ class ControllersTest extends AbstractConfigControllerTest
         RelationType::ONE_TO_MANY => [
             'readonly' => true,
             'bidirectional' => true,
-            'entities_to_select' => 89,
             'method' => 'createSelectOneToMany',
         ],
         RelationType::MANY_TO_MANY => [
             'readonly' => false,
             'bidirectional' => false,
-            'entities_to_select' => 155,
             'method' => 'createSelectOneToMany',
         ],
         RelationType::MANY_TO_ONE => [
             'readonly' => false,
             'bidirectional' => false,
-            'entities_to_select' => 155,
             'method' => 'createSelectManyToOne',
         ],
     ];
+
+    const NON_EXTENDED_ENTITY = 'Entity fallback value'; // 'Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue';
+    const EXTENDED_ENTITY = 'extend.entity.testentity2.entity_label'; // 'Extend\Entity\TestEntity2';
 
     public function testIndex()
     {
@@ -162,10 +164,17 @@ class ControllersTest extends AbstractConfigControllerTest
             $readOnlyValue = $crawler->filter('[name="oro_entity_config_type[extend][relation][bidirectional]"]')
                 ->attr('readonly');
 
-            $numberOfEntities = $crawler->filter('[name="oro_entity_config_type[extend][relation][target_entity]"]')
+            $entities = $crawler->filter('[name="oro_entity_config_type[extend][relation][target_entity]"]')
                 ->children();
 
-            $this->assertCount($relation['entities_to_select'], $numberOfEntities);
+            $entityLabels = $this->extractEntityLabelsFromDropdown($entities);
+
+            $this->assertContains(static::EXTENDED_ENTITY, $entityLabels);
+            if ($type === RelationType::ONE_TO_MANY) {
+                $this->assertNotContains(static::NON_EXTENDED_ENTITY, $entityLabels);
+            } else {
+                $this->assertContains(static::NON_EXTENDED_ENTITY, $entityLabels);
+            }
 
             $form = $saveButton->form();
             $method = $relation['method'];
@@ -211,5 +220,22 @@ class ControllersTest extends AbstractConfigControllerTest
         $readOnlyValue = $crawler->filter('[name="oro_entity_config_type[extend][relation][bidirectional]"]')
             ->attr('readonly');
         $this->assertEquals('readonly', $readOnlyValue);
+    }
+
+    /**
+     * @param Crawler $entities
+     * @return array
+     */
+    private function extractEntityLabelsFromDropdown(Crawler $entities)
+    {
+        $entityLabels = [];
+        /** @var \DOMElement $entity */
+        foreach ($entities as $entity) {
+            if ($entity->textContent) {
+                $entityLabels[] = $entity->textContent;
+            }
+        }
+
+        return $entityLabels;
     }
 }
