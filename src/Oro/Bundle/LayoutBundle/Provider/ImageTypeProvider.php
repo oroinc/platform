@@ -46,6 +46,18 @@ class ImageTypeProvider
         return $this->imageTypes;
     }
 
+    /**
+     * @return ThemeImageTypeDimension[]
+     */
+    public function getImageDimensions()
+    {
+        if (!$this->dimensions) {
+            $this->collectDimensionsFromThemes($this->themeManager->getAllThemes());
+        }
+
+        return $this->dimensions;
+    }
+
     protected function collectImageTypesFromThemes()
     {
         $themes = $this->themeManager->getAllThemes();

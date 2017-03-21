@@ -77,10 +77,11 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
         $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider1->reveal());
         $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider2->reveal());
 
-        $this->imageTypeProvider->getImageTypes()->willReturn([
-            $this->prepareImageType([$productOriginal, $productLarge, $productSmall, $productGalleryMain]),
-            $this->prepareImageType([$productLarge, $productSmall]),
-            $this->prepareImageType([$productOriginal, $productLarge, $productSmall])
+        $this->imageTypeProvider->getImageDimensions()->willReturn([
+            self::PRODUCT_ORIGINAL => $productOriginal,
+            self::PRODUCT_LARGE => $productLarge,
+            self::PRODUCT_SMALL => $productSmall,
+            self::PRODUCT_GALLERY_MAIN => $productGalleryMain
         ]);
 
         $this->filterConfig->set(self::PRODUCT_ORIGINAL, $this->prepareBaseFilterData())->shouldBeCalledTimes(1);
@@ -97,15 +98,6 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
             ))->shouldBeCalledTimes(1);
 
         $this->imageFilterLoader->load();
-    }
-
-    /**
-     * @param ThemeImageTypeDimension[] $dimensions
-     * @return ThemeImageType
-     */
-    private function prepareImageType(array $dimensions)
-    {
-        return new ThemeImageType('type', 'Type', $dimensions);
     }
 
     /**

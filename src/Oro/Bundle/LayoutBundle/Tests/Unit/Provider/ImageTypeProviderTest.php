@@ -36,30 +36,7 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         $theme1ListingDimensions = [self::DIMENSION_ORIGINAL];
         $theme2ListingDimensions = [self::DIMENSION_ORIGINAL, self::DIMENSION_CUSTOM];
 
-        $this->themeManager->getAllThemes()->willReturn([
-            $this->prepareTheme(
-                'theme1',
-                [
-                    'main' => ['Main', 1, $theme1MainDimensions],
-                    'listing' => ['Listing', 3, $theme1ListingDimensions],
-                ],
-                [
-                    self::DIMENSION_ORIGINAL => [null, null],
-                    self::DIMENSION_LARGE => [400, 400, ['option1' => true]],
-                    self::DIMENSION_SMALL => [50, 50],
-                ]
-            ),
-            $this->prepareTheme(
-                'theme2',
-                [
-                    'listing' => ['Listing', 5, $theme2ListingDimensions],
-                ],
-                [
-                    self::DIMENSION_CUSTOM => [88, 88],
-                ]
-            ),
-            $this->prepareTheme('theme3', [], [])
-        ]);
+        $this->prepareThemeManager($theme1MainDimensions, $theme1ListingDimensions, $theme2ListingDimensions);
 
         $imageTypes = $this->provider->getImageTypes();
 
@@ -83,6 +60,23 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->provider->getImageTypes();
+    }
+
+    public function testGetImageDimensions()
+    {
+        $theme1MainDimensions = [self::DIMENSION_ORIGINAL, self::DIMENSION_LARGE];
+        $theme1ListingDimensions = [self::DIMENSION_ORIGINAL];
+        $theme2ListingDimensions = [self::DIMENSION_ORIGINAL, self::DIMENSION_CUSTOM];
+
+        $this->prepareThemeManager($theme1MainDimensions, $theme1ListingDimensions, $theme2ListingDimensions);
+
+        $dimensions = $this->provider->getImageDimensions();
+
+        $dimensionLarge = $dimensions[self::DIMENSION_LARGE];
+        $this->assertCount(4, $dimensions);
+        $this->assertEquals(400, $dimensionLarge->getWidth());
+        $this->assertEquals(400, $dimensionLarge->getHeight());
+        $this->assertTrue($dimensionLarge->getOption('option1'));
     }
 
     /**
@@ -138,5 +132,41 @@ class ImageTypeProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($maxNumber, $imageType->getMaxNumber());
         $this->assertCount(count($dimensions), $imageType->getDimensions());
         $this->assertEquals($dimensions, array_keys($imageType->getDimensions()));
+    }
+
+    /**
+     * @param array $theme1MainDimensions
+     * @param array $theme1ListingDimensions
+     * @param array $theme2ListingDimensions
+     */
+    private function prepareThemeManager(
+        array $theme1MainDimensions,
+        array $theme1ListingDimensions,
+        array $theme2ListingDimensions
+    ) {
+        $this->themeManager->getAllThemes()->willReturn([
+            $this->prepareTheme(
+                'theme1',
+                [
+                    'main' => ['Main', 1, $theme1MainDimensions],
+                    'listing' => ['Listing', 3, $theme1ListingDimensions],
+                ],
+                [
+                    self::DIMENSION_ORIGINAL => [null, null],
+                    self::DIMENSION_LARGE => [400, 400, ['option1' => true]],
+                    self::DIMENSION_SMALL => [50, 50],
+                ]
+            ),
+            $this->prepareTheme(
+                'theme2',
+                [
+                    'listing' => ['Listing', 5, $theme2ListingDimensions],
+                ],
+                [
+                    self::DIMENSION_CUSTOM => [88, 88],
+                ]
+            ),
+            $this->prepareTheme('theme3', [], [])
+        ]);
     }
 }
