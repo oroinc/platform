@@ -27,7 +27,9 @@
 {% endblock %}
 
 {% block attribute_label_widget %}
-    <label>{{ label }}:</label>
+    {% if label|first != '_' %}
+        <label>{{ label }}:</label>
+    {% endif %}
 {% endblock %}
 
 {% block attribute_text_widget %}
