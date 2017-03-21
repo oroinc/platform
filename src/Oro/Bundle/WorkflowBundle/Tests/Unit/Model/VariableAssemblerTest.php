@@ -26,7 +26,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 use Oro\Component\Action\Exception\AssemblerException;
 
-class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
+class VariableAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
