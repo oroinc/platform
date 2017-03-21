@@ -287,6 +287,9 @@ class LayoutDataCollector extends DataCollector
         $property->setAccessible(true);
 
         foreach ($property->getValue($context->data()) as $key => $value) {
+            if (is_object($value)) {
+                $value = get_class($value);
+            }
             $this->data['context']['data'][$key] =  $value;
         }
     }
