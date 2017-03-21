@@ -4,7 +4,7 @@ namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-use Monolog\Handler\AbstractHandler;
+use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\HandlerInterface;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 
-class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInterface
+class DetailedLogsHandler extends AbstractProcessingHandler implements ContainerAwareInterface
 {
     /** @var HandlerInterface */
     protected $handler;
@@ -53,33 +53,9 @@ class DetailedLogsHandler extends AbstractHandler implements ContainerAwareInter
     /**
      * {@inheritdoc}
      */
-    public function handle(array $record)
+    protected function write(array $record)
     {
-        if ($this->processors) {
-            foreach ($this->processors as $processor) {
-                $record = call_user_func($processor, $record);
-            }
-        }
-
-        $this->buffer[] = $record;
-
-        return false === $this->bubble;
-    }
-
-    public function close()
-    {
-        if (count($this->buffer) === 0) {
-            return;
-        }
-
-        $this->handler->handleBatch(
-            array_filter(
-                $this->buffer,
-                function ($record) {
-                    return $record['level'] >= $this->level;
-                }
-            )
-        );
+        $this->handler->handle($record);
     }
 
     /**

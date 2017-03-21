@@ -14,11 +14,6 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
     protected $firstLineIsHeader = true;
 
     /**
-     * @var array
-     */
-    protected $header;
-
-    /**
      * @var ExcelFactory
      */
     protected $phpExcel;
@@ -28,6 +23,14 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      */
     protected $excelObj;
 
+    /**
+     * @var int
+     */
+    protected $currentRow = 0;
+
+    /**
+     * @param ExcelFactory $phpExcel
+     */
     public function __construct(ExcelFactory $phpExcel)
     {
         $this->phpExcel = $phpExcel;
@@ -55,12 +58,9 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      */
     public function write(array $items)
     {
-        $this->createPHPExcelObject();
-
         $writeArray = [];
-
         // write a header if needed
-        if ($this->firstLineIsHeader) {
+        if ($this->firstLineIsHeader && ! $this->excelObj) {
             if (!$this->header && count($items) > 0) {
                 $this->header = array_keys($items[0]);
             }
@@ -69,10 +69,11 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
             }
         }
 
+        $this->createPHPExcelObject();
         $writeArray = array_merge($writeArray, $items);
         $sheet = $this->excelObj->getActiveSheet();
-        $highestRow = $sheet->getHighestRow();
-        $sheet->fromArray($writeArray, null, 'A'.$highestRow);
+        $sheet->fromArray($writeArray, null, 'A'.++$this->currentRow);
+        $this->currentRow += count($writeArray) - 1;
     }
 
     /**
@@ -95,6 +96,11 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      */
     public function close()
     {
-        $this->phpExcel->createWriter($this->excelObj, 'Excel2007')->save($this->filePath);
+        if ($this->excelObj) {
+            $this->phpExcel->createWriter($this->excelObj, 'Excel2007')->save($this->filePath);
+            $this->excelObj = null;
+            $this->header = null;
+            $this->currentRow = 0;
+        }
     }
 }

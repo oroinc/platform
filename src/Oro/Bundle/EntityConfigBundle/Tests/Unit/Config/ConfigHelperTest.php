@@ -23,8 +23,7 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         'is_extend' => true,
         'origin' => ExtendScope::ORIGIN_CUSTOM,
         'owner' => ExtendScope::OWNER_CUSTOM,
-        'state' => ExtendScope::STATE_NEW,
-        'bidirectional' => false,
+        'state' => ExtendScope::STATE_NEW
     ];
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
@@ -340,7 +339,6 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'oneToMany|Test\Entity|Test\TargetEntity|owningSideField',
                     'target_entity' => 'Test\TargetEntity',
-                    'bidirectional' => false,
                 ]
             ],
             $resultFieldOptions
@@ -377,7 +375,6 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'state'         => ExtendScope::STATE_NEW,
                     'relation_key'  => 'manyToOne|Test\Entity|Test\TargetEntity|owningSideField',
                     'target_entity' => 'Test\TargetEntity',
-                    'bidirectional' => false,
                 ]
             ],
             $resultFieldOptions

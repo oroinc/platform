@@ -4,6 +4,9 @@ oro_behat_extension:
       selector: 'div#main-menu'
       class: Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu
 
+    MainMenuDropdown:
+      selector: '.dropdown-menu'
+
     PinBarLink:
       selector: '#pinbar div.list-bar .pin-holder a'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element

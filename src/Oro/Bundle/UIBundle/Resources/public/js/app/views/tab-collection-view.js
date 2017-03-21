@@ -5,7 +5,13 @@ define(function(require) {
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var module = require('module');
+    var config = module.config();
     var TabItemView = require('./tab-item-view');
+
+    config = _.extend({
+        templateClassName: 'nav nav-tabs'
+    }, config);
 
     TabCollectionView = BaseCollectionView.extend({
         listSelector: '[data-name="tabs-list"]',
@@ -27,7 +33,7 @@ define(function(require) {
         },
 
         template: function() {
-            return '<ul class="nav nav-tabs" data-name="tabs-list"></ul>';
+            return '<ul class="' + config.templateClassName + '" data-name="tabs-list"></ul>';
         },
 
         initialize: function(options) {

@@ -12,7 +12,7 @@ define(function(require) {
      *
      * Requires income data format:
      * ```javascript
-     * var cellValue = [{id: 1, text: 'tag-1', locked: false}, {id: 2, text: 'tag-2', locked: true}, ...];
+     * var cellValue = [{id: 1, text: 'tag-1'}, {id: 2, text: 'tag-2'}, ...];
      * ```
      *
      * Also please prepare and pass choices through cell configuration

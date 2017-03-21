@@ -51,6 +51,15 @@ class Element extends NodeElement
             $this->selectorManipulator->getSelectorAsXpath($session->getSelectorsHandler(), $selector),
             $session
         );
+
+        $this->init();
+    }
+
+    /**
+     * Initialize element
+     */
+    protected function init()
+    {
     }
 
     /**
@@ -157,11 +166,14 @@ class Element extends NodeElement
     }
 
     /**
-     * @return DocumentElement
+     * @return self
      */
     protected function getPage()
     {
-        return $this->session->getPage();
+        return $this->elementFactory->wrapElement(
+            'Page',
+            $this->session->getPage()
+        );
     }
 
     /**
@@ -170,5 +182,29 @@ class Element extends NodeElement
     protected function getName()
     {
         return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
+    }
+
+    /**
+     * @param \Closure $lambda
+     * @param int $timeLimit
+     * @return null|mixed Return false if closure throw error or return not true value.
+     *                     Return value that return closure
+     */
+    protected function spin(\Closure $lambda, $timeLimit = 60)
+    {
+        $time = $timeLimit;
+
+        while ($time > 0) {
+            try {
+                if ($result = $lambda($this)) {
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                // do nothing
+            }
+            usleep(50000);
+            $time -= 0.05;
+        }
+        return null;
     }
 }

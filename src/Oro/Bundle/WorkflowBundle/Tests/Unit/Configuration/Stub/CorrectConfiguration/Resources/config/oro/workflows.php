@@ -16,13 +16,13 @@ return [
             'active' => true,
         ],
         'scopes' => [
-           [
-               'scope1' => 'value1',
-               'scope2' => 'value2',
-           ],
-           [
-               'scope1' => 'value3',
-           ],
+            [
+                'scope1' => 'value1',
+                'scope2' => 'value2',
+            ],
+            [
+                'scope1' => 'value3',
+            ],
         ],
         'datagrids' => ['datagrid1', 'datagrid2'],
         'steps' => [
@@ -153,7 +153,63 @@ return [
                         'require' => null
                     ]
                 ]
-            ]
+            ],
+            'transition_with_form_options_configuration' =>
+                [
+                    'step_to' => 'first_step',
+                    'transition_definition' => 'first_transition_definition',
+                    'is_start' => false,
+                    'is_hidden' => false,
+                    'is_unavailable_hidden' => false,
+                    'acl_message' => null,
+                    'frontend_options' => [],
+                    'form_type' => 'oro_workflow_transition',
+                    'display_type' => 'dialog',
+                    'form_options' => [
+                        WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                            'handler' => 'handler',
+                            'template' => 'template',
+                            'data_provider' => 'data_provider',
+                            'data_attribute' => 'form_data',
+                        ],
+                    ],
+                    'page_template' => null,
+                    'dialog_template' => null,
+                    'init_entities' => [],
+                    'init_routes' => [],
+                    'init_datagrids' => [],
+                    'init_context_attribute' => 'init_context',
+                    'triggers' => [],
+                    'destination_page' => '',
+                ],
+            'transition_with_form_options_configuration_defaults' =>
+                [
+                    'step_to' => 'first_step',
+                    'transition_definition' => 'first_transition_definition',
+                    'is_start' => false,
+                    'is_hidden' => false,
+                    'is_unavailable_hidden' => false,
+                    'acl_message' => null,
+                    'frontend_options' => [],
+                    'form_type' => 'oro_workflow_transition',
+                    'display_type' => 'dialog',
+                    'form_options' => [
+                        WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                            'handler' => WorkflowConfiguration::DEFAULT_FORM_CONFIGURATION_HANDLER,
+                            'template' => WorkflowConfiguration::DEFAULT_FORM_CONFIGURATION_TEMPLATE,
+                            'data_provider' => 'data_provider',
+                            'data_attribute' => 'form_data',
+                        ],
+                    ],
+                    'page_template' => null,
+                    'dialog_template' => null,
+                    'init_entities' => [],
+                    'init_routes' => [],
+                    'init_datagrids' => [],
+                    'init_context_attribute' => 'init_context',
+                    'triggers' => [],
+                    'destination_page' => '',
+                ],
         ],
         'transition_definitions' => [
             'first_transition_definition' => [

@@ -21,8 +21,9 @@ define(function(require) {
         },
 
         onGroupChange: function(model) {
-            if (model.id === this.id) {
-                this.el.toggle();
+            if (model.get('id') === this.id) {
+                this.el.siblings('.' + this.el[0].className).hide();
+                this.el.show();
             }
         }
     });

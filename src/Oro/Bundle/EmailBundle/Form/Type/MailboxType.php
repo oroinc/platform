@@ -53,7 +53,6 @@ class MailboxType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'         => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
-            'cascade_validation' => true,
         ]);
     }
 
@@ -64,10 +63,7 @@ class MailboxType extends AbstractType
     {
         $builder->add('label', 'text', [
             'required'    => true,
-            'label'       => 'oro.email.mailbox.label.label',
-            'constraints' => [
-                new NotNull(),
-            ],
+            'label'       => 'oro.email.mailbox.label.label'
         ]);
         $builder->add('email', 'oro_email_email_address', [
             'required'    => true,

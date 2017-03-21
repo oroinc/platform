@@ -29,7 +29,6 @@ class AddressTypeController extends FOSRestController implements ClassResourceIn
      *      description="Get all address types items",
      *      resource=true
      * )
-     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function cgetAction()
@@ -50,7 +49,6 @@ class AddressTypeController extends FOSRestController implements ClassResourceIn
      *      description="Get address type item",
      *      resource=true
      * )
-     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function getAction($name)
