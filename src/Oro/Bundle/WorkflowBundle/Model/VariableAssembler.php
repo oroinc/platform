@@ -191,7 +191,7 @@ class VariableAssembler extends BaseAbstractAssembler
             return $options;
         }
 
-        $parameters = $this->variableGuesser->guessVariableParameters($rootClass, $propertyPath);
+        $parameters = $this->variableGuesser->guessParameters($rootClass, $propertyPath);
         if (!$parameters) {
             return $options;
         }
