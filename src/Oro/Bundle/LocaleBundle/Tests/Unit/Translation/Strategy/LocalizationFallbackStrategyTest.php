@@ -8,10 +8,12 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
-use Oro\Component\Testing\Unit\EntityTrait;
-
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,12 +68,8 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
             ->with('Oro\Bundle\LocaleBundle\Entity\Localization')
             ->willReturn($em);
         /** @var LocalizationRepository|\PHPUnit_Framework_MockObject_MockObject $repository */
-        $repository = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository')
-            ->disableOriginalConstructor()->getMock();
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with('Oro\Bundle\LocaleBundle\Entity\Localization')
-            ->willReturn($repository);
+        $repository = $this->createMock(LocalizationRepository::class);
+        $em->expects($this->once())->method('getRepository')->with(Localization::class)->willReturn($repository);
         $repository->expects($this->once())
             ->method('findRootsWithChildren')
             ->willReturn($entities);
@@ -92,37 +90,49 @@ class LocalizationFallbackStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function getLocaleFallbacksDataProvider()
     {
-        $secondLevelLevelEn = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
-            'name' => 'English1',
-            'languageCode' => 'en',
-            'formattingCode' => 'en_FR',
-        ]);
+        $secondLevelLevelEn = $this->getEntity(
+            Localization::class,
+            [
+                'name' => 'English1',
+                'language' => $this->getEntity(Language::class, ['code' => 'en']),
+                'formattingCode' => 'en_FR',
+            ]
+        );
         $firstLevelEn = $this->getEntity(
-            'Oro\Bundle\LocaleBundle\Entity\Localization',
+            Localization::class,
             [
                 'name' => 'English2',
-                'languageCode' => 'en',
+                'language' => $this->getEntity(Language::class, ['code' => 'en']),
                 'formattingCode' => 'en_EN',
                 'childLocalizations' => new ArrayCollection([$secondLevelLevelEn])
             ]
         );
-        $en = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
-            'name' => 'English3',
-            'languageCode' => 'en',
-            'formattingCode' => 'en',
-            'childLocalizations' => new ArrayCollection([$firstLevelEn])
-        ]);
-        $firstLevelRu = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
-            'name' => 'Russian1',
-            'languageCode' => 'ru',
-            'formattingCode' => 'ru_RU',
-        ]);
-        $ru = $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', [
-            'name' => 'Russian2',
-            'languageCode' => 'ru',
-            'formattingCode' => 'ru',
-            'childLocalizations' => new ArrayCollection([$firstLevelRu])
-        ]);
+        $en = $this->getEntity(
+            Localization::class,
+            [
+                'name' => 'English3',
+                'language' => $this->getEntity(Language::class, ['code' => 'en']),
+                'formattingCode' => 'en',
+                'childLocalizations' => new ArrayCollection([$firstLevelEn])
+            ]
+        );
+        $firstLevelRu = $this->getEntity(
+            Localization::class,
+            [
+                'name' => 'Russian1',
+                'language' => $this->getEntity(Language::class, ['code' => 'ru']),
+                'formattingCode' => 'ru_RU',
+            ]
+        );
+        $ru = $this->getEntity(
+            Localization::class,
+            [
+                'name' => 'Russian2',
+                'language' => $this->getEntity(Language::class, ['code' => 'ru']),
+                'formattingCode' => 'ru',
+                'childLocalizations' => new ArrayCollection([$firstLevelRu])
+            ]
+        );
         $localizations = [
             Configuration::DEFAULT_LOCALE => [
                 'en' => ['en' => ['en' => []]],

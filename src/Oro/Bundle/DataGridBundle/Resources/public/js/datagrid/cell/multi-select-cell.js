@@ -64,6 +64,7 @@ define([
                     '<span class="multiselect-value-wrapper"><span class="value-item">' +
                     value
                         .map(function(item) {return choices[item];})
+                        .filter(function(item) {return item;})
                         .join('</span><span class="value-item">') +
                     '</span></span>'
                 ) : '';

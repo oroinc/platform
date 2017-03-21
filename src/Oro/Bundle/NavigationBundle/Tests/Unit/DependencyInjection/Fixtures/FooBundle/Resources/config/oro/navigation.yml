@@ -6,16 +6,14 @@ navigation:
                 read_only: true
             call_list:
                 label: 'Calls'
-            to_replace:
-                label: 'Replaced'
-            to_move_top:
-                label: 'To move'
-            to_move_child:
-                label: 'To move child'
             shortcut_call_list:
                 label: Show list
             quicklinks_request_quote:
                 label: 'Request Quote'
+            to_replace_new_child:
+                label: 'To replace new child'
+            to_move_top_new_child:
+                label: 'To move top new child'
         tree:
             application_menu:
                 max_nesting_level: 1
@@ -23,10 +21,14 @@ navigation:
                     customers_tab:
                         children:
                             call_list: ~
-                            to_replace: ~
-                            to_move_top:
+                            to_replace:
+                                merge_strategy: replace
                                 children:
-                                    to_move_child: ~
+                                    to_replace_new_child: ~
+                            to_move_top:
+                                merge_strategy: move
+                                children:
+                                    to_move_top_new_child: ~
 
             shortcuts:
                 read_only: true

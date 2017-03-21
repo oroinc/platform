@@ -83,6 +83,16 @@ There are next filters form types:
     <td>oro_type_selectrow_filter</td>
     <td>This form type is used by datagrid extension only</td>
 </tr>
+<tr>
+    <td><a href="#oro_type_date_grouping_filter-form-type">DateGroupingFilterType</a></td>
+    <td>oro_type_date_grouping_filter</td>
+    <td>Represents date grouping filter</td>
+</tr>
+<tr>
+    <td><a href="#oro_type_skip_empty_periods_filter-form-type">SkipEmptyPeriodsFilterType</a></td>
+    <td>oro_type_skip_empty_periods_filter</td>
+    <td>Represents skip empty periods filter </td>
+</tr>
 </table>
 
 ### oro\_type\_filter Form Type
@@ -494,6 +504,79 @@ oro\_type\_filter
 
 _Oro\Bundle\FilterBundle\Form\Type\SelectRowFilterType_
 
+oro_filter.form.type.date_grouping
+### oro\_type\_date\_grouping\_filter Form Type
+
+**Options**
+
+* data\_name
+* joined\_column
+* not\_nullable\_field
+* calendar\_entity
+* target\_entity
+
+**Inherit Options**
+
+* field\_type
+* field\_options
+* operator\_choices
+* operator\_type
+* operator\_options
+* show\_filter
+* field\_type
+* operator\_choices
+
+**Default Options**
+
+* calendar\_table = "calendarDate"
+* calendar\_column = 'date'
+* calendar\_table\_for\_grouping = 'calendarDate1'
+* calendar\_column\_for\_grouping = 'date'
+* joined\_table = 'joinedTableAlias'
+* target\_column = 'date'
+
+**Parent Type**
+
+oro\_type\_choice\_filter
+
+**Class**
+
+_Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType_
+
+**JS Classes**
+
+_Oro.Filter.MultiSelectFilter_
+_Oro.Filter.SelectFilter_
+
+### oro\_type\_skip\_empty\_periods\_filter Form Type
+
+**Options**
+
+* not\_nullable\_field
+
+**Inherit Options**
+
+* field\_type
+* field\_options
+* operator\_choices
+* operator\_type
+* operator\_options
+* show\_filter
+* field\_type
+* operator\_choices
+
+**Parent Type**
+
+oro\_type\_choice\_filter
+
+**Class**
+
+_Oro\Bundle\FilterBundle\Form\Type\Filter\DateGroupingFilterType_
+
+**JS Classes**
+
+_Oro.Filter.MultiSelectFilter_
+_Oro.Filter.SelectFilter_
 
 Example of Usage
 ----------------

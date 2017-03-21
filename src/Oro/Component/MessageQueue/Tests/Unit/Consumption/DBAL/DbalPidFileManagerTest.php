@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\Dbal;
+namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL;
 
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Symfony\Component\Filesystem\Filesystem;
@@ -36,7 +36,7 @@ class DbalPidFileManagerTest extends \PHPUnit_Framework_TestCase
     {
         $processManager = new DbalPidFileManager($this->pidDir);
 
-        $this->setExpectedException(\LogicException::class, 'Pid file already exists');
+        $this->setExpectedException(\LogicException::class, 'The pid file already exists');
 
         $processManager->createPidFile('CONSUMER.ID');
         $processManager->createPidFile('CONSUMER.ID');

@@ -41,6 +41,10 @@ define(function(require) {
         },
 
         resizeEditor: function() {
+            if (this.$el.closest('[data-spy="scroll"]').length) {
+                // switch off resizer in case an editor is inside of scroll spy
+                return;
+            }
             this.getEditorView().setHeight(this.calcWysiwygHeight());
         },
 

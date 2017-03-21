@@ -62,6 +62,8 @@ class Criteria extends BaseCriteria
         switch ($operator) {
             case Comparison::LIKE:
                 return Query::OPERATOR_LIKE;
+            case Comparison::NOT_LIKE:
+                return Query::OPERATOR_NOT_LIKE;
             case Comparison::CONTAINS:
                 return Query::OPERATOR_CONTAINS;
             case Comparison::NOT_CONTAINS:

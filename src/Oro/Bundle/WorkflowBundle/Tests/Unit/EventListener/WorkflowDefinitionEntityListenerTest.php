@@ -140,6 +140,30 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException
+     * @expectedExceptionMessage Workflow 'workflow1' can't be removed due its System workflow
+     */
+    public function testPreRemoveSystemWorkflowException()
+    {
+        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $definitionMock */
+        $definitionMock = $this->createMock(WorkflowDefinition::class);
+        $definitionMock->expects($this->once())->method('isSystem')->willReturn(true);
+        $definitionMock->expects($this->once())->method('getName')->willReturn('workflow1');
+
+        $this->listener->preRemove($definitionMock);
+    }
+
+    public function testPreRemoveSystemWorkflow()
+    {
+        /** @var WorkflowDefinition|\PHPUnit_Framework_MockObject_MockObject $definitionMock */
+        $definitionMock = $this->createMock(WorkflowDefinition::class);
+        $definitionMock->expects($this->once())->method('isSystem')->willReturn(false);
+        $definitionMock->expects($this->never())->method('getName');
+
+        $this->listener->preRemove($definitionMock);
+    }
+
+    /**
      * @param string $name
      * @param array $groups
      * @return Workflow|\PHPUnit_Framework_MockObject_MockObject

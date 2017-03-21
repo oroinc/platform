@@ -2,18 +2,58 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Composer\Composer;
+use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 use Symfony\Component\Config\FileLocator;
 
 class TranslationPackagesProviderExtension implements TranslationPackagesProviderExtensionInterface
 {
-    const PACKAGE_NAME = 'Oro';
+    /** @var LocalRepositoryFactory */
+    protected $localRepositoryFactory;
+
+    /** @var Composer */
+    protected $composer;
+
+    /** @var array */
+    protected $packages = [];
+
+    /**
+     * @param LocalRepositoryFactory $localRepositoryFactory
+     * @param Composer $composer
+     */
+    public function __construct(LocalRepositoryFactory $localRepositoryFactory, Composer $composer)
+    {
+        $this->localRepositoryFactory = $localRepositoryFactory;
+        $this->composer = $composer;
+    }
+
+    /**
+     * @param $packageAlias
+     * @param string $packageName
+     * @param string $suffix
+     *
+     * @return $this
+     */
+    public function addPackage($packageAlias, $packageName, $suffix = '')
+    {
+        $this->packages[] = [$packageAlias, $packageName, $suffix];
+
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function getPackageNames()
     {
-        return [self::PACKAGE_NAME];
+        return array_unique(
+            array_map(
+                function (array $package) {
+                    return $package[0];
+                },
+                $this->packages
+            )
+        );
     }
 
     /**
@@ -21,6 +61,14 @@ class TranslationPackagesProviderExtension implements TranslationPackagesProvide
      */
     public function getPackagePaths()
     {
-        return new FileLocator(__DIR__ . '/../../../../');
+        $localRepository = $this->localRepositoryFactory->getLocalRepository();
+        $manager = $this->composer->getInstallationManager();
+
+        $paths = [];
+        foreach ($this->packages as $package) {
+            $paths[] = $manager->getInstallPath($localRepository->findPackage($package[1], '*')) . $package[2];
+        }
+
+        return new FileLocator($paths);
     }
 }

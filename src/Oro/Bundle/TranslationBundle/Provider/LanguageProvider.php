@@ -10,6 +10,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class LanguageProvider
 {
@@ -35,11 +36,13 @@ class LanguageProvider
     }
 
     /**
+     * @param bool $onlyEnabled
+     *
      * @return array
      */
-    public function getAvailableLanguages()
+    public function getAvailableLanguages($onlyEnabled = false)
     {
-        $codes = $this->repository->getAvailableLanguageCodes();
+        $codes = $this->repository->getAvailableLanguageCodes($onlyEnabled);
         $locales = Intl::getLocaleBundle()->getLocaleNames($this->localeSettings->getLanguage());
 
         return array_intersect_key($locales, array_flip($codes));
@@ -59,5 +62,23 @@ class LanguageProvider
     public function getAvailableLanguagesByCurrentUser()
     {
         return $this->repository->getAvailableLanguagesByCurrentUser($this->aclHelper);
+    }
+
+    /**
+     * @param bool $onlyEnabled
+     *
+     * @return array|Language[]
+     */
+    public function getLanguages($onlyEnabled = false)
+    {
+        return $this->repository->getLanguages($onlyEnabled);
+    }
+
+    /**
+     * @return null|object|Language
+     */
+    public function getDefaultLanguage()
+    {
+        return $this->repository->findOneBy(['code' => Translator::DEFAULT_LOCALE]);
     }
 }
