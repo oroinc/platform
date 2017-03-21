@@ -20,6 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
+use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Filter\SegmentFilter;
@@ -32,7 +33,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class SegmentFilterTest extends OrmTestCase
 {
@@ -145,11 +147,13 @@ class SegmentFilterTest extends OrmTestCase
         $segmentQueryBuilderRegistry->addQueryBuilder('static', $this->staticSegmentQueryBuilder);
         $segmentQueryBuilderRegistry->addQueryBuilder('dynamic', $this->dynamicSegmentQueryBuilder);
 
+        $segmentManager = new SegmentManager($this->em, $segmentQueryBuilderRegistry);
+
         $this->filter = new SegmentFilter(
             $this->formFactory,
             new FilterUtility(),
             $this->doctrine,
-            $segmentQueryBuilderRegistry,
+            $segmentManager,
             $this->entityNameProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider
@@ -443,7 +447,7 @@ class SegmentFilterTest extends OrmTestCase
             ->method('getQuery')
             ->willReturn($queryMock);
 
-        $queryMock->expects($this->once())
+        $queryBuilderMock->expects($this->once())
             ->method('getEntityManager')
             ->willReturn($em);
 

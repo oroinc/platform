@@ -438,4 +438,16 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
 
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isDynamic()
+    {
+        if ($this->getType()) {
+            return $this->getType()->getName() === SegmentType::TYPE_DYNAMIC;
+        }
+
+        return false;
+    }
 }

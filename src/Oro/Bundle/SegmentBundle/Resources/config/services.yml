@@ -27,6 +27,7 @@ services:
         class: %oro_segment.segment_manager.class%
         arguments:
             - '@doctrine.orm.entity_manager'
+            - '@oro_segment.query_builder_registry'
 
     oro_segment.segment_manager.api:
         class: %oro_segment.segment_manager.api.class%
@@ -63,7 +64,7 @@ services:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@doctrine'
-            - '@oro_segment.query_builder_registry'
+            - '@oro_segment.segment_manager'
             - '@oro_segment.entity_name_provider'
             - '@oro_entity_config.provider.entity'
             - '@oro_entity_config.provider.extend'
@@ -120,7 +121,6 @@ services:
     oro_segment.layout.data_provider.segment:
         class: Oro\Bundle\SegmentBundle\Layout\DataProvider\SegmentProvider
         arguments:
-            - '@oro_entity.doctrine_helper'
-            - '@oro_segment.query_builder_registry'
+            - '@oro_segment.segment_manager'
         tags:
             - { name: layout.data_provider, alias: segment }
