@@ -95,7 +95,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($formConfig) {
-            $formConfigId     = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
+            $formConfigId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
                 ->disableOriginalConstructor()
                 ->getMock();
             $formConfigObject = new Config($formConfigId, $formConfig);
