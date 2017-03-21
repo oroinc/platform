@@ -4,7 +4,8 @@
     {# Display contexts targets in the activity list item view #}
     {% if renderContexts is defined and renderContexts %}
     <div class="activity-context-activity-list">
-        {{ AC.activity_contexts(thread[0], target, true) }}
+        {% set checkTarget = target ? true : false %}
+        {{ AC.activity_contexts(thread|first, target, checkTarget) }}
     </div>
     {% endif %}
 

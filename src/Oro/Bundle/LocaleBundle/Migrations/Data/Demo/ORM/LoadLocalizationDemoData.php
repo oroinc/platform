@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -11,21 +12,23 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM\LoadLanguageDemoData;
 
-class LoadLocalizationDemoData extends AbstractFixture implements ContainerAwareInterface
+class LoadLocalizationDemoData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
      * @var array
      */
     protected $localizations = [
-        ['language' => 'en_US', 'formatting' => 'en_US', 'parent' => null],
-        ['language' => 'en_CA', 'formatting' => 'en_CA', 'parent' => 'en_US'],
-        ['language' => 'en_GB', 'formatting' => 'en_GB', 'parent' => 'en_US'],
-        ['language' => 'en_AU', 'formatting' => 'en_AU', 'parent' => 'en_US'],
-        ['language' => 'es_MX', 'formatting' => 'es_MX', 'parent' => 'en_US'],
-        ['language' => 'fr_CA', 'formatting' => 'fr_CA', 'parent' => 'en_CA'],
-        ['language' => 'fr', 'formatting' => 'fr_FR', 'parent' => 'fr_CA'],
-        ['language' => 'de', 'formatting' => 'de_DE', 'parent' => 'en_US'],
+        ['language' => LoadLanguageDemoData::LANG_EN_US, 'formatting' => 'en_US', 'parent' => null],
+        ['language' => LoadLanguageDemoData::LANG_EN_CA, 'formatting' => 'en_CA', 'parent' => 'en_US'],
+        ['language' => LoadLanguageDemoData::LANG_EN_GB, 'formatting' => 'en_GB', 'parent' => 'en_US'],
+        ['language' => LoadLanguageDemoData::LANG_EN_AU, 'formatting' => 'en_AU', 'parent' => 'en_US'],
+        ['language' => LoadLanguageDemoData::LANG_ES_AR, 'formatting' => 'es_AR', 'parent' => 'en_US'],
+        ['language' => LoadLanguageDemoData::LANG_FR_CA, 'formatting' => 'fr_CA', 'parent' => 'en_CA'],
+        ['language' => LoadLanguageDemoData::LANG_FR_FR, 'formatting' => 'fr_FR', 'parent' => 'fr_CA'],
+        ['language' => LoadLanguageDemoData::LANG_DE_DE, 'formatting' => 'de_DE', 'parent' => 'en_US'],
     ];
 
     /**
@@ -54,7 +57,8 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         $repository = $manager->getRepository('OroLocaleBundle:Localization');
 
         foreach ($this->localizations as $item) {
-            $code = $item['language'];
+            /** @var Language $language */
+            $language = $this->getReference($item['language']);
             $name = Intl::getLocaleBundle()->getLocaleName($item['formatting'], $localeCode);
 
             $localization = $repository->findOneBy(['name' => $name]);
@@ -62,7 +66,7 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
             if (!$localization) {
                 $localization = new Localization();
                 $localization
-                    ->setLanguageCode($item['language'])
+                    ->setLanguage($language)
                     ->setFormattingCode($item['formatting'])
                     ->setName($name)
                     ->setDefaultTitle($name);
@@ -78,11 +82,19 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
                 $manager->persist($localization);
             }
 
-            $registry[$code] = $localization;
+            $registry[$language->getCode()] = $localization;
 
-            $this->addReference('localization_' . $code, $localization);
+            $this->addReference('localization_' . $language->getCode(), $localization);
         }
 
         $manager->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [LoadLanguageDemoData::class];
     }
 }

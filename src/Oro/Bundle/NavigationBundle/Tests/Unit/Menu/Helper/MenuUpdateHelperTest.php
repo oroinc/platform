@@ -10,9 +10,13 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
 {
+    use EntityTrait;
+
     /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
@@ -47,10 +51,10 @@ class MenuUpdateHelperTest extends \PHPUnit_Framework_TestCase
             ]));
 
         $enLocalization = new Localization();
-        $enLocalization->setLanguageCode('en');
+        $enLocalization->setLanguage($this->getEntity(Language::class, ['code' => 'en']));
 
         $deLocalization = new Localization();
-        $deLocalization->setLanguageCode('de');
+        $deLocalization->setLanguage($this->getEntity(Language::class, ['code' => 'de']));
 
         $this->localizationHelper
             ->expects($this->once())

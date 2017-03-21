@@ -1,6 +1,6 @@
-{% set originalValue = record.getValue('key')|trans({}, record.getValue('domain'), 'en') %}
-{% if originalValue is empty %}
-    <span class="empty-string-value">Empty</span>
+{% set originalValue = record.getValue('englishValue') %}
+{% if originalValue is null %}
+    <span class="no-english-translation">{{ 'N/A'|trans }}</span>
 {% else %}
     {{ originalValue }}
 {% endif %}

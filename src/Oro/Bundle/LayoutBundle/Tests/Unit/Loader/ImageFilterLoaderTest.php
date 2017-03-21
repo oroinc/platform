@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Loader;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
@@ -15,6 +16,7 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
     const PRODUCT_ORIGINAL = 'product_original';
     const PRODUCT_LARGE = 'product_large';
     const PRODUCT_SMALL = 'product_small';
+    const PRODUCT_GALLERY_MAIN = 'product_gallery_main';
     const LARGE_SIZE = 378;
     const SMALL_SIZE = 56;
 
@@ -38,7 +40,7 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
      */
     protected $doctrineHelper;
 
-    public function __construct()
+    public function setUp()
     {
         $this->imageTypeProvider = $this->prophesize(ImageTypeProvider::class);
         $this->filterConfig = $this->prophesize(FilterConfiguration::class);
@@ -56,20 +58,30 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
         $productOriginal = new ThemeImageTypeDimension(self::PRODUCT_ORIGINAL, null, null);
         $productLarge = new ThemeImageTypeDimension(self::PRODUCT_LARGE, self::LARGE_SIZE, self::LARGE_SIZE);
         $productSmall = new ThemeImageTypeDimension(self::PRODUCT_SMALL, self::SMALL_SIZE, self::SMALL_SIZE);
+        $productGalleryMain = new ThemeImageTypeDimension(
+            self::PRODUCT_GALLERY_MAIN,
+            self::SMALL_SIZE,
+            Configuration::AUTO
+        );
 
         $this->imageTypeProvider->getImageTypes()->willReturn([
-            $this->prepareImageType([$productOriginal, $productLarge, $productSmall]),
+            $this->prepareImageType([$productOriginal, $productLarge, $productSmall, $productGalleryMain]),
             $this->prepareImageType([$productLarge, $productSmall]),
             $this->prepareImageType([$productOriginal, $productLarge, $productSmall])
         ]);
 
-        $this->filterConfig->set(self::PRODUCT_ORIGINAL, $this->prepareFilterData())->shouldBeCalledTimes(1);
+        $this->filterConfig->set(self::PRODUCT_ORIGINAL, $this->prepareBaseFilterData())->shouldBeCalledTimes(1);
         $this->filterConfig
-            ->set(self::PRODUCT_LARGE, $this->prepareFilterData(self::LARGE_SIZE, self::LARGE_SIZE))
+            ->set(self::PRODUCT_LARGE, $this->prepareFilterDataForResize(self::LARGE_SIZE, self::LARGE_SIZE))
             ->shouldBeCalledTimes(1);
         $this->filterConfig
-            ->set(self::PRODUCT_SMALL, $this->prepareFilterData(self::SMALL_SIZE, self::SMALL_SIZE))
+            ->set(self::PRODUCT_SMALL, $this->prepareFilterDataForResize(self::SMALL_SIZE, self::SMALL_SIZE))
             ->shouldBeCalledTimes(1);
+        $this->filterConfig
+            ->set(self::PRODUCT_GALLERY_MAIN, $this->prepareFilterDataForResizeWithAuto(
+                self::SMALL_SIZE,
+                Configuration::AUTO
+            ))->shouldBeCalledTimes(1);
 
         $this->imageFilterLoader->load();
     }
@@ -84,38 +96,56 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param int|null $width
-     * @param int|null $height
+     * @param int $width
+     * @param int $height
      * @return array
      */
-    private function prepareFilterData($width = null, $height = null)
+    private function prepareFilterDataForResize($width, $height)
     {
-        $filterData = [
+        $resizeFiltersData = [
+            'thumbnail' => [
+                'size' => [$width, $height],
+                'mode' => ImageFilterLoader::RESIZE_MODE,
+                'allow_upscale' => true
+            ],
+            'background' => [
+                'size' => [$width, $height],
+                'color' => ImageFilterLoader::BACKGROUND_COLOR
+            ]
+        ];
+
+        return array_merge_recursive($this->prepareBaseFilterData(), ['filters' => $resizeFiltersData]);
+    }
+
+    /**
+     * @param mixed $width
+     * @param mixed $height
+     * @return array
+     */
+    private function prepareFilterDataForResizeWithAuto($width, $height)
+    {
+        $resizeFiltersData = [
+            'scale' => [
+                'dim' => [
+                    Configuration::AUTO === $width ? null : $width,
+                    Configuration::AUTO === $height? null : $height
+                ]
+            ]
+        ];
+
+        return array_merge_recursive($this->prepareBaseFilterData(), ['filters' => $resizeFiltersData]);
+    }
+
+    /**
+     * @return array
+     */
+    private function prepareBaseFilterData()
+    {
+        return [
             'quality' => ImageFilterLoader::IMAGE_QUALITY,
             'filters' => [
                 'strip' => []
             ]
         ];
-
-        if ($width && $height) {
-            $filterData = array_merge_recursive(
-                $filterData,
-                [
-                    'filters' => [
-                        'thumbnail' => [
-                            'size' => [$width, $height],
-                            'mode' => ImageFilterLoader::RESIZE_MODE,
-                            'allow_upscale' => true
-                        ],
-                        'background' => [
-                            'size' => [$width, $height],
-                            'color' => ImageFilterLoader::BACKGROUND_COLOR
-                        ]
-                    ]
-                ]
-            );
-        }
-
-        return $filterData;
     }
 }

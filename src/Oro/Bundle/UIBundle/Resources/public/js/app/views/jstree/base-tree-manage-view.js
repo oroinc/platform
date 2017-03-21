@@ -87,12 +87,15 @@ define(function(require) {
         /**
          * Triggers after switching selectSubTree
          *
+         * @param {Object} event
          * @param {Object} data
          */
-        onSelectSubtreeChange: function(data) {
-            this.jsTreeInstance.settings.checkbox.cascade = data.selectSubTree ?
+        onSelectSubtreeChange: function(event, data) {
+            this.jsTreeConfig.checkbox.cascade = data.selectSubTree ?
                 'up+down+undetermined' :
                 'undetermined';
+
+            this.render();
         },
 
         /**

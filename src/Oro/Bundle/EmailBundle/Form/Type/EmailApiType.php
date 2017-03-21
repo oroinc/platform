@@ -141,8 +141,6 @@ class EmailApiType extends AbstractType
             [
                 'data_class'           => 'Oro\Bundle\EmailBundle\Form\Model\EmailApi',
                 'intention'            => 'email',
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'   => true,
                 'csrf_protection'      => false
             ]
         );

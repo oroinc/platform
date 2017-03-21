@@ -35,22 +35,10 @@ datagrids:
                 type:    url
                 route:   oro_integration_update
                 params:  [ id ]
-            delete_link:
-                type:    url
-                route:   oro_api_delete_integration
-                params:  [ id ]
             schedule_link:
                 type:    url
                 route:   oro_integration_schedule
                 params:  [ id ]
-            activate_link:
-                type:       url
-                route:      oro_api_activate_integration
-                params:     [ id ]
-            deactivate_link:
-                type:       url
-                route:      oro_api_deactivate_integration
-                params:     [ id ]
         sorters:
             columns:
                 name:    { data_name: c.name }
@@ -83,38 +71,17 @@ datagrids:
                 icon:         pencil-square-o
                 label:        oro.grid.action.update
                 rowAction:    true
+                order:        10
             schedule:
                 type:         schedule-sync
                 link:         schedule_link
                 acl_resource: oro_integration_update
                 icon:         refresh
                 label:        oro.integration.datagrid.action.schedule_sync
-            activate:
-                type:         ajax
-                acl_resource: oro_integration_update
-                label:        oro.integration.datagrid.action.activate
-                icon:         check
-                link:         activate_link
-            deactivate:
-                type:         ajax
-                acl_resource: oro_integration_update
-                label:        oro.integration.datagrid.action.deactivate
-                icon:         close
-                link:         deactivate_link
-            delete:
-                type:         delete
-                link:         delete_link
-                acl_resource: oro_integration_delete
-                icon:         trash-o
-                label:        oro.grid.action.delete
-                defaultMessages:
-                    confirm_content: oro.integration.delete_sync_integration_window.content
-                    confirm_ok:      oro.integration.delete_sync_integration_window.button_ok
-                    confirm_title:   oro.integration.delete_sync_integration_window.title
-                    success:         oro.integration.delete_sync_integration_window.success
+                order:        30
         action_configuration: ['@oro_integration.datagrid.action_configuration', 'getIsSyncAvailableCondition']
         options:
-            entityHint: channel
+            entityHint: channels
             entity_pagination: true
             mass_actions:
                 delete:

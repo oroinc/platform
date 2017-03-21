@@ -13,7 +13,7 @@ class PermissionContext extends OroFeatureContext implements KernelAwareContext
 
     //@codingStandardsIgnoreStart
     /**
-     * @Given /^restricted (?P<permission>[\w\_]*) permission for entity (?P<entity>[\w\\]*) and group (?P<group>[\w\_]*)$/
+     * @Given /^permission (?P<permission>[\w\_]*) for entity (?P<entity>[\w\\]*) and group (?P<group>[\w\_]*) restricts in application$/
      *
      * @param string $permission
      * @param string $entity
@@ -26,7 +26,7 @@ class PermissionContext extends OroFeatureContext implements KernelAwareContext
     }
 
     /**
-     * @Given /^restricted all permissions for entity (?P<entity>[\w\\]*) and group (?P<group>[\w\_]*)$/
+     * @Given /^all permissions for entity (?P<entity>[\w\\]*) and group (?P<group>[\w\_]*) restricts in application$/
      *
      * @param string $entity
      * @param string $group
@@ -37,7 +37,7 @@ class PermissionContext extends OroFeatureContext implements KernelAwareContext
     }
 
     /**
-     * @Given /^restricted (?P<capability>[\w\_]*) capability and group (?P<group>[\w\_]*)$/
+     * @Given /^capability (?P<capability>[\w\_]*) and group (?P<group>[\w\_]*) restricts in application$/
      *
      * @param string $capability
      * @param string $group

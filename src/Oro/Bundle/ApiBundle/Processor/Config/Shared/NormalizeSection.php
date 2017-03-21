@@ -53,18 +53,34 @@ abstract class NormalizeSection implements ProcessorInterface
     ) {
         $fields = $section->getFields();
         $toRemoveFieldNames = [];
+        $toAddFields = [];
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
                 $toRemoveFieldNames[] = $fieldName;
-            } elseif (!$field->hasPropertyPath() && $definition->hasField($fieldName)) {
-                $propertyPath = $definition->getField($fieldName)->getPropertyPath();
-                if ($propertyPath) {
-                    $field->setPropertyPath($propertyPath);
+            } elseif (!$field->hasPropertyPath()) {
+                if ($definition->hasField($fieldName)) {
+                    $propertyPath = $definition->getField($fieldName)->getPropertyPath();
+                    if ($propertyPath) {
+                        $field->setPropertyPath($propertyPath);
+                    }
+                } else {
+                    $definitionFieldName = $definition->findFieldNameByPropertyPath($fieldName);
+                    if (in_array($definitionFieldName, $definition->getIdentifierFieldNames(), true)) {
+                        $propertyPath = $definition->getField($definitionFieldName)->getPropertyPath();
+                        if ($propertyPath) {
+                            $field->setPropertyPath($propertyPath);
+                            $toRemoveFieldNames[] = $fieldName;
+                            $toAddFields[$definitionFieldName] = $field;
+                        }
+                    }
                 }
             }
         }
         foreach ($toRemoveFieldNames as $fieldName) {
             $section->removeField($fieldName);
+        }
+        foreach ($toAddFields as $fieldName => $field) {
+            $section->addField($fieldName, $field);
         }
     }
 

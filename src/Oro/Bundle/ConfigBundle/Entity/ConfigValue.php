@@ -135,7 +135,7 @@ class ConfigValue
     /**
      * Get config
      *
-     * @return string
+     * @return Config
      */
     public function getConfig()
     {
