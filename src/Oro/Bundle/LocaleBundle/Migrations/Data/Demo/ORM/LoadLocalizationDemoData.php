@@ -25,10 +25,10 @@ class LoadLocalizationDemoData extends AbstractFixture implements ContainerAware
         ['language' => LoadLanguageDemoData::LANG_EN_CA, 'formatting' => 'en_CA', 'parent' => 'en_US'],
         ['language' => LoadLanguageDemoData::LANG_EN_GB, 'formatting' => 'en_GB', 'parent' => 'en_US'],
         ['language' => LoadLanguageDemoData::LANG_EN_AU, 'formatting' => 'en_AU', 'parent' => 'en_US'],
-        ['language' => LoadLanguageDemoData::LANG_ES_MX, 'formatting' => 'es_MX', 'parent' => 'en_US'],
+        ['language' => LoadLanguageDemoData::LANG_ES_AR, 'formatting' => 'es_AR', 'parent' => 'en_US'],
         ['language' => LoadLanguageDemoData::LANG_FR_CA, 'formatting' => 'fr_CA', 'parent' => 'en_CA'],
-        ['language' => LoadLanguageDemoData::LANG_FR, 'formatting' => 'fr_FR', 'parent' => 'fr_CA'],
-        ['language' => LoadLanguageDemoData::LANG_DE, 'formatting' => 'de_DE', 'parent' => 'en_US'],
+        ['language' => LoadLanguageDemoData::LANG_FR_FR, 'formatting' => 'fr_FR', 'parent' => 'fr_CA'],
+        ['language' => LoadLanguageDemoData::LANG_DE_DE, 'formatting' => 'de_DE', 'parent' => 'en_US'],
     ];
 
     /**

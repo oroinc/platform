@@ -257,9 +257,9 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->at(1))->method('getOption')
             ->with('entityName')
             ->will($this->returnValue($entityName));
+        $context->expects($this->at(3))->method('getOption')->with('ids', [])->will($this->returnValue([]));
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
-
         $this->assertAttributeInstanceOf(
             'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
             'sourceIterator',

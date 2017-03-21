@@ -13,13 +13,13 @@ level:
     V011: MAJOR # Class protected method parameter added
     V012: MAJOR # *New public constructor (does not match supertype)*
     V013: MAJOR # *New protected constructor (does not match supertype)*
-    V014: MINOR # Class added
-    V015: MAJOR # Class public method added
-    V016: MAJOR # Class protected method added
+    V014: PATCH # Class added
+    V015: PATCH # Class public method added
+    V016: PATCH # Class protected method added
     V017: MINOR # *Final class public method added*
     V018: MINOR # *Final class protected method added*
-    V019: MAJOR # Class public property added
-    V020: MAJOR # Class protected property added
+    V019: PATCH # Class public property added
+    V020: PATCH # Class protected property added
     V021: MINOR # *Final class protected method parameter added*
     V022: PATCH # *Final class protected method removed*
     V023: PATCH # [Final] Class public class method implementation changed

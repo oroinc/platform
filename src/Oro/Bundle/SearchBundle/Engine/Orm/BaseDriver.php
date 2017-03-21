@@ -291,7 +291,7 @@ abstract class BaseDriver implements DBALPersisterInterface
             $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . $joinAlias . '.value NOT LIKE :value' . $index;
+        return sprintf('%s LOWER(%s.value) NOT LIKE LOWER(:value%s)', $stringQuery, $joinAlias, $index);
     }
 
     /**
