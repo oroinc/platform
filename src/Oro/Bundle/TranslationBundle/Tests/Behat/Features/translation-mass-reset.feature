@@ -12,4 +12,42 @@ Feature: Mass reset translations
     And I should see that Translated Value in 1 row is empty
     And I should see that Translated Value in 2 row is empty
     And I should see that Translated Value in 3 row is not empty
-    And I click Logout in user menu
+
+  Scenario: Reset translations except several
+   Given I go to System/Localization/Translations
+    And I hide all columns in grid except Translated Value, Key
+    When I check All Visible records in grid
+    And I uncheck first 4 records in grid
+    And I click "Reset Translation" link from mass action dropdown
+    Then I should see "Reset Confirmation"
+    When I click "Reset" in modal window
+    Then I should see "Selected translations were reset to their original values." flash message
+    And I should see that Translated Value in 3 row is not empty
+    And I should see that Translated Value in 4 row is not empty
+    And I should see that Translated Value in 5 row is empty
+
+  Scenario: Reset all translations in filters
+    Given I go to System/Localization/Translations
+    And I hide all columns in grid except Translated Value, Key
+    And I check "messages" in "Domain: All" filter strictly
+    And I check "Yes" in "Translated: All" filter strictly
+    When I check all records in grid
+    And I click "Reset Translation" link from mass action dropdown
+    Then I should see "Reset Confirmation"
+    When I click "Reset" in modal window
+    Then I have to wait for ajax up to "300" seconds
+    And I should see "Selected translations were reset to their original values." flash message
+    And there is zero records in grid
+    When I reset Domain filter
+    Then the number of records greater than or equal to 1
+
+  Scenario: Reset all translations
+    Given I go to System/Localization/Translations
+    And I hide all columns in grid except Translated Value, Key
+    When I check all records in grid
+    And I click "Reset Translation" link from mass action dropdown
+    Then I should see "Reset Confirmation"
+    When I click "Reset" in modal window
+    Then I have to wait for ajax up to "300" seconds
+    And I should see "Selected translations were reset to their original values." flash message
+    And there is zero records in grid

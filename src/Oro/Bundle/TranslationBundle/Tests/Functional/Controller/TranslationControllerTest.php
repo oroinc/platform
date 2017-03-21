@@ -72,9 +72,10 @@ class TranslationControllerTest extends WebTestCase
     public function testMassReset()
     {
         $ids = [
-            $this->getReference(LoadTranslations::TRANSLATION_KEY_1)->getId(),
-            $this->getReference(LoadTranslations::TRANSLATION_KEY_2)->getId(),
+            $this->getReference(LoadTranslations::TRANSLATION1)->getId(),
+            $this->getReference(LoadTranslations::TRANSLATION2)->getId(),
         ];
+
         $this->client->request('GET', $this->getUrl('oro_translation_mass_reset', [
             'gridName' => self::DATAGRID_NAME,
             'actionName' => self::RESET_ACTION_NAME,
@@ -88,10 +89,12 @@ class TranslationControllerTest extends WebTestCase
         $this->assertArrayHasKey('count', $result);
         $this->assertEquals(2, $result['count']);
 
+
         /** @var TranslationRepository $repo */
         $repo = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(Translation::class);
-        $this->assertEmpty($repo->findBy(['id' => $ids]));
-        $this->assertNotEmpty($repo->findOneBy([]));
+
+        $translations = $repo->findBy(['id' => $ids]);
+        $this->assertEmpty($translations);
     }
 
     public function testMassResetError()

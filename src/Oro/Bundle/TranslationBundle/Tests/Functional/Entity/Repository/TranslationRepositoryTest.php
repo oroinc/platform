@@ -199,21 +199,15 @@ class TranslationRepositoryTest extends WebTestCase
         foreach ($expectedTranslations as $translationRef) {
             /** @var Translation $translation */
             $translation = $this->getReference($translationRef);
-            $result[$translation->getTranslationKey()->getId()] = [
-                'translation_key_id' => $translation->getTranslationKey()->getId(),
+            $id = $translation->getTranslationKey()->getId();
+            $result[$id] = [
+                'translation_key_id' => $id,
                 'scope' => $translation->getScope(),
                 'value' => $translation->getValue(),
             ];
         }
 
         $this->assertEquals($result, $this->repository->getTranslationsData($language->getId()));
-    }
-
-    public function testDeleteAll()
-    {
-        $this->assertNotEmpty($this->repository->findOneBy([]));
-        $this->repository->deleteAll();
-        $this->assertEmpty($this->repository->findAll());
     }
 
     /**

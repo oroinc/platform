@@ -18,7 +18,8 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
@@ -36,6 +37,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iDonTSelectAnyRecordFromGrid()
     {
+        // No need to do anything
     }
 
     /**
@@ -58,7 +60,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^there (are|is) (?P<number>(?:|one|two|\d+)) record(?:|s) in grid$/
+     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number)
     {
@@ -721,7 +723,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iShowColumnInGrid($columnName)
     {
         $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
         $columnManager->checkColumnVisibility($columnName);
+        $columnManager->close();
     }
 
     /**
@@ -734,7 +738,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iHideColumnInGrid($columnName)
     {
         $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
         $columnManager->uncheckColumnVisibility($columnName);
+        $columnManager->close();
     }
 
     /**
@@ -750,7 +756,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $exceptions = array_filter($exceptions);
 
         $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
         $columnManager->hideAllColumns($exceptions);
+        $columnManager->close();
     }
 
     /**

@@ -69,6 +69,21 @@ class GridColumnManager extends Element
         }
     }
 
+    public function open()
+    {
+        $this->ensureManagerVisible();
+    }
+
+    public function close()
+    {
+        if (!$this->isVisible()) {
+            return;
+        }
+
+        $close = $this->find('css', 'span.close');
+        $close->click();
+    }
+
     /**
      * @return Table
      */

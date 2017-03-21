@@ -122,53 +122,6 @@ class TranslationManager
     }
 
     /**
-     * Resets translations to its default values
-     *
-     * @param int|int[] $ids Id or array of ids of translations to reset
-     * @return int Affected translations count
-     */
-    public function resetTranslations($ids)
-    {
-        if (!is_array($ids)) {
-            $ids = [$ids];
-        }
-
-        /** @var TranslationRepository $repo */
-        $repo = $this->getEntityRepository(Translation::class);
-
-        /** @var Translation[] $translations */
-        $translations = $repo->findBy(['id' => $ids]);
-        foreach ($translations as $translation) {
-            $translation->setValue(null);
-            $cacheKey = $this->getCacheKey(
-                $translation->getLanguage()->getCode(),
-                $translation->getTranslationKey()->getDomain(),
-                $translation->getTranslationKey()->getKey()
-            );
-            $this->translations[$cacheKey] = $translation;
-        }
-
-        return count($translations);
-    }
-
-    /**
-     * Resets all translations to its default values
-     *
-     * @return int Affected translations count
-     */
-    public function resetAllTranslations()
-    {
-        /** @var TranslationRepository $repo */
-        $this->translations = [];
-        $this->domainProvider->clearCache();
-
-        $repo = $this->getEntityRepository(Translation::class);
-        $repo->clear();
-
-        return $repo->deleteAll();
-    }
-
-    /**
      * Tries to find Translation key and if not found creates new one
      *
      * @param string $key

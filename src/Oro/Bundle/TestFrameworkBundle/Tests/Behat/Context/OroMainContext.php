@@ -557,6 +557,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Wait for ajax
+     *
+     * @Then /^(?:|I )have to wait for ajax$/
+     * @Then /^(?:|I )have to wait for ajax up to "(?P<timeInSec>(?:[^"]|\\")*)" seconds$/
+     */
+    public function iHaveToWaitForAjax($timeInSec = 60)
+    {
+        $timeInMs = $timeInSec * 1000;
+        $this->waitForAjax($timeInMs);
+    }
+
+    /**
      * Navigate through menu navigation
      * Every menu link must be separated by slash symbol "/"
      * Example: Given I go to System/ Channels

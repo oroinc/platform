@@ -136,13 +136,4 @@ class TranslationRepository extends EntityRepository
 
         return $translations;
     }
-
-    /**
-     * Deletes all translations
-     * @return int Affected rows count
-     */
-    public function deleteAll()
-    {
-        return $this->createQueryBuilder('t')->delete()->getQuery()->execute();
-    }
 }

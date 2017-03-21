@@ -88,7 +88,7 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     MassActionHeadCheckbox:
-      selector: 'div.grid-container th.grid-header-cell-massAction div.btn-group .btn'
+      selector: 'div.grid-container th.grid-header-cell-massAction div.btn-group .btn i'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     PageSize:
