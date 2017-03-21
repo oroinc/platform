@@ -43,4 +43,17 @@ class ConfigValueRepositoryTest extends WebTestCase
 
         $this->assertEmpty($configValues);
     }
+
+    public function testGetConfigValues()
+    {
+        /** @var ConfigValue $configValue */
+        $configValue = $this->repository->findOneBy(['section' => 'additional']);
+        $result = $this->repository->getConfigValues(
+            $configValue->getConfig()->getScopedEntity(),
+            $configValue->getSection(),
+            $configValue->getName()
+        );
+
+        $this->assertEquals([$configValue], $result);
+    }
 }
