@@ -100,8 +100,10 @@ class DbalPidFileManager
 
     private function ensurePidDirExists()
     {
-        $this->filesystem->mkdir($this->pidDir, 0777, true);
-        $this->filesystem->chmod($this->pidDir, 0777);
+        if (!is_dir($this->pidDir)) {
+            $this->filesystem->mkdir($this->pidDir, 0777, true);
+            $this->filesystem->chmod($this->pidDir, 0777);
+        }
     }
 
     /**
