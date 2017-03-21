@@ -800,7 +800,13 @@ filters such as `contains` when generating routes
         - third parameter is instance of `TranslationStatisticProvider`
         - fourth parameter is instance of `TranslatorInterface`
    - Changed parent from type from `locale` to `oro_choice`
-
+- Class `Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension`
+    - removed constant `PACKAGE_NAME`
+    - added constructor
+    - added method `public function addPackage(string $packageAlias, string $packageName, string $suffix = '')`
+- Updated service definition for `oro_translation.extension.transtation_packages_provider`
+    - changed publicity to `false`
+    
 UIBundle
 --------
 - Removed the following parameters from DIC:
