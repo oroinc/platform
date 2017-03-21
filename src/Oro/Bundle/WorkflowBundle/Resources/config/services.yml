@@ -121,6 +121,11 @@ services:
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
+    oro_workflow.provider.namespace_migration:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\NamespaceMigrationProvider'
+        tags:
+          - {name: oro_installer.namespace_migration_provider, priority: 20}
+
     oro_workflow.handler.transition_helper:
         class: 'Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper'
         arguments:

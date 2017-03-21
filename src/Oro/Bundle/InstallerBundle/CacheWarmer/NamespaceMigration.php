@@ -74,6 +74,8 @@ class NamespaceMigration
             $this->updateEntityConfigTable($configConnection, $from, $to);
             $this->updateEntityConfigFieldTables($configConnection, $from, $to);
 
+            $this->updateWorkflowDefinitionTable($configConnection, $from, $to);
+
             $defaultConnection->commit();
             $configConnection->commit();
             $searchConnection->commit();
@@ -82,6 +84,29 @@ class NamespaceMigration
             $configConnection->rollBack();
             $searchConnection->rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * @param Connection $configConnection
+     * @param string $from
+     * @param string $to
+     */
+    protected function updateWorkflowDefinitionTable(Connection $configConnection, $from, $to)
+    {
+        $entities = $configConnection->fetchAll('SELECT name, configuration FROM oro_workflow_definition');
+        foreach ($entities as $entity) {
+            $name = $entity['name'];
+            $originalData = $entity['configuration'];
+            $originalData = $originalData ? $configConnection->convertToPHPValue($originalData, Type::TARRAY) : [];
+
+            $data = $this->replaceArrayValue($originalData, $from, $to);
+
+            $data = $configConnection->convertToDatabaseValue($data, Type::TARRAY);
+
+            $sql = 'UPDATE oro_workflow_definition SET configuration = ? WHERE name = ?';
+            $parameters = [$data, $name];
+            $configConnection->executeUpdate($sql, $parameters);
         }
     }
 
