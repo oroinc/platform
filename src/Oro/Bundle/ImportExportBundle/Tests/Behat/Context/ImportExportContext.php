@@ -143,21 +143,30 @@ class ImportExportContext extends OroFeatureContext implements KernelAwareContex
 
         static::assertTrue($jobResult->isSuccessful());
 
-        $handler = fopen($filePath, 'rb');
+        try {
+            $handler = fopen($filePath, 'rb');
+            $headers = fgetcsv($handler, 1000, ',');
+            $expectedHeaders = $expectedEntities->getRow(0);
 
-        $i = 0;
-        while (($data = fgetcsv($handler, 1000, ',')) !== false) {
-            $entityData = $expectedEntities->getRow($i);
-
-            foreach ($entityData as $value) {
-                static::assertContains($value, $data);
+            foreach ($expectedHeaders as $key => $expectedHeader) {
+                static::assertEquals($expectedHeader, $headers[$key]);
             }
 
-            $i++;
-        }
+            $i = 1;
+            while (($data = fgetcsv($handler, 1000, ',')) !== false) {
+                $expectedEntityData = array_combine($headers, array_values($expectedEntities->getRow($i)));
+                $entityDataFromCsv = array_combine($headers, array_values($data));
 
-        fclose($handler);
-        unlink($filePath);
+                foreach ($expectedEntityData as $property => $value) {
+                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                }
+
+                $i++;
+            }
+        } finally {
+            fclose($handler);
+            unlink($filePath);
+        }
 
         static::assertCount($i, $expectedEntities->getRows());
     }
