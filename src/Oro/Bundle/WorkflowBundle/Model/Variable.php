@@ -206,13 +206,12 @@ class Variable implements EntityParameterInterface
      * Get option by key.
      *
      * @param string $key
-     * @param mixed  $default
      *
      * @return mixed|null
      */
-    public function getOption($key, $default = null)
+    public function getOption($key)
     {
-        return $this->hasOption($key) ? $this->options[$key] : $default;
+        return $this->hasOption($key) ? $this->options[$key] : null;
     }
 
     /**
