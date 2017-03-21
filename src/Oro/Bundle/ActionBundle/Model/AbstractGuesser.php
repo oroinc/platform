@@ -174,4 +174,118 @@ abstract class AbstractGuesser
 
         return $entityManager->getClassMetadata($class);
     }
+
+    /**
+     * @param string                       $rootClass
+     * @param string|PropertyPathInterface $propertyPath
+     *
+     * @return array|null
+     */
+    public function guessParameters($rootClass, $propertyPath)
+    {
+        $metadataParameters = $this->guessMetadataAndField($rootClass, $propertyPath);
+        if (!$metadataParameters) {
+            return null;
+        }
+
+        /** @var ClassMetadata $metadata */
+        $metadata = $metadataParameters['metadata'];
+        $field = $metadataParameters['field'];
+
+        $scalarParameters = $this->guessParametersScalarField($metadata, $field);
+        if ($scalarParameters !== false) {
+            return $scalarParameters;
+        }
+
+        if ($metadata->hasAssociation($field)) {
+            $multiple = $metadata->isCollectionValuedAssociation($field);
+            $type = $multiple
+                ? 'object'
+                : 'entity';
+            $class = $multiple
+                ? 'Doctrine\Common\Collections\ArrayCollection'
+                : $metadata->getAssociationTargetClass($field);
+
+            return $this->formatResult(
+                $this->getLabel($metadata->getName(), $field, $multiple),
+                $type,
+                ['class' => $class]
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Return "false" if can't find config for field, "null" if field type is unknown for given field
+     * or array with config data for given field
+     *
+     * @param ClassMetadata $metadata
+     * @param               $field
+     *
+     * @return array|bool
+     */
+    protected function guessParametersScalarField(ClassMetadata $metadata, $field)
+    {
+        $typeMappings = $this->getRegisteredTypeMappings();
+
+        if ($metadata->hasField($field)) {
+            $doctrineType = $metadata->getTypeOfField($field);
+            if (!isset($typeMappings[$doctrineType])) {
+                return null;
+            }
+
+            return $this->formatResult(
+                $this->getLabel($metadata->getName(), $field),
+                $typeMappings[$doctrineType]['type'],
+                $typeMappings[$doctrineType]['options']
+            );
+        } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)) {
+            $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
+            $fieldType = $entityConfig->getId()->getFieldType();
+            if (!$metadata->hasAssociation($field)) {
+                return $this->formatResult(
+                    $entityConfig->get('label'),
+                    $typeMappings[$fieldType]['type'],
+                    $typeMappings[$fieldType]['options']
+                );
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRegisteredTypeMappings()
+    {
+        if ($this->doctrineTypeMappingProvider !== null) {
+            return array_merge(
+                $this->doctrineTypeMapping,
+                $this->doctrineTypeMappingProvider->getDoctrineTypeMappings()
+            );
+        }
+
+        return $this->doctrineTypeMapping;
+    }
+
+    /**
+     * @param string $class
+     * @param string $field
+     * @param bool   $multiple
+     *
+     * @return string|null
+     */
+    protected function getLabel($class, $field, $multiple = false)
+    {
+        if (!$this->entityConfigProvider->hasConfig($class, $field)) {
+            return null;
+        }
+
+        $entityConfig = $this->entityConfigProvider->getConfig($class, $field);
+        $labelOption = $multiple ? 'plural_label' : 'label';
+
+        return $entityConfig->get($labelOption);
+    }
 }

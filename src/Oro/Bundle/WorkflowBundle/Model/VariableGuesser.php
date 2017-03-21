@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\ActionBundle\Model\AbstractGuesser;
@@ -101,46 +98,5 @@ class VariableGuesser extends AbstractGuesser
         $formOptions = $this->setVariableFormOptions($variable, $formOptions);
 
         return [$formType, $formOptions];
-    }
-
-    /**
-     * @param string $rootClass
-     * @param string|PropertyPathInterface $propertyPath
-     *
-     * @return array|null
-     */
-    public function guessVariableParameters($rootClass, $propertyPath)
-    {
-        $metadataParameters = $this->guessMetadataAndField($rootClass, $propertyPath);
-        if (!$metadataParameters) {
-            return null;
-        }
-
-        /** @var ClassMetadata $metadata */
-        $metadata = $metadataParameters['metadata'];
-        $field = $metadataParameters['field'];
-
-        $scalarParameters = $this->guessVariableParametersScalarField($metadata, $field);
-        if ($scalarParameters !== false) {
-            return $scalarParameters;
-        }
-
-        if ($metadata->hasAssociation($field)) {
-            $multiple = $metadata->isCollectionValuedAssociation($field);
-            $type = $multiple
-                ? 'object'
-                : 'entity';
-            $class = $multiple
-                ? 'Doctrine\Common\Collections\ArrayCollection'
-                : $metadata->getAssociationTargetClass($field);
-
-            return $this->formatResult(
-                $this->getLabel($metadata->getName(), $field, $multiple),
-                $type,
-                ['class' => $class]
-            );
-        }
-
-        return null;
     }
 }

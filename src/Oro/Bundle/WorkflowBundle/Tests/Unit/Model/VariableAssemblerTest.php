@@ -213,7 +213,7 @@ class VariableAssemblerTest extends \PHPUnit_Framework_TestCase
         if ($guessedParameters && array_key_exists('property_path', array_values($variableConfig)[0])) {
             $var = array_values($variableConfig)[0];
             $this->variableGuesser->expects($this->any())
-                ->method('guessVariableParameters')
+                ->method('guessParameters')
                 ->with('stdClass', $var['property_path'])
                 ->willReturn($guessedParameters);
         }
