@@ -13,6 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 class LoadSegmentData extends AbstractFixture
 {
     const SEGMENT_DYNAMIC = 'segment_dynamic';
+    const SEGMENT_DYNAMIC_WITH_FILTER = 'segment_dynamic_with_filter';
     const SEGMENT_STATIC = 'segment_static';
 
     /** @var array */
@@ -32,6 +33,34 @@ class LoadSegmentData extends AbstractFixture
                     ]
                 ],
                 'filters' =>[]
+            ]
+        ],
+        self::SEGMENT_DYNAMIC_WITH_FILTER => [
+            'name' => 'Dynamic Segment with Filter',
+            'description' => 'Dynamic Segment Description',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_DYNAMIC,
+            'definition' => [
+                'columns' => [
+                    [
+                        'func' => null,
+                        'label' => 'Label',
+                        'name' => 'name',
+                        'sorting' => 'DESC'
+                    ]
+                ],
+                'filters' =>[
+                    [
+                        'columnName' => 'name',
+                        'criterion' => [
+                            'filter' => 'string',
+                            'data' => [
+                                'value' => 'Some not existing name',
+                                'type' => 1,
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ],
         self::SEGMENT_STATIC => [

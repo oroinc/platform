@@ -144,6 +144,9 @@ class SegmentManager
                 $identifiers   = $classMetadata->getIdentifier();
                 $identifier = reset($identifiers);
                 $idsResult = $queryBuilder->getQuery()->getArrayResult();
+                if (!$idsResult) {
+                    return [null];
+                }
                 $subQuery = array_column($idsResult, $identifier);
             } else {
                 $subQuery = $queryBuilder->getDQL();

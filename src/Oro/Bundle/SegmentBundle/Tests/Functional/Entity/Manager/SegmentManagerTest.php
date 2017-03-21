@@ -47,6 +47,8 @@ class SegmentManagerTest extends WebTestCase
     {
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
+        /** @var Segment $dynamicSegment */
+        $dynamicSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
         /** @var Segment $staticSegment */
         $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
 
@@ -56,6 +58,11 @@ class SegmentManagerTest extends WebTestCase
                     [
                         'id'   => 'segment_' . $dynamicSegment->getId(),
                         'text' => $dynamicSegment->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id'   => 'segment_' . $dynamicSegmentWithFilter->getId(),
+                        'text' => $dynamicSegmentWithFilter->getName(),
                         'type' => 'segment',
                     ],
                     [
@@ -131,5 +138,20 @@ class SegmentManagerTest extends WebTestCase
             sprintf('SELECT snp.integerEntityId FROM %s snp WHERE snp.segment = :segment', SegmentSnapshot::class),
             $this->manager->getFilterSubQuery($dynamicSegment, $qb)
         );
+    }
+
+    public function testGetFilterSubQueryDynamicWithLimitAndNoResults()
+    {
+        $registry = $this->getContainer()->get('doctrine');
+        /** @var EntityRepository $repository */
+        $repository = $registry->getRepository(WorkflowAwareEntity::class);
+
+        $qb = $repository->createQueryBuilder('w');
+
+        /** @var Segment $dynamicSegment */
+        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        $dynamicSegment->setRecordsLimit(10);
+        $result = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
+        $this->assertEquals([null], $result);
     }
 }
