@@ -67,4 +67,12 @@ abstract class AbstractReader implements ReaderInterface
     protected function initializeFromContext(ContextInterface $context)
     {
     }
+
+    /**
+     * @param ContextInterface $context
+     */
+    public function initializeByContext(ContextInterface $context)
+    {
+        $this->initializeFromContext($context);
+    }
 }

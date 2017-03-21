@@ -23,11 +23,6 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
     protected $firstLineIsHeader = true;
 
     /**
-     * @var array
-     */
-    protected $header;
-
-    /**
      * @var resource
      */
     protected $fileHandle;
@@ -105,6 +100,7 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
         if ($this->fileHandle) {
             fclose($this->fileHandle);
             $this->fileHandle = null;
+            $this->header = null;
         }
     }
 

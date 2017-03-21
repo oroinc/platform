@@ -3,16 +3,13 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Symfony\Component\Routing\Router;
 
 class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,15 +17,13 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
     {
         new ImportExportResultSummarizer(
             $this->createRouterMock(),
-            $this->createConfigManagerMock(),
-            $this->createRenderMock(),
-            $this->createManagerRegistryMock()
+            $this->createConfigManagerMock()
         );
     }
 
     public function testShouldReturnCorrectSummaryInformationWithoutErrorInImport()
     {
-        $data = [
+        $result = [
             'success' => true,
             'errors' => [],
             'counts' => [
@@ -38,7 +33,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
                 'read' => 7,
             ],
         ];
-        $expectedData = [
+        $expectedData['data'] = [
             'hasError' => false,
             'successParts' => 2,
             'totalParts' => 2,
@@ -55,59 +50,23 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
         ];
 
         $job = new Job();
+
         $childJob1 = new Job();
-        $childJob1->setData($data);
+        $childJob1->setData($result);
         $job->addChildJob($childJob1);
+
         $childJob2 = new Job();
-        $childJob2->setData($data);
+        $childJob2->setData($result);
         $job->addChildJob($childJob2);
 
-        $template = new EmailTemplate();
-        $repository = $this->createEmailTemplateRepsitoryMock();
-        $repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['name' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT])
-            ->willReturn($template)
-            ;
-        $objectManager = $this->createObjectManagerMock();
-        $objectManager
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(EmailTemplate::class)
-            ->willReturn($repository)
-            ;
-
-        $managerRegistry = $this->createManagerRegistryMock();
-        $managerRegistry
-            ->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(EmailTemplate::class)
-            ->willReturn($objectManager)
-        ;
-
-        $render = $this->createRenderMock();
-        $render
-            ->expects($this->once())
-            ->method('compileMessage')
-            ->with($template, ['data' => $expectedData])
-            ->willReturn(['subject', 'summary'])
-            ;
         $consolidateService = new ImportExportResultSummarizer(
             $this->createRouterMock(),
-            $this->createConfigManagerMock(),
-            $render,
-            $managerRegistry
+            $this->createConfigManagerMock()
         );
 
-        list($subject, $summary) = $consolidateService->getSummaryResultForNotification(
-            $job,
-            'import.csv',
-            ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT
-        );
+        $result = $consolidateService->getSummaryResultForNotification($job, 'import.csv');
 
-        $this->assertEquals('subject', $subject);
-        $this->assertEquals('summary', $summary);
+        $this->assertEquals($expectedData, $result);
     }
 
     public function testShouldReturnCorrectSummaryInformationWithErrorLink()
@@ -126,7 +85,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
                 'read' => 5,
             ],
         ];
-        $expectedData = [
+        $expectedData['data'] = [
             'hasError' => true,
             'successParts' => 2,
             'totalParts' => 2,
@@ -139,75 +98,47 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
             'delete' => 0,
             'error_entries' => 0,
             'fileName' => 'import.csv',
-            'downloadLogUrl' => '127.0.0.1/log/12345',
+            'downloadLogUrl' => 'http://127.0.0.1/log/12345',
         ];
 
         $job = new Job();
+        $job->setId(12345);
+
         $childJob1 = new Job();
         $childJob1->setData($data);
-        $job->setId(12345);
         $job->addChildJob($childJob1);
+
         $childJob2 = new Job();
         $childJob2->setData($data);
         $job->addChildJob($childJob2);
-
-        $template = new EmailTemplate();
-        $repository = $this->createEmailTemplateRepsitoryMock();
-        $repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['name' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT])
-            ->willReturn($template)
-        ;
-        $objectManager = $this->createObjectManagerMock();
-        $objectManager
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(EmailTemplate::class)
-            ->willReturn($repository);
-        $managerRegistry = $this->createManagerRegistryMock();
-        $managerRegistry
-            ->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(EmailTemplate::class)
-            ->willReturn($objectManager);
-        $render = $this->createRenderMock();
-        $render
-            ->expects($this->once())
-            ->method('compileMessage')
-            ->with($template, ['data' => $expectedData])
-            ->willReturn(['subject', 'summary'])
-        ;
 
         $router = $this->createRouterMock();
         $router
             ->expects($this->once())
             ->method('generate')
             ->with(
-                'oro_importexport_import_error_log',
-                ['jobId' => $job->getId()]
+                $this->equalTo('oro_importexport_job_error_log'),
+                $this->equalTo(['jobId' => $job->getId()])
             )
-            ->willReturn('log/12345');
+            ->willReturn('/log/12345')
+        ;
+
         $configManager = $this->createConfigManagerMock();
         $configManager
             ->expects($this->once())
             ->method('get')
             ->with('oro_ui.application_url')
-            ->willReturn('127.0.0.1/');
+            ->willReturn('http://127.0.0.1')
+        ;
+
         $consolidateService = new ImportExportResultSummarizer(
             $router,
-            $configManager,
-            $render,
-            $managerRegistry
+            $configManager
         );
 
-        list($subject, $summary) = $consolidateService->getSummaryResultForNotification(
-            $job,
-            'import.csv',
-            ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT
-        );
-        $this->assertEquals('subject', $subject);
-        $this->assertEquals('summary', $summary);
+        $result = $consolidateService->getSummaryResultForNotification($job, 'import.csv');
+
+        $this->assertEquals($expectedData, $result);
     }
 
     public function testShouldReturnErrorLog()
@@ -232,7 +163,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
         $childJob1->setData($data);
         $job->addChildJob($childJob1);
         $childJob2 = new Job();
-        $childJob2->setData($data);
+        $childJob2->setData(array_merge($data, ['errors' => ['error 2']]));
         $job->addChildJob($childJob2);
 
         $consolidateService = new ImportExportResultSummarizer(
@@ -243,66 +174,68 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
         );
         $summary = $consolidateService->getErrorLog($job);
 
-        $this->assertEquals("error in part #1: error 1\n\rerror in part #2: error 1\n\r", $summary);
+        $this->assertEquals("error 1\nerror 2\n", $summary);
     }
 
     public function testProcessExportData()
     {
-        $exportResult = [
-            'success' => true,
-            'url' => '127.0.0.1',
-            'readsCount' => 10,
-            'errorsCount' => 0,
-            'entities' => 'Test'
+        $expectedResult = [
+            'exportResult' => [
+                'success' => true,
+                'url' => '127.0.0.1/export.log',
+                'readsCount' => 10,
+                'errorsCount' => 0,
+                'entities' => 'TestEntity',
+                'fileName' => 'export_result',
+                'downloadLogUrl' => '127.0.0.1/1.log'
+            ],
+            'jobName' => 'test.job.name',
         ];
 
-
-        $template = new EmailTemplate();
-        $repository = $this->createEmailTemplateRepsitoryMock();
-        $repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['name' => ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT])
-            ->willReturn($template)
+        $routerMock = $this->createRouterMock();
+        $routerMock
+            ->expects($this->at(0))
+            ->method('generate')
+            ->with('oro_importexport_export_download', ['fileName' =>'export_result'])
+            ->willReturn('/export.log')
         ;
-        $objectManager = $this->createObjectManagerMock();
-        $objectManager
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(EmailTemplate::class)
-            ->willReturn($repository)
+        $routerMock
+            ->expects($this->at(1))
+            ->method('generate')
+            ->with('oro_importexport_job_error_log', ['jobId' => 1])
+            ->willReturn('/1.log')
         ;
 
-        $managerRegistry = $this->createManagerRegistryMock();
-        $managerRegistry
-            ->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(EmailTemplate::class)
-            ->willReturn($objectManager)
-        ;
-
-        $render = $this->createRenderMock();
-        $render
-            ->expects($this->once())
-            ->method('compileMessage')
-            ->with($template, ['exportResult' => $exportResult, 'jobName' => 'test.job.name'])
-            ->willReturn(['subject', 'summary'])
+        $configManagerMock = $this->createConfigManagerMock();
+        $configManagerMock
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->with('oro_ui.application_url')
+            ->willReturn('127.0.0.1')
         ;
 
         $consolidateService = new ImportExportResultSummarizer(
-            $this->createRouterMock(),
-            $this->createConfigManagerMock(),
-            $render,
-            $managerRegistry
+            $routerMock,
+            $configManagerMock
         );
 
-        list($subject, $summary) = $consolidateService->processSummaryExportResultForNotification(
-            'test.job.name',
-            $exportResult
-        );
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setName('test.job.name');
+        $childJob = new Job();
+        $rootJob->addChildJob($childJob);
+        $childJob->setData([
+            'success' => true,
+            'file' => 'test',
+            'readsCount' => 10,
+            'errorsCount' => 0,
+            'entities' => 'TestEntity',
+            'errors' => []
+        ]);
 
-        $this->assertEquals('subject', $subject);
-        $this->assertEquals('summary', $summary);
+        $result = $consolidateService->processSummaryExportResultForNotification($rootJob, 'export_result');
+
+        $this->assertEquals($expectedResult, $result);
     }
 
     /**
@@ -335,20 +268,5 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
     private function createManagerRegistryMock()
     {
         return $this->createMock(ManagerRegistry::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
-     */
-    private function createObjectManagerMock()
-    {
-        return $this->createMock(ObjectManager::class);
-    }
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|EmailTemplateRepository
-     */
-    private function createEmailTemplateRepsitoryMock()
-    {
-        return $this->createMock(EmailTemplateRepository::class);
     }
 }

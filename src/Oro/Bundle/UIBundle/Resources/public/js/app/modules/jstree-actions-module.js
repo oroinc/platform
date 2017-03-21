@@ -4,7 +4,6 @@ define(function(require) {
     var ActionManager = require('oroui/js/jstree-action-manager');
     var ExpandActionView = require('oroui/js/app/views/jstree/expand-action-view');
     var CollapseActionView = require('oroui/js/app/views/jstree/collapse-action-view');
-    var SubtreeActionView = require('oroui/js/app/views/jstree/subtree-action-view');
     var MoveActionView = require('oroui/js/app/views/jstree/move-action-view');
 
     /**
@@ -23,13 +22,6 @@ define(function(require) {
 
     ActionManager.addAction('collapse', {
         view: CollapseActionView
-    });
-
-    ActionManager.addAction('subtree', {
-        view: SubtreeActionView,
-        isAvailable: function(options) {
-            return options.$tree.data('treeView').checkboxEnabled;
-        }
     });
 
     ActionManager.addAction('move', {

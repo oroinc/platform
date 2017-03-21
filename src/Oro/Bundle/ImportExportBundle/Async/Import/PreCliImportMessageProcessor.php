@@ -1,10 +1,15 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Psr\Log\LoggerInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Splitter\SplitterChain;
-use Oro\Bundle\ImportExportBundle\Splitter\SplitterInterface;
+use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
+use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
+use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -14,11 +19,9 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-
     /**
      * @var JobRunner
      */
@@ -40,37 +43,66 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
     protected $dependentJob;
 
     /**
-     * @var SplitterChain
-     */
-    protected $splitterChain;
-
-    /**
      * @var FileManager
      */
     protected $fileManager;
+
+    /**
+     * @var CliImportHandler
+     */
+    protected $cliImportHandler;
+
+    /**
+     * @var WriterChain
+     */
+    protected $writerChain;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
+     * @var integer
+     */
+    protected $batchSize;
 
     /**
      * @param JobRunner $jobRunner
      * @param MessageProducerInterface $producer
      * @param LoggerInterface $logger
      * @param DependentJobService $dependentJob
-     * @param SplitterChain $splitterChain
      * @param FileManager $fileManager
+     * @param CliImportHandler $cliImportHandler
+     * @param WriterChain $writerChain
+     * @param integer $batchSize
      */
     public function __construct(
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
         LoggerInterface $logger,
         DependentJobService $dependentJob,
-        SplitterChain $splitterChain,
-        FileManager $fileManager
+        FileManager $fileManager,
+        CliImportHandler $cliImportHandler,
+        WriterChain $writerChain,
+        $batchSize
     ) {
         $this->jobRunner = $jobRunner;
         $this->producer = $producer;
         $this->logger = $logger;
         $this->dependentJob = $dependentJob;
-        $this->splitterChain = $splitterChain;
         $this->fileManager = $fileManager;
+        $this->cliImportHandler = $cliImportHandler;
+        $this->writerChain = $writerChain;
+        $this->batchSize = $batchSize;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -101,21 +133,27 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
             ], $body);
 
         $format = pathinfo($body['originFileName'], PATHINFO_EXTENSION);
-        $splitterFile = $this->splitterChain->getSplitter($format);
+        $writer = $this->writerChain->getWriter($format);
+        $body['options']['batch_size'] = $this->batchSize;
 
-        if (! $splitterFile instanceof SplitterInterface) {
-            $this->logger->critical(
-                sprintf('Not supported format: "%s"', $format),
+        if (! $writer instanceof FileStreamWriter) {
+            $this->logger->warning(
+                sprintf('Not supported format: "%s", using default', $format),
                 ['message' => $message]
             );
-            return self::REJECT;
+            $writer = $this->writerChain->getWriter('csv');
         }
-        $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
-        $files = $splitterFile->getSplittedFilesNames($filePath);
 
-        if (! count($files)) {
-            $errors = $splitterFile->getErrors();
-            $this->sendErrorNotification($body, $errors);
+        try {
+            $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
+            $this->cliImportHandler->setImportingFileName($filePath);
+            $files = $this->cliImportHandler->splitImportFile(
+                $body['jobName'],
+                $body['process'],
+                $writer
+            );
+        } catch (\Exception $e) {
+            $this->sendErrorNotification($body, $e->getMessage());
 
             return self::REJECT;
         }
@@ -135,11 +173,7 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
             function (JobRunner $jobRunner, Job $job) use ($jobName, $body, $files) {
                 foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
-                        sprintf(
-                            '%s:chunk.%s',
-                            $jobName,
-                            ++$key
-                        ),
+                        sprintf('%s:chunk.%s', $jobName, ++$key),
                         function (JobRunner $jobRunner, Job $child) use ($file, $body) {
                             $body['fileName'] = $file;
                             $this->producer->send(
@@ -172,25 +206,32 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
         return $result ? self::ACK : self::REJECT;
     }
 
-
-    private function sendErrorNotification($body, $errors)
+    /**
+     * @param array $body
+     * @param string $error
+     */
+    private function sendErrorNotification(array $body, $error)
     {
         $errorMessage = sprintf(
-            'An error occurred while reading file %s: "%s"',
+            '[PreCliImportMessageProcessor] An error occurred while reading file %s: "%s"',
             $body['originFileName'],
-            implode(PHP_EOL, $errors)
+            $error
         );
+
         $this->logger->critical($errorMessage, ['message' => $body]);
 
         if (isset($body['notifyEmail'])) {
-            $this->producer->send(
-                Topics::SEND_IMPORT_ERROR_NOTIFICATION,
-                [
-                    'file' => $body['originFileName'],
-                    'error' => $errorMessage,
-                    'notifyEmail' => $body['notifyEmail'],
-                ]
-            );
+            $this->producer->send(NotifcationTopics::SEND_NOTIFICATION_EMAIL, [
+                'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
+                'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
+                'toEmail' => $body['notifyEmail'],
+                'template' => 'import_error',
+                'body' => [
+                    'originFileName' => $body['originFileName'],
+                    'error' => $error,
+                ],
+                'contentType' => 'text/html',
+            ]);
         }
     }
 
