@@ -24,7 +24,7 @@ class ImageTypeProvider
     /**
      * @var ThemeImageTypeDimension[]
      */
-    protected $dimensions;
+    protected $dimensions = [];
 
     /**
      * @param ThemeManager $themeManager
