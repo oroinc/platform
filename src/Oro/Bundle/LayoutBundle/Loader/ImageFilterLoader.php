@@ -7,6 +7,7 @@ use Imagine\Image\ImageInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
@@ -88,7 +89,6 @@ class ImageFilterLoader
     {
         $width = $dimension->getWidth();
         $height = $dimension->getHeight();
-        $withResize = $dimension->getWidth() && $dimension->getHeight();
 
         $filterSettings = [
             'quality' => self::IMAGE_QUALITY,
@@ -101,25 +101,44 @@ class ImageFilterLoader
             $filterSettings = array_merge_recursive($filterSettings, $provider->getFilterConfig());
         }
 
-        if ($withResize) {
+        if ($width && $height) {
             $filterSettings = array_merge_recursive(
-                [
-                    'filters' => [
-                        'thumbnail' => [
-                            'size' => [$width, $height],
-                            'mode' => self::RESIZE_MODE,
-                            'allow_upscale' => true
-                        ],
-                        'background' => [
-                            'size' => [$width, $height],
-                            'color' => self::BACKGROUND_COLOR
-                        ]
-                    ]
-                ],
+                ['filters' => $this->prepareResizeFilterSettings($width, $height)],
                 $filterSettings
             );
         }
 
         return $filterSettings;
+    }
+
+    /**
+     * @param mixed $width
+     * @param mixed $height
+     * @return array
+     */
+    private function prepareResizeFilterSettings($width, $height)
+    {
+        if (Configuration::AUTO === $width || Configuration::AUTO === $height) {
+            return [
+                'scale' => [
+                    'dim' => [
+                        Configuration::AUTO === $width ? null : $width,
+                        Configuration::AUTO === $height ? null : $height,
+                    ]
+                ]
+            ];
+        }
+
+        return [
+            'thumbnail' => [
+                'size' => [$width, $height],
+                'mode' => self::RESIZE_MODE,
+                'allow_upscale' => true
+            ],
+            'background' => [
+                'size' => [$width, $height],
+                'color' => self::BACKGROUND_COLOR
+            ]
+        ];
     }
 }

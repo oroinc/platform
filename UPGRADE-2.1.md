@@ -560,6 +560,8 @@ LocaleBundle
 - Class `Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider`
     - changed `__constructor` signature: 
         - the third argument changed from `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` to `Oro\Bundle\TranslationBundle\Provider\LanguageProvider`
+- The service `oro_translation.event_listener.language_change` was removed
+- The class `Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener` was removed
 
 MessageQueueBundle
 ------------------

@@ -82,7 +82,7 @@ class RemoveRestoreConfigFieldHandler
             function (ConfigInterface $config) {
                 return in_array(
                     $config->get('state'),
-                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
+                    [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE, ExtendScope::STATE_RESTORE]
                 );
             }
         );
