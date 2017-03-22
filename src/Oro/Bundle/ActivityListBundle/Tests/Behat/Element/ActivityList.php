@@ -36,11 +36,9 @@ class ActivityList extends Element
     public function getItems()
     {
         $itemElements = $this->findAll('css', 'div.list-item');
-        $wrappedElements = [];
-        foreach ($itemElements as $item) {
-            $wrappedElements[] = $this->elementFactory->wrapElement('ActivityListItem', $item);
-        }
 
-        return $wrappedElements;
+        return array_map(function (NodeElement $element) {
+            return $this->elementFactory->wrapElement('ActivityListItem', $element);
+        }, $itemElements);
     }
 }
