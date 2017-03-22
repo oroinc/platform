@@ -31,10 +31,13 @@ class SegmentRepositoryTest extends WebTestCase
 
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
+        /** @var Segment $dynamicSegment */
+        $dynamicSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
         /** @var Segment $staticSegment */
         $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
         $this->assertEquals([
             $dynamicSegment->getId() => $dynamicSegment->getName(),
+            $dynamicSegmentWithFilter->getId() => $dynamicSegmentWithFilter->getName(),
             $staticSegment->getId() => $staticSegment->getName(),
         ], $result);
     }
