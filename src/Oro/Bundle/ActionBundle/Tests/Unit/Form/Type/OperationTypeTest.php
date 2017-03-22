@@ -186,9 +186,11 @@ class OperationTypeTest extends FormIntegrationTestCase
                 'expectedDefaultData' => $this->createOperationData(
                     [
                         'field1' => 'default_field1_value',
-                        'field2' => 'default_field2_value'
+                        'field2' => 'default_field2_value',
+                        'default_field1' => 'default_field1_value',
+                        'default_field2' => 'default_field2_value',
                     ],
-                    false
+                    true
                 )
             ],
         ];
