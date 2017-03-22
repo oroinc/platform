@@ -169,7 +169,7 @@ class SegmentManager
             $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
             $queryBuilder->setMaxResults($segment->getRecordsLimit());
 
-            if ($segment->isDynamic() && $segment->getRecordsLimit()) {
+            if ($segment->isDynamic()) {
                 $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($segment->getEntity());
                 $identifiers   = $classMetadata->getIdentifier();
                 $identifier = reset($identifiers);

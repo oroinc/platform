@@ -101,13 +101,8 @@ class SegmentManagerTest extends WebTestCase
 
         /** @var Segment $dynamicSegment */
         $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
-        $this->assertRegExp(
-            sprintf(
-                '/^SELECT DISTINCT [a-z0-9]+.id FROM %s [a-z0-9]+$/',
-                'Oro\\\Bundle\\\TestFrameworkBundle\\\Entity\\\WorkflowAwareEntity'
-            ),
-            $this->manager->getFilterSubQuery($dynamicSegment, $qb)
-        );
+        $result = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
+        $this->assertCount(50, $result);
     }
 
     public function testGetFilterSubQueryDynamicWithLimit()
