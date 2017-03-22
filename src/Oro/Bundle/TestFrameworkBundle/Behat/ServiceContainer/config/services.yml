@@ -168,6 +168,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Environment\Handler\FeatureEnvironmentHandler
         arguments:
             - '@context.factory'
+            - '@symfony2_extension.kernel'
         tags:
             - { name: 'environment.handler', priority: 100 }
 
