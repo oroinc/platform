@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
@@ -123,7 +124,34 @@ class SegmentManager
             return null;
         }
 
+        $qb = $this->applyOrderByParts($segment, $qb);
+
         return $qb->where($qb->expr()->in('u.id', $subQuery));
+    }
+
+    /**
+     * Applies sorting to QueryBuilder from DynamicSegmentQueryBuilder
+     * @param Segment $segment
+     * @param QueryBuilder $qb
+     * @return QueryBuilder
+     */
+    private function applyOrderByParts(Segment $segment, QueryBuilder $qb)
+    {
+        $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder(SegmentType::TYPE_DYNAMIC);
+        $segmentQb = $segmentQueryBuilder->getQueryBuilder($segment);
+
+        $orderBy = $segmentQb->getDQLPart('orderBy');
+        $alias = current($segmentQb->getRootAliases());
+
+        /** @var OrderBy $obj */
+        foreach ($orderBy as $obj) {
+            foreach ($obj->getParts() as $part) {
+                $part = str_replace($alias, 'u', $part);
+                $qb->add('orderBy', $part);
+            }
+        }
+
+        return $qb;
     }
 
     /**
