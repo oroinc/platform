@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -71,6 +72,7 @@ class RelationType extends AbstractType
     {
         $form = $event->getForm();
         $data = $event->getData();
+
         if (!$data) {
             $data = $form->getParent()->getData();
         }
@@ -236,19 +238,38 @@ class RelationType extends AbstractType
         }
 
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
-            $form->add(
-                'bidirectional',
-                'genemu_jqueryselect2_choice',
-                [
-                    'choices' => ['No', 'Yes'],
-                    'empty_value' => false,
-                    'block' => 'general',
-                    'subblock' => 'properties',
-                    'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
-                    'read_only' => $readOnly,
-                    'data' => $this->getArrayValue($data, 'bidirectional'),
-                ]
-            );
+            $options = [
+                'choices' => ['No', 'Yes'],
+                'empty_value' => false,
+                'block' => 'general',
+                'subblock' => 'properties',
+                'label' => 'oro.entity_extend.entity_config.extend.field.items.bidirectional',
+                'read_only' => $readOnly,
+                'data' => $this->getArrayValue($data, 'bidirectional'),
+                'constraints' => [new Assert\Callback([$this ,'bidirectionalValidate'])]
+            ];
+
+            $form->add('bidirectional', 'genemu_jqueryselect2_choice', $options);
+        }
+    }
+
+    /**
+     * @param $object
+     * @param ExecutionContextInterface $context
+     */
+    public function bidirectionalValidate($object, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+        $targetEntity = $data['extend']['target_entity'];
+        if (!$targetEntity) {
+            return ;
+        }
+
+        $config = $this->configManager->getEntityConfig('extend', $data['extend']['target_entity']);
+        if (!$config->is('is_extend') && $data['extend']['bidirectional'] === '1') {
+            $context->buildViolation('The field can\'t be set to \'Yes\' when target entity isn\'t extended')
+                ->atPath('bidirectional')
+                ->addViolation();
         }
     }
 }
