@@ -6,107 +6,107 @@ Feature: Display settings manage
   As Administrator
   I need to be able to change display settings parameters
 
-  Scenario: Show/hide recent emails in user bar
+  Scenario: Hide recent emails in user bar
     Given I login as administrator
-    Then recent emails block must be visible
+    And I should see an "Recent Emails" element
     When I go to System/Configuration
     And I click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Show recent emails | false |
     And I save form
-    Then recent emails block should not be visible
+    Then I should not see an "Recent Emails" element
 
-  Scenario: Enable/disable WYSIWYG editor
+  Scenario: Disable WYSIWYG editor
     When I go to Activities/Calendar Events
     And press "Create Calendar event"
-    And I should see WYSIWYG editor
+    Then I should see an "WYSIWYG editor" element
     When I go to System/Configuration
-    And I click "Display settings"
-    When I set configuration to:
+    And click "Display settings"
+    And I fill "System Config Form" with:
       | Enable WYSIWYG editor | false |
-    And I save form
+    And save form
     And I go to Activities/Cases
     And press "Create Case"
-    Then I should not see WYSIWYG editor
+    Then I should not see an "WYSIWYG editor" element
 
   Scenario: Change records in grid per page amount
     When I go to Activities/Cases
-    Then per page amount must be 25
-    And records in grid should be 25
+    Then per page amount should be 25
+    And records in current page grid should be 25
     When I go to System/Configuration
     And I click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Items per Page by Default | 10 |
     And I save form
-    When I go to Activities/Cases
-    Then per page amount must be 10
-    And records in grid should be 10
+    And I go to Activities/Cases
+    Then per page amount should be 10
+    And records in current page grid should be 10
 
-  Scenario: Enable/disable locking grid header
+  Scenario: Make grid header sticky
     When I go to Activities/Cases
     Then I see that grid has scrollable header
     When I go to System/Configuration
     And I click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Lock headers in grids | off |
     And I save form
     When I go to Activities/Cases
     Then I see that grid header is sticky
 
-  Scenario: Enable/disable navigation through grid entity from a view page
+  Scenario: Disable navigation through grid entity from a view page
     When I go to Activities/Cases
     And I click view 1 in grid
-    Then I should see entity pagination controls
+    Then I should see an "Entity pagination" element
     When I go to System/Configuration
     And I click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Record Pagination | off |
     And I save form
     Then I go to Activities/Cases
-    And I click view 1 in grid
-    Then I should see no pagination controls
-    And I go to System/Configuration
-    And I click "Display settings"
-    Then I set configuration to:
+    And click view 1 in grid
+    Then I should not see an "Entity pagination" element
+
+  Scenario: Change record pagination limit
+    Given I go to System/Configuration
+    And click "Display settings"
+    And I fill "System Config Form" with:
       | Record Pagination | on |
     And I save form
-
-  Scenario: Set record pagination limit
     When I go to Activities/Cases
     And I click view 1 in grid
-    Then I should see entity pagination controls
+    Then I should see an "Entity pagination" element
     When I go to System/Configuration
     And I click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Record Pagination limit | 20 |
     And I save form
     Then I go to Activities/Cases
     And I click view 1 in grid
-    Then I should see no pagination controls
+    And I should not see an "Entity pagination" element
 
-  Scenario: Set activity list configuration
+  Scenario: Change activity list configuration
     When I go to Customers/Contacts
     And I click View Charlie in grid
     Then there is 10 records in activity list
     And activity list must be sorted descending by updated date
     When I go to System/Configuration
     And I click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Sort direction            | Ascending |
       | Items Per Page By Default | 25        |
     And I save form
-    When I go to Customers/Contacts
+    And I go to Customers/Contacts
     And I click View Charlie in grid
     Then there is 13 records in activity list
     And activity list must be sorted ascending by updated date
     When I go to System/Configuration
     And I click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Sort by field             | Created date |
       | Sort direction            | Descending   |
       | Items Per Page By Default | 10           |
     And I save form
-    When I go to Customers/Contacts
+    And I go to Customers/Contacts
     And click View Charlie in grid
     Then I see following records in activity list with provided order:
       | -1 days |
@@ -123,7 +123,7 @@ Feature: Display settings manage
     Given right sidebar is visible
     When I go to System/Configuration
     And click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Enable left sidebar  | Yes |
       | Enable right sidebar | No  |
     And save form
@@ -131,7 +131,7 @@ Feature: Display settings manage
     And left sidebar is visible
     When I go to System/Configuration
     And click "Display settings"
-    And I set configuration to:
+    And I fill "System Config Form" with:
       | Enable left sidebar  | Yes |
       | Enable right sidebar | Yes |
     And save form
@@ -139,7 +139,7 @@ Feature: Display settings manage
     And right sidebar is visible
 
   Scenario: Change calendar color settings
-    When I set configuration to:
+    When I fill "System Config Form" with:
       | Event colors    | Apple green, Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
       | Calendar colors | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
     And save form
@@ -154,7 +154,7 @@ Feature: Display settings manage
   Scenario: Change taxonomy color settings
     When I go to System/Configuration
     And I click "Display settings"
-    And set configuration to:
+    And fill "System Config Form" with:
       | Taxonomy Colors | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
     And save form
     And go to System/Tags Management/Taxonomies
@@ -167,8 +167,8 @@ Feature: Display settings manage
       Then I should not see "Show SQL Query"
       When I go to System/Configuration
       And click "Display settings"
-      And set configuration to:
+      And fill "System Config Form" with:
         | Display SQL in Reports and Segments | true |
       And save form
-      Then I go to Reports & Segments/Calendar Events/Test Report
-      And I should see "Show SQL Query"
+      And I go to Reports & Segments/Calendar Events/Test Report
+      Then I should see "Show SQL Query"

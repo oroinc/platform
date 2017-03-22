@@ -68,8 +68,12 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator
 
     GridToolbarActions:
-        selector: 'div.toolbar div.actions-panel'
-        class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolbarActions
+      selector: 'div.toolbar div.actions-panel'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolbarActions
+
+    GridToolBarTools:
+      selector: 'div.toolbar .grid-toolbar-tools'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridToolBarTools
 
     GridFloatingMenu:
       selector: '.dropdown-menu__floating'

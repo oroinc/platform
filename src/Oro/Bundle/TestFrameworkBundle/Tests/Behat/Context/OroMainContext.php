@@ -961,7 +961,7 @@ class OroMainContext extends MinkContext implements
      * @param string $selector
      * @return bool
      */
-    public function elementIsVisible($selector)
+    public function isNodeVisible($selector)
     {
         $element = $this->getPage()->findVisible('css', $selector);
 

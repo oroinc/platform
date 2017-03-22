@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Behat\Element;
 
-use Behat\Mink\Session;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 
 class ColorsConfigBlock extends Form
 {
@@ -13,20 +11,10 @@ class ColorsConfigBlock extends Form
 
     private $colorsStoreElement;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(
-        Session $session,
-        OroElementFactory $elementFactory,
-        $selector = ['type' => 'xpath', 'locator' => '/html/body']
-    ) {
-        parent::__construct($session, $elementFactory, $selector);
-
-        $storeElem = $this->find('css', "input[type='hidden']");
-        self::assertNotNull($storeElem, "Hidden input which store current colors not found");
-
-        $this->colorsStoreElement = $storeElem;
+    protected function init()
+    {
+        $this->colorsStoreElement = $this->find('css', "input[type='hidden']");
+        self::assertNotNull($this->colorsStoreElement, "Hidden input which store current colors not found");
     }
 
     /**
@@ -76,6 +64,6 @@ JS;
      */
     private function parseValues($valueString)
     {
-        return explode(', ', $valueString);
+        return array_map('trim', explode(',', $valueString));
     }
 }

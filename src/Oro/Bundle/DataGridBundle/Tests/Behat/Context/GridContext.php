@@ -685,6 +685,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Asserts per page value on current page with provided amount
+     *
+     * @Then /^per page amount should be (\d+)$/
+     */
+    public function perPageAmountShouldBe($expectedAmount)
+    {
+        $perPage = $this->elementFactory->createElement('GridToolBarTools')->getPerPageAmount();
+
+        self::assertNotNull($perPage, 'Grid per page control elements not found on current page');
+        self::assertEquals($expectedAmount, $perPage);
+    }
+
+    /**
+     * Records in table on current page should match the count.
+     * Example: Then records in grid should be 5
+     *
+     * @Then records in current page grid should be :count
+     */
+    public function recordsInGridShouldBe($count)
+    {
+        $gridRows = $this->getPage()->findAll('css', '.grid-container tbody tr');
+
+        self::assertCount((int) $count, $gridRows);
+    }
+
+    /**
      * @param string $stringNumber
      * @return int
      */
