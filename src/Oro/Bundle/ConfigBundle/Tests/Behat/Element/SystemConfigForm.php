@@ -49,11 +49,11 @@ class SystemConfigForm extends Form
             $useDefaultLabel = $container->find('css', "label:contains('$inputLabel')");
             $input = $useDefaultLabel->getParent()->find('css', 'input');
         } else {
-            $input = $container->find('css', '.control-subgroup select');
+            $input = $container->find('css', '[data-name="field__value"]');
         }
 
         $colorsBlock = $container->find('css', '.simplecolorpicker');
-        if (empty($input) && !empty($colorsBlock)) {
+        if ($input->getAttribute('type') == 'hidden' && !empty($colorsBlock)) {
             $input = $this->elementFactory->wrapElement('ColorsConfigBlock', $colorsBlock->getParent());
         }
 

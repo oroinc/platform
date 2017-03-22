@@ -1,4 +1,5 @@
 @fixture-cases.yml
+@fixture-custom_report.yml
 @fixture-activities.yml
 Feature: Display settings manage
   In order to control system display behavior
@@ -150,7 +151,7 @@ Feature: Display settings manage
     Then I should see following available "Calendar" colors:
       | Alizarin Crimson, Beige, Black, Lime, Melrose, Mercury, Apple green, Cornflower Blue, Mauve, Aqua, Aquamarine, Azure |
 
-  Scenario: Change calendar color settings
+  Scenario: Change taxonomy color settings
     When I go to System/Configuration
     And I click "Display settings"
     And set configuration to:
@@ -160,3 +161,14 @@ Feature: Display settings manage
     And press "Create Taxonomy"
     Then I should see following available "TaxonomyForm" colors:
       | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
+
+    Scenario: Change reports settings
+      When I go to Reports & Segments/Calendar Events/Test Report
+      Then I should not see "Show SQL Query"
+      When I go to System/Configuration
+      And click "Display settings"
+      And set configuration to:
+        | Display SQL in Reports and Segments | true |
+      And save form
+      Then I go to Reports & Segments/Calendar Events/Test Report
+      And I should see "Show SQL Query"
