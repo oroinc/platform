@@ -291,6 +291,8 @@ EntityExtendBundle
     - call to `addOneToManyRelation` creates bidirectional relation according to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional)
     - deprecated `addOneToManyInverseRelation`
     - throw exception when trying to use not allowed option while creating relation in migration
+- To be able to create bidirectional relation between entities and use "Reuse existing relation" functionality on UI
+    you _MUST_ select "bidirectional" field while creating relation
 - The parameter `oro_entity_extend.twig.extension.dynamic_fields.class` was removed from DIC
 - The parameter `oro_entity_extend.twig.extension.enum.class` was removed from DIC
 - The service `oro_entity_extend.twig.extension.dynamic_fields` was marked as `private`
@@ -798,7 +800,13 @@ filters such as `contains` when generating routes
         - third parameter is instance of `TranslationStatisticProvider`
         - fourth parameter is instance of `TranslatorInterface`
    - Changed parent from type from `locale` to `oro_choice`
-
+- Class `Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension`
+    - removed constant `PACKAGE_NAME`
+    - added constructor
+    - added method `public function addPackage(string $packageAlias, string $packageName, string $suffix = '')`
+- Updated service definition for `oro_translation.extension.transtation_packages_provider`
+    - changed publicity to `false`
+    
 UIBundle
 --------
 - Removed the following parameters from DIC:

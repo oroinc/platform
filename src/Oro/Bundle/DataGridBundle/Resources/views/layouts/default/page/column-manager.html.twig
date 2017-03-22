@@ -47,11 +47,10 @@
                     <span class="custom-checkbox__text"><%= label %></span>
                 </label>
             </div>
-
             <% if (_.isMobile()) { %>
                 <div class="column-manager__move">
-                    <span class="column-manager__move-btn" data-role="moveUp" title="Move column up"><i class="fa-chevron-up"></i></span>
-                    <span class="column-manager__move-btn" data-role="moveDown" title="Move column down"><i class="fa-chevron-down"></i></span>
+                    <span class="column-manager__move-btn column-manager__move-up" data-role="moveUp" title="Move column up"><i class="fa-long-arrow-up"></i></span>
+                    <span class="column-manager__move-btn column-manager__move-down" data-role="moveDown" title="Move column down"><i class="fa-long-arrow-down"></i></span>
                 </div>
             <% } %>
         </div>
