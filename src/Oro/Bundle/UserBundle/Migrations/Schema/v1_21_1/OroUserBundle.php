@@ -22,6 +22,10 @@ class OroUserBundle implements Migration
     public static function addEmailUserIndexes(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');
+        if ($table->hasIndex('user_owner_id_mailbox_owner_id_organization_id')) {
+            return;
+        }
+
         $table->addIndex(
             ['user_owner_id', 'mailbox_owner_id', 'organization_id'],
             'user_owner_id_mailbox_owner_id_organization_id',
