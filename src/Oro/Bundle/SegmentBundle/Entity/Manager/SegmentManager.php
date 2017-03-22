@@ -117,14 +117,15 @@ class SegmentManager
     public function getEntityQueryBuilder(Segment $segment)
     {
         $repository = $this->em->getRepository($segment->getEntity());
-        $qb = $repository->createQueryBuilder('u');
+        $alias = 'us';
+        $qb = $repository->createQueryBuilder($alias);
 
         $subQuery = $this->getFilterSubQuery($segment, $qb);
         if ($subQuery === null) {
             return null;
         }
 
-        $qb = $this->applyOrderByParts($segment, $qb);
+        $qb = $this->applyOrderByParts($segment, $qb, $alias);
 
         return $qb->where($qb->expr()->in('u.id', $subQuery));
     }
@@ -133,20 +134,21 @@ class SegmentManager
      * Applies sorting to QueryBuilder from DynamicSegmentQueryBuilder
      * @param Segment $segment
      * @param QueryBuilder $qb
+     * @param string $alias
      * @return QueryBuilder
      */
-    private function applyOrderByParts(Segment $segment, QueryBuilder $qb)
+    private function applyOrderByParts(Segment $segment, QueryBuilder $qb, $alias)
     {
         $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder(SegmentType::TYPE_DYNAMIC);
         $segmentQb = $segmentQueryBuilder->getQueryBuilder($segment);
 
         $orderBy = $segmentQb->getDQLPart('orderBy');
-        $alias = current($segmentQb->getRootAliases());
+        $aliasToReplace = current($segmentQb->getRootAliases());
 
         /** @var OrderBy $obj */
         foreach ($orderBy as $obj) {
             foreach ($obj->getParts() as $part) {
-                $part = str_replace($alias, 'u', $part);
+                $part = str_replace($aliasToReplace, $alias, $part);
                 $qb->add('orderBy', $part);
             }
         }
