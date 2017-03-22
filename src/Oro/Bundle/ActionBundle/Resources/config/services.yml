@@ -96,10 +96,6 @@ services:
             - '@doctrine'
             - '@oro_entity_config.provider.entity'
             - '@oro_entity_config.provider.form'
-
-    oro_action.attribute_guesser:
-        class: %oro_action.attribute_guesser.class%
-        parent: oro_action.abstract_guesser
         calls:
             # mapping from doctrine type to attribute parameters
             - [addDoctrineTypeMapping, ["string", "string"]]
@@ -121,6 +117,13 @@ services:
             # custom types
             - [addDoctrineTypeMapping, ["percent", "float"]]
             - [addDoctrineTypeMapping, ["money", "float"]]
+            # set doctine typr mapping provider
+            - [setDoctrineTypeMappingProvider, ['@oro_action.provider.doctrine_type_mapping']]
+
+    oro_action.attribute_guesser:
+        class: %oro_action.attribute_guesser.class%
+        parent: oro_action.abstract_guesser
+        calls:
             # mapping from attribute type to form parameters
             - [addFormTypeMapping, ["string", "text"]]
             - [addFormTypeMapping, ["int", "integer", { precision: 0 }]]
@@ -128,8 +131,6 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
-            # set doctine typr mapping provider
-            - [setDoctrineTypeMappingProvider, ['@oro_action.provider.doctrine_type_mapping']]
 
     oro_action.options_assembler:
         class: %oro_action.options_assembler.class%

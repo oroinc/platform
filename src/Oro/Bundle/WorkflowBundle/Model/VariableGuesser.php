@@ -75,7 +75,6 @@ class VariableGuesser extends AbstractGuesser
      * @param Variable $variable
      *
      * @return array
-     *
      */
     protected function getEntityForm(Variable $variable)
     {

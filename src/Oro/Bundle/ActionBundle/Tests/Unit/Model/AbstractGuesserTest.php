@@ -5,10 +5,15 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ActionBundle\Model\AbstractGuesser;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
@@ -33,18 +38,18 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->formRegistry = $this->getMockBuilder('Symfony\Component\Form\FormRegistry')
+        $this->formRegistry = $this->getMockBuilder(FormRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->managerRegistry
-            = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry');
+            = $this->getMockForAbstractClass(ManagerRegistry::class);
 
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->formConfigProvider = $this->getMockBuilder(ConfigProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -100,7 +105,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.unknown_field';
         $rootClass = 'RootClass';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())->method('hasAssociation')->with('unknown_field')
             ->will($this->returnValue(false));
         $metadata->expects($this->once())->method('hasField')->with('unknown_field')
@@ -116,7 +121,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.association';
         $rootClass = 'RootClass';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())->method('hasAssociation')->with('association')
             ->will($this->returnValue(true));
 
@@ -134,13 +139,13 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $associationEntity = 'AssociationEntity';
 
-        $entityMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $entityMetadata = $this->createMock(ClassMetadata::class);
         $entityMetadata->expects($this->any())->method('hasAssociation')->with('association')
             ->will($this->returnValue(true));
         $entityMetadata->expects($this->once())->method('getAssociationTargetClass')->with('association')
             ->will($this->returnValue($associationEntity));
 
-        $associationMetadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $associationMetadata = $this->createMock(ClassMetadata::class);
         $associationMetadata->expects($this->once())->method('hasAssociation')->with('field')
             ->will($this->returnValue(false));
         $associationMetadata->expects($this->once())->method('hasField')->with('field')
@@ -164,7 +169,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.field';
         $rootClass = 'RootClass';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())->method('hasAssociation')->with('field')
             ->will($this->returnValue(false));
         $metadata->expects($this->any())->method('hasField')->with('field')
@@ -186,7 +191,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $fieldLabel = 'Field Label';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
         $metadata->expects($this->any())->method('hasAssociation')->with('field')
@@ -223,7 +228,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $associationClass = 'AssociationClass';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
         $metadata->expects($this->any())->method('hasAssociation')->with('association')
@@ -256,7 +261,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $rootClass = 'RootClass';
         $fieldLabel = 'Field Label';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
 
@@ -291,7 +296,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
         $propertyPath = 'entity.association';
         $rootClass = 'RootClass';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())->method('getName')
             ->will($this->returnValue($rootClass));
         $metadata->expects($this->any())->method('hasAssociation')->with('association')
@@ -311,7 +316,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
             $this->guesser->guessParameters($rootClass, $propertyPath),
             null,
             'object',
-            ['class' => 'Doctrine\Common\Collections\ArrayCollection']
+            ['class' => ArrayCollection::class]
         );
     }
 
@@ -343,7 +348,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
             $valueMap[] = [$entity, $metadata];
         }
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $entityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
         $entityManager->expects($this->any())
@@ -375,7 +380,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
     ) {
         $labelOption = $multiple ? 'plural_label' : 'label';
 
-        $entityConfig = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $entityConfig = $this->getMockForAbstractClass(ConfigInterface::class);
         $entityConfig->expects($this->any())->method('has')->with($labelOption)
             ->will($this->returnValue(!empty($label)));
         $entityConfig->expects($this->any())->method('get')->with($labelOption)
@@ -387,7 +392,7 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityConfig));
 
         if ($fieldType) {
-            $configId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
+            $configId = $this->getMockBuilder(FieldConfigId::class)
                 ->disableOriginalConstructor()
                 ->getMock();
             $entityConfig->expects($this->any())->method('getId')
