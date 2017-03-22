@@ -65,7 +65,7 @@ class FixtureLoader implements SuiteAwareInterface
      */
     public function loadFixtureFile($filename)
     {
-        $file = DoctrineIsolator::findFile($filename, $this->suite);
+        $file = $this->findFile($filename);
 
         $objects = $this->load($file);
         $this->persist($objects);
@@ -197,6 +197,49 @@ class FixtureLoader implements SuiteAwareInterface
     public function setSuite(Suite $suite)
     {
         $this->suite = $suite;
+    }
+
+    /**
+     * @param string $filename
+     * @return string Real path to file with fuxtures
+     * @throws \InvalidArgumentException
+     */
+    public function findFile($filename)
+    {
+        $suitePaths = $this->suite->getSetting('paths');
+
+        if (false !== strpos($filename, ':')) {
+            list($bundleName, $filename) = explode(':', $filename);
+            $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
+            $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
+        }
+
+        if (!$file = $this->findFileInPath($filename, $suitePaths)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Can\'t find "%s" in pahts "%s"',
+                $filename,
+                implode(',', $suitePaths)
+            ));
+        }
+
+        return $file;
+    }
+
+    /**
+     * @param string $filename
+     * @param array $paths
+     * @return string|null
+     */
+    private function findFileInPath($filename, array $paths)
+    {
+        foreach ($paths as $path) {
+            $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        return null;
     }
 
     /**
