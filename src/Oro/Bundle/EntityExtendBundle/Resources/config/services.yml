@@ -525,3 +525,9 @@ services:
         decoration_inner_name: cache_warmer.inner
         arguments:
             - '@cache_warmer.inner'
+
+    oro_entity_extend.enum_entity_name_provider:
+        class: Oro\Bundle\EntityExtendBundle\Provider\EnumEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }
