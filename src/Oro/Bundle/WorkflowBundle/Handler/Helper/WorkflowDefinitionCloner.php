@@ -72,14 +72,7 @@ class WorkflowDefinitionCloner
     }
 
     /**
-     * Copy and retain variable configuration if:
-     *  - 'type' didn't change
-     *
-     * And in case of objects and entities:
-     *  - 'class' didn't change
-     *
-     * And in case of entities:
-     *  - 'options.identifier' didn't change
+     * Copy variable configuration
      *
      * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $source
@@ -106,48 +99,84 @@ class WorkflowDefinitionCloner
         $newVariables = $newDefinition[$variablesNode];
         $existingVariables = $existingDefinition[$variablesNode];
 
-        $newParsed = WDCHelper::parseVariableDefinitions($newVariables);
-        $existingParsed = WDCHelper::parseVariableDefinitions($existingVariables);
+        return self::mergeConfigurationVariablesValue($newConfig, $existingVariables, $newVariables);
+    }
 
-        foreach ($newParsed as $name => $newVariable) {
+    /**
+     * Retain variables value if:
+     *  - 'type' didn't change
+     *
+     * And in case of objects and entities:
+     *  - 'class' didn't change
+     *
+     * And in case of entities:
+     *  - 'options.identifier' didn't change
+     *
+     * @param array $configuration
+     * @param array $definition
+     * @param array $source
+     *
+     * @return array
+     */
+    private static function mergeConfigurationVariablesValue(array $configuration, $definition, $source)
+    {
+        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
+
+        $sourceParsed = WDCHelper::parseVariableDefinitions($source);
+        $definitionParsed = WDCHelper::parseVariableDefinitions($definition);
+
+        foreach ($sourceParsed as $name => $sourceVariable) {
             // nothing to copy
-            if (!isset($existingParsed[$name])) {
+            if (!isset($definitionParsed[$name])) {
                 continue;
             }
 
-            $existingVariable = $existingParsed[$name];
-
-            // types don't match
-            $newType = WDCHelper::getOption('type', $newVariable);
-            if ($newType !== WDCHelper::getOption('type', $existingVariable)) {
-                continue;
+            $existingVariable = $definitionParsed[$name];
+            if (self::isVariableValueRetainable($existingVariable, $sourceVariable)) {
+                $sourceVariable['value'] = WDCHelper::getOption('value', $existingVariable);
+                $configuration[$definitionsNode][$variablesNode][$name] = $sourceVariable;
             }
-
-            if (in_array($newType, ['object', 'entity'], true)) {
-                // class is not defined or changed
-                $newClass = WDCHelper::getOption('options.class', $newVariable);
-                $existingClass = WDCHelper::getOption('options.class', $existingVariable);
-
-                if (!$newClass || !$existingClass || $newClass !== $existingClass) {
-                    continue;
-                }
-
-                // entity identifier is not defined or changed
-                if ('entity' === $newType) {
-                    $newIdentifier = WDCHelper::getOption('options.identifier', $newVariable);
-                    $existingIdentifier = WDCHelper::getOption('options.identifier', $existingVariable);
-
-                    if (!$newClass || !$existingClass || $newIdentifier !== $existingIdentifier) {
-                        continue;
-                    }
-                }
-            }
-
-            $newVariable['value'] = WDCHelper::getOption('value', $existingVariable);
-            $newConfig[$definitionsNode][$variablesNode][$name] = $newVariable;
         }
 
-        return $newConfig;
+        return $configuration;
+    }
+
+    /**
+     * @param array $definition
+     * @param array $source
+     *
+     * @return bool
+     */
+    private static function isVariableValueRetainable($definition, $source)
+    {
+        // types don't match
+        $newType = WDCHelper::getOption('type', $source);
+        if ($newType !== WDCHelper::getOption('type', $definition)) {
+            return false;
+        }
+
+        if (!in_array($newType, ['object', 'entity'], true)) {
+            return true;
+        }
+
+        // class is not defined or changed
+        $newClass = WDCHelper::getOption('options.class', $source);
+        $existingClass = WDCHelper::getOption('options.class', $definition);
+
+        if (!$newClass || !$existingClass || $newClass !== $existingClass) {
+            return false;
+        }
+
+        if ('entity' !== $newType) {
+            return true;
+        }
+
+        // entity identifier is not defined or changed
+        $newIdentifier = WDCHelper::getOption('options.identifier', $source);
+        $existingIdentifier = WDCHelper::getOption('options.identifier', $definition);
+
+        return !(!$newClass || !$existingClass || $newIdentifier !== $existingIdentifier);
     }
 
     /**

@@ -277,56 +277,79 @@ class VariableAssembler extends BaseAbstractAssembler
             return $this->dataNormalizer->denormalizeVariable($workflow, $variable, $options['value']);
         }
 
-        $class = $this->getOption($options['options'], 'class');
         if ('object' === $type) {
-            try {
-                $propertyPath = $this->getOption($options, 'property_path');
-                if ($propertyPath) {
-                    $object = new $class();
-                    $object->{$propertyPath} = $options['value'];
-                } else {
-                    $object = new $class($options['value']);
-                }
-
-                return $object;
-            } catch (\Exception $e) {
-                return null;
-            }
+            return $this->denormalizeObjectVariable($options);
         }
 
         if ('entity' === $type) {
-            $manager = $this->getManagerForClass($class);
-            if (!$manager) {
-                throw new AssemblerException(sprintf('Can\'t get entity manager for class %s', $class));
-            }
-
-            $identifier = $this->getOption($options['options'], 'identifier');
-            if (!$identifier) {
-                return $manager->find($class, $options['value']);
-            }
-
-            /** @var ClassMetadataInfo $metadata */
-            $metadata = $manager->getClassMetadata($class);
-            if ($metadata->isIdentifierComposite) {
-                throw new AssemblerException(sprintf(
-                    'Entity with class %s has a composite identifier',
-                    $class
-                ));
-            }
-            if (!in_array($identifier, $metadata->getIdentifier(), true) && !$metadata->isUniqueField($identifier)) {
-                throw new AssemblerException(sprintf(
-                    'Field %s is not unique in entity with class %s',
-                    $identifier,
-                    $class
-                ));
-            }
-
-            $repository = $manager->getRepository($class);
-
-            return $repository->findOneBy([$identifier => $options['value']]);
+            return $this->denormalizeEntityVariable($options);
         }
 
         return null;
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return mixed
+     */
+    private function denormalizeObjectVariable(array $options)
+    {
+        $class = $this->getOption($options['options'], 'class');
+        $propertyPath = $this->getOption($options, 'property_path');
+
+        try {
+            if ($propertyPath) {
+                $object = new $class();
+                $object->{$propertyPath} = $options['value'];
+            } else {
+                $object = new $class($options['value']);
+            }
+
+            return $object;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return mixed
+     * @throws AssemblerException
+     */
+    private function denormalizeEntityVariable(array $options)
+    {
+        $class = $this->getOption($options['options'], 'class');
+        $manager = $this->getManagerForClass($class);
+        if (!$manager) {
+            throw new AssemblerException(sprintf('Can\'t get entity manager for class %s', $class));
+        }
+
+        $identifier = $this->getOption($options['options'], 'identifier');
+        if (!$identifier) {
+            return $manager->find($class, $options['value']);
+        }
+
+        /** @var ClassMetadataInfo $metadata */
+        $metadata = $manager->getClassMetadata($class);
+        if ($metadata->isIdentifierComposite) {
+            throw new AssemblerException(sprintf(
+                'Entity with class %s has a composite identifier',
+                $class
+            ));
+        }
+        if (!$metadata->isUniqueField($identifier) && !in_array($identifier, $metadata->getIdentifier(), true)) {
+            throw new AssemblerException(sprintf(
+                'Field %s is not unique in entity with class %s',
+                $identifier,
+                $class
+            ));
+        }
+
+        $repository = $manager->getRepository($class);
+
+        return $repository->findOneBy([$identifier => $options['value']]);
     }
 
     /**
