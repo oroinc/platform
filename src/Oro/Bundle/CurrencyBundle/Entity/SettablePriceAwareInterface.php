@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CurrencyBundle\Entity;
 
-interface PriceSetterAwareInterface extends PriceAwareInterface
+interface SettablePriceAwareInterface extends PriceAwareInterface
 {
     /**
      * @param Price $price
