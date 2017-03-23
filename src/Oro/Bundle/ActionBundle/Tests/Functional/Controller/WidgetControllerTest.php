@@ -534,7 +534,7 @@ class WidgetControllerTest extends WebTestCase
                 'frontend_options' => ['show_dialog' => true],
                 'attributes' => [
                     'message_attr' => ['label' => 'Message', 'type' => 'string'],
-                    'descr_attr' => ['property_path' => 'data.description']
+                    'descr_attr' => ['label' => 'Description', 'type' => 'string']
                 ],
                 'form_options' => [
                     'attribute_fields' => [
@@ -565,7 +565,7 @@ class WidgetControllerTest extends WebTestCase
                             '@not' => [
                                 'parameters' => [['@equal' => ['$description', '$.descr_attr']]],
                                 'message' => 'Please, write other description.'
-                            ]
+                    ]
                         ]
                     ]
                 ],
