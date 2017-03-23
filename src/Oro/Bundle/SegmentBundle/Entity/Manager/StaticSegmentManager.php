@@ -67,7 +67,7 @@ class StaticSegmentManager
 
         $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment);
         try {
-            $this->em->beginTransaction();
+            //$this->em->beginTransaction();
             $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
             $this->applyOrganizationLimit($segment, $qb);
             $qb->setMaxResults($segment->getRecordsLimit());
@@ -87,9 +87,9 @@ class StaticSegmentManager
                 $this->em->persist($segmentSnapshot);
             }
             $this->em->flush();
-            $this->em->commit();
+            //$this->em->commit();
         } catch (\Exception $exception) {
-            $this->em->rollback();
+            //$this->em->rollback();
 
             throw $exception;
         }
