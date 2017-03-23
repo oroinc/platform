@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-use Oro\Bundle\ActionBundle\Exception\AttributeException;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -10,6 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
+use Oro\Bundle\ActionBundle\Exception\AttributeException;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
