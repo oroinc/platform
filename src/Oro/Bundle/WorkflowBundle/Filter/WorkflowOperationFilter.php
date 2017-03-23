@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistryFilterInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -44,23 +43,16 @@ class WorkflowOperationFilter implements OperationRegistryFilterInterface
 
         $entityClass = $findCriteria->getEntityClass();
 
-        return array_filter($operations, function (Operation $operation) use ($entityClass) {
-            $operationName = $operation->getName();
-
-            if (!isset($this->disabledOperations[$operationName])) {
-                return true;
+        $filteredOperations = [];
+        foreach ($operations as $operationName => $operation) {
+            if (!isset($this->disabledOperations[$operationName][self::WILDCARD]) &&
+                !isset($this->disabledOperations[$operationName][$entityClass])
+            ) {
+                $filteredOperations[$operationName] = $operation;
             }
+        }
 
-            if (isset($this->disabledOperations[$operationName][self::WILDCARD])) {
-                return false;
-            }
-
-            if (isset($this->disabledOperations[$operationName][$entityClass])) {
-                return false;
-            }
-
-            return true;
-        });
+        return $filteredOperations;
     }
 
     private function loadOperationsToDisable()

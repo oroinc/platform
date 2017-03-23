@@ -8,6 +8,9 @@ use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class TitleService implements TitleServiceInterface
 {
     /**
@@ -99,6 +102,7 @@ class TitleService implements TitleServiceInterface
         if (null !== $title && $isJSON) {
             try {
                 $data = $this->jsonDecode($title);
+                $this->checkRenderParams($data, $isShort);
                 $params = $data['params'];
                 if ($isShort) {
                     $title = $data['short_template'];
@@ -256,9 +260,12 @@ class TitleService implements TitleServiceInterface
      *
      * @param array $params
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function setParams(array $params)
     {
+        $this->validateParams($params);
+
         $this->params = $params;
 
         return $this;
@@ -299,6 +306,27 @@ class TitleService implements TitleServiceInterface
         }
 
         return implode(' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ', $titleData);
+    }
+
+    /**
+     * @param array $data
+     * @param bool $isShort
+     *
+     * @throws \RuntimeException
+     */
+    protected function checkRenderParams(array $data, $isShort)
+    {
+        if (!isset($data['params'])) {
+            throw new \RuntimeException('Missing key "params" in JSON title.');
+        }
+
+        if ($isShort) {
+            if (!array_key_exists('short_template', $data)) {
+                throw new \RuntimeException('Missing key "short_template" in JSON title.');
+            }
+        } elseif (!array_key_exists('template', $data)) {
+            throw new \RuntimeException('Missing key "template" in JSON title.');
+        }
     }
 
     /**
@@ -344,10 +372,15 @@ class TitleService implements TitleServiceInterface
      */
     public function getSerialized()
     {
+        $params = [];
+        foreach ($this->getParams() as $paramName => $paramValue) {
+            //Explicitly case object to string because json_encode can not serialize it correct
+            $params[$paramName] = is_object($paramValue) ? (string)$paramValue : $paramValue;
+        }
         $data = [
             'template'       => $this->getTemplate(),
             'short_template' => $this->getShortTemplate(),
-            'params'         => $this->getParams()
+            'params'         => $params
         ];
         if ($this->prefix) {
             $data['prefix'] = $this->prefix;
@@ -395,5 +428,24 @@ class TitleService implements TitleServiceInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @param array $params
+     * @throws \InvalidArgumentException
+     */
+    private function validateParams(array $params)
+    {
+        foreach ($params as $key => $value) {
+            if (is_object($value) && !method_exists($value, '__toString')) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Object of type %s used for "%s" title param don\'t have __toString() method.',
+                        get_class($value),
+                        $key
+                    )
+                );
+            }
+        }
     }
 }

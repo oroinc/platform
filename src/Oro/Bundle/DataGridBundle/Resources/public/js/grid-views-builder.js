@@ -37,6 +37,7 @@ define(function(require) {
                 enableViews: options.enableViews,
                 $gridEl: options.$el,
                 showInNavbar: options.showViewsInNavbar,
+                showInCustomElement: options.showViewsInCustomElement,
                 buildViews: function(grid) {
                     if (_.isString(config.View)) {
                         tools.loadModules(config.View, function(View) {
@@ -82,15 +83,20 @@ define(function(require) {
          */
         build: function(View, collection) {
             var gridViews;
+            var $gridViews;
             var options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
                 var gridViewsOptions = _.extend({collection: collection}, options);
 
                 if (this.showInNavbar) {
-                    var $gridViews = $(gridGridViewsSelector);
+                    $gridViews = $(gridGridViewsSelector);
                     gridViewsOptions.title = $gridViews.text();
 
                     gridViews = new View(gridViewsOptions);
+                    $gridViews.html(gridViews.render().$el);
+                } else if (this.showInCustomElement) {
+                    gridViews = new GridViewsView(gridViewsOptions);
+                    $gridViews = $(this.showInCustomElement);
                     $gridViews.html(gridViews.render().$el);
                 } else {
                     gridViews = new View(gridViewsOptions);

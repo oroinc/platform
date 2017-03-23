@@ -8,6 +8,8 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Serializer\LocalizationArraySerializer;
+use Oro\Bundle\TranslationBundle\Entity\Language;
+
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +28,7 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Localization[] $localizations
-     * @dataProvider getLocalizations
+     * @dataProvider localizationsDataProvider
      */
     public function testFetch(array $localizations)
     {
@@ -48,9 +50,15 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function testFetchWithParentLocalization()
     {
-        $parent = $this->getEntity(Localization::class, ['id' => 1]);
+        $parent = $this->getEntity(Localization::class, [
+            'id' => 1,
+            'language' => $this->getEntity(Language::class, ['code' => 'ua'])
+        ]);
         /** @var Localization $child */
-        $child = $this->getEntity(Localization::class, ['id' => 2]);
+        $child = $this->getEntity(Localization::class, [
+            'id' => 2,
+            'language' => $this->getEntity(Language::class, ['code' => 'ru'])
+        ]);
         $child->setParentLocalization($parent);
 
         $localizations = [1 => $parent, 2 => $child];
@@ -73,7 +81,7 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Localization[] $localizations
-     * @dataProvider getLocalizations
+     * @dataProvider localizationsDataProvider
      */
     public function testSave(array $localizations)
     {
@@ -95,22 +103,39 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function getLocalizations()
+    public function localizationsDataProvider()
     {
         return [
             'singleLocalization' => [
-                [10 => $this->getEntity(Localization::class, ['id' => 10])]
+                [
+                    10 => $this->getEntity(Localization::class, [
+                        'id' => 10,
+                        'language' => $this->getEntity(Language::class, ['code' => 'en'])
+                    ])
+                ]
             ],
             'twoLocalizationsWithKeys' => [
                 [
-                    1 => $this->getEntity(Localization::class, ['id' => 1]),
-                    5 => $this->getEntity(Localization::class, ['id' => 5]),
+                    1 => $this->getEntity(Localization::class, [
+                        'id' => 1,
+                        'language' => $this->getEntity(Language::class, ['code' => 'en'])
+                    ]),
+                    5 => $this->getEntity(Localization::class, [
+                        'id' => 5,
+                        'language' => $this->getEntity(Language::class, ['code' => 'en'])
+                    ]),
                 ]
             ],
             'twoLocalizationsWithoutKeys' => [
                 [
-                    $this->getEntity(Localization::class, ['id' => 1]),
-                    $this->getEntity(Localization::class, ['id' => 2]),
+                    $this->getEntity(Localization::class, [
+                        'id' => 1,
+                        'language' => $this->getEntity(Language::class, ['code' => 'ru'])
+                    ]),
+                    $this->getEntity(Localization::class, [
+                        'id' => 2,
+                        'language' => $this->getEntity(Language::class, ['code' => 'ua'])
+                    ]),
                 ]
             ]
         ];

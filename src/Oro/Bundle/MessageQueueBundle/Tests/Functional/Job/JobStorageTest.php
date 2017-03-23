@@ -148,7 +148,7 @@ class JobStorageTest extends WebTestCase
      */
     private function getEntityManager()
     {
-        return $this->getContainer()->get('doctrine.orm.default_entity_manager');
+        return $this->getContainer()->get('doctrine.orm.message_queue_job_entity_manager');
     }
 
     /**

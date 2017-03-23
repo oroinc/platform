@@ -2,20 +2,22 @@ datagrids:
     base-oro-locale-localizations-grid:
         acl_resource: oro_locale_localization_view
         options:
-            entityHint: localization
+            entityHint: localizations
         source:
             type: orm
             query:
                 select:
                     - l.id
                     - l.name as name
-                    - l.languageCode
+                    - lng.code AS languageCode
                     - l.formattingCode
                     - l.createdAt
                     - l.updatedAt
                 from:
                     - { table: %oro_locale.entity.localization.class%, alias: l }
                 join:
+                    inner:
+                        - { join: l.language, alias: lng }
                     left:
                         - { join: l.parentLocalization, alias: pl }
         properties:
@@ -34,12 +36,15 @@ datagrids:
                 link: view_link
                 icon: eye
                 acl_resource: oro_locale_localization_view
-                row_action: true
+                rowAction: true
 
     oro-locale-localizations-grid:
         extends: base-oro-locale-localizations-grid
         options:
             entity_pagination: true
+            mass_actions:
+                delete:
+                    enabled: false
         source:
             type: orm
             query:
@@ -53,8 +58,8 @@ datagrids:
                 type:          twig
                 frontend_type: html
                 template:      OroLocaleBundle:Localization:Datagrid/title.html.twig
-            languageCode:
-                label: oro.locale.localization.language_code.label
+            language:
+                label: oro.locale.localization.language.label
                 type:          twig
                 frontend_type: html
                 template:      OroLocaleBundle:Localization:Datagrid/languageCode.html.twig
@@ -76,22 +81,21 @@ datagrids:
                 frontend_type: datetime
         sorters:
             default:
-                parentName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
                 name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
-        sorters:
+                parentName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
             columns:
                 name:
                     data_name: name
                 title:
                     data_name: title
-                languageCode:
+                language:
                     data_name: languageCode
                 formattingCode:
                     data_name: formattingCode
                 parentName:
                     data_name: parentName
                 createdAt:
-                    data_name: updatedAt
+                    data_name: createdAt
                 updatedAt:
                     data_name: updatedAt
         filters:
@@ -102,9 +106,9 @@ datagrids:
                 title:
                     type: string
                     data_name: title
-                languageCode:
+                language:
                     type: choice
-                    data_name: l.languageCode
+                    data_name: lng.id
                     options:
                         field_options:
                             choices: "@oro_locale.provider.localization_choices->getLanguageChoices"
@@ -148,8 +152,8 @@ datagrids:
                 type:          twig
                 frontend_type: html
                 template:      OroLocaleBundle:Localization:Datagrid/title.html.twig
-            languageCode:
-                label: oro.locale.localization.language_code.label
+            language:
+                label: oro.locale.localization.language.label
                 type:          twig
                 frontend_type: html
                 template:      OroLocaleBundle:Localization:Datagrid/languageCode.html.twig
@@ -170,5 +174,17 @@ datagrids:
 
     oro-locale-localizations-select-grid:
         extends: oro-locale-localizations-grid
+        source:
+            type: orm
+            query:
+                where:
+                    and:
+                        - l.id NOT IN (:ids)
+            bind_parameters:
+                -
+                    name: ids
+                    default: [0]
         options:
             entity_pagination: false
+        properties: { id: ~ }
+        actions: ~

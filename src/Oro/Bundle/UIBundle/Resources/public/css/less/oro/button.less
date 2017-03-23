@@ -121,6 +121,22 @@
   margin-top: 11px;
 }
 
+/* .btn-inverse */
+.btn-inverse {
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+  border-color: #222 #222 #000000;
+  #gradient > .vertical(#444, #222);
+
+  &:hover, &:focus, &:active {
+    color: #fff;
+    border-color: #444 #444 #000000;
+    background-color: #363636;
+    #gradient > .vertical(#222, #444);
+  }
+
+}
+
 /* .btn-danger */
 .btn-danger {
   background-color: #f35e3c;

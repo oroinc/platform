@@ -12,6 +12,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
         arguments:
             - '@suite.registry'
+            - '@specifications.finder'
         tags:
             - { name: cli.controller, priority: 700 }
 
@@ -95,6 +96,16 @@ services:
         arguments:
             - '@oro_element_factory'
             - '@oro_page_factory'
+        tags:
+            - { name: 'context.initializer' }
+
+    oro_behat_session_alias_provider:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProvider
+
+    oro_behat_session_alias_initializer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\SessionAliasAwareInitializer'
+        arguments:
+            - '@oro_behat_session_alias_provider'
         tags:
             - { name: 'context.initializer' }
 

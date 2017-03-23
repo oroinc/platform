@@ -80,12 +80,14 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
 
         $collection = new TreeCollection();
         $collection->target = $parent;
+        $collection->createRedirect = true;
 
         return [
             'with data' => [
                 'defaultData' => new TreeCollection(),
                 'submittedData' => [
-                    'target' => 'parent'
+                    'target' => 'parent',
+                    'createRedirect' => true,
                 ],
                 'expectedData' => $collection,
             ],
