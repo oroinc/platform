@@ -16,7 +16,7 @@ trait EntityTrait
      *
      * @return object
      */
-    protected function getEntity($className, array $properties = [], array $constructorArgs = null)
+    protected function getEntity($className, array $properties = [], array $constructorArgs = [])
     {
         $reflectionClass = new \ReflectionClass($className);
         $reflectionMethod = null;
@@ -26,7 +26,7 @@ trait EntityTrait
         }
 
         if ($reflectionMethod && $reflectionMethod->isPublic()) {
-            $entity = $reflectionClass->newInstance($constructorArgs);
+            $entity = $reflectionClass->newInstanceArgs($constructorArgs);
         } else {
             $entity = $reflectionClass->newInstanceWithoutConstructor();
         }
