@@ -104,7 +104,11 @@ class FilterHandler implements ConfigurationHandlerInterface
             self::$transitionDefinitionKeys,
             $configuration
         );
-        $this->filterConfigNode(WorkflowConfiguration::NODE_VARIABLES, self::$variableKeys, $configuration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS]);
+        $this->filterConfigNode(
+            WorkflowConfiguration::NODE_VARIABLES,
+            self::$variableKeys,
+            $configuration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS]
+        );
 
         return $this->filterKeys($configuration, self::$workflowKeys);
     }
