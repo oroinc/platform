@@ -311,49 +311,6 @@ class SegmentFilterTest extends OrmTestCase
         $this->assertFalse($result);
     }
 
-    public function testDynamicApply()
-    {
-        $dynamicSegmentStub = new Segment();
-        $dynamicSegmentStub->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
-        $dynamicSegmentStub->setEntity('Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser');
-
-        $filterData = ['value' => $dynamicSegmentStub];
-        $em         = $this->getEM();
-
-        $qb = $em->createQueryBuilder()
-            ->select(['t1.name'])
-            ->from('OroSegmentBundle:CmsUser', 't1');
-
-        $queryBuilder = new QueryBuilder($em);
-        $queryBuilder->select(['ts1.id'])
-            ->from('OroSegmentBundle:CmsUser', 'ts1')
-            ->andWhere('ts1.name LIKE :param1')
-            ->setParameter('param1', self::TEST_PARAM_VALUE);
-
-        $ds = new OrmFilterDatasourceAdapter($qb);
-
-        $this->dynamicSegmentQueryBuilder
-            ->expects(static::once())
-            ->method('getQueryBuilder')
-            ->with($dynamicSegmentStub)
-            ->will(static::returnValue($queryBuilder));
-
-        $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
-        $this->filter->apply($ds, $filterData);
-
-        $expectedResult = [
-            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1',
-            'WHERE t1.id IN(SELECT ts1.id FROM OroSegmentBundle:CmsUser ts1 WHERE ts1.name LIKE :param1)'
-        ];
-        $expectedResult = implode(' ', $expectedResult);
-
-        static::assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
-
-        $params = $ds->getQueryBuilder()->getParameters();
-        static::assertCount(1, $params, 'Should pass params to main query builder');
-        static::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
-    }
-
     public function testStaticApply()
     {
         $staticSegmentStub = new Segment();
@@ -420,7 +377,7 @@ class SegmentFilterTest extends OrmTestCase
         return $em;
     }
 
-    public function testDynamicApplyWithLimit()
+    public function testDynamicApply()
     {
         $dynamicSegment = (new Segment())
             ->setType(new SegmentType(SegmentType::TYPE_DYNAMIC))

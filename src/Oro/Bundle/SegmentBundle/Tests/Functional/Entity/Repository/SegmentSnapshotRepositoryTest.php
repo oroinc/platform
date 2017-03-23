@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 
@@ -18,7 +19,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData']);
+        $this->loadFixtures([LoadSegmentSnapshotData::class]);
     }
 
     public function testRemoveByEntity()
@@ -164,7 +165,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                     'OroSegmentBundle:SegmentSnapshot',
                     'snp',
                     Join::WITH,
-                    'snp.integerEntityId = CONCAT(entity.id, \'\')'
+                    'snp.integerEntityId = entity.id'
                 );
         } else {
             $queryBuilder

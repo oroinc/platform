@@ -92,11 +92,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         );
         $result  = preg_replace('/(ts)(\d+)/', 't1', $result);
         $this->assertSame(
-            sprintf(
-                'SELECT DISTINCT t1.%s FROM %s t1 WHERE t1.email LIKE :string1',
-                self::TEST_IDENTIFIER_NAME,
-                self::TEST_ENTITY
-            ),
+            'SELECT t1.userName, t1.id FROM AcmeBundle:UserEntity t1 WHERE t1.email LIKE :string1',
             $result
         );
     }
