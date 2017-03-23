@@ -308,10 +308,9 @@ class OperationTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param bool $noAttributes
+     * @param array $attributes
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    //protected function createOperation($noAttributes = false)
     protected function createOperation(array $attributes = [])
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeManager $attributeManager */
