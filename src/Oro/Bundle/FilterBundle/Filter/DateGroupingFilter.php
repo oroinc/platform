@@ -88,6 +88,7 @@ class DateGroupingFilter extends ChoiceFilter
                 );
                 break;
             case DateGroupingFilterType::TYPE_MONTH:
+                $this->handleCalendarDateSelect($qb, DateGroupingFilterType::TYPE_MONTH);
                 $this->addFilter(DateGroupingFilterType::TYPE_MONTH, $qb);
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
@@ -101,6 +102,7 @@ class DateGroupingFilter extends ChoiceFilter
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_MONTH);
                 break;
             case DateGroupingFilterType::TYPE_QUARTER:
+                $this->handleCalendarDateSelect($qb, DateGroupingFilterType::TYPE_QUARTER);
                 $this->addFilter(DateGroupingFilterType::TYPE_QUARTER, $qb);
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
@@ -115,6 +117,7 @@ class DateGroupingFilter extends ChoiceFilter
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_QUARTER);
                 break;
             default:
+                $this->handleCalendarDateSelect($qb, DateGroupingFilterType::TYPE_YEAR);
                 $this->addFilter(DateGroupingFilterType::TYPE_YEAR, $qb);
                 $qb->addSelect(
                     sprintf(
@@ -129,6 +132,41 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return true;
+    }
+
+    /**
+     * Apply cast of filter type on calendar date select
+     *
+     * @param QueryBuilder $qb
+     * @param $filterType
+     */
+    protected function handleCalendarDateSelect(QueryBuilder $qb, $filterType)
+    {
+        $configDataName = $this->get(FilterUtility::DATA_NAME_KEY);
+
+        // Resetting dql selects for the need of altering the first one . By convention the first one is set as data
+        // for the filter
+        $selects = $qb->getDQLPart('select');
+        $qb->resetDQLPart('select');
+
+        // Retrieve first select
+        $calendarDateSelect = array_shift($selects);
+
+        // Retrieve first part of Select expression
+        $selectParts = $calendarDateSelect->getParts();
+        $firstPart = array_shift($selectParts);
+
+        // Apply filter type cast on date
+        $partWithCast = sprintf('%s(%s)', $filterType, $configDataName);
+        $firstPart = str_replace($configDataName, $partWithCast, $firstPart);
+
+        // Add new updated select
+        $qb->addSelect($firstPart);
+
+        // Add the rest of original selects
+        foreach ($selects as $select) {
+            $qb->add('select', $select, true);
+        }
     }
 
     /**
@@ -246,7 +284,8 @@ class DateGroupingFilter extends ChoiceFilter
         $joinedColumn,
         $extraWhereClauses,
         $extraWhereParameters
-    ) {
+    )
+    {
         $subQueryBuilder = $this->entityManager->createQueryBuilder();
         $extraWhereClauses = str_replace(
             $this->config['data_name'],
