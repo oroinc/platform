@@ -21,7 +21,10 @@
                             {{ resetButton({
                                 'dataUrl': path(routePrefix ~ 'ajax_reset', {menuName: entity.root.name, context: context}),
                                 'dataRedirect': path(routePrefix ~ 'view', {menuName: entity.root.name, context: context}),
-                                'menuKey': entity.root.name
+                                'menuKey': entity.root.name,
+                                'data': {
+                                    'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : entity.root.name }),
+                                }
                             }) }}
 
                             {{ UI.buttonSeparator() }}
@@ -99,7 +102,7 @@
                                         'onRootSelectRoute' : routePrefix ~ 'view',
                                         'onSelectRoute' : routePrefix ~ 'update',
                                         'onMoveRoute' : routePrefix ~ 'ajax_move',
-                                        'successMessage': movedMessage|default('oro.ui.jstree.move_node_error')
+                                        'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
                                     } %}
 
                                     {{ UI.renderJsTree(
@@ -135,14 +138,15 @@
 
     {% set url = parameters.dataUrl is defined ? parameters.dataUrl : '' %}
 
+    {% set parametersData = parameters.data|merge({
+        'message': 'oro.navigation.menuupdate.reset_confirm'|trans({ '%menuKey%' : parameters.menuKey }),
+        'ok-text': 'oro.navigation.menuupdate.reset_ok_text'|trans,
+        'title': 'oro.navigation.menuupdate.reset_title'|trans,
+        'url': url
+    }) %}
+
     {% set parameters = parameters|merge({
-        'data': {
-            'message': 'oro.navigation.menuupdate.reset_confirm'|trans({ '%menuKey%' : parameters.menuKey }),
-            'success-message': resetedMessage|default('oro.navigation.menuupdate.reset_message')|trans({ '%menuKey%' : parameters.menuKey }),
-            'ok-text': 'oro.navigation.menuupdate.reset_ok_text'|trans,
-            'title': 'oro.navigation.menuupdate.reset_title'|trans,
-            'url': url
-        },
+        'data': parametersData,
         'title': 'oro.navigation.menuupdate.reset'|trans,
         'label': 'oro.navigation.menuupdate.reset'|trans,
         'aCss': ' btn icons-holder-text no-hash remove-button',

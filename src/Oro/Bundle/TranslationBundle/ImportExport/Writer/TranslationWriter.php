@@ -43,7 +43,13 @@ class TranslationWriter implements ItemWriterInterface
                 $domain = $item->getTranslationKey()->getDomain();
                 $locale = $item->getLanguage()->getCode();
 
-                $this->translationManager->saveTranslation($key, $item->getValue(), $locale, $domain);
+                $this->translationManager->saveTranslation(
+                    $key,
+                    $item->getValue(),
+                    $locale,
+                    $domain,
+                    Translation::SCOPE_UI
+                );
             }
 
             $this->translationManager->flush(true);

@@ -65,7 +65,7 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
         $contextData = [
             'string' => 'string',
             'array' => [],
-            'object' => new \stdClass()
+            'object' => \stdClass::class
         ];
         foreach ($contextData as $name => $item) {
             $context->data()->set($name, $item);

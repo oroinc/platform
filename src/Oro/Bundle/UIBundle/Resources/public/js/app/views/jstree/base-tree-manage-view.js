@@ -162,6 +162,9 @@ define(function(require) {
          * @param {Object} data
          */
         rollback: function(data) {
+            if (data.old_position > data.position) {
+                data.old_position++;
+            }
             this.moveTriggered = true;
             this.$tree.jstree('move_node', data.node, data.old_parent, data.old_position);
             this.moveTriggered = false;

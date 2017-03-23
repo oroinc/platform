@@ -1,5 +1,5 @@
-@fixture-../../../../../UserBundle/Tests/Behat/Features/Fixtures/user.yml
-@fixture-../../../../../OrganizationBundle/Tests/Behat/Features/Fixtures/BusinessUnit.yml
+@fixture-OroUserBundle:user.yml
+@fixture-OroOrganizationBundle:BusinessUnit.yml
 Feature: Adding attributes for workflow transition
   In order to specify attributes for workflow transitions
   As an Administrator
