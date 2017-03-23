@@ -83,10 +83,8 @@ class ConfigFieldGridController extends Controller
         $successMessage = $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.saved');
         $formAction = $this->generateUrl('oro_entityextend_field_update', ['id' => $entity->getId()]);
 
-        $response = $this->get('oro_entity_config.form.handler.create_update_config_field_handler')
+        return $this->get('oro_entity_config.form.handler.create_update_config_field_handler')
             ->handleFieldSave($request, $entity, $redirectUrl, $formAction, $successMessage);
-
-        return $this->addExtendedClassNamesToResponse($response);
     }
 
     /**
@@ -160,24 +158,5 @@ class ConfigFieldGridController extends Controller
             $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.cannot_be_restored'),
             $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.restored')
         );
-    }
-
-    /**
-     * @param array|RedirectResponse $response
-     * @return array
-     */
-    private function addExtendedClassNamesToResponse($response)
-    {
-        if (is_array($response)) {
-            $configs = $this->get('oro_entity_config.config_manager')->getConfigs('extend');
-            $nonExtendedClassNames = [];
-            foreach ($configs as $config) {
-                if (!$config->is('is_extend')) {
-                    $nonExtendedClassNames[] = $config->getId()->getClassName();
-                }
-            }
-            $response['nonExtendedClassNames'] = $nonExtendedClassNames;
-        }
-        return $response;
     }
 }

@@ -74,11 +74,9 @@
         'dataBlocks': dataBlocks,
         'hiddenData': form_rest(form)
     }%}
-    {% if nonExtendedClassNames is defined and form.extend.relation is defined %}
+    {% if non_extended_entities_classes is defined and form.extend.relation is defined %}
         {% set options = {
-            'nonExtendedEntitiesClassNames' : nonExtendedClassNames,
-            'bidirectionalId' : form.extend.relation.bidirectional.vars.id,
-            'targetEntityId': form.extend.relation.target_entity.vars.id
+            'nonExtendedEntitiesClassNames' : non_extended_entities_classes
         } %}
         <div data-page-component-module="oroentityextend/js/bidirectional-only-for-extended-component"
              data-page-component-options="{{ options|json_encode }}">

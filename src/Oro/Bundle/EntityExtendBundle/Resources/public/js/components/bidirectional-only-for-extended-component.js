@@ -8,14 +8,14 @@ define(function(require) {
 
     BidirectionalOnlyForExtendedComponent = BaseComponent.extend({
         initialize: function(options) {
-            var targetEntityField = $('#' + options.targetEntityId);
-            var bidirectionalField = $('#' + options.bidirectionalId);
+            var targetEntityField = $('[data-name="field__target-entity"]');
+            var bidirectionalField = $('[data-name="field__bidirectional"]');
             targetEntityField.change(function() {
                 if (_.indexOf(options.nonExtendedEntitiesClassNames, targetEntityField.val().trim()) !== -1) {
                     bidirectionalField.val('0').trigger('change');
-                    bidirectionalField.select2('enable', false);
+                    bidirectionalField.select2('readonly', true);
                 } else {
-                    bidirectionalField.select2('enable', true);
+                    bidirectionalField.select2('readonly', false);
                 }
             });
         }
