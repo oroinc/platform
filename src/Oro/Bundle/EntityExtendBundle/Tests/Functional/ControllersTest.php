@@ -116,16 +116,10 @@ class ControllersTest extends AbstractConfigControllerTest
                 'GET',
                 $this->getUrl("oro_entityextend_field_create", array('id' => $id))
             );
-            $continueButton = $crawler->selectButton('Continue');
-            $form = $continueButton->form();
-            $form["oro_entity_extend_field_type[fieldName]"] = "name" . strtolower($type);
-            $form["oro_entity_extend_field_type[type]"] = $type;
-            $this->client->followRedirects(true);
-            $crawler = $this->client
-                ->submit(
-                    $form,
-                    [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]
-                );
+
+            $name = "name" . strtolower($type);
+            $crawler = $this->getCrawlerAfterSubmittingFieldRelationForm($crawler, $name, $type);
+
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
             $form = $crawler->selectButton('Save and Close')->form();
@@ -150,12 +144,7 @@ class ControllersTest extends AbstractConfigControllerTest
             );
 
             $name = 'name' . strtolower($type);
-            $continueButton = $crawler->selectButton('Continue');
-            $form = $continueButton->form();
-            $form["oro_entity_extend_field_type[fieldName]"] = $name;
-            $form["oro_entity_extend_field_type[type]"] = $type;
-            $this->client->followRedirects(true);
-            $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]);
+            $crawler = $this->getCrawlerAfterSubmittingFieldRelationForm($crawler, $name, $type);
             $result = $this->client->getResponse();
             $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
@@ -237,5 +226,88 @@ class ControllersTest extends AbstractConfigControllerTest
         }
 
         return $entityLabels;
+    }
+    
+    /**
+     * @depends testView
+     * @param integer $id
+     */
+    public function testNonExtendedNonBidirectional($id)
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl("oro_entityextend_field_create", array('id' => $id))
+        );
+
+        $type = RelationType::MANY_TO_ONE;
+        $name = 'namebiok' . strtolower($type);
+        $crawler = $this->getCrawlerAfterSubmittingFieldRelationForm($crawler, $name, $type);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $saveButton = $crawler->selectButton('Save and Close');
+        $form = $saveButton->form();
+        $this->createManyToOneNonExtendableEntitySelect($form);
+
+        $this->client->followRedirects(true);
+        $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
+        $result = $this->client->getResponse();
+
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('Field saved', $content);
+        $this->assertContains($name, $content);
+    }
+
+    /**
+     * @depends testView
+     * @param integer $id
+     */
+    public function testNonExtendedBidirectional($id)
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl("oro_entityextend_field_create", array('id' => $id))
+        );
+
+        $type = RelationType::MANY_TO_ONE;
+        $name = 'namebierror' . strtolower($type);
+        $crawler = $this->getCrawlerAfterSubmittingFieldRelationForm($crawler, $name, $type);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $saveButton = $crawler->selectButton('Save and Close');
+        $form = $saveButton->form();
+
+        $this->createManyToOneNonExtendableEntitySelect($form);
+        $this->createBidirectionalSelect($form);
+        $form["oro_entity_config_type[extend][relation][bidirectional]"] = "1";
+
+        $this->client->followRedirects(true);
+        $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
+        $result = $this->client->getResponse();
+
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains(
+            'The field can&#039;t be set to &#039;Yes&#039; when target entity isn&#039;t extended.',
+            $result->getContent()
+        );
+    }
+
+    /**
+     * @param Crawler $crawler
+     * @param string $name
+     * @param string $type
+     * @return Crawler
+     */
+    protected function getCrawlerAfterSubmittingFieldRelationForm($crawler, $name, $type)
+    {
+        $continueButton = $crawler->selectButton('Continue');
+        $form = $continueButton->form();
+        $form["oro_entity_extend_field_type[fieldName]"] = $name;
+        $form["oro_entity_extend_field_type[type]"] = $type;
+        $this->client->followRedirects(true);
+
+        return $this->client->submit($form, [Router::ACTION_PARAMETER => $continueButton->attr('data-action')]);
     }
 }
