@@ -565,7 +565,7 @@ class WidgetControllerTest extends WebTestCase
                             '@not' => [
                                 'parameters' => [['@equal' => ['$description', '$.descr_attr']]],
                                 'message' => 'Please, write other description.'
-                    ]
+                            ]
                         ]
                     ]
                 ],
