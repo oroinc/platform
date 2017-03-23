@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Entity", "Doctrine", "DBAL", "ORM", "Utils", "Util"],
     "license": "MIT",
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.0",
         "doctrine/orm": "2.5.*"
     },
     "autoload": {
