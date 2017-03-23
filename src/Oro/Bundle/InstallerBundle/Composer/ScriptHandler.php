@@ -146,6 +146,7 @@ class ScriptHandler extends SensioScriptHandler
         if (!$pluginInstalled) {
             throw new \RuntimeException(
                 'NPM/Bower Dependency Manager for Composer is not installed. Please run from CLI:'.PHP_EOL.
+                '> composer self-update'.PHP_EOL.
                 '> composer global require fxp/composer-asset-plugin'.PHP_EOL.
                 'See https://github.com/fxpio/composer-asset-plugin for details and usage.'.PHP_EOL
             );
