@@ -129,7 +129,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
             ' id="oro_entity_config_type_extend_relation_target_field" >' .
             '<option value="" selected="selected"></option> ' .
             '<option value="id">' .
-            'Language' .
+            'Entity fallback value' .
             '</option> </select> '
         );
 
