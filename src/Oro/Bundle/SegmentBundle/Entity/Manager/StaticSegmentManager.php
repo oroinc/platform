@@ -66,34 +66,26 @@ class StaticSegmentManager
         }
 
         $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment);
-        try {
-            //$this->em->beginTransaction();
-            $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
-            $this->applyOrganizationLimit($segment, $qb);
-            $qb->setMaxResults($segment->getRecordsLimit());
-            $result = $qb->getQuery()->getArrayResult();
-            $identifier = $entityMetadata->getSingleIdentifierFieldName();
-            $identifierType = $entityMetadata->getTypeOfField($identifier);
 
-            $ids = array_column($result, $identifier);
+        $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
+        $this->applyOrganizationLimit($segment, $qb);
+        $qb->setMaxResults($segment->getRecordsLimit());
+        $result = $qb->getQuery()->getArrayResult();
+        $identifier = $entityMetadata->getSingleIdentifierFieldName();
+        $identifierType = $entityMetadata->getTypeOfField($identifier);
 
-            foreach ($ids as $id) {
-                $segmentSnapshot = new SegmentSnapshot($segment);
-                if ($identifierType === 'integer') {
-                    $segmentSnapshot->setIntegerEntityId($id);
-                } else {
-                    $segmentSnapshot->setEntityId($id);
-                }
-                $this->em->persist($segmentSnapshot);
+        $ids = array_column($result, $identifier);
+
+        foreach ($ids as $id) {
+            $segmentSnapshot = new SegmentSnapshot($segment);
+            if ($identifierType === 'integer') {
+                $segmentSnapshot->setIntegerEntityId($id);
+            } else {
+                $segmentSnapshot->setEntityId($id);
             }
-            $this->em->flush();
-            //$this->em->commit();
-        } catch (\Exception $exception) {
-            //$this->em->rollback();
-
-            throw $exception;
+            $this->em->persist($segmentSnapshot);
         }
-
+        $this->em->flush();
         $segment = $this->em->merge($segment);
         $segment->setLastRun(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($segment);
