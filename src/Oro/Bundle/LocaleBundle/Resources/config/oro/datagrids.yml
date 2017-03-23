@@ -36,7 +36,7 @@ datagrids:
                 link: view_link
                 icon: eye
                 acl_resource: oro_locale_localization_view
-                row_action: true
+                rowAction: true
 
     oro-locale-localizations-grid:
         extends: base-oro-locale-localizations-grid
@@ -95,7 +95,7 @@ datagrids:
                 parentName:
                     data_name: parentName
                 createdAt:
-                    data_name: updatedAt
+                    data_name: createdAt
                 updatedAt:
                     data_name: updatedAt
         filters:
