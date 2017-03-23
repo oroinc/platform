@@ -74,6 +74,15 @@
         'dataBlocks': dataBlocks,
         'hiddenData': form_rest(form)
     }%}
-
+    {% if nonExtendedClassNames is defined and form.extend.relation is defined %}
+        {% set options = {
+            'nonExtendedEntitiesClassNames' : nonExtendedClassNames,
+            'bidirectionalId' : form.extend.relation.bidirectional.vars.id,
+            'targetEntityId': form.extend.relation.target_entity.vars.id
+        } %}
+        <div data-page-component-module="oroentityextend/js/bidirectional-only-for-extended-component"
+             data-page-component-options="{{ options|json_encode }}">
+        </div>
+    {% endif %}
     {{ parent() }}
 {% endblock content_data %}
