@@ -2,6 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDefinitionClonerHelper;
 
 class WorkflowDefinitionClonerHelperTest extends \PHPUnit_Framework_TestCase
@@ -239,5 +246,250 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
         ];
+    }
+
+    /**
+     * @dataProvider copyConfigurationVariablesProvider
+     *
+     * @param array $definition
+     * @param array $source
+     * @param array $expected
+     */
+    public function testCopyConfigurationVariables($definition, $source, $expected)
+    {
+        $sourceDefinition = $this->createDefinition();
+        $existingDefinition = $this->createDefinition();
+
+        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
+
+        $existingConfig[$definitionsNode][$variablesNode] = $definition;
+        $existingDefinition->setConfiguration($existingConfig);
+
+        $sourceConfig[$definitionsNode][$variablesNode] = $source;
+        $sourceDefinition->setConfiguration($sourceConfig);
+
+        $mergedConfiguration = WorkflowDefinitionClonerHelper::copyConfigurationVariables(
+            $existingDefinition,
+            $sourceDefinition
+        );
+
+        $this->assertEquals($mergedConfiguration[$definitionsNode][$variablesNode], $expected);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array
+     */
+    public function copyConfigurationVariablesProvider()
+    {
+        return [
+            'no_existing_definition' => [
+                'definition' => [],
+                'source' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_1',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_1',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ]
+            ],
+            'correct_merge' => [
+                'definition' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_1',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'source' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => null,
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_1',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ]
+            ],
+            'type_change' => [
+                'definition' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_1',
+                        'type' => 'string',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'source' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_2',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_2',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ]
+            ],
+            'class_change' => [
+                'definition' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_1',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'source' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_2',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'DateTime',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_2',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'DateTime',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ]
+            ],
+            'identifier_change' => [
+                'definition' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_1',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'id'
+                        ]
+                    ]
+                ],
+                'source' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_2',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'code'
+                        ]
+                    ]
+                ],
+                'expected' => [
+                    'test_variable' => [
+                        'label' => 'label',
+                        'value' => 'value_2',
+                        'type' => 'entity',
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'code'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return WorkflowDefinition
+     */
+    protected function createDefinition()
+    {
+        $step1 = new WorkflowStep();
+        $step1->setName('step1');
+
+        $step2 = new WorkflowStep();
+        $step2->setName('step2');
+
+        $steps = new ArrayCollection([$step1, $step2]);
+
+        $entityAcl1 = new WorkflowEntityAcl();
+        $entityAcl1->setStep($step1);
+
+        $entityAcl2 = new WorkflowEntityAcl();
+        $entityAcl2->setStep($step2);
+
+        $entityAcls = new ArrayCollection([$entityAcl1, $entityAcl2]);
+
+        $restriction1 = new WorkflowRestriction();
+        $restriction1->setStep($step1);
+
+        $restriction2 = new WorkflowRestriction();
+        $restriction2->setStep($step2);
+
+        $restrictions = new ArrayCollection([$restriction1, $restriction2]);
+
+        $definition = new WorkflowDefinition();
+        $definition
+            ->setSteps($steps)
+            ->setStartStep($step2)
+            ->setEntityAcls($entityAcls)
+            ->setRestrictions($restrictions)
+            ->setApplications(['app1', 'app2']);
+
+        return $definition;
     }
 }
