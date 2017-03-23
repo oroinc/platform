@@ -91,6 +91,13 @@ class SegmentManagerTest extends WebTestCase
         $this->assertCount(50, $this->manager->getEntityQueryBuilder($dynamicSegment)->getQuery()->getResult());
     }
 
+    public function testGetEntityQueryBuilderWithSorting()
+    {
+        /** @var Segment $dynamicSegment */
+        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        $this->assertCount(0, $this->manager->getEntityQueryBuilder($dynamicSegment)->getQuery()->getResult());
+    }
+
     public function testGetFilterSubQueryDynamic()
     {
         $registry = $this->getContainer()->get('doctrine');

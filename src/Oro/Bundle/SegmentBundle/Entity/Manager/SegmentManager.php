@@ -117,7 +117,7 @@ class SegmentManager
     public function getEntityQueryBuilder(Segment $segment)
     {
         $repository = $this->em->getRepository($segment->getEntity());
-        $alias = 'us';
+        $alias = 'u';
         $qb = $repository->createQueryBuilder($alias);
 
         $subQuery = $this->getFilterSubQuery($segment, $qb);
@@ -127,7 +127,7 @@ class SegmentManager
 
         $qb = $this->applyOrderByParts($segment, $qb, $alias);
 
-        return $qb->where($qb->expr()->in('u.id', $subQuery));
+        return $qb->where($qb->expr()->in($alias . '.id', $subQuery));
     }
 
     /**
@@ -175,7 +175,7 @@ class SegmentManager
                 $identifier = reset($identifiers);
                 $idsResult = $queryBuilder->getQuery()->getArrayResult();
                 if (!$idsResult) {
-                    return [null];
+                    return [0];
                 }
                 $subQuery = array_column($idsResult, $identifier);
             } else {
