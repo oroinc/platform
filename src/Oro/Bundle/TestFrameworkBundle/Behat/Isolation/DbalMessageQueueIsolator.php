@@ -22,6 +22,11 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     private $kernel;
 
     /**
+     * @var Process
+     */
+    private $process;
+
+    /**
      * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)
@@ -38,12 +43,16 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $command = sprintf(
-            './console oro:message-queue:consume --env=%s %s > /dev/null 2>&1 &',
-            $this->kernel->getEnvironment(),
-            $this->kernel->isDebug() ? '' : '--no-debug'
+            'php %s/console oro:message-queue:consume --env=%s',
+            realpath($this->kernel->getRootDir()),
+            $this->kernel->getEnvironment()
         );
-        $process = new Process($command, $this->kernel->getRootDir());
-        $process->run();
+        $this->process = new Process($command);
+        $this->process->start(function ($type, $buffer) {
+            if (Process::ERR === $type) {
+                echo 'MessageQueueConsumer ERR > '.$buffer;
+            }
+        });
     }
 
     /** {@inheritdoc} */
@@ -53,7 +62,7 @@ class DbalMessageQueueIsolator implements IsolatorInterface
         $em = $this->kernel->getContainer()->get('doctrine')->getManager();
         DbalMessageQueueIsolator::waitForMessageQueue($em->getConnection());
 
-        $process = new Process('pkill -f oro:message-queue:consume', $this->kernel->getRootDir());
+        $process = new Process(sprintf('pkill -f "%s/console oro:message-queue:consume"', $this->kernel->getRootDir()));
 
         try {
             $process->run();
