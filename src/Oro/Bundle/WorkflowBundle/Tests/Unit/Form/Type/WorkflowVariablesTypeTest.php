@@ -15,10 +15,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType;
-use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
-use Oro\Bundle\WorkflowBundle\Model\VariableManager;
+use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
@@ -42,7 +43,6 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $entityManager = $this->createMock(EntityManager::class);
         $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->variableGuesser = $this->createMock(VariableGuesser::class);
 
         $classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
@@ -54,7 +54,10 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 
-        $this->type = new WorkflowVariablesType($this->variableGuesser, $managerRegistry);
+        $transformer = new WorkflowVariableDataTransformer($managerRegistry);
+        $this->variableGuesser = $this->createMock(VariableGuesser::class);
+
+        $this->type = new WorkflowVariablesType($this->variableGuesser, $transformer);
     }
 
     public function testBuildForm()
