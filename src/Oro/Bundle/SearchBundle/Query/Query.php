@@ -41,6 +41,7 @@ class Query
     const OPERATOR_EXISTS              = 'exists';
     const OPERATOR_NOT_EXISTS          = 'notexists';
     const OPERATOR_LIKE                = 'like';
+    const OPERATOR_NOT_LIKE            = 'notlike';
 
     const TYPE_TEXT     = 'text';
     const TYPE_INTEGER  = 'integer';
@@ -233,6 +234,7 @@ class Query
      * Add "WHERE" parameter
      *
      * @deprecated Since 1.8 use criteria to add conditions
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * @param string $keyWord
      * @param string $fieldName
@@ -250,6 +252,9 @@ class Query
         switch ($condition) {
             case self::OPERATOR_LIKE:
                 $expr = $expr->like($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_NOT_LIKE:
+                $expr = $expr->notLike($fieldName, $fieldValue);
                 break;
             case self::OPERATOR_CONTAINS:
                 $expr = $expr->contains($fieldName, $fieldValue);

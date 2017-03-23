@@ -12,6 +12,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableSuitesController
         arguments:
             - '@suite.registry'
+            - '@specifications.finder'
         tags:
             - { name: cli.controller, priority: 700 }
 

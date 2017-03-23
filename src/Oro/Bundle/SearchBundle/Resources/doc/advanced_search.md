@@ -132,6 +132,13 @@ name like value
 name like "string value"
 ```
 
+* **notlike** - operator `notlike` is used for finding records without specified substring in any position (`NOT LIKE %value%` statement behaviour). If the search value is a multi-word string that contains whitespaces, it should be enclosed in quotes.
+Examples:
+```
+name notlike value
+name notlike "string value"
+```
+
 ### For numeric fields
 
 * **= (EQUALS)** - operator `=` is used for search records where field matches the specified value.
