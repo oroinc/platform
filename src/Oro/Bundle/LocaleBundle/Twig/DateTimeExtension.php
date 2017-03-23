@@ -20,6 +20,19 @@ class DateTimeExtension extends \Twig_Extension
     }
 
     /**
+     * @param \DateTime|null|string $date
+     * @return string
+     */
+    public function dateTimeMediumFormat($date)
+    {
+        if ($date instanceof \DateTime) {
+            $date = $this->formatDateTime($date, ['timeType' => \IntlDateFormatter::MEDIUM]);
+        }
+
+        return $date;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFilters()
