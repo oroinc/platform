@@ -4,11 +4,9 @@ namespace Oro\Bundle\ReportBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
+
 use Oro\Bundle\QueryDesignerBundle\Form\Type\AbstractQueryDesignerType;
-use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
 
 class ReportType extends AbstractQueryDesignerType
 {
@@ -46,6 +44,7 @@ class ReportType extends AbstractQueryDesignerType
             ->add('description', 'textarea', array('required' => false));
 
         parent::buildForm($builder, $options);
+        $builder->addEventSubscriber(new DateGroupingFormSubscriber());
     }
 
     /**
@@ -58,7 +57,6 @@ class ReportType extends AbstractQueryDesignerType
             array(
                 'data_class'         => 'Oro\Bundle\ReportBundle\Entity\Report',
                 'intention'          => 'report',
-                'cascade_validation' => true
             )
         );
 

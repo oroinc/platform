@@ -105,12 +105,19 @@ define([
         /**
          * Default current state of collection
          *
-         * @property
+         * @property {Object}
          */
         state: _.extend({
             appearanceType: 'grid',
             appearanceData: {}
         }, BackbonePageableCollection.prototype.state),
+
+        /**
+         * Previous state of collection
+         *
+         * @property {Object}
+         */
+        previousState: {},
 
         /**
          * Declaration of URL parameters
@@ -542,8 +549,11 @@ define([
          * @param {Object} state
          */
         updateState: function(state) {
+            var previousState = _.clone(this.state);
             var newState = _.extend({}, this.state, state);
+
             this.state = this._checkState(newState);
+            this.previousState = previousState;
             this.trigger('updateState', this, this.state);
         },
 

@@ -30,6 +30,7 @@ define(function(require) {
                 enableViews: options.enableViews,
                 $gridEl: options.$el,
                 showInNavbar: options.showViewsInNavbar,
+                showInCustomElement: options.showViewsInCustomElement,
                 buildViews: function(grid) {
                     var gridViews = gridViewsBuilder.build.call(this, grid.collection);
                     deferred.resolve(gridViews);
@@ -68,15 +69,20 @@ define(function(require) {
          */
         build: function(collection) {
             var gridViews;
+            var $gridViews;
             var options = gridViewsBuilder.combineGridViewsOptions.call(this);
             if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
                 var gridViewsOptions = _.extend({collection: collection}, options);
 
                 if (this.showInNavbar) {
-                    var $gridViews = $(gridGridViewsSelector);
+                    $gridViews = $(gridGridViewsSelector);
                     gridViewsOptions.title = $gridViews.text();
 
                     gridViews = new GridViewsView(gridViewsOptions);
+                    $gridViews.html(gridViews.render().$el);
+                } else if (this.showInCustomElement) {
+                    gridViews = new GridViewsView(gridViewsOptions);
+                    $gridViews = $(this.showInCustomElement);
                     $gridViews.html(gridViews.render().$el);
                 } else {
                     gridViews = new GridViewsView(gridViewsOptions);
@@ -97,6 +103,7 @@ define(function(require) {
             var collection = gridContentManager.getViewsCollection(options.gridName);
 
             if (!collection) {
+                gridViewsBuilder.normalizeGridViewModelsData(options.views, this.metadata.initialState);
                 collection = new GridViewsCollection(options.views, {gridName: options.gridName});
             }
 
@@ -108,6 +115,16 @@ define(function(require) {
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;
             return _.omit(options, ['views']);
+        },
+
+        normalizeGridViewModelsData: function(items, initialState) {
+            _.each(items, function(item) {
+                _.each(['columns', 'sorter'], function(attr) {
+                    if (_.isEmpty(item[attr])) {
+                        $.extend(true, item, _.pick(initialState, attr));
+                    }
+                });
+            });
         }
     };
 

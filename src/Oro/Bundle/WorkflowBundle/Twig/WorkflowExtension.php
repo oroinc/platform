@@ -26,7 +26,7 @@ class WorkflowExtension extends \Twig_Extension
      */
     protected function getWorkflowManager()
     {
-        return $this->container->get('oro_workflow.manager');
+        return $this->container->get('oro_workflow.registry.workflow_manager')->getManager();
     }
 
     /**

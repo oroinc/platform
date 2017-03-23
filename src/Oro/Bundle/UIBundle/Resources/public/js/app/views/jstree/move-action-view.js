@@ -4,6 +4,7 @@ define(function(require) {
     var MoveActionView;
     var AbstractActionView = require('oroui/js/app/views/jstree/abstract-action-view');
     var _ = require('underscore');
+    var $ = require('jquery');
     var __ = require('orotranslation/js/translator');
     var DialogWidget = require('oro/dialog-widget');
     var routing = require('routing');
@@ -42,18 +43,30 @@ define(function(require) {
                     modal: true,
                     allowMaximize: true,
                     width: 650,
-                    minHeight: 100
+                    minHeight: 100,
+                    close: _.bind(this.onDialogClose, this)
                 }
             });
 
+            $tree.data('treeView').moveTriggered = true;
+
             this.dialogWidget.once('formSave', _.bind(function(changed) {
-                _.each(changed, function(data) {
+                $.when(_.each(changed, function(data) {
+                    var defer = $.Deferred();
                     $tree.jstree('move_node', data.id, data.parent, data.position);
                     $tree.jstree('uncheck_node', '#' + data.id);
+
+                    return defer.resolve();
+                })).done(function() {
+                    $tree.data('treeView').moveTriggered = false;
                 });
             }, this));
 
             this.dialogWidget.render();
+        },
+
+        onDialogClose: function() {
+            this.options.$tree.data('treeView').moveTriggered = false;
         }
     });
 

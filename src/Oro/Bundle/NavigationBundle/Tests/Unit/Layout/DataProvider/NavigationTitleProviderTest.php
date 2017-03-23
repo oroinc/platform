@@ -50,6 +50,7 @@ class NavigationTitleProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->titleService->expects($this->once())
             ->method('loadByRoute')
+            ->with($routeName, 'frontend_menu')
             ->willReturn(null);
 
         $this->titleService->expects($this->once())

@@ -47,10 +47,10 @@ class BehatBundleConfiguration implements ConfigurationInterface
                             ->then(function ($suite) {
                                 $suite['settings'] = isset($suite['settings'])
                                     ? $suite['settings']
-                                    : array();
+                                    : [];
 
                                 foreach ($suite as $key => $val) {
-                                    $suiteKeys = array('enabled', 'type', 'settings');
+                                    $suiteKeys = ['enabled', 'type', 'settings'];
                                     if ('paths' === $key) {
                                         $val = array_map(function ($v) {
                                             if ('@' === substr($v, 0, 1)) {
@@ -74,9 +74,9 @@ class BehatBundleConfiguration implements ConfigurationInterface
                         ->end()
                         ->normalizeKeys(false)
                         ->addDefaultsIfNotSet()
-                        ->treatTrueLike(array('enabled' => true))
-                        ->treatNullLike(array('enabled' => true))
-                        ->treatFalseLike(array('enabled' => false))
+                        ->treatTrueLike(['enabled' => true])
+                        ->treatNullLike(['enabled' => true])
+                        ->treatFalseLike(['enabled' => false])
                         ->children()
                             ->booleanNode('enabled')
                                 ->info('Enables/disables suite')
@@ -88,7 +88,7 @@ class BehatBundleConfiguration implements ConfigurationInterface
                             ->end()
                             ->arrayNode('settings')
                                 ->info('Specifies suite extra settings')
-                                ->defaultValue(array())
+                                ->defaultValue([])
                                 ->useAttributeAsKey('name')
                                 ->prototype('variable')->end()
                             ->end()

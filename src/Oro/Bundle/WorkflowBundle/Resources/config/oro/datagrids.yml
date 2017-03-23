@@ -98,8 +98,11 @@ datagrids:
 
     workflow-definitions-grid:
         options:
-            entityHint: workflow
+            entityHint: workflows
             export:     false
+            mass_actions:
+                delete:
+                    enabled: false
         acl_resource: oro_workflow_definition_view
         source:
             type: orm

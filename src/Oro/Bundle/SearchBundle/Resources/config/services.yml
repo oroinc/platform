@@ -274,3 +274,10 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_search_type_string_filter }
+
+    oro_search.event_listener.reindex_demo_data:
+        class: Oro\Bundle\SearchBundle\EventListener\ReindexDemoDataListener
+        arguments:
+            - "@oro_search.search.engine.indexer"
+        tags:
+            - { name: kernel.event_listener, event: console.terminate, method: afterExecute }

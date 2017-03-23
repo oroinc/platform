@@ -65,11 +65,17 @@ class PdoPgsql extends BaseDriver
     {
         $useFieldName = $searchCondition['fieldName'] !== '*';
         $condition = $searchCondition['condition'];
+
         $fieldValue = $this->filterTextFieldValue($searchCondition['fieldName'], $searchCondition['fieldValue']);
 
         switch ($condition) {
             case Query::OPERATOR_LIKE:
                 $searchString = parent::createContainsStringQuery($index, $useFieldName);
+                $setOrderBy = false;
+                break;
+
+            case Query::OPERATOR_NOT_LIKE:
+                $searchString = parent::createNotContainsStringQuery($index, $useFieldName);
                 $setOrderBy = false;
                 break;
 
@@ -228,7 +234,7 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true)) {
+        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true) && $fieldValue) {
             $searchArray = explode(Query::DELIMITER, $fieldValue);
 
             foreach ($searchArray as $key => $string) {
@@ -245,7 +251,7 @@ class PdoPgsql extends BaseDriver
             }
         } elseif ($searchCondition === Query::OPERATOR_STARTS_WITH) {
             $qb->setParameter('value' . $index, $fieldValue . '%');
-        } elseif ($searchCondition === Query::OPERATOR_LIKE) {
+        } elseif ($searchCondition === Query::OPERATOR_LIKE || $searchCondition === Query::OPERATOR_NOT_LIKE) {
             $qb->setParameter('value' . $index, '%' . $fieldValue . '%');
         } else {
             $qb->setParameter('value' . $index, $fieldValue);

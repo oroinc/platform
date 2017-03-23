@@ -172,6 +172,14 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         },
 
         /**
+         * Are we have touch screen
+         */
+        isTouchDevice: function()  {
+            return ('ontouchstart' in window) ||
+                ('DocumentTouch' in window && document instanceof window.DocumentTouch);
+        },
+
+        /**
          * Are we currently on iOS device
          */
         isIOS: function() {

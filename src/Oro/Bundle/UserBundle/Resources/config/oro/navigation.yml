@@ -94,18 +94,19 @@ navigation:
 
     titles:
         oro_user_index: ~
-        oro_user_view: '%%username%%'
-        oro_user_update: '%%username%% - Edit'
-        oro_user_create: 'Create User'
-        oro_user_config: '%%username%% - Configure'
+        oro_user_view: '%username% - oro.ui.view'
+        oro_user_update: '%username% - oro.ui.edit'
+        oro_user_create: 'oro.ui.create_entity'
+        oro_user_config: '%username% - oro.user.configure.label'
 
-        oro_user_profile_view: '%%username%%'
-        oro_user_profile_update: '%%username%% - Edit'
-        oro_user_profile_configuration: '%%username%% - Configure'
+        oro_user_profile_view: '%username% - oro.ui.view'
+        oro_user_profile_update: '%username% - oro.ui.edit'
+        oro_user_profile_configuration: '%username% - oro.user.configure.label'
 
         oro_user_role_index: ~
-        oro_user_role_update: '%%role%% - Edit'
-        oro_user_role_create: 'Create Role'
+        oro_user_role_view: '%role% - oro.ui.view'
+        oro_user_role_update: '%role% - oro.ui.edit'
+        oro_user_role_create: 'oro.ui.create_entity'
 
         oro_user_security_login: 'Login'
         oro_user_status_list: "User Status"
@@ -116,5 +117,5 @@ navigation:
         oro_user_reset_check_email: 'Password Reset - Check Email'
 
         oro_user_group_index: ~
-        oro_user_group_create: 'Create Group'
-        oro_user_group_update: '%%group%% - Edit'
+        oro_user_group_create: 'oro.ui.create_entity'
+        oro_user_group_update: '%group% - oro.ui.edit'

@@ -127,8 +127,6 @@ class EmailNotificationType extends AbstractType
             array(
                 'data_class'           => 'Oro\Bundle\NotificationBundle\Entity\EmailNotification',
                 'intention'            => 'emailnotification',
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'   => true,
             )
         );
     }

@@ -15,6 +15,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractLoadMultipleUserData extends AbstractFixture implements ContainerAwareInterface
 {
+    const ACL_PERMISSION = 'permission';
+    const ACL_LEVEL = 'level';
+
     /**
      * @var ContainerInterface
      */
@@ -132,12 +135,15 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
             $sid = $aclManager->getSid($role);
             $oid = $aclManager->getOid('entity:' . $className);
 
-            $builder = $aclManager->getMaskBuilder($oid);
-            $mask = $builder->reset()->get();
             foreach ($allowedAcls as $acl) {
-                $mask = $builder->add($acl)->get();
+                $permission = $acl[self::ACL_PERMISSION];
+                $level = $acl[self::ACL_LEVEL];
+
+                $builder = $aclManager->getMaskBuilder($oid, $permission);
+                $builder->add($permission . '_' . $level);
+
+                $aclManager->setPermission($sid, $oid, $builder->get());
             }
-            $aclManager->setPermission($sid, $oid, $mask);
         }
     }
 

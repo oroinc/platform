@@ -51,7 +51,6 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
-                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                     'api_context'          => $this->context
                 ]
             )

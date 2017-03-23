@@ -8,7 +8,6 @@ parameters:
     oro_organization.organization.manager.api.class:           Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
-    oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
     oro_organization.listener.choice_tree_filter_load_data_listener.class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
 

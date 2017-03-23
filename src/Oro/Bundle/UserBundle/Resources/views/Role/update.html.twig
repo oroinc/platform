@@ -2,7 +2,7 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% oro_title_set({params : { "%role%": form.vars.value.label } }) %}
+{% oro_title_set({params : { "%role%": form.vars.value.label, "%entityName%": 'oro.user.role.entity_label'|trans } }) %}
 {% set gridName = 'role-users-grid' %}
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
 
