@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
-use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationPackagesProviderPass;
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\ActionProvidersPass;
 use Oro\Component\DependencyInjection\Tests\Unit\AbstractExtensionCompilerPassTest;
 
-class TranslationPackagesProviderPassTest extends AbstractExtensionCompilerPassTest
+class ActionProvidersPassTest extends AbstractExtensionCompilerPassTest
 {
     public function testProcess()
     {
-        $this->assertServiceDefinitionMethodCalled('addExtension');
+        $this->assertServiceDefinitionMethodCalled('addActionProvider');
         $this->assertContainerBuilderCalled();
 
         $this->getCompilerPass()->process($this->containerBuilder);
@@ -20,7 +20,7 @@ class TranslationPackagesProviderPassTest extends AbstractExtensionCompilerPassT
      */
     protected function getCompilerPass()
     {
-        return new TranslationPackagesProviderPass();
+        return new ActionProvidersPass();
     }
 
     /**
@@ -28,7 +28,7 @@ class TranslationPackagesProviderPassTest extends AbstractExtensionCompilerPassT
      */
     protected function getServiceId()
     {
-        return TranslationPackagesProviderPass::SERVICE_ID;
+        return ActionProvidersPass::SERVICE_ID;
     }
 
     /**
@@ -36,6 +36,6 @@ class TranslationPackagesProviderPassTest extends AbstractExtensionCompilerPassT
      */
     protected function getTagName()
     {
-        return TranslationPackagesProviderPass::EXTENSION_TAG;
+        return ActionProvidersPass::EXTENSION_TAG;
     }
 }
