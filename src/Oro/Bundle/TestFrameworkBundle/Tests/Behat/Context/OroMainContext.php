@@ -586,6 +586,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Assert main menu item existing
+     *
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<path>[\/\w\s]+) in main menu$/
+     */
+    public function iShouldSeeOrNotInMainMenu($negotiation, $path)
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $hasLink = $mainMenu->hasLink($path);
+
+        if (!empty(trim($negotiation))) {
+            self::assertFalse($hasLink);
+        } else {
+            self::assertTrue($hasLink);
+        }
+    }
+
+    /**
      * Assert current page
      * Example: Then I should be on Search Result page
      * Example: Then I should be on Default Calendar View page
@@ -929,6 +947,25 @@ class OroMainContext extends MinkContext implements
     protected function createOroForm()
     {
         return $this->createElement('OroForm');
+    }
+
+    /**
+     * Asserts that link with provided title exists in user menu
+     *
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see (?P<title>[\w\s]+) in user menu$/
+     */
+    public function iShouldSeeOrNotInUserMenu($title, $negotiation = null)
+    {
+        /** @var UserMenu $userMenu */
+        $userMenu = $this->createElement('UserMenu');
+        self::assertTrue($userMenu->isValid());
+        $userMenu->open();
+
+        if (!empty(trim($negotiation))) {
+            self::assertFalse($userMenu->hasLink($title));
+        } else {
+            self::assertTrue($userMenu->hasLink($title));
+        }
     }
 
     /**
