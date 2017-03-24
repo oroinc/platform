@@ -54,14 +54,23 @@ class ButtonSearchContextTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return array
+     * @return \Generator
      */
     public function getSetEntityDataProvider()
     {
-        return [
-            [10],
-            [uniqid()],
-            [[10, uniqid()]],
-        ];
+        yield 'simple int id' => [10];
+        yield 'simple string id' => [uniqid('', true)];
+        yield 'array id' => [[10, uniqid('', true)]];
+    }
+
+    public function testGetHash()
+    {
+        $this->buttonSearchContext->setEntity('Class', ['id' => 42])
+            ->setRouteName('test_route')
+            ->setDatagrid('test_datagrid')
+            ->setReferrer('test_referrer')
+            ->setGroup(['test_group1', 'test_groug2']);
+
+        $this->assertEquals('654dfa2c4ef17b70a92ed9b7c0ffbc5a', $this->buttonSearchContext->getHash());
     }
 }

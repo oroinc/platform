@@ -35,26 +35,17 @@ Feature: Show "Update Schema" button for entity fields
     Then I should see "Field saved" flash message
     And I should see "Update Schema"
 
-  Scenario: Remove one Custom Field and continue to see "Update Schema" button
-    Given I click Remove some_another_field in grid
-    Then I should see "Delete Confirmation"
-    And I press "Yes"
-    Then I should see some_another_field Boolean some_another_field Custom Deleted in grid
-    And I should see "Update Schema"
-
-  Scenario: Update schema with help of "Update Schema" button
+  Scenario: Update schema
     Given I click "Update Schema"
     Then I should see "Schema update confirmation"
     And I press "Yes, Proceed"
     Then I should see "Schema updated"
+    And I move backward one page
+    And I should not see "Update Schema"
 
-  Scenario: Restore field and continue to see "Update Schema" button, after deletion of another field
-    Given I move backward one page
-    Then I click Restore some_another_field in grid
-    And I should see some_another_field Boolean some_another_field Custom Restored in grid
-    And I should see "Update Schema"
-    Then I click Remove some_field in grid
+  Scenario: Remove Custom Field
+    Given I click Remove some_another_field in grid
     Then I should see "Delete Confirmation"
     And I press "Yes"
-    Then I should see some_field Decimal some_field Custom Deleted in grid
+    Then I should see some_another_field Boolean some_another_field Custom Deleted in grid
     And I should see "Update Schema"

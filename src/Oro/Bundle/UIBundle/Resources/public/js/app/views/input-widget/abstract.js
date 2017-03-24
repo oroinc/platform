@@ -117,6 +117,7 @@ define(function(require) {
         },
 
         disposeWidget: function() {
+            this.$container = null;
             if (this.destroyOptions) {
                 this.widgetFunction(this.destroyOptions);
             }

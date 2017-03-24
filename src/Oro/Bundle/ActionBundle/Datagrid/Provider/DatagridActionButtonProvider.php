@@ -1,25 +1,26 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Datagrid\EventListener;
+namespace Oro\Bundle\ActionBundle\Datagrid\Provider;
 
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
+use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
-use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
+
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
-use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class ButtonListener
+class DatagridActionButtonProvider implements DatagridActionProviderInterface
 {
     /** @var ButtonProvider */
     protected $buttonProvider;
@@ -39,11 +40,8 @@ class ButtonListener
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var ButtonSearchContext */
-    protected $searchContext;
-
-    /** @var ButtonsCollection */
-    protected $buttons;
+    /** @var ButtonsCollection[] */
+    protected $buttons = [];
 
     /** @var array */
     protected $groups;
@@ -80,37 +78,36 @@ class ButtonListener
         $this->groups = $groups;
     }
 
-    /**
-     * @param ConfigureActionsBefore $event
-     */
-    public function onConfigureActions(ConfigureActionsBefore $event)
+    /** {@inheritdoc} */
+    public function hasActions(DatagridConfiguration $configuration)
     {
-        $config = $event->getConfig();
-
         // datasource types other than ORM are not handled
-        if (!$config->isOrmDatasource()) {
+        if (!$configuration->isOrmDatasource()) {
+            return false;
+        }
+
+        return 0 !== count($this->getButtons($this->getButtonSearchContext($configuration), $configuration));
+    }
+
+    /**
+     * @param DatagridConfiguration $configuration
+     */
+    public function applyActions(DatagridConfiguration $configuration)
+    {
+        if (!$this->hasActions($configuration)) {
             return;
         }
 
-        $this->searchContext = $this->getButtonSearchContext($config);
-        $this->buttons = $this->getButtons(
-            $this->searchContext,
-            $config->offsetGetOr(ActionExtension::ACTION_KEY, [])
-        );
+        $searchContext = $this->getButtonSearchContext($configuration);
 
-        if (0 === count($this->buttons)) {
-            return;
-        }
+        $this->applyContextConfig($configuration);
+        $this->applyActionsConfig($configuration, $searchContext);
 
-        $this->processDatagridConfig($config);
-        $this->processActionsConfig($config);
-        $this->processMassActionsConfig($config);
+        $this->processMassActionsConfig($configuration, $searchContext);
 
-        $config->offsetSet(
+        $configuration->offsetSet(
             ActionExtension::ACTION_CONFIGURATION_KEY,
-            $this->getRowConfigurationClosure(
-                $config->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY, [])
-            )
+            $this->getRowConfigurationClosure($configuration, $searchContext)
         );
     }
 
@@ -118,33 +115,43 @@ class ButtonListener
      * Returns buttons if they not already exist in datagrid config as actions
      *
      * @param ButtonSearchContext $searchContext
-     * @param array $datagridActionsConfig
+     * @param DatagridConfiguration $configuration
      * @return ButtonsCollection
      */
-    protected function getButtons(ButtonSearchContext $searchContext, array $datagridActionsConfig)
+    protected function getButtons(ButtonSearchContext $searchContext, DatagridConfiguration $configuration)
     {
-        $buttonCollection = $this->buttonProvider->match($searchContext);
+        $hash = $searchContext->getHash();
+        if (!array_key_exists($hash, $this->buttons)) {
+            $buttonCollection = $this->buttonProvider->match($searchContext);
+            $datagridActionsConfig = $configuration->offsetGetOr(ActionExtension::ACTION_KEY, []);
 
-        return $buttonCollection->filter(
-            function (ButtonInterface $button) use ($datagridActionsConfig) {
-                return !array_key_exists(strtolower($button->getName()), $datagridActionsConfig);
-            }
-        );
+            $this->buttons[$hash] = $buttonCollection->filter(
+                function (ButtonInterface $button) use ($datagridActionsConfig) {
+                    return !array_key_exists(strtolower($button->getName()), $datagridActionsConfig);
+                }
+            );
+        }
+
+        return $this->buttons[$hash];
     }
 
     /**
-     * @param array|null|callable $actionConfiguration
+     * @param DatagridConfiguration $configuration
+     * @param ButtonSearchContext $context
      * @return \Closure
      */
-    protected function getRowConfigurationClosure($actionConfiguration)
+    protected function getRowConfigurationClosure(DatagridConfiguration $configuration, ButtonSearchContext $context)
     {
-        return function (ResultRecordInterface $record, array $config) use ($actionConfiguration) {
+        $buttons = $this->getButtons($context, $configuration);
+        $actionConfiguration = $configuration->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY, []);
+
+        return function (ResultRecordInterface $record, array $config) use ($buttons, $actionConfiguration, $context) {
             $configuration = $this->retrieveConfiguration($actionConfiguration, $record, $config);
 
-            $searchContext = clone $this->searchContext;
+            $searchContext = clone $context;
             $searchContext->setEntity($searchContext->getEntityClass(), $record->getValue('id'));
 
-            $buttons = $this->buttons->map(
+            $buttons = $buttons->map(
                 function (
                     ButtonInterface $button,
                     ButtonProviderExtensionInterface $extension
@@ -154,6 +161,10 @@ class ButtonListener
                 ) {
                     $name = strtolower($button->getName());
                     $enabled = false;
+
+                    if ($searchContext->getEntityId() === null) {
+                        $configuration[$name] = false;
+                    }
 
                     $newButton = clone $button;
                     if (!array_key_exists($name, $configuration) || $configuration[$name] !== false) {
@@ -192,7 +203,7 @@ class ButtonListener
         $rowActions = [];
 
         if (is_callable($actionConfiguration)) {
-            $rowActions = call_user_func($actionConfiguration, $record, $config);
+            $rowActions = $actionConfiguration($record, $config);
         } elseif (is_array($actionConfiguration)) {
             $rowActions = $actionConfiguration;
         }
@@ -218,7 +229,7 @@ class ButtonListener
     /**
      * @param DatagridConfiguration $config
      */
-    protected function processDatagridConfig(DatagridConfiguration $config)
+    protected function applyContextConfig(DatagridConfiguration $config)
     {
         $context = $this->contextHelper->getContext();
 
@@ -229,12 +240,13 @@ class ButtonListener
 
     /**
      * @param DatagridConfiguration $config
+     * @param ButtonSearchContext $context
      */
-    protected function processActionsConfig(DatagridConfiguration $config)
+    protected function applyActionsConfig(DatagridConfiguration $config, ButtonSearchContext $context)
     {
         $actionsConfig = $config->offsetGetOr(ActionExtension::ACTION_KEY, []);
 
-        foreach ($this->buttons as $button) {
+        foreach ($this->getButtons($context, $config) as $button) {
             /** @var ButtonInterface $button */
             $name = strtolower($button->getName());
 
@@ -272,12 +284,13 @@ class ButtonListener
 
     /**
      * @param DatagridConfiguration $config
+     * @param ButtonSearchContext $context
      */
-    protected function processMassActionsConfig(DatagridConfiguration $config)
+    protected function processMassActionsConfig(DatagridConfiguration $config, ButtonSearchContext $context)
     {
         $actions = $config->offsetGetOr('mass_actions', []);
 
-        foreach ($this->buttons->getIterator() as $button) {
+        foreach ($this->getButtons($context, $config)->getIterator() as $button) {
             if (!$button instanceof OperationButton) {
                 continue;
             }
