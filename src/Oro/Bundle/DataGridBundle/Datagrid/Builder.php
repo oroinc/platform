@@ -83,21 +83,18 @@ class Builder
      *
      * @param DatagridConfiguration $config
      * @param ParameterBag          $parameters
+     * @param array                 $additionalParameters
      *
      * @return DatagridInterface
      */
-    public function build(DatagridConfiguration $config, ParameterBag $parameters)
+    public function build(DatagridConfiguration $config, ParameterBag $parameters, array $additionalParameters = [])
     {
         /**
          * @TODO: should be refactored in BAP-6849
          */
         $minified = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
         if (is_array($minified) && array_key_exists('g', $minified) && is_array($minified['g'])) {
-            $gridParams = [];
-            foreach ($minified['g'] as $gridParamName => $gridParamValue) {
-                $gridParams[$gridParamName] = $gridParamValue;
-            }
-            $parameters->add($gridParams);
+            $parameters->add(array_merge($minified['g'], $additionalParameters));
         }
 
         /**

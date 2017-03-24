@@ -9,6 +9,8 @@ use Oro\Bundle\TranslationBundle\Translation\KeySource\TranslationKeySource;
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyGenerator;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 
 class WorkflowTranslationHelper
@@ -45,6 +47,7 @@ class WorkflowTranslationHelper
     /**
      * @param string $workflowName
      * @param string $locale
+     *
      * @return array
      */
     public function findWorkflowTranslations($workflowName, $locale)
@@ -62,6 +65,7 @@ class WorkflowTranslationHelper
      * @param string $key
      * @param string $workflowName
      * @param string|null $locale
+     *
      * @return string
      */
     public function findWorkflowTranslation($key, $workflowName, $locale = null)
@@ -91,7 +95,8 @@ class WorkflowTranslationHelper
     /**
      * @param string $key
      * @param string|null $locale
-     * @return string
+     *
+     * @return string|null
      */
     public function findTranslation($key, $locale = null)
     {
@@ -130,9 +135,10 @@ class WorkflowTranslationHelper
     /**
      * @param string $key
      * @param string $locale
-     * @return string
+     *
+     * @return null|string
      */
-    private function findValue($key, $locale = Translator::DEFAULT_LOCALE)
+    public function findValue($key, $locale = Translator::DEFAULT_LOCALE)
     {
         return $this->translationHelper->findValue($key, $locale, self::TRANSLATION_DOMAIN);
     }
@@ -151,5 +157,73 @@ class WorkflowTranslationHelper
             self::TRANSLATION_DOMAIN,
             Translation::SCOPE_UI
         );
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     *
+     * @return array
+     */
+    public function generateDefinitionTranslationKeys(WorkflowDefinition $definition)
+    {
+        $config = $definition->getConfiguration();
+
+        $keys = [
+            $definition->getLabel(),
+        ];
+
+        foreach ($config[WorkflowConfiguration::NODE_STEPS] as $item) {
+            $keys[] = $item['label'];
+        }
+
+        foreach ($config[WorkflowConfiguration::NODE_ATTRIBUTES] as $item) {
+            $keys[] = $item['label'];
+        }
+
+        foreach ($config[WorkflowConfiguration::NODE_TRANSITIONS] as $item) {
+            $keys[] = $item['label'];
+            $keys[] = $item['message'];
+        }
+
+        if (isset($config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS])) {
+            $variableDefinitions = $config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+            foreach ($variableDefinitions[WorkflowConfiguration::NODE_VARIABLES] as $item) {
+                $keys[] = $item['label'];
+                if (isset($item['options']['form_options']['tooltip'])) {
+                    $keys[] = $item['options']['form_options']['tooltip'];
+                }
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * @param array $keys
+     * @param string|null $locale
+     * @param string $default
+     *
+     * @return array
+     */
+    public function generateDefinitionTranslations(array $keys, $locale = null, $default = '')
+    {
+        $translator = $this->translator;
+        $translations = [];
+        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        $locale = (null === $locale) ? $translator->getLocale() : $locale;
+
+        foreach ($keys as $key) {
+            if ($translator->hasTrans($key, $domain, $locale)) {
+                $translation = $translator->trans($key, [], $domain, $locale);
+            } elseif ($translator->hasTrans($key, $domain, Translator::DEFAULT_LOCALE)) {
+                $translation = $translator->trans($key, [], $domain, Translator::DEFAULT_LOCALE);
+            } else {
+                $translation = $default;
+            }
+
+            $translations[$key] = $translation;
+        }
+
+        return $translations;
     }
 }

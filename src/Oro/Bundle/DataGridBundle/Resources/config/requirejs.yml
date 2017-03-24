@@ -88,3 +88,5 @@ config:
         'orodatagrid/js/app/transitions/update-main-property-transition': 'bundles/orodatagrid/js/app/transitions/update-main-property-transition.js'
         'orodatagrid/js/app/views/board/card-view': 'bundles/orodatagrid/js/app/views/board/card-view.js'
         'orodatagrid/js/app/transitions/abstract-transition': 'bundles/orodatagrid/js/app/transitions/abstract-transition.js'
+        'orodatagrid/js/app/components/multi-grid-component': 'bundles/orodatagrid/js/app/components/multi-grid-component.js'
+        'orodatagrid/js/app/views/multi-grid-view': 'bundles/orodatagrid/js/app/views/multi-grid-view.js'

@@ -29,6 +29,9 @@ use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -531,6 +534,40 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Click on button in modal window
+     * Example: Given I click "Edit" in modal window
+     * Example: When I click "Save and Close" in modal window
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" in modal window$/
+     */
+    public function pressButtonInModalWindow($button)
+    {
+        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
+        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        try {
+            $button = $this->fixStepArgument($button);
+            $modalWindow->pressButton($button);
+        } catch (ElementNotFoundException $e) {
+            if ($modalWindow->hasLink($button)) {
+                $modalWindow->clickLink($button);
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Wait for ajax
+     *
+     * @Then /^(?:|I )have to wait for ajax$/
+     * @Then /^(?:|I )have to wait for ajax up to "(?P<timeInSec>(?:[^"]|\\")*)" seconds$/
+     */
+    public function iHaveToWaitForAjax($timeInSec = 60)
+    {
+        $timeInMs = $timeInSec * 1000;
+        $this->waitForAjax($timeInMs);
     }
 
     /**

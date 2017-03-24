@@ -51,7 +51,7 @@ class ConfigSettingsUpdateEvent extends Event
      * @param array $settings
      * @return ConfigSettingsUpdateEvent
      */
-    public function setSettings($settings)
+    public function setSettings(array $settings)
     {
         $this->settings = $settings;
 

@@ -1,6 +1,16 @@
 UPGRADE FROM 2.0 to 2.1
 ========================
 
+####General
+- Changed minimum required php version to 7.0
+- Updated dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin to version 1.3.
+- Composer updated to version 1.4.
+
+```
+    composer self-update
+    composer global require "fxp/composer-asset-plugin"
+```
+
 MessageQueue Component
 ----------------------
 - Class `Oro\Component\MessageQueue\Client\Meta\DestinationsCommand`
@@ -291,6 +301,8 @@ EntityExtendBundle
     - call to `addOneToManyRelation` creates bidirectional relation according to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional)
     - deprecated `addOneToManyInverseRelation`
     - throw exception when trying to use not allowed option while creating relation in migration
+- To be able to create bidirectional relation between entities and use "Reuse existing relation" functionality on UI
+    you _MUST_ select "bidirectional" field while creating relation
 - The parameter `oro_entity_extend.twig.extension.dynamic_fields.class` was removed from DIC
 - The parameter `oro_entity_extend.twig.extension.enum.class` was removed from DIC
 - The service `oro_entity_extend.twig.extension.dynamic_fields` was marked as `private`
@@ -798,7 +810,13 @@ filters such as `contains` when generating routes
         - third parameter is instance of `TranslationStatisticProvider`
         - fourth parameter is instance of `TranslatorInterface`
    - Changed parent from type from `locale` to `oro_choice`
-
+- Class `Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension`
+    - removed constant `PACKAGE_NAME`
+    - added constructor
+    - added method `public function addPackage(string $packageAlias, string $packageName, string $suffix = '')`
+- Updated service definition for `oro_translation.extension.transtation_packages_provider`
+    - changed publicity to `false`
+    
 UIBundle
 --------
 - Removed the following parameters from DIC:
@@ -991,6 +1009,12 @@ WorkflowBundle
     - removed property `protected $workflowManager`
 - Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand`.
 - Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand`.
+- Class `\Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor`:
+    - Signature of method `translateWorkflowDefinitionFields` changed, now it accept optional boolean parameter `$useKeyAsTranslation`
+- Class `\Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper`:
+    - added public method `generateDefinitionTranslationKeys`
+    - added public method `generateDefinitionTranslations`
+    - changed access level from `private` to `public` for method `findValue`
 
 TestFrameworkBundle
 -------------------
