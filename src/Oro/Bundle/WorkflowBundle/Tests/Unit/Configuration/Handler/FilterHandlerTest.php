@@ -114,6 +114,7 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                                     'delete' => false,
                                 ],
                                 'options' => [],
+                                'unknownKey' => 'unkownValue',
                             ]
                         ]
                     ]

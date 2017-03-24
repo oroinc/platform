@@ -260,9 +260,12 @@ class TitleService implements TitleServiceInterface
      *
      * @param array $params
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function setParams(array $params)
     {
+        $this->validateParams($params);
+
         $this->params = $params;
 
         return $this;
@@ -425,5 +428,24 @@ class TitleService implements TitleServiceInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @param array $params
+     * @throws \InvalidArgumentException
+     */
+    private function validateParams(array $params)
+    {
+        foreach ($params as $key => $value) {
+            if (is_object($value) && !method_exists($value, '__toString')) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Object of type %s used for "%s" title param don\'t have __toString() method.',
+                        get_class($value),
+                        $key
+                    )
+                );
+            }
+        }
     }
 }
