@@ -18,6 +18,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
@@ -449,6 +450,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $titleColumnName,
         array $options = []
     ) {
+        $this->ensureTargetNotHidden($table, $associationName);
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
@@ -634,6 +636,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $gridColumnNames,
         array $options = []
     ) {
+        $this->ensureTargetNotHidden($table, $associationName);
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
@@ -773,7 +776,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *
      * @param Schema       $schema
      * @param Table|string $table                 A Table object or table name of owning side entity
-     * @param string       $associationName       The name of a relation field
+     * @param string       $associationName       The name of a relation field. This field can't be hidden
      * @param Table|string $targetTable           A Table object or table name of inverse side entity
      * @param string       $targetAssociationName The name of a relation field on the inverse side
      * @param string[]     $titleColumnNames      Column names are used to show a title of owning side entity
@@ -792,6 +795,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $gridColumnNames,
         array $options = []
     ) {
+        $this->ensureTargetNotHidden($table, $associationName);
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
@@ -1100,6 +1104,21 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     ));
                 }
             }
+        }
+    }
+
+    /**
+     * @param string|ExtendTable $table
+     * @param string $associationName
+     */
+    private function ensureTargetNotHidden($table, $associationName)
+    {
+        $options = $this->extendOptionsManager->getExtendOptions();
+        $tableName = $this->getTableName($table);
+        $keyName = $tableName.'!'.$associationName;
+        if (!empty($options[$keyName][ExtendOptionsManager::MODE_OPTION])
+            && $options[$keyName][ExtendOptionsManager::MODE_OPTION] === ConfigModel::MODE_HIDDEN) {
+            throw new \InvalidArgumentException('Target field can\'t be hidden.');
         }
     }
 }

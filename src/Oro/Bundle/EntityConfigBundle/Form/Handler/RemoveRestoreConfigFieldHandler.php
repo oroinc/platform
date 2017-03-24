@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Handler;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\AfterRemoveFieldEvent;
@@ -76,23 +75,8 @@ class RemoveRestoreConfigFieldHandler
             );
         }
 
-        $fields = $this->configHelper->filterEntityConfigByField(
-            $field,
-            'extend',
-            function (ConfigInterface $config) {
-                return in_array(
-                    $config->get('state'),
-                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
-                );
-            }
-        );
-
         $entityConfig = $this->configHelper->getEntityConfigByField($field, 'extend');
-        if (!count($fields)) {
-            $entityConfig->set('upgradeable', false);
-        } else {
-            $entityConfig->set('upgradeable', true);
-        }
+        $entityConfig->set('upgradeable', true);
 
         $fieldConfig = $this->configHelper->getFieldConfig($field, 'extend');
         $fieldConfig->set('state', ExtendScope::STATE_DELETE);

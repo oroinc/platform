@@ -14,6 +14,7 @@ use Symfony\Component\Validator\ValidatorInterface;
 
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\ImportExportBundle\Context\BatchContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -204,11 +205,22 @@ class ImportStrategyHelper
      */
     public function addValidationErrors(array $validationErrors, ContextInterface $context, $errorPrefix = null)
     {
+        $batchSize = null;
+        $batchNumber = null;
+        if ($context instanceof BatchContextInterface) {
+            $batchSize = $context->getBatchSize();
+            $batchNumber = $context->getBatchNumber();
+        }
+
         if (null === $errorPrefix) {
+            $rowNumber = $context->getReadOffset();
+            if ($batchNumber && $batchSize) {
+                $rowNumber += --$batchNumber * $batchSize;
+            }
             $errorPrefix = $this->translator->trans(
                 'oro.importexport.import.error %number%',
                 array(
-                    '%number%' => $context->getReadOffset()
+                    '%number%' => $rowNumber
                 )
             );
         }

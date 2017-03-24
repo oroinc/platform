@@ -2,7 +2,7 @@ datagrids:
     base-oro-locale-localizations-grid:
         acl_resource: oro_locale_localization_view
         options:
-            entityHint: localization
+            entityHint: localizations
         source:
             type: orm
             query:
@@ -36,12 +36,15 @@ datagrids:
                 link: view_link
                 icon: eye
                 acl_resource: oro_locale_localization_view
-                row_action: true
+                rowAction: true
 
     oro-locale-localizations-grid:
         extends: base-oro-locale-localizations-grid
         options:
             entity_pagination: true
+            mass_actions:
+                delete:
+                    enabled: false
         source:
             type: orm
             query:
@@ -92,7 +95,7 @@ datagrids:
                 parentName:
                     data_name: parentName
                 createdAt:
-                    data_name: updatedAt
+                    data_name: createdAt
                 updatedAt:
                     data_name: updatedAt
         filters:

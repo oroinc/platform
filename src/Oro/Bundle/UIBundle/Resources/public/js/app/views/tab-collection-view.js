@@ -10,7 +10,7 @@ define(function(require) {
     var TabItemView = require('./tab-item-view');
 
     config = _.extend({
-        tamplateClassName: 'nav nav-tabs'
+        templateClassName: 'nav nav-tabs'
     }, config);
 
     TabCollectionView = BaseCollectionView.extend({
@@ -19,6 +19,7 @@ define(function(require) {
         itemView: TabItemView,
         useDropdown: false,
         itemsWidth: 0,
+        itemsMaxWidth: 0,
         dropdownTemplate: require('tpl!oroui/templates/dropdown-control.html'),
         dropdown: '[data-dropdown]',
         dropdownWrapper: '[data-dropdown-wrapper]',
@@ -33,7 +34,7 @@ define(function(require) {
         },
 
         template: function() {
-            return '<ul class="' + config.tamplateClassName + '" data-name="tabs-list"></ul>';
+            return '<ul class="' + config.templateClassName + '" data-name="tabs-list"></ul>';
         },
 
         initialize: function(options) {
@@ -109,7 +110,7 @@ define(function(require) {
                 for (var i = this.collection.models.length - 1; i >= 0; i--) {
                     var $currentView = this.getItemView(this.collection.models[i]).$el;
 
-                    if ((visibleWidth + this.dropdownWidth()) < this.dropdownContainerWidth) {
+                    if ((visibleWidth + this.getItemsMaxWidth()) < this.dropdownContainerWidth) {
                         this.$el.find(this.listSelector).prepend($currentView);
                     } else {
                         this.$el.find(this.dropdownWrapper).prepend($currentView);
@@ -129,15 +130,21 @@ define(function(require) {
         },
 
         calcItems: function() {
+            var self = this;
             var itemsWidth = 0;
 
             _.each(this.getItemViews(), function(view) {
                 var itemWidth = view.$el.outerWidth(true);
                 itemsWidth += itemWidth;
                 view.$el.data('dropdownOuterWidth', itemWidth);
+                self.itemsMaxWidth = Math.max(self.itemsMaxWidth, itemWidth);
             });
 
             return itemsWidth;
+        },
+
+        getItemsMaxWidth: function() {
+            return this.itemsMaxWidth;
         },
 
         render: function() {

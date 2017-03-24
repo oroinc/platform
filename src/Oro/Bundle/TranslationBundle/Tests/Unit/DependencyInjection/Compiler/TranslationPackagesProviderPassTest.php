@@ -3,29 +3,39 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\TranslationPackagesProviderPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Component\DependencyInjection\Tests\Unit\AbstractExtensionCompilerPassTest;
 
-class TranslationPackagesProviderPassTest extends \PHPUnit_Framework_TestCase
+class TranslationPackagesProviderPassTest extends AbstractExtensionCompilerPassTest
 {
     public function testProcess()
     {
-        /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $builder */
-        $builder = $this->getMockBuilder(ContainerBuilder::class)->disableOriginalConstructor()->getMock();
+        $this->assertServiceDefinitionMethodCalled('addExtension');
+        $this->assertContainerBuilderCalled();
 
-        /** @var $compilerPass TranslationPackagesProviderPass|\PHPUnit_Framework_MockObject_MockObject */
-        $compilerPass = $this->getMockBuilder(TranslationPackagesProviderPass::class)
-            ->setMethods(['registerTaggedServices'])
-            ->getMock();
+        $this->getCompilerPass()->process($this->containerBuilder);
+    }
 
-        $compilerPass->expects($this->once())
-            ->method('registerTaggedServices')
-            ->with(
-                $builder,
-                TranslationPackagesProviderPass::SERVICE_ID,
-                TranslationPackagesProviderPass::EXTENSION_TAG,
-                'addExtension'
-            );
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCompilerPass()
+    {
+        return new TranslationPackagesProviderPass();
+    }
 
-        $compilerPass->process($builder);
+    /**
+     * {@inheritdoc}
+     */
+    protected function getServiceId()
+    {
+        return TranslationPackagesProviderPass::SERVICE_ID;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTagName()
+    {
+        return TranslationPackagesProviderPass::EXTENSION_TAG;
     }
 }

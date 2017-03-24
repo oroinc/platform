@@ -133,7 +133,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
         $choiceType->expects($this->any())->method('getParent')->willReturn('choice');
 
         return [
-            new PreloadedExtension(['oro_choice' => $choiceType], [])
+            new PreloadedExtension([OroChoiceType::NAME => $choiceType], [])
         ];
     }
 }
