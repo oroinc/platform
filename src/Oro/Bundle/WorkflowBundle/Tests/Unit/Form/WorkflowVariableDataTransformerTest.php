@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 
-class WorkflowVariablesDataTransformerTest extends \PHPUnit_Framework_TestCase
+class WorkflowVariableDataTransformerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array $options
@@ -67,6 +67,9 @@ class WorkflowVariablesDataTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $transformer->reverseTransform($entity));
     }
 
+    /**
+     * @return array
+     */
     public function reverseTransformProvider()
     {
         return [
