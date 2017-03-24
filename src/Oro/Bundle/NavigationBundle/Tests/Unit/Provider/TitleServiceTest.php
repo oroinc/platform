@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 
@@ -196,6 +197,20 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dataArray['params'], $this->titleService->getParams());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Object of type stdClass used for "foo" title param don't have __toString() method.
+     */
+    public function testSetParamsObjectWithoutToString()
+    {
+        $this->titleService->setParams(
+            [
+                'foo' => new \stdClass(),
+                'bar' => 'valid_param_value'
+            ]
+        );
+    }
+
     public function testLoadByRoute()
     {
         $route          = 'test_route';
@@ -326,6 +341,20 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             '{"template":null,"short_template":null,"params":[]}',
+            $this->titleService->getSerialized()
+        );
+    }
+
+    public function testGetSerializedWithObjectInParams()
+    {
+        $value = new LocalizedFallbackValue();
+        $value->setString('String');
+        $this->titleService->setTemplate('test template');
+        $this->titleService->setShortTemplate('test short template');
+        $this->titleService->setParams(['localized_obj' => $value]);
+
+        $this->assertEquals(
+            '{"template":"test template","short_template":"test short template","params":{"localized_obj":"String"}}',
             $this->titleService->getSerialized()
         );
     }

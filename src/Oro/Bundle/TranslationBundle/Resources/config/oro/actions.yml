@@ -35,6 +35,17 @@ operations:
             - '@flash_message':
                 message: oro.translation.language.message.added
                 type: 'success'
+            - '@assign_url':
+                attribute: $.rebuildCacheUrl
+                route: oro_translation_translation_index
+            - '@trans':
+                attribute: $.rebuildCacheMessage
+                id: oro.translation.translation.rebuild_cache_required
+                params:
+                    '%%path%%': $.rebuildCacheUrl
+            - '@flash_message':
+                message: $.rebuildCacheMessage
+                type: 'warning'
             - '@refresh_grid': oro-translation-language-grid
 
     oro_translation_language_disable:

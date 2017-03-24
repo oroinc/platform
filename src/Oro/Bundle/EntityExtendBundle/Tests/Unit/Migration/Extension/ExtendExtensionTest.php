@@ -2471,6 +2471,90 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Target field can't be hidden.
+     */
+    public function testAddManyToOneInverseRelationWhenFieldIsHidden()
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->extendOptionsManager
+            ->setColumnOptions(
+                'oro_test',
+                'OroTestRelation',
+                [ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_HIDDEN]
+            );
+
+        $extension->addManyToOneInverseRelation(
+            $schema,
+            'oro_test',
+            'OroTestRelation',
+            'oro_test2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name']
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Target field can't be hidden.
+     */
+    public function testAddOneToManyInverseRelationWhenFieldIsHidden()
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->extendOptionsManager
+            ->setColumnOptions(
+                'oro_test',
+                'OroTestRelation',
+                [ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_HIDDEN]
+            );
+
+        $extension->addOneToManyInverseRelation(
+            $schema,
+            'oro_test',
+            'OroTestRelation',
+            'oro_test2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name']
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Target field can't be hidden.
+     */
+    public function testAddManyToManyInverseRelationWhenFieldIsHidden()
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->extendOptionsManager
+            ->setColumnOptions(
+                'oro_test',
+                'OroTestRelation',
+                [ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_HIDDEN]
+            );
+
+        $extension->addManyToManyInverseRelation(
+            $schema,
+            'oro_test',
+            'OroTestRelation',
+            'oro_test2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name']
+        );
+    }
+
+    /**
      * @dataProvider validateOptionsDataProvider
      * @param array $config
      * @param bool  $throwException

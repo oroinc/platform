@@ -44,7 +44,7 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
      */
     public function process($object)
     {
-        if (!$this->serializer) {
+        if (! $this->serializer) {
             throw new RuntimeException('Serializer must be injected.');
         }
         $data = $this->serializer->serialize(
