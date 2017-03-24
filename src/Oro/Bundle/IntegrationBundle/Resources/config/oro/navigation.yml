@@ -23,5 +23,5 @@ navigation:
 
     titles:
         oro_integration_index:  ~
-        oro_integration_update: '%%integration.name%%'
+        oro_integration_update: '%integration.name%'
         oro_integration_create: 'Create Integration'

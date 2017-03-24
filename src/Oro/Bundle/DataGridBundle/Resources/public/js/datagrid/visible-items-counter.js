@@ -32,6 +32,9 @@ define([
             optionPrefix: 'itemscounter'
         },
 
+        /** @property */
+        transTemplate: null,
+
         /**
          * Initializer.
          *
@@ -46,6 +49,10 @@ define([
 
             if (options.template) {
                 this.template = options.template;
+            }
+
+            if (options.transTemplate) {
+                this.transTemplate = options.transTemplate;
             }
 
             if (!options.collection) {
@@ -95,7 +102,8 @@ define([
             this.$el.empty();
             this.$el.html(this.template({
                 disabled: !this.enabled || !state.totalRecords,
-                state: _.extend({length: this.collection.length}, state)
+                state: _.extend({length: this.collection.length}, state),
+                transTemplate: this.transTemplate
             }));
 
             if (this.hidden) {

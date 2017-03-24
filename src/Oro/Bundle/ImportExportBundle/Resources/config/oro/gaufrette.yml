@@ -1,9 +1,0 @@
-knp_gaufrette:
-    adapters:
-        importexport:
-            local:
-                directory: '%kernel.cache_dir%/import_export'
-    filesystems:
-        importexport:
-            adapter:    importexport
-            alias:      importexport_filesystem

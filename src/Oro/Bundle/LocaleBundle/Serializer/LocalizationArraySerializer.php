@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\TranslationBundle\Entity\Language;
 
 class LocalizationArraySerializer implements SerializerInterface
 {
@@ -19,7 +20,6 @@ class LocalizationArraySerializer implements SerializerInterface
      */
     protected static $fieldsToSerializeInLocalization = [
         'id',
-        'languageCode',
         'formattingCode',
         'name',
         'createdAt',
@@ -44,6 +44,7 @@ class LocalizationArraySerializer implements SerializerInterface
      * @var array
      */
     protected static $relationClasses = [
+        'language' => [Language::class, ['id', 'code']],
         'parentLocalization' => [Localization::class, 'id']
     ];
 
@@ -188,24 +189,32 @@ class LocalizationArraySerializer implements SerializerInterface
         array $localizationArray
     ) {
         foreach (static::$relationClasses as $propertyName => $classOptions) {
-            $classPropertyName = $classOptions[1];
+            $classPropertyNames = (array)$classOptions[1];
 
             $reflectionProperty = $reflectionLocalization->getProperty($propertyName);
             $reflectionProperty->setAccessible(true);
 
-            if ($reflectionProperty->getValue($localization) === null) {
-                $propertyValue = null;
-            } else {
-                try {
-                    $propertyValue = (new PropertyAccessor())->getValue(
-                        $reflectionProperty->getValue($localization),
-                        $classPropertyName
-                    );
-                } catch (\Exception $exception) {
+            foreach ($classPropertyNames as $classPropertyName) {
+                if ($reflectionProperty->getValue($localization) === null) {
                     $propertyValue = null;
+                } else {
+                    try {
+                        $propertyValue = (new PropertyAccessor())->getValue(
+                            $reflectionProperty->getValue($localization),
+                            $classPropertyName
+                        );
+                    } catch (\Exception $exception) {
+                        $propertyValue = null;
+                    }
+                }
+
+                if (is_array($classOptions[1])) {
+                    $localizationArray[$reflectionProperty->getName()][$classPropertyName] = $propertyValue;
+                } else {
+                    $localizationArray[$reflectionProperty->getName()] = $propertyValue;
                 }
             }
-            $localizationArray[$reflectionProperty->getName()] = $propertyValue;
+
             $reflectionProperty->setAccessible(false);
         }
 
@@ -222,21 +231,31 @@ class LocalizationArraySerializer implements SerializerInterface
         \ReflectionObject $reflectionLocalization,
         Localization $localization
     ) {
-        foreach (static::$relationClasses as $propertyName => list($className, $classPropertyName)) {
+        foreach (static::$relationClasses as $propertyName => list($className, $classPropertyNames)) {
             if (!array_key_exists($propertyName, $data) || $data[$propertyName] === null) {
                 continue;
             }
 
             $reflectionProperty = $reflectionLocalization->getProperty($propertyName);
+            $reflectionProperty->setAccessible(true);
 
             $relationClass = new $className();
             $relationReflectionClass = new \ReflectionObject($relationClass);
-            $relationReflectionProperty = $relationReflectionClass->getProperty($classPropertyName);
-            $relationReflectionProperty->setAccessible(true);
-            $relationReflectionProperty->setValue($relationClass, $data[$propertyName]);
-            $relationReflectionProperty->setAccessible(false);
 
-            $reflectionProperty->setAccessible(true);
+            foreach ((array)$classPropertyNames as $classPropertyName) {
+                $value = is_array($classPropertyNames)
+                    ? $data[$propertyName][$classPropertyName]
+                    : $data[$propertyName];
+
+                if ($value === null) {
+                    continue;
+                }
+
+                $relationReflectionProperty = $relationReflectionClass->getProperty($classPropertyName);
+                $relationReflectionProperty->setAccessible(true);
+                $relationReflectionProperty->setValue($relationClass, $value);
+                $relationReflectionProperty->setAccessible(false);
+            }
 
             $reflectionProperty->setValue($localization, $relationClass);
             $reflectionProperty->setAccessible(false);

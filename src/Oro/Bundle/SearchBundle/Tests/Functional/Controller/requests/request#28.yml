@@ -1,0 +1,20 @@
+request:
+    supported_engines: [orm]
+    search: "+- item1 &^& item2 200987654"
+    offset: 0
+    max_results: 1
+response:
+    records_count: 2
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item2@mail.com 200987654
+                record_url: http://localhost%oro_default_prefix%search/
+    soap:
+        item:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item2@mail.com 200987654
+                record_url: http://localhost%oro_default_prefix%search/

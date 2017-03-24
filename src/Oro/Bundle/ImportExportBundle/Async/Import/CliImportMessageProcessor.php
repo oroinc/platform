@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
+use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\CliImportHandler;
@@ -15,7 +16,6 @@ use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -110,7 +110,7 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                 );
                 $this->saveJobResult($job, $result);
                 $this->logger->info(
-                    $this->importExportResultSummarizer->getSummaryMessage(
+                    $this->importExportResultSummarizer->getImportSummaryMessage(
                         array_merge(['originFileName' => $body['originFileName']], $result),
                         $body['process'],
                         $this->logger
@@ -126,6 +126,10 @@ class CliImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         return $result ? self::ACK : self::REJECT;
     }
 
+    /**
+     * @param Job $job
+     * @param array $data
+     */
     protected function saveJobResult(Job $job, array $data)
     {
         unset($data['message']);

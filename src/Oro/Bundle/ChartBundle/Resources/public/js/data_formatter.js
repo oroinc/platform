@@ -83,7 +83,7 @@ define([
                     case 'year':
                     case 'month':
                     case 'day':
-                        return Date.parse(data); //add convert to date
+                        return dateTimeFormatter.unformatBackendDateTime(data).valueOf(); //add convert to date
                     case 'datetime':
                     case 'time':
                         var date = dateTimeFormatter.unformatBackendDateTime(data);

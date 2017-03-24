@@ -8,9 +8,11 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader as AliceLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class FixtureLoader implements SuiteAwareInterface
 {
     /**
@@ -38,30 +40,23 @@ class FixtureLoader implements SuiteAwareInterface
      */
     protected $entitySupplement;
 
-    /**
-     * @var MessageQueueIsolatorInterface
-     */
-    protected $messageQueueIsolator;
 
     /**
      * @param KernelInterface $kernel
      * @param EntityClassResolver $entityClassResolver
      * @param EntitySupplement $entitySupplement
      * @param OroAliceLoader $aliceLoader
-     * @param MessageQueueIsolatorInterface $messageQueueIsolator
      */
     public function __construct(
         KernelInterface $kernel,
         EntityClassResolver $entityClassResolver,
         EntitySupplement $entitySupplement,
-        OroAliceLoader $aliceLoader,
-        MessageQueueIsolatorInterface $messageQueueIsolator
+        OroAliceLoader $aliceLoader
     ) {
         $this->kernel = $kernel;
         $this->aliceLoader = $aliceLoader;
         $this->entityClassResolver = $entityClassResolver;
         $this->entitySupplement = $entitySupplement;
-        $this->messageQueueIsolator = $messageQueueIsolator;
     }
 
     /**
@@ -70,7 +65,7 @@ class FixtureLoader implements SuiteAwareInterface
      */
     public function loadFixtureFile($filename)
     {
-        $file = DoctrineIsolator::findFile($filename, $this->suite);
+        $file = $this->findFile($filename);
 
         $objects = $this->load($file);
         $this->persist($objects);
@@ -113,7 +108,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -157,7 +151,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         return $entities;
     }
@@ -171,7 +164,6 @@ class FixtureLoader implements SuiteAwareInterface
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         $this->aliceLoader->setDoctrine($doctrine);
         $result = $this->aliceLoader->load($dataOrFilename);
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
 
         return $result;
     }
@@ -197,7 +189,6 @@ class FixtureLoader implements SuiteAwareInterface
         }
 
         $em->flush();
-        $this->messageQueueIsolator->waitWhileProcessingMessages();
     }
 
     /**
@@ -206,6 +197,49 @@ class FixtureLoader implements SuiteAwareInterface
     public function setSuite(Suite $suite)
     {
         $this->suite = $suite;
+    }
+
+    /**
+     * @param string $filename
+     * @return string Real path to file with fuxtures
+     * @throws \InvalidArgumentException
+     */
+    public function findFile($filename)
+    {
+        $suitePaths = $this->suite->getSetting('paths');
+
+        if (false !== strpos($filename, ':')) {
+            list($bundleName, $filename) = explode(':', $filename);
+            $bundlePath = $this->kernel->getBundle($bundleName)->getPath();
+            $suitePaths = [sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundlePath, DIRECTORY_SEPARATOR)];
+        }
+
+        if (!$file = $this->findFileInPath($filename, $suitePaths)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Can\'t find "%s" in pahts "%s"',
+                $filename,
+                implode(',', $suitePaths)
+            ));
+        }
+
+        return $file;
+    }
+
+    /**
+     * @param string $filename
+     * @param array $paths
+     * @return string|null
+     */
+    private function findFileInPath($filename, array $paths)
+    {
+        foreach ($paths as $path) {
+            $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        return null;
     }
 
     /**

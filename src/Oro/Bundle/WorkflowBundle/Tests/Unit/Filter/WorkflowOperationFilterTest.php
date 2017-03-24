@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Filter;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -10,6 +10,7 @@ use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Filter\WorkflowOperationFilter;
 
 class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
 {
@@ -85,9 +86,9 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function filterDataProvider()
     {
-        $operation1 = $this->createOperation('operation1');
-        $operation2 = $this->createOperation('operation2');
-        $operation3 = $this->createOperation('operation3');
+        $operation1 = $this->createOperation('first');
+        $operation2 = $this->createOperation('second');
+        $operation3 = $this->createOperation('third');
 
         yield 'wont filter if no configs met' => [
             'disabledOperationsConfigs' => [
@@ -103,8 +104,8 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
         yield 'not filtered' => [
             'disabledOperationsConfigs' => [
                 [],
-                ['operation3' => []],
-                ['operation3' => ['entityClass1']]
+                ['third' => []],
+                ['third' => ['entityClass1']]
             ],
             'operationsToFilter' => ['first' => $operation1, 'second' => $operation2],
             'criteria' => new OperationFindCriteria('entityClass1', null, null),
@@ -113,7 +114,7 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
 
         yield 'filtered by name only' => [
             'disabledOperationsConfigs' => [
-                ['operation1' => []]
+                ['first' => []]
             ],
             'operationsToFilter' => ['first' => $operation1, 'second' => $operation2],
             'criteria' => new OperationFindCriteria('entityClass1', null, null),
@@ -122,8 +123,8 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
 
         yield 'filtered by one wildcard' => [
             'disabledOperationsConfigs' => [
-                ['operation3' => []], //wildcard
-                ['operation2' => ['entityClass1']]
+                ['third' => []], //wildcard
+                ['second' => ['entityClass1']]
             ],
             'operationsToFilter' => ['first' => $operation1, 'second' => $operation2, 'third' => $operation3],
             'criteria' => new OperationFindCriteria('entityClass2', null, null),
@@ -132,9 +133,9 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
 
         yield 'filtered by wildcard and class and keep with non matched class' => [
             'disabledOperationsConfigs' => [
-                ['operation3' => []], //wildcard
-                ['operation2' => ['entityClass2']],
-                ['operation1' => ['entityClass1']]
+                ['third' => []], //wildcard
+                ['second' => ['entityClass2']],
+                ['first' => ['entityClass1']]
             ],
             'operationsToFilter' => ['first' => $operation1, 'second' => $operation2, 'third' => $operation3],
             'criteria' => new OperationFindCriteria('entityClass2', null, null),
@@ -143,8 +144,8 @@ class WorkflowOperationFilterTest extends \PHPUnit_Framework_TestCase
 
         yield 'filtered by merged class names' => [
             'disabledOperationsConfigs' => [
-                ['operation2' => ['entityClass1']], //wildcard
-                ['operation2' => ['entityClass2']]
+                ['second' => ['entityClass1']], //wildcard
+                ['second' => ['entityClass2']]
             ],
             'operationsToFilter' => ['first' => $operation1, 'second' => $operation2, 'third' => $operation3],
             'criteria' => new OperationFindCriteria('entityClass2', null, null),

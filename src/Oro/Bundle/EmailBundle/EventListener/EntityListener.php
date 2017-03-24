@@ -179,6 +179,8 @@ class EntityListener implements OptionalListenerInterface
                 'ownerIds' => $ids,
             ]);
         }
+
+        $this->emailActivityUpdates->clearPendingEntities();
     }
 
     /**

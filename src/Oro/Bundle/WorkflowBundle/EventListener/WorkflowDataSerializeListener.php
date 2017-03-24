@@ -7,7 +7,9 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
@@ -106,12 +108,10 @@ class WorkflowDataSerializeListener
     {
         $this->serializer->setWorkflowName($workflowItem->getWorkflowName());
 
-        // Cloning workflow data instance to prevent changing of original data.
-        $workflowData = clone $workflowItem->getData();
-        // entity attribute must not be serialized
-        $workflowData->remove($workflowItem->getDefinition()->getEntityAttributeName());
-
-        $serializedData = $this->serializer->serialize($workflowData, $this->format);
+        $serializedData = $this->serializer->serialize(
+            $this->getWorkflowData($workflowItem),
+            $this->format
+        );
         $workflowItem->setSerializedData($serializedData);
         $workflowItem->getData()->setModified(false);
     }
@@ -135,11 +135,55 @@ class WorkflowDataSerializeListener
     }
 
     /**
+     * @param WorkflowItem $workflowItem
+     * @return WorkflowData
+     */
+    protected function getWorkflowData(WorkflowItem $workflowItem)
+    {
+        // Cloning workflow data instance to prevent changing of original data.
+        $workflowData = clone $workflowItem->getData();
+
+        // entity attribute must not be serialized
+        $workflowData->remove($workflowItem->getDefinition()->getEntityAttributeName());
+
+        $virtualAttributes = array_keys($workflowItem->getDefinition()->getVirtualAttributes());
+        foreach ($virtualAttributes as $attributeName) {
+            $workflowData->remove($attributeName);
+        }
+
+        // workflow attributes must not be serialized
+        $workflowConfig = $workflowItem->getDefinition()->getConfiguration();
+        $variableNames = $this->getVariablesNamesFromConfiguration($workflowConfig);
+        foreach ($variableNames as $variableName) {
+            $workflowData->remove($variableName);
+        }
+
+        return $workflowData;
+    }
+
+    /**
      * @param $entity
      * @return bool
      */
     protected function isSupported($entity)
     {
         return $entity instanceof WorkflowItem;
+    }
+
+    /**
+     * @param array $configuration
+     *
+     * @return array
+     */
+    protected function getVariablesNamesFromConfiguration($configuration)
+    {
+        $definitionsNode = WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS;
+        $variablesNode = WorkflowConfiguration::NODE_VARIABLES;
+
+        if (!is_array($configuration) || !isset($configuration[$definitionsNode][$variablesNode])) {
+            return [];
+        }
+
+        return array_keys($configuration[$definitionsNode][$variablesNode]);
     }
 }

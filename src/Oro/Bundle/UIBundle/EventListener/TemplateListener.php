@@ -31,10 +31,15 @@ class TemplateListener
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
-        $container = $request->query->get('_widgetContainer');
+
+        $container = $request->query->get(
+            '_widgetContainerTemplate',
+            $request->request->get('_widgetContainerTemplate')
+        );
         if (!$container) {
-            $container = $request->request->get('_widgetContainer');
+            $container = $request->query->get('_widgetContainer', $request->request->get('_widgetContainer'));
         }
+
         if ($container) {
             $template = $request->attributes->get('_template');
             if ($template instanceof TemplateReferenceInterface) {

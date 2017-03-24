@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -92,7 +93,7 @@ class CorrectSortValue implements ProcessorInterface
 
         $result = [];
         foreach ($value as $fieldName => $direction) {
-            if ('id' === $fieldName) {
+            if (JsonApiDoc::ID === $fieldName) {
                 $this->addEntityIdentifierFieldNames($result, $entityClass, $direction, $config);
             } else {
                 $result[$fieldName] = $direction;

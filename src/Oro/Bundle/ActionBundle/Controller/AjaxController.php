@@ -45,7 +45,7 @@ class AjaxController extends Controller
             if (!$operation instanceof Operation) {
                 throw new OperationNotFoundException($operationName);
             }
-            if (!$operation->isAvailable($data)) {
+            if (!$operation->isAvailable($data, $errors)) {
                 throw new ForbiddenOperationException();
             }
 

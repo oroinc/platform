@@ -115,7 +115,3 @@ oro:
             label:
                 label:            Label
                 description:      Label of the address type ('Shipping' or 'Billing').
-        action:
-            read_dictionaries:
-                label: "Access address drop-downs"
-                description: "See drop-down menus for Countries, streets, etc. in the Address forms"

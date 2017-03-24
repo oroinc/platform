@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
@@ -33,6 +34,15 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
     /** @var array */
     protected $cachedEntities = [];
+
+    /** @var array */
+    protected $cachedExistingEntities = [];
+
+    /** @var array */
+    protected $cachedInverseSingleRelations = [];
+
+    /** @var array */
+    protected $cachedInverseMultipleRelations = [];
 
     /**
      * @param EventDispatcherInterface     $eventDispatcher
@@ -70,6 +80,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->assertEnvironment($entity);
 
         $this->cachedEntities = [];
+        $this->cachedInverseSingleRelations = [];
+        $this->cachedExistingEntities = [];
+        $this->cachedInverseMultipleRelations = [];
 
         if (!$entity = $this->beforeProcessEntity($entity)) {
             return null;
@@ -126,6 +139,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 return $existingEntity;
             }
             $this->cachedEntities[$existingOid] = $existingEntity;
+            $this->cachedExistingEntities[$existingOid] = $existingEntity;
         } else {
             // if can't find entity and new entity can't be persisted
             if (!$isPersistNew) {
@@ -285,6 +299,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                 $fieldName         = $field['name'];
                 $isFullRelation    = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
                 $isPersistRelation = $this->databaseHelper->isCascadePersist($entityName, $fieldName);
+                
                 $searchContext     = $this->generateSearchContextForRelationsUpdate(
                     $entity,
                     $entityName,
@@ -305,6 +320,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                             $searchContext,
                             true
                         );
+
+                        $this->cacheInverseFieldRelation($entityName, $fieldName, $relationEntity);
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
                 } elseif ($this->fieldHelper->isMultipleRelation($field)) {
@@ -326,6 +343,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
                             if ($collectionEntity) {
                                 $collectionEntities->add($collectionEntity);
+                                $this->cacheInverseFieldRelation($entityName, $fieldName, $collectionEntity);
                             }
                         }
 
@@ -349,6 +367,26 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+
+            foreach ($this->cachedExistingEntities as $oid => $object) {
+                if (array_key_exists($oid, $this->cachedInverseSingleRelations)) {
+                    foreach ($this->cachedInverseSingleRelations[$oid] as $fieldName => $value) {
+                        // restore initial value of related entity's inverse field
+                        $this->fieldHelper->setObjectValue($object, $fieldName, $value);
+                    }
+                }
+            }
+
+            foreach ($this->cachedInverseMultipleRelations as $fieldEntityPair) {
+                foreach ($fieldEntityPair as $fieldName => $object) {
+                    /** @var PersistentCollection $collection */
+                    $collection = $this->fieldHelper->getObjectValue($object, $fieldName);
+                    if ($collection->contains($entity)) {
+                        // remove entity from related entity's updated collections
+                        $collection->removeElement($entity);
+                    }
+                }
+            }
 
             $this->doctrineHelper->getEntityManager($entity)->detach($entity);
 
@@ -478,5 +516,35 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         }
 
         return [$inversedFieldName => $entity];
+    }
+
+    /**
+     * Temporarily save related entity inversed fields in order to recover them if import iteration fails
+     * @param string $entityName
+     * @param string $fieldName
+     * @param mixed $relationEntity
+     */
+    protected function cacheInverseFieldRelation($entityName, $fieldName, $relationEntity)
+    {
+        if (null === $relationEntity) {
+            return;
+        }
+
+        $oid = spl_object_hash($relationEntity);
+        $inverseFieldName = $this->databaseHelper->getInversedRelationFieldName($entityName, $fieldName);
+
+        if (array_key_exists($oid, $this->cachedExistingEntities) && $inverseFieldName) {
+            $relatedFields = $this->fieldHelper->getFields(ClassUtils::getClass($relationEntity), true);
+            $index = array_search($inverseFieldName, array_column($relatedFields, 'name'));
+
+            if ($index && $this->fieldHelper->isMultipleRelation($relatedFields[$index])) {
+                $this->cachedInverseMultipleRelations[$oid][$inverseFieldName] = $relationEntity;
+            }
+
+            if ($index && $this->fieldHelper->isSingleRelation($relatedFields[$index])) {
+                $value = $this->fieldHelper->getObjectValue($relationEntity, $inverseFieldName);
+                $this->cachedInverseSingleRelations[$oid][$inverseFieldName] = $value;
+            }
+        }
     }
 }

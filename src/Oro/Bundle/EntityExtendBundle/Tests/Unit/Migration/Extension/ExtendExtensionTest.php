@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
@@ -22,6 +23,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -89,13 +92,15 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $config
      * @return ExtendExtension
      */
-    protected function getExtendExtension()
+    protected function getExtendExtension(array $config = [])
     {
         $result = new ExtendExtension(
             $this->extendOptionsManager,
-            $this->entityMetadataHelper
+            $this->entityMetadataHelper,
+            new PropertyConfigBag($config)
         );
         $result->setNameGenerator(new ExtendDbIdentifierNameGenerator());
 
@@ -2463,6 +2468,257 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ],
             ]
         );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Target field can't be hidden.
+     */
+    public function testAddManyToOneInverseRelationWhenFieldIsHidden()
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->extendOptionsManager
+            ->setColumnOptions(
+                'oro_test',
+                'OroTestRelation',
+                [ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_HIDDEN]
+            );
+
+        $extension->addManyToOneInverseRelation(
+            $schema,
+            'oro_test',
+            'OroTestRelation',
+            'oro_test2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name']
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Target field can't be hidden.
+     */
+    public function testAddOneToManyInverseRelationWhenFieldIsHidden()
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->extendOptionsManager
+            ->setColumnOptions(
+                'oro_test',
+                'OroTestRelation',
+                [ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_HIDDEN]
+            );
+
+        $extension->addOneToManyInverseRelation(
+            $schema,
+            'oro_test',
+            'OroTestRelation',
+            'oro_test2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name']
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Target field can't be hidden.
+     */
+    public function testAddManyToManyInverseRelationWhenFieldIsHidden()
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $this->extendOptionsManager
+            ->setColumnOptions(
+                'oro_test',
+                'OroTestRelation',
+                [ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_HIDDEN]
+            );
+
+        $extension->addManyToManyInverseRelation(
+            $schema,
+            'oro_test',
+            'OroTestRelation',
+            'oro_test2',
+            'users',
+            ['name'],
+            ['name'],
+            ['name']
+        );
+    }
+
+    /**
+     * @dataProvider validateOptionsDataProvider
+     * @param array $config
+     * @param bool  $throwException
+     */
+    public function testValidateOptionAllowedTypesInManyToManyRelation(array $config, $throwException)
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension($config);
+
+        $table = $schema->createTable('table1');
+        $table->addColumn('id', 'integer');
+        $table->addColumn('name', 'string');
+        $table->setPrimaryKey(['id']);
+
+        if ($throwException) {
+            $this->expectException(\UnexpectedValueException::class);
+        }
+
+        $extension->addManyToManyRelation(
+            $schema,
+            $table,
+            'associationName',
+            'table1',
+            ['id'],
+            ['id'],
+            ['id'],
+            [
+                'scope' => [
+                    'not_allowed_option' => true
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider validateOptionsDataProvider
+     * @param array $config
+     * @param bool  $throwException
+     */
+    public function testValidateOptionAllowedTypesInOneToManyRelation(array $config, $throwException)
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension($config);
+
+        $table = $schema->createTable('table1');
+        $table->addColumn('id', 'integer');
+        $table->addColumn('name', 'string');
+        $table->setPrimaryKey(['id']);
+
+        if ($throwException) {
+            $this->expectException(\UnexpectedValueException::class);
+        }
+
+        $extension->addOneToManyRelation(
+            $schema,
+            $table,
+            'associationName',
+            'table1',
+            ['id'],
+            ['id'],
+            ['id'],
+            [
+                'scope' => [
+                    'not_allowed_option' => true
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @dataProvider validateOptionsDataProvider
+     * @param array $config
+     * @param bool  $throwException
+     */
+    public function testValidateOptionAllowedTypesInManyToOneRelation(array $config, $throwException)
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension($config);
+
+        $table = $schema->createTable('table1');
+        $table->addColumn('id', 'integer');
+        $table->addColumn('name', 'string');
+        $table->setPrimaryKey(['id']);
+
+        if ($throwException) {
+            $this->expectException(\UnexpectedValueException::class);
+        }
+
+        $extension->addManyToOneRelation(
+            $schema,
+            $table,
+            'associationName',
+            'table1',
+            'id',
+            [
+                'scope' => [
+                    'not_allowed_option' => true
+                ],
+            ]
+        );
+    }
+
+    public function testValidationWillNotBreakOnInvalidOptionProvided()
+    {
+        $schema = $this->getExtendSchema();
+        $extension = $this->getExtendExtension([
+            'scope' => ['options' => []]
+        ]);
+
+        $table = $schema->createTable('table1');
+        $table->addColumn('id', 'integer');
+        $table->addColumn('name', 'string');
+        $table->setPrimaryKey(['id']);
+
+        $extension->addManyToOneRelation(
+            $schema,
+            $table,
+            'associationName',
+            'table1',
+            'id',
+            [
+                '_custom_option' => true,
+                'scope' => [
+                    'not_allowed_option' => true
+                ],
+            ]
+        );
+
+        $this->assertArrayHasKey('table1!associationName', $schema->getExtendOptions());
+    }
+
+    /**
+     * @return array
+     */
+    public function validateOptionsDataProvider()
+    {
+        return [
+            'config with not allowed option ' => [[
+                'scope' => [
+                    'field' => [
+                        'items' => [
+                            'not_allowed_option' => [
+                                'options' => [
+                                    'allowed_type' => ['allowed_one', 'allowed_two']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ], true],
+            'config with allowed option' => [[
+                'scope' => [
+                    'field' => [
+                        'items' => [
+                            'not_allowed_option' => [
+                                'options' => [
+                                    'allowed_type' => ['oneToMany', 'manyToOne', 'manyToMany']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ], false]
+        ];
     }
 
     protected function assertSchemaSql(Schema $schema, array $expectedSql)

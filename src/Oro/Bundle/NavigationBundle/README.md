@@ -12,14 +12,6 @@ ACL implementation from Oro UserBundle.
 
 <a name="first-menu"></a>
 
-### Initialize Page Titles
-
-To load page titles from configs and controller annotations execute following command:
-
-```
-php app/console oro:navigation:init
-```
-
 ### Menu data sources
 
 Menu data can come from different sources:
@@ -127,17 +119,19 @@ menu_config:
             scope_type: <string>                # menu scope type identifier
             read_only: <boolean>                # disable ability to edit menu in UI
             max_nesting_level: <integer>        # menu max nesting level
-            merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
             children:                           # submenu items
                 <links to items hierarchy>
+                <key>:
+                    merge_strategy: <strategy>  # node merge strategy. possible strategies are replace|move
+                    children:
+                        <links to items hierarchy>
 ```
 
-To change merge strategy of tree node there are 3 possible options:
- - append - default. Node will be appended. If same node already present in tree it will be not changed.
- - replace - all nodes with same name will be removed and replaced in tree with current node definition
- - move - all nodes with same name will be removed and replaced in tree. Node children will be merged with found node children.
+To change merge strategy of tree node there are 2 possible options:
+ - move _(default)_ - node with same name will be removed and replaced in tree. Node children will be merged with found node children
+ - replace - node with same name and children will be removed and replaced in tree with current node definition
 
-Configuration builder reads all menu.yaml and merges its to one menu configuration. Therefore, developer can add or
+Configuration builder reads all navigation.yml and merges its to one menu configuration. Therefore, developer can add or
 replace any menu item from his bundles. Developers can prioritize loading and rewriting of menu's configuration
 options via sorting bundles in AppKernel.php.
 
@@ -151,21 +145,15 @@ Rout titles can be defined in navigation.yml file:
 
 ```yaml
 titles:
-    route_name_1: "%%parameter%% - Title"
-    route_name_2: "Edit %%parameter%% record"
+    route_name_1: "%parameter% - Title"
+    route_name_2: "Edit %parameter% record"
     route_name_3: "Static title"
 ```
 
 Title can be defined with annotation together with route annotation:
 
 ```
-@TitleTemplate("Route title with %%parameter%%")
-```
-
-After titles update following command should be executed:
-
-```
-php app/console oro:navigation:init
+@TitleTemplate("Route title with %parameter%")
 ```
 
 ## Rendering Menus

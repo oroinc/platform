@@ -84,8 +84,9 @@ oro:
         sync_error: 'Failed to add sync job to the queue. Error: %s.'
         sync_error_integration_deactivated: 'Failed to add sync job to the queue. Integration is not active.'
         progress: Check progress.
-        activate: Activate
-        deactivate: Deactivate
+        activate: 'Activate'
+        deactivate: 'Deactivate'
+        delete: 'Delete'
         button:
             force_sync: Full Re-sync
             sync: Schedule sync
@@ -103,8 +104,14 @@ oro:
 
         notification:
             channel:
-                activated: Integration has been activated successfully
-                deactivated: Integration has been deactivated successfully
+                activated: 'Integration has been activated successfully'
+                deactivated: 'Integration has been deactivated successfully'
+                deleted: 'Integration has been deleted successfully'
 
         action:
             assign.label: Select the assignee of the integration
+
+        operation:
+            attribute:
+                actionAllowed.label: 'Action is allowed'
+                actionSuccess.label: 'Action is successful'

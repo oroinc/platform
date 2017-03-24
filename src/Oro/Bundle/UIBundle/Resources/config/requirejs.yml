@@ -183,6 +183,7 @@ config:
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
         'oroui/js/tools/api-accessor': 'bundles/oroui/js/tools/api-accessor.js'
         'oroui/js/tools/search-api-accessor': 'bundles/oroui/js/tools/search-api-accessor.js'
+        'oroui/js/tools/layout-helper': 'bundles/oroui/js/tools/layout-helper.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
@@ -209,6 +210,7 @@ config:
         'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
         'oroui/js/app/views/zoomable-area-view': 'bundles/oroui/js/app/views/zoomable-area-view.js'
         'oroui/js/app/views/layout-subtree-view': 'bundles/oroui/js/app/views/layout-subtree-view.js'
+        'oroui/js/app/views/tab-collection-view': 'bundles/oroui/js/app/views/tab-collection-view'
 
         'oroui/js/viewport-manager': 'bundles/oroui/js/viewport-manager.js'
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
@@ -229,6 +231,7 @@ config:
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
         'oroui/js/app/components/viewport-component': 'bundles/oroui/js/app/components/viewport-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
+        'oroui/js/app/components/widget-form-component': 'bundles/oroui/js/app/components/widget-form-component.js'
         'oroui/js/app/views/jstree/base-tree-view': 'bundles/oroui/js/app/views/jstree/base-tree-view.js'
         'oroui/js/app/views/jstree/base-tree-manage-view': 'bundles/oroui/js/app/views/jstree/base-tree-manage-view.js'
         'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'

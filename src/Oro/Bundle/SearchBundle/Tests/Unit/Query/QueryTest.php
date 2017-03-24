@@ -87,6 +87,17 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Comparison::LIKE, $whereExpression->getOperator());
     }
 
+    public function testWhereNotLike()
+    {
+        $query = new Query();
+        $query->setMappingConfig($this->config);
+        $query->from('Oro\Bundle\DataBundle\Entity\Product');
+        $query->andWhere('all_data', Query::OPERATOR_NOT_LIKE, 'test', 'string');
+
+        $whereExpression = $query->getCriteria()->getWhereExpression();
+        $this->assertEquals(Comparison::NOT_LIKE, $whereExpression->getOperator());
+    }
+
     public function testGetMaxResults()
     {
         $query = new Query();
@@ -132,7 +143,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testStringCleanup()
     {
-        $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again';
+        $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again RE FW Re';
 
         $clearedValue     = Query::clearString($testString);
         $textAllDataField = sprintf('%s %s', $testString, $clearedValue);
@@ -167,9 +178,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function dataProviderForClearString()
     {
         return [
-            ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re: FW: Test One äöü ßü abc 3 again'],
-            ['text with ___ \' special chars \/ "', 'text with ___ special chars'],
-            ['at @ * . test', 'at @ * . test'],
+            ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re FW Test One äöü ßü abc 3 again'],
+            ['text with ___ \' special chars \/ "', 'text with special chars'],
+            ['at @ * . test', 'at test'],
         ];
     }
 

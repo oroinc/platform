@@ -3,18 +3,19 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+
 use Knp\Menu\ItemInterface;
+
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
@@ -34,21 +35,18 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-
         $registry = $this->createMock(ManagerRegistry::class);
-
-        $translator = $this->createMock(TranslatorInterface::class);
 
         $kernel = $this->createMock(KernelInterface::class);
 
         return [
             new PreloadedExtension(
                 [
-                    LocalizedFallbackValueCollectionType::NAME => new LocalizedFallbackValueCollectionType($registry),
-                    LocalizedPropertyType::NAME => new LocalizedPropertyType(),
-                    LocalizationCollectionType::NAME => new LocalizationCollectionTypeStub(),
-                    'oro_icon_select' => new OroIconTypeStub($kernel),
-                    'genemu_jqueryselect2_choice' => new Select2Type('choice'),
+                    new LocalizedFallbackValueCollectionType($registry),
+                    new LocalizedPropertyType(),
+                    new LocalizationCollectionTypeStub(),
+                    new OroIconTypeStub($kernel),
+                    new Select2Type('choice'),
                 ],
                 []
             ),
@@ -130,7 +128,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         $form->submit([]);
 
         $expected = new MenuUpdate();
-        $expectedTitle = (new LocalizedFallbackValue);
+        $expectedTitle = new LocalizedFallbackValue;
         $expected->addTitle($expectedTitle);
         $expected->addDescription(new LocalizedFallbackValue);
 

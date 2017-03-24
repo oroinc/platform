@@ -10,10 +10,10 @@
             </div>
             <div class="column-manager-table"></div>
             <div class="column-manager-reset">
-                <span class="link" data-role="column-manager-reset">
+                <a href="#" class="link" data-role="column-manager-reset">
                     <i class="fa fa-refresh"></i>
-                    <a href="#"><%= _.__('oro.datagrid.column_manager.reset')%></a>
-                </span>
+                    <span><%= _.__('oro.datagrid.column_manager.reset')%></span>
+                </a>
             </div>
         </div>
     </script>
@@ -35,21 +35,23 @@
     <td class="column-manager__item">
         <div class="column-manager__container">
             <span class="column-manager__handle handle"></span>
-            <label for="column-<%= cid  %>"
-                   data-checkbox
-                   class="custom-checkbox ">
-                <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
-                <% if (disabledVisibilityChange) { %> disabled <% } %>
-                <% if (renderable) { %> checked <% } %>
-                    class="custom-checkbox__input"
-                />
-                <span class="custom-checkbox__icon"></span>
-                <span class="custom-checkbox__text"><%= label %></span>
-            </label>
-
+            <div class="column-manager__label">
+                <label data-checkbox
+                       class="custom-checkbox ">
+                    <input type="checkbox" data-role="renderable"
+                    <% if (disabledVisibilityChange) { %> disabled <% } %>
+                    <% if (renderable) { %> checked <% } %>
+                        class="custom-checkbox__input"
+                    />
+                    <span class="custom-checkbox__icon"></span>
+                    <span class="custom-checkbox__text"><%= label %></span>
+                </label>
+            </div>
             <% if (_.isMobile()) { %>
-                <span class="btn move-up" data-role="moveUp" title="Move column up"><i class="fa-chevron-up"></i></span>
-                <span class="btn move-down" data-role="moveDown" title="Move column down"><i class="fa-chevron-down"></i></span>
+                <div class="column-manager__move">
+                    <span class="column-manager__move-btn column-manager__move-up" data-role="moveUp" title="Move column up"><i class="fa-long-arrow-up"></i></span>
+                    <span class="column-manager__move-btn column-manager__move-down" data-role="moveDown" title="Move column down"><i class="fa-long-arrow-down"></i></span>
+                </div>
             <% } %>
         </div>
     </td>
