@@ -156,8 +156,8 @@ services:
             - ''
             - '@doctrine.orm.entity_manager'
 
-    oro_action.datagrid.event_listener.button:
-        class: 'Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener'
+    oro_action.datagrid.action.button_provider:
+        class: 'Oro\Bundle\ActionBundle\Datagrid\Provider\DatagridActionButtonProvider'
         arguments:
             - '@oro_action.provider.button'
             - '@oro_action.helper.context'
@@ -168,7 +168,7 @@ services:
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.extension.action.configure-actions.before, method: onConfigureActions }
+            - { name: oro_datagrid.extension.action.provider, priority: 250 }
 
     oro_action.datagrid.extension.delete_mass_action:
         class: Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension

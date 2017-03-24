@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\EventListener;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Provider;
 
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 
@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
-use Oro\Bundle\ActionBundle\Datagrid\EventListener\ButtonListener;
+use Oro\Bundle\ActionBundle\Datagrid\Provider\DatagridActionButtonProvider;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
@@ -24,10 +24,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
-use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class ButtonListenerTest extends \PHPUnit_Framework_TestCase
+class DatagridActionButtonProviderTest extends \PHPUnit_Framework_TestCase
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
     const TEST_ROUTE = 'test_route';
@@ -41,26 +40,19 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
 
-    /** @var ButtonListener */
-    protected $listener;
+    /** @var DatagridActionButtonProvider */
+    protected $provider;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->buttonProvider = $this->getMockBuilder(ButtonProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->buttonProvider = $this->createMock(ButtonProvider::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
-        $contextHelper = $this->getMockBuilder(ContextHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contextHelper = $this->createMock(ContextHelper::class);
         $contextHelper->expects($this->any())
             ->method('getContext')
             ->willReturn(
@@ -74,19 +66,17 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $provider = $this->createMock(MassActionProviderInterface::class);
-        $provider->expects($this->any())
+        $massActionProvider = $this->createMock(MassActionProviderInterface::class);
+        $massActionProvider->expects($this->any())
             ->method('getActions')
             ->willReturn(['test_config' => ['label' => 'test_label']]);
 
-        $this->massActionProviderRegistry = $this->getMockBuilder(MassActionProviderRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->massActionProviderRegistry = $this->createMock(MassActionProviderRegistry::class);
 
         $this->massActionProviderRegistry->expects($this->any())
             ->method('getProvider')
             ->with(self::PROVIDER_ALIAS)
-            ->willReturn($provider);
+            ->willReturn($massActionProvider);
 
         /* @var $optionsHelper OptionsHelper|\PHPUnit_Framework_MockObject_MockObject */
         $optionsHelper = $this->getMockBuilder(OptionsHelper::class)
@@ -104,26 +94,13 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
-        $this->listener = new ButtonListener(
+        $this->provider = new DatagridActionButtonProvider(
             $this->buttonProvider,
             $contextHelper,
             $this->massActionProviderRegistry,
             $optionsHelper,
             $this->entityClassResolver,
             new StubTranslator()
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset(
-            $this->listener,
-            $this->massActionProviderRegistry,
-            $this->buttonProvider,
-            $this->entityClassResolver
         );
     }
 
@@ -135,7 +112,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider onConfigureActionsProvider
      */
-    public function testOnConfigureActions(
+    public function testApplyActions(
         DatagridConfiguration $config,
         ButtonsCollection $buttonCollection,
         $expected,
@@ -143,9 +120,9 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
     ) {
         $this->buttonProvider->expects($this->once())->method('match')->willReturn($buttonCollection);
 
-        $this->listener->onConfigureActions(new ConfigureActionsBefore($config));
-
+        $this->provider->hasActions($config);
         if ($expected) {
+            $this->provider->applyActions($config);
             $options = $config->offsetGetOr('options');
 
             $this->assertInternalType('array', $options);
@@ -186,19 +163,21 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
         $this->buttonProvider->expects($this->any())->method('match')->willReturn($buttonsCollection);
 
         if ($groups) {
-            $this->listener->setGroups($groups);
+            $this->provider->setGroups($groups);
         }
 
-        $this->listener->onConfigureActions(new ConfigureActionsBefore($datagridConfig));
+        if ($this->provider->hasActions($datagridConfig)) {
+            $this->provider->applyActions($datagridConfig);
 
-        $actionConfigurationCallback = $datagridConfig->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY, []);
+            $actionConfigurationCallback = $datagridConfig->offsetGetOr(ActionExtension::ACTION_CONFIGURATION_KEY, []);
 
-        if ($actionConfigurationCallback) {
-            $this->assertInstanceOf('Closure', $actionConfigurationCallback);
+            if ($actionConfigurationCallback) {
+                $this->assertInstanceOf('Closure', $actionConfigurationCallback);
 
-            $this->assertEquals($expectedActions, call_user_func($actionConfigurationCallback, $record, []));
-        } else {
-            $this->assertEmpty($actionConfigurationCallback);
+                $this->assertEquals($expectedActions, $actionConfigurationCallback($record, []));
+            } else {
+                $this->assertEmpty($actionConfigurationCallback);
+            }
         }
     }
 
@@ -401,6 +380,25 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                     'update' => false,
                 ],
             ],
+            'operations not allowed' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
+                'record' => new ResultRecord([]),
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('operation1', true),
+                        $this->createButton('operation2', false)
+                    ]
+                ),
+                'expectedActions' => [
+                    'operation1' => false,
+                    'operation2' => false
+                ]
+            ],
             '1 allowed action and callable parent config' => [
                 'config' => DatagridConfiguration::create([
                     'name' => 'datagrid_name',
@@ -497,6 +495,7 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createButtonsCollection(array $buttons)
     {
+        /** @var ButtonProviderExtensionInterface|\PHPUnit_Framework_MockObject_MockObject $extension */
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
         $extension->expects($this->once())->method('find')->willReturn($buttons);
         $extension->expects($this->any())
