@@ -136,6 +136,14 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getTag()
+    {
+        return 'database';
+    }
+
+    /**
      * @param string $commandline The command line to run
      * @param int $timeout The timeout in seconds
      * @return Process
