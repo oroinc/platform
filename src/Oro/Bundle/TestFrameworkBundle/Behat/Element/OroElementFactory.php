@@ -13,7 +13,7 @@ class OroElementFactory implements SuiteAwareInterface
     /**
      * @var Mink
      */
-    private $mink = null;
+    private $mink;
 
     /**
      * @var SelectorsHandler

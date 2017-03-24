@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -36,6 +37,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iDonTSelectAnyRecordFromGrid()
     {
+        // No need to do anything
     }
 
     /**
@@ -58,7 +60,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^there (are|is) (?P<number>(?:|one|two|\d+)) record(?:|s) in grid$/
+     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number)
     {
@@ -277,6 +279,33 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 self::assertEquals($value1, $value2);
                 break;
         }
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Assert that column value of specified row is equal to given value
+     * Example: I should see that Translated Value in 1 row is equal to "some value"
+     * @Then /^(?:|I )should see that (?P<column>([\w\s]+)) in (?P<rowNumber>([\d]+)) row is equal to "(?P<value>(.*))"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertColumnValueEquals($column, $rowNumber, $value)
+    {
+        $rowValue = $this->getGrid()->getRowByNumber($rowNumber)->getCellValue($column);
+        self::assertEquals($value, $rowValue);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Assert that column value of specified row is empty (or not empty)
+     * Example: I should see that Translated Value in 1 row is empty
+     * Example: I should see that Translated Value in 1 row is not empty
+     * @Then /^(?:|I )should see that (?P<column>([\w\s]+)) in (?P<rowNumber>([\d]+)) row is (?P<type>(empty|not empty))$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertColumnValueIsEmpty($column, $rowNumber, $type)
+    {
+        $rowValue = $this->getGrid()->getRowByNumber($rowNumber)->getCellValue($column);
+        $type === 'empty' ? self::assertEmpty($rowValue) : self::assertNotEmpty($rowValue);
     }
 
     /**
@@ -685,6 +714,54 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check visibility checkbox for specified column
+     * Show this column in grid
+     *
+     * @Given /^(?:|I) show column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I) mark as visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iShowColumnInGrid($columnName)
+    {
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
+        $columnManager->checkColumnVisibility($columnName);
+        $columnManager->close();
+    }
+
+    /**
+     * Uncheck visibility checkbox for specified column
+     * Hide this column in grid
+     *
+     * @Given /^(?:|I) hide column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I) mark as not visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iHideColumnInGrid($columnName)
+    {
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
+        $columnManager->uncheckColumnVisibility($columnName);
+        $columnManager->close();
+    }
+
+    /**
+     * Hide all columns in grid except mentioned
+     *
+     * @When /^I hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^I hide all columns in grid$/
+     */
+    public function iHideAllColumnsInGrid($exceptions = '')
+    {
+        $exceptions = explode(',', $exceptions);
+        $exceptions = array_map('trim', $exceptions);
+        $exceptions = array_filter($exceptions);
+
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
+        $columnManager->hideAllColumns($exceptions);
+        $columnManager->close();
+    }
+
+    /**
      * @param string $stringNumber
      * @return int
      */
@@ -742,5 +819,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         return $filters;
+    }
+
+    /**
+     * @return GridColumnManager
+     */
+    private function getGridColumnManager()
+    {
+        return $this->createElement('GridColumnManager');
     }
 }
