@@ -109,6 +109,12 @@ class AjaxControllerTest extends WebTestCase
         }
 
         $this->assertEquals($flashMessages, $this->getContainer()->get('session')->getFlashBag()->all());
+
+        if ($statusCode === Response::HTTP_FORBIDDEN) {
+            $response = self::getJsonResponseContent($result, Response::HTTP_FORBIDDEN);
+
+            $this->assertEquals(['Expected error message'], $response['messages']);
+        }
     }
 
     /**
@@ -158,7 +164,12 @@ class AjaxControllerTest extends WebTestCase
                     [
                         'oro_action_test_action' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
+                            OperationDefinition::PRECONDITIONS => [
+                                '@equal' => [
+                                    'message' => 'Expected error message',
+                                    'parameters' => ['$message', 'test message wrong']
+                                ]
+                            ],
                         ],
                     ]
                 ),
@@ -269,7 +280,12 @@ class AjaxControllerTest extends WebTestCase
                     [
                         'oro_action_test_action' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
+                            OperationDefinition::PRECONDITIONS => [
+                                '@equal' => [
+                                    'message' => 'Expected error message',
+                                    'parameters' => ['$message', 'test message wrong']
+                                ]
+                            ],
                         ],
                     ]
                 ),
