@@ -50,4 +50,30 @@ class UserManager extends BaseUserManager
             $user->addRole($role);
         }
     }
+
+    /**
+     * Generates a random string that can be used as a password for a user.
+     *
+     * @param int $maxLength
+     *
+     * @return string
+     */
+    public function generatePassword($maxLength = 30)
+    {
+        return str_shuffle(
+            substr(
+                sprintf(
+                    '%s%s%s',
+                    // get one random upper case letter
+                    substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 1),
+                    // get one random digit
+                    substr(str_shuffle('1234567890'), 0, 1),
+                    // get some random string
+                    strtr(base64_encode(hash('sha256', uniqid((string)mt_rand(), true), true)), '+/=', '___')
+                ),
+                0,
+                $maxLength
+            )
+        );
+    }
 }
