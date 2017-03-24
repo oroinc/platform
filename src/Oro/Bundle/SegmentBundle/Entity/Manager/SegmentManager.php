@@ -149,7 +149,7 @@ class SegmentManager
         foreach ($orderBy as $obj) {
             foreach ($obj->getParts() as $part) {
                 $part = str_replace($aliasToReplace, $alias, $part);
-                $qb->add('orderBy', $part);
+                $qb->add('orderBy', $part, true);
             }
         }
 
