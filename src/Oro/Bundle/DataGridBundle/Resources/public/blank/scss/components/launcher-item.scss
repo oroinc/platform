@@ -1,0 +1,75 @@
+// @theme: blank;
+
+@mixin mode-icon-size($size: $launcher-item-icon-size) {
+    font-size: $size;
+    line-height: strip-units($size / 10);
+}
+
+.launcher-item {
+    position: relative;
+
+    display: block;
+    margin: $launcher-item-offset;
+
+    &.mode-text-only,
+    &.mode-icon-only {
+        display: inline-block;
+        margin: 0;
+        padding: $launcher-item-action-inner-offset;
+
+        &:not(:first-child) {
+            &:before {
+                top: $launcher-item-separator-top;
+                left: 0;
+                bottom: $launcher-item-separator-bottom;
+
+                border-left: $launcher-item-border-left;
+
+                @include after();
+            }
+        }
+    }
+
+    .action {
+        display: block;
+
+        &.mode-icon-only {
+            color: $launcher-item-icon-color;
+
+            @include hover-focus {
+                text-decoration: none;
+
+                color: $launcher-item-icon-hover-focus-color;
+            }
+
+            [class^="fa-"],
+            [class*=" fa-"] {
+                margin-right: 0;
+
+                &:before {
+                    @include mode-icon-size();
+                }
+            }
+        }
+    }
+
+    .dropdown-menu & {
+        margin: $launcher-item-offset;
+
+        &.mode-text-only {
+            display: block;
+            padding: 0;
+
+            &:before {
+                content: none;
+            }
+        }
+
+        .action {
+            &.mode-icon-text,
+            &.mode-text-only {
+                padding: $launcher-item-action-inner-offset;
+            }
+        }
+    }
+}

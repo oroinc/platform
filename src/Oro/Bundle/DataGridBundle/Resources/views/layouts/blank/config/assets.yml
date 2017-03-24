@@ -1,0 +1,4 @@
+styles:
+    inputs:
+        - 'bundles/orodatagrid/blank/scss/variables/launcher-item-config.scss'
+        - 'bundles/orodatagrid/blank/scss/styles.scss'

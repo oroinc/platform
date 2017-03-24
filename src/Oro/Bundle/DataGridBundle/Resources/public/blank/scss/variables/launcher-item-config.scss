@@ -1,0 +1,10 @@
+// @theme: blank;
+
+$launcher-item-icon-size: 16px !default;
+$launcher-item-separator-top: 5px !default;
+$launcher-item-separator-bottom: 5px !default;
+$launcher-item-offset: 5px 0 !default;
+$launcher-item-action-inner-offset: 0 10px !default;
+$launcher-item-border-left: 1px solid get-color('additional', 'middle') !default;
+$launcher-item-icon-color: get-color('additional', 'middle') !default;
+$launcher-item-icon-hover-focus-color: get-color('additional', 'dark') !default;

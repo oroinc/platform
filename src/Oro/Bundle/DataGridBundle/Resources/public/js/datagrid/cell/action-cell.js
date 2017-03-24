@@ -83,7 +83,7 @@ define([
 
         /** @property */
         launcherItemTemplate: _.template(
-            '<li class="launcher-item <% if (className) { %> <%= \'mode-\' + className %> <% } %>"></li>'
+            '<li class="launcher-item<% if (className) { %> <%= \'mode-\' + className %><% } %>"></li>'
         ),
 
         /** @property */
