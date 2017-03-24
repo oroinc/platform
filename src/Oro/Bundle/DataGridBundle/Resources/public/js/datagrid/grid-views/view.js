@@ -20,8 +20,10 @@ define(function(require) {
      * @extends Backbone.View
      */
     GridViewsView = Backbone.View.extend({
+        /** @property */
         DEFAULT_GRID_VIEW_ID: '__all__',
 
+        /** @property */
         className: 'grid-views',
 
         /** @property */
@@ -49,6 +51,7 @@ define(function(require) {
         /** @property */
         enabled: true,
 
+        /** @property */
         appearances: null,
 
         /** @property */
@@ -70,6 +73,19 @@ define(function(require) {
 
         /** @property */
         originalTitle: null,
+
+        /** @property */
+        route: 'oro_datagrid_api_rest_gridview_default',
+
+        /** @property */
+        DeleteConfirmation: DeleteConfirmation,
+
+        /** @property */
+        defaults: {
+            DeleteConfirmationOptions: {
+                content: __('Are you sure you want to delete this item?')
+            }
+        },
 
         /**
          * Initializer.
@@ -209,7 +225,12 @@ define(function(require) {
          * @param {Event} e
          */
         onSave: function(e) {
-            var model = this._getCurrentViewModel();
+            var model = this._getEditableViewModel(e);
+
+            this._onSaveModel(model);
+        },
+
+        _onSaveModel: function(model) {
             var self = this;
 
             model.save({
@@ -234,49 +255,57 @@ define(function(require) {
         onSaveAs: function(e) {
             var modal = new ViewNameModal();
             var self = this;
-            modal.on('ok', function(e) {
-                var model = self._createViewModel({
-                    label: this.$('input[name=name]').val(),
-                    is_default: this.$('input[name=is_default]').is(':checked'),
-                    type: 'private',
-                    grid_name: self.gridName,
-                    filters: self.collection.state.filters,
-                    sorters: self.collection.state.sorters,
-                    columns: self.collection.state.columns,
-                    appearanceType: self.collection.state.appearanceType,
-                    appearanceData: self.collection.state.appearanceData,
-                    editable: self.permissions.EDIT,
-                    deletable: self.permissions.DELETE
-                });
-                model.save(null, {
-                    wait: true,
-                    success: function(model) {
-                        var icon = self._getAppearanceIcon(model.get('appearanceType'));
-                        model.set('name', model.get('id'));
-                        model.set('icon', icon);
-                        model.unset('id');
-                        self.viewsCollection.add(model);
-                        self.changeView(model.get('name'));
-                        self.collection.state.gridView = model.get('name');
-                        self.viewDirty = !self._isCurrentStateSynchronized();
-                        self._updateTitle();
-                        self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
-                        mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
 
-                        if (model.get('is_default')) {
-                            self._getCurrentDefaultViewModel().set({is_default: false});
-                        }
-                    },
-                    error: function(model, response, options) {
-                        modal.open();
-                        self._showNameError(modal, response);
-                    }
-                });
+            modal.on('ok', function(e) {
+                self._onSaveAsModel.call(self, modal);
             });
 
             modal.open();
             $('#gridViewName').focus();
         },
+
+        _onSaveAsModel: function(container) {
+            var self = this;
+            var container = container || self;
+
+            var model = self._createViewModel({
+                label: $('input[name=name]', container.$el).val(),
+                is_default: $('input[name=is_default]', container.$el).is(':checked'),
+                type: 'private',
+                grid_name: this.gridName,
+                filters: this.collection.state.filters,
+                sorters: this.collection.state.sorters,
+                columns: this.collection.state.columns,
+                appearanceType: this.collection.state.appearanceType,
+                appearanceData: this.collection.state.appearanceData,
+                editable: this.permissions.EDIT,
+                deletable: this.permissions.DELETE
+            });
+            model.save(null, {
+                wait: true,
+                success: function(model) {
+                    var icon = self._getAppearanceIcon(model.get('appearanceType'));
+                    model.set('name', model.get('id'));
+                    model.set('icon', icon);
+                    model.unset('id');
+                    self.viewsCollection.add(model);
+                    self.changeView(model.get('name'));
+                    self.collection.state.gridView = model.get('name');
+                    self.viewDirty = !self._isCurrentStateSynchronized();
+                    self._updateTitle();
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
+                    mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
+
+                    if (model.get('is_default')) {
+                        self._getCurrentDefaultViewModel().set({is_default: false});
+                    }
+                },
+                error: function(model, response, options) {
+                    self.onError(container, model, response, options);
+                }
+            });
+        },
+
         _getAppearanceIcon: function(appearanceType) {
             return this.appearances ? _.result(_.findWhere(this.appearances, {type: appearanceType}), 'icon') : '';
         },
@@ -285,7 +314,7 @@ define(function(require) {
          * @param {Event} e
          */
         onShare: function(e) {
-            var model = this._getCurrentViewModel();
+            var model = this._getEditableViewModel(e);
             var self = this;
 
             model.save({
@@ -303,7 +332,7 @@ define(function(require) {
          * @param {Event} e
          */
         onUnshare: function(e) {
-            var model = this._getCurrentViewModel();
+            var model = this._getEditableViewModel(e);
             var self = this;
 
             model.save({
@@ -321,12 +350,9 @@ define(function(require) {
          * @param {Event} e
          */
         onDelete: function(e) {
-            var id = this._getCurrentView().value;
-            var model = this.viewsCollection.get(id);
+            var model = this._getModelForDelete(e);
 
-            var confirm = new DeleteConfirmation({
-                content: __('Are you sure you want to delete this item?')
-            });
+            var confirm = new this.DeleteConfirmation(this.defaults.DeleteConfirmationOptions);
             confirm.on('ok', _.bind(function() {
                 model.destroy({wait: true});
                 model.once('sync', function() {
@@ -341,43 +367,70 @@ define(function(require) {
         /**
          * @param {Event} e
          */
+        _getModelForDelete: function(e) {
+            var id = this._getCurrentView().value;
+
+            return this.viewsCollection.get(id);
+        },
+
+        /**
+         * @param {Event} e
+         */
         onRename: function(e) {
-            var model = this._getCurrentViewModel();
+            var model = this._getEditableViewModel(e);
             var self = this;
 
             var modal = new ViewNameModal({
                 defaultValue: model.get('label'),
-                defaultChecked: model.get('is_default'),
+                defaultChecked: model.get('is_default')
             });
             modal.on('ok', function() {
-                model.save({
-                    label: this.$('input[name=name]').val(),
-                    is_default: this.$('input[name=is_default]').is(':checked')
-                }, {
-                    wait: true,
-                    success: function() {
-                        var currentDefaultViewModel = self._getCurrentDefaultViewModel();
-                        var isCurrentDefault = currentDefaultViewModel === model;
-                        var isCurrentWasDefault = currentDefaultViewModel === undefined;
-                        if (model.get('is_default') && !isCurrentDefault) {
-                            // if current view hadn't default property and it is going to be
-                            currentDefaultViewModel.set({is_default: false});
-                        } else if (isCurrentWasDefault) {
-                            // if current view had 'default' property and this property was removed, there are no
-                            // views with 'default' property and it shall be set to system view.
-                            self._getDefaultSystemViewModel().set({is_default: true});
-                        }
-                        self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
-                    },
-                    error: function(model, response, options) {
-                        modal.open();
-                        self._showNameError(modal, response);
-                    }
-                });
+                self._onRenameSaveModel(model, modal);
             });
 
             modal.open();
         },
+
+        /**
+         * @param {object} model
+         * @param {object} context
+         */
+        _onRenameSaveModel: function(model, container) {
+            var self = this;
+            var container = container || self;
+
+            model.save({
+                label: $('input[name=name]', container.$el).val(),
+                is_default: $('input[name=is_default]', container.$el).is(':checked')
+            }, {
+                wait: true,
+                success: function() {
+                    var currentDefaultViewModel = self._getCurrentDefaultViewModel();
+                    var isCurrentDefault = currentDefaultViewModel === model;
+                    var isCurrentWasDefault = currentDefaultViewModel === undefined;
+                    if (model.get('is_default') && !isCurrentDefault) {
+                        // if current view hadn't default property and it is going to be
+                        currentDefaultViewModel.set({is_default: false});
+                    } else if (isCurrentWasDefault) {
+                        // if current view had 'default' property and this property was removed, there are no
+                        // views with 'default' property and it shall be set to system view.
+                        self._getDefaultSystemViewModel().set({is_default: true});
+                    }
+                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                },
+                error: function(model, response, options) {
+                    self.onError(container, model, response, options);
+                }
+            });
+        },
+
+        onError: function(modal, model, response, options) {
+            if (_.isObject(modal)) {
+                modal.open();
+            }
+            this._showNameError(modal, response);
+        },
+
 
         /**
          * @param {Event} e
@@ -417,7 +470,7 @@ define(function(require) {
             var isDefault = 1;
             var defaultModel = this._getCurrentDefaultViewModel();
             var gridName = this.gridName;
-            var currentViewModel = this._getCurrentViewModel();
+            var currentViewModel = this._getEditableViewModel(e);
             var id = currentViewModel.id;
             if (this._isCurrentViewSystem()) {
                 // in this case we need to set default to false on current default view
@@ -427,7 +480,7 @@ define(function(require) {
                 }
             }
             return $.post(
-                routing.generate('oro_datagrid_api_rest_gridview_default', {
+                routing.generate(this.route, {
                     id: id,
                     default: isDefault,
                     gridName: gridName
@@ -514,24 +567,42 @@ define(function(require) {
                 navbar: Boolean(this.title)
             });
 
-            var actions = this._getCurrentActions();
+            var actions = this._getViewActions();
             html = this.template({
                 title: title,
                 titleLabel: this.title,
                 disabled: !this.enabled,
                 choices: this.getViewChoices(),
+                current: this.collection.state.gridView,
                 dirty: this.viewDirty,
                 editedLabel: __('oro.datagrid.gridView.data_edited'),
                 actionsLabel: __('oro.datagrid.gridView.actions'),
                 actions: actions,
-                showActions: _.some(actions, function(action) {
-                    return action.enabled;
-                })
+                showActions: this.showActions(actions),
+                gridViewId: this.cid
             });
 
             this.$el.append(html);
 
             return this;
+        },
+
+        /**
+         * @returns {*|Array}
+         * @private
+         */
+        _getViewActions: function() {
+            return this._getCurrentActions();
+        },
+
+        /**
+         * @param actions
+         * @returns {boolean}
+         */
+        showActions: function(actions) {
+            return _.some(actions, function(action) {
+                return action.enabled;
+            });
         },
 
         /**
@@ -542,13 +613,22 @@ define(function(require) {
         _getCurrentActions: function() {
             var currentView = this._getCurrentViewModel();
 
+            return this._getActions(currentView);
+        },
+
+        /**
+         * @param View
+         * @returns {*[]}
+         * @private
+         */
+        _getActions: function(View) {
             return [
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
                     enabled: this.viewDirty &&
-                            typeof currentView !== 'undefined' &&
-                            currentView.get('editable')
+                             typeof View !== 'undefined' &&
+                             View.get('editable')
                 },
                 {
                     label: __('oro.datagrid.action.save_grid_view_as'),
@@ -558,22 +638,22 @@ define(function(require) {
                 {
                     label: __('oro.datagrid.action.rename_grid_view'),
                     name: 'rename',
-                    enabled: typeof currentView !== 'undefined' &&
-                            currentView.get('editable')
+                    enabled: typeof View !== 'undefined' &&
+                             View.get('editable')
                 },
                 {
                     label: __('oro.datagrid.action.share_grid_view'),
                     name: 'share',
-                    enabled: typeof currentView !== 'undefined' &&
-                            currentView.get('type') === 'private' &&
-                            this.permissions.SHARE
+                    enabled: typeof View !== 'undefined' &&
+                             View.get('type') === 'private' &&
+                             this.permissions.SHARE
                 },
                 {
                     label: __('oro.datagrid.action.unshare_grid_view'),
                     name: 'unshare',
-                    enabled: typeof currentView !== 'undefined' &&
-                            currentView.get('editable') &&
-                            currentView.get('type') === 'public' &&
+                    enabled: typeof View !== 'undefined' &&
+                             View.get('editable') &&
+                             View.get('type') === 'public' &&
                             this.permissions.SHARE
                 },
                 {
@@ -584,13 +664,13 @@ define(function(require) {
                 {
                     label: __('oro.datagrid.action.delete_grid_view'),
                     name: 'delete',
-                    enabled: typeof currentView !== 'undefined' &&
-                            currentView.get('deletable')
+                    enabled: typeof View !== 'undefined' &&
+                             View.get('deletable')
                 },
                 {
                     label: __('oro.datagrid.action.set_as_default_grid_view'),
                     name: 'use_as_default',
-                    enabled: typeof currentView !== 'undefined' && !currentView.get('is_default')
+                    enabled: typeof View !== 'undefined' && !View.get('is_default')
                 }
             ];
         },
@@ -618,6 +698,15 @@ define(function(require) {
             return this.viewsCollection.findWhere({
                 name: this._getCurrentView().value
             });
+        },
+
+        /**
+         * @private
+         *
+         * @returns {undefined|GridViewModel}
+         */
+        _getEditableViewModel: function() {
+            return this._getCurrentViewModel();
         },
 
         /**

@@ -1,23 +1,17 @@
 // @theme: blank;
 
 .grid-views {
+    position: relative;
+
     margin: $grid-views-offset;
-
-    &__dropdown-toggle {
-        color: inherit;
-    }
-
-    .btn-group {
-        margin-left: 0;
-    }
 
     &__dropdown {
         width: $grid-views-dropdown-width;
         padding: 0;
+    }
 
-        &__title {
-            padding: $grid-views-dropdown-title-offset-inner;
-        }
+    &__title {
+        padding: $grid-views-title-offset-inner;
     }
 
     &__close {
@@ -48,38 +42,8 @@
         border-bottom: $grid-views-dropdown-list-item-border;
     }
 
-    &__icons-list {
-        &__item {
-            float: left;
-
-            & + * {
-                padding-left: 7px;
-                margin-left: 5px;
-
-                border-left: 1px solid $grid-views-dropdown-icon-color;
-            }
-        }
-
-        &__icon {
-            font-size: $grid-views-dropdown-icon-size;
-
-            color: $grid-views-dropdown-icon-color;
-
-            @include hover-focus {
-                color: get-color(additional, 'dark');
-            }
-        }
-    }
-    .custom-radio__control {
-        + .custom-radio {
-            &__text {
-                font-size: 13px;
-
-                &:before {
-                    margin-right: 10px;
-                }
-            }
-        }
+    &__actions {
+        color: $grid-views-actions-color;
     }
 
     &__label {
@@ -89,39 +53,31 @@
 
     &__footer {
         padding: $grid-views-dropdown-footer-offset-inner;
+    }
 
-        &__form {
+    &__edit-container {
+        display: none;
+
+        &-content {
+            padding: $grid-views-dropdown-form-content-offset-inner;
+
+            @include clearfix();
+        }
+    }
+
+    &__toggle-container {
+        text-align: center;
+
+        &.opened {
             display: none;
 
-            .btn {
-                margin-right: 5px;
-            }
-            
-            .actions {
-                float: left;
-                margin-right: 20px;
-            }
-
-            .custom-checkbox {
-                margin-top: 7px;
-            }
-        }
-
-        &__toggle-container {
-            text-align: center;
-
-            &.open {
-                display: none;
-            }
-
-            &.open + * {
+             + .grid-views__form {
                 display: block;
             }
         }
+    }
 
-        .input {
-            width: 100%;
-            margin-bottom: 10px;
-        }
+    .custom-checkbox {
+        padding-top: 4px;
     }
 }
