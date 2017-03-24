@@ -284,8 +284,7 @@ class DateGroupingFilter extends ChoiceFilter
         $joinedColumn,
         $extraWhereClauses,
         $extraWhereParameters
-    )
-    {
+    ) {
         $subQueryBuilder = $this->entityManager->createQueryBuilder();
         $extraWhereClauses = str_replace(
             $this->config['data_name'],
