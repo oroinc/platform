@@ -4,8 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -34,26 +32,18 @@ class VariableAssembler extends BaseAbstractAssembler
     protected $translator;
 
     /**
-     * @var ManagerRegistry
-     */
-    protected $managerRegistry;
-
-    /**
      * @param WorkflowVariableNormalizer $dataNormalizer
      * @param VariableGuesser            $variableGuesser
      * @param TranslatorInterface        $translator
-     * @param ManagerRegistry            $managerRegistry
      */
     public function __construct(
         WorkflowVariableNormalizer $dataNormalizer,
         VariableGuesser $variableGuesser,
-        TranslatorInterface $translator,
-        ManagerRegistry $managerRegistry
+        TranslatorInterface $translator
     ) {
         $this->dataNormalizer = $dataNormalizer;
         $this->variableGuesser = $variableGuesser;
         $this->translator = $translator;
-        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -146,26 +136,10 @@ class VariableAssembler extends BaseAbstractAssembler
 
         $this->validateVariable($variable);
 
-        $denormalizedValue = $this->denormalizeVariable($workflow, $variable, $options);
+        $denormalizedValue = $this->dataNormalizer->denormalizeVariable($workflow, $variable, $options);
         $variable->setValue($denormalizedValue);
 
         return $variable;
-    }
-
-    /**
-     * @param string $class
-     *
-     * @return \Doctrine\Common\Persistence\ObjectManager|null
-     * @throws AssemblerException
-     */
-    protected function getManagerForClass($class)
-    {
-        $entityManager = $this->managerRegistry->getManagerForClass($class);
-        if (!$entityManager) {
-            throw new AssemblerException(sprintf('Can\'t get entity manager for class %s', $class));
-        }
-
-        return $entityManager;
     }
 
     /**
@@ -260,96 +234,6 @@ class VariableAssembler extends BaseAbstractAssembler
                 )
             );
         }
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param Variable $variable
-     * @param array    $options
-     *
-     * @return null|mixed|\Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer
-     * @throws AssemblerException
-     */
-    private function denormalizeVariable(Workflow $workflow, Variable $variable, array $options)
-    {
-        $type = $variable->getType();
-        if (!in_array($type, ['object', 'entity'], true)) {
-            return $this->dataNormalizer->denormalizeVariable($workflow, $variable, $options['value']);
-        }
-
-        if ('object' === $type) {
-            return $this->denormalizeObjectVariable($options);
-        }
-
-        if ('entity' === $type) {
-            return $this->denormalizeEntityVariable($options);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return mixed
-     */
-    private function denormalizeObjectVariable(array $options)
-    {
-        $class = $this->getOption($options['options'], 'class');
-        $propertyPath = $this->getOption($options, 'property_path');
-
-        try {
-            if ($propertyPath) {
-                $object = new $class();
-                $object->{$propertyPath} = $options['value'];
-            } else {
-                $object = new $class($options['value']);
-            }
-
-            return $object;
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return mixed
-     * @throws AssemblerException
-     */
-    private function denormalizeEntityVariable(array $options)
-    {
-        $class = $this->getOption($options['options'], 'class');
-        $manager = $this->getManagerForClass($class);
-        if (!$manager) {
-            throw new AssemblerException(sprintf('Can\'t get entity manager for class %s', $class));
-        }
-
-        $identifier = $this->getOption($options['options'], 'identifier');
-        if (!$identifier) {
-            return $manager->find($class, $options['value']);
-        }
-
-        /** @var ClassMetadataInfo $metadata */
-        $metadata = $manager->getClassMetadata($class);
-        if ($metadata->isIdentifierComposite) {
-            throw new AssemblerException(sprintf(
-                'Entity with class %s has a composite identifier',
-                $class
-            ));
-        }
-        if (!$metadata->isUniqueField($identifier) && !in_array($identifier, $metadata->getIdentifier(), true)) {
-            throw new AssemblerException(sprintf(
-                'Field %s is not unique in entity with class %s',
-                $identifier,
-                $class
-            ));
-        }
-
-        $repository = $manager->getRepository($class);
-
-        return $repository->findOneBy([$identifier => $options['value']]);
     }
 
     /**
