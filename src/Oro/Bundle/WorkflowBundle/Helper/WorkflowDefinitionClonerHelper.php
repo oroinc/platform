@@ -53,19 +53,7 @@ class WorkflowDefinitionClonerHelper
 
         $accessor = PropertyAccess::createPropertyAccessor();
         try {
-            $accessorKey = $key;
-            if (is_array($options)) {
-                $parts = explode('.', $key);
-                $accessorKey = '';
-                foreach ($parts as $part) {
-                    if (empty($part)) {
-                        $part = 0;
-                    }
-                    $accessorKey .= sprintf('[%s]', $part);
-                }
-            }
-
-            $value = $accessor->getValue($options, $accessorKey);
+            $value = $accessor->getValue($options, self::getAccessorKey($key));
             if (!$value) {
                 return $default;
             }
@@ -74,6 +62,25 @@ class WorkflowDefinitionClonerHelper
         } catch (\RuntimeException $e) {
             return $default;
         }
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    protected static function getAccessorKey($key)
+    {
+        $parts = explode('.', $key);
+        $accessorKey = '';
+        foreach ($parts as $part) {
+            if (empty($part)) {
+                $part = 0;
+            }
+            $accessorKey .= sprintf('[%s]', $part);
+        }
+
+        return $accessorKey;
     }
 
     /**
