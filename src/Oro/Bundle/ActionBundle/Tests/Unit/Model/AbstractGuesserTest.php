@@ -38,20 +38,14 @@ class AbstractGuesserTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->formRegistry = $this->getMockBuilder(FormRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formRegistry = $this->createMock(FormRegistry::class);
 
         $this->managerRegistry
             = $this->getMockForAbstractClass(ManagerRegistry::class);
 
-        $this->entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $this->formConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->doctrineTypeMappingProvider = $this->createMock(DoctrineTypeMappingProvider::class);
 
