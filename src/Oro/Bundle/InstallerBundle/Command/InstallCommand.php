@@ -116,7 +116,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'cache:clear',
                 [
                     '--no-optional-warmers' => true,
-                    '--process-isolation'   => true
+                    '--process-isolation'   => true,
+                    '--no-debug' => true,
                 ]
             );
         }
@@ -591,6 +592,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $cacheClearOptions = ['--process-isolation' => true];
         if ($commandExecutor->getDefaultOption('no-debug')) {
             $cacheClearOptions['--no-debug'] = true;
+        }
+        if ($input->getOption('env')) {
+            $cacheClearOptions['--env'] = $input->getOption('env');
         }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 
