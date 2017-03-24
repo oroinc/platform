@@ -50,7 +50,6 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
                 'type'          => $entityType,
                 'attributes'    => [
                     'username'  => 'test_user_1',
-                    'password'  => 'TestUser#12345',
                     'firstName' => 'Test First Name',
                     'lastName'  => 'Test Last Name',
                     'email'     => 'test_user_1@example.com',
@@ -247,7 +246,6 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
                 'type'          => $entityType,
                 'attributes'    => [
                     'username'  => 'test_user_2',
-                    'password'  => 'TestUser#12345',
                     'firstName' => 'Test First Name',
                     'lastName'  => 'Test Last Name',
                     'email'     => 'test_user_2@example.com',
@@ -339,7 +337,6 @@ class RestJsonApiCreateWithIncludedTest extends RestJsonApiTestCase
                 'id'            => 'PRIMARY_USER_OBJECT',
                 'attributes'    => [
                     'username'  => 'test_user_3',
-                    'password'  => 'TestUser#12345',
                     'firstName' => 'Test First Name',
                     'lastName'  => 'Test Last Name',
                     'email'     => 'test_user_3@example.com',
