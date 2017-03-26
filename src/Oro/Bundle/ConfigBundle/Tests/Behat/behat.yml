@@ -7,3 +7,14 @@ oro_behat_extension:
     SidebarConfigMenu:
       selector: 'div.system-configuration-container div.left-panel'
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu
+
+  suites:
+    OroDataGridBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - OroConfigBundle::FeatureContext
+        - OroDataGridBundle::GridContext
+        - OroNavigationBundle::FeatureContext
+        - OroActivityListBundle::ActivityContext
+      paths:
+        - '@OroConfigBundle/Tests/Behat/Features'

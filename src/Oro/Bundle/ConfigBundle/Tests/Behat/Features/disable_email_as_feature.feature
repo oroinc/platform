@@ -1,5 +1,5 @@
 @fixture-disable_emails_stuff.yml
-Feature: Disable Emails
+Feature: Disable Email system functionality
   In order to lightweight the system
   As Administrator
   I need have ability to turn off the Email functionality

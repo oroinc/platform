@@ -26,6 +26,7 @@ class MainMenu extends Element
      */
     public function openAndClick($path)
     {
+        $this->dropDown = $this;
         $items = explode('/', $path);
         $linkLocator = trim(array_pop($items));
 
