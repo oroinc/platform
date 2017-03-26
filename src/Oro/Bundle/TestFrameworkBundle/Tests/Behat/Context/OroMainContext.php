@@ -29,8 +29,13 @@ use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
@@ -532,6 +537,40 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Click on button in modal window
+     * Example: Given I click "Edit" in modal window
+     * Example: When I click "Save and Close" in modal window
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" in modal window$/
+     */
+    public function pressButtonInModalWindow($button)
+    {
+        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
+        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        try {
+            $button = $this->fixStepArgument($button);
+            $modalWindow->pressButton($button);
+        } catch (ElementNotFoundException $e) {
+            if ($modalWindow->hasLink($button)) {
+                $modalWindow->clickLink($button);
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Wait for ajax
+     *
+     * @Then /^(?:|I )have to wait for ajax$/
+     * @Then /^(?:|I )have to wait for ajax up to "(?P<timeInSec>(?:[^"]|\\")*)" seconds$/
+     */
+    public function iHaveToWaitForAjax($timeInSec = 60)
+    {
+        $timeInMs = $timeInSec * 1000;
+        $this->waitForAjax($timeInMs);
+    }
+
+    /**
      * Navigate through menu navigation
      * Every menu link must be separated by slash symbol "/"
      * Example: Given I go to System/ Channels
@@ -860,6 +899,28 @@ class OroMainContext extends MinkContext implements
             $this->createElement($element)->isVisible(),
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
+    }
+
+    /**
+     * Presses button with specified id|name|title|alt|value in some named section
+     * Example: When I press "Add" in "General Information" section
+     * Example: And I press "Add" in "General Information" section
+     *
+     * @When /^(?:|I )press "(?P<button>(?:[^"]|\\")*)" in "(?P<section>[^"]+)" section$/
+     */
+    public function pressButtonInSection($button, $section)
+    {
+        $button = $this->fixStepArgument($button);
+        $section = $this->fixStepArgument($section);
+        $page = $this->getSession()->getPage();
+
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
+
+        if ($sectionContainer->hasButton($button)) {
+            $sectionContainer->pressButton($button);
+        } else {
+            $sectionContainer->clickLink($button);
+        }
     }
 
     /**.

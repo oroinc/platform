@@ -1,22 +1,25 @@
 {
-  "name": "orocrm-dev",
+  "name": "oroplatform-dev",
   "description": "The \"OroCRM Development Edition\" distribution",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/orocrm/platform"
   },
   "devDependencies": {
-    "karma": "0.12",
-    "karma-requirejs": "0.2",
-    "karma-junit-reporter": "0.2",
-    "karma-phantomjs-launcher": "0.1",
-    "karma-chrome-launcher": "^0.2",
-    "karma-firefox-launcher": "0.1.6",
-    "karma-coverage": "^0.2",
-    "karma-jasmine": "2_0",
-    "karma-requirejs-exposure": "git://github.com/laboro/karma-requirejs-exposure#master",
+    "jasmine-core": "2.5.2",
     "jscs": "1.13.1",
     "jshint": "2.8.0",
-    "jshint-junit-reporter": "0.2.2"
+    "jshint-junit-reporter": "0.2.2",
+    "karma": "1.5.0",
+    "karma-chrome-launcher": "2.0.0",
+    "karma-coverage": "1.1.1",
+    "karma-firefox-launcher": "1.0.1",
+    "karma-jasmine": "1.1.0",
+    "karma-junit-reporter": "1.2.0",
+    "karma-phantomjs-launcher": "1.0.4",
+    "karma-requirejs": "1.1.0",
+    "karma-requirejs-exposure": "git://github.com/laboro/karma-requirejs-exposure#master",
+    "requirejs": "2.3.3"
   }
 }

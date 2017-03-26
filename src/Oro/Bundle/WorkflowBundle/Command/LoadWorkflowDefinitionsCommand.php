@@ -83,10 +83,13 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                     $definitionHandler->createWorkflowDefinition($workflowDefinition);
                 }
 
-                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $output->writeln(Yaml::dump($workflowDefinition->getConfiguration(), 10));
-                }
+                $output->writeln(
+                    Yaml::dump($workflowDefinition->getConfiguration(), 10),
+                    OutputInterface::VERBOSITY_VERBOSE
+                );
             }
+            $output->writeln('');
+            $output->writeln('Please run command \'<info>oro:translation:load</info>\' to load translations.');
         } else {
             $output->writeln('No workflow definitions found.');
         }

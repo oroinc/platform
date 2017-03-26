@@ -82,3 +82,9 @@
 
     {{ parent() }}
 {% endblock %}
+
+{%- block number_widget -%}
+    {%- set attr = attr|merge({'step': 'any', 'min': '0'}) -%}
+    {%- set type = type|default('number') -%}
+    {{ block('form_widget_simple') }}
+{%- endblock number_widget -%}
