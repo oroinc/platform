@@ -183,12 +183,12 @@ navigation_items:
 
 ## Breadcrumb Provider
 
-The goal of breadcrumb provider is to allow developers to shows breadcrumbs based on specific menu from navigation.yml.
-You can get breadcrumbs by any menu alias. Also this menu can be create only for breadcrumbs structure and do not must, but can be visible somewere.
+The goal of breadcrumb provider is to provide possibility to show a breadcrumbs based on specific menu defined in `navigation.yml`.
+You can get the breadcrumbs through any existing [menu alias](#menu-declaration-in-yaml). And menu can be created and used for breadcrumbs structure only.
 
 ### Usage of breadcrumb provider
 
-For using breadcrumb provider you can create layout update with block **breadcrumbs** and required option **menu_name**:
+For using breadcrumb provider you should create layout update with predefined block type **breadcrumbs** and required option **menu_name**:
 
 ```yml
 # CustomerBundle/Resources/views/layouts/blank/imports/oro_customer_page/oro_customer_page.yml
@@ -206,3 +206,5 @@ layout:
             options:
                 menu_name: "oro_customer_breadcrumbs_menu" #required menu alias
 ```
+After rendering of breadcrumbs block type you should see menu labels separated by slashes. All breadcrumb items can be clickable,
+except the last one, which represents a current page.
