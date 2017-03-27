@@ -39,6 +39,10 @@ DataGridBundle
 - Removed event `oro_datagrid.datagrid.extension.action.configure-actions.before`, now it is a call of `Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface::hasActions` of registered through a `oro_datagrid.extension.action.provider` tag services.
 - Interface `Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface`
     - the signature of method `getDatagrid` was changed - added new parameter `array $additionalParameters = []`.
+    
+TestFrameworkBundle
+-------------------
+- added fourth (boolean) parameter to `\Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::runCommand` `$exceptionOnError` to throw `\RuntimeException` when command should executes as utility one.  
 
 WorkflowBundle
 --------------
@@ -47,3 +51,18 @@ WorkflowBundle
     - removed constructor
     - now extends `Oro\Bundle\ActionBundle\Model\AbstractGuesser`
     - service `oro_workflow.variable_guesser` has parent defined as `oro_action.abstract_guesser`
+- Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener` added
+- Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener` auto start workflow part were moved into `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener`
+- Added parameter `$activeOnly` (boolean) with default `false` to method `\Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getAllRelatedEntityClasses`
+- Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache` added:
+    - **purpose**: to check whether an entity has been involved as some workflow related entity in cached manner to avoid DB calls
+    - **methods**:
+        - `hasRelatedActiveWorkflows($entity)`
+        - `hasRelatedWorkflows($entity)`
+    - invalidation of cache occurs on workflow changes events: 
+        - `oro.workflow.after_update`
+        - `oro.workflow.after_create`
+        - `oro.workflow.after_delete`
+        - `oro.workflow.activated`
+        - `oro.workflow.deactivated`
+- Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`
