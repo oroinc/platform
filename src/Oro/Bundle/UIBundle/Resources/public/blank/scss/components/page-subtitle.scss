@@ -8,5 +8,17 @@
 
     &__text {
         vertical-align: middle;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            color: get-color('additional', 'middle');
+        }
+
+        @include hover-focus {
+            [class^="fa-"],
+            [class*=" fa-"] {
+                color: get-color('additional', 'dark');
+            }
+        }
     }
 }
