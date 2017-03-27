@@ -4,11 +4,14 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Loader;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
+use Prophecy\Argument;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageType;
 use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
+use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 
 class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
@@ -64,10 +67,21 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
             Configuration::AUTO
         );
 
-        $this->imageTypeProvider->getImageTypes()->willReturn([
-            $this->prepareImageType([$productOriginal, $productLarge, $productSmall, $productGalleryMain]),
-            $this->prepareImageType([$productLarge, $productSmall]),
-            $this->prepareImageType([$productOriginal, $productLarge, $productSmall])
+        $customFilterProvider1 = $this->prophesize(CustomImageFilterProviderInterface::class);
+        $customFilterProvider1->isApplicable(Argument::any())->willReturn(true);
+        $customFilterProvider1->getFilterConfig()->willReturn(['customFilterData']);
+        $customFilterProvider2 = $this->prophesize(CustomImageFilterProviderInterface::class);
+        $customFilterProvider2->isApplicable(Argument::any())->willReturn(false);
+        $customFilterProvider2->getFilterConfig()->shouldNotBeCalled([]);
+
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider1->reveal());
+        $this->imageFilterLoader->addCustomImageFilterProvider($customFilterProvider2->reveal());
+
+        $this->imageTypeProvider->getImageDimensions()->willReturn([
+            self::PRODUCT_ORIGINAL => $productOriginal,
+            self::PRODUCT_LARGE => $productLarge,
+            self::PRODUCT_SMALL => $productSmall,
+            self::PRODUCT_GALLERY_MAIN => $productGalleryMain
         ]);
 
         $this->filterConfig->set(self::PRODUCT_ORIGINAL, $this->prepareBaseFilterData())->shouldBeCalledTimes(1);
@@ -84,15 +98,6 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
             ))->shouldBeCalledTimes(1);
 
         $this->imageFilterLoader->load();
-    }
-
-    /**
-     * @param ThemeImageTypeDimension[] $dimensions
-     * @return ThemeImageType
-     */
-    private function prepareImageType(array $dimensions)
-    {
-        return new ThemeImageType('type', 'Type', $dimensions);
     }
 
     /**
@@ -145,7 +150,8 @@ class ImageFilterLoaderTest extends \PHPUnit_Framework_TestCase
             'quality' => ImageFilterLoader::IMAGE_QUALITY,
             'filters' => [
                 'strip' => []
-            ]
+            ],
+            'customFilterData'
         ];
     }
 }

@@ -126,7 +126,7 @@ class OroMainContext extends MinkContext implements
             }
 
             return null;
-        }, 10);
+        }, 15);
 
         self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
         self::assertNotNull($flashMessage, sprintf(
@@ -135,14 +135,14 @@ class OroMainContext extends MinkContext implements
             implode(',', array_keys($actualFlashMessages))
         ));
 
-        /** @var NodeElement $closeButton */
-        $closeButton = $flashMessage->find('css', 'button.close');
-        if (null !== $closeButton) {
-            try {
-                $closeButton->press();
-            } catch (\Exception $e) {
-                //No worries, flash message can disappeared till time next call
-            }
+        try {
+            /** @var NodeElement $closeButton */
+            $closeButton = $flashMessage->find('css', 'button.close');
+            $closeButton->press();
+        } catch (\Throwable $e) {
+            //No worries, flash message can disappeared till time next call
+        } catch (\Exception $e) {
+            //No worries, flash message can disappeared till time next call
         }
     }
 

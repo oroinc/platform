@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\DistributionBundle\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class PackageController extends Controller
 {
@@ -88,12 +92,16 @@ class PackageController extends Controller
 
     /**
      * @Route("/package/install")
+     *
+     * @param Request $request
+     *
+     * @return Response
      */
-    public function installAction()
+    public function installAction(Request $request)
     {
         $this->setUpEnvironment();
 
-        $params = $this->getRequest()->get('params');
+        $params = $request->get('params');
         $packageName = $this->getParamValue($params, 'packageName', null);
         $packageVersion = $this->getParamValue($params, 'version', null);
         $loadDemoData = $this->getParamValue($params, 'loadDemoData', null);
@@ -109,7 +117,7 @@ class PackageController extends Controller
         if ($manager->isPackageInstalled($packageName)) {
             $responseContent = [
                 'code' => self::CODE_ERROR,
-                'message' => 'Package has already been installed'
+                'message' => $this->trans('oro.distribution.package.already_installed'),
             ];
             $response->setContent(json_encode($responseContent));
 
@@ -163,12 +171,16 @@ class PackageController extends Controller
 
     /**
      * @Route("/package/update")
+     *
+     * @param Request $request
+     *
+     * @return Response
      */
-    public function updateAction()
+    public function updateAction(Request $request)
     {
         $this->setUpEnvironment();
 
-        $params = $this->getRequest()->get('params');
+        $params = $request->get('params');
         $packageName = $this->getParamValue($params, 'packageName', null);
 
         /** @var PackageManager $manager */
@@ -179,7 +191,7 @@ class PackageController extends Controller
         if (!$manager->isPackageInstalled($packageName)) {
             $responseContent = [
                 'code' => self::CODE_ERROR,
-                'message' => sprintf('Package %s is not yet installed', $packageName)
+                'message' => $this->trans('oro.distribution.package.not_installed', ['%package%' => $packageName]),
             ];
             $response->setContent(json_encode($responseContent));
 
@@ -189,7 +201,7 @@ class PackageController extends Controller
         if (!$manager->isUpdateAvailable($packageName)) {
             $responseContent = [
                 'code' => self::CODE_ERROR,
-                'message' => sprintf('No updates available for package %s', $packageName)
+                'message' => $this->trans('oro.distribution.package.no_updates', ['%package%' => $packageName]),
             ];
             $response->setContent(json_encode($responseContent));
 
@@ -257,5 +269,16 @@ class PackageController extends Controller
         }
 
         return $notWritablePaths;
+    }
+
+    /**
+     * @param $key
+     * @param array $params
+     *
+     * @return string
+     */
+    private function trans($key, $params = [])
+    {
+        return $this->get('translator')->trans($key, $params);
     }
 }
