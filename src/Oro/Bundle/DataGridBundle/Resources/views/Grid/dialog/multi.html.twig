@@ -1,0 +1,73 @@
+{#
+    Required variables:
+        - gridWidgetName
+        - dialogWidgetName
+        - entityTargets
+            - label
+            - className
+            - gridName
+        - sourceEntityClassAlias
+        - entityTargets
+
+    Optional variables:
+        - multiGridComponent
+        - sourceEntity
+        - params
+            - grid_query
+#}
+{% block page_container %}
+    <div class="widget-content">
+
+        {% set itemsArray = [] %}
+        {% for item in entityTargets %}
+            {% set itemArray = {
+                'label': item.label|trans,
+                'className': item.className,
+                'gridName': item.gridName
+                }
+            %}
+            {% set itemsArray = itemsArray|merge([itemArray]) %}
+        {% endfor %}
+
+        {% set firstItem = itemsArray|first %}
+        {% set options = params|default({})|merge({
+                items: itemsArray,
+                params: params|default({}),
+                gridWidgetName: gridWidgetName,
+                dialogWidgetName: dialogWidgetName,
+                sourceEntityId: sourceEntity.id|default(null),
+                sourceEntityClassAlias: sourceEntityClassAlias
+            })
+        %}
+
+        <script type="text/template" id="multi-grid-item">
+            <li id="<%= entity.get('entityAlias') %>" class="context-item" data-cid="<%= entity.cid %>">
+                <%= entity.get('label') %>
+            </li>
+        </script>
+
+        <div data-page-component-module="{{ multiGridComponent|default('orodatagrid/js/app/components/multi-grid-component') }}"
+             data-page-component-options="{{ options|json_encode }}" class="btn-group">
+            <button class="activity-context-current-block dropdown-toggle" data-toggle="dropdown">
+                <span class="activity-context-current-item"></span>
+                <span class="fa-caret-down"></span>
+            </button>
+            <ul class="context-items-dropdown dropdown-menu"></ul>
+        </div>
+
+        {% if itemsArray %}
+            {{ oro_widget_render({
+                'widgetType': 'block',
+                'widgetTemplate': 'dialog',
+                'url': path(
+                    'oro_datagrid_widget',
+                    params.grid_query.params|default({})|merge({
+                        gridName: itemsArray|first['gridName'],
+                        params: {entity_class: itemsArray|first['className']},
+                    })
+                ),
+                'alias': gridWidgetName,
+            }) }}
+        {% endif %}
+    </div>
+{% endblock %}

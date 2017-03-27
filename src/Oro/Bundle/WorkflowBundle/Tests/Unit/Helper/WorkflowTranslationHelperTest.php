@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Helper\TranslationHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -210,6 +209,34 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())->method('flush');
 
         $this->helper->flushTranslations();
+    }
+
+    /**
+     * @param string|null $expected
+     *
+     * @dataProvider findValueDataProvider
+     */
+    public function testFindValue($expected)
+    {
+        $key = 'key';
+        $locale = null;
+
+        $this->translationHelper->expects($this->once())->method('findValue')->with(
+            $key,
+            $locale,
+            WorkflowTranslationHelper::TRANSLATION_DOMAIN
+        )->willReturn($expected);
+
+        $this->assertEquals($expected, $this->helper->findValue($key, $locale));
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function findValueDataProvider()
+    {
+        yield 'string value' => ['expected' => 'string'];
+        yield 'null value' => ['expected' => null];
     }
 
     /**

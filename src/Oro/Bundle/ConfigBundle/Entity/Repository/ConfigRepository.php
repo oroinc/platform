@@ -25,4 +25,20 @@ class ConfigRepository extends EntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * @param string $scope
+     * @param integer $scopeId
+     * @return mixed
+     */
+    public function deleteByEntity($scope, $scopeId)
+    {
+        return $this->createQueryBuilder('c')
+            ->delete()
+            ->where('c.scopedEntity = :entityName AND c.recordId = :entityId')
+            ->setParameter('entityName', $scope)
+            ->setParameter('entityId', $scopeId)
+            ->getQuery()
+            ->execute();
+    }
 }
