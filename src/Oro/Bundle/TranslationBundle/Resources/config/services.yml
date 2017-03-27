@@ -179,8 +179,18 @@ services:
     oro_translation.packages_provider.translation:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider'
 
-    oro_translation.extension.transtation_packages_provider:
+    oro_translation.extension.transtation_packages_provider.abstract:
         class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension'
+        abstract: true
+        public: false
+        arguments:
+            - '@oro_platform.composer.local_repo_factory'
+            - '@oro_distribution.composer'
+
+    oro_translation.extension.transtation_packages_provider:
+        parent: oro_translation.extension.transtation_packages_provider.abstract
+        calls:
+            - ['addPackage', ['Oro', 'oro/platform', '/src']]
         tags:
             - {name: oro_translation.extension.packages_provider}
 
@@ -304,3 +314,17 @@ services:
             - '@translator'
         tags:
             - { name: layout.data_provider, alias: translator }
+
+    oro_translation.mass_action.reset_translation:
+        class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction'
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.mass_action.type, type: reset_translations }
+
+    oro_translation.mass_action.reset_translation_handler:
+        class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassActionHandler'
+        arguments:
+           - '@oro_translation.manager.translation'
+           - '@translator'
+           - '@oro_entity.doctrine_helper'
+           - '@oro_security.security_facade'

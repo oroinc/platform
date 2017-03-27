@@ -38,7 +38,7 @@ class ReportColumnDublicateValidator extends ConstraintValidator
         foreach ($columns as $key => $value) {
             $key = $value['name'].$value['func'];
             if (isset($useMap[$key])) {
-                $result[] = $useMap[$key];
+                $result[] = $value['label'];
             }
             $useMap[$key] = $value['name'];
         }

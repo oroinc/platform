@@ -64,6 +64,12 @@ workflows:
                 var2:
                     type: 'string'
                     value: null
+                entity_var:
+                    type: 'entity'
+                    options:
+                        class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+                    value: '1'
+
 
     test_groups_flow1:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity

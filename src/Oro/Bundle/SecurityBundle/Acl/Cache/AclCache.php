@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\DoctrineAclCache;
 use Symfony\Component\Security\Acl\Domain\FieldEntry;
@@ -15,6 +16,8 @@ class AclCache extends DoctrineAclCache
 {
     const ENTRY_CLASS = 'Symfony\Component\Security\Acl\Domain\Entry';
 
+    const CACHE_CLEAR_EVENT = 'oro_security.acl_cache.clear';
+
     /**
      * @var CacheProvider
      */
@@ -24,6 +27,11 @@ class AclCache extends DoctrineAclCache
      * @var UnderlyingAclCache
      */
     protected $underlyingCache;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @param CacheProvider $cache
@@ -38,6 +46,14 @@ class AclCache extends DoctrineAclCache
         $this->cache = $cache;
         $this->cache->setNamespace($prefix);
         parent::__construct($this->cache, $permissionGrantingStrategy, $prefix);
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -58,6 +74,10 @@ class AclCache extends DoctrineAclCache
         $this->cache->deleteAll();
         // we should clear underlying cache to avoid generation of wrong ACLs
         $this->underlyingCache->clearCache();
+
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(self::CACHE_CLEAR_EVENT);
+        }
     }
 
     /**
