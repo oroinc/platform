@@ -4,13 +4,15 @@ namespace Oro\Bundle\IntegrationBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroIntegrationExtension extends Extension
 {
     /**
      * {@inheritDoc}
+     *
+     * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -19,5 +21,7 @@ class OroIntegrationExtension extends Extension
         $loader->load('services.yml');
         $loader->load('rest_transport.yml');
         $loader->load('repositories.yml');
+        $loader->load('factories.yml');
+        $loader->load('action_handler.yml');
     }
 }

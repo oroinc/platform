@@ -18,7 +18,9 @@ class ClearInactiveMailboxes extends AbstractFixture implements ContainerAwareIn
      */
     public function load(ObjectManager $manager)
     {
-        $this->getProducer()->send(Topics::CLEAR_INACTIVE_MAILBOX, []);
+        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+            $this->getProducer()->send(Topics::CLEAR_INACTIVE_MAILBOX, []);
+        }
     }
 
     /**

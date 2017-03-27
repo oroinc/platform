@@ -63,16 +63,39 @@ return [
                     'type' => 'string',
                     'value' => 'Var1Value',
                     'options' => [],
+                    'property_path' => null,
                 ],
                 'var2' => [
                     'type' => 'array',
                     'value' => [1,2,3,4,5],
                     'options' => [],
+                    'property_path' => null,
                 ],
                 'var3' => [
                     'type' => 'string',
                     'value' => null,
                     'options' => [],
+                    'property_path' => null,
+                ],
+                'first_object' => [
+                    'type' => 'object',
+                    'property_path' => null,
+                    'value' => '2017-03-15 00:00:00',
+                    'options' => [
+                        'class' => 'DateTime'
+                    ]
+                ],
+                'var_entity' => [
+                    'type' => 'entity',
+                    'property_path' => null,
+                    'entity_acl' => [
+                        'update' => true,
+                        'delete' => false
+                    ],
+                    'options' => [
+                        'class' => 'Oro\Bundle\UserBundle\Entity\User'
+                    ],
+                    'value' => 1
                 ]
             ]
         ],

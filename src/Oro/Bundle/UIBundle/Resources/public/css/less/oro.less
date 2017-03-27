@@ -3291,7 +3291,9 @@ label .popover-content {
 }
 
 .entity-create-or-select-container {
-  .entity-create-btn, .entity-create-btn[disabled], .entity-create-btn[disabled]:active {
+  .entity-create-btn,
+  .entity-create-btn[disabled],
+  .entity-create-btn[disabled]:active {
     padding: 0 6px;
     margin-left: 3px;
     height: 30px;
@@ -3327,11 +3329,18 @@ label .popover-content {
       font-size: 14px;
     }
   }
+  &:not(.entity-create-enabled):not(.entity-create-multi-enabled) {
+    .input-append .select2-container {
+      width: 263px;
+    }
+  }
 }
 
-.entity-create-enabled .input-prepend .select2-container,
-.entity-create-enabled .input-append .select2-container {
-  width: 228px;
+.entity-create-enabled {
+  .input-prepend .select2-container,
+  .input-append .select2-container {
+    width: 229px;
+  }
 }
 
 .invisible {

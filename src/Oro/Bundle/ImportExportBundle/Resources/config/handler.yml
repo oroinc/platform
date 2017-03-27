@@ -15,6 +15,9 @@ services:
             - '@oro_importexport.processor.registry'
             - '@oro_entity_config.provider.entity'
             - '@translator'
+            - '@oro_importexport.writer.writer_chain'
+            - '@oro_importexport.reader.reader_chain'
+            - '@oro_importexport.file.batch_file_manager'
 
     oro_importexport.handler.import.abstract:
         class: %oro_importexport.handler.import.abstract.class%
@@ -31,9 +34,9 @@ services:
         parent: oro_importexport.handler.abstract
         calls:
             - [setMimeTypeGuesser, ['@oro_importexport.file.mime_type_guesser']]
-            - [setRouter, ['@router']]
-            - [setConfigManager, ['@oro_config.global']]
+            - [setReaderChain, ['@oro_importexport.reader.reader_chain']]
             - [setFileManager, ['@oro_importexport.file.file_manager']]
+            - [setWriterChain, ['@oro_importexport.writer.writer_chain']]
         lazy: true
 
     oro_importexport.handler.import.cli:

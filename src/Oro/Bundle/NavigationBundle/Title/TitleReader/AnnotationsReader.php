@@ -32,6 +32,10 @@ class AnnotationsReader implements ReaderInterface
     public function getTitle($route)
     {
         $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            return null;
+        }
+
         $controller = $request->get('_controller');
         if (strpos($controller, '::')) {
             list($class, $method) = explode('::', $controller);

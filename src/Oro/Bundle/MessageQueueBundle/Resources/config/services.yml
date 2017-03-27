@@ -49,3 +49,11 @@ services:
             - '%oro_message_queue.consumption.interrupt_filepath%'
         tags:
             - { name: 'kernel.event_listener', event: 'oro.entity_extend.entity.schema.update', priority: -250, method: 'interruptConsumption' }
+
+    oro_message_queue.consumption.token_storage_clearer_extension:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\TokenStorageClearerExtension'
+        public: false
+        arguments:
+            - '@security.token_storage'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }

@@ -7,7 +7,6 @@ oro.translation:
 
     action:
         disable: 'Disable'
-        remove_translation: 'Remove translation'
         enable: 'Enable'
         download: 'Download'
         install: 'Install'
@@ -19,6 +18,13 @@ oro.translation:
         install.title: 'Install "%language%" language'
         update.title: 'Update "%language%" language'
         rebuild_cache.label: 'Update Cache'
+        reset:
+            label: 'Reset Translation'
+            hint: 'Reset Translation'
+            success: 'Selected translations were reset to their original values.'
+            failure: 'Failed to reset translations to their original values.'
+            nothing_to_reset: 'You should select at least one translation with translated value.'
+
     language:
         form.select:
             empty_value: 'Please select...'
@@ -69,6 +75,7 @@ oro.translation:
         message:
             rebuild_cache: 'Translation Cache has been updated'
         current.label: 'Current (Cached) Value'
+        rebuild_cache_required: "Translation cache update is required. <a href='%path%'>Click here</a> to update"
 
     translation_key:
         entity_label: 'Translation Key'

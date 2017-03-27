@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 class TranslationControllerTest extends WebTestCase
 {
     const DATAGRID_NAME = 'oro-translation-translations-grid';
+    const RESET_ACTION_NAME = 'oro_translation_translation_reset';
 
     /** @var  ManagerRegistry */
     protected $registry;
@@ -65,6 +67,56 @@ class TranslationControllerTest extends WebTestCase
             $this->assertContains(sprintf('"domain":"%s"', $translation['domain']), $response);
             $this->assertContains(sprintf('"value":"%s"', $translation['value']), $response);
         }
+    }
+
+    public function testMassReset()
+    {
+        $ids = [
+            $this->getReference(LoadTranslations::TRANSLATION1)->getId(),
+            $this->getReference(LoadTranslations::TRANSLATION2)->getId(),
+        ];
+
+        $this->client->request('GET', $this->getUrl('oro_translation_mass_reset', [
+            'gridName' => self::DATAGRID_NAME,
+            'actionName' => self::RESET_ACTION_NAME,
+            'inset' => 1,
+            'values' => ',,,' . implode(',', $ids) . ',,,',
+        ]));
+
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertNotEmpty($result['successful']);
+        $this->assertArrayHasKey('count', $result);
+        $this->assertEquals(2, $result['count']);
+
+
+        /** @var TranslationRepository $repo */
+        $repo = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(Translation::class);
+
+        $translations = $repo->findBy(['id' => $ids]);
+        $this->assertEmpty($translations);
+    }
+
+    public function testMassResetError()
+    {
+        $this->client->request('GET', $this->getUrl('oro_translation_mass_reset', [
+            'gridName' => self::DATAGRID_NAME,
+            'actionName' => self::RESET_ACTION_NAME,
+            'inset' => 1,
+            'values' => '',
+        ]));
+
+        $translator = $this->getContainer()->get('translator');
+
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('successful', $result);
+        $this->assertFalse($result['successful']);
+        $this->assertArrayHasKey('message', $result);
+        $this->assertEquals(
+            $translator->trans('oro.translation.action.reset.nothing_to_reset'),
+            $result['message']
+        );
     }
 
     /**

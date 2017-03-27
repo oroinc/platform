@@ -38,7 +38,7 @@ trait DBALPersisterDriverTrait
     private $writeableItemData = [];
 
     /**
-     * Doctrine types for columns in $itemData
+     * Doctrine types for columns in $writeableItemData
      *
      * @var array
      * [
@@ -101,7 +101,7 @@ trait DBALPersisterDriverTrait
     private $indexUpdateData = [];
 
     /**
-     * Stores all data taken from Items given by 'addItem' method
+     * Stores all data taken from Items given by 'writeItem' method
      */
     public function flushWrites()
     {
@@ -121,7 +121,7 @@ trait DBALPersisterDriverTrait
     }
 
     /**
-     * Adds AbstractItem of which data will be stored when 'store' method is called
+     * Adds AbstractItem of which data will be stored when 'flushWrites' method is called
      *
      * @param AbstractItem $item
      */
@@ -252,7 +252,7 @@ trait DBALPersisterDriverTrait
     }
 
     /**
-     * Converts $item into array and stores the result in the DbalStorer object
+     * Converts $item into array and stores the result in the object
      *
      * @param AbstractItem $item
      */
@@ -309,7 +309,7 @@ trait DBALPersisterDriverTrait
     }
 
     /**
-     * Converts indexes of $item into objects and stores them in the DbalStorer object
+     * Converts indexes of $item into objects and stores them in the object
      *
      * @param Collection   $fields
      * @param AbstractItem $item
