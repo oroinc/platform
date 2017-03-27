@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
@@ -20,11 +21,18 @@ class WorkflowVariablesType extends AbstractType
     protected $variableGuesser;
 
     /**
-     * @param VariableGuesser $variableGuesser
+     * @var WorkflowVariableDataTransformer
      */
-    public function __construct(VariableGuesser $variableGuesser)
+    protected $transformer;
+
+    /**
+     * @param VariableGuesser                 $variableGuesser
+     * @param WorkflowVariableDataTransformer $transformer
+     */
+    public function __construct(VariableGuesser $variableGuesser, WorkflowVariableDataTransformer $transformer)
     {
         $this->variableGuesser = $variableGuesser;
+        $this->transformer = $transformer;
     }
 
     /**
@@ -63,7 +71,17 @@ class WorkflowVariablesType extends AbstractType
         foreach ($variables as $variable) {
             /** @var TypeGuess $typeGuess */
             $typeGuess = $this->variableGuesser->guessVariableForm($variable);
-            $builder->add($variable->getName(), $typeGuess->getType(), $typeGuess->getOptions());
+            if (!$typeGuess instanceof TypeGuess) {
+                continue;
+            }
+
+            $fieldName = $variable->getName();
+            $builder->add($fieldName, $typeGuess->getType(), $typeGuess->getOptions());
+
+            if ('entity' === $variable->getType()) {
+                $this->transformer->setVariable($variable);
+                $builder->get($fieldName)->addModelTransformer($this->transformer);
+            }
         }
     }
 
@@ -75,9 +93,14 @@ class WorkflowVariablesType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefined(['workflow'])
-            ->setDefaults(['data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData'])
-            ->setAllowedTypes(['workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow'])
+        $resolver
+            ->setDefined(['workflow'])
+            ->setDefaults([
+                'data_class' => 'Oro\Bundle\WorkflowBundle\Model\WorkflowData'
+            ])
+            ->setAllowedTypes([
+                'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow'
+            ])
             ->setRequired(['workflow']);
     }
 }

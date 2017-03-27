@@ -37,6 +37,8 @@ oro:
             designer:               Designer
             columns:                Columns
             filters:                Filters
+            segment_choice:
+                placeholder: Choose segment
 
         condition_builder:
             apply_segment:              Apply %s segment

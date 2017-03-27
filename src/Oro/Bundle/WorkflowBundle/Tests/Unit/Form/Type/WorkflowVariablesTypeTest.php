@@ -3,6 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -12,10 +15,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType;
-use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
-use Oro\Bundle\WorkflowBundle\Model\VariableManager;
+use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
+use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
@@ -36,9 +40,24 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     {
         parent::setUp();
 
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $entityManager = $this->createMock(EntityManager::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+
+        $classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
+        $managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
+
+        $transformer = new WorkflowVariableDataTransformer($managerRegistry);
         $this->variableGuesser = $this->createMock(VariableGuesser::class);
 
-        $this->type = new WorkflowVariablesType($this->variableGuesser);
+        $this->type = new WorkflowVariablesType($this->variableGuesser, $transformer);
     }
 
     public function testBuildForm()
@@ -101,6 +120,11 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         foreach ($childrenOptions as $childName => $childOptions) {
             $this->assertTrue($form->has($childName));
             $childForm = $form->get($childName);
+
+            if (!is_array($childOptions)) {
+                continue;
+            }
+
             foreach ($childOptions as $optionName => $optionValue) {
                 $this->assertTrue($childForm->getConfig()->hasOption($optionName));
                 $this->assertEquals($optionValue, $childForm->getConfig()->getOption($optionName));
@@ -197,6 +221,55 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     ]
                 ]
             ],
+            'entity_variable_without_identifier' => [
+                'submitData' => ['first' => (object) ['id' => 1]],
+                'formData' => $this->createWorkflowData(['first' => 1]),
+                'form_options' => [
+                    'workflow' => $this->createWorkflowWithVariables([
+                        [
+                            'name' => 'first',
+                            'label' => 'First Label',
+                            'value' => 1,
+                            'type' => 'entity',
+                            'options' => [
+                                'class' => 'stdClass'
+                            ]
+                        ]
+                    ])
+                ],
+                'childrenOptions' => ['first' => []],
+                'guessedData' => [
+                    [
+                        'form_type' => TextType::class,
+                        'form_options' => []
+                    ]
+                ]
+            ],
+            'entity_variable_with_identifier' => [
+                'submitData' => ['first' => (object) ['id' => 1]],
+                'formData' => $this->createWorkflowData(['first' => 1]),
+                'form_options' => [
+                    'workflow' => $this->createWorkflowWithVariables([
+                        [
+                            'name' => 'first',
+                            'label' => 'First Label',
+                            'value' => 1,
+                            'type' => 'entity',
+                            'options' => [
+                                'class' => 'stdClass',
+                                'identifier' => 'id'
+                            ]
+                        ]
+                    ])
+                ],
+                'childrenOptions' => ['first' => []],
+                'guessedData' => [
+                    [
+                        'form_type' => TextType::class,
+                        'form_options' => []
+                    ]
+                ]
+            ],
         ];
     }
 
@@ -209,11 +282,14 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $variableCollection = new ArrayCollection();
 
         foreach ($variables as $key => $varOptions) {
+            $options = isset($varOptions['options']) ? $varOptions['options'] : [];
+
             $var = new Variable();
             $var->setValue($varOptions['value']);
             $var->setType($varOptions['type']);
             $var->setName($varOptions['name']);
             $var->setLabel($varOptions['label']);
+            $var->setOptions($options);
             $variableCollection->add($var);
         }
 

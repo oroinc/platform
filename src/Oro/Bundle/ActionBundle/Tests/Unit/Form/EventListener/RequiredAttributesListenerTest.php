@@ -40,13 +40,9 @@ class RequiredAttributesListenerTest extends \PHPUnit_Framework_TestCase
         $values = ['test' => 'value'];
 
         $data = $this->createActionData();
-        $data->expects($this->once())->method('getValues')->with($attributeNames)->willReturn($values);
 
         $event = $this->createFormEvent();
         $event->expects($this->once())->method('getData')->willReturn($data);
-        $event->expects($this->once())
-            ->method('setData')
-            ->with($this->isInstanceOf('Oro\Bundle\ActionBundle\Model\ActionData'));
 
         $this->listener->initialize($attributeNames);
         $this->listener->onPreSetData($event);
@@ -59,9 +55,6 @@ class RequiredAttributesListenerTest extends \PHPUnit_Framework_TestCase
 
         $submitEvent = $this->createFormEvent();
         $submitEvent->expects($this->once())->method('getData')->willReturn($formData);
-        $submitEvent->expects($this->once())
-            ->method('setData')
-            ->with($this->isInstanceOf('Oro\Bundle\ActionBundle\Model\ActionData'));
 
         $this->listener->onSubmit($submitEvent);
     }
