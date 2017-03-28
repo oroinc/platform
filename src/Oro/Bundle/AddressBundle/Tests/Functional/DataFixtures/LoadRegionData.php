@@ -10,6 +10,7 @@ class LoadRegionData extends AbstractFixture
 {
     const REGION_AD_07 = 'region.ad07';
     const REGION_DK_85 = 'region.dk85';
+    const REGION_US_NY = 'region.usny';
 
     /** @var array */
     protected $regions = [
@@ -22,6 +23,11 @@ class LoadRegionData extends AbstractFixture
             'combinedCode' => 'DK-85',
             'code' => '85',
             'name' => 'Sjælland',
+        ],
+        self::REGION_US_NY => [
+            'combinedCode' => 'US-NY',
+            'code' => 'US',
+            'name' => 'New York',
         ],
     ];
 
