@@ -47,11 +47,9 @@ class LoadRegionData extends AbstractFixture
                 $region = new Region($data['combinedCode']);
                 $region->setCode($data['code']);
                 $region->setName($data['name']);
-
             }
 
             $this->setReference($reference, $region);
-
             $manager->persist($region);
         }
 
