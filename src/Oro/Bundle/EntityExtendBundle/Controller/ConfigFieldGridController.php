@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -82,8 +83,7 @@ class ConfigFieldGridController extends Controller
         $successMessage = $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.saved');
         $formAction = $this->generateUrl('oro_entityextend_field_update', ['id' => $entity->getId()]);
 
-        return $this
-            ->get('oro_entity_config.form.handler.create_update_config_field_handler')
+        return $this->get('oro_entity_config.form.handler.create_update_config_field_handler')
             ->handleFieldSave($request, $entity, $redirectUrl, $formAction, $successMessage);
     }
 

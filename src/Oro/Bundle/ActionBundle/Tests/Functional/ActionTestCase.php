@@ -125,7 +125,8 @@ abstract class ActionTestCase extends WebTestCase
                 'success' => $isSuccess,
                 'message' => '',
                 'messages' => [],
-                'redirectUrl' => $this->getUrl($redirectUrl)
+                'redirectUrl' => $this->getUrl($redirectUrl),
+                'pageReload' => true
             ],
             json_decode($this->client->getResponse()->getContent(), true)
         );
