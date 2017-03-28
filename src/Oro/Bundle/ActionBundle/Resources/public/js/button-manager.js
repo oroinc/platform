@@ -158,7 +158,7 @@ define(function(require) {
                 });
                 this.doWidgetReload();
             } else {
-                this.doPageReload();
+                this.doPageReload(response);
             }
         },
 
@@ -169,8 +169,20 @@ define(function(require) {
             mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
         },
 
-        doPageReload: function() {
-            mediator.execute('refreshPage', {fullRedirect: this.options.fullRedirect});
+        /**
+         * @param {Object} response
+         */
+        doPageReload: function(response) {
+            var pageReload = true;
+            if (response.pageReload !== undefined) {
+                pageReload = Boolean(response.pageReload);
+            }
+
+            if (pageReload) {
+                mediator.execute('refreshPage', {fullRedirect: this.options.fullRedirect});
+            } else {
+                mediator.execute('hideLoading');
+            }
         },
 
         doWidgetReload: function() {
