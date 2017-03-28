@@ -3,14 +3,12 @@ namespace Oro\Bundle\IntegrationBundle\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\IntegrationBundle\Authentication\Token\IntegrationTokenAwareTrait;
+
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
@@ -20,6 +18,10 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ReversSyncIntegrationProcessor implements
     MessageProcessorInterface,
@@ -27,6 +29,7 @@ class ReversSyncIntegrationProcessor implements
     TopicSubscriberInterface
 {
     use ContainerAwareTrait;
+    use IntegrationTokenAwareTrait;
 
     /**
      * @var DoctrineHelper
@@ -58,6 +61,7 @@ class ReversSyncIntegrationProcessor implements
      * @param ReverseSyncProcessor $reverseSyncProcessor
      * @param TypesRegistry $typesRegistry
      * @param JobRunner $jobRunner,
+     * @param TokenStorageInterface $tokenStorage
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -65,12 +69,14 @@ class ReversSyncIntegrationProcessor implements
         ReverseSyncProcessor $reverseSyncProcessor,
         TypesRegistry $typesRegistry,
         JobRunner $jobRunner,
+        TokenStorageInterface $tokenStorage,
         LoggerInterface $logger
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->reverseSyncProcessor = $reverseSyncProcessor;
         $this->typesRegistry = $typesRegistry;
         $this->jobRunner = $jobRunner;
+        $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
         $this->reverseSyncProcessor->getLoggerStrategy()->setLogger($logger);
     }
@@ -152,6 +158,7 @@ class ReversSyncIntegrationProcessor implements
         }
 
         $result = $this->jobRunner->runUnique($ownerId, $jobName, function () use ($integration, $body) {
+            $this->setTemporaryIntegrationToken($integration);
             $this->reverseSyncProcessor->process(
                 $integration,
                 $body['connector'],

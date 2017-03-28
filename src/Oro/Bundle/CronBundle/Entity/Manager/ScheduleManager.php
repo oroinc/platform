@@ -5,8 +5,8 @@ namespace Oro\Bundle\CronBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-
 use Oro\Bundle\CronBundle\Entity\Schedule;
+use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 
 class ScheduleManager
 {
@@ -16,13 +16,21 @@ class ScheduleManager
     /** @var string */
     protected $scheduleClass;
 
+    /** @var SchedulesByArgumentsFilterInterface */
+    private $schedulesByArgumentsFilter;
+
     /**
      * @param ManagerRegistry $registry
+     * @param SchedulesByArgumentsFilterInterface $schedulesByArgumentsFilter,
      * @param string $scheduleClass
      */
-    public function __construct(ManagerRegistry $registry, $scheduleClass)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        SchedulesByArgumentsFilterInterface $schedulesByArgumentsFilter,
+        $scheduleClass
+    ) {
         $this->registry = $registry;
+        $this->schedulesByArgumentsFilter = $schedulesByArgumentsFilter;
         $this->scheduleClass = $scheduleClass;
     }
 
@@ -36,12 +44,7 @@ class ScheduleManager
     {
         $schedules = $this->getRepository()->findBy(['command' => $command, 'definition' => $definition]);
 
-        $argumentsSchedule = new Schedule();
-        $argumentsSchedule->setArguments($arguments);
-
-        $schedules = array_filter($schedules, function (Schedule $schedule) use ($argumentsSchedule) {
-            return $schedule->getArgumentsHash() === $argumentsSchedule->getArgumentsHash();
-        });
+        $schedules = $this->schedulesByArgumentsFilter->filter($schedules, $arguments);
 
         return count($schedules) > 0;
     }
@@ -69,6 +72,19 @@ class ScheduleManager
             ->setDefinition($definition);
 
         return $schedule;
+    }
+
+    /**
+     * @param string $command
+     * @param string[] $arguments
+     *
+     * @return Schedule[]
+     */
+    public function getSchedulesByCommandAndArguments($command, array $arguments)
+    {
+        $schedules = $this->getRepository()->findBy(['command' => $command]);
+
+        return $this->schedulesByArgumentsFilter->filter($schedules, $arguments);
     }
 
     /**

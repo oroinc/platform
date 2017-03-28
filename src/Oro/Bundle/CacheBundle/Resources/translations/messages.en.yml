@@ -1,0 +1,18 @@
+oro:
+    cache:
+        invalidate:
+            label: 'Invalidate cache'
+            type:
+                scheduled: 'Schedule Invalidation'
+                immediate: 'Now'
+            at.label: 'at'
+            invalidate_cache_at.label: 'Invalidate cache at'
+            invalidate_now.label: 'Invalidate Now'
+            invalidate_service.label: 'Invalidate Cache Service'
+            action:
+                cancel: 'Cancel'
+                remove: 'Remove Scheduled Invalidation'
+                submit: 'Submit'
+            flash:
+                invalidate_success: 'Cache was successfully invalidated'
+                save_success: 'Cache settings have been saved'
