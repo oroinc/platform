@@ -112,6 +112,23 @@ class ConfigHelper
     }
 
     /**
+     * @return array
+     */
+    public function getNonExtendedEntitiesClasses()
+    {
+        $configs = $this->configManager->getConfigs('extend');
+
+        $nonExtendedClassNames = [];
+        foreach ($configs as $config) {
+            if (!$config->is('is_extend')) {
+                $nonExtendedClassNames[] = $config->getId()->getClassName();
+            }
+        }
+
+        return $nonExtendedClassNames;
+    }
+
+    /**
      * @param ConfigInterface $extendEntityConfig
      * @param $fieldType
      * @param array $additionalFieldOptions
