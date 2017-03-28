@@ -58,7 +58,7 @@ class MainMenu extends Element
             sprintf(
                 "Menu item '%s' not found on the page:\n%s",
                 $item,
-                $this->getPage()->find('css', 'head')->getOuterHtml()
+                $this->getPage()->find('css', 'head title')->getOuterHtml()
             )
         );
 
