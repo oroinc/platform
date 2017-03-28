@@ -244,13 +244,20 @@ class ConfigHelperHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getExtendRequireJsModules')
             ->willReturn($modules);
 
+        $nonExtendedEntities = ['first', 'second'];
+        $this->configHelper
+            ->expects($this->once())
+            ->method('getNonExtendedEntitiesClasses')
+            ->willReturn($nonExtendedEntities);
+
         $expectedResponse = [
             'entity_config' => $entityConfig,
             'field_config' => $fieldConfig,
             'field' => $fieldConfigModel,
             'form' => $formView,
             'formAction' => $formAction,
-            'require_js' => $modules
+            'require_js' => $modules,
+            'non_extended_entities_classes' => $nonExtendedEntities,
         ];
 
         $this->assertEquals(

@@ -50,7 +50,7 @@ class ImageFilterLoader
 
     public function load()
     {
-        foreach ($this->getAllDimensions() as $dimension) {
+        foreach ($this->imageTypeProvider->getImageDimensions() as $dimension) {
             $filterName = $dimension->getName();
             $this->filterConfiguration->set(
                 $filterName,
@@ -65,20 +65,6 @@ class ImageFilterLoader
     public function addCustomImageFilterProvider(CustomImageFilterProviderInterface $provider)
     {
         $this->customFilterProviders[] = $provider;
-    }
-
-    /**
-     * @return ThemeImageTypeDimension[]
-     */
-    private function getAllDimensions()
-    {
-        $dimensions = [];
-
-        foreach ($this->imageTypeProvider->getImageTypes() as $imageType) {
-            $dimensions = array_merge($dimensions, $imageType->getDimensions());
-        }
-
-        return $dimensions;
     }
 
     /**
@@ -98,7 +84,9 @@ class ImageFilterLoader
         ];
 
         foreach ($this->customFilterProviders as $provider) {
-            $filterSettings = array_merge_recursive($filterSettings, $provider->getFilterConfig());
+            if ($provider->isApplicable($dimension)) {
+                $filterSettings = array_replace_recursive($filterSettings, $provider->getFilterConfig());
+            }
         }
 
         if ($width && $height) {
