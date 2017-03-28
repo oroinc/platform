@@ -15,13 +15,15 @@ class InvalidateCacheScheduleCommand extends ContainerAwareCommand
 {
     const NAME = 'oro:cache:invalidate:schedule';
 
-    /** @internal */
+    /**
+     * @internal
+     */
     const ARGUMENT_SERVICE_NAME = InvalidateCacheActionScheduledHandler::PARAM_HANDLER_SERVICE_NAME;
 
     const ARGUMENT_PARAMETERS = 'parameters';
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function configure()
     {
@@ -41,7 +43,7 @@ class InvalidateCacheScheduleCommand extends ContainerAwareCommand
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @throws InvalidArgumentException
      */
