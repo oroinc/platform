@@ -31,6 +31,11 @@ ActivityBundle
     - action `contextAction` is rendered in `OroDataGridBundle:Grid/dialog:multi.html.twig`
     - action `contextGridAction` was removed
 
+ApiBundle
+---------
+- Added class `Oro\Bundle\ApiBundle\Processor\ApiFormBuilderSubscriberProcessor`
+    - can be used to add subscribers to `FormContext`
+
 DataGridBundle
 --------------
 - Interface `Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface` added.
