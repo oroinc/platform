@@ -30,6 +30,11 @@ ActivityBundle
 - Class `Oro\Bundle\ActivityBundle\Controller\ActivityController`
     - action `contextAction` is rendered in `OroDataGridBundle:Grid/dialog:multi.html.twig`
     - action `contextGridAction` was removed
+    
+DataAuditBundle
+---------------
+A new string field `ownerDescription` with the database column `owner_description` was added to the entity 
+`Oro\Bundle\DataAuditBundle\Entity\Audit` and to the base class `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit`
 
 DataGridBundle
 --------------
@@ -62,6 +67,17 @@ AnnotationsReader
     - use `Oro\Bundle\NavigationBundle\Provider\TitleTranslator` as third argument instead of `Symfony\Component\Translation\TranslatorInterface`
     - use `Oro\Component\DependencyInjection\ServiceLink` as fourth argument
 
+IntegrationBundle
+-----------------
+- Class `Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor`
+    - construction signature was changed now it takes next arguments:
+        - `DoctrineHelper` $doctrineHelper,
+        - `ReverseSyncProcessor` $reverseSyncProcessor,
+        - `TypesRegistry` $typesRegistry,
+        - `JobRunner` $jobRunner,
+        - `TokenStorageInterface` $tokenStorage,
+        - `LoggerInterface` $logger
+        
 WorkflowBundle
 --------------
 - Changed implemented interface of  `Oro\Bundle\WorkflowBundle\Model\Variable` class from `Oro\Bundle\ActionBundle\Model\ParameterInterface` to `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`
