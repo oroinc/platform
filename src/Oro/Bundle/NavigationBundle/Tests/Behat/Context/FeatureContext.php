@@ -484,15 +484,12 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iShouldSeeOrNotInMainMenu($negotiation, $path)
     {
+        $isMenuItemVisibleExpectation = empty(trim($negotiation));
         /** @var MainMenu $mainMenu */
         $mainMenu = $this->createElement('MainMenu');
         $hasLink = $mainMenu->hasLink($path);
 
-        if (!empty(trim($negotiation))) {
-            self::assertFalse($hasLink);
-        } else {
-            self::assertTrue($hasLink);
-        }
+        self::assertSame($isMenuItemVisibleExpectation, $hasLink);
     }
 
     /**
@@ -502,15 +499,12 @@ class FeatureContext extends OroFeatureContext implements
      */
     public function iShouldSeeOrNotInUserMenu($title, $negotiation = null)
     {
+        $isLinkVisibleInUserMenuExpectation = empty(trim($negotiation));
         /** @var UserMenu $userMenu */
         $userMenu = $this->createElement('UserMenu');
         self::assertTrue($userMenu->isValid());
         $userMenu->open();
 
-        if (!empty(trim($negotiation))) {
-            self::assertFalse($userMenu->hasLink($title));
-        } else {
-            self::assertTrue($userMenu->hasLink($title));
-        }
+        self::assertSame($isLinkVisibleInUserMenuExpectation, $userMenu->hasLink($title));
     }
 }
