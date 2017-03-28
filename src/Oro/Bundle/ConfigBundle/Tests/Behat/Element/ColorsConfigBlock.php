@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Behat\Element;
 
+use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
@@ -9,6 +10,7 @@ class ColorsConfigBlock extends Form
 {
     use AllowedColorsMapping;
 
+    /** @var NodeElement */
     private $colorsStoreElement;
 
     protected function init()
@@ -55,7 +57,7 @@ element.value = '{$encodedValues}';
 JS;
 
         $this->getDriver()->executeScript($script);
-        $this->getDriver()->waitForAjax(100);
+        $this->getDriver()->waitForAjax(10);
     }
 
     /**

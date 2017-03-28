@@ -7,7 +7,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
-use Oro\Bundle\CalendarBundle\Tests\Behat\Element\EventForm;
+use Oro\Bundle\CalendarBundle\Tests\Behat\Element\ColorsAwareInterface;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -79,6 +79,8 @@ class FeatureContext extends OroFeatureContext implements
     /**
      * Asserts that activity list items are be sorted in provided order
      *
+     * Example: Then activity list must be sorted ascending by updated date
+     *
      * @Given /^activity list must be sorted (ascending|descending) by updated date$/
      */
     public function activityListMustBeSortedBy($order)
@@ -101,6 +103,10 @@ class FeatureContext extends OroFeatureContext implements
 
     /**
      * Asserts records in activity list with provided table one by one
+     * Example: Then I see following records in activity list with provided order:
+     *             | Merry christmas |
+     *             | Happy new year  |
+     *             | Call with Jenny |
      *
      * @Then /^I see following records in activity list with provided order:$/
      */
@@ -110,7 +116,8 @@ class FeatureContext extends OroFeatureContext implements
         $list = $this->elementFactory->createElement('ActivityList');
 
         foreach ($list->getItems() as $key => $item) {
-            if (count($table->getRows()) >= $key) {
+            // break cycle when all provided items checked
+            if (count($table->getRows()) <= $key) {
                 break;
             }
             self::assertEquals($table->getRow($key)[0], $item->getTitle());
@@ -121,6 +128,7 @@ class FeatureContext extends OroFeatureContext implements
      * Asserts visibility of provided sidebar
      *
      * Example: Then right sidebar is out of sight
+     *          Then left sidebar is visible
      *
      * @Given /^(left|right) sidebar is (visible|out of sight)$/
      */
@@ -138,28 +146,40 @@ class FeatureContext extends OroFeatureContext implements
     /**
      * Asserts provided color array with available blocks on page, one by one element
      *
+     * If provided color count less than existing on form - will be
+     * checked first N elements begins from start
+     *
+     * Example:  Then I should see following available "Event Form" colors:
+     *             | Apple green, Cornflower Blue, Mercury |
+     *
+     *           Then I should see following available "TaxonomyForm" colors:
+     *             | Cornflower Blue, Mercury, Melrose, Mauve |
+     *
+     * @see AllowedColorsMapping for full list of available color names
+     *
      * @Then /^I should see following available "(.+)" colors:$/
      */
     public function iShouldSeeFollowingAvailableEventColors($target, TableNode $table)
     {
-        self::assertTrue(
-            $this->elementFactory->hasElement($target),
-            "Element with name $target not found"
-        );
+        if (!$this->elementFactory->hasElement($target)) {
+            throw new \InvalidArgumentException(sprintf('Could not find element with "%s" name', $target));
+        }
 
-        /** @var EventForm $form */
+        /** @var ColorsAwareInterface $form */
         $form = $this->elementFactory->createElement($target);
         $actual = $form->getAvailableColors();
 
+        // parse provided color list to an array
         $expectedNames = $table->getRow(0);
         $expectedNames = explode(', ', reset($expectedNames));
 
         foreach ($expectedNames as $expectedName) {
             $currentActual = array_shift($actual);
+            $currentExpected = $this->getHexByColorName($expectedName);
             self::assertEquals(
-                $this->getHexByColorName($expectedName),
+                $currentExpected,
                 $currentActual,
-                "Provided and found on page color arrays are different"
+                "Provided ($currentExpected) and found ($currentActual) on page colors are different"
             );
         }
     }

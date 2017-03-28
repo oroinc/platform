@@ -50,7 +50,7 @@ Feature: Display settings manage
     And I fill "System Config Form" with:
       | Lock headers in grids | off |
     And I save form
-    When I go to Activities/Cases
+    And I go to Activities/Cases
     Then I see that grid header is sticky
 
   Scenario: Disable navigation through grid entity from a view page
@@ -62,17 +62,17 @@ Feature: Display settings manage
     And I fill "System Config Form" with:
       | Record Pagination | off |
     And I save form
-    Then I go to Activities/Cases
+    And I go to Activities/Cases
     And click view 1 in grid
     Then I should not see an "Entity pagination" element
 
   Scenario: Change record pagination limit
-    Given I go to System/Configuration
+    When I go to System/Configuration
     And click "Display settings"
     And I fill "System Config Form" with:
       | Record Pagination | on |
     And I save form
-    When I go to Activities/Cases
+    And I go to Activities/Cases
     And I click view 1 in grid
     Then I should see an "Entity pagination" element
     When I go to System/Configuration
@@ -80,9 +80,9 @@ Feature: Display settings manage
     And I fill "System Config Form" with:
       | Record Pagination limit | 20 |
     And I save form
-    Then I go to Activities/Cases
+    And I go to Activities/Cases
     And I click view 1 in grid
-    And I should not see an "Entity pagination" element
+    Then I should not see an "Entity pagination" element
 
   Scenario: Change activity list configuration
     When I go to Customers/Contacts
@@ -96,7 +96,7 @@ Feature: Display settings manage
       | Items Per Page By Default | 25        |
     And I save form
     And I go to Customers/Contacts
-    And I click View Charlie in grid
+    And click View Charlie in grid
     Then there is 13 records in activity list
     And activity list must be sorted ascending by updated date
     When I go to System/Configuration
