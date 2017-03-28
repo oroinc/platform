@@ -42,7 +42,7 @@ class ConfigurationManager
         $configuration = $this->configurationProvider->getFeaturesConfiguration();
         
         foreach ($configuration as $featureName => $featureConfig) {
-            if ($featureConfig['toggle'] == $toggle) {
+            if (isset($featureConfig['toggle']) && $featureConfig['toggle'] == $toggle) {
                 return $featureName;
             }
         }

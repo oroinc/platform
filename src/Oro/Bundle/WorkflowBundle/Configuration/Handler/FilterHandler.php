@@ -62,6 +62,8 @@ class FilterHandler implements ConfigurationHandlerInterface
     protected static $variableKeys = [
         'name',
         'type',
+        'entity_acl',
+        'property_path',
         'value',
         'options'
     ];
@@ -102,7 +104,11 @@ class FilterHandler implements ConfigurationHandlerInterface
             self::$transitionDefinitionKeys,
             $configuration
         );
-        $this->filterConfigNode(WorkflowConfiguration::NODE_VARIABLES, self::$variableKeys, $configuration);
+        $this->filterConfigNode(
+            WorkflowConfiguration::NODE_VARIABLES,
+            self::$variableKeys,
+            $configuration[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS]
+        );
 
         return $this->filterKeys($configuration, self::$workflowKeys);
     }
@@ -116,8 +122,8 @@ class FilterHandler implements ConfigurationHandlerInterface
     {
         if (!empty($configuration[$nodeKey]) && is_array($configuration[$nodeKey])) {
             $filteredAttributes = [];
-            foreach ($configuration[$nodeKey] as $rawAttribute) {
-                $filteredAttributes[] = $this->filterKeys($rawAttribute, $keys);
+            foreach ($configuration[$nodeKey] as $attributeKey => $rawAttribute) {
+                $filteredAttributes[$attributeKey] = $this->filterKeys($rawAttribute, $keys);
             }
             $configuration[$nodeKey] = $filteredAttributes;
         }
