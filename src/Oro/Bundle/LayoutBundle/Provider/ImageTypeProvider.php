@@ -24,7 +24,7 @@ class ImageTypeProvider
     /**
      * @var ThemeImageTypeDimension[]
      */
-    protected $dimensions;
+    protected $dimensions = [];
 
     /**
      * @param ThemeManager $themeManager
@@ -44,6 +44,18 @@ class ImageTypeProvider
         }
 
         return $this->imageTypes;
+    }
+
+    /**
+     * @return ThemeImageTypeDimension[]
+     */
+    public function getImageDimensions()
+    {
+        if (!$this->dimensions) {
+            $this->collectDimensionsFromThemes($this->themeManager->getAllThemes());
+        }
+
+        return $this->dimensions;
     }
 
     protected function collectImageTypesFromThemes()
@@ -91,7 +103,8 @@ class ImageTypeProvider
                 $this->dimensions[$name] = new ThemeImageTypeDimension(
                     $name,
                     $dimension['width'],
-                    $dimension['height']
+                    $dimension['height'],
+                    array_key_exists('options', $dimension) ? $dimension['options'] : null
                 );
             }
         }
