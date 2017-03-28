@@ -180,7 +180,7 @@ class SegmentFilter extends EntityFilter
         $queryBuilder = $this->getSegmentQueryBuilder($segment);
         $query        = $queryBuilder->getQuery();
 
-        if (!$this->isDynamic($segment) || !$segment->getRecordsLimit()) {
+        if (!$this->isDynamic($segment)) {
             $subquery = $query->getDQL();
             $params = $query->getParameters();
             /** @var Parameter $param */
@@ -193,6 +193,9 @@ class SegmentFilter extends EntityFilter
             $identifier = reset($identifiers);
             $idsResult = $query->getArrayResult();
             $subquery = array_column($idsResult, $identifier);
+            if (!$subquery) {
+                $subquery = [0];
+            }
         }
 
         /**@var OrmExpressionBuilder $expressionBuilder */
