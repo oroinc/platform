@@ -1,0 +1,9 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'layout.html.twig'
+
+        - '@add':
+            id: filter_container_tpl
+            parentId: head
+            blockType: block
