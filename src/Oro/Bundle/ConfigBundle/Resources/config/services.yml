@@ -90,6 +90,7 @@ services:
         class: %oro_config.form.config_subscriber.class%
         arguments:
           - '@oro_config.user'
+          - '@oro_entity.doctrine_helper'
 
     oro_config.type.form:
         class:                        %oro_config.type.form.class%
@@ -136,4 +137,3 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@validator'
-            - '@oro_attachment.file_manager'

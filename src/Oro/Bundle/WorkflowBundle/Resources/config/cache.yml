@@ -26,3 +26,18 @@ services:
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.transition_trigger_event' ] ]
             - [ setTriggerClassName, [ '%oro_workflow.entity.transition_trigger_event.class%' ] ]
+
+    oro_workflow.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_workflow' ]]
+
+    oro_workflow.cache.entity_aware:
+        class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache
+        arguments:
+            - '@oro_workflow.cache'
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: oro_workflow.changes.subscriber }
+
