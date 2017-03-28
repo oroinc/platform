@@ -3,15 +3,20 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\NavigationBundle\Entity\Title;
-use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
-use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
+use Oro\Component\TestUtils\Mocks\ServiceLink;
 
 class RouteChoiceTypeTest extends FormIntegrationTestCase
 {
@@ -21,14 +26,19 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     private $router;
 
     /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleReaderRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $registry;
+    private $readerRegistry;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TitleTranslator|\PHPUnit_Framework_MockObject_MockObject
      */
     private $translator;
+
+    /**
+     * @var TitleService|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $titleService;
 
     /**
      * @var RouteChoiceType
@@ -40,12 +50,16 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
      */
     protected function setUp()
     {
-
-        $this->translator = $this->getTranslator();
-        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->router = $this->createMock(RouterInterface::class);
+        $this->translator = $this->createMock(TitleTranslator::class);
+        $this->readerRegistry = $this->createMock(TitleReaderRegistry::class);
+        $this->titleService = $this->createMock(TitleService::class);
 
-        $this->formType = new RouteChoiceType($this->router, $this->registry, $this->translator);
+        $this->formType = new RouteChoiceType(
+            $this->router,
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(TranslatorInterface::class)
+        );
 
         parent::setUp();
     }
@@ -157,16 +171,21 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptionsDoNotAddTitles()
     {
+        $this->formType->setTitleTranslator($this->translator);
+        $this->formType->setReaderRegistry($this->readerRegistry);
+        $this->formType->setTitleServiceLink(new ServiceLink($this->titleService));
+
         $routeCollection = $this->getRouteCollection();
 
         $this->router->expects($this->once())
             ->method('getRouteCollection')
             ->willReturn($routeCollection);
 
-        $this->registry->expects($this->never())
+        $this->readerRegistry
+            ->expects($this->never())
             ->method($this->anything());
 
-        $options = ['add_titles' => false];
+        $options = ['add_titles' => false, 'menu_name' => 'menu'];
 
         $resolver = new OptionsResolver();
         $this->formType->configureOptions($resolver);
@@ -182,6 +201,75 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
 
         $this->assertArrayHasKey('choices', $resolvedOptions);
         $this->assertEquals($expectedChoices, $resolvedOptions['choices']);
+    }
+
+    public function testConfigureOptionsWithoutTitleTranslator()
+    {
+        $this->formType->setReaderRegistry($this->readerRegistry);
+        $this->formType->setTitleServiceLink(new ServiceLink($this->titleService));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf('The "%s::titleTranslator" property is required.', RouteChoiceType::class)
+        );
+
+        $routeCollection = $this->getRouteCollection();
+
+        $this->router->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $options = ['add_titles' => true, 'menu_name' => 'menu'];
+
+        $resolver = new OptionsResolver();
+        $this->formType->configureOptions($resolver);
+        $resolver->resolve($options);
+    }
+
+    public function testConfigureOptionsWithoutReaderRegistry()
+    {
+        $this->formType->setTitleTranslator($this->translator);
+        $this->formType->setTitleServiceLink(new ServiceLink($this->titleService));
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf('The "%s::readerRegistry" property is required.', RouteChoiceType::class)
+        );
+
+        $routeCollection = $this->getRouteCollection();
+
+        $this->router->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $options = ['add_titles' => true, 'menu_name' => 'menu'];
+
+        $resolver = new OptionsResolver();
+        $this->formType->configureOptions($resolver);
+        $resolver->resolve($options);
+    }
+
+    public function testConfigureOptionsWithoutTitleServiceLink()
+    {
+        $this->formType->setTitleTranslator($this->translator);
+        $this->formType->setReaderRegistry($this->readerRegistry);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            sprintf('The "%s::titleServiceLink" property is required.', RouteChoiceType::class)
+        );
+
+        $routeCollection = $this->getRouteCollection();
+
+        $this->router->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $options = ['add_titles' => true, 'menu_name' => 'menu'];
+
+        $resolver = new OptionsResolver();
+        $this->formType->configureOptions($resolver);
+        $resolver->resolve($options);
     }
 
     /**
