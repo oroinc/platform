@@ -43,7 +43,7 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
             return trim(strip_tags($element->getHtml()));
         }, $integrationElements);
 
-        $isIntegrationVisibleExpectation = !empty(trim($negotiation));
+        $isIntegrationVisibleExpectation = empty(trim($negotiation));
         foreach ($table->getRows() as list($row)) {
             if ($isIntegrationVisibleExpectation) {
                 self::assertContains($row, $actual, "Integration with name $row not found");
