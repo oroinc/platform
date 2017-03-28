@@ -48,7 +48,8 @@ class DeleteTest extends WebTestCase
                 'success' => true,
                 'message' => '',
                 'messages' => [],
-                'redirectUrl' => $this->getUrl('oro_test_item_index', ['id' => $item->getId()])
+                'redirectUrl' => $this->getUrl('oro_test_item_index', ['id' => $item->getId()]),
+                'pageReload' => true
             ],
             $response
         );
