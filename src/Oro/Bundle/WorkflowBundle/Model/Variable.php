@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Oro\Bundle\ActionBundle\Model\ParameterInterface;
+use Oro\Bundle\ActionBundle\Model\EntityParameterInterface;
 
-class Variable implements ParameterInterface
+class Variable implements EntityParameterInterface
 {
     const INTERNAL_TYPE_VARIABLE = 'variable';
 
@@ -17,6 +17,16 @@ class Variable implements ParameterInterface
      * @var string
      */
     protected $type;
+
+    /**
+     * @var array
+     */
+    protected $entityAcl = [];
+
+    /**
+     * @var string
+     */
+    protected $propertyPath;
 
     /**
      * @var mixed
@@ -55,6 +65,34 @@ class Variable implements ParameterInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param array $entityAcl
+     *
+     * @return Variable
+     */
+    public function setEntityAcl(array $entityAcl)
+    {
+        $this->entityAcl = $entityAcl;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEntityUpdateAllowed()
+    {
+        return !array_key_exists('update', $this->entityAcl) || $this->entityAcl['update'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEntityDeleteAllowed()
+    {
+        return !array_key_exists('delete', $this->entityAcl) || $this->entityAcl['delete'];
     }
 
     /**
@@ -169,7 +207,7 @@ class Variable implements ParameterInterface
      *
      * @param string $key
      *
-     * @return null|mixed
+     * @return mixed|null
      */
     public function getOption($key)
     {
@@ -198,6 +236,26 @@ class Variable implements ParameterInterface
         }
 
         return $this->options['form_options'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPropertyPath()
+    {
+        return $this->propertyPath;
+    }
+
+    /**
+     * @param string $propertyPath
+     *
+     * @return Variable
+     */
+    public function setPropertyPath($propertyPath)
+    {
+        $this->propertyPath = $propertyPath;
+
+        return $this;
     }
 
     /**

@@ -15,7 +15,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v2_0';
+        return 'v2_1';
     }
 
     /**
@@ -46,6 +46,7 @@ class OroDataAuditBundleInstaller implements Installation
         $auditTable->addColumn('organization_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('type', 'string', ['length' => 255]);
         $auditTable->addColumn('transaction_id', 'string', ['length' => 255]);
+        $auditTable->addColumn('owner_description', 'string', ['notnull' => false, 'length' => 255]);
 
         $auditTable->setPrimaryKey(['id']);
 

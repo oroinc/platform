@@ -207,6 +207,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_enum_name }
 
+    oro_entity_extend.validator.non_extended_entity_bidirectional:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\NonExtendedEntityBidirectionalValidator
+        arguments:
+            - "@oro_entity_config.config_manager"
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.non_extended_entity_bidirectional }
+
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%
         arguments:

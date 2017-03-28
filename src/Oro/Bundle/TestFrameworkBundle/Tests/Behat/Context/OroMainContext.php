@@ -29,6 +29,9 @@ use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -104,26 +107,29 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
-    public function iShouldSeeFlashMessage($title)
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message')
     {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */
-        $flashMessage = $this->spin(function (OroMainContext $context) use ($title, &$actualFlashMessages) {
-            $flashMessages = $context->findAllElements('Flash Message');
+        $flashMessage = $this->spin(
+            function (OroMainContext $context) use ($title, &$actualFlashMessages, $flashMessageElement) {
+                $flashMessages = $context->findAllElements($flashMessageElement);
 
-            foreach ($flashMessages as $flashMessage) {
-                if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                    $actualFlashMessageText = $flashMessage->getText();
-                    $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
+                foreach ($flashMessages as $flashMessage) {
+                    if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                        $actualFlashMessageText = $flashMessage->getText();
+                        $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
 
-                    if (false !== stripos($actualFlashMessageText, $title)) {
-                        return $flashMessage;
+                        if (false !== stripos($actualFlashMessageText, $title)) {
+                            return $flashMessage;
+                        }
                     }
                 }
-            }
 
-            return null;
-        }, 10);
+                return null;
+            },
+            15
+        );
 
         self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
         self::assertNotNull($flashMessage, sprintf(
@@ -132,14 +138,14 @@ class OroMainContext extends MinkContext implements
             implode(',', array_keys($actualFlashMessages))
         ));
 
-        /** @var NodeElement $closeButton */
-        $closeButton = $flashMessage->find('css', 'button.close');
-        if (null !== $closeButton) {
-            try {
-                $closeButton->press();
-            } catch (\Exception $e) {
-                //No worries, flash message can disappeared till time next call
-            }
+        try {
+            /** @var NodeElement $closeButton */
+            $closeButton = $flashMessage->find('css', 'button.close');
+            $closeButton->press();
+        } catch (\Throwable $e) {
+            //No worries, flash message can disappeared till time next call
+        } catch (\Exception $e) {
+            //No worries, flash message can disappeared till time next call
         }
     }
 
@@ -531,6 +537,40 @@ class OroMainContext extends MinkContext implements
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Click on button in modal window
+     * Example: Given I click "Edit" in modal window
+     * Example: When I click "Save and Close" in modal window
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" in modal window$/
+     */
+    public function pressButtonInModalWindow($button)
+    {
+        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
+        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        try {
+            $button = $this->fixStepArgument($button);
+            $modalWindow->pressButton($button);
+        } catch (ElementNotFoundException $e) {
+            if ($modalWindow->hasLink($button)) {
+                $modalWindow->clickLink($button);
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Wait for ajax
+     *
+     * @Then /^(?:|I )have to wait for ajax$/
+     * @Then /^(?:|I )have to wait for ajax up to "(?P<timeInSec>(?:[^"]|\\")*)" seconds$/
+     */
+    public function iHaveToWaitForAjax($timeInSec = 60)
+    {
+        $timeInMs = $timeInSec * 1000;
+        $this->waitForAjax($timeInMs);
     }
 
     /**

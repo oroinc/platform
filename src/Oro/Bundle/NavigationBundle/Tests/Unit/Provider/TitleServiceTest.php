@@ -197,6 +197,20 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dataArray['params'], $this->titleService->getParams());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Object of type stdClass used for "foo" title param don't have __toString() method.
+     */
+    public function testSetParamsObjectWithoutToString()
+    {
+        $this->titleService->setParams(
+            [
+                'foo' => new \stdClass(),
+                'bar' => 'valid_param_value'
+            ]
+        );
+    }
+
     public function testLoadByRoute()
     {
         $route          = 'test_route';
@@ -342,6 +356,32 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             '{"template":"test template","short_template":"test short template","params":{"localized_obj":"String"}}',
             $this->titleService->getSerialized()
+        );
+    }
+
+    public function testCreateTitle()
+    {
+        $route = 'test_route';
+        $testTitle = 'Test Title';
+        $menuName = 'application_menu';
+        $breadcrumbs = ['Parent Path'];
+
+        $this->userConfigManager
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['oro_navigation.title_suffix', false, false, null, 'Suffix'],
+                ['oro_navigation.title_delimiter', false, false, null, '-'],
+            ]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbLabels')
+            ->willReturn($breadcrumbs);
+
+        $this->assertEquals(
+            'Test Title - Parent Path - Suffix',
+            $this->titleService->createTitle($route, $testTitle, $menuName)
         );
     }
 }

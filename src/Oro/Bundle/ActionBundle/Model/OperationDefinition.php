@@ -20,6 +20,9 @@ class OperationDefinition
     /** @var boolean */
     private $enabled = true;
 
+    /** @var boolean */
+    private $pageReload = true;
+
     /** @var string */
     private $substituteOperation;
 
@@ -124,6 +127,25 @@ class OperationDefinition
     public function isEnabled()
     {
         return $this->enabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPageReload(): bool
+    {
+        return $this->pageReload;
+    }
+
+    /**
+     * @param bool $pageReload
+     * @return $this
+     */
+    public function setPageReload(bool $pageReload)
+    {
+        $this->pageReload = (bool)$pageReload;
+
+        return $this;
     }
 
     /**
