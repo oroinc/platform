@@ -15,7 +15,23 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('oro_theme');
 
+
         $rootNode
+            ->beforeNormalization()
+                ->ifTrue(function($value) {
+                    if (!isset($value['themes'])) {
+                        return false;
+                    }
+
+                    foreach ($value['themes'] as $themeName => $value) {
+                        if (false !== strpos($themeName, '-') && false === strpos($themeName, '_')) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                ->thenInvalid("Theme name should not contain only '-' special characters")
+            ->end()
             ->children()
                 ->arrayNode('themes')
                     ->useAttributeAsKey('name')
