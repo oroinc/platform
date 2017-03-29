@@ -26,6 +26,28 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $processor->processConfiguration($configuration, $configs));
     }
 
+    public function testInvalidConfiguration()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $configs = [
+            [
+                'active_theme' => 'foo',
+                'themes' => array(
+                    'foo-bar' => array(
+                        'label' => 'Foo Theme',
+                        'styles' => 'style.css',
+                        'logo' => 'logo.png',
+                        'icon' => 'favicon.ico',
+                        'screenshot' => 'screenshot.png'
+                    )
+                )
+            ]
+        ];
+        $configuration = new Configuration();
+        $processor = new Processor();
+        $processor->processConfiguration($configuration, $configs);
+    }
+
     public function processConfigurationDataProvider()
     {
         return array(
@@ -95,6 +117,13 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'logo' => 'logo-extended.png',
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
+                            ),
+                            'foo-bar_bar' => array(
+                                'label' => 'Bar Extended Theme',
+                                'styles' => 'style-extended.css',
+                                'logo' => 'logo-extended.png',
+                                'icon' => 'favicon-extended.ico',
+                                'screenshot' => 'screenshot-extended.png'
                             )
                         )
                     )
@@ -116,6 +145,13 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'
                         ),
+                        'foo-bar_bar' => array(
+                            'label' => 'Bar Extended Theme',
+                            'styles' => array('style-extended.css'),
+                            'logo' => 'logo-extended.png',
+                            'icon' => 'favicon-extended.ico',
+                            'screenshot' => 'screenshot-extended.png'
+                        )
                     )
                 )
             )
