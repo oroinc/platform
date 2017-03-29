@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SkipIsolatorsController implements Controller
+class SkipController implements Controller
 {
     /** @var  TestIsolationSubscriber*/
     protected $testIsolationSubscriber;
@@ -24,14 +24,6 @@ class SkipIsolatorsController implements Controller
      */
     public function configure(SymfonyCommand $command)
     {
-        $command
-            ->addOption(
-                '--skip-isolators',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                '',
-                'database,cache,message-queue,doctrine'
-            );
     }
 
     /**
@@ -41,12 +33,6 @@ class SkipIsolatorsController implements Controller
     {
         /** @var bool $skip */
         $skip = $input->getOption('dry-run');
-        $skipIsolators = false === $input->hasParameterOption('--skip-isolators')
-            ? ''
-            : $input->getOption('skip-isolators');
-        $skipIsolators = array_map('trim', explode(',', $skipIsolators));
-
-        $this->testIsolationSubscriber->setSkipIsolators($skipIsolators);
         $this->testIsolationSubscriber->setSkip($skip);
     }
 }

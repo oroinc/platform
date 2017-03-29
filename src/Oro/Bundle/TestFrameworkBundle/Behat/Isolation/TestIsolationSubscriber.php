@@ -39,9 +39,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     /** @var  bool */
     protected $skip;
 
-    /** @var  null|array */
-    protected $skipIsolators;
-
     /**
      * @param IsolatorInterface[] $isolators
      */
@@ -85,9 +82,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         }
 
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
-                continue;
-            }
             if ($isolator->isOutdatedState()) {
                 $helper = new QuestionHelper();
                 $question = new ConfirmationQuestion(
@@ -111,9 +105,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin isolating application state</comment>');
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
-                continue;
-            }
             $isolator->start($event);
         }
         $this->output->writeln('<comment>Application ready for tests</comment>');
@@ -131,9 +122,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $event = new BeforeIsolatedTestEvent($event->getFeature());
 
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
-                continue;
-            }
             $isolator->beforeTest($event);
         }
     }
@@ -161,9 +149,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $event = new AfterIsolatedTestEvent();
 
         foreach ($this->reverseIsolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
-                continue;
-            }
             $isolator->afterTest($event);
         }
     }
@@ -178,9 +163,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin clean up isolation environment</comment>');
         foreach ($this->reverseIsolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
-                continue;
-            }
             $isolator->terminate($event);
         }
         $this->output->writeln('<comment>Isolation environment is clean</comment>');
@@ -208,13 +190,5 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     public function setSkip($skip)
     {
         $this->skip = $skip;
-    }
-
-    /**
-     * @param null|array $skipIsolators
-     */
-    public function setSkipIsolators($skipIsolators)
-    {
-        $this->skipIsolators = $skipIsolators;
     }
 }

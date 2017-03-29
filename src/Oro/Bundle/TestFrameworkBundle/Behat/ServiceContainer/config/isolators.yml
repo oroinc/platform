@@ -7,8 +7,8 @@ services:
     tags:
       - { name: 'event_dispatcher.subscriber', priority: 100 }
 
-  cli.controller.input_output_controller:
-    class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SkipIsolatorsController
+  cli.controller.skip_controller:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\SkipController
     arguments:
       - '@oro_behat_extension.isolation.test_isolation_subscriber'
     tags:

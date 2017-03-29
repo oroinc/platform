@@ -104,14 +104,6 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getTag()
-    {
-        return 'cache';
-    }
-
-    /**
      * @param string $commandline The command line to run
      */
     protected function runProcess($commandline)

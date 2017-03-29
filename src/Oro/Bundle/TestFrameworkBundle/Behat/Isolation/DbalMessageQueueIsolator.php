@@ -106,14 +106,6 @@ class DbalMessageQueueIsolator implements IsolatorInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getTag()
-    {
-        return 'message-queue';
-    }
-
-    /**
      * @param Connection $connection
      */
     public static function waitForMessageQueue(Connection $connection, $timeLimit = 60)
