@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->beforeNormalization()
-                ->ifTrue(function($value) {
+                ->ifTrue(function ($value) {
                     if (!isset($value['themes'])) {
                         return false;
                     }
