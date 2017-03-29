@@ -49,6 +49,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'piwik_token_auth'         => [
                             'value' => null,
                             'scope' => 'app'
+                        ],
+                        'precalculated_statistic_enabled' => [
+                            'value' => true,
+                            'scope' => 'app'
                         ]
                     ]
                 ]
