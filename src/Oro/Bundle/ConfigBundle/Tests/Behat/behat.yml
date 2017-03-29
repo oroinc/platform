@@ -7,3 +7,15 @@ oro_behat_extension:
     SidebarConfigMenu:
       selector: 'div.system-configuration-container div.left-panel'
       class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu
+
+    ColorsConfigBlock:
+      class: Oro\Bundle\ConfigBundle\Tests\Behat\Element\ColorsConfigBlock
+
+    Recent Emails:
+      selector: '.email-notification-menu'
+
+    WYSIWYG editor:
+      selector: '[data-bound-view="oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view"] iframe'
+
+    Entity pagination:
+      selector: '#entity-pagination'
