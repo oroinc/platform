@@ -45,13 +45,18 @@ define(function(require) {
             var accessLevels = this.model.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
+                    className: [
+                        'dropdown-menu',
+                        'dropdown-menu-collection',
+                        'dropdown-menu__permissions-item'
+                    ].join(' '),
                     collection: accessLevels,
                     keysMap: {
                         id: 'access_level',
                         text: 'access_level_label'
                     },
                     dropdownMenuOptions: {
-                        flipMode: true
+                        container: true
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);

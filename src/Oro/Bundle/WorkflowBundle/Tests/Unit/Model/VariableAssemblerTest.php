@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\VariableAssembler;
+use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
@@ -17,12 +22,22 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 use Oro\Component\Action\Exception\AssemblerException;
 
-class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
+class VariableAssemblerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var WorkflowVariableNormalizer|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $variableNormalizer;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $variableNormalizer;
+    protected $variableGuesser;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $translator;
 
     /**
      * @var \Oro\Bundle\WorkflowBundle\Model\Workflow|\PHPUnit_Framework_MockObject_MockObject
@@ -34,9 +49,15 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
         $attributeNormalizer = $this->createMock(AttributeNormalizer::class);
         $serializer = $this->createMock(WorkflowAwareSerializer::class);
 
-        $this->variableNormalizer = $this->createMock(WorkflowVariableNormalizer::class);
+        $this->variableNormalizer = $this->getMockBuilder(WorkflowVariableNormalizer::class)
+            ->setConstructorArgs([$this->createMock(ManagerRegistry::class)])
+            ->setMethods(['denormalizeVariable'])
+            ->getMock();
         $this->variableNormalizer->addAttributeNormalizer($attributeNormalizer);
         $this->variableNormalizer->setSerializer($serializer);
+
+        $this->variableGuesser = $this->createMock(VariableGuesser::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $aclManager = $this->createMock(AclManager::class);
@@ -84,7 +105,11 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $assembler = new VariableAssembler($this->variableNormalizer);
+        $assembler = new VariableAssembler(
+            $this->variableNormalizer,
+            $this->variableGuesser,
+            $this->translator
+        );
         $assembler->assemble($this->workflow, $configuration);
     }
 
@@ -105,12 +130,12 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
             'no_options' => [
                 ['name' => []],
                 AssemblerException::class,
-                '/Invalid variable type \"\w?\", allowed types are/',
+                'Option "type" is required',
             ],
             'no_type' => [
                 ['name' => ['label' => 'test', 'value' => 'test']],
                 AssemblerException::class,
-                '/Invalid variable type \"\w?\", allowed types are/',
+                'Option "type" is required',
             ],
             'invalid_type' => [
                 ['name' => ['label' => 'Label', 'type' => 'text', 'value' => 'text']],
@@ -128,10 +153,31 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
                 AssemblerException::class,
                 'Option "class" is required in variable "name"',
             ],
+            'missing_entity_class' => [
+                ['name' => ['label' => 'Label', 'type' => 'entity']],
+                AssemblerException::class,
+                'Option "class" is required in variable "name"',
+            ],
             'invalid_class' => [
                 ['name' => ['label' => 'Label', 'type' => 'object', 'options' => ['class' => 'InvalidClass']]],
                 AssemblerException::class,
                 'Class "InvalidClass" referenced by "class" option in variable "name" not found',
+            ],
+            'not_allowed_entity_acl' => [
+                [
+                    'name' => [
+                        'label' => 'Label',
+                        'type' => 'object',
+                        'options' => [
+                            'class' => 'stdClass'
+                        ],
+                        'entity_acl' => [
+                            'update' => false
+                        ],
+                    ]
+                ],
+                AssemblerException::class,
+                'Variable "Label" with type "object" can\'t have entity ACL'
             ],
         ];
     }
@@ -141,20 +187,34 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
      *
      * @param array    $configuration
      * @param Variable $expectedVariable
+     * @param array    $guessedParameters
      */
-    public function testAssemble($configuration, $expectedVariable)
+    public function testAssemble($configuration, $expectedVariable, array $guessedParameters = [])
     {
+        $variableConfig = $configuration;
         $configuration = [
             'variable_definitions' => [
                 'variables' => $configuration,
             ],
         ];
 
-        $this->variableNormalizer->expects($this->once())
+        if ($guessedParameters && array_key_exists('property_path', array_values($variableConfig)[0])) {
+            $var = array_values($variableConfig)[0];
+            $this->variableGuesser->expects($this->any())
+                ->method('guessParameters')
+                ->with('stdClass', $var['property_path'])
+                ->willReturn($guessedParameters);
+        }
+
+        $this->variableNormalizer->expects($this->any())
             ->method('denormalizeVariable')
             ->willReturn($expectedVariable->getValue());
 
-        $assembler = new VariableAssembler($this->variableNormalizer);
+        $assembler = new VariableAssembler(
+            $this->variableNormalizer,
+            $this->variableGuesser,
+            $this->translator
+        );
         $variables = $assembler->assemble($this->workflow, $configuration);
 
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $variables);
@@ -203,11 +263,135 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
                     'variable_one' => [
                         'label' => 'label',
                         'type' => 'object',
-                        'value' => new \stdClass(),
-                        'options' => ['class' => 'stdClass'],
+                        'value' => '2017-03-15 00:00:00',
+                        'options' => ['class' => 'DateTime'],
                     ],
                 ],
-                $this->getVariable('variable_one', 'label', 'object', new \stdClass(), ['class' => 'stdClass']),
+                $this->getVariable(
+                    'variable_one',
+                    'label',
+                    'object',
+                    new \DateTime('2017-03-15 00:00:00'),
+                    ['class' => 'DateTime']
+                ),
+            ],
+            'entity_minimal' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => ['class' => 'stdClass'],
+                    ]
+                ],
+                $this->getVariable('variable_one', 'label', 'entity', null, ['class' => 'stdClass'])
+            ],
+            'with_related_entity' => [
+                [
+                    'entity' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => ['class' => 'stdClass'],
+
+                    ]
+                ],
+                $this->getVariable('entity', 'label', 'entity', null, ['class' => 'stdClass'])
+            ],
+            'with_entity_acl' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => ['class' => 'stdClass'],
+                        'entity_acl' => ['update' => false],
+                    ]
+                ],
+                $this->getVariable(
+                    'variable_one',
+                    'label',
+                    'entity',
+                    null,
+                    ['class' => 'stdClass'],
+                    null,
+                    ['update' => false]
+                )
+            ],
+            'entity_full_guessed_parameters' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'options' => ['class' => 'stdClass'],
+                        'property_path' => 'entity.field'
+                    ]
+                ],
+                $this->getVariable('variable_one', 'label', 'entity', null, ['class' => 'stdClass'], 'entity.field'),
+                'guessedParameters' => [
+                    'label' => 'guessed label',
+                    'type' => 'object',
+                    'options' => ['class' => 'GuessedClass'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider configurationEntityIdentifierProvider
+     *
+     * @param array    $configuration
+     * @param Variable $expectedVariable
+     */
+    public function testEntityIdentifierAssemble($configuration, $expectedVariable)
+    {
+        $configuration = [
+            'variable_definitions' => [
+                'variables' => $configuration,
+            ],
+        ];
+
+        $this->variableNormalizer->expects($this->any())
+            ->method('denormalizeVariable')
+            ->willReturn($expectedVariable->getValue());
+
+        $assembler = new VariableAssembler(
+            $this->variableNormalizer,
+            $this->variableGuesser,
+            $this->translator
+        );
+        $variables = $assembler->assemble($this->workflow, $configuration);
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $variables);
+        $this->assertCount(1, $variables);
+        $this->assertTrue($variables->containsKey($expectedVariable->getName()));
+        $this->assertEquals($expectedVariable, $variables->get($expectedVariable->getName()));
+        $this->assertEquals($expectedVariable->getValue(), $variables->get($expectedVariable->getName())->getValue());
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
+    public function configurationEntityIdentifierProvider()
+    {
+        return [
+            'entity_id_field' => [
+                [
+                    'variable_one' => [
+                        'label' => 'label',
+                        'type' => 'entity',
+                        'value' => 1,
+                        'options' => [
+                            'class' => 'stdClass',
+                            'identifier' => 'code'
+                        ],
+                    ]
+                ],
+                $this->getVariable(
+                    'variable_one',
+                    'label',
+                    'entity',
+                    (object) ['code' => 1],
+                    ['class' => 'stdClass', 'identifier' => 'code']
+                )
             ],
         ];
     }
@@ -218,18 +402,29 @@ class VariablAssemblerTest extends \PHPUnit_Framework_TestCase
      * @param string $type
      * @param mixed  $value
      * @param array  $options
+     * @param string $propertyPath
+     * @param array  $entityAcl
      *
      * @return Variable
      */
-    protected function getVariable($name, $label, $type, $value, array $options = [])
-    {
+    protected function getVariable(
+        $name,
+        $label,
+        $type,
+        $value,
+        array $options = [],
+        $propertyPath = null,
+        array $entityAcl = []
+    ) {
         $variable = new Variable();
         $variable
             ->setName($name)
             ->setLabel($label)
             ->setType($type)
             ->setValue($value)
-            ->setOptions($options);
+            ->setOptions($options)
+            ->setPropertyPath($propertyPath)
+            ->setEntityAcl($entityAcl);
 
         return $variable;
     }

@@ -446,10 +446,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param string $name
      * @param array $params
      * @param bool $cleanUp strip new lines and multiple spaces, removes dependency on terminal columns
+     * @param bool $exceptionOnError
      *
      * @return string
      */
-    protected static function runCommand($name, array $params = [], $cleanUp = true)
+    protected static function runCommand($name, array $params = [], $cleanUp = true, $exceptionOnError = false)
     {
         /** @var KernelInterface $kernel */
         $kernel = self::getContainer()->get('kernel');
@@ -477,11 +478,15 @@ abstract class WebTestCase extends BaseWebTestCase
         $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'br+');
         $output = new StreamOutput($fp);
 
-        $application->run($input, $output);
+        $exitCode = $application->run($input, $output);
 
         rewind($fp);
 
         $content = stream_get_contents($fp);
+
+        if ($exceptionOnError && $exitCode !== 0) {
+            throw new \RuntimeException($content);
+        }
 
         if ($cleanUp) {
             $content = preg_replace(['/\s{2,}\n\s{2,}/', '/(\n|\s{2,})+/'], ['', ' '], $content);

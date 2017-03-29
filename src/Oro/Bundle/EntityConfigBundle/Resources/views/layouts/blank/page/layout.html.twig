@@ -1,33 +1,56 @@
 {% block attribute_group_rest_widget -%}
     {% import 'OroUIBundle::macros.html.twig' as UI -%}
-    {% if tabsOptions is not empty %}
+
+    {% set content = '' %}
+    {% set visibleTabsOptions = [] %}
+
+    {% set tabsOptionsById = [] %}
+    {% for tab in tabsOptions %}
+        {% set tabsOptionsById = tabsOptionsById|merge({
+            (tab.id): tab
+        }) %}
+    {% endfor %}
+
+    {% for child in block if child.vars.visible -%}
+        {% set childContent = block_widget(child) %}
+        {% if childContent|trim|length > 0 %}
+            {% set content = content ~ childContent %}
+            {% set visibleTabsOptions = visibleTabsOptions|merge([tabsOptionsById[child.vars.group]]) %}
+        {% endif %}
+    {%- endfor %}
+
+    {% if visibleTabsOptions is not empty %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' product-view__attributes-container'
+        }) %}
         <div {{ block('block_attributes') }}>
             <div {{ UI.renderPageComponentAttributes({
                 module: 'oroentityconfig/js/attribute-group-tabs-component',
-                options: {data: tabsOptions}
+                options: {data: visibleTabsOptions}
             }) }}></div>
 
-            {{ block_widget(block) }}
+            {{ content|raw }}
         </div>
     {% endif %}
 {%- endblock %}
 
 {% block attribute_group_rest_attribute_group_widget %}
+    {% set content = block_widget(block) %}
+    {% if content|trim|length > 0 %}
     {% set attr = layout_attr_defaults(attr, {
         'data-page-component-module': 'oroentityconfig/js/attribute-group-tab-content-component',
         '~data-page-component-options': {'id': group}|json_encode
     }) %}
     <div {{ block('block_attributes') }} style="display: none;" class="tab-content">
-        {{ block_widget(block) }}
+        {{ content|raw }}
     </div>
-{% endblock %}
-
-{% block attribute_group_widget %}
-    {{ block_widget(block) }}
+    {% endif %}
 {% endblock %}
 
 {% block attribute_label_widget %}
-    <label>{{ label }}:</label>
+    {% if label|first != '_' %}
+        <label>{{ label }}:</label>
+    {% endif %}
 {% endblock %}
 
 {% block attribute_text_widget %}
