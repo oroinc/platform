@@ -1,0 +1,3 @@
+config:
+    paths:
+        'orocache/js/app/components/invalidate-cache-component': 'bundles/orocache/js/app/components/invalidate-cache-component.js'

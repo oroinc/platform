@@ -30,6 +30,11 @@ ActivityBundle
 - Class `Oro\Bundle\ActivityBundle\Controller\ActivityController`
     - action `contextAction` is rendered in `OroDataGridBundle:Grid/dialog:multi.html.twig`
     - action `contextGridAction` was removed
+    
+DataAuditBundle
+---------------
+A new string field `ownerDescription` with the database column `owner_description` was added to the entity 
+`Oro\Bundle\DataAuditBundle\Entity\Audit` and to the base class `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit`
 
 DataGridBundle
 --------------
@@ -44,6 +49,35 @@ TestFrameworkBundle
 -------------------
 - added fourth (boolean) parameter to `\Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::runCommand` `$exceptionOnError` to throw `\RuntimeException` when command should executes as utility one.  
 
+AnnotationsReader
+--------------
+- Methods in class `Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader` were removed:
+    - `setRouter`
+    - `setCache`
+- Signature of class `Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader` was changed:
+    - use `Doctrine\Common\Annotations\Reader` as first argument instead of `Symfony\Component\HttpFoundation\RequestStack`
+    - use `Symfony\Component\Routing\Router` as second argument
+    - use `Doctrine\Common\Cache\Cache` as third argument
+- Methods in class `Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType` were removed:
+    - `setReaderRegistry`
+    - `setTitleTranslator`
+    - `setTitleServiceLink`
+- Signature of class `Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType` was changed:
+    - use `Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry` as second argument instead of `Doctrine\Common\Persistence\ManagerRegistry`
+    - use `Oro\Bundle\NavigationBundle\Provider\TitleTranslator` as third argument instead of `Symfony\Component\Translation\TranslatorInterface`
+    - use `Oro\Component\DependencyInjection\ServiceLink` as fourth argument
+
+IntegrationBundle
+-----------------
+- Class `Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor`
+    - construction signature was changed now it takes next arguments:
+        - `DoctrineHelper` $doctrineHelper,
+        - `ReverseSyncProcessor` $reverseSyncProcessor,
+        - `TypesRegistry` $typesRegistry,
+        - `JobRunner` $jobRunner,
+        - `TokenStorageInterface` $tokenStorage,
+        - `LoggerInterface` $logger
+        
 WorkflowBundle
 --------------
 - Changed implemented interface of  `Oro\Bundle\WorkflowBundle\Model\Variable` class from `Oro\Bundle\ActionBundle\Model\ParameterInterface` to `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`

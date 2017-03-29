@@ -175,7 +175,7 @@ class FeatureChecker
      */
     protected function check($feature, $scopeIdentifier = null)
     {
-        switch ($this->strategy) {
+        switch ($this->configManager->get($feature, 'strategy', $this->strategy)) {
             case self::STRATEGY_AFFIRMATIVE:
                 return $this->checkAffirmativeStrategy($feature, $scopeIdentifier);
 
@@ -219,7 +219,7 @@ class FeatureChecker
             return false;
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
 
     /**
@@ -256,10 +256,14 @@ class FeatureChecker
         }
 
         if ($enabled > 0) {
-            return $this->allowIfEqualGrantedDeniedDecisions;
+            return $this->configManager->get(
+                $feature,
+                'allow_if_equal_granted_denied',
+                $this->allowIfEqualGrantedDeniedDecisions
+            );
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
     
     /**
@@ -291,7 +295,7 @@ class FeatureChecker
             return true;
         }
 
-        return $this->allowIfAllAbstainDecisions;
+        return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
 
     /**

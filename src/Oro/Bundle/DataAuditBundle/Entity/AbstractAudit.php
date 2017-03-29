@@ -118,6 +118,13 @@ abstract class AbstractAudit
     protected $transactionId;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="owner_description", type="string", length=255, nullable=true)
+     */
+    protected $ownerDescription;
+
+    /**
      * Set user
      *
      * @param  AbstractUser $user
@@ -406,5 +413,21 @@ abstract class AbstractAudit
             ];
         }
         return $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwnerDescription()
+    {
+        return $this->ownerDescription;
+    }
+
+    /**
+     * @param string $ownerDescription
+     */
+    public function setOwnerDescription($ownerDescription)
+    {
+        $this->ownerDescription = $ownerDescription;
     }
 }

@@ -107,26 +107,29 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
-    public function iShouldSeeFlashMessage($title)
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message')
     {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */
-        $flashMessage = $this->spin(function (OroMainContext $context) use ($title, &$actualFlashMessages) {
-            $flashMessages = $context->findAllElements('Flash Message');
+        $flashMessage = $this->spin(
+            function (OroMainContext $context) use ($title, &$actualFlashMessages, $flashMessageElement) {
+                $flashMessages = $context->findAllElements($flashMessageElement);
 
-            foreach ($flashMessages as $flashMessage) {
-                if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                    $actualFlashMessageText = $flashMessage->getText();
-                    $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
+                foreach ($flashMessages as $flashMessage) {
+                    if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                        $actualFlashMessageText = $flashMessage->getText();
+                        $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
 
-                    if (false !== stripos($actualFlashMessageText, $title)) {
-                        return $flashMessage;
+                        if (false !== stripos($actualFlashMessageText, $title)) {
+                            return $flashMessage;
+                        }
                     }
                 }
-            }
 
-            return null;
-        }, 15);
+                return null;
+            },
+            15
+        );
 
         self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
         self::assertNotNull($flashMessage, sprintf(
