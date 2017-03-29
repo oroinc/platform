@@ -32,15 +32,15 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configs = [
             [
                 'active_theme' => 'foo',
-                'themes' => array(
-                    'foo-bar' => array(
+                'themes' => [
+                    'foo-bar' => [
                         'label' => 'Foo Theme',
                         'styles' => 'style.css',
                         'logo' => 'logo.png',
                         'icon' => 'favicon.ico',
                         'screenshot' => 'screenshot.png'
-                    )
-                )
+                    ]
+                ]
             ]
         ];
         $configuration = new Configuration();
@@ -53,111 +53,111 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function processConfigurationDataProvider()
     {
-        return array(
-            'empty' => array(
-                'configs' => array(array()),
-                'expected' => array('themes' => array())
-            ),
-            'full' => array(
-                'configs' => array(
-                    array(
+        return [
+            'empty' => [
+                'configs' => [[]],
+                'expected' => ['themes' => []]
+            ],
+            'full' => [
+                'configs' => [
+                    [
                         'active_theme' => 'foo',
-                        'themes' => array(
-                            'foo' => array(
+                        'themes' => [
+                            'foo' => [
                                 'label' => 'Foo Theme',
                                 'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
-                            )
-                        )
-                    )
-                ),
-                'expected' => array(
+                            ]
+                        ]
+                    ]
+                ],
+                'expected' => [
                     'active_theme' => 'foo',
-                    'themes' => array(
-                        'foo' => array(
+                    'themes' => [
+                        'foo' => [
                             'label' => 'Foo Theme',
-                            'styles' => array('style.css'),
+                            'styles' => ['style.css'],
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
-                        )
-                    )
-                )
-            ),
-            'merge' => array(
-                'configs' => array(
-                    array(
+                        ]
+                    ]
+                ]
+            ],
+            'merge' => [
+                'configs' => [
+                    [
                         'active_theme' => 'foo',
-                        'themes' => array(
-                            'foo' => array(
+                        'themes' => [
+                            'foo' => [
                                 'label' => 'Foo Theme',
                                 'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
-                            )
-                        )
-                    ),
-                    array(
+                            ]
+                        ]
+                    ],
+                    [
                         'active_theme' => 'bar',
-                        'themes' => array(
-                            'bar' => array(
+                        'themes' => [
+                            'bar' => [
                                 'label' => 'Bar Theme',
                                 'styles' => 'style.css',
                                 'logo' => 'logo.png',
                                 'icon' => 'favicon.ico',
                                 'screenshot' => 'screenshot.png'
-                            )
-                        )
-                    ),
-                    array(
-                        'themes' => array(
-                            'bar' => array(
+                            ]
+                        ]
+                    ],
+                    [
+                        'themes' => [
+                            'bar' => [
                                 'label' => 'Bar Extended Theme',
                                 'styles' => 'style-extended.css',
                                 'logo' => 'logo-extended.png',
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
-                            ),
-                            'foo-bar_bar' => array(
+                            ],
+                            'foo-bar_bar' => [
                                 'label' => 'Bar Extended Theme',
                                 'styles' => 'style-extended.css',
                                 'logo' => 'logo-extended.png',
                                 'icon' => 'favicon-extended.ico',
                                 'screenshot' => 'screenshot-extended.png'
-                            )
-                        )
-                    )
-                ),
-                'expected' => array(
+                            ]
+                        ]
+                    ]
+                ],
+                'expected' => [
                     'active_theme' => 'bar',
-                    'themes' => array(
-                        'foo' => array(
+                    'themes' => [
+                        'foo' => [
                             'label' => 'Foo Theme',
-                            'styles' => array('style.css'),
+                            'styles' => ['style.css'],
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
-                        ),
-                        'bar' => array(
+                        ],
+                        'bar' => [
                             'label' => 'Bar Extended Theme',
-                            'styles' => array('style.css', 'style-extended.css'),
+                            'styles' => ['style.css', 'style-extended.css'],
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'
-                        ),
-                        'foo-bar_bar' => array(
+                        ],
+                        'foo-bar_bar' => [
                             'label' => 'Bar Extended Theme',
-                            'styles' => array('style-extended.css'),
+                            'styles' => ['style-extended.css'],
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'
-                        )
-                    )
-                )
-            )
-        );
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 }

@@ -15,7 +15,6 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('oro_theme');
 
-
         $rootNode
             ->beforeNormalization()
                 ->ifTrue(function ($value) {
