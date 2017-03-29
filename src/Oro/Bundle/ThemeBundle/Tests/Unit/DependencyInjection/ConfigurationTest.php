@@ -48,6 +48,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor->processConfiguration($configuration, $configs);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function processConfigurationDataProvider()
     {
         return array(
