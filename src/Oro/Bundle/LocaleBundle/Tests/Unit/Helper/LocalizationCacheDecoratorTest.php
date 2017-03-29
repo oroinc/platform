@@ -4,10 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Cache\ArrayCache;
 
+use JMS\Serializer\SerializerInterface;
+
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationCacheDecorator;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Serializer\LocalizationArraySerializer;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -17,85 +18,86 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
     use EntityTrait;
 
     /**
-     * @var LocalizationArraySerializer
+     * @var SerializerInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $localizationArraySerializer;
+    private $serializer;
 
     public function setUp()
     {
-        $this->localizationArraySerializer = new LocalizationArraySerializer();
+        $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
     }
 
-    /**
-     * @param Localization[] $localizations
-     * @dataProvider localizationsDataProvider
-     */
-    public function testFetch(array $localizations)
-    {
-        $cacheProvider = $this->getArrayCache($localizations);
-
-        $localizationCacheHelper = new LocalizationCacheDecorator(
-            $cacheProvider,
-            $this->localizationArraySerializer
-        );
-
-        $result = $localizationCacheHelper->fetch(LocalizationManager::CACHE_NAMESPACE);
-        $this->assertCount(count($localizations), $result);
-
-        foreach ($result as $i => $localization) {
-            $this->assertInstanceOf(Localization::class, $localization);
-            $this->assertEquals($localizations[$i], $localization);
-        }
-    }
-
-    public function testFetchWithParentLocalization()
-    {
-        $parent = $this->getEntity(Localization::class, [
-            'id' => 1,
-            'language' => $this->getEntity(Language::class, ['code' => 'ua'])
-        ]);
-        /** @var Localization $child */
-        $child = $this->getEntity(Localization::class, [
-            'id' => 2,
-            'language' => $this->getEntity(Language::class, ['code' => 'ru'])
-        ]);
-        $child->setParentLocalization($parent);
-
-        $localizations = [1 => $parent, 2 => $child];
-
-        $cacheProvider = $this->getArrayCache($localizations);
-
-        $localizationCacheHelper = new LocalizationCacheDecorator(
-            $cacheProvider,
-            $this->localizationArraySerializer
-        );
-
-        $result = $localizationCacheHelper->fetch(LocalizationManager::CACHE_NAMESPACE);
-        $this->assertCount(count($localizations), $result);
-
-        foreach ($result as $i => $localization) {
-            $this->assertInstanceOf(Localization::class, $localization);
-            $this->assertEquals($localizations[$i], $localization);
-        }
-    }
-
-    /**
-     * @param Localization[] $localizations
-     * @dataProvider localizationsDataProvider
-     */
-    public function testSave(array $localizations)
+    public function testFetchWithNoLocalizationsFromCache()
     {
         $cacheProvider = $this->getArrayCache();
 
-        $localizationCacheHelper = new LocalizationCacheDecorator(
+        $localizationCacheDecorator = new LocalizationCacheDecorator(
             $cacheProvider,
-            $this->localizationArraySerializer
+            $this->serializer
         );
 
-        $localizationCacheHelper->save(LocalizationManager::CACHE_NAMESPACE, $localizations);
+        $this->assertFalse($localizationCacheDecorator->fetch(LocalizationManager::CACHE_NAMESPACE));
+    }
+
+    /**
+     * @param Localization[] $localizations
+     * @param array          $localizationsFromCache
+     * @dataProvider localizationsDataProvider
+     */
+    public function testFetch(array $localizations, array $localizationsFromCache)
+    {
+        $cacheProvider = $this->getArrayCache($localizationsFromCache);
+
+        $localizationMap = [];
+        foreach ($localizationsFromCache as $id => $localizationFromCache) {
+            $localizationMap[] = [
+                $localizationFromCache,
+                Localization::class,
+                LocalizationCacheDecorator::SERIALIZATION_FORMAT,
+                null,
+                $localizations[$id]
+            ];
+        }
+        $this->serializer->expects($this->exactly(count($localizationsFromCache)))
+            ->method('deserialize')
+            ->willReturnMap($localizationMap);
+
+        $localizationCacheDecorator = new LocalizationCacheDecorator(
+            $cacheProvider,
+            $this->serializer
+        );
+
+        $result = $localizationCacheDecorator->fetch(LocalizationManager::CACHE_NAMESPACE);
+        $this->assertCount(count($localizations), $result);
+
+        foreach ($result as $i => $localization) {
+            $this->assertInstanceOf(Localization::class, $localization);
+            $this->assertEquals($localizations[$i], $localization);
+        }
+    }
+
+    /**
+     * @param Localization[] $localizations
+     * @param array          $localizationsFromCache
+     * @dataProvider localizationsDataProvider
+     */
+    public function testSave(array $localizations, array $localizationsFromCache)
+    {
+        $cacheProvider = $this->getArrayCache();
+
+        $this->serializer->expects($this->exactly(count($localizations)))
+            ->method('serialize')
+            ->willReturnOnConsecutiveCalls(...$localizationsFromCache);
+
+        $localizationCacheDecorator = new LocalizationCacheDecorator(
+            $cacheProvider,
+            $this->serializer
+        );
+
+        $localizationCacheDecorator->save(LocalizationManager::CACHE_NAMESPACE, $localizations);
 
         $this->assertEquals(
-            $this->serializeLocalizations($localizations),
+            $localizationsFromCache,
             $cacheProvider->fetch(LocalizationManager::CACHE_NAMESPACE)
         );
     }
@@ -112,7 +114,8 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
                         'id' => 10,
                         'language' => $this->getEntity(Language::class, ['code' => 'en'])
                     ])
-                ]
+                ],
+                [10 => ['id' => 10, 'language' => ['code' => 'en']]]
             ],
             'twoLocalizationsWithKeys' => [
                 [
@@ -124,7 +127,8 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
                         'id' => 5,
                         'language' => $this->getEntity(Language::class, ['code' => 'en'])
                     ]),
-                ]
+                ],
+                [1 => ['id' => 1, 'language' => ['code' => 'en']], 5 => ['id' => 5, 'language' => ['code' => 'en']]]
             ],
             'twoLocalizationsWithoutKeys' => [
                 [
@@ -136,7 +140,8 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
                         'id' => 2,
                         'language' => $this->getEntity(Language::class, ['code' => 'ua'])
                     ]),
-                ]
+                ],
+                [['id' => 1, 'language' => ['code' => 'ru']], ['id' => 2, 'language' => ['code' => 'ua']]]
             ]
         ];
     }
@@ -152,21 +157,10 @@ class LocalizationCacheDecoratorTest extends \PHPUnit_Framework_TestCase
         if ($localizations) {
             $arrayCache->save(
                 LocalizationManager::CACHE_NAMESPACE,
-                $this->serializeLocalizations($localizations)
+                $localizations
             );
         }
 
         return $arrayCache;
-    }
-
-    /**
-     * @param Localization[] $localizations
-     * @return string[]
-     */
-    private function serializeLocalizations(array $localizations)
-    {
-        return array_map(function ($element) {
-            return $this->localizationArraySerializer->serialize($element);
-        }, $localizations);
     }
 }

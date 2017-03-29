@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
@@ -81,15 +81,15 @@ class WorkflowDefinitionController extends Controller
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
-     * @throws AccessDeniedHttpException
+     * @throws AccessDeniedException
      */
     public function updateAction(WorkflowDefinition $workflowDefinition)
     {
         if ($workflowDefinition->isSystem()) {
-            throw new AccessDeniedHttpException('System workflow definitions are not editable');
+            throw new AccessDeniedException('System workflow definitions are not editable');
         }
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
+        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition, true);
 
         $form = $this->get('oro_workflow.form.workflow_definition');
         $form->setData($workflowDefinition);
@@ -129,13 +129,13 @@ class WorkflowDefinitionController extends Controller
      * @param WorkflowDefinition $workflowDefinition
      *
      * @return array
-     * @throws AccessDeniedHttpException
+     * @throws AccessDeniedException
      */
     public function configureAction(Request $request, WorkflowDefinition $workflowDefinition)
     {
         $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
         if (!count($workflow->getVariables())) {
-            throw new AccessDeniedHttpException();
+            throw new AccessDeniedException();
         }
 
         $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
@@ -146,11 +146,14 @@ class WorkflowDefinitionController extends Controller
 
         if ($request->isMethod('POST')) {
             $form->handleRequest($request);
-            $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
-            $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
-            $this->addFlash('success', $this->get('translator')->trans('oro.workflow.variable.save.success_message'));
+            if ($form->isValid()) {
+                $workflowVarHandler = $this->get('oro_workflow.handler.workflow_variables');
+                $translator = $this->get('translator');
+                $workflowVarHandler->updateWorkflowVariables($workflowDefinition, $form->getData());
+                $this->addFlash('success', $translator->trans('oro.workflow.variable.save.success_message'));
 
-            return $this->get('oro_ui.router')->redirect($workflowDefinition);
+                return $this->get('oro_ui.router')->redirect($workflowDefinition);
+            }
         }
 
         return [
@@ -174,7 +177,7 @@ class WorkflowDefinitionController extends Controller
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
         $translateLinks = $this->getTranslationsDatagridLinksProvider()->getWorkflowTranslateLinks($workflowDefinition);
-        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition);
+        $this->getTranslationProcessor()->translateWorkflowDefinitionFields($workflowDefinition, true);
         $workflow = $this->get('oro_workflow.manager.system')->getWorkflow($workflowDefinition->getName());
 
         return [

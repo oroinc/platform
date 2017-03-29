@@ -38,6 +38,7 @@ class AjaxController extends Controller
         $errors = new ArrayCollection();
         $code = Response::HTTP_OK;
         $message = '';
+        $pageReload = true;
 
         try {
             $operation = $this->getOperationRegistry()->findByName($operationName);
@@ -45,11 +46,12 @@ class AjaxController extends Controller
             if (!$operation instanceof Operation) {
                 throw new OperationNotFoundException($operationName);
             }
-            if (!$operation->isAvailable($data)) {
+            if (!$operation->isAvailable($data, $errors)) {
                 throw new ForbiddenOperationException();
             }
 
             $operation->execute($data, $errors);
+            $pageReload = $operation->getDefinition()->isPageReload();
         } catch (OperationNotFoundException $e) {
             $code = Response::HTTP_NOT_FOUND;
         } catch (ForbiddenOperationException $e) {
@@ -62,7 +64,7 @@ class AjaxController extends Controller
             $message = $e->getMessage();
         }
 
-        return $this->handleResponse($request, $data, $code, $message, $errors);
+        return $this->handleResponse($request, $data, $code, $message, $errors, $pageReload);
     }
 
     /**
@@ -71,14 +73,22 @@ class AjaxController extends Controller
      * @param int $code
      * @param string $message
      * @param Collection $errorMessages
+     * @param bool $pageReload
      * @return Response
      */
-    protected function handleResponse(Request $request, ActionData $data, $code, $message, Collection $errorMessages)
-    {
+    protected function handleResponse(
+        Request $request,
+        ActionData $data,
+        $code,
+        $message,
+        Collection $errorMessages,
+        bool $pageReload
+    ) {
         $response = [
             'success' => $code === Response::HTTP_OK,
             'message' => $message,
-            'messages' => $this->prepareMessages($errorMessages)
+            'messages' => $this->prepareMessages($errorMessages),
+            'pageReload' => $pageReload
         ];
 
         // handle redirect for failure response on non ajax requests
@@ -88,7 +98,7 @@ class AjaxController extends Controller
             return $this->redirect($this->generateUrl($routeName));
         }
 
-        if ($data->getRefreshGrid() || !$response['success']) {
+        if ($data->getRefreshGrid() || !$response['success'] || !$response['pageReload']) {
             $response['refreshGrid'] = $data->getRefreshGrid();
             $response['flashMessages'] = $this->get('session')->getFlashBag()->all();
         } elseif ($data->getRedirectUrl()) {

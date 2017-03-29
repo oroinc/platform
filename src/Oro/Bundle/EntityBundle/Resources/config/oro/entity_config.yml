@@ -103,6 +103,7 @@ entity_config:
                         type:               text
                         options:
                             label:          oro.entity.entity_config.entity.field.items.label
+                            tooltip:        oro.entity.entity_config.entity.field.items.label.tooltip
                             block:          general
                             required:       true
 

@@ -53,7 +53,14 @@ class MainMenu extends Element
             return null;
         }, 5);
 
-        self::assertNotNull($link, sprintf('Menu item "%s" not found', $item));
+        self::assertNotNull(
+            $link,
+            sprintf(
+                "Menu item '%s' not found on the page:\n%s",
+                $item,
+                $this->getPage()->find('css', 'head title')->getOuterHtml()
+            )
+        );
 
         return $link;
     }
