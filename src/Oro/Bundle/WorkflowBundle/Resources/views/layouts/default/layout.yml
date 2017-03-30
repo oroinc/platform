@@ -1,0 +1,4 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'OroWorkflowBundle:layouts:default/layout.html.twig'

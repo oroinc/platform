@@ -170,6 +170,8 @@ oro:
 
         transition:
             start: "Start %workflow%"
+            form:
+                submit.label: Submit
 
         workflowdefinition:
             entity_label:                 Workflow

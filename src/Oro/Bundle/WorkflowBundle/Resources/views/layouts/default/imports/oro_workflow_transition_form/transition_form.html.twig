@@ -1,0 +1,41 @@
+{% import 'OroUIBundle::macros.html.twig' as macros %}
+    
+{% block __oro_workflow_transition_form__transition_form_widget -%}
+    {% set transitionMessage = transition.message|trans({},'workflows') %}
+    {% if transitionMessage == transition.message %}
+        {# if no translation for message then do not show message #}
+        {% set transitionMessage = '' %}
+    {% endif %}
+    
+    {% if transitionMessage %}
+        <div class="alert">{{ transitionMessage }}</div>
+    {% endif %}
+    {{ form_errors(form) }}
+
+    <form method="POST"
+          data-nohash="true"
+          data-disable-autofocus="true"
+          id="{{ form.vars.id }}"
+          name="{{ form.vars.name }}"
+          class="form-dialog oro-workflow-transition-form"
+    >
+        <div class="hidden">
+            {{ form_widget(form._token) }}
+        </div>
+        {{ block_widget(block) }}
+        {{ form_rest(form) }}
+    </form>
+    {{ oro_form_js_validation(form) }}
+{%- endblock %}
+
+{% block __oro_workflow_transition_form__transition_form_fields_widget -%}
+    {{ form_rest(form) }}
+{% endblock __oro_workflow_transition_form__transition_form_fields_widget -%}
+
+{% block __oro_workflow_transition_form__transition_form_actions_widget -%}
+    <div class="btn-group">
+        <button type="button"
+                class="btn btn-success"
+        >{{ 'oro.workflow.transition.form.submit.label'|trans }}</button>
+    </div>
+{% endblock __oro_workflow_transition_form__transition_form_actions_widget -%}
