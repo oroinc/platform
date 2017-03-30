@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
+use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,6 +16,9 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityContext;
 
+    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
+    protected $dispatcher;
+
     protected function setUp()
     {
         $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
@@ -20,10 +26,12 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $cache    = $this->getMockForAbstractClass('Doctrine\Common\Cache\CacheProvider');
 
+        $this->dispatcher = $this->createMock(EventDispatcher::class);
+
         $this->securityContext = $this
             ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $this->manager = new UserScopeManager($doctrine, $cache);
+        $this->manager = new UserScopeManager($doctrine, $cache, $this->dispatcher);
         $this->manager->setSecurityContext($this->securityContext);
     }
 
@@ -93,6 +101,10 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->securityContext->expects($this->never())
             ->method('getToken');
 
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+
         $this->manager->setScopeId(456);
         $this->assertEquals(456, $this->manager->getScopeId());
     }
@@ -101,6 +113,10 @@ class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
     {
         $user = new User();
         $user->setId(123);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $this->manager->setScopeIdFromEntity($user);
         $this->assertEquals(123, $this->manager->getScopeId());
