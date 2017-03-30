@@ -544,3 +544,21 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@form.factory'
             - '@oro_workflow.serializer.data.serializer'
+
+    oro_workflow.layout.data_provider.transition_form:
+        parent: oro_layout.provider.abstract_form
+        class: 'Oro\Bundle\WorkflowBundle\Layout\DataProvider\TransitionFormProvider'
+        calls:
+            - [setWorkflowManager, ['@oro_workflow.manager']]
+        tags:
+            - { name: layout.data_provider, alias: oro_workflow_transition_form }
+
+    oro_workflow.layout.data_provider.start_transition_form:
+        parent: oro_workflow.layout.data_provider.transition_form
+        class: 'Oro\Bundle\WorkflowBundle\Layout\DataProvider\StartTransitionFormProvider'
+        calls:
+            - [setRequestStack, ['@request_stack']]
+            - [setButtonSearchContextProvider, ['@oro_action.provider.button_search_context']]
+            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
+        tags:
+            - { name: layout.data_provider, alias: oro_workflow_start_transition_form }
