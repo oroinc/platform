@@ -100,3 +100,8 @@ WorkflowBundle
         - `oro.workflow.activated`
         - `oro.workflow.deactivated`
 - Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`
+    
+CurrencyBundle
+--------------
+- Interface `Oro\Bundle\MultiCurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface`:
+    - added method `getTransformSelectQueryForDataGrid` that allow to use query transformer in datagrid config
