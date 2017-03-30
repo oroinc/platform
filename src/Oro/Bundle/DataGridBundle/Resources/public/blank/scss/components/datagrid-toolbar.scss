@@ -1,4 +1,4 @@
-.grid-toolbar {
+.datagrid-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-content: stretch;
@@ -29,7 +29,7 @@
   }
 
   &.extended {
-    .grid-tool {
+    .datagrid-tool {
       flex-grow: 0;
 
       &:first-child {
@@ -47,7 +47,7 @@
   }
 
   &.simplistic {
-    .grid-tool {
+    .datagrid-tool {
       flex-grow: 1;
 
       &:first-child {
@@ -64,7 +64,7 @@
 
 }
 
-.grid-tool {
+.datagrid-tool {
   margin: 3px 0;
 
   &:not(:first-child) {
@@ -81,9 +81,9 @@
 }
 
 @include breakpoint('desktop') {
-  .grid-toolbar {
+  .datagrid-toolbar {
     &.simplistic {
-      .grid-tool {
+      .datagrid-tool {
         &:first-child {
           flex-basis: 100%;
           margin: 0 0 10px;
@@ -94,9 +94,9 @@
 }
 
 @include breakpoint('tablet') {
-  .grid-toolbar {
+  .datagrid-toolbar {
     &.extended {
-      .grid-tool {
+      .datagrid-tool {
         &:last-child {
           flex-basis: auto;
         }
@@ -114,7 +114,7 @@
 }
 
 @include breakpoint('mobile') {
-  .grid-tool {
+  .datagrid-tool {
     .action-selectbox_custom_in-pager {
       margin-right: $offset-x-s;
     }
