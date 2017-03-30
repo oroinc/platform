@@ -272,7 +272,7 @@ class DatagridDateGroupingBuilder
             $newLeftJoins[] = $join;
         }
         $source['query']['join']['left'] = $newLeftJoins;
-        $source['query']['select'][] = $this->getCalenderSelectProperty();
+        array_unshift($source['query']['select'], $this->getCalenderSelectProperty());
         $config->offsetSet(static::SOURCE_KEY_NAME, $source);
     }
 

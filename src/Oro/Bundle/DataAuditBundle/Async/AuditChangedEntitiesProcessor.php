@@ -69,6 +69,8 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
         }
 
+        $ownerDescription = isset($body['owner_description']) ? $body['owner_description'] : null;
+
         $this->entityChangesToAuditEntryConverter->convert(
             $body['entities_inserted'],
             $transactionId,
@@ -76,6 +78,7 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $user,
             $organization,
             $impersonation,
+            $ownerDescription,
             AbstractAudit::ACTION_CREATE
         );
 
@@ -86,6 +89,7 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $user,
             $organization,
             $impersonation,
+            $ownerDescription,
             AbstractAudit::ACTION_UPDATE
         );
 
@@ -96,6 +100,7 @@ class AuditChangedEntitiesProcessor implements MessageProcessorInterface, TopicS
             $user,
             $organization,
             $impersonation,
+            $ownerDescription,
             AbstractAudit::ACTION_REMOVE
         );
 

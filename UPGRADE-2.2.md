@@ -30,6 +30,11 @@ ActivityBundle
 - Class `Oro\Bundle\ActivityBundle\Controller\ActivityController`
     - action `contextAction` is rendered in `OroDataGridBundle:Grid/dialog:multi.html.twig`
     - action `contextGridAction` was removed
+    
+DataAuditBundle
+---------------
+A new string field `ownerDescription` with the database column `owner_description` was added to the entity 
+`Oro\Bundle\DataAuditBundle\Entity\Audit` and to the base class `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit`
 
 DataGridBundle
 --------------
@@ -39,7 +44,40 @@ DataGridBundle
 - Removed event `oro_datagrid.datagrid.extension.action.configure-actions.before`, now it is a call of `Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface::hasActions` of registered through a `oro_datagrid.extension.action.provider` tag services.
 - Interface `Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface`
     - the signature of method `getDatagrid` was changed - added new parameter `array $additionalParameters = []`.
+    
+TestFrameworkBundle
+-------------------
+- added fourth (boolean) parameter to `\Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::runCommand` `$exceptionOnError` to throw `\RuntimeException` when command should executes as utility one.  
 
+AnnotationsReader
+--------------
+- Methods in class `Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader` were removed:
+    - `setRouter`
+    - `setCache`
+- Signature of class `Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader` was changed:
+    - use `Doctrine\Common\Annotations\Reader` as first argument instead of `Symfony\Component\HttpFoundation\RequestStack`
+    - use `Symfony\Component\Routing\Router` as second argument
+    - use `Doctrine\Common\Cache\Cache` as third argument
+- Methods in class `Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType` were removed:
+    - `setReaderRegistry`
+    - `setTitleTranslator`
+    - `setTitleServiceLink`
+- Signature of class `Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType` was changed:
+    - use `Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry` as second argument instead of `Doctrine\Common\Persistence\ManagerRegistry`
+    - use `Oro\Bundle\NavigationBundle\Provider\TitleTranslator` as third argument instead of `Symfony\Component\Translation\TranslatorInterface`
+    - use `Oro\Component\DependencyInjection\ServiceLink` as fourth argument
+
+IntegrationBundle
+-----------------
+- Class `Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor`
+    - construction signature was changed now it takes next arguments:
+        - `DoctrineHelper` $doctrineHelper,
+        - `ReverseSyncProcessor` $reverseSyncProcessor,
+        - `TypesRegistry` $typesRegistry,
+        - `JobRunner` $jobRunner,
+        - `TokenStorageInterface` $tokenStorage,
+        - `LoggerInterface` $logger
+        
 WorkflowBundle
 --------------
 - Changed implemented interface of  `Oro\Bundle\WorkflowBundle\Model\Variable` class from `Oro\Bundle\ActionBundle\Model\ParameterInterface` to `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`
@@ -47,3 +85,18 @@ WorkflowBundle
     - removed constructor
     - now extends `Oro\Bundle\ActionBundle\Model\AbstractGuesser`
     - service `oro_workflow.variable_guesser` has parent defined as `oro_action.abstract_guesser`
+- Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener` added
+- Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemListener` auto start workflow part were moved into `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowStartListener`
+- Added parameter `$activeOnly` (boolean) with default `false` to method `\Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository::getAllRelatedEntityClasses`
+- Class `\Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache` added:
+    - **purpose**: to check whether an entity has been involved as some workflow related entity in cached manner to avoid DB calls
+    - **methods**:
+        - `hasRelatedActiveWorkflows($entity)`
+        - `hasRelatedWorkflows($entity)`
+    - invalidation of cache occurs on workflow changes events: 
+        - `oro.workflow.after_update`
+        - `oro.workflow.after_create`
+        - `oro.workflow.after_delete`
+        - `oro.workflow.activated`
+        - `oro.workflow.deactivated`
+- Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`

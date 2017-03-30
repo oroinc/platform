@@ -7,9 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
+use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
-use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 
 class EntityChangesToAuditEntryConverter
 {
@@ -62,6 +62,7 @@ class EntityChangesToAuditEntryConverter
      * @param EntityReference $user
      * @param EntityReference $organization
      * @param EntityReference $impersonation
+     * @param string|null     $ownerDescription
      * @param string|null     $auditDefaultAction
      */
     public function convert(
@@ -71,6 +72,7 @@ class EntityChangesToAuditEntryConverter
         EntityReference $user,
         EntityReference $organization,
         EntityReference $impersonation,
+        $ownerDescription = null,
         $auditDefaultAction = null
     ) {
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
@@ -122,6 +124,10 @@ class EntityChangesToAuditEntryConverter
                     $audit->addField($field);
                 }
             }
+
+            if ($ownerDescription) {
+                $audit->setOwnerDescription($ownerDescription);
+            }
         }
 
         $auditEntityManager->flush();
@@ -134,6 +140,7 @@ class EntityChangesToAuditEntryConverter
      * @param EntityReference $user
      * @param EntityReference $organization
      * @param EntityReference $impersonation
+     * @param string          $ownerDescription
      * @param string          $auditDefaultAction
      */
     public function convertSkipFields(
@@ -143,7 +150,8 @@ class EntityChangesToAuditEntryConverter
         EntityReference $user,
         EntityReference $organization,
         EntityReference $impersonation,
-        $auditDefaultAction
+        $ownerDescription = null,
+        $auditDefaultAction = null
     ) {
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
@@ -157,7 +165,7 @@ class EntityChangesToAuditEntryConverter
 
             $audit = $this->findAuditEntity($auditEntryClass, $transactionId, $entityClass, $entityId);
             if (null === $audit) {
-                $this->createAuditEntity(
+                $audit = $this->createAuditEntity(
                     $auditEntityManager,
                     $auditEntryClass,
                     $transactionId,
@@ -169,6 +177,10 @@ class EntityChangesToAuditEntryConverter
                     $impersonation,
                     $auditDefaultAction
                 );
+            }
+
+            if ($ownerDescription) {
+                $audit->setOwnerDescription($ownerDescription);
             }
         }
 

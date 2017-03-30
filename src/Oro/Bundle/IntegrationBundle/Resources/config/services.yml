@@ -310,6 +310,7 @@ services:
             - '@oro_integration.reverse_sync.processor'
             - '@oro_integration.manager.types_registry'
             - '@oro_message_queue.job.runner'
+            - '@security.token_storage'
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
