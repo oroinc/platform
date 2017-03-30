@@ -307,6 +307,10 @@ abstract class AbstractScopeManager
      */
     public function setScopeId($scopeId)
     {
+    }
+
+    protected function dispatchScopeIdChangeEvent()
+    {
         $event = new ConfigManagerScopeIdUpdateEvent();
         $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
     }
