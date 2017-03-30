@@ -6,9 +6,10 @@ use Behat\Testwork\Cli\Controller;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\TestIsolationSubscriber;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class InputOutputController implements Controller
+class SkipController implements Controller
 {
     /** @var  TestIsolationSubscriber*/
     protected $testIsolationSubscriber;
@@ -30,7 +31,8 @@ class InputOutputController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->testIsolationSubscriber->setInput($input);
-        $this->testIsolationSubscriber->setOutput($output);
+        /** @var bool $skip */
+        $skip = $input->getOption('dry-run');
+        $this->testIsolationSubscriber->setSkip($skip);
     }
 }

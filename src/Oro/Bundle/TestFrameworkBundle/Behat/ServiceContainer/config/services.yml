@@ -15,7 +15,7 @@ services:
         calls:
             - [setSpecificationsFinder, ["@specifications.finder"]]
         tags:
-            - { name: cli.controller, priority: 1100 }
+            - { name: cli.controller, priority: 700 }
 
     mink.listener.sessions:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener
@@ -69,7 +69,7 @@ services:
         tags:
             - { name: 'cli.controller', priority: 500 }
 
-    cli.controller.input_output_conyroller:
+    cli.controller.input_output_controller:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
         arguments:
             - '@oro_behat_extension.isolation.test_isolation_subscriber'
