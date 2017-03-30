@@ -28,4 +28,12 @@ class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformer
 
         return $query;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTransformSelectQueryForDataGrid($originalFieldName, $rootAlias)
+    {
+        return $this->getTransformSelectQuery($originalFieldName, null, $rootAlias);
+    }
 }
