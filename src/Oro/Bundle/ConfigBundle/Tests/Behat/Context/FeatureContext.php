@@ -9,6 +9,8 @@ use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\CalendarBundle\Tests\Behat\Element\ColorsAwareInterface;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
+use Behat\Mink\Element\NodeElement;
+use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
@@ -181,6 +183,33 @@ class FeatureContext extends OroFeatureContext implements
                 $currentActual,
                 "Provided ($currentExpected) and found ($currentActual) on page colors are different"
             );
+        }
+    }
+
+    /**
+     * Assert that following links exists on integration sidebar
+     *
+     * @Given /^(?:|I )should(?P<negotiation>(\s| not ))see following integrations:$/
+     */
+    public function iShouldOrNotSeeFollowingIntegrations($negotiation, TableNode $table)
+    {
+        /** @var SidebarConfigMenu $menu */
+        $menu = $this->elementFactory->createElement('SidebarConfigMenu');
+        $integrationElements = $menu->getIntegrations();
+
+        self::assertNotEmpty($integrationElements);
+
+        $actual = array_map(function (NodeElement $element) {
+            return trim(strip_tags($element->getHtml()));
+        }, $integrationElements);
+
+        $isIntegrationVisibleExpectation = empty(trim($negotiation));
+        foreach ($table->getRows() as list($row)) {
+            if ($isIntegrationVisibleExpectation) {
+                self::assertContains($row, $actual, "Integration with name $row not found");
+            } else {
+                self::assertNotContains($row, $actual, "Integration $row still exists");
+            }
         }
     }
 }
