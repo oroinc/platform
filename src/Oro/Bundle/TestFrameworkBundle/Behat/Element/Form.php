@@ -228,6 +228,10 @@ class Form extends Element
 
         $value = self::checkAdditionalFunctions($value);
 
+        if (in_array($value, ['true', 'false', 'yes', 'no', 'on', 'off'])) {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+
         return $value;
     }
 
