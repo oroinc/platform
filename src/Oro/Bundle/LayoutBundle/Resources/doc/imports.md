@@ -110,7 +110,7 @@ First, in `DataGridBundle`, the datagrid toolbar was imported with the following
 ```yaml
 layout:
     actions:
-		...
+    ...
     imports:
         -
             id: datagrid_toolbar		
