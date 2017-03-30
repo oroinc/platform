@@ -144,6 +144,7 @@ datagrid:
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_user_delete
+        action_configuration: ['@oro_user.datagrid.action_checker', checkActions]
 
     groups-grid:
         extended_entity_name: %oro_user.group.entity.class%
