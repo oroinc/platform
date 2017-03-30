@@ -4,7 +4,6 @@ namespace Oro\Bundle\WorkflowBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Component\Action\Action\ActionInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -16,6 +15,8 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+
+use Oro\Component\Action\Action\ActionInterface;
 
 class TransitionWidgetHelper
 {
