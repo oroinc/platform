@@ -55,6 +55,7 @@ and will put response to console after completion
   * [.getUrl(urlParameters)](#module_ApiAccessor#getUrl) ⇒ <code>string</code>
   * [.formatBody(body)](#module_ApiAccessor#formatBody) ⇒ <code>Object</code>
   * [.formatResult(response)](#module_ApiAccessor#formatResult) ⇒ <code>Object</code>
+  * [.getErrorHandlerMessage(options)](#module_ApiAccessor#getErrorHandlerMessage) ⇒ <code>boolean</code>
 
 <a name="module_ApiAccessor#initialize"></a>
 ### apiAccessor.initialize(options)
@@ -182,4 +183,14 @@ Formats response before it is sent out from this api accessor.
 | Param | Type |
 | --- | --- |
 | response | <code>Object</code> | 
+
+<a name="module_ApiAccessor#getErrorHandlerMessage"></a>
+### apiAccessor.getErrorHandlerMessage(options) ⇒ <code>boolean</code>
+Returns error handler message attribute from given options
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+
+| Param |
+| --- |
+| options | 
 

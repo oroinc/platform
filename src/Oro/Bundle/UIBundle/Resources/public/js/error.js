@@ -88,12 +88,28 @@ define([
             } else if (_.isString(context)) {
                 this.showFlashError(context);
             } else if (_.isObject(context) && context.responseJSON && context.responseJSON.message) {
-                this.showFlashError(context.responseJSON.message);
+                var message = this.prepareErrorMessage(context.responseJSON);
+                this.showFlashError(message);
             } else if (this.isXHRStatus(context, 403)) {
                 this.showFlashError(_.__('oro.ui.forbidden_error'));
             } else {
                 this.showFlashError(defaults.message);
             }
+        },
+
+        prepareErrorMessage: function(response) {
+            var message = response.message + ': ';
+            if (_.has(response, 'errors') && !_.isNull(response.errors)) {
+                _.each(response.errors.children, function(child) {
+                    if (_.has(child, 'errors') && !_.isNull(child.errors)) {
+                        _.each(child.errors, function(error) {
+                            message += error + ', ';
+                        });
+                    }
+                });
+            }
+            message = message.substring(0, message.length - 2);
+            return message;
         },
 
         /**
