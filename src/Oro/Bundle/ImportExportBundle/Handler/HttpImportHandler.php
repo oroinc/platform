@@ -5,7 +5,6 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Symfony\Component\HttpFoundation\File\File;
 
 class HttpImportHandler extends AbstractImportHandler
 {
@@ -102,6 +101,7 @@ class HttpImportHandler extends AbstractImportHandler
             'importInfo' => $importInfo,
             'errors'     => $errorsAndExceptions,
             'counts'     => $counts,
+            'postponedRows' => $jobResult->getContext()->getPostponedRows(),
         ];
     }
 }
