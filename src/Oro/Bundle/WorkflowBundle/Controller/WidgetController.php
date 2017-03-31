@@ -105,8 +105,7 @@ class WidgetController extends Controller
         $entity = $this->getTransitionWidgetHelper()->getOrCreateEntityReference($entityClass, $entityId);
         $workflowItem = $workflow->createWorkflowItem($entity, $dataArray);
 
-        $transitionForm = $this->get('oro_workflow.layout.data_provider.start_transition_form')
-            ->getTransitionForm($transitionName, $workflowItem);
+        $transitionForm = $this->getTransitionWidgetHelper()->getTransitionForm($workflowItem, $transition);
 
         $saved = $this->getTransitionFormHandler($transition)
             ->processStartTransitionForm($transitionForm, $workflowItem, $transition, $request);
@@ -159,8 +158,7 @@ class WidgetController extends Controller
         $workflow = $workflowManager->getWorkflow($workflowItem);
 
         $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
-        $transitionForm = $this->get('oro_workflow.layout.data_provider.transition_form')
-            ->getTransitionForm($transitionName, $workflowItem);
+        $transitionForm = $this->getTransitionWidgetHelper()->getTransitionForm($workflowItem, $transition);
 
         $saved = $this->getTransitionFormHandler($transition)
             ->processTransitionForm($transitionForm, $workflowItem, $transition, $request);
