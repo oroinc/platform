@@ -172,6 +172,7 @@ oro:
             start: "Start %workflow%"
             form:
                 submit.label: Submit
+                cancel.label: Cancel
 
         workflowdefinition:
             entity_label:                 Workflow
