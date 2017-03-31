@@ -29,6 +29,6 @@ class BreadcrumbProvider
      */
     public function getBreadcrumbs($menuName)
     {
-        return $this->breadcrumbManager->getBreadcrumbs($menuName, false);
+        return $this->breadcrumbManager->getBreadcrumbs($menuName);
     }
 }

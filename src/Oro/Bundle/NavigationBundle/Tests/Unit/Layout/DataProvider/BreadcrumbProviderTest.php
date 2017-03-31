@@ -40,7 +40,7 @@ class BreadcrumbProviderTest extends \PHPUnit_Framework_TestCase
         ];
         $this->breadcrumbManager->expects($this->once())
             ->method('getBreadcrumbs')
-            ->with($menuName, false)
+            ->with($menuName, true)
             ->willReturn($breadcrumbs);
 
         $result = $this->provider->getBreadcrumbs($menuName);

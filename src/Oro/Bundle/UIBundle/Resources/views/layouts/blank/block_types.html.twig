@@ -38,7 +38,11 @@
                     } %}
                 {% endif %}
                 {% set label = breadcrumb.label_localized|default(null) ? breadcrumb.label_localized|localized_value : breadcrumb.label|trans %}
-                {% set url = breadcrumb.route|default(null) ? path(breadcrumb.route, breadcrumb.routeParams|default([])) : null %}
+                {% if breadcrumb.uri is defined %}
+                    {% set url = breadcrumb.uri %}
+                {% else %}
+                    {% set url = breadcrumb.route|default(null) ? path(breadcrumb.route, breadcrumb.routeParams|default([])) : null %}
+                {% endif %}
                 {{ not loop.first ? ' / ' }}
                 {% if url and not loop.last %}<a href="{{ url }}" class="breadcrumbs__link">{{ label }}</a>{% else %}{{ label }}{% endif %}
             {% endfor %}
