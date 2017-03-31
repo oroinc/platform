@@ -343,4 +343,30 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             $this->titleService->getSerialized()
         );
     }
+
+    public function testCreateTitle()
+    {
+        $route = 'test_route';
+        $testTitle = 'Test Title';
+        $menuName = 'application_menu';
+        $breadcrumbs = ['Parent Path'];
+
+        $this->userConfigManager
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['oro_navigation.title_suffix', false, false, null, 'Suffix'],
+                ['oro_navigation.title_delimiter', false, false, null, '-'],
+            ]);
+
+        $this->breadcrumbManager
+            ->expects($this->once())
+            ->method('getBreadcrumbLabels')
+            ->willReturn($breadcrumbs);
+
+        $this->assertEquals(
+            'Test Title - Parent Path - Suffix',
+            $this->titleService->createTitle($route, $testTitle, $menuName)
+        );
+    }
 }

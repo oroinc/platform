@@ -3,12 +3,20 @@
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\NavigationBundle\Provider\TitleService;
+use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+
+use Oro\Component\DependencyInjection\ServiceLink;
 
 class RouteChoiceType extends AbstractType
 {
@@ -20,14 +28,24 @@ class RouteChoiceType extends AbstractType
     private $router;
 
     /**
-     * @var ManagerRegistry
+     * @var TitleTranslator
      */
-    private $registry;
+    private $titleTranslator;
 
     /**
-     * @var TranslatorInterface
+     * @var TitleReaderRegistry
      */
-    private $translator;
+    private $readerRegistry;
+
+    /**
+     * @var ServiceLink
+     */
+    private $titleServiceLink;
+
+    /**
+     * @var RouteCollection
+     */
+    private $routeCollection;
 
     /**
      * @param RouterInterface $router
@@ -37,8 +55,30 @@ class RouteChoiceType extends AbstractType
     public function __construct(RouterInterface $router, ManagerRegistry $registry, TranslatorInterface $translator)
     {
         $this->router = $router;
-        $this->registry = $registry;
-        $this->translator = $translator;
+    }
+
+    /**
+     * @param TitleTranslator $titleTranslator
+     */
+    public function setTitleTranslator(TitleTranslator $titleTranslator)
+    {
+        $this->titleTranslator = $titleTranslator;
+    }
+
+    /**
+     * @param TitleReaderRegistry $readerRegistry
+     */
+    public function setReaderRegistry(TitleReaderRegistry $readerRegistry)
+    {
+        $this->readerRegistry = $readerRegistry;
+    }
+
+    /**
+     * @param ServiceLink $titleServiceLink
+     */
+    public function setTitleServiceLink(ServiceLink $titleServiceLink)
+    {
+        $this->titleServiceLink = $titleServiceLink;
     }
 
     /**
@@ -46,6 +86,8 @@ class RouteChoiceType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setRequired('menu_name');
+
         $resolver->setDefault('path_filter', null);
         $resolver->setDefault('name_filter', '/^oro_\w+$/');
         $resolver->setDefault('options_filter', []);
@@ -76,7 +118,7 @@ class RouteChoiceType extends AbstractType
                 }
 
                 if ($options['add_titles']) {
-                    $titles = $this->loadRouteTitles($routes);
+                    $titles = $this->loadRouteTitles($routes, $options['menu_name']);
                     foreach ($choices as $routeName => $routeTitle) {
                         if (array_key_exists($routeName, $titles)) {
                             $choices[$routeName] = sprintf('%s (%s)', $routeTitle, $titles[$routeName]);
@@ -104,9 +146,8 @@ class RouteChoiceType extends AbstractType
         $nameFilter = null,
         $pathFilter = null
     ) {
-        $routes = $this->router->getRouteCollection();
         $filteredRoutes = [];
-        foreach ($routes as $routeName => $route) {
+        foreach ($this->getRouteCollection() as $routeName => $route) {
             $required = $this->isGetMethodAllowed($route)
                 && $this->isParametersAllowed($withoutParametersOnly, $route)
                 && $this->isOptionsAllowed($optionsFilter, $route)
@@ -180,14 +221,55 @@ class RouteChoiceType extends AbstractType
     }
 
     /**
-     * @param array $routes
+     * @param array  $routes
+     * @param string $menuName
      * @return array
      */
-    private function loadRouteTitles(array $routes)
+    private function loadRouteTitles(array $routes, $menuName)
     {
-        //ToDo in BB-6555: use getTitles from cache
+        $this
+            ->checkRequiredProperty('titleServiceLink')
+            ->checkRequiredProperty('readerRegistry')
+            ->checkRequiredProperty('titleTranslator');
 
-        return [];
+        /** @var TitleService $titleService */
+        $titleService = $this->titleServiceLink->getService();
+
+        $titles = [];
+        foreach ($routes as $routeName) {
+            $title = $this->readerRegistry->getTitleByRoute($routeName);
+            if ($title) {
+                $titles[$routeName] = $this->titleTranslator
+                    ->trans($titleService->createTitle($routeName, $title, $menuName));
+            }
+        }
+
+        return $titles;
+    }
+
+    /**
+     * @param string $propertyName
+     * @return RouteChoiceType
+     */
+    private function checkRequiredProperty($propertyName)
+    {
+        if ($this->$propertyName === null) {
+            throw new \LogicException(sprintf('The "%s::%s" property is required.', get_class($this), $propertyName));
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return RouteCollection
+     */
+    private function getRouteCollection()
+    {
+        if ($this->routeCollection === null) {
+            $this->routeCollection = $this->router->getRouteCollection();
+        }
+
+        return $this->routeCollection;
     }
 
     /**

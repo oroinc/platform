@@ -282,9 +282,15 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Create title template for current route and menu name
+     *
+     * @param string      $route
+     * @param string      $title
+     * @param string|null $menuName
+     *
+     * @return string
      */
-    protected function createTitle($route, $title, $menuName = null)
+    public function createTitle($route, $title, $menuName = null)
     {
         $titleData = [];
 

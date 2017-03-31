@@ -20,9 +20,6 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
     /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
-    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
-    protected $translator;
-
     /** @var WorkflowManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $workflowManager;
 
@@ -38,15 +35,14 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
     /** @var DumpWorkflowTranslationsCommand */
     protected $command;
 
+    /** @var WorkflowTranslationHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $workflowTranslationHelper;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -55,12 +51,14 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->workflowTranslationHelper = $this->createMock(WorkflowTranslationHelper::class);
+
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap([
                 ['oro_workflow.manager', 1, $this->workflowManager],
-                ['translator.default', 1, $this->translator],
+                ['oro_workflow.helper.translation', 1, $this->workflowTranslationHelper],
             ]));
 
         $this->input = $this->createMock(InputInterface::class);
@@ -76,13 +74,13 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset(
-            $this->translator,
             $this->workflowManager,
             $this->workfow,
             $this->container,
             $this->input,
             $this->output,
-            $this->command
+            $this->command,
+            $this->workflowTranslationHelper
         );
     }
 
@@ -147,33 +145,31 @@ class DumpWorkflowTranslationsCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->workflow->expects($this->once())->method('getDefinition')->willReturn($definition);
 
-        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
-        $defaultLocale = Translator::DEFAULT_LOCALE;
+        $this->workflowTranslationHelper->expects($this->any())
+            ->method('generateDefinitionTranslationKeys')
+            ->willReturn([
+                'wf1.definition1.label',
+                'wf1.step1.label',
+                'wf1.step2.label',
+                'wf1.step2.label',
+                'wf1.step3.label',
+                'wf1.step3.label',
+                'wf1.attribute1.label',
+                'wf1.transition1.label',
+                'wf1.transition1.message',
+            ]);
 
-        $this->translator->expects($this->any())
-            ->method('hasTrans')
-            ->will($this->returnValueMap([
-                ['wf1.definition1.label', $domain, 'locale1', true],
-                ['wf1.step1.label', $domain, 'locale1', true],
-                ['wf1.step2.label', $domain, 'locale1', false],
-                ['wf1.step2.label', $domain, $defaultLocale, true],
-                ['wf1.step3.label', $domain, 'locale1', false],
-                ['wf1.step3.label', $domain, $defaultLocale, false],
-                ['wf1.attribute1.label', $domain, 'locale1', true],
-                ['wf1.transition1.label', $domain, 'locale1', true],
-                ['wf1.transition1.message', $domain, 'locale1', true],
-            ]));
-
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->will($this->returnValueMap([
-                ['wf1.definition1.label', [], $domain, 'locale1', 'definition1.label.locale1'],
-                ['wf1.step1.label', [], $domain, 'locale1', 'step1.label.locale1'],
-                ['wf1.step2.label', [], $domain, $defaultLocale, 'step2.label.defaultLocale'],
-                ['wf1.attribute1.label', [], $domain, 'locale1', 'attribute1.label.locale1'],
-                ['wf1.transition1.label', [], $domain, 'locale1', 'transition1.label.locale1'],
-                ['wf1.transition1.message', [], $domain, 'locale1', 'transition1.message.locale1'],
-            ]));
+        $this->workflowTranslationHelper->expects($this->any())
+            ->method('generateDefinitionTranslations')
+            ->willReturn([
+                'wf1.definition1.label'=>'definition1.label.locale1',
+                'wf1.step1.label'=>'step1.label.locale1',
+                'wf1.step2.label'=>'step2.label.defaultLocale',
+                'wf1.step3.label'=>'',
+                'wf1.attribute1.label'=>'attribute1.label.locale1',
+                'wf1.transition1.label'=>'transition1.label.locale1',
+                'wf1.transition1.message'=>'transition1.message.locale1',
+            ]);
 
         $this->output->expects($this->once())
             ->method('write')

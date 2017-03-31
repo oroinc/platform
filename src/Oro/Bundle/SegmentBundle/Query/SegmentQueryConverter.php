@@ -99,12 +99,6 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         $functionReturnType,
         $isDistinct = false
     ) {
-        if ($isDistinct) {
-            $columnExpr = 'DISTINCT ' . (string)$columnExpr;
-        } else { //Restrict select with id field only
-            return;
-        }
-
         if ($functionExpr !== null) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,

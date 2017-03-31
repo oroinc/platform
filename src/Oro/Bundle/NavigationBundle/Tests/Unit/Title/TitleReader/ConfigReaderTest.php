@@ -33,9 +33,15 @@ class ConfigReaderTest extends \PHPUnit_Framework_TestCase
         $this->reader = new ConfigReader($this->configurationProvider);
     }
 
-    public function testGetTitleSuccess()
+    public function testGetTitle()
     {
         $title = $this->reader->getTitle(self::TEST_ROUTE);
         $this->assertEquals('Test title template', $title);
+    }
+
+    public function testGetTitleEmpty()
+    {
+        $title = $this->reader->getTitle('custom_route');
+        $this->assertNull($title);
     }
 }

@@ -104,6 +104,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             [
                 'expectedMessages' => [
                     'Loading workflow definitions...',
+                    'Please run command \'oro:translation:load\' to load translations.'
                 ],
                 'expectedDefinitions' => [
                     'first_workflow',
