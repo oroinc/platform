@@ -2,30 +2,36 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Oro\Component\Action\Action\CallServiceMethod;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
+use Oro\Component\Action\Tests\Unit\Action\Stub\TestService;
+use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\Action\Action\CallServiceMethod;
-use Oro\Component\ConfigExpression\ContextAccessor;
-use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
-use Oro\Component\Action\Tests\Unit\Action\Stub\TestService;
-
 class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
-    protected $container;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
+     */
+    private $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
-    protected $eventDispatcher;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
-    /** @var CallServiceMethod */
-    protected $action;
+    /**
+     * @var CallServiceMethod
+     */
+    private $action;
 
     protected function setUp()
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->action = new CallServiceMethod(new ContextAccessor(), $this->container);
         $this->action->setDispatcher($this->eventDispatcher);
@@ -38,12 +44,8 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $serviceName = 'test_service';
-
-        $this->assertContainerCalled($serviceName, 1, 1);
-
         $options = [
-            'service' => $serviceName,
+            'service' => 'test_service',
             'method' => 'testMethod',
             'method_parameters' => ['param' => 'value'],
             'attribute' => 'test'
@@ -57,116 +59,135 @@ class CallServiceMethodTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($options, 'options', $this->action);
     }
 
-    /**
-     * @dataProvider initializeExceptionDataProvider
-     *
-     * @param array $inputData
-     * @param string $exception
-     * @param string $exceptionMessage
-     * @param bool $hasService
-     */
-    public function testInitializeException(array $inputData, $exception, $exceptionMessage, $hasService = true)
+    public function testInitializeNoServiceException()
     {
-        $this->container->expects($this->any())
-            ->method('has')
-            ->willReturn($hasService);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturn(new TestService());
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Service name parameter is required');
 
-        $this->expectException($exception);
-        $this->expectExceptionMessage($exceptionMessage);
-
-        $this->action->initialize($inputData);
+        $this->action->initialize([]);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function testInitializeNoMethodException()
     {
-        return [
-            [
-                'inputData' => [],
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
-                'expectedExceptionMessage' => 'Service name parameter is required'
-            ],
-            [
-                'inputData' => [
-                    'service' => 'test_service'
-                ],
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
-                'expectedExceptionMessage' => 'Undefined service with name "test_service"',
-                'hasService' => false
-            ],
-            [
-                'inputData' => [
-                    'service' => 'test_service'
-                ],
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
-                'expectedExceptionMessage' => 'Method name parameter is required'
-            ],
-            [
-                'inputData' => [
-                    'service' => 'test_service',
-                    'method' => 'test_method'
-                ],
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
-                'expectedExceptionMessage' => 'Could not found public method "test_method" in service "test_service"'
-            ]
-        ];
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Method name parameter is required');
+
+        $this->action->initialize([
+            'service' => 'service'
+        ]);
     }
 
-    public function testExecuteMethod()
+    public function testExecuteActionUndefinedServiceException()
     {
-        $this->assertContainerCalled('test_service');
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Undefined service with name "test_service"');
 
-        $data = new StubStorage(['param' => 'value']);
+        $service = 'test_service';
         $options = [
-            'service' => 'test_service',
+            'service' => $service,
+            'method' => 'testMethod',
+        ];
+
+        $this->container->expects(static::once())
+            ->method('has')
+            ->with($service)
+            ->willReturn(false);
+
+        $this->action->initialize($options);
+        $this->action->execute('');
+    }
+
+    public function testExecuteActionMethodNotExists()
+    {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Could not found public method "noMethod" in service "test_service"');
+
+        $service = 'test_service';
+        $options = [
+            'service' => $service,
+            'method' => 'noMethod',
+        ];
+
+        $this->setContainerServiceExpectations($service);
+
+        $this->action->initialize($options);
+        $this->action->execute('');
+    }
+
+    public function testExecuteActionWithAttribute()
+    {
+        $service = 'test_service';
+        $options = [
+            'service' => $service,
             'method' => 'testMethod',
             'method_parameters' => [new PropertyPath('param')],
             'attribute' => 'test'
         ];
 
+        $this->setContainerServiceExpectations($service);
+
+        $context = new StubStorage(['param' => 'value']);
+
         $this->action->initialize($options);
-        $this->action->execute($data);
+        $this->action->execute($context);
 
         $this->assertEquals(
             ['param' => 'value', 'test' => TestService::TEST_METHOD_RESULT . 'value'],
-            $data->getValues()
+            $context->getValues()
         );
     }
 
-    public function testExecuteWithoutAttribute()
+    public function testExecuteActionWithoutAttribute()
     {
-        $this->assertContainerCalled('test_service');
-
-        $data = new StubStorage(['param' => 'value']);
-        $options = array(
-            'service' => 'test_service',
+        $service = 'test_service';
+        $options = [
+            'service' => $service,
             'method' => 'testMethod',
-            'method_parameters' => ['test']
-        );
+            'method_parameters' => [new PropertyPath('param')],
+        ];
+
+        $this->setContainerServiceExpectations($service);
+
+        $context = new StubStorage(['param' => 'value']);
 
         $this->action->initialize($options);
-        $this->action->execute($data);
+        $this->action->execute($context);
 
-        $this->assertEquals(['param' => 'value'], $data->getValues());
+        $this->assertEquals(['param' => 'value'], $context->getValues());
+    }
+
+    public function testExecuteActionPropertyPathService()
+    {
+        $service = 'test_service';
+        $options = [
+            'service' => new PropertyPath('service'),
+            'method' => 'testMethod',
+            'method_parameters' => [new PropertyPath('param')],
+        ];
+
+        $this->setContainerServiceExpectations($service);
+
+        $context = new StubStorage(['param' => 'value', 'service' => $service]);
+
+        $this->action->initialize($options);
+        $this->action->execute($context);
+
+        $this->assertEquals(
+            ['param' => 'value', 'service' => $service],
+            $context->getValues()
+        );
     }
 
     /**
      * @param string $serviceName
-     * @param int $hasCalls
-     * @param int $getCalls
      */
-    protected function assertContainerCalled($serviceName, $hasCalls = 1, $getCalls = 2)
+    private function setContainerServiceExpectations($serviceName)
     {
-        $this->container->expects($this->exactly($hasCalls))
+        $this->container->expects(static::once())
             ->method('has')
             ->with($serviceName)
             ->willReturn(true);
-        $this->container->expects($this->exactly($getCalls))
+        $this->container->expects(static::once())
             ->method('get')
             ->with($serviceName)
             ->willReturn(new TestService());

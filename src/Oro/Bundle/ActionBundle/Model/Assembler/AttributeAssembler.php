@@ -109,7 +109,7 @@ class AttributeAssembler extends AbstractAssembler
             return $options;
         }
 
-        $attributeParameters = $this->attributeGuesser->guessAttributeParameters($rootClass, $propertyPath);
+        $attributeParameters = $this->attributeGuesser->guessParameters($rootClass, $propertyPath);
         if ($attributeParameters) {
             foreach ($guessedOptions as $option) {
                 if (empty($options[$option]) && !empty($attributeParameters[$option])) {

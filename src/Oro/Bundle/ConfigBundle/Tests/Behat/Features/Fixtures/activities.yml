@@ -1,0 +1,42 @@
+Oro\Bundle\ContactBundle\Entity\Contact:
+  contactCharlie:
+    firstName: Charlie
+    lastName: Sheen
+    email: charlie@sheen.com
+    owner: '@admin'
+    organization: '@organization'
+
+OroEntityProxy\OroEmailBundle\EmailAddressProxy:
+  charlieAddress:
+    owner: '@contactCharlie'
+    email: charlie@sheen.com
+    hasOwner: true
+
+Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
+  calendarEvent{1..3}:
+    title: '<sentence(6, true)>'
+    addActivityTarget: ['@contactCharlie']
+    createdAt: '<dateTimeBetween("-200 days", "-10 days")>'
+    updatedAt: '<dateTimeBetween($createdAt, "-10 days")>'
+    start: '<dateTimeBetween($createdAt, $createdAt)>'
+    end: '<dateTimeBetween($createdAt, $createdAt)>'
+    allDay: false
+
+Oro\Bundle\TaskBundle\Entity\Task:
+  task:
+    subject: 'First test task'
+    addActivityTarget: ['@contactCharlie']
+    createdAt: '<dateTime("now")>'
+    updatedAt: '<dateTime($createdAt)>'
+    dueDate: '<dateTime($createdAt)>'
+
+Oro\Bundle\CallBundle\Entity\Call:
+  call{1..9}:
+    subject: "-<current()> days"
+    addActivityTarget: ['@contactCharlie']
+    phoneNumber: <e164PhoneNumber()>
+    notes: '<sentence(6, true)>'
+    createdAt: '<dateTimeBetween($subject, $subject)>'
+    updatedAt: '<dateTimeBetween($createdAt, "now")>'
+    callDateTime: '<dateTimeBetween($createdAt, $createdAt)>'
+    organization: '@organization'

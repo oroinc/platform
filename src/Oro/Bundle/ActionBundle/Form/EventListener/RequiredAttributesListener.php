@@ -41,8 +41,6 @@ class RequiredAttributesListener implements EventSubscriberInterface
         $data = $event->getData();
         if ($data instanceof ActionData) {
             $this->data = $data;
-
-            $event->setData(new ActionData($data->getValues($this->attributeNames)));
         }
     }
 
@@ -59,8 +57,6 @@ class RequiredAttributesListener implements EventSubscriberInterface
             foreach ($data->getValues() as $name => $value) {
                 $this->data->$name = $value;
             }
-
-            $event->setData($this->data);
         }
     }
 

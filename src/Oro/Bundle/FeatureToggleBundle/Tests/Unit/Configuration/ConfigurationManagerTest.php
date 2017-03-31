@@ -110,6 +110,15 @@ class ConfigurationManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->configurationManager->getFeatureByToggle('wrong_toggle_key'));
     }
 
+    public function testGetFeatureByToggleWhenNotIsset()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getFeaturesConfiguration')
+            ->willReturn(['feature1' => ['not_toggle' => 'oro_bundle.toggle_key']]);
+
+        $this->assertNull($this->configurationManager->getFeatureByToggle('oro_bundle.toggle_key'));
+    }
+
     /**
      * @dataProvider getResourcesByTypeProvider
      */

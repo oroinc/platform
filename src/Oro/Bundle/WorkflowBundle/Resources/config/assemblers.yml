@@ -10,6 +10,8 @@ services:
         public: false
         arguments:
             - '@oro_workflow.serializer.variable.normalizer'
+            - '@oro_workflow.variable_guesser'
+            - '@translator'
         public: false
 
     oro_workflow.step_assembler:
