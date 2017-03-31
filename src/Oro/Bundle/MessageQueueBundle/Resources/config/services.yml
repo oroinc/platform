@@ -1,5 +1,6 @@
 parameters:
     oro_message_queue.consumption.interrupt_filepath: '%kernel.cache_dir%/mq/interrupt_consumption.meta'
+    oro_message_queue.maintance.idle_time: 5
 
 services:
     oro_message_queue.consumption.extensions:
@@ -55,5 +56,16 @@ services:
         public: false
         arguments:
             - '@security.token_storage'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
+
+    oro_message_queue.consumption.extension.maintance:
+        class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
+        public: false
+        arguments:
+            - '@oro_platform.maintenance'
+            - '%oro_message_queue.maintance.idle_time%'
+        calls:
+            - ['setFilePathServerLockFromConfig', ['%kernel.root_dir%/config/oro_env.conf']]
         tags:
             - { name: 'oro_message_queue.consumption.extension' }
