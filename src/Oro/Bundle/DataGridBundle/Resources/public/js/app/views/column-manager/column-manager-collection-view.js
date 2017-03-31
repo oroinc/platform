@@ -213,11 +213,13 @@ define(function(require) {
         },
 
         adjustListHeight: function() {
-            var windowHeight = $('html').height();
+            var windowHeight = $(window).height();
             var $wrapper = this.$('.table-wrapper');
+            var $footer = this.$el.next('[data-column-manager-footer]');
+            var $footerHeight = $footer.length ? $footer.outerHeight() : 0;
             var rect = $wrapper[0].getBoundingClientRect();
             var margin = (this.$el.outerHeight(true) - rect.height) / 2;
-            $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin, 40) + 'px');
+            $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight) + 'px');
         }
     });
 
