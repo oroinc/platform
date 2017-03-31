@@ -6,10 +6,11 @@ layout:
             items:
                 transition_form_wrapper:
                     blockType: container
-#                form_errors:
-#                    blockType: form_errors
-#                    options:
-#                        form: '=data["oro_workflow_transition_form"].getTransitionFormView(data["transition"].getName(), data["workflowItem"])'
+                form_warning_message:
+                    blockType: text
+                    options:
+                        text: '=data["translator"].getTrans(data["transition"].getMessage(),[],"workflows")'
+                        visible: '=((data["transition"].getMessage()!="")&&(data["translator"].getTrans(data["transition"].getMessage(),[],"workflows")!=data["transition"].getMessage()))'
                 form_start:
                     blockType: form_start
                     options:
@@ -37,7 +38,7 @@ layout:
             tree:
                 transition_form_holder:
                     transition_form_wrapper:
-#                        form_errors: ~
+                        form_warning_message: ~
                         form_start: ~
                         form_fields: ~
                         form_actions:
