@@ -174,28 +174,45 @@
 }
 
 #floating-validation-message() {
+  display: block;
   position: relative;
-  display: table;
-  top: -62px;
-  color: white;
-  background-color: @errorMessageBalloonBackground;
   width: auto;
+  height: 0;
   margin: 0;
-  padding: 5px 5px 5px 20px;
-  border-radius: 4px;
   &:before {
-    color: white;
+    content: normal;
   }
   &:after {
     content: '';
     display: block;
     position: absolute;
     top: 100%;
-    margin-top: -1px;
+    margin-top: -38px;
     left: 10px;
     border-style: solid;
     border-color: lighten(@errorText, 20%) transparent;
     border-width: 8px 4px 0;
+  }
+  > span {
+    position: fixed;
+    width: @widthInput;
+    margin-top: -37px;
+    > span {
+      position: absolute;
+      bottom: 0;
+      padding: 5px 5px 5px 20px;
+      border-radius: 4px;
+      background-color: @errorMessageBalloonBackground;
+      color: white;
+    }
+    > span:before {
+      content: "\f00d";
+      display: inline-block;
+      width: 14px;
+      margin-left: -14px;
+      color: white;
+      font: normal 1.15em/1em 'FontAwesome';
+    }
   }
 }
 

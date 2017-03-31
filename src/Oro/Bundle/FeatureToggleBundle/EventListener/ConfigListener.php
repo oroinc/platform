@@ -93,6 +93,11 @@ class ConfigListener
         return $featuresStates;
     }
 
+    public function onScopeIdChange()
+    {
+        $this->featureChecker->resetCache();
+    }
+
     /**
      * @param array $configKeys
      * @return array
