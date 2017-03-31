@@ -152,9 +152,10 @@ class MassActionDispatcher
         if ($values) {
             $valueWhereCondition =
                 $inset
-                    ? $qb->expr()->in($identifierField, $values)
-                    : $qb->expr()->notIn($identifierField, $values);
+                    ? $qb->expr()->in($identifierField, ':values')
+                    : $qb->expr()->notIn($identifierField, ':values');
             $qb->andWhere($valueWhereCondition);
+            $qb->setParameter('values', $values);
         }
 
         return $qb;

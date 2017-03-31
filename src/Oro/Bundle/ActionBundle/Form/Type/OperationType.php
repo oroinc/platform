@@ -201,6 +201,10 @@ class OperationType extends AbstractType
             $attributeOptions['options'] = [];
         }
 
+        if ($attribute->getPropertyPath() && !isset($attributeOptions['options']['property_path'])) {
+            $attributeOptions['options']['property_path'] = $attribute->getPropertyPath();
+        }
+
         $attributeOptions['options']['label'] = isset($attributeOptions['label'])
             ? $attributeOptions['label']
             : $attribute->getLabel();

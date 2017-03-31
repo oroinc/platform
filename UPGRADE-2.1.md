@@ -1046,6 +1046,12 @@ WorkflowBundle
     - removed property `protected $workflowManager`
 - Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand`.
 - Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand`.
+- Class `\Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor`:
+    - Signature of method `translateWorkflowDefinitionFields` changed, now it accept optional boolean parameter `$useKeyAsTranslation`
+- Class `\Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper`:
+    - added public method `generateDefinitionTranslationKeys`
+    - added public method `generateDefinitionTranslations`
+    - changed access level from `private` to `public` for method `findValue`
 
 TestFrameworkBundle
 -------------------

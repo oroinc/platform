@@ -60,6 +60,8 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $impersonation = new EntityReference(Impersonation::class, $body['impersonation_id']);
         }
 
+        $ownerDecription = isset($body['owner_description']) ? $body['owner_description'] : null;
+
         $map = [];
 
         // one to one, one to many, many to many inverse side
@@ -79,7 +81,8 @@ class AuditChangedEntitiesInverseRelationsProcessor implements MessageProcessorI
             $loggedAt,
             $user,
             $organization,
-            $impersonation
+            $impersonation,
+            $ownerDecription
         );
 
         return self::ACK;
