@@ -31,6 +31,5 @@ class OroWorkflowExtension extends Extension
         $loader->load('grid.yml');
         $loader->load('cache.yml');
         $loader->load('client.yml');
-        $loader->load('block_types.yml');
     }
 }
