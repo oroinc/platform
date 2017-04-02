@@ -30,8 +30,7 @@ class NavigationItemsListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $disabledItems = false;
-//        $disabledItems = $this->featureChecker->getDisabledResourcesByType('navigation_items');
+        $disabledItems = $this->featureChecker->getDisabledResourcesByType('navigation_items');
         if (!$disabledItems) {
             return;
         }
