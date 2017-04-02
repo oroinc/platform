@@ -48,7 +48,7 @@ class NavigationItemsListenerTest extends \PHPUnit_Framework_TestCase
     public function testOnNavigationConfigure(ConfigureMenuEvent $event, MenuItem $expected)
     {
         $this->navigationListener->onNavigationConfigure($event);
-//        $this->assertEquals($expected, $event->getMenu());
+        $this->assertEquals($expected, $event->getMenu());
     }
 
     /**
