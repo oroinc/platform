@@ -13,78 +13,80 @@
         <% } %>
     </div>
     <div class="footer row-fluid">
-        <span class="pull-left fromName">
+        <span class="pull-left from-name">
             <% if (linkFromName) { %>
                 <a href="<%- linkFromName %>"><%- fromName %></a>
             <% } else { %>
                 <%- fromName %>
             <% } %>
         </span>
-        <span class="pull-right reply-all-action">
-            {{- UI.clientLink({
-                'dataUrlRaw': "<%= replyAllRoute %>",
-                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-                'label': 'oro.email.reply_all'|trans,
-                'widget': {
-                    'type': 'dialog',
-                    'multiple': false,
-                    'options': {
-                        'alias': 'reply-dialog',
-                        'dialogOptions' : {
-                            'title' : 'oro.email.reply'|trans,
-                            'allowMaximize': true,
-                            'allowMinimize': true,
-                            'dblclick': 'maximize',
-                            'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+        <span class="pull-right">
+            <span class="forward-action">
+                {{- UI.clientLink({
+                    'dataUrlRaw': "<%= forwardRoute %>",
+                    'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                    'label': 'oro.email.forward'|trans,
+                    'widget': {
+                        'type': 'dialog',
+                        'multiple': false,
+                        'options': {
+                            'alias': 'reply-dialog',
+                            'dialogOptions' : {
+                                'title' : 'oro.email.forward'|trans,
+                                'allowMaximize': true,
+                                'allowMinimize': true,
+                                'dblclick': 'maximize',
+                                'maximizedHeightDecreaseBy': 'minimize-bar',
+                                'width': 1000
+                            }
                         }
                     }
-                }
-            }) -}}
-        </span>
-        <span class="pull-right reply-action">
-            {{- UI.clientLink({
-                'dataUrlRaw': "<%= replyRoute %>",
-                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-                'label': 'oro.email.reply'|trans,
-                'widget': {
-                    'type': 'dialog',
-                    'multiple': false,
-                    'options': {
-                        'alias': 'reply-dialog',
-                        'dialogOptions' : {
-                            'title' : 'oro.email.reply_all'|trans,
-                            'allowMaximize': true,
-                            'allowMinimize': true,
-                            'dblclick': 'maximize',
-                            'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+                }) -}}
+            </span>
+            <span class="reply-action">
+                {{- UI.clientLink({
+                    'dataUrlRaw': "<%= replyRoute %>",
+                    'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                    'label': 'oro.email.reply'|trans,
+                    'widget': {
+                        'type': 'dialog',
+                        'multiple': false,
+                        'options': {
+                            'alias': 'reply-dialog',
+                            'dialogOptions' : {
+                                'title' : 'oro.email.reply_all'|trans,
+                                'allowMaximize': true,
+                                'allowMinimize': true,
+                                'dblclick': 'maximize',
+                                'maximizedHeightDecreaseBy': 'minimize-bar',
+                                'width': 1000
+                            }
                         }
                     }
-                }
-            }) -}}
-        </span>
-        <span class="pull-right forward-action">
-            {{- UI.clientLink({
-                'dataUrlRaw': "<%= forwardRoute %>",
-                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-                'label': 'oro.email.forward'|trans,
-                'widget': {
-                    'type': 'dialog',
-                    'multiple': false,
-                    'options': {
-                        'alias': 'reply-dialog',
-                        'dialogOptions' : {
-                            'title' : 'oro.email.forward'|trans,
-                            'allowMaximize': true,
-                            'allowMinimize': true,
-                            'dblclick': 'maximize',
-                            'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+                }) -}}
+            </span>
+            <span class="reply-all-action">
+                {{- UI.clientLink({
+                    'dataUrlRaw': "<%= replyAllRoute %>",
+                    'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                    'label': 'oro.email.reply_all'|trans,
+                    'widget': {
+                        'type': 'dialog',
+                        'multiple': false,
+                        'options': {
+                            'alias': 'reply-dialog',
+                            'dialogOptions' : {
+                                'title' : 'oro.email.reply'|trans,
+                                'allowMaximize': true,
+                                'allowMinimize': true,
+                                'dblclick': 'maximize',
+                                'maximizedHeightDecreaseBy': 'minimize-bar',
+                                'width': 1000
+                            }
                         }
                     }
-                }
-            }) -}}
+                }) -}}
+            </span>
         </span>
     </div>
 </script>

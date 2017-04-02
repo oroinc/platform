@@ -150,4 +150,12 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->configListener->onUpdateAfter();
     }
+
+    public function testOnScopeIdChange()
+    {
+        $this->featureChecker->expects($this->once())
+            ->method('resetCache');
+
+        $this->configListener->onScopeIdChange();
+    }
 }

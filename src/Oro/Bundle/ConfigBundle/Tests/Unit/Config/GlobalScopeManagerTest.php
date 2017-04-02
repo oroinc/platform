@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 
@@ -39,6 +41,7 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
         $doctrine    = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
+        $dispatcher = $this->createMock(EventDispatcher::class);
 
         $this->cache = new ArrayCache();
 
@@ -47,7 +50,7 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->with('Oro\Bundle\ConfigBundle\Entity\Config')
             ->willReturn($this->em);
 
-        $this->manager = new GlobalScopeManager($doctrine, $this->cache);
+        $this->manager = new GlobalScopeManager($doctrine, $this->cache, $dispatcher);
     }
 
     /**
