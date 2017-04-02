@@ -220,16 +220,16 @@ class LayoutBuilder implements LayoutBuilderInterface
         $this->layoutManipulator->applyChanges($context);
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-//        if ($this->blockViewCache) {
-//            $rootView = $this->blockViewCache->fetch($context);
-//            if ($rootView === null) {
-//                $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
-//
-//                $this->blockViewCache->save($context, $rootView);
-//            }
-//        } else {
+        if ($this->blockViewCache) {
+            $rootView = $this->blockViewCache->fetch($context);
+            if ($rootView === null) {
+                $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+
+                $this->blockViewCache->save($context, $rootView);
+            }
+        } else {
             $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
-//        }
+        }
 
         $rootView = $this->getRootView($rootView, $rootId);
 
