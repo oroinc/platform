@@ -123,10 +123,12 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->assertNotEmpty($crawler->html());
 
         $this->assertContains('Var1Value', $crawler->html());
+        $this->assertContains('test_flow', $crawler->html());
 
         // update variable value
         $form = $crawler->selectButton('Save')->form([
             'oro_workflow_variables[var1]' => 'Var1NewValue',
+            'oro_workflow_variables[entity_var]' => 'test_multistep_flow',
         ]);
 
         $this->client->followRedirects(true);
@@ -134,6 +136,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains('Var1NewValue', $crawler->html());
+        $this->assertContains('test_multistep_flow', $crawler->html());
     }
 
     public function testActivateFormAction()
@@ -156,7 +159,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::WITH_GROUPS2, $crawler->html());
-        $this->assertContains('name="oro_workflow_replacement_select"', $crawler->html());
+        $this->assertContains('name="oro_workflow_replacement"', $crawler->html());
         $this->assertContains('Activate', $crawler->html());
         $this->assertContains('Cancel', $crawler->html());
         $this->assertContains('The following workflows will be deactivated', $crawler->html());

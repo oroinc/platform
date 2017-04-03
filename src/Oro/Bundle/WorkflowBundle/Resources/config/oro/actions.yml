@@ -30,7 +30,7 @@ operations:
                     - '@call_service_method':
                         service: oro_workflow.translation.processor
                         method: translateWorkflowDefinitionFields
-                        method_parameters: [$.data]
+                        method_parameters: [$.data, true]
                     - '@clone_object':
                         target: $.data
                         attribute: $.clone

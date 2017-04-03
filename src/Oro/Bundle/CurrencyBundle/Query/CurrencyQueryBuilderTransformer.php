@@ -13,7 +13,6 @@ class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformer
         $originalFieldName,
         QueryBuilder $qb = null,
         $rootAlias = null,
-        $addAlias = false,
         $newFieldName = null
     ) {
         if (!$originalFieldName) {
@@ -27,5 +26,13 @@ class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformer
         $query = sprintf('%s.%sValue', $rootAlias, $originalFieldName);
 
         return $query;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTransformSelectQueryForDataGrid($originalFieldName, $rootAlias)
+    {
+        return $this->getTransformSelectQuery($originalFieldName, null, $rootAlias);
     }
 }

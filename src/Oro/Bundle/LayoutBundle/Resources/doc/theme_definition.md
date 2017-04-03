@@ -9,7 +9,6 @@ Basically, think of a **theme** as a skin for your application. Files, that the 
 ## Configuration
 
 The configuration file should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
-Deprecated method: placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`
 Theme folder(name) must match [a-zA-Z][a-zA-Z0-9_\-:]* expression.
 
 ### Themes configuration reference

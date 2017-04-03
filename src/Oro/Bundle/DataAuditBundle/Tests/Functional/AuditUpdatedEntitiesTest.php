@@ -54,6 +54,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
         $message = $this->createDummyMessage([
             'timestamp' => $expectedLoggedAt->getTimestamp(),
             'transaction_id' => 'theTransactionId',
+            'owner_description' => 'Some Owner Description',
             'entities_updated' => [
                 [
                     'entity_class' => TestAuditDataOwner::class,
@@ -81,6 +82,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
         $this->assertEquals(1, $audit->getVersion());
         $this->assertEquals('theTransactionId', $audit->getTransactionId());
         $this->assertEquals($expectedLoggedAt, $audit->getLoggedAt());
+        $this->assertEquals('Some Owner Description', $audit->getOwnerDescription());
         $this->assertNull($audit->getUser());
         $this->assertNull($audit->getOrganization());
     }

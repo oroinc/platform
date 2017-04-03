@@ -4,7 +4,6 @@ namespace Oro\Bundle\RequireJSBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputInterface;
@@ -110,12 +109,9 @@ class OroBuildCommand extends ContainerAwareCommand
             $process->setTimeout($this->config['building_timeout']);
         }
 
-        $request = Request::createFromGlobals();
-        $server = $request->server->all();
-
         // some workaround when this command is launched from web
-        if (isset($server['PATH'])) {
-            $env = $server;
+        if (isset($_SERVER['PATH'])) {
+            $env = $_SERVER;
             if (isset($env['Path'])) {
                 unset($env['Path']);
             }

@@ -50,11 +50,27 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testHandle()
     {
-        $configuration = ['name' => 'test_workflow', null, 'label' => 'wflabel'];
+        $configuration = [
+            'name' => 'test_workflow',
+            null,
+            'label' => 'wflabel',
+            'transitions' => [
+                'test_transition' => [
+                    'label' => 'test_transition',
+                    'message' => 'oro.workflow.test_workflow.transition.test_transition.warning_message'
+                ]
+            ]
+        ];
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects($this->at(0))
             ->method('saveTranslation')
             ->with('oro.workflow.test_workflow.label', 'wflabel');
+        $this->translationHelper->expects($this->at(1))
+            ->method('saveTranslation')
+            ->with('oro.workflow.test_workflow.transition.test_transition.label', 'test_transition');
+        $this->translationHelper->expects($this->at(2))
+            ->method('saveTranslationAsSystem')
+            ->with('oro.workflow.test_workflow.transition.test_transition.warning_message', '');
 
         $this->assertEquals($configuration, $this->processor->handle($configuration));
     }
@@ -85,23 +101,30 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider translateWorkflowDefinitionFieldsProvider
+     *
+     * @param WorkflowDefinition $expected
      * @param WorkflowDefinition $definition
      * @param array $values
-     * @param WorkflowDefinition $expected
+     * @param bool $useKeyAsTranslation
      */
     public function testTranslateWorkflowDefinitionFields(
+        WorkflowDefinition $expected,
         WorkflowDefinition $definition,
         array $values,
-        WorkflowDefinition $expected
+        $useKeyAsTranslation
     ) {
-        $this->translationHelper->expects($this->any())->method('findWorkflowTranslation')->willReturnMap($values);
+        $this->translationHelper->expects($this->exactly(count($values)))
+            ->method('findWorkflowTranslation')
+            ->willReturnMap($values);
 
-        $this->processor->translateWorkflowDefinitionFields($definition);
+        $this->processor->translateWorkflowDefinitionFields($definition, $useKeyAsTranslation);
 
         $this->assertEquals($expected, $definition);
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
      * @return array
      */
     public function translateWorkflowDefinitionFieldsProvider()
@@ -176,10 +199,52 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
+
+        $keyedConfig = [
+            'transitions' => [
+                'transition1' => [
+                    'label' => 'oro.workflow.test_workflow.transition.transition1.label',
+                    'message' => 'Message1',
+                    'form_options' => [
+                        'attribute_fields' => [
+                            'attribute1' => [
+                                'options' => [
+                                    'label' =>
+                                        'oro.workflow.test_workflow.transition.transition1.attribute.attribute1.label'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            'attributes' => [
+                'attribute1' => ['label' => 'oro.workflow.test_workflow.attribute.attribute1.label'],
+                'attribute2' => ['label' => '']
+
+            ]
+        ];
+        $definitionKeys = new WorkflowDefinition();
+        $definitionKeys->setName('test_workflow');
+        $definitionKeys->setLabel('oro.workflow.test_workflow.label');
+        $definitionKeys->addStep(
+            (new WorkflowStep())->setName('step1')->setLabel('oro.workflow.test_workflow.step.step1.label')
+        );
+        $definitionKeys->setConfiguration($keyedConfig);
+
+        $definitionKeysExpected = new WorkflowDefinition();
+        $definitionKeysExpected->setName('test_workflow');
+        $definitionKeysExpected->setLabel('oro.workflow.test_workflow.label');
+        $definitionKeysExpected->addStep(
+            (new WorkflowStep())->setName('step1')->setLabel('oro.workflow.test_workflow.step.step1.label')
+        );
+        $keyedConfig['transitions']['transition1']['message'] = '';
+        $definitionKeysExpected->setConfiguration($keyedConfig);
+
         return [
             'full case' => [
-                $definition,
-                [
+                'expected' => $expected,
+                'definition' => $definition,
+                'values' => [
                     ['stored_label_key1', 'test_workflow', null, 'translated_label_key'],
                     ['step1_stored_label_key', 'test_workflow', null, 'translated_step1_stored_label_key'],
                     ['step2_stored_label_key', 'test_workflow', null, 'translated_step2_stored_label_key'],
@@ -197,7 +262,51 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
                     ['attribute1_stored_label_key', 'test_workflow', null, 'translated_attribute1_stored_label_key'],
                     [null, null, null]
                 ],
-                $expected
+                'useKeyAsTranslation' => false,
+            ],
+            'full case use keys as translations' => [
+                'expected' => $definitionKeysExpected,
+                'definition' => $definitionKeys,
+                'values' => [
+                    ['oro.workflow.test_workflow.label', 'test_workflow', null, 'oro.workflow.test_workflow.label'],
+                    [
+                        'oro.workflow.test_workflow.transition.transition1.label',
+                        'test_workflow',
+                        null,
+                        'oro.workflow.test_workflow.transition.transition1.label'
+                    ],
+                    [
+                        'oro.workflow.test_workflow.transition.transition1.warning_message',
+                        'test_workflow',
+                        null,
+                        'oro.workflow.test_workflow.transition.transition1.warning_message'
+                    ],
+                    [
+                        'oro.workflow.test_workflow.step.step1.label',
+                        'test_workflow',
+                        null,
+                        'oro.workflow.test_workflow.step.step1.label'
+                    ],
+                    [
+                        'oro.workflow.test_workflow.transition.transition1.attribute.attribute1.label',
+                        'test_workflow',
+                        null,
+                        'oro.workflow.test_workflow.transition.transition1.attribute.attribute1.label'
+                    ],
+                    [
+                        'oro.workflow.test_workflow.attribute.attribute1.label',
+                        'test_workflow',
+                        null,
+                        'oro.workflow.test_workflow.attribute.attribute1.label'
+                    ],
+                    [
+                        'oro.workflow.test_workflow.attribute.attribute2.label',
+                        'test_workflow',
+                        null,
+                        ''
+                    ],
+                ],
+                'useKeyAsTranslation' => true,
             ]
         ];
     }

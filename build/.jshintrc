@@ -28,9 +28,15 @@
 
         "jasmine": false,
         "describe": false,
+        "fdescribe": false,
+        "ddescribe": false,
+        "xdescribe": false,
         "beforeEach": false,
         "afterEach": false,
         "it": false,
+        "fit": false,
+        "iit": false,
+        "xit": false,
         "expect": false,
         "spyOn": false
     }
