@@ -20,6 +20,12 @@
     &.mode-icon-only {
         display: inline-block;
         margin: 0;
+
+        padding: $launcher-item-action-inner-offset;
+
+        &:last-child {
+            padding-right: 0;
+        }
     }
 
     &.mode-text-only {
@@ -36,7 +42,6 @@
 
     .action {
         display: block;
-        padding: $launcher-item-action-inner-offset;
 
         &.mode-icon-only {
             color: $launcher-item-icon-color;

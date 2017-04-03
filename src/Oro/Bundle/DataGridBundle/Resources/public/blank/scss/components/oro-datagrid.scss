@@ -1,0 +1,13 @@
+// @theme: blank;
+
+.oro-datagrid {
+    &.no-data-visible {
+        .no-data {
+            display: block;
+        }
+
+        .grid-scrollable-container {
+            display: none;
+        }
+    }
+}
