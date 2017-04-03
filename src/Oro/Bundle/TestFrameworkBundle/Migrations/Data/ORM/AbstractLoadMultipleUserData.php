@@ -131,20 +131,41 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
      */
     protected function setRolePermissions(AclManager $aclManager, Role $role, $className, array $allowedAcls)
     {
-        if ($aclManager->isAclEnabled()) {
-            $sid = $aclManager->getSid($role);
-            $oid = $aclManager->getOid('entity:' . $className);
+        if (!$aclManager->isAclEnabled()) {
+            return;
+        }
+
+        $sid = $aclManager->getSid($role);
+        $oid = $aclManager->getOid($this->getOidDescriptorByClassname($className));
+        $extension = $aclManager->getExtensionSelector()->select($oid);
+        $maskBuilders = $extension->getAllMaskBuilders();
+
+        foreach ($maskBuilders as $maskBuilder) {
+            $maskBuilder->reset();
 
             foreach ($allowedAcls as $acl) {
                 $permission = $acl[self::ACL_PERMISSION];
                 $level = $acl[self::ACL_LEVEL];
 
-                $builder = $aclManager->getMaskBuilder($oid, $permission);
-                $builder->add($permission . '_' . $level);
+                $maskName = $permission . '_' . $level;
 
-                $aclManager->setPermission($sid, $oid, $builder->get());
+                if ($maskBuilder->hasMask('MASK_' . $maskName)) {
+                    $maskBuilder->add($maskName);
+                }
             }
+
+            $aclManager->setPermission($sid, $oid, $maskBuilder->get());
         }
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return string
+     */
+    protected function getOidDescriptorByClassname($className)
+    {
+        return 'entity:' . $className;
     }
 
     /**
