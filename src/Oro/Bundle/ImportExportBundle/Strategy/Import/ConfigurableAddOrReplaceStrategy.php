@@ -365,37 +365,45 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         // validate entity
         $validationErrors = $this->strategyHelper->validateEntity($entity);
         if ($validationErrors) {
-            $this->context->incrementErrorEntriesCount();
-            $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
-
-            foreach ($this->cachedExistingEntities as $oid => $object) {
-                if (array_key_exists($oid, $this->cachedInverseSingleRelations)) {
-                    foreach ($this->cachedInverseSingleRelations[$oid] as $fieldName => $value) {
-                        // restore initial value of related entity's inverse field
-                        $this->fieldHelper->setObjectValue($object, $fieldName, $value);
-                    }
-                }
-            }
-
-            foreach ($this->cachedInverseMultipleRelations as $fieldEntityPair) {
-                foreach ($fieldEntityPair as $fieldName => $object) {
-                    /** @var PersistentCollection $collection */
-                    $collection = $this->fieldHelper->getObjectValue($object, $fieldName);
-                    if ($collection->contains($entity)) {
-                        // remove entity from related entity's updated collections
-                        $collection->removeElement($entity);
-                    }
-                }
-            }
-
-            $this->doctrineHelper->getEntityManager($entity)->detach($entity);
-
+            $this->processValidationErrors($entity, $validationErrors);
             return null;
         }
 
         $this->updateContextCounters($entity);
 
         return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @param array $validationErrors
+     */
+    protected function processValidationErrors($entity, array $validationErrors)
+    {
+        $this->context->incrementErrorEntriesCount();
+        $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+
+        foreach ($this->cachedExistingEntities as $oid => $object) {
+            if (array_key_exists($oid, $this->cachedInverseSingleRelations)) {
+                foreach ($this->cachedInverseSingleRelations[$oid] as $fieldName => $value) {
+                    // restore initial value of related entity's inverse field
+                    $this->fieldHelper->setObjectValue($object, $fieldName, $value);
+                }
+            }
+        }
+
+        foreach ($this->cachedInverseMultipleRelations as $fieldEntityPair) {
+            foreach ($fieldEntityPair as $fieldName => $object) {
+                /** @var PersistentCollection $collection */
+                $collection = $this->fieldHelper->getObjectValue($object, $fieldName);
+                if ($collection->contains($entity)) {
+                    // remove entity from related entity's updated collections
+                    $collection->removeElement($entity);
+                }
+            }
+        }
+
+        $this->doctrineHelper->getEntityManager($entity)->detach($entity);
     }
 
     /**
