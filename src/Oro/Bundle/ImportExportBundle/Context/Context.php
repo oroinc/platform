@@ -26,6 +26,11 @@ class Context implements ContextInterface, BatchContextInterface
     private $errors = array();
 
     /**
+     * @var array
+     */
+    private $postponedRows = array();
+
+    /**
      * Constructor
      *
      * @param array $configuration
@@ -59,6 +64,36 @@ class Context implements ContextInterface, BatchContextInterface
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRow(array $row)
+    {
+        $this->postponedRows[] = $row;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addPostponedRows(array $rows)
+    {
+        foreach ($rows as $row) {
+            $this->addPostponedRow($row);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPostponedRows()
+    {
+        return $this->postponedRows;
     }
 
     /**
