@@ -1,0 +1,8 @@
+oro_behat_extension:
+  elements:
+    LanguageSettingsSystemConfigForm:
+      selector: "div[id^='configuration-options-block']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Use Default Language: 'language_settings[oro_locale___language][use_parent_scope_value]'

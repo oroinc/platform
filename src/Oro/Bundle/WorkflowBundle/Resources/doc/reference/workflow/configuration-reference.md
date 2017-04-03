@@ -832,9 +832,6 @@ A single variable can be described with the following configuration:
     * **multiple**
         *boolean*
         Indicates whether several entities are supported. Allowed only when type is entity.
-    * **virtual**
-        *boolean*
-        Such attribute will not be saved in the database and available only on current transition. Default value is false.
     * **identifier**
         *string*
         Applies to entities only. Class identifier specifies the identity field which will be used to query for the desired entity, in case a default entity needs to be loaded upon workflow assembling.
@@ -873,7 +870,7 @@ Using a variable:
         '@and':
             ...
             - '@not':
-                - '@less_total_limit': [$entity, $.data.threshold]
+                - '@some_condition': [$entity, $.data.admin_user]
 ```
 
 Example Workflow Configuration
