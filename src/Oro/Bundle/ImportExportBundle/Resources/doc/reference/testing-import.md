@@ -5,7 +5,6 @@ Table of Contents
 -----------------
  - [Summary](#summary)
  - [Usage](#usage)
- - [Working example](#working-example)
 
 Summary
 -------
@@ -30,7 +29,7 @@ use Oro\Bundle\ImportExportBundle\Tests\Functional\Import\AbstractImportTest;
 /**
  * @dbIsolationPerTest
  */
-class CustomerUserImportTest extends AbstractImportTest
+class MyImportTest extends AbstractImportTest
 ```
 
 It will force you to prepare few methods required for test.
@@ -100,8 +99,3 @@ It has such structure:
 this test compares all records from database ordered by ID ASC.
 In this example it will compare first two records from database.
 It also compares count of retrieved records compared to array count.
-
-Working example
----------------
-If you want to see working example, please see: 
-*Oro\Bundle\CustomerBundle\Tests\Functional\Import\CustomerUserImportTest* 

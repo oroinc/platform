@@ -5,7 +5,6 @@ Table of Contents
 -----------------
  - [Summary](#summary)
  - [Usage](#usage)
- - [Working example](#working-example)
 
 Summary
 -------
@@ -30,7 +29,7 @@ use Oro\Bundle\ImportExportBundle\Tests\Functional\Export\AbstractExportTest;
 /**
  * @dbIsolationPerTest
  */
-class CustomerExportTest extends AbstractExportTest
+class MyExportTest extends AbstractExportTest
 ```
 
 It will force you to prepare few methods required for test.
@@ -108,8 +107,3 @@ Remember not to count header.
         return 16;
     }
 ```
-
-Working example
----------------
-If you want to see working example, please see: 
-*\Oro\Bundle\CustomerBundle\Tests\Functional\ImportExport\CustomerExportTest* 
