@@ -50,11 +50,27 @@ class TranslationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testHandle()
     {
-        $configuration = ['name' => 'test_workflow', null, 'label' => 'wflabel'];
+        $configuration = [
+            'name' => 'test_workflow',
+            null,
+            'label' => 'wflabel',
+            'transitions' => [
+                'test_transition' => [
+                    'label' => 'test_transition',
+                    'message' => 'oro.workflow.test_workflow.transition.test_transition.warning_message'
+                ]
+            ]
+        ];
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects($this->at(0))
             ->method('saveTranslation')
             ->with('oro.workflow.test_workflow.label', 'wflabel');
+        $this->translationHelper->expects($this->at(1))
+            ->method('saveTranslation')
+            ->with('oro.workflow.test_workflow.transition.test_transition.label', 'test_transition');
+        $this->translationHelper->expects($this->at(2))
+            ->method('saveTranslationAsSystem')
+            ->with('oro.workflow.test_workflow.transition.test_transition.warning_message', '');
 
         $this->assertEquals($configuration, $this->processor->handle($configuration));
     }

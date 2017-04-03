@@ -1018,4 +1018,17 @@ class OroMainContext extends MinkContext implements
     {
         return $this->getSession()->getDriver()->waitForAjax($time);
     }
+
+    /**
+     * Checks that element on page exists and visible
+     *
+     * @param string $selector
+     * @return bool
+     */
+    public function isNodeVisible($selector)
+    {
+        $element = $this->getPage()->findVisible('css', $selector);
+
+        return !is_null($element);
+    }
 }

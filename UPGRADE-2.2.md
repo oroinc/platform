@@ -31,6 +31,13 @@ ActivityBundle
     - action `contextAction` is rendered in `OroDataGridBundle:Grid/dialog:multi.html.twig`
     - action `contextGridAction` was removed
     
+ConfigBundle
+--------------
+- Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager`:
+    - added third argument `EventDispatcherInterface $eventDispatcher`
+    - abstract service `oro_config.scope_manager.abstract` now has third argument defined as `@event_dispatcher`
+- Class `ConfigManagerScopeIdUpdateEvent` was added
+
 DataAuditBundle
 ---------------
 A new string field `ownerDescription` with the database column `owner_description` was added to the entity 
@@ -100,3 +107,10 @@ WorkflowBundle
         - `oro.workflow.activated`
         - `oro.workflow.deactivated`
 - Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`
+- Class `Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler` was removed
+- Class `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType` renamed to `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType`
+    
+CurrencyBundle
+--------------
+- Interface `Oro\Bundle\MultiCurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface`:
+    - added method `getTransformSelectQueryForDataGrid` that allow to use query transformer in datagrid config

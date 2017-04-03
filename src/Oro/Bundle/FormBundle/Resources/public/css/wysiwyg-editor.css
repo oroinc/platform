@@ -5,6 +5,10 @@ body {
     color: #444;
     min-height: 100px;
 }
+body:not([contenteditable]) {
+    cursor: not-allowed;
+    background-color: #eee;
+}
 .email-prev-body {
     margin-left: 10px;
     padding-left: 10px;

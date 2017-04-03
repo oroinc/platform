@@ -110,4 +110,29 @@ class ActivityListItem extends Element
     {
         return $this->findAll('css', 'div.activity-context-activity-list div.context-item');
     }
+
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAtDate()
+    {
+        $dateElement = $this->find('css', '.created-at .date');
+        self::assertNotNull($dateElement, 'Not found created_at date block element');
+
+        return new \DateTime($dateElement->getText());
+    }
+
+    /**
+     * Retrieve item bold title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        $titleElement = $this->find('css', '.message-item.message strong');
+        self::assertNotNull($titleElement, 'Not found item title element');
+
+        return $titleElement->getText();
+    }
 }
