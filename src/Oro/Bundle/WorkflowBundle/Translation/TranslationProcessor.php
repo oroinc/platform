@@ -46,6 +46,8 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
                 }
 
                 $this->translationHelper->saveTranslation($translationKey, $value);
+            } elseif (preg_match('/^oro\.workflow\..+\.transition\..+\.warning_message$/', $translationKey)) {
+                $this->translationHelper->saveTranslationAsSystem($translationKey, '');
             }
         }
 

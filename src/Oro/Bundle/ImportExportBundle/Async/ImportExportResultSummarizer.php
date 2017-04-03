@@ -183,9 +183,9 @@ class ImportExportResultSummarizer
             $data['readsCount'] += $childrenJobData['readsCount'];
             $data['errorsCount'] += $childrenJobData['errorsCount'];
             $data['success']  += $childrenJobData['success'];
+            $data['entities'] = isset($childrenJobData['entities']) ? $childrenJobData['entities'] : $data['entities'];
         }
 
-        $data['entities'] = isset($childrenJobData['entities']) ? $childrenJobData['entities'] : null;
         $data['success'] = !!$data['success'];
 
         return $data;
