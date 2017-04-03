@@ -184,7 +184,7 @@
                             'onRootSelectRoute' : routePrefix ~ 'view',
                             'onSelectRoute' : routePrefix ~ 'update',
                             'onMoveRoute' : routePrefix ~ 'ajax_move',
-                            'successMessage': movedMessage|default('oro.ui.jstree.move_node_error')
+                            'successMessage': movedMessage|default('oro.navigation.menuupdate.moved_success_message')
                         } %}
                         {{ UI.renderJsTree(
                             {
