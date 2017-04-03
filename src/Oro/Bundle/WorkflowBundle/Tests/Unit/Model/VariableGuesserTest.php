@@ -141,7 +141,7 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
                 'formConfig' => [
                     'entity' => 'TestEntity',
                     'form_type' => 'test_type',
-                    'form_options' => array('key' => 'value')
+                    'form_options' => ['key' => 'value']
                 ],
             ],
             'entity guess' => [ // test guessing for entities that have defined their form type in the variable config
