@@ -3,120 +3,22 @@ namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
-use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class PreHttpImportMessageProcessor extends PreImportMessageProcessorAbstract
 {
-    /**
-     * @var JobRunner
-     */
-    protected $jobRunner;
-
-    /**
-     * @var MessageProducerInterface
-     */
-    protected $producer;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var DependentJobService
-     */
-    protected $dependentJob;
-
-    /**
-     * @var FileManager
-     */
-    protected $fileManager;
-
-    /**
-     * @var HttpImportHandler
-     */
-    protected $httpImportHandler;
-
-    /**
-     * @var WriterChain
-     */
-    protected $writerChain;
-
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
     /**
      * @var ManagerRegistry
      */
     protected $managerRegistry;
-
-    /**
-     * @var integer
-     */
-    protected $batchSize;
-
-    /**
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     * @param DependentJobService $dependentJob
-     * @param DependentJobService $dependentJob
-     * @param FileManager $fileManager
-     * @param HttpImportHandler $httpImportHandler
-     * @param WriterChain $writerChain
-     * @param integer $batchSize
-     */
-    public function __construct(
-        JobRunner $jobRunner,
-        MessageProducerInterface $producer,
-        LoggerInterface $logger,
-        DependentJobService $dependentJob,
-        FileManager $fileManager,
-        HttpImportHandler $httpImportHandler,
-        WriterChain $writerChain,
-        $batchSize
-    ) {
-        $this->jobRunner = $jobRunner;
-        $this->producer = $producer;
-        $this->logger = $logger;
-        $this->dependentJob = $dependentJob;
-        $this->fileManager = $fileManager;
-        $this->httpImportHandler = $httpImportHandler;
-        $this->writerChain = $writerChain;
-        $this->batchSize = $batchSize;
-    }
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function setConfigManager(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -129,11 +31,8 @@ class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicS
     /**
      * {@inheritdoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    protected function validateMessageBody($body)
     {
-        $this->backwardCompatibilityMapper($message);
-        $body = JSON::decode($message->getBody());
-
         if (! isset(
             $body['userId'],
             $body['securityToken'],
@@ -143,11 +42,11 @@ class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicS
             $body['originFileName']
         )) {
             $this->logger->critical(
-                sprintf('[PreHttpImportMessageProcessor] Got invalid message. body: %s', $message->getBody()),
-                ['message' => $message]
+                sprintf('[PreHttpImportMessageProcessor] Got invalid message. body: %s', JSON::encode($body)),
+                ['body' => $body]
             );
 
-            return self::REJECT;
+            return false;
         }
 
         $body = array_replace_recursive([
@@ -156,22 +55,15 @@ class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicS
         ], $body);
 
         $body['options']['batch_size'] = $this->batchSize;
-        $format = pathinfo($body['originFileName'], PATHINFO_EXTENSION);
-        $writer = $this->writerChain->getWriter($format);
 
-        if (! $writer instanceof FileStreamWriter) {
-            $this->logger->warning(
-                sprintf('[PreHttpImportMessageProcessor] Not supported format: "%s", using default', $format),
-                ['message' => $message]
-            );
-            $writer = $this->writerChain->getWriter('csv');
-        }
+        return $body;
+    }
 
-        if (! ($files = $this->getSplittedFiles($writer, $body))) {
-            return self::REJECT;
-        }
-
-        $parentMessageId = $message->getMessageId();
+    /**
+     * {@inheritdoc}
+     */
+    protected function processJob($parentMessageId, $body, $files)
+    {
         $jobName = sprintf(
             'oro:%s:%s:%s:%s',
             $body['process'],
@@ -214,34 +106,7 @@ class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicS
         );
         $this->fileManager->deleteFile($body['fileName']);
 
-        return $result ? self::ACK : self::REJECT;
-    }
-
-    /**
-     * @param FileStreamWriter $writer
-     * @param array $body
-     * @return array|null
-     */
-    private function getSplittedFiles(FileStreamWriter $writer, array $body)
-    {
-        try {
-            $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
-            $this->httpImportHandler->setImportingFileName($filePath);
-
-            return $this->httpImportHandler->splitImportFile(
-                $body['jobName'],
-                $body['process'],
-                $writer
-            );
-        } catch (\Exception $e) {
-            $this->sendErrorNotification($body, $e->getMessage());
-
-            return null;
-        } catch (\Throwable $e) {
-            $this->sendErrorNotification($body, $e->getMessage());
-
-            return null;
-        }
+        return $result;
     }
 
     /**
@@ -249,14 +114,13 @@ class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::PRE_HTTP_IMPORT, Topics::IMPORT_HTTP_PREPARING, Topics::IMPORT_HTTP_VALIDATION_PREPARING];
+        return [Topics::PRE_HTTP_IMPORT];
     }
 
     /**
-     * @param array $body
-     * @param string $error
+     * {@inheritdoc}
      */
-    private function sendErrorNotification(array $body, $error)
+    protected function sendErrorNotification(array $body, $error)
     {
         $errorMessage = sprintf(
             '[PreHttpImportMessageProcessor] An error occurred while reading file %s: "%s"',
@@ -291,35 +155,5 @@ class PreHttpImportMessageProcessor implements MessageProcessorInterface, TopicS
             ],
             'contentType' => 'text/html',
         ]);
-    }
-
-    /**
-     * Method convert body old import topic to new
-     * @deprecated (deprecated since 2.1 will be remove in 2.3)
-     * @param $message
-     */
-    private function backwardCompatibilityMapper(MessageInterface $message)
-    {
-        $topic = $message->getProperty(Config::PARAMETER_TOPIC_NAME);
-
-        if ($topic !== Topics::IMPORT_HTTP_PREPARING && $topic !== Topics::IMPORT_HTTP_VALIDATION_PREPARING) {
-            return;
-        }
-        $body = JSON::decode($message->getBody());
-
-        if (! $body['filePath'] || ! $body['processorAlias'] || ! $body['userId'] || ! $body['securityToken']) {
-            return;
-        }
-        $body['fileName'] = FileManager::generateUniqueFileName(pathinfo($body['originFileName'], PATHINFO_EXTENSION));
-        $this->fileManager->writeFileToStorage($body['filePath'], $body['fileName']);
-
-        if (Topics::IMPORT_HTTP_PREPARING === $topic) {
-            $body['process'] = ProcessorRegistry::TYPE_IMPORT;
-            $body['jobName'] = JobExecutor::JOB_IMPORT_FROM_CSV;
-        } else {
-            $body['process'] = ProcessorRegistry::TYPE_IMPORT_VALIDATION;
-            $body['jobName'] = JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV;
-        }
-        $message->setBody(JSON::encode($body));
     }
 }
