@@ -724,9 +724,7 @@ define([
             options.data = data;
 
             if (!options.error) {
-                options.error = function() {
-                    mediator.execute('showMessage', 'error', __('oro.datagrid.loading_failed_message'));
-                };
+                options.errorHandlerMessage = __('oro.datagrid.loading_failed_message');
             }
 
             // @todo rewrite this, use mode=infinite (if possible)
