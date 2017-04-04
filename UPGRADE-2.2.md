@@ -114,3 +114,29 @@ CurrencyBundle
 --------------
 - Interface `Oro\Bundle\MultiCurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface`:
     - added method `getTransformSelectQueryForDataGrid` that allow to use query transformer in datagrid config
+
+EmailBundle
+------------
+- Class `Oro\Bundle\EmailBundle\Entity\AutoResponseRule`
+    - methods related to `conditions` property were removed. Use methods related to `definition` property instead.
+- Class `Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition` was removed
+- Class `Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleConditionType` was removed
+- Class `Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType`
+    - form field `conditions` was removed. Use field `definition` instead.
+- Class `Oro\Bundle\EmailBundle\Manager\AutoResponseManager`
+    - construction signature was changed now it takes next arguments:
+        - `Registry` $registry,
+        - `EmailModelBuilder` $emailBuilder,
+        - `Processor` $emailProcessor,
+        - `EmailRenderer` $emailRender,
+        - `LoggerInterface` $logger,
+        - `TranslatorInterface` $translator,
+        - $defaultLocale
+- Class `Oro\Bundle\EmailBundle\Validator\AutoResponseRuleConditionValidator` was removed
+- Class `Oro\Bundle\EmailBundle\Validator\Constraints\AutoResponseRuleCondition` was removed
+- Class `Oro\Bundle\EmailBundle\Controller\AutoResponseRuleController`
+    - action `update` now returns following data: `form`, `saved`, `data`, `metadata`
+- template `Resources/views/Form/autoresponseFields.html.twig` was removed as it contained possibility to add collection item after arbitrary item, which is not needed anymore with new form
+- template `Resources/views/AutoResponseRule/dialog/update.html.twig` was changed
+- template `Resources/views/Configuration/Mailbox/update.html.twig` was changed
+- template `EmailBundle/Resources/views/Form/fields.html.twig` was changed
