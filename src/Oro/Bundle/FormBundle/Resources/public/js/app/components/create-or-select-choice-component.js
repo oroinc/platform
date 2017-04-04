@@ -153,7 +153,9 @@ define([
                 var newVal = self._getCleanValue($el);
                 $el.val(newVal);
                 if ($el.is('textarea')) {
-                    $el.text(newVal);
+                    $el.text(newVal).change();
+                } else {
+                    $el.change();
                 }
             });
         },
