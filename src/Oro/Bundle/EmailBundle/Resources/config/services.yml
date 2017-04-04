@@ -1019,6 +1019,12 @@ services:
         tags:
             - { name: oro_entity.name_provider, priority: 0 }
 
+    oro_email.email_body_entity_name_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider
+        public: false
+        tags:
+            - { name: oro_entity.name_provider, priority: 0 }
+
     oro_email.link.mailbox_process_storage:
         tags:
             - { name: oro_service_link,  service: oro_email.mailbox.process_storage }
