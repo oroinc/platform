@@ -423,3 +423,15 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@request_stack'
             - '@security.context'
+
+    oro_user.datagrid.action_checker:
+        class: Oro\Bundle\UserBundle\Datagrid\ActionChecker
+        arguments:
+            - '@oro_security.security_facade'
+
+    oro_user.api.create.save_entity:
+        class: Oro\Bundle\UserBundle\Api\Processor\Create\SaveEntity
+        arguments:
+            - '@oro_user.manager'
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, class: Oro\Bundle\UserBundle\Entity\User }

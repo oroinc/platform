@@ -179,7 +179,8 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
         $mapperProvider  = new SearchMappingProvider($eventDispatcher);
         $mapperProvider->setMappingConfig($this->mappingConfig);
 
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            ->getMockForAbstractClass();
 
         $this->mapper = new ObjectMapper($this->dispatcher, $this->mappingConfig);
         $this->mapper->setMappingProvider($mapperProvider);
@@ -333,5 +334,16 @@ class ObjectMapperTest extends \PHPUnit_Framework_TestCase
     public function testNonExistsConfig()
     {
         $this->assertEquals(false, $this->mapper->getEntityConfig('non exists entity'));
+    }
+
+    public function testBuildAllDataField()
+    {
+        $allData = '';
+
+        $allData = $this->mapper->buildAllDataField($allData, 'first second');
+        $this->assertEquals(' first second', $allData);
+
+        $allData = $this->mapper->buildAllDataField($allData, 'second third');
+        $this->assertEquals(' first second third', $allData);
     }
 }

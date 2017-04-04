@@ -16,7 +16,8 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
  * @ORM\Table(name="oro_audit", indexes={
  *      @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
  *      @ORM\Index(name="idx_oro_audit_type", columns={"type"}),
- *      @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"})
+ *      @ORM\Index(name="idx_oro_audit_object_class", columns={"object_class"}),
+ *      @ORM\Index(name="idx_oro_audit_obj_by_type", columns={"object_id", "object_class", "type"})
  * })
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")

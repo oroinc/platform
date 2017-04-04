@@ -250,6 +250,32 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($gridDataArray, $this->twigExtension->getGridData($grid));
     }
 
+    public function testGetGridDataException()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
+        $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
+        $gridData = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\ResultsObject')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $grid->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($gridData));
+
+        $errorArray = [
+            "data" => [],
+            "metadata" => [],
+            "options" => []
+        ];
+
+        $exception = new \Exception('Page not found');
+        $gridData->expects($this->once())
+            ->method('toArray')
+            ->willThrowException($exception);
+
+        $this->assertSame($errorArray, $this->twigExtension->getGridData($grid));
+    }
+
     /**
      * @dataProvider generateGridElementIdDataProvider
      * @param string $gridName
