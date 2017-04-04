@@ -5,11 +5,12 @@ namespace Oro\Bundle\UserBundle\Security;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\UserBundle\Exception\OrganizationException;
 
 class UserChecker extends BaseUserChecker
 {
@@ -40,6 +41,23 @@ class UserChecker extends BaseUserChecker
     /**
      * {@inheritdoc}
      */
+    public function checkPostAuth(UserInterface $user)
+    {
+        parent::checkPostAuth($user);
+
+        if ($user instanceof User) {
+            if (!$this->hasOrganization($user)) {
+                $exception = new OrganizationException();
+                $exception->setUser($user);
+
+                throw $exception;
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function checkPreAuth(UserInterface $user)
     {
         parent::checkPreAuth($user);
@@ -60,5 +78,15 @@ class UserChecker extends BaseUserChecker
 
             throw $exception;
         }
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    protected function hasOrganization(User $user)
+    {
+        return $user->getOrganizations(true)->count() > 0;
     }
 }

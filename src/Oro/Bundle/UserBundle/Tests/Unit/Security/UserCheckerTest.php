@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\UserBundle\Security\UserChecker;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UserCheckerTest extends \PHPUnit_Framework_TestCase
 {
@@ -137,6 +138,44 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
             'exceptionThrown' => true,
         ];
 
+        return $data;
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param boolean       $exceptionThrown
+     *
+     * @dataProvider checkPostAuthProvider
+     */
+    public function testCheckPostAuth(UserInterface $user, $exceptionThrown)
+    {
+        if ($exceptionThrown) {
+            $this->setExpectedException('Oro\Bundle\UserBundle\Exception\OrganizationException');
+        }
+        $this->userChecker->checkPostAuth($user);
+    }
+
+    public function checkPostAuthProvider()
+    {
+        $data = [];
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $data['invalid_user_class'] = [
+            'user' => $user,
+            'exceptionThrown' => false,
+        ];
+        $organization = new Organization();
+        $organization->setEnabled(true);
+        $user1 = new User();
+        $user1->addOrganization($organization);
+        $data['with_organization'] = [
+            'user' => $user1,
+            'exceptionThrown' => false,
+        ];
+        $user2 = new User();
+        $data['without_organization'] = [
+            'user' => $user2,
+            'exceptionThrown' => true,
+        ];
         return $data;
     }
 }
