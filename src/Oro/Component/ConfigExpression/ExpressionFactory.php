@@ -28,7 +28,7 @@ class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesI
     {
         foreach ($this->extensions as $extension) {
             if ($extension->hasExpression($name)) {
-                $expr = $extension->getExpression($name);
+                $expr = clone $extension->getExpression($name);
                 if (!$expr instanceof ExpressionInterface) {
                     throw new Exception\UnexpectedTypeException(
                         $expr,

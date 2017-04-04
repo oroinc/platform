@@ -424,6 +424,7 @@ services:
             - '@oro_email.mailer.processor'
             - '@oro_email.email_renderer'
             - '@logger'
+            - '@translator'
             - %locale%
 
     oro_email.link.autoresponserule_manager:

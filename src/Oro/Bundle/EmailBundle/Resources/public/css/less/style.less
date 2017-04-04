@@ -20,97 +20,136 @@
   }
 }
 
-.ui-dialog [data-ftid=oro_email_autoresponserule] .form-horizontal .control-group .controls {
+.ui-dialog [data-ftid=oro_email_autoresponserule] {
+  .control-group {
+    max-width: none;
+  }
+
   input[type=text] {
-    width: 456px;
+    width: 807px;
   }
 
-  select {
-    width: 458px;
-    max-width: 458px;
-  }
+  .form-horizontal .control-group .controls {
+    .new-entity {
+      .control-group:nth-of-type(2) {
+        .controls > div {
+          display: inline-block;
+          vertical-align: top;
+        }
+      }
 
-  .select2-container {
-    width: 468px;
-    max-width: 468px;
-  }
+      .emailtemplate-translatation {
+        width: 360px;
+      }
 
-  .create-select-entity-choice-container {
-    margin-left: -142px;
+      .mce-tinymce {
+        width: 345px;
+      }
 
-    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(2) {
-      margin-left: 50px;
-      .control-label.wrap {
+      .emailtemplate-variables {
+        width: 435px;
+        margin-left: 26px;
+        margin-top: -52px;
+        position: absolute;
+      }
+    }
+
+    .dropdown {
+      input[type=text] {
+        width: calc(~"100% - 270px");
+        float: right;
+        margin-right: 10px;
+      }
+
+      .dropdown-menu {
+        top: initial;
+      }
+    }
+
+    .condition-builder {
+      width: 821px;
+    }
+
+    .conditions-group {
+      min-height: 100px;
+
+      .select2-container {
+        width: auto;
+        min-width: 74px;
+        display: inline-block;
+        margin: 0;
+        line-height: 30px;
+      }
+    }
+
+    select {
+      max-width: none;
+      width: 809px;
+    }
+
+    .select2-container {
+      max-width: none;
+      width: 819px;
+    }
+
+    .condition {
+      margin-left: 0;
+    }
+
+    .create-select-entity-choice-container {
+      margin-left: -142px;
+
+      [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(2) {
+        .control-label.wrap {
+          width: 130px;
+          label {
+            display: block;
+          }
+        }
+      }
+
+      [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(3) > .control-label.wrap {
         width: 130px;
-        label {
-          display: block;
+      }
+
+      [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:last-of-type {
+        text-align: right;
+        margin-right: 460px;
+
+        .control-label.wrap {
+          float: none;
+          display: inline-block;
+          margin-right: 0;
+        }
+
+        input {
+          margin-top: 0;
+        }
+
+        .controls {
+          margin: 0;
+          display: inline-block;
         }
       }
     }
 
-    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(3) > .control-label.wrap {
-      width: 130px;
-    }
-
-    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:last-of-type {
-      text-align: right;
-
-      .control-label.wrap {
-        float: none;
-        display: inline-block;
-      }
-
-      input {
-        margin-top: 0;
+    .emailtemplate-translatation {
+      .control-label {
+        width: 70px;
       }
 
       .controls {
-        margin: 0;
-        display: inline-block;
+        margin-left: 85px;
       }
-    }
-  }
 
-  .emailtemplate-translatation {
-    .control-label {
-      width: 70px;
-    }
-
-    .controls {
-      margin-left: 85px;
-    }
-
-    .tab-content {
-      margin-left: -85px;
-      border-top: 1px solid #ddd;
-      margin-top: -1px;
-    }
-
-    .mce-tinymce {
-      width: 468px;
-    }
-  }
-
-  [data-ftid=oro_email_autoresponserule_conditions] {
-    .selector {
-      margin: 0 5px 0 0;
-    }
-
-    select {
-      width: 85px;
-
-      &.type {
-        width: 105px;
+      .tab-content {
+        margin-left: -85px;
+        border-top: 1px solid #ddd;
+        margin-top: -1px;
       }
-    }
-
-    input {
-      width: 185px;
     }
   }
 }
-
-
 
 .emailtemplate-translatation {
   .tab-content {
