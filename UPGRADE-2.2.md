@@ -107,6 +107,8 @@ WorkflowBundle
         - `oro.workflow.activated`
         - `oro.workflow.deactivated`
 - Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`
+- Class `Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler` was removed
+- Class `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType` renamed to `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType`
     
 CurrencyBundle
 --------------
