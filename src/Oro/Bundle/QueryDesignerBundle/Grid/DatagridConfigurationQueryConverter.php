@@ -175,7 +175,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         if (!$functionExpr && $fieldType === 'dictionary') {
             list($entityAlias) = explode('.', $columnExpr);
             $nameDql = $this->entityNameResolver->getNameDQL(
-                $entityClassName,
+                $this->getTargetEntityClass($entityClassName, $fieldName),
                 $entityAlias
             );
             if ($nameDql) {
@@ -212,6 +212,24 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             sprintf('[fields_acl][columns][%s][data_name]', $columnAlias),
             $columnExpr
         );
+    }
+
+    /**
+     * Get target entity class for virtual field.
+     *
+     * @param string $entityClassName
+     * @param string $fieldName
+     * @return string
+     */
+    protected function getTargetEntityClass($entityClassName, $fieldName)
+    {
+        if ($this->virtualFieldProvider->isVirtualField($entityClassName, $fieldName)) {
+            $key = sprintf('%s::%s', $entityClassName, $fieldName);
+            if (isset($this->virtualColumnOptions[$key]['related_entity_name'])) {
+                return $this->virtualColumnOptions[$key]['related_entity_name'];
+            }
+        }
+        return $entityClassName;
     }
 
     /**
