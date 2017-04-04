@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroEncodedPasswordType extends AbstractType
 {
@@ -62,16 +64,28 @@ class OroEncodedPasswordType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        parent::setDefaultOptions($resolver);
+        if (false === $options['browser_autocomplete']) {
+            // Use soft merge ("+" operator) to preserve 'autocomplete' value if it was already specified.
+            $view->vars['attr'] += ['autocomplete' => 'new-password'];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
 
         $resolver->setDefaults([
             'encode' => true,
-            'attr' => [
-                'autocomplete' => 'new-password'
-            ]
+            'browser_autocomplete' => false,
         ]);
+
+        $resolver->setAllowedTypes('encode', 'bool');
+        $resolver->setAllowedTypes('browser_autocomplete', 'bool');
     }
 
     /**

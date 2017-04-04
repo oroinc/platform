@@ -218,3 +218,7 @@ EmailBundle
 - template `Resources/views/AutoResponseRule/dialog/update.html.twig` was changed
 - template `Resources/views/Configuration/Mailbox/update.html.twig` was changed
 - template `EmailBundle/Resources/views/Form/fields.html.twig` was changed
+
+FormBundle
+----------
+- Form types OroEncodedPlaceholderPasswordType, OroEncodedPasswordType acquired `browser_autocomplete` option with default value set to `false`, which means that password autocomplete is off by default.
