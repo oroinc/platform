@@ -115,6 +115,12 @@ CurrencyBundle
 - Interface `Oro\Bundle\MultiCurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface`:
     - added method `getTransformSelectQueryForDataGrid` that allow to use query transformer in datagrid config
 
+PlatformBundle
+--------------
+- Service `jms_serializer.link` was removed.
+- Class `Oro\Bundle\PlatformBundle\Twig\SerializerExtension`
+    - construction signature was changed, now it takes `ContainerInterface` $container instead of `ServiceLink` $serializerLink (jms_serializer.link)
+
 EmailBundle
 ------------
 - Class `Oro\Bundle\EmailBundle\Entity\AutoResponseRule`
