@@ -145,7 +145,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('save')
-            ->with($changes)
+            ->with($changes, $scopeIdentifier)
             ->willReturn(
                 [
                     [$greetingKey => 'updated value'],

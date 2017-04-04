@@ -192,38 +192,15 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
             'jobName' => 'test.job.name',
         ];
 
-        $routerMock = $this->createRouterMock();
-        $routerMock
-            ->expects($this->at(0))
-            ->method('generate')
-            ->with('oro_importexport_export_download', ['fileName' =>'export_result'])
-            ->willReturn('/export.log')
-        ;
-        $routerMock
-            ->expects($this->at(1))
-            ->method('generate')
-            ->with('oro_importexport_job_error_log', ['jobId' => 1])
-            ->willReturn('/1.log')
-        ;
-
-        $configManagerMock = $this->createConfigManagerMock();
-        $configManagerMock
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->with('oro_ui.application_url')
-            ->willReturn('127.0.0.1')
-        ;
-
-        $consolidateService = new ImportExportResultSummarizer(
-            $routerMock,
-            $configManagerMock
-        );
+        $consolidateService = $this->createConsolidatedService();
 
         $rootJob = new Job();
         $rootJob->setId(1);
         $rootJob->setName('test.job.name');
         $childJob = new Job();
+        $chunkJob = new Job();
         $rootJob->addChildJob($childJob);
+        $rootJob->addChildJob($chunkJob);
         $childJob->setData([
             'success' => true,
             'file' => 'test',
@@ -232,6 +209,39 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
             'entities' => 'TestEntity',
             'errors' => []
         ]);
+        $chunkJob->setData([]);
+
+        $result = $consolidateService->processSummaryExportResultForNotification($rootJob, 'export_result');
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function testProcessExportDataWithoutEntities()
+    {
+        $expectedResult = [
+            'exportResult' => [
+                'success' => false,
+                'url' => '127.0.0.1/1.log',
+                'readsCount' => 0,
+                'errorsCount' => 0,
+                'entities' => null,
+                'fileName' => 'export_result',
+                'downloadLogUrl' => '127.0.0.1/1.log'
+            ],
+            'jobName' => 'test.job.name',
+        ];
+
+        $consolidateService = $this->createConsolidatedService();
+
+        $rootJob = new Job();
+        $rootJob->setId(1);
+        $rootJob->setName('test.job.name');
+        $childJob = new Job();
+        $chunkJob = new Job();
+        $rootJob->addChildJob($childJob);
+        $rootJob->addChildJob($chunkJob);
+        $childJob->setData([]);
+        $chunkJob->setData([]);
 
         $result = $consolidateService->processSummaryExportResultForNotification($rootJob, 'export_result');
 
@@ -268,5 +278,37 @@ class ImportExportResultSummarizerTest extends \PHPUnit_Framework_TestCase
     private function createManagerRegistryMock()
     {
         return $this->createMock(ManagerRegistry::class);
+    }
+
+    /**
+     * @return ImportExportResultSummarizer
+     */
+    private function createConsolidatedService()
+    {
+        $routerMock = $this->createRouterMock();
+        $routerMock
+            ->expects($this->at(0))
+            ->method('generate')
+            ->with('oro_importexport_export_download', ['fileName' => 'export_result'])
+            ->willReturn('/export.log');
+        $routerMock
+            ->expects($this->at(1))
+            ->method('generate')
+            ->with('oro_importexport_job_error_log', ['jobId' => 1])
+            ->willReturn('/1.log');
+
+        $configManagerMock = $this->createConfigManagerMock();
+        $configManagerMock
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->with('oro_ui.application_url')
+            ->willReturn('127.0.0.1');
+
+        $consolidateService = new ImportExportResultSummarizer(
+            $routerMock,
+            $configManagerMock
+        );
+
+        return $consolidateService;
     }
 }

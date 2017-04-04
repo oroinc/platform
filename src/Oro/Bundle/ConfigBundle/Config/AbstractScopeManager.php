@@ -185,8 +185,8 @@ abstract class AbstractScopeManager
     public function flush($scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        if (count($this->changedSettings[$entityId]) > 0) {
-            $this->save($this->changedSettings[$entityId]);
+        if (!empty($this->changedSettings[$entityId])) {
+            $this->save($this->changedSettings[$entityId], $scopeIdentifier);
             $this->changedSettings[$entityId] = [];
         }
     }

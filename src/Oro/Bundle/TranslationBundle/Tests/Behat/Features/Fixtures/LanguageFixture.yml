@@ -24,3 +24,8 @@ Oro\Bundle\TranslationBundle\Entity\Language:
         enabled: true
         organization: '@organization'
         owner: '@admin'
+    germany:
+        code: 'de'
+        enabled: true
+        organization: '@organization'
+        owner: '@admin'
