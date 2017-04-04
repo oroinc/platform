@@ -376,6 +376,25 @@ class ButtonListenerTest extends \PHPUnit_Framework_TestCase
                     'action3' => false
                 ],
             ],
+            'operations not allowed' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    'source' => [
+                        'type' => OrmDatasource::TYPE,
+                    ],
+                ]),
+                'record' => new ResultRecord([]),
+                'buttonCollection' => $this->createButtonsCollection(
+                    [
+                        $this->createButton('operation1', true),
+                        $this->createButton('operation2', false)
+                    ]
+                ),
+                'expectedActions' => [
+                    'operation1' => false,
+                    'operation2' => false
+                ],
+            ],
             '1 allowed action and array parent config' => [
                 'config' => DatagridConfiguration::create([
                     'name' => 'datagrid_name',

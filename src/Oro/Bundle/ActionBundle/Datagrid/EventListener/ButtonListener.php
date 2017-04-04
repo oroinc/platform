@@ -93,10 +93,13 @@ class ButtonListener
         }
 
         $this->searchContext = $this->getButtonSearchContext($config);
-        $this->buttons = $this->getButtons(
-            $this->searchContext,
-            $config->offsetGetOr(ActionExtension::ACTION_KEY, [])
-        );
+
+        if (null === $this->buttons) {
+            $this->buttons = $this->getButtons(
+                $this->searchContext,
+                $config->offsetGetOr(ActionExtension::ACTION_KEY, [])
+            );
+        }
 
         if (0 === count($this->buttons)) {
             return;
@@ -154,8 +157,12 @@ class ButtonListener
                 ) {
                     $name = strtolower($button->getName());
                     $enabled = false;
-
                     $newButton = clone $button;
+
+                    if ($searchContext->getEntityId() === null) {
+                        $configuration[$name] = false;
+                    }
+
                     if (!array_key_exists($name, $configuration) || $configuration[$name] !== false) {
                         $enabled = $extension->isAvailable($newButton, $searchContext);
                     }
