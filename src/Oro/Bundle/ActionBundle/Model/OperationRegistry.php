@@ -157,9 +157,11 @@ class OperationRegistry
             return false;
         }
 
-        return $this->isEntityClassMatched($findCriteria, $config) ||
+        $applicable = $this->isEntityClassMatched($findCriteria, $config) ||
             $this->isRouteMatched($findCriteria, $config) ||
             $this->isDatagridMatched($findCriteria, $config);
+
+        return $applicable && $this->isNotExcluded($findCriteria->getDatagrid(), (array)$config['exclude_datagrids']);
     }
 
     /**
@@ -169,11 +171,16 @@ class OperationRegistry
      */
     private function isEntityClassMatched(OperationFindCriteria $criteria, array $config)
     {
-        return $this->match(
+        $applicable = $this->match(
             $criteria->getEntityClass(),
             $this->filterEntities((array)$config['entities']),
             $this->filterEntities((array)$config['exclude_entities']),
             (bool)$config['for_all_entities']
+        );
+
+        return $applicable && $this->isNotExcluded(
+            $criteria->getEntityClass(),
+            $this->filterEntities((array)$config['exclude_entities'])
         );
     }
 
@@ -216,7 +223,21 @@ class OperationRegistry
             return false;
         }
 
-        return ($forAll && !in_array($value, $exclusion, true)) || (!$forAll && in_array($value, $inclusion, true));
+        return $forAll || (!$forAll && in_array($value, $inclusion, true));
+    }
+
+    /**
+     * @param string $value
+     * @param array $exclusion
+     * @return bool
+     */
+    protected function isNotExcluded($value, array $exclusion)
+    {
+        if (!$value) {
+            return true;
+        }
+
+        return !in_array($value, $exclusion, true);
     }
 
     /**
