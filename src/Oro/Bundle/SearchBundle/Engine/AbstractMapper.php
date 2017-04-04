@@ -197,17 +197,9 @@ abstract class AbstractMapper
                     $textAllDataField = $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD];
                 }
 
-                $clearedValue = Query::clearString($value);
-                $textAllDataField .= sprintf(' %s %s ', $value, $clearedValue);
-
-                $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = implode(
-                    Query::DELIMITER,
-                    array_unique(
-                        explode(
-                            Query::DELIMITER,
-                            $textAllDataField
-                        )
-                    )
+                $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = $this->buildAllDataField(
+                    $textAllDataField,
+                    $value
                 );
 
                 $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
@@ -215,5 +207,28 @@ abstract class AbstractMapper
         }
 
         return $objectData;
+    }
+
+    /**
+     * @param string $original
+     * @param string $addition
+     * @return string
+     */
+    public function buildAllDataField($original, $addition)
+    {
+        $clearedAddition = Query::clearString($addition);
+
+        $original .= sprintf(' %s %s ', $addition, $clearedAddition);
+        $original = implode(
+            Query::DELIMITER,
+            array_unique(
+                explode(
+                    Query::DELIMITER,
+                    $original
+                )
+            )
+        );
+
+        return $original;
     }
 }
