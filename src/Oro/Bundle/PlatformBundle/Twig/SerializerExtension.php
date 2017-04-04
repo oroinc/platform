@@ -26,6 +26,9 @@ class SerializerExtension extends BaseSerializerExtension
     {
         if (!$this->serializer) {
             $this->serializer = $this->serializerLink->getService();
+            if (!$this->serializer) {
+                throw new \RuntimeException('The JMS Serializer was not found.');
+            }
         }
 
         return parent::serialize($object, $type, $context);

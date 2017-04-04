@@ -14,7 +14,7 @@ parameters:
 services:
     jms_serializer.link:
         tags:
-            - { name: oro_service_link,  service: jms_serializer }
+            - { name: oro_service_link,  service: ?jms_serializer }
 
     jms_serializer.twig_extension.serializer:
         class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
