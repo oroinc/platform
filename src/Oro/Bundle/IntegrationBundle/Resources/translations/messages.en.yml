@@ -60,12 +60,18 @@ oro:
             entity_plural_label:            Integrations
             entity_description:             Represent integration
             id.label:                       Id
-            type.label:                     Type
+            type:
+                label:                      Type
+                description:                Integration type
             transport.label:                Transport type
-            enabled.label:                  Enabled
+            enabled:
+                label:                      Enabled
+                description:                Enable or disable integration
             mapping_settings.label:         Mapping Setting
             statuses.label:                 Statuses
-            name.label:                     Name
+            name:
+                label:                      Name
+                description:                Integration name
             connectors.label:               Connectors
             synchronization_settings.label: Synchronization Settings
             organization.label:             Organization
