@@ -5,13 +5,67 @@
 
     margin: $grid-views-offset;
 
+    border-bottom: $grid-views-border-bottom;
+
+    @include clearfix;
+
+    &__header {
+        display: inline-block;
+        padding: $offset-y-m 0;
+    }
+
+    &__aditional {
+        float: right;
+
+        margin-left: $offset-y;
+    }
+
     &__dropdown {
         width: $grid-views-dropdown-width;
         padding: 0;
     }
 
     &__title {
-        padding: $grid-views-title-offset-inner;
+        font-size: $grid-views-title-font-size;
+        font-family: $grid-views-title-font-family;
+        text-transform: $grid-views-title-text-transform;
+
+        cursor: pointer;
+
+        &.has-icon {
+            position: relative;
+            padding-left: $grid-views-title-icon-inner-offset;
+        }
+    }
+
+    &__piece {
+        position: absolute;
+        top: -3px;
+        left: 0;
+    }
+
+    &__title-text {
+        vertical-align: middle;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            color: get-color('additional', 'middle');
+        }
+
+        @include hover-focus {
+            [class^="fa-"],
+            [class*=" fa-"] {
+                color: get-color('additional', 'dark');
+            }
+        }
+    }
+
+    &__subtitle {
+        padding: $grid-views-subtitle-offset-inner;
+    }
+
+    &__edit-label {
+        color: $grid-views-edit-label-color;
     }
 
     &__close {
@@ -85,12 +139,10 @@
 @include breakpoint('mobile') {
     .grid-views {
         &__dropdown {
-            top: -1px;
+            top: -6px;
             left: -1px;
-            right: -1px;
 
-
-            width: auto;
+            width: $grid-views-dropdown-mobile-width;
         }
     }
 }

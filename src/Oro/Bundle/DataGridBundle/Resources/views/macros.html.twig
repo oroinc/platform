@@ -51,7 +51,8 @@
             showViewsInCustomElement: renderParams.showViewsInCustomElement is defined ? renderParams.showViewsInCustomElement : false,
             inputName: oro_datagrid_build_inputname(datagrid.name),
             themeOptions: renderParams.themeOptions|default({}),
-            toolbarOptions: renderParams.toolbarOptions|default({})
+            toolbarOptions: renderParams.toolbarOptions|default({}),
+            gridViewsOptions: renderParams.gridViewsOptions|default({}),
         } %}
         <div id="{{ gridId }}"
              data-page-component-module="{{ renderParams.datagridComponent|default("orodatagrid/js/app/components/datagrid-component") }}"

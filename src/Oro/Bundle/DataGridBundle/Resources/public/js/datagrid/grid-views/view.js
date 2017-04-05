@@ -431,7 +431,6 @@ define(function(require) {
             this._showNameError(modal, response);
         },
 
-
         /**
          * @param {Event} e
          */
@@ -562,10 +561,7 @@ define(function(require) {
 
             this._checkCurrentState();
 
-            var title = this.titleTemplate({
-                title: this._getCurrentViewLabel(),
-                navbar: Boolean(this.title)
-            });
+            var title = this.renderTitle();
 
             var actions = this._getViewActions();
             html = this.template({
@@ -585,6 +581,16 @@ define(function(require) {
             this.$el.append(html);
 
             return this;
+        },
+
+        /**
+         * @returns {HTMLElement}
+         */
+        renderTitle: function() {
+            return this.titleTemplate({
+                title: this._getCurrentViewLabel(),
+                navbar: Boolean(this.title)
+            });
         },
 
         /**
@@ -626,7 +632,7 @@ define(function(require) {
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
-                    enabled: this.viewDirty &&
+                    enabled: this._getViewIsDirty(View) &&
                              typeof View !== 'undefined' &&
                              View.get('editable')
                 },
@@ -659,7 +665,7 @@ define(function(require) {
                 {
                     label: __('oro.datagrid.action.discard_grid_view_changes'),
                     name: 'discard_changes',
-                    enabled: this.viewDirty
+                    enabled: this._getViewIsDirty(View)
                 },
                 {
                     label: __('oro.datagrid.action.delete_grid_view'),
@@ -683,6 +689,14 @@ define(function(require) {
          */
         _createViewModel: function(data) {
             return new GridViewModel(data);
+        },
+
+        /**
+         * @returns {boolean|*}
+         * @private
+         */
+        _getViewIsDirty: function(View) {
+            return this.viewDirty;
         },
 
         /**

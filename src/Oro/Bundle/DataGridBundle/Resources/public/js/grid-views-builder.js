@@ -34,6 +34,7 @@ define(function(require) {
                     gridViews: {},
                     options: {}
                 }),
+                gridViewsOptions: _.defaults({}, options.gridViewsOptions),
                 enableViews: options.enableViews,
                 $gridEl: options.$el,
                 showInNavbar: options.showViewsInNavbar,
@@ -95,7 +96,7 @@ define(function(require) {
                     gridViews = new View(gridViewsOptions);
                     $gridViews.html(gridViews.render().$el);
                 } else if (this.showInCustomElement) {
-                    gridViews = new GridViewsView(gridViewsOptions);
+                    gridViews = new View(gridViewsOptions);
                     $gridViews = $(this.showInCustomElement);
                     $gridViews.html(gridViews.render().$el);
                 } else {
@@ -128,6 +129,8 @@ define(function(require) {
 
             options.viewsCollection = collection;
             options.appearances = this.metadata.options.appearances;
+            options.gridViewsOptions = this.gridViewsOptions;
+
             return _.omit(options, ['views']);
         },
 
