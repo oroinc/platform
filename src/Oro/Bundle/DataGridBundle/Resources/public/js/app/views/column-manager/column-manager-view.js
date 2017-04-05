@@ -23,7 +23,8 @@ define(function(require) {
         },
 
         listen: {
-            'change:renderable collection': 'onRenderableChange'
+            'change:renderable collection': 'onRenderableChange',
+            'layout:reposition mediator': 'adjustListHeight'
         },
 
         initialize: function(options) {
@@ -54,6 +55,15 @@ define(function(require) {
             this.$('[data-role="column-manager-select-all"]').toggleClass('disabled', !hasUnrenderable);
             this.$('[data-role="column-manager-unselect-all"]').toggleClass('disabled', !hasRenderable);
             this.$('[data-role="column-manager-reset"]').toggleClass('disabled', !hasChanged);
+        },
+
+        adjustListHeight: function() {
+            var windowHeight = $(window).height();
+            var $wrapper = this.$('.table-wrapper');
+            var $footerHeight = this.$('[data-footer]').outerHeight() || 0;
+            var rect = $wrapper[0].getBoundingClientRect();
+            var margin = (this.$('[data-table]').outerHeight(true) - rect.height) / 2;
+            $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight, 40) + 'px');
         },
 
         /**
