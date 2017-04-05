@@ -4,6 +4,7 @@ define(function(require) {
     var ZoomAreaView;
     var BaseView = require('oroui/js/app/views/base/view');
     var $ = require('jquery');
+    var _ = require('underscore');
     var ZoomStateModel = require('oroui/js/app/models/zoom-state-model');
     var ZoomControlsView = require('./zoom-controls-view');
 
@@ -32,11 +33,13 @@ define(function(require) {
             ZoomAreaView.__super__.initialize.apply(this, arguments);
             this.$zoomedElement = this.$el.find('>*:first');
             if (!this.model) {
-                this.model = new ZoomStateModel({
+                var initialValues = {
                     zoomLevel: 1,
                     dx: 0,
                     dy: 0
-                }, {
+                };
+                _.extend(initialValues, _.pick(options, 'minZoom', 'maxZoom'));
+                this.model = new ZoomStateModel(initialValues, {
                     wrapper: this.el,
                     inner: this.$zoomedElement[0]
                 });
