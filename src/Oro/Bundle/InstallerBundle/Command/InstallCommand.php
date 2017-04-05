@@ -135,10 +135,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             );
         }
         $output->writeln(
-            '<info>Make sure that consumer command was running <comment>oro:message-queue:consume</comment>' .
-            'More info you can find here:'.'<comment>'.
+            '<info>Make sure that consumer command was running <comment>oro:message-queue:consume</comment>. ' .
+            'More info you can find here: <comment>'.
             'https://www.orocrm.com/documentation/current/book/installation#activating-background-tasks' .
-            '</comment></info>'
+            '</comment></info>.'
         );
     }
 
