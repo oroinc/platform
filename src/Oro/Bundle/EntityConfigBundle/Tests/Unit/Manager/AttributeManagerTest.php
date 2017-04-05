@@ -608,6 +608,7 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals(true, $this->manager->isActive($attribute));
+        // Check that configManager::getProvider() called once
         $this->assertEquals(true, $this->manager->isActive($attribute));
     }
 }
