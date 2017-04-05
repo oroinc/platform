@@ -545,6 +545,12 @@ services:
             - '@form.factory'
             - '@oro_workflow.serializer.data.serializer'
 
+    oro_workflow.helper.workflow_deactivation:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper'
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@oro_workflow.helper.translation'
+
     oro_workflow.layout.data_provider.transition_form:
         parent: oro_layout.provider.abstract_form
         class: 'Oro\Bundle\WorkflowBundle\Layout\DataProvider\TransitionFormProvider'

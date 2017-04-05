@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -13,6 +14,8 @@ use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
 class WorkflowQueryTraitTest extends \PHPUnit_Framework_TestCase
 {
     use WorkflowQueryTrait;
+
+    const ENTITY_CLASS = 'SomeEntityClass';
 
     /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $queryBuilder;
@@ -48,32 +51,34 @@ class WorkflowQueryTraitTest extends \PHPUnit_Framework_TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['ident1', 'ident2']);
 
-        $this->queryBuilder->expects($this->at(1))
+        $this->queryBuilder->expects($this->once())
             ->method('getRootEntities')
             ->willReturn(['entityClass1', 'entityClass2']);
 
-        $this->queryBuilder->expects($this->at(2))
+        $this->queryBuilder->expects($this->once())
             ->method('getEntityManager')
             ->willReturn($this->entityManager);
 
-        $this->queryBuilder->expects($this->at(3))
+        $this->queryBuilder->expects($this->once())
             ->method('getRootAliases')
             ->willReturn(['rootAlias']);
 
-        $this->queryBuilder->expects($this->at(4))
+        $this->queryBuilder->expects($this->exactly(2))
             ->method('leftJoin')
-            ->with(
-                WorkflowItem::class,
-                'itemAlias',
-                Join::WITH,
-                sprintf('CAST(rootAlias.ident1 as string) = CAST(itemAlias.entityId as string)' .
-                    ' AND itemAlias.entityClass = \'entityClass1\'')
+            ->withConsecutive(
+                [
+                    WorkflowItem::class,
+                    'itemAlias',
+                    Join::WITH,
+                    sprintf('CAST(rootAlias.ident1 as string) = CAST(itemAlias.entityId as string)' .
+                        ' AND itemAlias.entityClass = \'entityClass1\'')
+                ],
+                [
+                    'itemAlias.currentStep',
+                    'stepAlias'
+                ]
             )
             ->willReturn($this->queryBuilder);
-
-        $this->queryBuilder->expects($this->at(5))
-            ->method('leftJoin')
-            ->with('itemAlias.currentStep', 'stepAlias')->willReturn($this->queryBuilder);
 
         $this->assertSame(
             $this->queryBuilder,
@@ -132,5 +137,98 @@ class WorkflowQueryTraitTest extends \PHPUnit_Framework_TestCase
                 'itemAlias'
             )
         );
+    }
+
+    /**
+     * @dataProvider identifierFieldTypeDataProvider
+     * @param string $identifierFieldType
+     * @param string $identifierFieldName
+     * @param string $entityAlias
+     * @param string $itemAlias
+     * @param string $expectedCondition
+     */
+    public function testJoinWorkflowItem(
+        $identifierFieldType,
+        $identifierFieldName,
+        $entityAlias,
+        $itemAlias,
+        $expectedCondition
+    ) {
+        /** @var WorkflowQueryTrait $trait */
+        $trait = static::getMockForTrait(WorkflowQueryTrait::class);
+
+        $this->classMetadata
+            ->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn([$identifierFieldName]);
+
+        $this->classMetadata
+            ->expects($this->any())
+            ->method('getTypeOfField')
+            ->with($identifierFieldName)
+            ->willReturn($identifierFieldType);
+
+        $this->entityManager
+            ->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($this->classMetadata);
+
+        $this->queryBuilder
+            ->expects($this->any())
+            ->method('getRootEntities')
+            ->willReturn([self::ENTITY_CLASS]);
+
+        $this->queryBuilder
+            ->expects($this->any())
+            ->method('getRootAliases')
+            ->willReturn([$entityAlias]);
+
+        $this->queryBuilder
+            ->expects($this->any())
+            ->method('getEntityManager')
+            ->willReturn($this->entityManager);
+
+        $this->queryBuilder
+            ->expects($this->once())
+            ->method('leftJoin')
+            ->with(
+                WorkflowItem::class,
+                $itemAlias,
+                Join::WITH,
+                $expectedCondition
+            );
+
+        $trait->joinWorkflowItem($this->queryBuilder, $itemAlias);
+    }
+
+    /**
+     * @return array
+     */
+    public function identifierFieldTypeDataProvider()
+    {
+        return [
+            [
+                'identifierFieldType' => Type::INTEGER,
+                'identifierFieldName' => 'idField',
+                'entityAlias' => 't',
+                'itemAlias' => 'workflowAlias',
+                'expectedCondition' => sprintf(
+                    't.idField = CAST(workflowAlias.entityId as int) AND workflowAlias.entityClass = \'%s\'',
+                    self::ENTITY_CLASS
+                )
+            ],
+            [
+                'identifierFieldType' => Type::STRING,
+                'identifierFieldName' => 'idField',
+                'entityAlias' => 'rootAlias',
+                'itemAlias' => 'workflowAlias',
+                'expectedCondition' => sprintf(
+                    'CAST(rootAlias.idField as string) = CAST(workflowAlias.entityId as string) ' .
+                    'AND workflowAlias.entityClass = \'%s\'',
+                    self::ENTITY_CLASS
+                )
+            ]
+        ];
     }
 }

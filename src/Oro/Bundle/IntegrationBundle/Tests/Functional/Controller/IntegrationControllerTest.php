@@ -7,6 +7,7 @@ use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestIntegrationTransport;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DomCrawler\Form;
@@ -54,7 +55,6 @@ class IntegrationControllerTest extends WebTestCase
         $channel = $this->createChannel();
         $this->entityManager->persist($channel);
         $this->entityManager->flush();
-
         $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -220,6 +220,7 @@ class IntegrationControllerTest extends WebTestCase
         $channel->setName('aName');
         $channel->setType('aType');
         $channel->setEnabled(true);
+        $channel->setTransport(new TestIntegrationTransport());
 
         return $channel;
     }

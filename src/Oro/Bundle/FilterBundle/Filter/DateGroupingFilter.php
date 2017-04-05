@@ -167,6 +167,9 @@ class DateGroupingFilter extends ChoiceFilter
         foreach ($selects as $select) {
             $qb->add('select', $select, true);
         }
+
+        // Add groupBy without cast , required for postgres
+        $qb->addGroupBy($configDataName);
     }
 
     /**

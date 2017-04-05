@@ -71,3 +71,8 @@ services:
         parent: doctrine_cache.abstract.array
         calls:
             - [setNamespace, [ 'oro_config' ] ]
+
+    oro_test.transport_provider:
+        class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider
+        tags:
+            - { name: oro_integration.transport, type: aType, channel_type: aType }

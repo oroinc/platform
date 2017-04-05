@@ -42,16 +42,19 @@ class LoadLanguageDemoData extends AbstractFixture
         /** @var EntityManager $manager */
         $user = $this->getFirstUser($manager);
         $organization = $user->getOrganization();
+        $languageRepository = $manager->getRepository(Language::class);
 
         foreach (self::$languages as $reference => $code) {
-            $language = new Language();
-            $language->setCode($code)
-                ->setEnabled(true)
-                ->setOwner($user)
-                ->setOrganization($organization);
+            $language = $languageRepository->findOneBy(['code' => $code]);
+            if (!$language) {
+                $language = new Language();
+                $language->setCode($code)
+                    ->setEnabled(true)
+                    ->setOwner($user)
+                    ->setOrganization($organization);
 
-            $manager->persist($language);
-
+                $manager->persist($language);
+            }
             $this->addReference($reference, $language);
         }
 
