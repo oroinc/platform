@@ -83,6 +83,7 @@ define(function(require) {
             this.$frontTimeField.off().remove();
             if (this.$frontDateField.data('isWrapped')) {
                 this.$frontDateField.unwrap();
+                this.$frontDateField.removeData('isWrapped');
             }
             this._super().dispose.apply(this, arguments);
         },
