@@ -4,15 +4,17 @@
 {% set config_extend %}
     require({
         baseUrl: {{ baseAssetParts[0]|json_encode|raw }},
+        {% if baseAssetParts[1] is defined %}
         urlArgs: function(id, url) {
             var absoluteUrlRegexp = /^https?:\/\/|^\/\//i;
             if (absoluteUrlRegexp.test(url) && url.indexOf('{{ app.request.host }}') === -1) {
                 return '';
             } else {
                 var delimiter = url.indexOf('?') === -1 ? '?' : '&';
-                return delimiter + '{{ baseAssetParts[1] is defined ? baseAssetParts[1] : '' }}';
+                return delimiter + '{{ baseAssetParts[1] }}';
             }
         }
+        {% endif %}
     });
     {{ config_extend|default('') }}
 {% endset %}
