@@ -266,7 +266,6 @@ define(function(require) {
 
         _onSaveAsModel: function(container) {
             var self = this;
-            var container = container || self;
 
             var model = self._createViewModel({
                 label: $('input[name=name]', container.$el).val(),
@@ -397,7 +396,6 @@ define(function(require) {
          */
         _onRenameSaveModel: function(model, container) {
             var self = this;
-            var container = container || self;
 
             model.save({
                 label: $('input[name=name]', container.$el).val(),
