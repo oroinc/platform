@@ -199,11 +199,12 @@ define([
 
     // updates place for message label before show message
     $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(func, element, message) {
+        message = '<span><span>' + message + '</span></span>';
         var label = this.errorsFor(element);
         if (message && label.length) {
             this.settings.errorPlacement(label, element);
         }
-        return func.apply(this, _.rest(arguments));
+        return func.call(this, element, message);
     });
 
     // fixes focus on select2 element
@@ -371,7 +372,12 @@ define([
         onfocusout: function(element, event) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
-                    var realField = $(element).closest('.select2-container').parent()
+                    var $selectContainer = $(element).closest('.select2-container');
+                    // prevent validation if selection still in progress
+                    if ($selectContainer.hasClass('select2-dropdown-open')) {
+                        return;
+                    }
+                    var realField = $selectContainer.parent()
                         .find('.select2[type=hidden], select.select2')[0];
                     this.element(realField ? realField : element);
                 } else {

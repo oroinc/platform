@@ -297,16 +297,12 @@ services:
         arguments:
             - '%oro_locale.entity.localization.class%'
 
-    oro_locale.serializer.localization_array_serializer:
-        class: 'Oro\Bundle\LocaleBundle\Serializer\LocalizationArraySerializer'
-        public: false
-
     oro_locale.provider.localization_choices:
         class: 'Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider'
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.formatter.language_code'
-            - '@oro_locale.formatter.formatting_code'
+            - '@oro_translation.provider.language'
             - '@oro_locale.manager.localization'
 
     oro_locale.decorator.localization_cache:
@@ -314,7 +310,7 @@ services:
         public: false
         arguments:
             - '@oro_locale.cache'
-            - '@oro_locale.serializer.localization_array_serializer'
+            - '@jms_serializer'
 
     oro_locale.manager.localization:
         class: 'Oro\Bundle\LocaleBundle\Manager\LocalizationManager'

@@ -5,11 +5,9 @@ namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Parameter;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
@@ -65,46 +63,25 @@ class StaticSegmentManager
         }
 
         $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment);
-        try {
-            $this->em->beginTransaction();
-            $date       = new \DateTime('now', new \DateTimeZone('UTC'));
-            $dateString = '\'' . $date->format('Y-m-d H:i:s') . '\'';
-            if ($this->em->getConnection()->getDriver()->getName() === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
-                $dateString = sprintf('TIMESTAMP %s', $dateString);
+
+        $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
+        $this->applyOrganizationLimit($segment, $qb);
+        $qb->setMaxResults($segment->getRecordsLimit());
+        $result = $qb->getQuery()->getArrayResult();
+        $identifier = $entityMetadata->getSingleIdentifierFieldName();
+        $identifierType = $entityMetadata->getTypeOfField($identifier);
+
+        $ids = array_column($result, $identifier);
+
+        foreach ($ids as $id) {
+            $segmentSnapshot = new SegmentSnapshot($segment);
+            if ($identifierType === 'integer') {
+                $segmentSnapshot->setIntegerEntityId($id);
+            } else {
+                $segmentSnapshot->setEntityId($id);
             }
-            $insertString = sprintf(
-                ', %d, %s ',
-                $segment->getId(),
-                $dateString
-            );
-
-            $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
-            $this->applyOrganizationLimit($segment, $qb);
-            $query = $qb->getQuery();
-            $query->setMaxResults($segment->getRecordsLimit());
-
-            $segmentQuery = $query->getSQL();
-            $segmentQuery = substr_replace($segmentQuery, $insertString, stripos($segmentQuery, 'from'), 0);
-
-            $fieldToSelect = 'entity_id';
-            if ($entityMetadata->getTypeOfField($entityMetadata->getSingleIdentifierFieldName()) === 'integer') {
-                $fieldToSelect = 'integer_entity_id';
-            }
-
-            $dbQuery = 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) (%s)';
-            $dbQuery = sprintf($dbQuery, $segmentQuery);
-
-            $statement = $this->em->getConnection()->prepare($dbQuery);
-            $this->bindParameters($statement, $query->getParameters());
-            $statement->execute();
-
-            $this->em->commit();
-        } catch (\Exception $exception) {
-            $this->em->rollback();
-
-            throw $exception;
+            $this->em->persist($segmentSnapshot);
         }
-
         $segment = $this->em->merge($segment);
         $segment->setLastRun(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($segment);

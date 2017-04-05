@@ -30,4 +30,11 @@ class DefaultCurrencyConfigProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $defaultCurrencyConfigProvider->getCurrencyList());
     }
+
+    public function testGetCurrencies()
+    {
+        $defaultCurrencyConfigProvider = new DefaultCurrencyConfigProvider($this->configManager);
+
+        $this->assertEquals(['USD' => 'USD'], $defaultCurrencyConfigProvider->getCurrencies());
+    }
 }

@@ -64,6 +64,7 @@ class LimitConsumedMessagesExtension extends AbstractExtension
             ));
 
             $context->setExecutionInterrupted(true);
+            $context->setInterruptedReason('The message limit reached.');
         }
     }
 }

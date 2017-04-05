@@ -42,6 +42,22 @@ class LanguageRepository extends EntityRepository
     }
 
     /**
+     * @param bool $onlyEnabled
+     *
+     * @return array|Language[]
+     */
+    public function getLanguages($onlyEnabled = false)
+    {
+        $qb = $this->createQueryBuilder('language');
+
+        if ($onlyEnabled) {
+            $qb->where($qb->expr()->eq('language.enabled', ':enabled'))->setParameter('enabled', true);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @param string $languageCode
      *
      * @return array

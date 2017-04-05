@@ -56,6 +56,7 @@ system_configuration:
                 label: oro.locale.system_configuration.fields.language.label
                 tooltip: oro.locale.form.tooltip.language
                 required: true
+                resettable: true
                 constraints:
                     - NotBlank: ~
 
@@ -69,6 +70,7 @@ system_configuration:
                 required: true
                 multiple: true
                 show_all: true
+                resettable: false
                 constraints:
                     - NotBlank: ~
 
@@ -137,7 +139,7 @@ system_configuration:
         oro_locale.enabled_localizations:
             data_type: array
             type: oro_locale_localization_selection
-            priority: 20
+            priority: 10
             options:
                 label: oro.locale.system_configuration.fields.enabled_localizations.label
                 required: true
@@ -149,7 +151,7 @@ system_configuration:
         oro_locale.default_localization:
             data_type: string
             type: oro_locale_localization_selection
-            priority: 10
+            priority: 20
             options:
                 label: oro.locale.system_configuration.fields.default_localization.label
                 required: true

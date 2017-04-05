@@ -72,6 +72,10 @@ define(function(require) {
                     keysMap: {
                         id: 'access_level',
                         text: 'access_level_label'
+                    },
+                    dropdownMenuOptions: {
+                        align: 'right',
+                        container: true
                     }
                 });
                 this.listenTo(dropdown, 'selected', this.onAccessLevelSelect);
@@ -94,7 +98,6 @@ define(function(require) {
             if (!this.$('.dropdown-toggle').parent().hasClass('open')) {
                 this.$('.dropdown-toggle').dropdown('toggle');
             }
-            e.stopPropagation();
         },
 
         _hideDropdown: function(e) {

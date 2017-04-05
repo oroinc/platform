@@ -61,7 +61,7 @@ datagrids:
                             modal:         true
                             dblclick:      maximize
                             maximizedHeightDecreaseBy: minimize-bar
-                            width: 700
+                            width: 1000
             delete:
                 type:         delete
                 acl_resource: oro_email_autoresponserule_delete
@@ -190,7 +190,7 @@ datagrids:
                 mailbox: { data_name: eu.origin }
             default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
-            entityHint: email
+            entityHint: emails
 
     simplified-email-grid:
         extends: base-email-grid
@@ -355,7 +355,7 @@ datagrids:
                 route: oro_email_email_reply
                 params: { id: email.id }
         options:
-            entityHint: email
+            entityHint: emails
             toolbarOptions:
                 hide: true
                 pagination:
@@ -665,7 +665,7 @@ datagrids:
     email-for-context-grid:
         extends: email-grid
         options:
-            entityHint: email
+            entityHint: emails
             entity_pagination: true
             toolbarOptions:
                 pageSize:

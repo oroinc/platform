@@ -48,7 +48,7 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Or
                 $time = 1000;
                 break;
             case 'Installation':
-                $time = 120;
+                $time = 180;
                 break;
             default:
                 throw new RuntimeException('Unknown initialization');

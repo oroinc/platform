@@ -4,6 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBu
 
 use Doctrine\ORM\Query;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
 class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
@@ -371,6 +372,137 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                 'columns' => [
                     'c1' => ['data_name' => 't1.column1'],
                     'c2' => ['data_name' => 't2.name']
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testVirtualColumnsForDictionary()
+    {
+        $en                    = 'Acme\Entity\TestEntity';
+        $definition            = [
+            'columns' => [
+                ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
+                ['name' => 'vc1', 'label' => 'lbl2', 'sorting' => 'DESC'],
+            ],
+        ];
+        $doctrine              = $this->getDoctrine(
+            [
+                $en => [
+                    'column1' => 'string',
+                ],
+            ]
+        );
+        $virtualColumnProvider = $this->getVirtualFieldProvider(
+            [
+                [
+                    $en,
+                    'vc1',
+                    [
+                        'select' => [
+                            'expr'         => 'owner.displayName',
+                            'return_type'  => 'dictionary',
+                            'filter_by_id' => true
+                        ],
+                        'join'   => [
+                            'left' => [
+                                [
+                                    'join'  => 'entity.owner',
+                                    'alias' => 'owner'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $model = new QueryDesignerModel();
+        $model->setEntity($en);
+        $model->setDefinition(json_encode($definition));
+
+        $entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityNameResolver->expects($this->once())
+            ->method('getNameDQL')
+            ->willReturn('testName');
+
+        $builder = $this->createDatagridConfigurationBuilder(
+            $model,
+            $doctrine,
+            null,
+            $virtualColumnProvider,
+            [],
+            $entityNameResolver
+        );
+        $result  = $builder->getConfiguration()->toArray();
+
+        $expected = [
+            'source'  => [
+                'type'         => 'orm',
+                'query'        => [
+                    'select' => [
+                        't1.column1 as c1',
+                        'testName as c2',
+                    ],
+                    'from'   => [
+                        ['table' => $en, 'alias' => 't1']
+                    ],
+                    'join'   => [
+                        'left' => [
+                            [
+                                'join'  => 't1.owner',
+                                'alias' => 't2'
+                            ],
+                        ]
+                    ]
+                ],
+                'query_config' => [
+                    'table_aliases'  => [
+                        ''               => 't1',
+                        't1.owner|left' => 't2',
+                    ],
+                    'column_aliases' => [
+                        'column1' => 'c1',
+                        'vc1'     => 'c2',
+                    ],
+                ],
+                'hints'        => [
+                    [
+                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
+                        'value' => 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker',
+                    ]
+                ]
+            ],
+            'columns' => [
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
+                'c2' => ['label' => 'lbl2', 'frontend_type' => 'dictionary', 'translatable' => false],
+            ],
+            'name'    => 'test_grid',
+            'sorters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2'],
+                ],
+                'default' => ['c2' => 'DESC']
+            ],
+            'filters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
+                    'c2' => ['data_name' => 't1.vc1', 'type' => 'dictionary', 'translatable' => false],
+                ]
+            ],
+            'fields_acl' => [
+                'columns' => [
+                    'c1' => ['data_name' => 't1.column1'],
+                    'c2' => ['data_name' => 'testName']
                 ]
             ]
         ];

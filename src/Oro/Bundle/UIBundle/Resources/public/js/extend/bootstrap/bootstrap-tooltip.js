@@ -30,11 +30,13 @@ define(function(require) {
     Tooltip.prototype.applyPlacement = function(offset, placement) {
         var $tip = this.tip();
         var arrowDimension = ['left', 'right'].indexOf(placement) !== -1 ? 'width' : 'height';
-        var arrowSize;
+        var arrowSize = 0;
         var position;
 
         $tip.addClass(placement).addClass('in');
-        arrowSize = this.arrow()[0].getBoundingClientRect()[arrowDimension] - 1;
+        if (this.arrow().length) {
+            arrowSize = this.arrow()[0].getBoundingClientRect()[arrowDimension] - 1;
+        }
 
         switch (placement) {
             case 'bottom':

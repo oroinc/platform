@@ -2,204 +2,177 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
+use Gaufrette\Filesystem;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor;
-
+use Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testImportProcessCanBeConstructedWithRequiredAttributes()
     {
         $chunkHttpImportMessageProcessor = new HttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
             $this->createJobRunnerMock(),
-            $this->createMessageProducerInterfaceMock(),
-            $this->createDoctrineMock(),
-            $this->createTokenStorageInterfaceMock(),
             $this->createImportExportResultSummarizerMock(),
             $this->createJobStorageMock(),
-            $this->createLoggerInterfaceMock(),
-            $this->createFileManagerMock()
+            $this->createLoggerMock(),
+            $this->createFileManagerMock(),
+            $this->createHttpImportHandlerMock(),
+            $this->createTokenSerializerMock(),
+            $this->createTokenStorageInterfaceMock()
         );
         $this->assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
-        $this->assertInstanceOf(TopicSubscriberInterface::class, $chunkHttpImportMessageProcessor);
-    }
-
-    public function testImportProcessShouldReturnSubscribedTopics()
-    {
-        $expectedSubscribedTopics = [Topics::HTTP_IMPORT, Topics::IMPORT_HTTP, Topics::IMPORT_HTTP_VALIDATION,];
-        $this->assertEquals($expectedSubscribedTopics, HttpImportMessageProcessor::getSubscribedTopics());
+        $this->assertInstanceOf(ImportMessageProcessor::class, $chunkHttpImportMessageProcessor);
     }
 
     public function testShouldLogErrorAndRejectMessageIfMessageWasInvalid()
     {
-        $logger = $this->createLoggerInterfaceMock();
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message. body: []')
-        ;
+            ->with('[HttpImportMessageProcessor] Got invalid message. body: []');
 
         $processor = new HttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
             $this->createJobRunnerMock(),
-            $this->createMessageProducerInterfaceMock(),
-            $this->createDoctrineMock(),
-            $this->createTokenStorageInterfaceMock(),
             $this->createImportExportResultSummarizerMock(),
             $this->createJobStorageMock(),
             $logger,
-            $this->createFileManagerMock()
+            $this->createFileManagerMock(),
+            $this->createHttpImportHandlerMock(),
+            $this->createTokenSerializerMock(),
+            $this->createTokenStorageInterfaceMock()
         );
 
         $message = $this->createMessageMock();
         $message
             ->expects($this->exactly(2))
             ->method('getBody')
-            ->willReturn('[]')
-        ;
+            ->willReturn('[]');
 
         $result = $processor->process($message, $this->createSessionMock());
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldLogErrorAndRejectMessageIfUserNotFound()
+    public function testShouldLogErrorAndRejectMessageIfTokenCannotBeSet()
     {
-        $logger = $this->createLoggerInterfaceMock();
+        $tokenSerializer = $this->createTokenSerializerMock();
+        $tokenSerializer
+            ->expects($this->once())
+            ->method('deserialize')
+            ->with($this->equalTo('security_token'))
+            ->willReturn(null);
+
+        $tokenStorage = $this->createTokenStorageInterfaceMock();
+        $tokenStorage
+            ->expects($this->never())
+            ->method('setToken');
+
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
-            ->method('error')
-            ->with('User not found. id: 1')
-        ;
+            ->method('critical');
 
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn(null);
-        ;
-
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
-        $processor = new HttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerInterfaceMock(),
-            $doctrine,
-            $this->createTokenStorageInterfaceMock(),
-            $this->createImportExportResultSummarizerMock(),
-            $this->createJobStorageMock(),
-            $logger,
-            $this->createFileManagerMock()
-        );
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->once())
-            ->method('getBody')
-            ->willReturn(json_encode([
-                    'fileName' => '123456.csv',
-                    'originFileName' => 'test.csv',
-                    'userId' => '1',
-                    'jobId' => '1',
-                    'jobName' => 'test_import',
-                    'processorAlias' => 'test',
-                    'process' => 'import',
-                    'options' => [],
-                ]))
-        ;
-        $result = $processor->process($message, $this->createSessionMock());
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRunJobACKMessage()
-    {
-        $user = new User();
-        $user->setId(1);
-        $user->setFirstName('John');
-
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($user);
-        ;
-
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
-
+        $job = new Job();
+        $job->setId(1);
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects($this->once())
             ->method('runDelayed')
-            ->willReturn(true)
-        ;
+            ->with(1)
+            ->will(
+                $this->returnCallback(
+                    function ($jobId, $callback) use ($jobRunner, $job) {
+                        return $callback($jobRunner, $job);
+                    }
+                )
+            );
+
         $processor = new HttpImportMessageProcessor(
-            $this->createHttpImportHandlerMock(),
             $jobRunner,
-            $this->createMessageProducerInterfaceMock(),
-            $doctrine,
-            $this->createTokenStorageInterfaceMock(),
             $this->createImportExportResultSummarizerMock(),
             $this->createJobStorageMock(),
-            $this->createLoggerInterfaceMock(),
-            $this->createFileManagerMock()
-        )
-        ;
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->once())
-            ->method('getBody')
-            ->willReturn(
-                json_encode([
+            $logger,
+            $this->createFileManagerMock(),
+            $this->createHttpImportHandlerMock(),
+            $tokenSerializer,
+            $tokenStorage
+        );
+
+        $message = new NullMessage();
+        $message->setBody(
+            json_encode(
+                [
                     'fileName' => '123456.csv',
                     'originFileName' => 'test.csv',
                     'userId' => '1',
+                    'securityToken' => 'security_token',
                     'jobId' => '1',
                     'jobName' => 'test',
                     'processorAlias' => 'test',
                     'process' => 'import',
                     'options' => [],
-                ])
+                ]
             )
-        ;
+        );
+
         $result = $processor->process($message, $this->createSessionMock());
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+
+        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+    }
+
+
+    public function dataProviderForTestProcessImport()
+    {
+        return [
+            [
+                [
+                    'success' => true,
+                    'filePath' => 'csv',
+                    'importInfo' => 'imports was done',
+                    'message' => '',
+                ],
+                0
+            ],
+            [
+                [
+                    'success' => true,
+                    'filePath' => 'csv',
+                    'importInfo' => 'imports was done',
+                    'message' => '',
+                    'errors' => ['test error'],
+                ],
+                1
+            ],
+        ];
     }
 
     /**
+     * @dataProvider dataProviderForTestProcessImport
+     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testShouldProcessedDataAndACKMessage()
+    public function testShouldProcessedDataMessage($body, $writeLog)
     {
         $job = new Job();
         $job->setId(1);
@@ -209,21 +182,6 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $organization = new Organization();
         $organization->setId(1);
         $user->setOrganization($organization);
-
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($user);
-        ;
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects($this->once())
@@ -237,7 +195,8 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             )
         ;
-        $logger = $this->createLoggerInterfaceMock();
+
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('info')
@@ -253,14 +212,8 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $httpImportHandler
             ->expects($this->once())
             ->method('handle')
-            ->willReturn(
-                [
-                    'success' => true,
-                    'filePath' => 'csv',
-                    'importInfo' => 'imports was done',
-                    'message' => '',
-                ]
-            );
+            ->willReturn($body);
+
         $jobStorage = $this->createJobStorageMock();
         $jobStorage
             ->expects($this->once())
@@ -276,7 +229,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $importExportResultSummarizer = $this->createImportExportResultSummarizerMock();
         $importExportResultSummarizer
             ->expects($this->once())
-            ->method('getSummaryMessage')
+            ->method('getImportSummaryMessage')
             ->with()
             ->willReturn('Import of the csv is completed, success: 1, info: imports was done, message: ');
         ;
@@ -288,38 +241,59 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('123456.csv')
             ->willReturn('123456.csv');
 
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem
+            ->expects($this->exactly($writeLog))
+            ->method('write');
+
+        $fileManager
+            ->expects($this->exactly($writeLog))
+            ->method('getFileSystem')
+            ->willReturn($filesystem);
+
+        $token = $this->createMock(UsernamePasswordOrganizationToken::class);
+
+        $tokenSerializer = $this->createTokenSerializerMock();
+        $tokenSerializer
+            ->expects($this->once())
+            ->method('deserialize')
+            ->with($this->equalTo('security_token'))
+            ->willReturn($token)
+        ;
+
+        $tokenStorage = $this->createTokenStorageInterfaceMock();
+        $tokenStorage
+            ->expects($this->once())
+            ->method('setToken')
+            ->with($this->equalTo($token))
+        ;
+
         $processor = new HttpImportMessageProcessor(
-            $httpImportHandler,
             $jobRunner,
-            $this->createMessageProducerInterfaceMock(),
-            $doctrine,
-            $this->createTokenStorageInterfaceMock(),
             $importExportResultSummarizer,
             $jobStorage,
             $logger,
-            $fileManager
+            $fileManager,
+            $httpImportHandler,
+            $tokenSerializer,
+            $tokenStorage
         );
 
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->once())
-            ->method('getBody')
-            ->willReturn(
-                json_encode(
-                    [
-                        'fileName' => '123456.csv',
-                        'originFileName' => 'test.csv',
-                        'userId' => '1',
-                        'jobId' => '1',
-                        'jobName' => 'test',
-                        'processorAlias' => 'test',
-                        'process' => 'import',
-                        'options' => [],
-                    ]
-                )
-            )
-        ;
+        $message = new NullMessage();
+        $message->setBody(json_encode([
+            'fileName' => '123456.csv',
+            'originFileName' => 'test.csv',
+            'userId' => '1',
+            'securityToken' => 'security_token',
+            'jobId' => '1',
+            'jobName' => 'test',
+            'processorAlias' => 'test',
+            'process' => 'import',
+            'options' => [],
+        ]));
+
         $result = $processor->process($message, $this->createSessionMock());
+
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
@@ -366,7 +340,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
      */
-    protected function createLoggerInterfaceMock()
+    protected function createLoggerMock()
     {
         return $this->createMock(LoggerInterface::class);
     }
@@ -396,14 +370,6 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|UserRepository
-     */
-    private function createUserRepositoryMock()
-    {
-        return $this->createMock(UserRepository::class);
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ImportExportResultSummarizer
      */
     private function createImportExportResultSummarizerMock()
@@ -417,5 +383,13 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createFileManagerMock()
     {
         return $this->createMock(FileManager::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
+     */
+    private function createTokenSerializerMock()
+    {
+        return $this->createMock(TokenSerializerInterface::class);
     }
 }

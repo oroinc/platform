@@ -284,6 +284,54 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
             ],
+            'collapsed_related_entity_with_renamed_id'                       => [
+                'config'         => [
+                    'fields' => [
+                        'id'      => null,
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'collapse'         => true,
+                            'fields'           => [
+                                'name' => [
+                                    'property_path' => 'id'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedConfig' => [
+                    'fields' => [
+                        'id'      => null,
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'contact.id',
+                            'collapse'         => true,
+                            'fields'           => [
+                                'name' => [
+                                    'property_path' => 'id'
+                                ],
+                                'id'   => null
+                            ]
+                        ]
+                    ]
+                ],
+                'configObject'   => [
+                    'fields' => [
+                        'id'      => [],
+                        'contact' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'contact.id',
+                            'collapse'         => true,
+                            'fields'           => [
+                                'name' => [
+                                    'property_path' => 'id'
+                                ],
+                                'id'   => []
+                            ]
+                        ]
+                    ]
+                ],
+            ],
             'single_property_path'                                           => [
                 'config'         => [
                     'fields' => [
@@ -689,8 +737,8 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
                         'contact'     => [
-                            'exclude'          => false,
-                            'fields'           => [
+                            'exclude' => false,
+                            'fields'  => [
                                 'name' => null
                             ]
                         ]
@@ -700,7 +748,7 @@ class ConfigNormalizerTest extends \PHPUnit_Framework_TestCase
                     'fields' => [
                         'contactName' => ['property_path' => 'contact.name'],
                         'contact'     => [
-                            'fields'           => [
+                            'fields' => [
                                 'name' => []
                             ]
                         ]

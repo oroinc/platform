@@ -9,9 +9,11 @@
 </script>
 <script type="text/template" id="filter-hint-template">
     <span><%- label %>: <strong class="filter-criteria-hint"></strong>
+        <% if (allowClear) { %>
         <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>">
             <i class="fa-close hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i>
         </span>
+        <% } %>
     </span>
 </script>
 <script type="text/template" id="none-filter-template">

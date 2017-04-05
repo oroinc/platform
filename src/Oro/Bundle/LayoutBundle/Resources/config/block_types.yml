@@ -174,6 +174,7 @@ services:
                         rel: {required: true}
                         href: {required: true}
                         type: ~
+                        hreflang: ~
             - [setName, ['external_resource']]
         tags:
              - { name: layout.block_type, alias: external_resource }
@@ -286,6 +287,14 @@ services:
             - [setName, ['form_fields']]
         tags:
              - { name: layout.block_type, alias: form_fields }
+
+    oro_layout.block_type.form_field:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setOptionsConfig, [{form: ~, instance_name: {default: ''}}]]
+            - [setName, ['form_field']]
+        tags:
+             - { name: layout.block_type, alias: form_field }
 
     oro_layout.block_type.form_end:
         parent: oro_layout.block_type.abstract_configurable

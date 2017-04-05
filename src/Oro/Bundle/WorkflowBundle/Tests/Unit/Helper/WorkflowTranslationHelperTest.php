@@ -115,10 +115,15 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
     public function testSaveTranslation()
     {
         $this->translator->expects($this->exactly(2))->method('getLocale')->willReturn('en');
-        $this->manager
-            ->expects($this->exactly(2))
+        $this->manager->expects($this->exactly(2))
             ->method('saveTranslation')
-            ->with('test_key', 'test_value', 'en', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+            ->with(
+                'test_key',
+                'test_value',
+                'en',
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
+            );
         $this->helper->saveTranslation('test_key', 'test_value');
         $this->helper->saveTranslation('test_key', 'test_value');
     }
@@ -136,10 +141,26 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
                 'test_key',
                 'test_value',
                 Translator::DEFAULT_LOCALE,
-                WorkflowTranslationHelper::TRANSLATION_DOMAIN
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_UI
             );
 
         $this->helper->saveTranslation('test_key', 'test_value');
+    }
+
+    public function testSaveTranslationAsSystem()
+    {
+        $this->translator->expects($this->once())->method('getLocale')->willReturn('en');
+        $this->manager->expects($this->once())
+            ->method('saveTranslation')
+            ->with(
+                'test_key',
+                'test_value',
+                'en',
+                WorkflowTranslationHelper::TRANSLATION_DOMAIN,
+                Translation::SCOPE_SYSTEM
+            );
+        $this->helper->saveTranslationAsSystem('test_key', 'test_value');
     }
 
     /**
@@ -210,6 +231,34 @@ class WorkflowTranslationHelperTest extends \PHPUnit_Framework_TestCase
         $this->manager->expects($this->once())->method('flush');
 
         $this->helper->flushTranslations();
+    }
+
+    /**
+     * @param string|null $expected
+     *
+     * @dataProvider findValueDataProvider
+     */
+    public function testFindValue($expected)
+    {
+        $key = 'key';
+        $locale = null;
+
+        $this->translationHelper->expects($this->once())->method('findValue')->with(
+            $key,
+            $locale,
+            WorkflowTranslationHelper::TRANSLATION_DOMAIN
+        )->willReturn($expected);
+
+        $this->assertEquals($expected, $this->helper->findValue($key, $locale));
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function findValueDataProvider()
+    {
+        yield 'string value' => ['expected' => 'string'];
+        yield 'null value' => ['expected' => null];
     }
 
     /**

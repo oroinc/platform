@@ -2,7 +2,6 @@ parameters:
     oro_email.form.subscriber.emailtemplate.class:        Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber
     oro_email.form.subscriber.autoresponserule.class:     Oro\Bundle\EmailBundle\Form\EventListener\AutoResponseRuleSubscriber
     oro_email.form.type.autoresponserule.class:           Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType
-    oro_email.form.type.autoresponserule_condition.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleConditionType
     oro_email.form.type.autoresponse_template.class:      Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType
     oro_email.form.type.autoresponse_template_choice.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType
     oro_email.form.extension.mailbox_unbound_rules.class: Oro\Bundle\EmailBundle\Form\Extension\MailboxUnboudRulesExtension
@@ -48,11 +47,6 @@ services:
             - '@oro_email.form.subscriber.autoresponserule'
         tags:
             - { name: form.type, alias: oro_email_autoresponserule }
-
-    oro_email.form.type.autoresponserule_condition:
-        class: %oro_email.form.type.autoresponserule_condition.class%
-        tags:
-            - { name: form.type, alias: oro_email_autoresponserule_condition }
 
     oro_email.form.type.autoresponse_template:
         class: %oro_email.form.type.autoresponse_template.class%

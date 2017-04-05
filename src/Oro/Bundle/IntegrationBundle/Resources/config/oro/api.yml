@@ -1,0 +1,26 @@
+api:
+    entities:
+        Oro\Bundle\IntegrationBundle\Entity\Channel:
+            documentation_resource: '@OroIntegrationBundle/Resources/doc/api/channel.md'
+            actions:
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+            fields:
+                mappingSettings:
+                    exclude: true
+                connectors:
+                    exclude: true
+                editMode:
+                    exclude: true
+                previouslyEnabled:
+                    exclude: true
+                synchronizationSettings:
+                    exclude: true
+                defaultBusinessUnitOwner:
+                    exclude: true
+                defaultUserOwner:
+                    exclude: true
+                organization:
+                    exclude: true

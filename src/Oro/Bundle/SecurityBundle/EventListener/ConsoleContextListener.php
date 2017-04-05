@@ -38,7 +38,7 @@ class ConsoleContextListener
     {
         $command = $event->getCommand();
         $input = $event->getInput();
-        $definition = $command->getApplication()->getDefinition();
+        $definition = $command->getDefinition();
 
         $definition->addOption(
             new InputOption(

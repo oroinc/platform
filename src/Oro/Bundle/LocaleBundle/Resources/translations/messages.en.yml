@@ -14,7 +14,7 @@ oro.locale:
         name.label: 'Name'
         title.label: 'Title'
         titles.label: 'Titles'
-        language_code.label: 'Language'
+        language.label: 'Language'
         formatting_code.label: 'Formatting'
         child_localizations.label: 'Child localizations'
         parent_localization.label: 'Parent localization'
@@ -31,6 +31,7 @@ oro.locale:
         form:
             placeholder:
                 select_parent_localization: 'Please select parent localization...'
+                select_localization: 'Please select localization...'
                 select_language: 'Please select language...'
                 select_formatting: 'Please select formatting...'
                 choose: 'Choose a localization...'

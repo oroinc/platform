@@ -3,56 +3,73 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 
 use Doctrine\Common\Annotations\Reader;
+use Doctrine\Common\Cache\Cache;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 
 class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Request|\PHPUnit_Framework_MockObject_MockObject */
-    private $request;
-
     /** @var Reader|\PHPUnit_Framework_MockObject_MockObject */
     private $reader;
 
+    /** @var Router|\PHPUnit_Framework_MockObject_MockObject */
+    private $router;
+
+    /** @var Cache|\PHPUnit_Framework_MockObject_MockObject */
+    private $cache;
+
     /** @var AnnotationsReader */
     private $annotationReader;
+
 
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $this->reader = $this->getMockBuilder(Reader::class)->disableOriginalConstructor()->getMock();
+        $this->reader = $this->createMock(Reader::class);
+        $this->router = $this->createMock(Router::class);
+        $this->cache = $this->createMock(Cache::class);
 
-        $requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
-        $requestStack->expects($this->once())
-            ->method('getCurrentRequest')
-            ->willReturn($this->request);
-
-        $this->annotationReader = new AnnotationsReader($requestStack, $this->reader);
+        $this->annotationReader = new AnnotationsReader($this->reader, $this->router, $this->cache);
     }
 
-    public function testGetTitle()
+    public function testGetTitleWithoutCache()
     {
-        $route = 'test_route';
+        $routeName = 'test_route';
 
         $annotation = $this->getMockBuilder(TitleTemplate::class)->disableOriginalConstructor()->getMock();
         $annotation->expects($this->once())
             ->method('getValue')
             ->willReturn('Title Template');
 
-        $this->request
-            ->expects($this->once())
-            ->method('get')
-            ->with('_controller')
-            ->willReturn(AnnotationsReaderTest::class . '::testGetTitle');
+        $classes = [$routeName => AnnotationsReaderTest::class . '::testGetTitleWithoutCache'];
 
-        $reflectionMethod = new \ReflectionMethod(AnnotationsReaderTest::class, 'testGetTitle');
+        $this->cache
+            ->expects($this->once())
+            ->method('contains')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn(false);
+
+        $this->cache
+            ->expects($this->once())
+            ->method('save')
+            ->with(AnnotationsReader::CACHE_KEY, $classes);
+
+        $route = new Route('/');
+        $route->setDefault('_controller', AnnotationsReaderTest::class . '::testGetTitleWithoutCache');
+
+        $this->router
+            ->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn([$routeName => $route]);
+
+        $reflectionMethod = new \ReflectionMethod(AnnotationsReaderTest::class, 'testGetTitleWithoutCache');
 
         $this->reader
             ->expects($this->once())
@@ -60,18 +77,61 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
             ->with($reflectionMethod, TitleTemplate::class)
             ->willReturn($annotation);
 
-        $this->assertEquals('Title Template', $this->annotationReader->getTitle($route));
+        $this->assertEquals('Title Template', $this->annotationReader->getTitle($routeName));
+    }
+
+    public function testGetTitleWithCache()
+    {
+        $routeName = 'test_route';
+
+        $annotation = $this->getMockBuilder(TitleTemplate::class)->disableOriginalConstructor()->getMock();
+        $annotation->expects($this->once())
+            ->method('getValue')
+            ->willReturn('Title Template');
+
+        $classes = [$routeName => AnnotationsReaderTest::class . '::testGetTitleWithCache'];
+
+        $this->cache
+            ->expects($this->once())
+            ->method('contains')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn(true);
+
+        $this->cache
+            ->expects($this->once())
+            ->method('fetch')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn($classes);
+
+
+        $reflectionMethod = new \ReflectionMethod(AnnotationsReaderTest::class, 'testGetTitleWithCache');
+
+        $this->reader
+            ->expects($this->once())
+            ->method('getMethodAnnotation')
+            ->with($reflectionMethod, TitleTemplate::class)
+            ->willReturn($annotation);
+
+        $this->assertEquals('Title Template', $this->annotationReader->getTitle($routeName));
     }
 
     public function testGetTitleEmpty()
     {
-        $route = 'test_route';
+        $routeName = 'test_route';
 
-        $this->request
+        $classes = [$routeName => AnnotationsReaderTest::class . '::testGetTitleEmpty'];
+
+        $this->cache
             ->expects($this->once())
-            ->method('get')
-            ->with('_controller')
-            ->willReturn(AnnotationsReaderTest::class . '::testGetTitleEmpty');
+            ->method('contains')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn(true);
+
+        $this->cache
+            ->expects($this->once())
+            ->method('fetch')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn($classes);
 
         $reflectionMethod = new \ReflectionMethod(AnnotationsReaderTest::class, 'testGetTitleEmpty');
 
@@ -81,23 +141,56 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
             ->with($reflectionMethod, TitleTemplate::class)
             ->willReturn(null);
 
-        $this->assertNull($this->annotationReader->getTitle($route));
+        $this->assertNull($this->annotationReader->getTitle($routeName));
     }
 
     public function testGetTitleControllerIsEmpty()
     {
-        $route = 'test_route';
+        $routeName = 'test_route';
 
-        $this->request
+        $classes = [];
+
+        $this->cache
             ->expects($this->once())
-            ->method('get')
-            ->with('_controller')
-            ->willReturn(null);
+            ->method('contains')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn(true);
+
+        $this->cache
+            ->expects($this->once())
+            ->method('fetch')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn($classes);
 
         $this->reader
             ->expects($this->never())
             ->method('getMethodAnnotation');
 
-        $this->assertNull($this->annotationReader->getTitle($route));
+        $this->assertNull($this->annotationReader->getTitle($routeName));
+    }
+
+    public function testGetTitleControllerIsUndefined()
+    {
+        $routeName = 'test_route';
+
+        $classes = [$routeName => 'WrongControllerAndMethod'];
+
+        $this->cache
+            ->expects($this->once())
+            ->method('contains')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn(true);
+
+        $this->cache
+            ->expects($this->once())
+            ->method('fetch')
+            ->with(AnnotationsReader::CACHE_KEY)
+            ->willReturn($classes);
+
+        $this->reader
+            ->expects($this->never())
+            ->method('getMethodAnnotation');
+
+        $this->assertNull($this->annotationReader->getTitle($routeName));
     }
 }

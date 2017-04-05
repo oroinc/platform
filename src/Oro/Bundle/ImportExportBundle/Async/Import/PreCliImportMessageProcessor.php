@@ -1,126 +1,51 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\Splitter\SplitterChain;
-use Oro\Bundle\ImportExportBundle\Splitter\SplitterInterface;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\DependentJobService;
+use Oro\Bundle\NotificationBundle\Async\Topics as NotifcationTopics;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
-class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class PreCliImportMessageProcessor extends PreImportMessageProcessorAbstract
 {
-
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
-
-    /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var DependentJobService
-     */
-    protected $dependentJob;
-
-    /**
-     * @var SplitterChain
-     */
-    protected $splitterChain;
-
-    /**
-     * @var FileManager
-     */
-    protected $fileManager;
-
-    /**
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     * @param DependentJobService $dependentJob
-     * @param SplitterChain $splitterChain
-     * @param FileManager $fileManager
-     */
-    public function __construct(
-        JobRunner $jobRunner,
-        MessageProducerInterface $producer,
-        LoggerInterface $logger,
-        DependentJobService $dependentJob,
-        SplitterChain $splitterChain,
-        FileManager $fileManager
-    ) {
-        $this->jobRunner = $jobRunner;
-        $this->producer = $producer;
-        $this->logger = $logger;
-        $this->dependentJob = $dependentJob;
-        $this->splitterChain = $splitterChain;
-        $this->fileManager = $fileManager;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    protected function validateMessageBody($body)
     {
-        $body = JSON::decode($message->getBody());
-
         if (! isset(
             $body['jobName'],
             $body['process'],
             $body['processorAlias'],
             $body['fileName'],
             $body['originFileName']
-        )) {
+        )
+        ) {
             $this->logger->critical(
-                sprintf('Got invalid message. body: %s', $message->getBody()),
+                sprintf('Got invalid message. body: %s', $body),
                 ['message' => $body]
             );
 
-            return self::REJECT;
+            return false;
         }
 
         $body = array_replace_recursive([
-                'notifyEmail' => null,
-                'options' => []
-            ], $body);
+            'notifyEmail' => null,
+            'options' => []
+        ], $body);
 
-        $format = pathinfo($body['originFileName'], PATHINFO_EXTENSION);
-        $splitterFile = $this->splitterChain->getSplitter($format);
+        $body['options']['batch_size'] = $this->batchSize;
 
-        if (! $splitterFile instanceof SplitterInterface) {
-            $this->logger->critical(
-                sprintf('Not supported format: "%s"', $format),
-                ['message' => $message]
-            );
-            return self::REJECT;
-        }
-        $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
-        $files = $splitterFile->getSplittedFilesNames($filePath);
+        return $body;
+    }
 
-        if (! count($files)) {
-            $errors = $splitterFile->getErrors();
-            $this->sendErrorNotification($body, $errors);
-
-            return self::REJECT;
-        }
-
-        $parentMessageId = $message->getMessageId();
+    /**
+     * {@inheritdoc}
+     */
+    protected function processJob($parentMessageId, $body, $files)
+    {
         $jobName = sprintf(
             'oro_cli:%s:%s:%s:%s',
             $body['process'],
@@ -135,11 +60,7 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
             function (JobRunner $jobRunner, Job $job) use ($jobName, $body, $files) {
                 foreach ($files as $key => $file) {
                     $jobRunner->createDelayed(
-                        sprintf(
-                            '%s:chunk.%s',
-                            $jobName,
-                            ++$key
-                        ),
+                        sprintf('%s:chunk.%s', $jobName, ++$key),
                         function (JobRunner $jobRunner, Job $child) use ($file, $body) {
                             $body['fileName'] = $file;
                             $this->producer->send(
@@ -169,28 +90,34 @@ class PreCliImportMessageProcessor implements MessageProcessorInterface, TopicSu
 
         $this->fileManager->deleteFile($body['fileName']);
 
-        return $result ? self::ACK : self::REJECT;
+        return $result;
     }
 
-
-    private function sendErrorNotification($body, $errors)
+    /**
+     * {@inheritdoc}
+     */
+    protected function sendErrorNotification(array $body, $error)
     {
         $errorMessage = sprintf(
-            'An error occurred while reading file %s: "%s"',
+            '[PreCliImportMessageProcessor] An error occurred while reading file %s: "%s"',
             $body['originFileName'],
-            implode(PHP_EOL, $errors)
+            $error
         );
+
         $this->logger->critical($errorMessage, ['message' => $body]);
 
         if (isset($body['notifyEmail'])) {
-            $this->producer->send(
-                Topics::SEND_IMPORT_ERROR_NOTIFICATION,
-                [
-                    'file' => $body['originFileName'],
-                    'error' => $errorMessage,
-                    'notifyEmail' => $body['notifyEmail'],
-                ]
-            );
+            $this->producer->send(NotifcationTopics::SEND_NOTIFICATION_EMAIL, [
+                'fromEmail' => $this->configManager->get('oro_notification.email_notification_sender_email'),
+                'fromName' => $this->configManager->get('oro_notification.email_notification_sender_name'),
+                'toEmail' => $body['notifyEmail'],
+                'template' => 'import_error',
+                'body' => [
+                    'originFileName' => $body['originFileName'],
+                    'error' => $error,
+                ],
+                'contentType' => 'text/html',
+            ]);
         }
     }
 

@@ -147,7 +147,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
         $attributeConfiguration = current($configuration);
         if ($guessedParameters && array_key_exists('property_path', $attributeConfiguration)) {
             $attributeGuesser->expects($this->any())
-                ->method('guessAttributeParameters')
+                ->method('guessParameters')
                 ->with($relatedEntity, $attributeConfiguration['property_path'])
                 ->will($this->returnValue($guessedParameters));
         }
