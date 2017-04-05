@@ -73,11 +73,7 @@ class PersistentBatchWriter implements
         try {
             $em->beginTransaction();
 
-            foreach ($items as $item) {
-                $em->persist($item);
-            }
-
-            $em->flush();
+            $this->saveItems($items, $em);
             $em->commit();
 
             $configuration = $this->contextRegistry
@@ -138,5 +134,18 @@ class PersistentBatchWriter implements
     public function restoreStepExecution()
     {
         $this->stepExecution = $this->previousStepExecution;
+    }
+
+    /**
+     * @param array $items
+     * @param EntityManager $em
+     */
+    protected function saveItems(array $items, EntityManager $em)
+    {
+        foreach ($items as $item) {
+            $em->persist($item);
+        }
+
+        $em->flush();
     }
 }

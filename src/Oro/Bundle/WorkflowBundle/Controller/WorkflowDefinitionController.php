@@ -97,7 +97,7 @@ class WorkflowDefinitionController extends Controller
         $entityFields = [];
         if (null !== $workflowDefinition->getRelatedEntity()) {
             /* @var $provider EntityWithFieldsProvider */
-            $provider = $this->get('oro_entity.entity_field_list_provider');
+            $provider = $this->get('oro_workflow.entity_field_list_provider');
             $entityFields = $provider->getFields(false, false, true, false, true, true);
         }
 
