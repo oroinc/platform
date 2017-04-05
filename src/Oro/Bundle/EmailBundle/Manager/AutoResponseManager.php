@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Exception;
-
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
 
@@ -11,6 +9,7 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
@@ -21,6 +20,7 @@ use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Model\AutoResponseRuleCondition;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
@@ -61,6 +61,9 @@ class AutoResponseManager
     /** @var EmailRenderer */
     protected $emailRender;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /** @var array */
     protected $filterToConditionMap = [
         TextFilterType::TYPE_CONTAINS     => 'contains',
@@ -74,13 +77,20 @@ class AutoResponseManager
         FilterUtility::TYPE_NOT_EMPTY     => 'not_empty',
     ];
 
+    /** @var array */
+    protected $filterOperatorToExprMap = [
+        FilterUtility::CONDITION_AND => '@and',
+        FilterUtility::CONDITION_OR => '@or',
+    ];
+
     /**
-     * @param Registry          $registry
-     * @param EmailModelBuilder $emailBuilder
-     * @param Processor         $emailProcessor
-     * @param EmailRenderer     $emailRender
-     * @param LoggerInterface   $logger
-     * @param string            $defaultLocale
+     * @param Registry            $registry
+     * @param EmailModelBuilder   $emailBuilder
+     * @param Processor           $emailProcessor
+     * @param EmailRenderer       $emailRender
+     * @param LoggerInterface     $logger
+     * @param TranslatorInterface $translator
+     * @param string              $defaultLocale
      */
     public function __construct(
         Registry $registry,
@@ -88,12 +98,14 @@ class AutoResponseManager
         Processor $emailProcessor,
         EmailRenderer $emailRender,
         LoggerInterface $logger,
+        TranslatorInterface $translator,
         $defaultLocale
     ) {
         $this->registry          = $registry;
         $this->emailBuilder      = $emailBuilder;
         $this->emailProcessor    = $emailProcessor;
         $this->logger            = $logger;
+        $this->translator        = $translator;
         $this->defaultLocale     = $defaultLocale;
         $this->configExpressions = new ConfigExpressions();
         $this->accessor          = PropertyAccess::createPropertyAccessor();
@@ -129,6 +141,38 @@ class AutoResponseManager
     }
 
     /**
+     * @return array
+     */
+    public function createEmailEntity()
+    {
+        return [
+            'name' => 'email',
+            'fields' => [
+                $this->createField('subject', 'oro.email.subject.label'),
+                $this->createField('emailBody.bodyContent', 'oro.email.email_body.label'),
+                $this->createField('fromName', 'From'),
+                $this->createField(sprintf('cc.%s.name', static::INDEX_PLACEHOLDER), 'Cc'),
+                $this->createField(sprintf('bcc.%s.name', static::INDEX_PLACEHOLDER), 'Bcc'),
+            ],
+        ];
+    }
+
+    /**
+     * @param string $name
+     * @param string $label
+     *
+     * @return array
+     */
+    protected function createField($name, $label)
+    {
+        return [
+            'label' => $this->translator->trans($label),
+            'name' => $name,
+            'type' => 'text',
+        ];
+    }
+
+    /**
      * @param Mailbox $mailbox
      * @param Email   $email
      */
@@ -149,7 +193,7 @@ class AutoResponseManager
     {
         try {
             $this->emailProcessor->process($email, $origin);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $this->logger->error('Email sending failed.', ['exception' => $ex]);
         }
     }
@@ -250,25 +294,82 @@ class AutoResponseManager
      */
     public function createRuleExpr(AutoResponseRule $rule, Email $email)
     {
-        $configs = [];
-        foreach ($rule->getConditions() as $condition) {
-            $paths = $this->getFieldPaths($condition->getField(), $email);
+        $definition = json_decode($rule->getDefinition(), true);
+        if (!$definition || !isset($definition['filters'])) {
+            return [];
+        }
 
-            $args = [null];
-            if (!in_array($condition->getFilterType(), [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-                $args[] = $this->parseValue($condition->getFilterValue(), $condition->getFilterType());
-            }
+        return $this->createGroupExpr([$definition['filters']], $email);
+    }
 
-            foreach ($paths as $path) {
-                $args[0]   = $path;
-                $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
-                $configs[] = [
-                    $configKey => $args,
-                ];
+    /**
+     * @param array $group
+     * @param Email $email
+     */
+    protected function createGroupExpr(array $group, Email $email)
+    {
+        $exprs = [];
+        $operators = [];
+
+        foreach ($group as $filter) {
+            if (is_string($filter)) {
+                $operators[] = $filter;
+            } elseif (is_array($filter)) {
+                if (array_key_exists('columnName', $filter)) {
+                    $condition = AutoResponseRuleCondition::createFromFilter($filter);
+                    $exprs[] = $this->createFilterExpr($condition, $email);
+                } else {
+                    $exprs[] = $this->createGroupExpr($filter, $email);
+                }
             }
         }
 
-        return $configs ? ['@and' => $configs] : [];
+        if (!$exprs) {
+            return [];
+        }
+
+        if (count($exprs) - count($operators) !== 1) {
+            throw new \LogicException('Number of operators have to be about 1 less than number of exprs.');
+        }
+
+        $exprOperators = array_map(function ($operator) {
+            return $this->filterOperatorToExprMap[$operator];
+        }, $operators);
+
+        return array_reduce($exprs, function ($carry, $expr) use (&$exprOperators) {
+            if (!$carry) {
+                return $expr;
+            }
+
+            return [array_shift($exprOperators) => [$carry, $expr]];
+        });
+    }
+
+    /**
+     * @param AutoResponseRuleCondition $condition
+     * @param Email $email
+     *
+     * @return array
+     */
+    protected function createFilterExpr(AutoResponseRuleCondition $condition, Email $email)
+    {
+        $paths = $this->getFieldPaths($condition->getField(), $email);
+
+        $args = [null];
+        if (!in_array($condition->getFilterType(), [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+            $args[] = $this->parseValue($condition->getFilterValue(), $condition->getFilterType());
+        }
+
+        $configs = [];
+        foreach ($paths as $path) {
+            $args[0]   = $path;
+            $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
+            $configs[] = [
+                $configKey => $args,
+            ];
+        }
+
+        return $configs ? [$this->filterOperatorToExprMap[FilterUtility::CONDITION_OR] => $configs] : [];
     }
 
     /**

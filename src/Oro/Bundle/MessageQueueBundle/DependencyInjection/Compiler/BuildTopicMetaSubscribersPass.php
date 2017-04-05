@@ -1,9 +1,10 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 
 class BuildTopicMetaSubscribersPass implements CompilerPassInterface
 {
@@ -69,6 +70,7 @@ class BuildTopicMetaSubscribersPass implements CompilerPassInterface
             }
 
             $topicName = $tagAttribute['topicName'];
+
             if (false == isset($topicsSubscribers[$topicName])) {
                 $topicsSubscribers[$topicName] = [];
             }

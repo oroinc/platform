@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\PersistentCollection;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -17,6 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType;
+use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -99,20 +99,18 @@ class AutoResponseRuleController extends Controller
         if ($form->isValid()) {
             $em = $this->getAutoResponseRuleManager();
             $em->persist($rule);
-
-            $conditions = $rule->getConditions();
-            if ($conditions instanceof PersistentCollection) {
-                array_map([$em, 'remove'], $conditions->getDeleteDiff());
-            }
-
             $em->flush();
 
             $this->clearAutoResponses();
         }
 
+        $entity = $this->getAutoResponseManager()->createEmailEntity();
+
         return [
             'form'  => $form->createView(),
             'saved' => $form->isValid(),
+            'data'  => [$entity['name'] => $entity],
+            'metadata' => $this->get('oro_query_designer.query_designer.manager')->getMetadata('string')
         ];
     }
 
@@ -133,6 +131,14 @@ class AutoResponseRuleController extends Controller
     protected function getEventDispatcher()
     {
         return $this->get('event_dispatcher');
+    }
+
+    /**
+     * @return AutoResponseManager
+     */
+    protected function getAutoResponseManager()
+    {
+        return $this->get('oro_email.autoresponserule_manager');
     }
 
     /**

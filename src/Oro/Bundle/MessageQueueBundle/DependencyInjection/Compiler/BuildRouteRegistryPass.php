@@ -81,7 +81,7 @@ class BuildRouteRegistryPass implements CompilerPassInterface
             $destinationName = empty($tagAttribute['destinationName']) ?
                 Config::DEFAULT_QUEUE_NAME :
                 $tagAttribute['destinationName'];
-            
+
             $configs[$tagAttribute['topicName']][] = [$processorName, $destinationName];
         }
     }

@@ -38,6 +38,12 @@ ConfigBundle
     - abstract service `oro_config.scope_manager.abstract` now has third argument defined as `@event_dispatcher`
 - Class `ConfigManagerScopeIdUpdateEvent` was added
 
+CurrencyBundle
+--------------
+- Interface `Oro\Bundle\MultiCurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface`:
+    - added method `getTransformSelectQueryForDataGrid` that allow to use query transformer in datagrid config
+
+
 DataAuditBundle
 ---------------
 A new string field `ownerDescription` with the database column `owner_description` was added to the entity 
@@ -51,12 +57,87 @@ DataGridBundle
 - Removed event `oro_datagrid.datagrid.extension.action.configure-actions.before`, now it is a call of `Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface::hasActions` of registered through a `oro_datagrid.extension.action.provider` tag services.
 - Interface `Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface`
     - the signature of method `getDatagrid` was changed - added new parameter `array $additionalParameters = []`.
-    
-TestFrameworkBundle
--------------------
-- added fourth (boolean) parameter to `\Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::runCommand` `$exceptionOnError` to throw `\RuntimeException` when command should executes as utility one.  
+- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used. 
+- Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export`, `setExportConnector` with `@oro_datagrid.importexport.export_connector`, `setExportProcessor` with `@oro_datagrid.importexport.processor.export` and `setWriterChain`  with `@oro_importexport.writer.writer_chain` were added. The constructor was removed, the parent class constructor is used.   
 
-AnnotationsReader
+ImportExportBundle
+------------------
+- Message topics `oro.importexport.cli_import`, `oro.importexport.import_http_validation`, `oro.importexport.import_http` with the constants were removed.
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessorAbstract` was added,
+    - construction signature: 
+        - JobRunner $jobRunner,
+        - MessageProducerInterface $producer,
+        - LoggerInterface $logger,
+        - DependentJobService $dependentJob,
+        - FileManager $fileManager,
+        - AbstractImportHandler $importHandler,
+        - WriterChain $writerChain,
+        - $batchSize
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\PreCliImportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. The constructor was removed, the parent class constructor is used. 
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`.  The constructor was removed, the parent class constructor is used. 
+- Added class `Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor`
+    - construction signature: 
+        - JobRunner $jobRunner,
+        - ImportExportResultSummarizer $importExportResultSummarizer,
+        - JobStorage $jobStorage
+        - LoggerInterface $logger,
+        - FileManager $fileManager,
+        - AbstractImportHandler $importHandler
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor`
+    - construction signature was changed now it takes next arguments: 
+        - JobRunner $jobRunner,
+        - ImportExportResultSummarizer $importExportResultSummarizer,
+        - JobStorage $jobStorage
+        - LoggerInterface $logger,
+        - FileManager $fileManager,
+        - CliImportHandler $cliImportHandler
+    - does not implement TopicSubscriberInterface now.
+    - subscribed topic moved to tag in `mq_processor.yml`.  
+    - service `oro_importexport.async.http_import` decorates `oro_importexport.async.import`
+- Class `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`
+    - construction signature was changed now it takes next arguments: 
+        - JobRunner $jobRunner,
+        - ImportExportResultSummarizer $importExportResultSummarizer,
+        - JobStorage $jobStorage
+        - LoggerInterface $logger,
+        - FileManager $fileManager,
+        - HttpImportHandler $cliImportHandler
+        - TokenSerializerInterface $tokenSerializer
+        - TokenStorageInterface $tokenStorage
+    - does not implement TopicSubscriberInterface now.
+    - subscribed topic moved to tag in `mq_processor.yml`.  
+    - service `oro_importexport.async.cli_import` decorates `oro_importexport.async.import`
+- Class `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` that implements `MessageProcessorInterface` and `TopicSubscriberInterface` was added. 
+    - construction signature:
+        - JobRunner $jobRunner,
+        - JobStorage $jobStorage,
+        - TokenStorageInterface $tokenStorage,
+        - TokenSerializerInterface $tokenSerializer,
+        - LoggerInterface $logger
+- Class `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` that implements `MessageProcessorInterface` and `TopicSubscriberInterface` was added. 
+    - construction signature:
+        - JobRunner $jobRunner,
+        - MessageProducerInterface $producer,
+        - TokenSerializerInterface $tokenSerializer,
+        - TokenStorageInterface $tokenStorage,
+        - DependentJobService $dependentJob,
+        - LoggerInterface $logger,
+        - $sizeOfBatch
+- Class `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_importexport.handler.export` and `setDoctrineHelper` with `@oro_entity.doctrine_helper` were added. The constructor was removed, the parent class constructor is used. 
+- Class `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_importexport.handler.export` and `setDoctrineHelper` with `@oro_entity.doctrine_helper` were added.  The constructor was removed, the parent class constructor is used. 
+
+IntegrationBundle
+-----------------
+- Class `Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor`
+    - construction signature was changed now it takes next arguments:
+        - `DoctrineHelper` $doctrineHelper,
+        - `ReverseSyncProcessor` $reverseSyncProcessor,
+        - `TypesRegistry` $typesRegistry,
+        - `JobRunner` $jobRunner,
+        - `TokenStorageInterface` $tokenStorage,
+        - `LoggerInterface` $logger
+
+NavigationBundle
 --------------
 - Methods in class `Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader` were removed:
     - `setRouter`
@@ -74,16 +155,11 @@ AnnotationsReader
     - use `Oro\Bundle\NavigationBundle\Provider\TitleTranslator` as third argument instead of `Symfony\Component\Translation\TranslatorInterface`
     - use `Oro\Component\DependencyInjection\ServiceLink` as fourth argument
 
-IntegrationBundle
------------------
-- Class `Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor`
-    - construction signature was changed now it takes next arguments:
-        - `DoctrineHelper` $doctrineHelper,
-        - `ReverseSyncProcessor` $reverseSyncProcessor,
-        - `TypesRegistry` $typesRegistry,
-        - `JobRunner` $jobRunner,
-        - `TokenStorageInterface` $tokenStorage,
-        - `LoggerInterface` $logger
+
+TestFrameworkBundle
+-------------------
+- added fourth (boolean) parameter to `\Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::runCommand` `$exceptionOnError` to throw `\RuntimeException` when command should executes as utility one.  
+ 
         
 WorkflowBundle
 --------------
@@ -110,7 +186,35 @@ WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler` was removed
 - Class `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType` renamed to `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType`
     
-CurrencyBundle
+
+PlatformBundle
 --------------
-- Interface `Oro\Bundle\MultiCurrencyBundle\Query\CurrencyQueryBuilderTransformerInterface`:
-    - added method `getTransformSelectQueryForDataGrid` that allow to use query transformer in datagrid config
+- Service `jms_serializer.link` was removed.
+- Class `Oro\Bundle\PlatformBundle\Twig\SerializerExtension`
+    - construction signature was changed, now it takes `ContainerInterface` $container instead of `ServiceLink` $serializerLink (jms_serializer.link)
+
+EmailBundle
+------------
+- Class `Oro\Bundle\EmailBundle\Entity\AutoResponseRule`
+    - methods related to `conditions` property were removed. Use methods related to `definition` property instead.
+- Class `Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition` was removed
+- Class `Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleConditionType` was removed
+- Class `Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType`
+    - form field `conditions` was removed. Use field `definition` instead.
+- Class `Oro\Bundle\EmailBundle\Manager\AutoResponseManager`
+    - construction signature was changed now it takes next arguments:
+        - `Registry` $registry,
+        - `EmailModelBuilder` $emailBuilder,
+        - `Processor` $emailProcessor,
+        - `EmailRenderer` $emailRender,
+        - `LoggerInterface` $logger,
+        - `TranslatorInterface` $translator,
+        - $defaultLocale
+- Class `Oro\Bundle\EmailBundle\Validator\AutoResponseRuleConditionValidator` was removed
+- Class `Oro\Bundle\EmailBundle\Validator\Constraints\AutoResponseRuleCondition` was removed
+- Class `Oro\Bundle\EmailBundle\Controller\AutoResponseRuleController`
+    - action `update` now returns following data: `form`, `saved`, `data`, `metadata`
+- template `Resources/views/Form/autoresponseFields.html.twig` was removed as it contained possibility to add collection item after arbitrary item, which is not needed anymore with new form
+- template `Resources/views/AutoResponseRule/dialog/update.html.twig` was changed
+- template `Resources/views/Configuration/Mailbox/update.html.twig` was changed
+- template `EmailBundle/Resources/views/Form/fields.html.twig` was changed
