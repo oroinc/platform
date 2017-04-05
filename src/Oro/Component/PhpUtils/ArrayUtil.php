@@ -12,6 +12,26 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 class ArrayUtil
 {
     /**
+     * Returns elements of the array separated by separator
+     *
+     * @param mixed $separator
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function interpose($separator, array $array)
+    {
+        $result = [];
+        foreach ($array as $element) {
+            $result[] = $separator;
+            $result[] = $element;
+        }
+        array_shift($result);
+
+        return $result;
+    }
+
+    /**
      * Checks whether the array is associative or sequential.
      *
      * @param array $array

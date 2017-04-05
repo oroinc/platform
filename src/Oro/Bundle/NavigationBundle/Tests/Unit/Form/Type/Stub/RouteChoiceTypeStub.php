@@ -38,6 +38,7 @@ class RouteChoiceTypeStub extends AbstractType
         );
 
         $resolver->setDefault('choices', $this->choices);
+        $resolver->setDefault('menu_name', 'menu');
     }
 
     /**

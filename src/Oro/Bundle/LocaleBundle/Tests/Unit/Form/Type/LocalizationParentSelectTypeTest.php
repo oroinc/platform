@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationParentSelectType;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -27,7 +29,7 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('oro_jqueryselect2_hidden', $this->formType->getParent());
+        $this->assertEquals(OroEntitySelectOrCreateInlineType::NAME, $this->formType->getParent());
     }
 
     public function testGetName()
@@ -69,8 +71,9 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
      *
      * @param object|null $parentData
      * @param int|null $expectedParentId
+     * @param array $expectedIds
      */
-    public function testBuildView($parentData, $expectedParentId)
+    public function testBuildView($parentData, $expectedParentId, array $expectedIds)
     {
         $parentForm = $this->createMock('Symfony\Component\Form\FormInterface');
         $parentForm->expects($this->once())->method('getData')->willReturn($parentData);
@@ -85,6 +88,12 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('configs', $formView->vars);
         $this->assertArrayHasKey('entityId', $formView->vars['configs']);
         $this->assertEquals($expectedParentId, $formView->vars['configs']['entityId']);
+
+        $this->assertArrayHasKey('grid_parameters', $formView->vars);
+        $this->assertInternalType('array', $formView->vars['grid_parameters']);
+        $this->assertArrayHasKey('ids', $formView->vars['grid_parameters']);
+        $this->assertInternalType('array', $formView->vars['grid_parameters']['ids']);
+        $this->assertEquals($expectedIds, $formView->vars['grid_parameters']['ids']);
     }
 
     /**
@@ -96,10 +105,29 @@ class LocalizationParentSelectTypeTest extends \PHPUnit_Framework_TestCase
             'without entity' => [
                 'parentData' => null,
                 'expectedParentId' => null,
+                'expectedIds' => [],
             ],
             'with entity' => [
-                'parentData' => $this->getEntity('Oro\Bundle\LocaleBundle\Entity\Localization', ['id' => 42]),
+                'parentData' => $this->getEntity(
+                    Localization::class,
+                    [
+                        'id' => 42,
+                        'childLocalizations' => [
+                            $this->getEntity(
+                                Localization::class,
+                                [
+                                    'id' => 105,
+                                    'childLocalizations' => [
+                                        $this->getEntity(Localization::class, ['id' => 110])
+                                    ]
+                                ]
+                            ),
+                            $this->getEntity(Localization::class, ['id' => 120])
+                        ]
+                    ]
+                ),
                 'expectedParentId' => 42,
+                'expectedIds' => [42, 105, 110, 120],
             ],
         ];
     }

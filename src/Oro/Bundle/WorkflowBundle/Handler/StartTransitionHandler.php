@@ -60,10 +60,6 @@ class StartTransitionHandler
      */
     public function handle(Workflow $workflow, Transition $transition, $data, $entity)
     {
-        if ($transition->getPageTemplate() || $transition->getDialogTemplate()) {
-            return;
-        }
-
         $responseCode = null;
         $responseMessage = null;
         $workflowItem = null;

@@ -134,6 +134,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'API documentation cache</info>'
             );
         }
+        $output->writeln(
+            '<info>Make sure that consumer command was running <comment>oro:message-queue:consume</comment>' .
+            'More info you can find here:'.'<comment>'.
+            'https://www.orocrm.com/documentation/current/book/installation#activating-background-tasks' .
+            '</comment></info>'
+        );
     }
 
     /**
@@ -210,7 +216,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $commandExecutor->runCommand(
                 'cache:clear',
                 [
+                    '--no-optional-warmers' => true,
                     '--no-warmup' => true,
+                    '--no-debug' => true,
                 ]
             );
             $managers = $this->getContainer()->get('doctrine')->getManagers();
@@ -581,6 +589,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $cacheClearOptions = ['--process-isolation' => true];
         if ($commandExecutor->getDefaultOption('no-debug')) {
             $cacheClearOptions['--no-debug'] = true;
+        }
+        if ($input->getOption('env')) {
+            $cacheClearOptions['--env'] = $input->getOption('env');
         }
         $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 

@@ -27,7 +27,10 @@ class Grid extends Table
     {
         $massActionsButton = $this->getMassActionButton();
         $massActionsButton->press();
+
         $massActionLink = $this->getMassActionLink($title);
+        self::assertNotNull($massActionLink, 'Mass action link not found on the page');
+        self::assertTrue($massActionLink->isVisible(), 'Mass action link is not visible');
         $massActionLink->click();
     }
 
@@ -131,7 +134,7 @@ class Grid extends Table
                 ->createElement('GridFloatingMenu')
                 ->find('named', ['link', ucfirst($action)]);
         } else {
-            $link = $row->find('named', ['link', $action]);
+            $link = $row->find('named', ['link', ucfirst($action)]);
         }
 
         self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $row->getText(), $action));

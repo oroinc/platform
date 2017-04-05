@@ -8,6 +8,17 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class MainMenu extends Element
 {
+    /** @var Element */
+    private $dropDown = null;
+
+    /**
+     * @inheritdoc
+     */
+    protected function init()
+    {
+        $this->dropDown = $this;
+    }
+
     /**
      * @param string $path
      * @throws ElementNotFoundException
@@ -15,36 +26,58 @@ class MainMenu extends Element
      */
     public function openAndClick($path)
     {
+        $this->dropDown = $this;
         $items = explode('/', $path);
         $linkLocator = trim(array_pop($items));
-        $that = $this;
 
-        while ($item = array_shift($items)) {
-            /** @var NodeElement $link */
-            $link = $this->findVisibleLink($that, trim($item));
-            $link->mouseOver();
-            $that = $this->elementFactory->wrapElement(
-                'MainMenuDropdown',
-                $link->getParent()->find('css', '.dropdown-menu')
-            );
-        }
+        $this->moveByMenuTree($path);
 
-        $link = $this->findVisibleLink($that, trim($linkLocator));
+        $link = $this->findVisibleLink($linkLocator);
         $link->click();
 
         return $link;
     }
 
     /**
-     * @param Element $element
-     * @param $item
+     * @inheritdoc
+     */
+    public function hasLink($path)
+    {
+        try {
+            $this->moveByMenuTree($path);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    private function moveByMenuTree($path)
+    {
+        $items = explode('/', $path);
+        array_pop($items);
+
+        while ($item = array_shift($items)) {
+            /** @var NodeElement $link */
+            $link = $this->findVisibleLink($item);
+            $link->mouseOver();
+            $this->dropDown = $this->elementFactory->wrapElement(
+                'MainMenuDropdown',
+                $link->getParent()->find('css', '.dropdown-menu')
+            );
+        }
+    }
+
+    /**
+     * @param string $title
      * @return NodeElement
      */
-    protected function findVisibleLink(Element $element, $item)
+    protected function findVisibleLink($title)
     {
+        $title = trim($title);
+
         /** @var NodeElement $link */
-        $link = $element->spin(function (NodeElement $element) use ($item) {
-            $link = $element->findLink(trim($item));
+        $link = $this->dropDown->spin(function (NodeElement $element) use ($title) {
+            $link = $element->findLink($title);
 
             if ($link && $link->isVisible()) {
                 return $link;
@@ -53,7 +86,7 @@ class MainMenu extends Element
             return null;
         }, 5);
 
-        self::assertNotNull($link, sprintf('Menu item "%s" not found', $item));
+        self::assertNotNull($link, sprintf('Menu item "%s" not found', $title));
 
         return $link;
     }

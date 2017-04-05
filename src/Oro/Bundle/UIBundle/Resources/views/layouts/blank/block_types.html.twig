@@ -31,21 +31,22 @@
     }) %}
     <div {{ block('block_attributes') }}>
         <span class="breadcrumbs__item">
-            {% for breadcrumb in breadcrumbs %}
-                {% if breadcrumb is not iterable %}
-                    {% set breadcrumb = {
-                        label: breadcrumb
-                    } %}
-                {% endif %}
-                {% set label = breadcrumb.label_localized|default(null) ? breadcrumb.label_localized|localized_value : breadcrumb.label|trans %}
-                {% if breadcrumb.uri is defined %}
-                    {% set url = breadcrumb.uri %}
-                {% else %}
-                    {% set url = breadcrumb.route|default(null) ? path(breadcrumb.route, breadcrumb.routeParams|default([])) : null %}
-                {% endif %}
-                {{ not loop.first ? ' / ' }}
-                {% if url and not loop.last %}<a href="{{ url }}" class="breadcrumbs__link">{{ label }}</a>{% else %}{{ label }}{% endif %}
-            {% endfor %}
+            {% if breadcrumbs is not iterable %}
+                {{ breadcrumbs }}
+            {% else %}
+                {% for breadcrumb in breadcrumbs %}
+                    {{ not loop.first ? ' / ' }}
+                    {% if breadcrumb.label is defined %}
+                        {% if breadcrumb.url and not loop.last %}
+                            <a href="{{ breadcrumb.url }}" class="breadcrumbs__link">{{ breadcrumb.label }}</a>
+                        {% else %}
+                            {{ breadcrumb.label }}
+                        {% endif %}
+                    {%  else %}
+                        {{ breadcrumb }}
+                    {%  endif %}
+                {% endfor %}
+            {% endif %}
         </span>
         {{ block('container_widget') }}
     </div>

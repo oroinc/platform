@@ -782,6 +782,7 @@ services:
             index_1: '@oro_security.acl.permission_granting_strategy'
         calls:
             - [setUnderlyingCache, ['@security.acl.underlying.cache']]
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_security.acl.voter.basic_permissions:
         class: Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
@@ -801,3 +802,8 @@ services:
         public: true
         arguments:
             index_1: '@oro_security.acl.permission_granting_strategy'
+
+    oro_security.token_serializer:
+        class: Oro\Bundle\SecurityBundle\Authentication\TokenSerializer
+        arguments:
+            - '@doctrine'

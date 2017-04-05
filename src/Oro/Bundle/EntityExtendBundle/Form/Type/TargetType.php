@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -100,7 +101,7 @@ class TargetType extends AbstractType
             ? [$this->configManager->getId('extend', $this->targetEntityClass)]
             : $this->configManager->getIds('extend');
 
-        if (in_array($relationType, [RelationTypeBase::ONE_TO_MANY, RelationTypeBase::MANY_TO_MANY], true)) {
+        if ($relationType === RelationTypeBase::ONE_TO_MANY) {
             $entityIds = array_filter(
                 $entityIds,
                 function (EntityConfigId $configId) {
@@ -116,12 +117,7 @@ class TargetType extends AbstractType
             function (EntityConfigId $configId) {
                 $config = $this->configManager->getConfig($configId);
 
-                return
-                    !$config->is('state', ExtendScope::STATE_NEW)
-                    && (
-                        $this->targetEntityClass
-                        || !$config->is('is_deleted')
-                    );
+                return $this->isSuitableAsTarget($config, $this->targetEntityClass);
             }
         );
 
@@ -149,6 +145,24 @@ class TargetType extends AbstractType
         return [
             'data-icon' => $entityConfig->get('icon')
         ];
+    }
+
+    /**
+     * Checks if entity is suitable as target for relation
+     * @param ConfigInterface $config
+     * @param string $targetEntityClass
+     * @return bool
+     */
+    protected function isSuitableAsTarget(ConfigInterface $config, $targetEntityClass)
+    {
+        return
+            !$config->is('is_extend')
+            ||
+            (!$config->is('state', ExtendScope::STATE_NEW)
+                && (
+                    $targetEntityClass
+                    || !$config->is('is_deleted')
+                ));
     }
 
     /**

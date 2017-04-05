@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
+use JMS\Serializer\Annotation as Serializer;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 trait UpdatedAtAwareTrait
@@ -22,6 +24,7 @@ trait UpdatedAtAwareTrait
 
     /**
      * @var bool
+     * @Serializer\Type("boolean")
      */
     protected $updatedAtSet;
 

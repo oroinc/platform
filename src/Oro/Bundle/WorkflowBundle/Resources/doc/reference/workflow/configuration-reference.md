@@ -247,6 +247,9 @@ Single attribute can be described with next configuration:
     * **multiple**
         *boolean*
         Indicates whether several entities are supported. Allowed only when type is entity.
+    * **virtual**
+        *boolean*
+        Such attribute will not be saved in the database and available only on current transition. Default value is false.
 
 **Notice**
 Attribute configuration does not contain any information about how to render attribute on step forms,
@@ -266,6 +269,10 @@ workflows:
                 delete: false
             options:
                 class: Oro\Bundle\AccountBundle\Entity\Account
+        send_email:
+            type: checkbox
+            options:
+                virtual: true
         new_company_name:
             type: string
         opportunity:
@@ -794,6 +801,21 @@ A single variable can be described with the following configuration:
         elements of array should be scalars or objects that supports serialize/deserialize
     * **object**
         object should support serialize/deserialize, option "class" is required for this type
+    * **entity**
+        Doctrine entity, option "class" is required and it must be a Doctrine manageable class
+* **entity_acl**
+    Defines an ACL for the specific entity stored in this attribute.
+    * **update**
+        *boolean*
+        Can entity be updated. Default value is true.
+    * **delete**
+        *boolean*
+        Can entity be deleted. Default value is true.
+* **property_path**
+    *string*
+    Used to work with variable value by reference and specifies path to data storage. If property path is specified
+    then all other attribute properties except name are optional - they can be automatically guessed
+    based on last element (field) of property path.
 * **label**
     *translatable*: `oro.workflow.{workflow_name}.variable.{variable_name}.label`
     Label can be shown in the UI
@@ -806,6 +828,15 @@ A single variable can be described with the following configuration:
         *array*
         Options defined here are passed to the `WorkflowVariablesType` form type.
         Browse class *Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType* for more details.
+        Constraints may be set to workflow configuration form with the `constraints` option. All Symfony form constrains are supported.
+    * **multiple**
+        *boolean*
+        Indicates whether several entities are supported. Allowed only when type is entity.
+    * **identifier**
+        *string*
+        Applies to entities only. Class identifier specifies the identity field which will be used to query for the desired entity, in case a default entity needs to be loaded upon workflow assembling.
+        Not specifying it will read the identifier field names from the entity's metadata.
+        Note: It's not necessary to use a primary key, any **unique** key is supporter, as long as it is not a composite key.
 
 **Notice**
 Unlike attributes, variable configuration does contain information about how to render variables in the configuration form, with the `form_options` node under `options`.
@@ -820,12 +851,16 @@ workflows:
     my_workflow:
         variable_definitions:
             variables:
-               threshold:
-                    type: 'float'
-                    value: 5000
+               admin_user:
+                    type: 'entity'
+                    value: 1 # id of the user to be loaded upon variable assembling
                     options:
+                        class: Oro\Bundle\UserBundle\Entity\User
+                        identifier: id
                         form_options:
                             tooltip: true
+                            constraints:
+                                NotBlank: ~
 ```
 
 Using a variable:
@@ -835,7 +870,7 @@ Using a variable:
         '@and':
             ...
             - '@not':
-                - '@less_total_limit': [$entity, $.data.threshold]
+                - '@some_condition': [$entity, $.data.admin_user]
 ```
 
 Example Workflow Configuration

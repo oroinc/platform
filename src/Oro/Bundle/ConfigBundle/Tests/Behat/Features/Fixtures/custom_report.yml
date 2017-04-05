@@ -1,0 +1,7 @@
+Oro\Bundle\ReportBundle\Entity\Report:
+  report:
+    name: Test Report
+    type: 'TABLE'
+    entity: Oro\Bundle\CalendarBundle\Entity\CalendarEvent
+    organization: '@organization'
+    definition: '{"columns":[{"name":"id","label":"Id","func":"","sorting":""}],"grouping_columns":[]}'

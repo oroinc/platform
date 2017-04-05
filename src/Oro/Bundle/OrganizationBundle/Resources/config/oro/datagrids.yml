@@ -2,8 +2,11 @@ datagrids:
     business-unit-grid:
         extended_entity_name: %oro_organization.business_unit.entity.class%
         options:
-            entityHint: business unit
+            entityHint: business units
             entity_pagination: true
+            mass_actions:
+                delete:
+                    enabled: false
         source:
             type: orm
             skip_acl_apply: true
@@ -182,7 +185,7 @@ datagrids:
             default:
                 hasCurrentBusinessUnit: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
         options:
-            entityHint: user
+            entityHint: users
             rowSelection:
                 dataField: id
                 columnName: hasCurrentBusinessUnit
@@ -193,7 +196,7 @@ datagrids:
     bu-view-users-grid:
         extends: user-relation-grid
         options:
-            entityHint: user
+            entityHint: users
         acl_resource: oro_business_unit_view
         source:
             query:

@@ -12,9 +12,10 @@ interface ManagerInterface
      *
      * @param string $name Unique name of grid, optionally with scope ("grid-name:grid-scope")
      * @param ParameterBag|array|null $parameters
+     * @param array $additionalParameters
      * @return DatagridInterface
      */
-    public function getDatagrid($name, $parameters = null);
+    public function getDatagrid($name, $parameters = null, array $additionalParameters = []);
 
     /**
      * Returns prepared datagrid object for further operations based on parameters from request.

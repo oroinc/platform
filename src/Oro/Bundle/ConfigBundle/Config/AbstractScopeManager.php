@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
+use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 
 /**
  * A base class for configuration scope managers
@@ -18,6 +21,9 @@ abstract class AbstractScopeManager
     /** @var CacheProvider */
     protected $cache;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var array */
     protected $changedSettings = [];
 
@@ -25,10 +31,14 @@ abstract class AbstractScopeManager
      * @param ManagerRegistry $doctrine
      * @param CacheProvider   $cache
      */
-    public function __construct(ManagerRegistry $doctrine, CacheProvider $cache)
-    {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        CacheProvider $cache,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->doctrine = $doctrine;
         $this->cache    = $cache;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -175,8 +185,8 @@ abstract class AbstractScopeManager
     public function flush($scopeIdentifier = null)
     {
         $entityId = $this->resolveIdentifier($scopeIdentifier);
-        if (count($this->changedSettings[$entityId]) > 0) {
-            $this->save($this->changedSettings[$entityId]);
+        if (!empty($this->changedSettings[$entityId])) {
+            $this->save($this->changedSettings[$entityId], $scopeIdentifier);
             $this->changedSettings[$entityId] = [];
         }
     }
@@ -297,6 +307,12 @@ abstract class AbstractScopeManager
      */
     public function setScopeId($scopeId)
     {
+    }
+
+    protected function dispatchScopeIdChangeEvent()
+    {
+        $event = new ConfigManagerScopeIdUpdateEvent();
+        $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
     }
 
     /**

@@ -31,10 +31,14 @@ class ActivityList extends Element
     }
 
     /**
-     * @return NodeElement[]
+     * @return ActivityListItem[]
      */
     public function getItems()
     {
-        return $this->findAll('css', 'div.list-item');
+        $itemElements = $this->findAll('css', 'div.list-item');
+
+        return array_map(function (NodeElement $element) {
+            return $this->elementFactory->wrapElement('ActivityListItem', $element);
+        }, $itemElements);
     }
 }

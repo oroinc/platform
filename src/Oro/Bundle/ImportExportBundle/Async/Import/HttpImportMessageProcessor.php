@@ -4,220 +4,126 @@ namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\Config;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class HttpImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class HttpImportMessageProcessor extends ImportMessageProcessor
 {
     /**
-     * @var HttpImportHandler
+     * @var TokenSerializerInterface
      */
-    protected $httpImportHandler;
-
-    /**
-     * @var JobRunner
-     */
-    protected $jobRunner;
-
-    /**
-     * @var MessageProducerInterface
-     */
-    protected $producer;
-
-    /**
-     * @var RegistryInterface
-     */
-    protected $doctrine;
+    private $tokenSerializer;
 
     /**
      * @var TokenStorageInterface
      */
-    protected $tokenStorage;
+    private $tokenStorage;
 
     /**
-     * @var LoggerInterface
+     * @param JobRunner $jobRunner
+     * @param ImportExportResultSummarizer $importExportResultSummarizer
+     * @param JobStorage $jobStorage
+     * @param LoggerInterface $logger
+     * @param FileManager $fileManager
+     * @param HttpImportHandler $importHandler
+     * @param TokenSerializerInterface $tokenSerializer
+     * @param TokenStorageInterface $tokenStorage
      */
-    protected $logger;
-
-    /**
-     * @var JobStorage
-     */
-    protected $jobStorage;
-
-    /**
-     * @var ImportExportResultSummarizer
-     */
-    protected $importExportResultSummarizer;
-
     public function __construct(
-        HttpImportHandler $httpImportHandler,
         JobRunner $jobRunner,
-        MessageProducerInterface $producer,
-        RegistryInterface $doctrine,
-        TokenStorageInterface $tokenStorage,
         ImportExportResultSummarizer $importExportResultSummarizer,
         JobStorage $jobStorage,
         LoggerInterface $logger,
-        FileManager $fileManager
+        FileManager $fileManager,
+        HttpImportHandler $importHandler,
+        TokenSerializerInterface $tokenSerializer,
+        TokenStorageInterface $tokenStorage
     ) {
-        $this->httpImportHandler = $httpImportHandler;
-        $this->jobRunner = $jobRunner;
-        $this->producer = $producer;
-        $this->doctrine = $doctrine;
+        parent::__construct(
+            $jobRunner,
+            $importExportResultSummarizer,
+            $jobStorage,
+            $logger,
+            $fileManager,
+            $importHandler
+        );
+
+        $this->tokenSerializer = $tokenSerializer;
         $this->tokenStorage = $tokenStorage;
-        $this->importExportResultSummarizer = $importExportResultSummarizer;
-        $this->jobStorage = $jobStorage;
-        $this->logger = $logger;
-        $this->fileManager = $fileManager;
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $body
+     * @param Job $job
+     * @return bool
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    protected function handleImport(array $body, Job $job)
     {
-        $this->backwardCompatibilityMapper($message);
+        if (! $this->setSecurityToken($body['securityToken'])) {
+            $this->logger->critical(
+                sprintf('[HttpImportMessageProcessor] Cannot set security token'),
+                ['message' => $body]
+            );
+            return null;
+        }
+
+        return parent::handleImport($body, $job);
+    }
+
+    /**
+     * @param MessageInterface $message
+     * @return array|null
+     */
+    protected function getNormalizeBody(MessageInterface $message)
+    {
         $body = JSON::decode($message->getBody());
 
-        if (! isset(
+        if (!isset(
             $body['jobId'],
             $body['userId'],
+            $body['securityToken'],
             $body['processorAlias'],
             $body['fileName'],
             $body['jobName'],
             $body['process'],
             $body['originFileName']
-        )) {
-            $this->logger->critical(
-                sprintf('Got invalid message. body: %s', $message->getBody()),
-                ['message' => $message]
-            );
-
-            return self::REJECT;
+        )
+        ) {
+            return null;
         }
 
-        $body = array_replace_recursive(
-            ['options' => []],
+        return array_replace_recursive(
+            [
+                'options' => []
+            ],
             $body
         );
-
-        if (! ($user = $this->doctrine->getRepository(User::class)->find($body['userId'])) instanceof User) {
-            $this->logger->error(
-                sprintf('User not found. id: %s', $body['userId']),
-                ['message' => $body]
-            );
-
-            return self::REJECT;
-        }
-
-        $result = $this
-            ->jobRunner
-            ->runDelayed(
-                $body['jobId'],
-                function (JobRunner $jobRunner, Job $job) use ($body, $user) {
-                    $this->initUserToken($user);
-                    $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
-                    $this->httpImportHandler->setImportingFileName($filePath);
-                    $result = $this->httpImportHandler->handle(
-                        $body['process'],
-                        $body['jobName'],
-                        $body['processorAlias'],
-                        $body['options']
-                    );
-                    $this->saveJobResult($job, $result);
-                    $this->logger->info(
-                        $this->importExportResultSummarizer->getSummaryMessage(
-                            array_merge(['originFileName' => $body['originFileName']], $result),
-                            $body['process'],
-                            $this->logger
-                        ),
-                        ['message' => $body]
-                    );
-
-                    return $result['success'];
-                }
-            );
-
-        $this->fileManager->deleteFile($body['fileName']);
-
-        return $result ? self::ACK : self::REJECT;
     }
 
-    protected function initUserToken($user)
+    /**
+     * @param string $serializedToken
+     *
+     * @return bool
+     */
+    private function setSecurityToken($serializedToken)
     {
-        $token = new UsernamePasswordOrganizationToken(
-            $user,
-            null,
-            'import',
-            $user->getOrganization(),
-            $user->getRoles()
-        );
+        $token = $this->tokenSerializer->deserialize($serializedToken);
+
+        if (null === $token) {
+            return false;
+        }
+
         $this->tokenStorage->setToken($token);
-    }
 
-    protected function saveJobResult(Job $job, array $data)
-    {
-        unset($data['message']);
-        unset($data['importInfo']);
-        $job = $this->jobStorage->findJobById($job->getId());
-        $job->setData($data);
-        $this->jobStorage->saveJob($job);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedTopics()
-    {
-        return [Topics::HTTP_IMPORT, Topics::IMPORT_HTTP, Topics::IMPORT_HTTP_VALIDATION];
-    }
-
-    /**
-     * Method convert body old import topic to new
-     * @deprecated (deprecated since 2.1 will be remove in 2.3)
-     * @param $message
-     */
-    private function backwardCompatibilityMapper(MessageInterface &$message)
-    {
-        $topic = $message->getProperty(Config::PARAMETER_TOPIC_NAME);
-
-        if ($topic !== Topics::IMPORT_HTTP && $topic !== Topics::IMPORT_HTTP_VALIDATION) {
-            return;
-        }
-        $body = JSON::decode($message->getBody());
-
-        if (! isset($body['jobId'], $body['userId'], $body['processorAlias'], $body['filePath'])) {
-            return;
-        }
-        $this->fileManager->writeFileToStorage($body['filePath'], basename($body['filePath']), true);
-        $body['fileName'] = basename($body['filePath']);
-
-        if (Topics::IMPORT_HTTP === $topic) {
-            $body['process'] = ProcessorRegistry::TYPE_IMPORT;
-            $body['jobName'] = JobExecutor::JOB_IMPORT_FROM_CSV;
-        } else {
-            $body['process'] = ProcessorRegistry::TYPE_IMPORT_VALIDATION;
-            $body['jobName'] = JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV;
-        }
-        $message->setBody(JSON::encode($body));
+        return true;
     }
 }

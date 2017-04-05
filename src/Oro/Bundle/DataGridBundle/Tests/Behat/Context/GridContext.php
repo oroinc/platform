@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterDateTimeItem;
@@ -20,6 +21,7 @@ use Symfony\Component\DomCrawler\Crawler;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class GridContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -35,6 +37,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iDonTSelectAnyRecordFromGrid()
     {
+        // No need to do anything
     }
 
     /**
@@ -57,7 +60,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^there (are|is) (?P<number>(?:|one|two|\d+)) record(?:|s) in grid$/
+     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
     public function numberOfRecordsShouldBe($number)
     {
@@ -166,6 +169,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then the number of records greater than or equal to :number
+     *
+     * @param int $number
+     */
+    public function theNumberOfRecordsGreaterThanOrEqual($number)
+    {
+        self::assertGreaterThanOrEqual(
+            $number,
+            $this->getGridPaginator()->getTotalRecordsCount()
+        );
+    }
+
+    /**
      * @Then the number of records remained the same
      * @Then no records were deleted
      */
@@ -265,6 +281,33 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Assert that column value of specified row is equal to given value
+     * Example: I should see that Translated Value in 1 row is equal to "some value"
+     * @Then /^(?:|I )should see that (?P<column>([\w\s]+)) in (?P<rowNumber>([\d]+)) row is equal to "(?P<value>(.*))"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertColumnValueEquals($column, $rowNumber, $value)
+    {
+        $rowValue = $this->getGrid()->getRowByNumber($rowNumber)->getCellValue($column);
+        self::assertEquals($value, $rowValue);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Assert that column value of specified row is empty (or not empty)
+     * Example: I should see that Translated Value in 1 row is empty
+     * Example: I should see that Translated Value in 1 row is not empty
+     * @Then /^(?:|I )should see that (?P<column>([\w\s]+)) in (?P<rowNumber>([\d]+)) row is (?P<type>(empty|not empty))$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertColumnValueIsEmpty($column, $rowNumber, $type)
+    {
+        $rowValue = $this->getGrid()->getRowByNumber($rowNumber)->getCellValue($column);
+        $type === 'empty' ? self::assertEmpty($rowValue) : self::assertNotEmpty($rowValue);
+    }
+
     /**
      * Assert column values by given row
      * Example: Then I should see Charlie Sheen in grid with following data:
@@ -274,6 +317,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | State   | Kharkivs'ka Oblast' |
      *
      * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in grid with following data:$/
      */
     public function assertRowValues($content, TableNode $table)
     {
@@ -399,14 +443,42 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I check "Task, Email" in Activity Type filter
      *
      * @When /^(?:|I )check "(?P<filterItems>.+)" in (?P<filterName>([\w\s]+)) filter$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" in "(?P<filterName>.+)" filter$/
      */
     public function iCheckCheckboxesInFilter($filterName, $filterItems)
     {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterName);
+
+        $this->checkItemsInFilter($filterItem, $filterItems);
+    }
+
+    /**
+     * Select value in select filter
+     * Example: When I check "Task, Email" in "Activity Type" filter strictly
+     *
+     * @When /^(?:|I )check "(?P<filterItems>.+)" in "(?P<filterLabel>.+)" filter strictly$/
+     *
+     * @param string $filterLabel
+     * @param string $filterItems
+     */
+    public function iCheckItemsInFilterStrictly($filterLabel, $filterItems)
+    {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters()->getFilterItem('MultipleChoice', $filterLabel, true);
+
+        $this->checkItemsInFilter($filterItem, $filterItems);
+    }
+
+    /**
+     * @param MultipleChoice $filter
+     * @param string $filterItems
+     */
+    protected function checkItemsInFilter(MultipleChoice $filter, $filterItems)
+    {
         $filterItems = array_map('trim', explode(',', $filterItems));
 
-        $filterItem->checkItems($filterItems);
+        $filter->checkItems($filterItems);
     }
 
     /**
@@ -448,6 +520,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iCheckAllRecordsInGrid()
     {
+        if (!count($this->getGrid()->getRows())) {
+            self::fail('Grid has no records to check');
+        }
         $this->getGrid()->massCheck('All');
     }
 
@@ -490,6 +565,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And I click delete Sign a contract with Charlie in grid
      *
      * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) (?P<content>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I )click (?P<action>(Clone|(?!\bon)\w)*) "(?P<content>(.+))" in grid$/
      */
     public function clickActionInRow($content, $action)
     {
@@ -638,6 +714,80 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check visibility checkbox for specified column
+     * Show this column in grid
+     *
+     * @Given /^(?:|I) show column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I) mark as visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iShowColumnInGrid($columnName)
+    {
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
+        $columnManager->checkColumnVisibility($columnName);
+        $columnManager->close();
+    }
+
+    /**
+     * Uncheck visibility checkbox for specified column
+     * Hide this column in grid
+     *
+     * @Given /^(?:|I) hide column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     * @Given /^(?:|I) mark as not visible column (?P<columnName>(?:[^"]|\\")*) in grid$/
+     */
+    public function iHideColumnInGrid($columnName)
+    {
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
+        $columnManager->uncheckColumnVisibility($columnName);
+        $columnManager->close();
+    }
+
+    /**
+     * Hide all columns in grid except mentioned
+     *
+     * @When /^I hide all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^I hide all columns in grid$/
+     */
+    public function iHideAllColumnsInGrid($exceptions = '')
+    {
+        $exceptions = explode(',', $exceptions);
+        $exceptions = array_map('trim', $exceptions);
+        $exceptions = array_filter($exceptions);
+
+        $columnManager = $this->getGridColumnManager();
+        $columnManager->open();
+        $columnManager->hideAllColumns($exceptions);
+        $columnManager->close();
+    }
+
+    /**
+     * Asserts per page value on current page with provided amount
+     *
+     * @Then /^per page amount should be (\d+)$/
+     */
+    public function perPageAmountShouldBe($expectedAmount)
+    {
+        $perPage = $this->elementFactory->createElement('GridToolBarTools')->getPerPageAmount();
+
+        self::assertNotNull($perPage, 'Grid per page control elements not found on current page');
+        self::assertEquals($expectedAmount, $perPage);
+    }
+
+    /**
+     * Records in table on current page should match the count.
+     * Example: Then records in grid should be 5
+     *
+     * @Then records in current page grid should be :count
+     */
+    public function recordsInGridShouldBe($count)
+    {
+        $gridRows = $this->getPage()->findAll('css', '.grid-container tbody tr');
+
+        self::assertCount((int) $count, $gridRows);
+    }
+
+    /**
      * @param string $stringNumber
      * @return int
      */
@@ -695,5 +845,13 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         return $filters;
+    }
+
+    /**
+     * @return GridColumnManager
+     */
+    private function getGridColumnManager()
+    {
+        return $this->createElement('GridColumnManager');
     }
 }
