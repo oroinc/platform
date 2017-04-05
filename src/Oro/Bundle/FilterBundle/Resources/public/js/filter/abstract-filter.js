@@ -104,6 +104,13 @@ define([
         dropdownFitContainers: ['.ui-dialog-content>*:first-child', '#container', 'body'],
 
         /**
+         * Allow clear selected value
+         *
+         * @property {Boolean}
+         */
+        allowClear: true,
+
+        /**
          * Initialize.
          *
          * @param {Object} options

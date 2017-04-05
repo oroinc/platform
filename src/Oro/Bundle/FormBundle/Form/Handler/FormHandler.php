@@ -58,10 +58,7 @@ class FormHandler implements FormHandlerInterface
 
                 $manager->beginTransaction();
                 try {
-                    $manager->persist($data);
-                    $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $data));
-                    $manager->flush();
-                    $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $data));
+                    $this->saveData($data, $form);
                     $manager->commit();
                 } catch (\Exception $exception) {
                     $manager->rollback();
@@ -73,5 +70,18 @@ class FormHandler implements FormHandlerInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param $data
+     * @param FormInterface $form
+     */
+    protected function saveData($data, FormInterface $form)
+    {
+        $manager = $this->doctrineHelper->getEntityManager($data);
+        $manager->persist($data);
+        $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $data));
+        $manager->flush();
+        $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $data));
     }
 }

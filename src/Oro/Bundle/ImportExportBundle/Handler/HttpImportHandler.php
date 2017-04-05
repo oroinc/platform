@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
-
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class HttpImportHandler extends AbstractImportHandler
@@ -93,13 +92,11 @@ class HttpImportHandler extends AbstractImportHandler
             $errors = array_merge($errors, $jobResult->getFailureExceptions());
         }
 
-        $errorsAndExceptions = array_slice($errors, 0, 100);
-
         return [
             'success'    => $jobResult->isSuccessful(),
             'message'    => $message,
             'importInfo' => $importInfo,
-            'errors'     => $errorsAndExceptions,
+            'errors'     => $errors,
             'counts'     => $counts,
             'postponedRows' => $jobResult->getContext()->getPostponedRows(),
         ];
