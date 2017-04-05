@@ -16,7 +16,7 @@ class StepExecutionProxyContext implements ContextInterface, BatchContextInterfa
     /**
      * @var array
      */
-    private $postponedRows;
+    private $postponedRows = [];
 
     public function __construct(StepExecution $stepExecution)
     {

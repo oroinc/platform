@@ -64,9 +64,6 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
             $entity = $this->validateAndUpdateContext($entity);
         }
 
-        //@todo remove it before merge to feature branch - it's just for showing how to pass row data to postponedRows
-        //$this->context->addPostponedRow($this->context->getValue('itemData'));
-
         return $entity;
     }
 

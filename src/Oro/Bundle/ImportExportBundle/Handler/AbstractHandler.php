@@ -8,6 +8,7 @@ use Akeneo\Bundle\BatchBundle\Job\Job;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -61,13 +62,19 @@ class AbstractHandler
     protected $batchFileManager;
 
     /**
-     * @param JobExecutor $jobExecutor
-     * @param ProcessorRegistry $processorRegistry
-     * @param ConfigProvider $entityConfigProvider
+     * @var FileManager
+     */
+    protected $fileManager;
+
+    /**
+     * @param JobExecutor         $jobExecutor
+     * @param ProcessorRegistry   $processorRegistry
+     * @param ConfigProvider      $entityConfigProvider
      * @param TranslatorInterface $translator
-     * @param WriterChain $writerChain
-     * @param ReaderChain $readerChain
-     * @param BatchFileManager $batchFileManager
+     * @param WriterChain         $writerChain
+     * @param ReaderChain         $readerChain
+     * @param BatchFileManager    $batchFileManager
+     * @param FileManager         $fileManager
      */
     public function __construct(
         JobExecutor $jobExecutor,
@@ -76,7 +83,8 @@ class AbstractHandler
         TranslatorInterface $translator,
         WriterChain $writerChain,
         ReaderChain $readerChain,
-        BatchFileManager $batchFileManager
+        BatchFileManager $batchFileManager,
+        FileManager $fileManager
     ) {
         $this->jobExecutor        = $jobExecutor;
         $this->processorRegistry  = $processorRegistry;
@@ -85,6 +93,7 @@ class AbstractHandler
         $this->writerChain = $writerChain;
         $this->readerChain = $readerChain;
         $this->batchFileManager = $batchFileManager;
+        $this->fileManager = $fileManager;
     }
 
     /**

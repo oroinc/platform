@@ -9,7 +9,7 @@ class TestContext implements ContextInterface
     /**
      * @var array
      */
-    private $postponedRows;
+    private $postponedRows = [];
 
     /**
      * {@inheritdoc}
@@ -32,8 +32,6 @@ class TestContext implements ContextInterface
     {
         return [];
     }
-
-
 
     /**
      * {@inheritdoc}

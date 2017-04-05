@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -38,6 +39,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $this->createLoggerMock(),
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
+            $this->createMock(PostponedRowsHandler::class),
             $this->createTokenSerializerMock(),
             $this->createTokenStorageInterfaceMock()
         );
@@ -60,6 +62,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $logger,
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
+            $this->createMock(PostponedRowsHandler::class),
             $this->createTokenSerializerMock(),
             $this->createTokenStorageInterfaceMock()
         );
@@ -115,6 +118,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $logger,
             $this->createFileManagerMock(),
             $this->createHttpImportHandlerMock(),
+            $this->createMock(PostponedRowsHandler::class),
             $tokenSerializer,
             $tokenStorage
         );
@@ -140,7 +144,6 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
-
 
     public function dataProviderForTestProcessImport()
     {
@@ -275,6 +278,7 @@ class HttpImportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             $logger,
             $fileManager,
             $httpImportHandler,
+            $this->createMock(PostponedRowsHandler::class),
             $tokenSerializer,
             $tokenStorage
         );

@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
@@ -29,14 +30,15 @@ class HttpImportMessageProcessor extends ImportMessageProcessor
     private $tokenStorage;
 
     /**
-     * @param JobRunner $jobRunner
+     * @param JobRunner                    $jobRunner
      * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param JobStorage $jobStorage
-     * @param LoggerInterface $logger
-     * @param FileManager $fileManager
-     * @param HttpImportHandler $importHandler
-     * @param TokenSerializerInterface $tokenSerializer
-     * @param TokenStorageInterface $tokenStorage
+     * @param JobStorage                   $jobStorage
+     * @param LoggerInterface              $logger
+     * @param FileManager                  $fileManager
+     * @param HttpImportHandler            $importHandler
+     * @param PostponedRowsHandler         $postponedRowsHandler
+     * @param TokenSerializerInterface     $tokenSerializer
+     * @param TokenStorageInterface        $tokenStorage
      */
     public function __construct(
         JobRunner $jobRunner,
@@ -45,6 +47,7 @@ class HttpImportMessageProcessor extends ImportMessageProcessor
         LoggerInterface $logger,
         FileManager $fileManager,
         HttpImportHandler $importHandler,
+        PostponedRowsHandler $postponedRowsHandler,
         TokenSerializerInterface $tokenSerializer,
         TokenStorageInterface $tokenStorage
     ) {
@@ -54,7 +57,8 @@ class HttpImportMessageProcessor extends ImportMessageProcessor
             $jobStorage,
             $logger,
             $fileManager,
-            $importHandler
+            $importHandler,
+            $postponedRowsHandler
         );
 
         $this->tokenSerializer = $tokenSerializer;
@@ -62,11 +66,9 @@ class HttpImportMessageProcessor extends ImportMessageProcessor
     }
 
     /**
-     * @param array $body
-     * @param Job $job
-     * @return bool
+     * {@inheritdoc}
      */
-    protected function handleImport(array $body, Job $job)
+    protected function handleImport(array $body, Job $job, JobRunner $jobRunner)
     {
         if (! $this->setSecurityToken($body['securityToken'])) {
             $this->logger->critical(
@@ -76,12 +78,11 @@ class HttpImportMessageProcessor extends ImportMessageProcessor
             return null;
         }
 
-        return parent::handleImport($body, $job);
+        return parent::handleImport($body, $job, $jobRunner);
     }
 
     /**
-     * @param MessageInterface $message
-     * @return array|null
+     * {@inheritdoc}
      */
     protected function getNormalizeBody(MessageInterface $message)
     {
