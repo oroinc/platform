@@ -45,9 +45,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
         $user         = $authenticatedToken->getUser();
         $organization = $guesser->guess($user, $token);
 
-        if (!$organization) {
-            throw new BadCredentialsException("You don't have active organization assigned.");
-        } elseif (!$user->getOrganizations(true)->contains($organization)) {
+        if ($organization && !$user->getOrganizations(true)->contains($organization)) {
             throw new BadCredentialsException(
                 sprintf("You don't have access to organization '%s'", $organization->getName())
             );

@@ -78,7 +78,8 @@ define([
 
         render: function() {
             this.setElement(this.template({
-                label: this.inline ? null : this.label
+                label: this.inline ? null : this.label,
+                allowClear: this.filter.allowClear
             }));
 
             if (this.filter.selectWidget) {

@@ -13,6 +13,8 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class FieldUpdatesChecker
 {
+    use ChangedEntityGeneratorTrait;
+
     /**
      * @var PropertyAccessor
      */
@@ -41,16 +43,15 @@ class FieldUpdatesChecker
      */
     public function isRelationFieldChanged($entity, $fieldName)
     {
-        $updatedEntities = $this->getUnitOfWork()->getScheduledEntityUpdates();
         $field = $this->propertyAccessor->getValue($entity, $fieldName);
 
         if ($field instanceof Collection) {
             foreach ($field as $fieldElement) {
-                if (in_array($fieldElement, $updatedEntities, true)) {
+                if ($this->inChangedEntities($fieldElement)) {
                     return true;
                 }
             }
-        } elseif (in_array($field, $updatedEntities, true)) {
+        } elseif ($this->inChangedEntities($field)) {
             return true;
         }
 
@@ -66,5 +67,20 @@ class FieldUpdatesChecker
         $entityManager = $this->managerRegistry->getManager();
 
         return $entityManager->getUnitOfWork();
+    }
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
+    private function inChangedEntities($entity)
+    {
+        foreach ($this->getChangedEntities($this->getUnitOfWork()) as $changedEntity) {
+            if (spl_object_hash($changedEntity) === spl_object_hash($entity)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
