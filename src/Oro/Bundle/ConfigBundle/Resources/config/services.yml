@@ -40,6 +40,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_config.cache'
+            - '@event_dispatcher'
 
     oro_config.scope.user:
         class: %oro_config.user.class%

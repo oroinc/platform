@@ -137,6 +137,10 @@ ConfigBundle
 - Class `Oro\Bundle\ConfigBundle\Twig\ConfigExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $cm`
+- Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager`:
+    - added third argument `EventDispatcherInterface $eventDispatcher`
+    - abstract service `oro_config.scope_manager.abstract` now has third argument defined as `@event_dispatcher`
+- Class `ConfigManagerScopeIdUpdateEvent` was added
 
 CurrencyBundle
 --------------
