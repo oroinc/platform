@@ -33,7 +33,7 @@ define(function(require) {
         listen: {
             'change collection': 'filter',
             'visibilityChange': 'updateHeaderWidths',
-            'layout:reposition mediator': 'updateView'
+            'layout:reposition mediator': 'updateHeaderWidths'
         },
 
         /**
@@ -186,22 +186,17 @@ define(function(require) {
         toggleFallback: function() {
             var hasVisibleItems = Boolean(this.visibleItems.length);
             // to hide table's header once no visible data
-            this.$('.table-header-wrapper, .table-wrapper').toggle(hasVisibleItems);
+            this.$('[data-role="column-manager-table-header-wrapper"], [data-role="column-manager-table-wrapper"]').toggle(hasVisibleItems);
             ColumnManagerCollectionView.__super__.toggleFallback.apply(this, arguments);
-        },
-
-        updateView: function() {
-            this.adjustListHeight();
-            this.updateHeaderWidths();
         },
 
         updateHeaderWidths: function() {
             var i;
             var clientWidth;
-            var $wrapper = this.$('.table-wrapper');
+            var $wrapper = this.$('[data-role="column-manager-table-wrapper"]');
             var $table = $wrapper.children('table');
             var tableThs = $table.find('thead th');
-            var headerThs = this.$('.table-header-wrapper tr th');
+            var headerThs = this.$('[data-role="column-manager-table-header-wrapper"] tr th');
             $wrapper.css('padding-right', 0);
             clientWidth = $wrapper[0].clientWidth;
             if (clientWidth > 0) {
@@ -210,16 +205,6 @@ define(function(require) {
             for (i = 0; i < tableThs.length - 1; i += 1) {
                 $(headerThs[i]).width($(tableThs[i]).width());
             }
-        },
-
-        adjustListHeight: function() {
-            var windowHeight = $(window).height();
-            var $wrapper = this.$('.table-wrapper');
-            var $footer = this.$el.next('[data-column-manager-footer]');
-            var $footerHeight = $footer.length ? $footer.outerHeight() : 0;
-            var rect = $wrapper[0].getBoundingClientRect();
-            var margin = (this.$el.outerHeight(true) - rect.height) / 2;
-            $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight) + 'px');
         }
     });
 

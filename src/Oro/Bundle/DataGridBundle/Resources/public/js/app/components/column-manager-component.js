@@ -143,7 +143,8 @@ define(function(require) {
             if (!this.columnManagerCollectionView) {
                 this.createViews();
             }
-            this.columnManagerCollectionView.updateView();
+            this.columnManagerCollectionView.updateHeaderWidths();
+            this.columnManagerView.adjustListHeight();
         },
 
         /**
