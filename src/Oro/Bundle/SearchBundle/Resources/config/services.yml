@@ -58,6 +58,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.search.engine'
+            - '@property_accessor'
         calls:
             - [setRealTimeUpdate, [%oro_search.realtime_update%]]
             - [setEntitiesConfig, [%oro_search.entities_config%]]

@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
+use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Common\Util\ClassUtils;
+
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
@@ -57,13 +62,28 @@ class IndexListener implements OptionalListenerInterface
     protected $enabled = true;
 
     /**
+     * @var PropertyAccessorInterface
+     */
+    protected $propertyAccessor;
+
+    /**
+     * @var array
+     */
+    protected $entitiesIndexedFieldsCache = [];
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param EngineInterface $searchEngine
+     * @param PropertyAccessorInterface $propertyAccessor
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EngineInterface $searchEngine)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->searchEngine   = $searchEngine;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        EngineInterface $searchEngine,
+        PropertyAccessorInterface $propertyAccessor
+    ) {
+        $this->doctrineHelper   = $doctrineHelper;
+        $this->searchEngine    = $searchEngine;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -113,19 +133,24 @@ class IndexListener implements OptionalListenerInterface
 
         // schedule saved entities
         // inserted and updated entities should be processed as is
-        $savedEntities = array_merge(
-            $unitOfWork->getScheduledEntityInsertions(),
-            $this->getEntitiesWithUpdatedIndexedFields($unitOfWork)
+        $inserts = $unitOfWork->getScheduledEntityInsertions();
+        $updates = $unitOfWork->getScheduledEntityUpdates();
+        $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
+        $this->savedEntities = array_merge(
+            $this->savedEntities,
+            $this->getEntitiesWithUpdatedIndexedFields($unitOfWork),
+            $this->getAssociatedEntitiesToReindex($entityManager, $inserts),
+            $this->getAssociatedEntitiesToReindex($entityManager, $updates),
+            $this->getEntitiesFromUpdatedCollections($unitOfWork)
         );
-        foreach ($savedEntities as $hash => $entity) {
-            if (empty($this->savedEntities[$hash]) && $this->isSupported($entity)) {
-                $this->savedEntities[$hash] = $entity;
+
+        foreach ($inserts as $object) {
+            if ($this->isSupported($object)) {
+                $this->savedEntities[spl_object_hash($object)] = $object;
             }
         }
-
         // schedule deleted entities
         // deleted entities should be processed as references because on postFlush they are already deleted
-        $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
         foreach ($deletedEntities as $hash => $entity) {
             if (empty($this->deletedEntities[$hash]) && $this->isSupported($entity)) {
                 $this->deletedEntities[$hash] = $entityManager->getReference(
@@ -139,6 +164,33 @@ class IndexListener implements OptionalListenerInterface
     /**
      * @param UnitOfWork $uow
      *
+     * @return array
+     */
+    protected function getEntitiesFromUpdatedCollections(UnitOfWork $uow)
+    {
+        $collectionUpdates = $uow->getScheduledCollectionUpdates();
+        // collect owners of all changed collections if owner class has mapping to collection field
+        return array_reduce(
+            $collectionUpdates,
+            function (array $entities, PersistentCollection $collection) {
+                $owner        = $collection->getOwner();
+                $className     = ClassUtils::getClass($owner);
+                $changedFields = $this->getIntersectChangedIndexedFields(
+                    $className,
+                    [$collection->getMapping()['fieldName']]
+                );
+                if ($changedFields) {
+                    $entities[spl_object_hash($owner)] = $owner;
+                }
+                return $entities;
+            },
+            []
+        );
+    }
+
+    /**
+     * @param UnitOfWork $uow
+     *
      * @return object[]
      */
     protected function getEntitiesWithUpdatedIndexedFields(UnitOfWork $uow)
@@ -147,21 +199,46 @@ class IndexListener implements OptionalListenerInterface
 
         foreach ($uow->getScheduledEntityUpdates() as $hash => $entity) {
             $className = ClassUtils::getClass($entity);
-            if (!$this->mappingProvider->isFieldsMappingExists($className)) {
-                continue;
-            }
-
-            $entityConfig = $this->mappingProvider->getEntityConfig($className);
-
-            $indexedFields = [];
-            foreach ($entityConfig['fields'] as $fieldConfig) {
-                $indexedFields[] = $fieldConfig['name'];
-            }
-
-            $changeSet = $uow->getEntityChangeSet($entity);
-            $fieldsToReindex = array_intersect($indexedFields, array_keys($changeSet));
-            if ($fieldsToReindex) {
+            $changedIndexedFields = $this->getIntersectChangedIndexedFields(
+                $className,
+                array_keys($uow->getEntityChangeSet($entity))
+            );
+            if ($changedIndexedFields) {
                 $entitiesToReindex[$hash] = $entity;
+            }
+        }
+
+        return $entitiesToReindex;
+    }
+
+    /**
+     * @param EntityManager $entityManager
+     * @param array $entities
+     *
+     * @return array
+     */
+    protected function getAssociatedEntitiesToReindex(EntityManager $entityManager, $entities)
+    {
+        $entitiesToReindex = [];
+
+        foreach ($entities as $entity) {
+            $className = ClassUtils::getClass($entity);
+            $meta = $entityManager->getClassMetadata($className);
+
+            foreach ($meta->getAssociationMappings() as $association) {
+                if (!empty($association['inversedBy']) && $association['type'] === ClassMetadataInfo::MANY_TO_ONE) {
+                    $targetClass = $association['targetEntity'];
+                    $changedIndexedFields = $this->getIntersectChangedIndexedFields(
+                        $targetClass,
+                        [$association['inversedBy']]
+                    );
+                    if (!$changedIndexedFields) {
+                        continue;
+                    }
+
+                    $associationValue = $this->propertyAccessor->getValue($entity, $association['fieldName']);
+                    $entitiesToReindex[spl_object_hash($associationValue)] = $associationValue;
+                }
             }
         }
 
@@ -201,18 +278,16 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function indexEntities()
     {
-        // process saved entities
         if ($this->savedEntities) {
-            $savedEntities = $this->savedEntities;
+            $this->searchEngine->save($this->savedEntities);
+
             $this->savedEntities = [];
-            $this->searchEngine->save($savedEntities, $this->realTimeUpdate);
         }
 
-        // process deleted entities
         if ($this->deletedEntities) {
-            $deletedEntities = $this->deletedEntities;
+            $this->searchEngine->delete($this->deletedEntities);
+
             $this->deletedEntities = [];
-            $this->searchEngine->delete($deletedEntities, $this->realTimeUpdate);
         }
     }
 
@@ -222,7 +297,7 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function isSupported($entity)
     {
-        return $this->mappingProvider->isClassSupported(ClassUtils::getClass($entity));
+        return !empty($this->getEntityIndexedFields(ClassUtils::getClass($entity)));
     }
 
     /**
@@ -231,5 +306,43 @@ class IndexListener implements OptionalListenerInterface
     protected function hasEntitiesToIndex()
     {
         return !empty($this->savedEntities) || !empty($this->deletedEntities);
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return array
+     */
+    protected function getEntityIndexedFields($className)
+    {
+        if (isset($this->entitiesIndexedFieldsCache[$className])) {
+            return $this->entitiesIndexedFieldsCache[$className];
+        }
+        if (!$this->mappingProvider->hasFieldsMapping($className)) {
+            $this->entitiesIndexedFieldsCache[$className] = [];
+
+            return [];
+        }
+
+        $entityConfig = $this->mappingProvider->getEntityConfig($className);
+
+        foreach ($entityConfig['fields'] as $fieldConfig) {
+            $this->entitiesIndexedFieldsCache[$className][$fieldConfig['name']] = $fieldConfig['name'];
+        }
+
+        return $this->entitiesIndexedFieldsCache[$className];
+    }
+
+    /**
+     * Returns intersection of indexed fields and changed fields for the given class
+     *
+     * @param string $className
+     * @param array  $changedFields
+     *
+     * @return array
+     */
+    protected function getIntersectChangedIndexedFields($className, array $changedFields)
+    {
+        return array_intersect($this->getEntityIndexedFields($className), $changedFields);
     }
 }

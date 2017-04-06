@@ -4,6 +4,9 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class SearchMappingProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var SearchMappingProvider */
@@ -113,5 +116,11 @@ class SearchMappingProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->provider->getEntityMapParameter('Oro\TestBundle\Entity\TestEntity', 'badParameter', false)
         );
+    }
+
+    public function testHasFieldsMapping()
+    {
+        $this->assertTrue($this->provider->hasFieldsMapping('Oro\TestBundle\Entity\TestEntity'));
+        $this->assertFalse($this->provider->hasFieldsMapping('Oro\TestBundle\Entity\BadEntity'));
     }
 }
