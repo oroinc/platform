@@ -1,35 +1,33 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor;
+
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
+
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldReturnSubscribedTopics()
     {
-        $this->assertEquals(
-            [Topics::PRE_EXPORT],
-            PreExportMessageProcessor::getSubscribedTopics()
-        );
+        $this->assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
     }
 
-    public function invalidMessageBodyParametersProvider()
+    public function invalidMessageBodyProvider()
     {
         return [
             [
@@ -48,7 +46,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider invalidMessageBodyParametersProvider
+     * @dataProvider invalidMessageBodyProvider
      * @param string $loggerMessage
      * @param array $messageBody
      */
@@ -62,13 +60,12 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         ;
 
         $processor = new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
             $this->createMessageProducerMock(),
-            $this->createDatagridExportIdFetcher(),
+            $this->createTokenSerializerMock(),
             $this->createTokenStorageMock(),
+            $this->createDependentJobServiceMock(),
             $logger,
-            $this->createDependentJobService(),
             100
         );
 
@@ -106,22 +103,19 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $message = new NullMessage();
         $message->setBody(json_encode([
             'format' => 'csv',
-            'batchSize' => 100,
             'parameters' => ['gridName' => 'grid_name'],
             'securityToken' => 'serialized_security_token',
         ]));
 
         $processor = new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
             $this->createJobRunnerMock(),
             $this->createMessageProducerMock(),
-            $this->createDatagridExportIdFetcher(),
+            $tokenSerializer,
             $tokenStorage,
+            $this->createDependentJobServiceMock(),
             $logger,
-            $this->createDependentJobService(),
             100
         );
-        $processor->setTokenSerializer($tokenSerializer);
 
         $result = $processor->process($message, $this->createSessionMock());
 
@@ -129,198 +123,137 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Security token is null
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testShouldThrowExceptionIfUserIsNotAuthenticated()
+    public function testShouldReturnMessageACKOnExportSuccess()
     {
-        $token = $this->createTokenMock();
-
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('serialized_security_token'))
-            ->willReturn($token)
-        ;
-
-        $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn(null)
-        ;
-
+        $jobUniqueName = 'oro_datagrid.pre_export.grid_name.user_1.csv';
         $message = new NullMessage();
         $message->setBody(json_encode([
             'format' => 'csv',
-            'batchSize' => 100,
             'parameters' => ['gridName' => 'grid_name'],
-            'securityToken' => 'serialized_security_token',
+            'securityToken' => 'token',
         ]));
+        $message->setMessageId(123);
 
-        $processor = new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $this->createDatagridExportIdFetcher(),
-            $tokenStorage,
-            $this->createLoggerMock(),
-            $this->createDependentJobService(),
-            100
-        );
-        $processor->setTokenSerializer($tokenSerializer);
-
-        $processor->process($message, $this->createSessionMock());
-    }
-
-    public function invalidUserTypeProvider()
-    {
-        $notObject = 'not_object';
-        $notUserObject = new \stdClass();
-        $userWithoutRequiredMethods = $this->createMock(UserInterface::class);
-        $userWithoutGetEmailMethod = $this->createPartialMock(
-            UserInterface::class,
-            ['getId', 'getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials']
-        );
-
-        return [
-            [$notObject],
-            [$notUserObject],
-            [$userWithoutRequiredMethods],
-            [$userWithoutGetEmailMethod],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidUserTypeProvider
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported user type
-     *
-     * @param mixed $user
-     */
-    public function testShouldThrowExceptionIfUserHasNotSupportedType($user)
-    {
-        $token = $this->createTokenMock();
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user)
-        ;
-
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('serialized_security_token'))
-            ->willReturn($token)
-        ;
-
-        $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token)
-        ;
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'format' => 'csv',
-            'batchSize' => 100,
-            'parameters' => ['gridName' => 'grid_name'],
-            'securityToken' => 'serialized_security_token',
-        ]));
-
-        $processor = new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createMessageProducerMock(),
-            $this->createDatagridExportIdFetcher(),
-            $tokenStorage,
-            $this->createLoggerMock(),
-            $this->createDependentJobService(),
-            100
-        );
-        $processor->setTokenSerializer($tokenSerializer);
-
-        $processor->process($message, $this->createSessionMock());
-    }
-
-    public function testShouldRunUniqueJobIfAllParametersCorrect()
-    {
-        $user = new User();
-        $user->setId(1);
-
-        $token = $this->createTokenMock();
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user)
-        ;
-
-        $tokenSerializer = $this->createTokenSerializerMock();
-        $tokenSerializer
-            ->expects($this->once())
-            ->method('deserialize')
-            ->with($this->equalTo('serialized_security_token'))
-            ->willReturn($token)
-        ;
-
-        $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage
-            ->expects($this->once())
-            ->method('setToken')
-            ->with($this->equalTo($token))
-        ;
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token)
-        ;
+        $job = $this->createJob(1);
+        $childJob = $this->createJob(10, $job);
 
         $jobRunner = $this->createJobRunnerMock();
         $jobRunner
             ->expects($this->once())
             ->method('runUnique')
-            ->with(
-                $this->equalTo('abcd'),
-                $this->equalTo('oro_datagrid.pre_export.grid_name.user_1.csv')
-            )
-            ->willReturn(true)
+            ->with($this->equalTo(123), $this->equalTo($jobUniqueName))
+            ->will($this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
+                return $callback($jobRunner, $childJob);
+            }))
+        ;
+        $jobRunner
+            ->expects($this->once())
+            ->method('createDelayed')
+            ->with($jobUniqueName.'.chunk.1')
+            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner, $childJob) {
+                return $callback($jobRunner, $childJob);
+            }))
         ;
 
-        $message = new NullMessage();
-        $message->setMessageId('abcd');
-        $message->setBody(json_encode([
-            'format' => 'csv',
-            'batchSize' => 100,
-            'parameters' => ['gridName' => 'grid_name'],
-            'securityToken' => 'serialized_security_token',
-        ]));
+        $dependentJobContext = $this->createDependentJobContextMock();
+        $dependentJobContext
+            ->expects($this->once())
+            ->method('addDependentJob')
+        ;
+
+        $dependentJob = $this->createDependentJobMock();
+        $dependentJob
+            ->expects($this->once())
+            ->method('createDependentJobContext')
+            ->with($this->equalTo($job))
+            ->willReturn($dependentJobContext)
+        ;
+        $dependentJob
+            ->expects($this->once())
+            ->method('saveDependentJob')
+            ->with($this->equalTo($dependentJobContext))
+        ;
+
+        $user = $this->createUserStub();
+        $user
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn(1)
+        ;
+        $user
+            ->expects($this->once())
+            ->method('getEmail')
+        ;
+
+        $token = $this->createTokenMock();
+        $token
+            ->expects($this->exactly(2))
+            ->method('getUser')
+            ->willReturn($user)
+        ;
+
+        $tokenSerializer = $this->createTokenSerializerMock();
+        $tokenSerializer
+            ->expects($this->once())
+            ->method('deserialize')
+            ->with($this->equalTo('token'))
+            ->willReturn($token)
+        ;
+
+        $tokenStorage = $this->createTokenStorageMock();
+        $tokenStorage
+            ->expects($this->once())
+            ->method('setToken')
+            ->with($this->equalTo($token))
+        ;
+        $tokenStorage
+            ->expects($this->exactly(2))
+            ->method('getToken')
+            ->willReturn($token)
+        ;
 
         $processor = new PreExportMessageProcessor(
-            $this->createExportHandlerMock(),
             $jobRunner,
             $this->createMessageProducerMock(),
-            $this->createDatagridExportIdFetcher(),
+            $tokenSerializer,
             $tokenStorage,
+            $dependentJob,
             $this->createLoggerMock(),
-            $this->createDependentJobService(),
             100
         );
-        $processor->setTokenSerializer($tokenSerializer);
 
-        $processor->process($message, $this->createSessionMock());
+        $exportHandler = $this->createExportHandlerMock();
+        $exportHandler
+            ->expects($this->once())
+            ->method('getExportingEntityIds')
+            ->willReturn([])
+        ;
+        $processor->setExportHandler($exportHandler);
+
+        $processor->setExportIdFetcher($this->createExportIdFetcherMock());
+
+        $result = $processor->process($message, $this->createSessionMock());
+
+        $this->assertEquals(PreExportMessageProcessor::ACK, $result);
+    }
+
+    /**
+     * @param int $id
+     * @param Job $rootJob
+     *
+     * @return Job
+     */
+    private function createJob($id, $rootJob = null)
+    {
+        $job = new Job();
+        $job->setId($id);
+        if ($rootJob instanceof Job) {
+            $job->setRootJob($rootJob);
+        }
+
+        return $job;
     }
 
     /**
@@ -366,7 +299,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DatagridExportIdFetcher
      */
-    private function createDatagridExportIdFetcher()
+    private function createExportIdFetcherMock()
     {
         return $this->createMock(DatagridExportIdFetcher::class);
     }
@@ -382,7 +315,7 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobService
      */
-    private function createDependentJobService()
+    private function createDependentJobServiceMock()
     {
         return $this->createMock(DependentJobService::class);
     }
@@ -401,5 +334,32 @@ class PreExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createTokenMock()
     {
         return $this->createMock(TokenInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobContext
+     */
+    private function createDependentJobContextMock()
+    {
+        return $this->createMock(DependentJobContext::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|DependentJobService
+     */
+    private function createDependentJobMock()
+    {
+        return $this->createMock(DependentJobService::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|UserInterface
+     */
+    private function createUserStub()
+    {
+        return $this->createPartialMock(
+            UserInterface::class,
+            ['getId', 'getEmail', 'getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials']
+        );
     }
 }

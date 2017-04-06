@@ -75,7 +75,7 @@ operations:
                 conditions:
                     '@not_blank': $.data.relatedEntity
                 parameters:
-                    service: oro_entity.entity_field_list_provider
+                    service: oro_workflow.entity_field_list_provider
                     method: getFields
                     method_parameters: [false, false, true, false, true, true]
                     attribute: $.entityFields

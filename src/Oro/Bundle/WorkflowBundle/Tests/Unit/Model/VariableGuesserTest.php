@@ -11,7 +11,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\OrderBundle\Validator\Constraints\Discounts;
+use Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;
 
@@ -121,7 +121,7 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
                         'key' => 'value',
                         'constraints' => [
                             new NotBlank(),
-                            new Discounts(),
+                            new UserAuthenticationFieldsConstraint(),
                             new GreaterThan(10)
                         ]
                     ],
@@ -132,7 +132,7 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
                     'form_options' => [
                         'constraints' => [
                             'NotBlank' => null,
-                            'Oro\Bundle\OrderBundle\Validator\Constraints\Discounts' => null,
+                            UserAuthenticationFieldsConstraint::class => null,
                             'GreaterThan' => 10,
                         ]
                     ]
@@ -141,7 +141,7 @@ class VariableGuesserTest extends \PHPUnit_Framework_TestCase
                 'formConfig' => [
                     'entity' => 'TestEntity',
                     'form_type' => 'test_type',
-                    'form_options' => array('key' => 'value')
+                    'form_options' => ['key' => 'value']
                 ],
             ],
             'entity guess' => [ // test guessing for entities that have defined their form type in the variable config

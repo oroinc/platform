@@ -56,6 +56,7 @@ services:
         arguments:
             - '@router'
             - '@oro_config.global'
+            - '@oro_importexport.file.file_manager'
         public: false
 
     oro_importexport.writer.writer_chain:

@@ -1,0 +1,204 @@
+# Types:
+# - 1: contains
+# - 2: not contains
+
+and:
+    definition:
+        filters:
+            -
+                -
+                    columnName: subject
+                    criterion:
+                        filter: string
+                        data:
+                            value: ''
+                            type: filter_empty_option
+                - AND
+                -
+                    columnName: emailBody.bodyContent
+                    criterion:
+                        filter: string
+                        data:
+                            value: offer
+                            type: '1'
+                - AND
+                -
+                    columnName: emailBody.bodyContent
+                    criterion:
+                        filter: string
+                        data:
+                            value: sale
+                            type: '1'
+                - AND
+                -
+                    columnName: emailBody.bodyContent
+                    criterion:
+                        filter: string
+                        data:
+                            value: won
+                            type: '1'
+    expression:
+        '@and':
+            - '@and':
+                - '@and':
+                    - { '@or': [{ '@empty': [$subject] }] }
+                    - { '@or': [{ '@contains': [$emailBody.bodyContent, offer] }] }
+                - { '@or': [{ '@contains': [$emailBody.bodyContent, sale] }] }
+            - { '@or': [{ '@contains': [$emailBody.bodyContent, won] }] }
+    applicable_emails:
+        - subject: ~
+          body: This is email body with offer, sale and won words.
+          date: now
+    inapplicable_emails:
+        - subject: not empty subject
+          body: This is email body with offer, sale and won words.
+          date: now
+        - subject: ~
+          body: This email has nothing.
+          date: now
+        - subject: ~
+          body: This is email body with offer, sale and won words.
+          date: -2 days
+        - subject: ~
+          body: This is email body with offer and won words.
+          date: now
+        - subject: ~
+          body: This is email body with sale and won words.
+          date: now
+
+combined:
+    definition:
+        filters:
+            -
+                -
+                    columnName: emailBody.bodyContent
+                    criterion:
+                        filter: string
+                        data:
+                            value: onemore
+                            type: '1'
+                - AND
+                -
+                    columnName: emailBody.bodyContent
+                    criterion:
+                        filter: string
+                        data:
+                            value: excluded
+                            type: '2'
+                - OR
+                -
+                    columnName: emailBody.bodyContent
+                    criterion:
+                        filter: string
+                        data:
+                            value: always
+                            type: '1'
+    expression:
+        '@or':
+            - '@and':
+                - { '@or': [{ '@contains': [$emailBody.bodyContent, onemore] }] }
+                - { '@or': [{ '@not_contains': [$emailBody.bodyContent, excluded] }] }
+            - { '@or': [{ '@contains': [$emailBody.bodyContent, always] }] }
+    applicable_emails:
+       - subject: ~
+         body: This email has onemore word without the other
+         date: now
+       - subject: ~
+         body: This email has always word with excluded
+         date: now
+    inapplicable_emails:
+       - subject: ~
+         body: This email has onemore word with excluded one
+         date: now
+       - subject: ~
+         body: This email has no interesting words
+         date: now
+
+groups:
+    definition:
+        filters:
+            -
+                -
+                    columnName: emailBody.bodyContent
+                    criterion:
+                        filter: string
+                        data:
+                            value: offer
+                            type: '1'
+                - AND
+                -
+                    -
+                        columnName: emailBody.bodyContent
+                        criterion:
+                            filter: string
+                            data:
+                                value: price
+                                type: '1'
+                    - OR
+                    -
+                        columnName: emailBody.bodyContent
+                        criterion:
+                            filter: string
+                            data:
+                                value: value
+                                type: '1'
+    expression:
+        '@and':
+            - '@or':
+                - { '@or': [{ '@contains': [$emailBody.bodyContent, price] }] }
+                - { '@or': [{ '@contains': [$emailBody.bodyContent, value] }] }
+            - { '@or': [{ '@contains': [$emailBody.bodyContent, offer] }] }
+    applicable_emails:
+       - subject: ~
+         body: This email has offer and price
+         date: now
+       - subject: ~
+         body: This email has offer and value
+         date: now
+    inapplicable_emails:
+       - subject: ~
+         body: This email has offer only
+         date: now
+       - subject: ~
+         body: This email has value only
+         date: now
+       - subject: ~
+         body: This email has price only
+         date: now
+       - subject: ~
+         body: This email has neither of the words
+         date: now
+
+flat:
+    definition:
+        filters:
+            -
+                columnName: subject
+                criterion:
+                    filter: string
+                    data:
+                        value: ''
+                        type: filter_empty_option
+            - AND
+            -
+                columnName: emailBody.bodyContent
+                criterion:
+                    filter: string
+                    data:
+                        value: offer
+                        type: '1'
+    expression:
+        '@and':
+            - { '@or': [{ '@empty': [$subject] }] }
+            - { '@or': [{ '@contains': [$emailBody.bodyContent, offer] }] }
+    applicable_emails:
+        - subject: ~
+          body: This is email body with offer word.
+          date: now
+    inapplicable_emails:
+        - subject: not empty subject
+          body: This is email body with offer, sale and won words.
+          date: now
+        - subject: ~
+          body: This email has nothing.
+          date: now

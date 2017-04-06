@@ -1,119 +1,106 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Async\Export;
 
-use Psr\Log\LoggerInterface;
-
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
 use Oro\Bundle\DataGridBundle\Async\Topics;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
-use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
+use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
-class PreExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
 {
     /**
      * @var ExportHandler
      */
-    private $exportHandler;
-
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
-
-    /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
+    protected $exportHandler;
 
     /**
      * @var DatagridExportIdFetcher
      */
-    private $exportIdReader;
-
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var DependentJobService
-     */
-    private $dependentJob;
-
-    /**
-     * @var TokenSerializerInterface
-     */
-    private $tokenSerializer;
-
-    /**
-     * @var int
-     */
-    private $batchSize;
+    protected $exportIdFetcher;
 
     /**
      * @param ExportHandler $exportHandler
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param DatagridExportIdFetcher $exportIdReader
-     * @param TokenStorageInterface $tokenStorage
-     * @param LoggerInterface $logger
-     * @param DependentJobService $dependentJob
-     * @param int $batchSize
      */
-    public function __construct(
-        ExportHandler $exportHandler,
-        JobRunner $jobRunner,
-        MessageProducerInterface $producer,
-        DatagridExportIdFetcher $exportIdReader,
-        TokenStorageInterface $tokenStorage,
-        LoggerInterface $logger,
-        DependentJobService $dependentJob,
-        $batchSize
-    ) {
-        $this->exportHandler = $exportHandler;
-        $this->jobRunner = $jobRunner;
-        $this->producer = $producer;
-        $this->exportIdReader = $exportIdReader;
-        $this->tokenStorage = $tokenStorage;
-        $this->logger = $logger;
-        $this->dependentJob = $dependentJob;
-        $this->batchSize = $batchSize;
-    }
-
-    /**
-     * @param TokenSerializerInterface $tokenSerializer
-     */
-    public function setTokenSerializer(TokenSerializerInterface $tokenSerializer)
+    public function setExportHandler(ExportHandler $exportHandler)
     {
-        $this->tokenSerializer = $tokenSerializer;
+        $this->exportHandler = $exportHandler;
     }
 
     /**
-     * {@inheritdoc}
+     * @param DatagridExportIdFetcher $exportIdFetcher
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function setExportIdFetcher(DatagridExportIdFetcher $exportIdFetcher)
+    {
+        $this->exportIdFetcher = $exportIdFetcher;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedTopics()
+    {
+        return [Topics::PRE_EXPORT];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getJobUniqueName(array $body)
+    {
+        return sprintf(
+            'oro_datagrid.pre_export.%s.user_%s.%s',
+            $body['parameters']['gridName'],
+            $this->getUser()->getId(),
+            $body['format']
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExportingEntityIds(array $body)
+    {
+        $contextParameters = new ParameterBag($body['parameters']['gridParameters']);
+        $contextParameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
+        $body['parameters']['gridParameters'] = $contextParameters;
+
+        $ids = $this->exportHandler->getExportingEntityIds(
+            $this->exportIdFetcher,
+            $body['parameters']
+        );
+
+        return $ids;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getDelayedJobCallback(array $body, array $ids = [])
+    {
+        if (! empty($ids)) {
+            $body['parameters']['gridParameters']['_export']['ids'] = $ids;
+        }
+
+        return function (JobRunner $jobRunner, Job $child) use ($body) {
+            $this->producer->send(
+                Topics::EXPORT,
+                array_merge($body, ['jobId' => $child->getId()])
+            );
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getMessageBody(MessageInterface $message)
     {
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
@@ -124,6 +111,7 @@ class PreExportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                 'gridParameters' => [],
                 FormatterProvider::FORMAT_TYPE => 'excel',
             ],
+            'exportType' => ProcessorRegistry::TYPE_EXPORT,
             'securityToken' => null,
         ], $body);
 
@@ -133,7 +121,7 @@ class PreExportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                 ['message' => $message]
             );
 
-            return self::REJECT;
+            return false;
         }
 
         if (! $this->setSecurityToken($body['securityToken'])) {
@@ -142,137 +130,13 @@ class PreExportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                 ['message' => $message]
             );
 
-            return self::REJECT;
-        }
-
-        $originBody = $body;
-        $contextParameters = new ParameterBag($body['parameters']['gridParameters']);
-        $contextParameters->set(ActionExtension::ENABLE_ACTIONS_PARAMETER, false);
-        $body['parameters']['gridParameters'] = $contextParameters;
-
-        $jobUniqueName = sprintf(
-            'oro_datagrid.pre_export.%s.user_%s.%s',
-            $body['parameters']['gridName'],
-            $this->getUser()->getId(),
-            $body['format']
-        );
-
-        $result = $this->jobRunner->runUnique(
-            $message->getMessageId(),
-            $jobUniqueName,
-            function (JobRunner $jobRunner, Job $job) use ($originBody, $body, $jobUniqueName) {
-                $exportingEntityIds = $this->exportHandler->getExportingEntityIds(
-                    $this->exportIdReader,
-                    $body['parameters']
-                );
-
-                foreach ($this->splitOnBatch($exportingEntityIds) as $key => $batchData) {
-                    $jobRunner->createDelayed(
-                        sprintf('%s.chunk.%s', $jobUniqueName, ++$key),
-                        function (JobRunner $jobRunner, Job $child) use ($originBody, $batchData) {
-                            $originBody['parameters']['gridParameters']['_export']['ids'] = $batchData;
-
-                            $this->producer->send(
-                                Topics::EXPORT,
-                                array_merge($originBody, ['jobId' => $child->getId()])
-                            );
-                        }
-                    );
-                }
-
-                $this->addDependedJob($job->getRootJob(), $originBody);
-
-                $this->logger->info(
-                    sprintf(
-                        '[DataGridPreExportMessageProcessor] Scheduled %s entities for export.',
-                        count($exportingEntityIds)
-                    ),
-                    ['messageBody' => $body]
-                );
-
-                return true;
-            }
-        );
-
-        return $result ? self::ACK : self::REJECT;
-    }
-
-    /**
-     * @return array
-     */
-    public static function getSubscribedTopics()
-    {
-        return [Topics::PRE_EXPORT];
-    }
-
-    /**
-     * @param string $serializedToken
-     *
-     * @return bool
-     */
-    private function setSecurityToken($serializedToken)
-    {
-        $token = $this->tokenSerializer->deserialize($serializedToken);
-
-        if (null === $token) {
             return false;
         }
 
-        $this->tokenStorage->setToken($token);
+        // prepare body for dependent job message
+        $body['jobName'] = $body['parameters']['gridName'];
+        $body['outputFormat'] = $body['format'];
 
-        return true;
-    }
-
-    /**
-     * @return UserInterface
-     *
-     * @throws \RuntimeException
-     */
-    private function getUser()
-    {
-        $token = $this->tokenStorage->getToken();
-
-        if (null === $token) {
-            throw new \RuntimeException('Security token is null');
-        }
-
-        $user = $token->getUser();
-
-        if (! is_object($user) || ! $user instanceof UserInterface
-            || ! method_exists($user, 'getId') || ! method_exists($user, 'getEmail')
-        ) {
-            throw new \RuntimeException('Not supported user type');
-        }
-
-        return $user;
-    }
-
-    /**
-     * @param array $ids
-     *
-     * @return array
-     */
-    private function splitOnBatch(array $ids)
-    {
-        return array_chunk($ids, $this->batchSize);
-    }
-
-    /**
-     * @param Job $rootJob
-     * @param array $body
-     */
-    private function addDependedJob(Job $rootJob, array $body)
-    {
-        $context = $this->dependentJob->createDependentJobContext($rootJob);
-
-        $context->addDependentJob(ImportExportTopics::POST_EXPORT, [
-            'jobId' => $rootJob->getId(),
-            'email' => $this->getUser()->getEmail(),
-            'jobName' => $body['parameters']['gridName'],
-            'exportType' => ProcessorRegistry::TYPE_EXPORT,
-            'outputFormat' => $body['format'],
-        ]);
-
-        $this->dependentJob->saveDependentJob($context);
+        return $body;
     }
 }
