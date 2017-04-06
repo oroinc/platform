@@ -57,14 +57,16 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then there is one record in grid
      * Example: And there are two records in grid
      * Example: And there are 7 records in grid
+     * Example: And there are 7 records in Quote Grid
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
+     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in (grid|(?P<name>[\s\w]+))$/
      */
-    public function numberOfRecordsShouldBe($number)
+    public function numberOfRecordsShouldBe($number, $name = 'GridPaginator')
     {
-        self::assertEquals($this->getCount($number), $this->getGridPaginator()->getTotalRecordsCount());
+        $grid = $this->elementFactory->createElement($name);
+        self::assertEquals($this->getCount($number), $grid->getTotalRecordsCount());
     }
 
     /**
@@ -243,13 +245,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Sort grid by column
      * Example: When sort grid by Created at
      * Example: But when I sort grid by First Name again
+     * Example: When I sort Quotes Grid by Updated At
      *
-     * @When /^(?:|when )(?:|I )sort grid by (?P<field>([\w\s]*[^again]))(?:| again)$/
+     * @When /^(?:|when )(?:|I )sort (grid|(?P<name>[\s\w]+)) by (?P<field>([\w\s]*[^again]))(?:| again)$/
      */
-    public function sortGridBy($field)
+    public function sortGridBy($field, $name = 'Grid')
     {
         $this->elementFactory
-            ->createElement('Grid')
+            ->createElement($name)
             ->getElement('GridHeader')
             ->findElementContains('GridHeaderLink', $field)
             ->click();
@@ -315,17 +318,20 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      *            | Phone   | +1 415-731-9375     |
      *            | Country | Ukraine             |
      *            | State   | Kharkivs'ka Oblast' |
+     * Example: Then I should see Charlie Sheen in Frontend Grid with following data:
+     *            | Email   | charlie@gmail.com   |
+     *            | Phone   | +1 415-731-9375     |
      *
-     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in grid with following data:$/
-     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in grid with following data:$/
+     * @Then /^(?:|I )should see (?P<content>([\w\s\.\_]+)) in (grid|(?P<name>[\s\w]+)) with following data:$/
+     * @Then /^(?:|I )should see "(?P<content>([\w\s\.\_\(\)]+))" in (grid|(?P<name>[\s\w]+)) with following data:$/
      */
-    public function assertRowValues($content, TableNode $table)
+    public function assertRowValues($content, TableNode $table, $name = 'Grid')
     {
         /** @var Grid $grid */
-        $grid = $this->elementFactory->findElementContains('Grid', $content);
+        $grid = $this->elementFactory->findElementContains($name, $content);
 
         /** @var TableHeader $gridHeader */
-        $gridHeader = $grid->getElement('GridHeader');
+        $gridHeader = $grid->getElement($grid::TABLE_HEADER_ELEMENT);
         $row = $grid->getRowByContent($content);
 
         $crawler = new Crawler($row->getHtml());
@@ -337,6 +343,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         foreach ($table->getRows() as list($header, $value)) {
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = trim($columns[$columnNumber-1]->text());
+            // removing multiple spaces, newlines, tabs
+            $actualValue = preg_replace('/[\s\t\n\r\x{00a0}]+/iu', " ", $actualValue);
 
             self::assertEquals(
                 $value,
@@ -540,12 +548,15 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then there is no records in grid
+     * Assert that provided grid element has no records in it
+     * Example: there is no records in Frontend Grid
+     *
+     * @Then /^there is no records in (grid|(?P<name>[\s\w]+))$/
      * @Then all records should be deleted
      */
-    public function thereIsNoRecordsInGrid()
+    public function thereIsNoRecordsInGrid($name = 'Grid')
     {
-        self::assertCount(0, $this->getGrid()->getRows());
+        self::assertCount(0, $this->getGrid($name)->getRows());
     }
 
     /**

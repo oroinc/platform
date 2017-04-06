@@ -11,6 +11,7 @@ use Oro\Bundle\CalendarBundle\Tests\Behat\Element\ColorsAwareInterface;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
@@ -77,20 +78,24 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
-     * Asserts that activity list items are be sorted in provided order
+     * Asserts that <Element> items are be sorted in provided order
      *
-     * Example: Then activity list must be sorted ascending by updated date
+     * Example: Then ActivityList must be sorted ascending by updated date
      *
-     * @Given /^activity list must be sorted (ascending|descending) by updated date$/
+     * @Given /^(?P<name>(?:[\w\s]+)) must be sorted (?P<order>(?:ascending|descending)) by updated date$/
      */
-    public function activityListMustBeSortedBy($order)
+    public function activityListMustBeSortedBy($name, $order)
     {
         /** @var ActivityList $list */
-        $list = $this->elementFactory->createElement('ActivityList');
+        $list = $this->elementFactory->createElement($name);
 
         $actual = [];
         foreach ($list->getItems() as $item) {
-            $actual[] = $item->getCreatedAtDate();
+            if ($item instanceof TableRow) {
+                $actual[] = $item->getCellValue('Updated At');
+            } else {
+                $actual[] = $item->getCreatedAtDate();
+            }
         }
 
         $expected = $actual;
