@@ -59,10 +59,10 @@ define(function(require) {
 
         adjustListHeight: function() {
             var windowHeight = $(window).height();
-            var $wrapper = this.$('.table-wrapper');
-            var $footerHeight = this.$('[data-footer]').outerHeight() || 0;
+            var $wrapper = this.$('[data-role="column-manager-table-wrapper"]');
+            var $footerHeight = this.$('[data-role="column-manager-footer"]').outerHeight() || 0;
             var rect = $wrapper[0].getBoundingClientRect();
-            var margin = (this.$('[data-table]').outerHeight(true) - rect.height) / 2;
+            var margin = (this.$('[data-role="column-manager-table"]').outerHeight(true) - rect.height) / 2;
             $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight, 40) + 'px');
         },
 
