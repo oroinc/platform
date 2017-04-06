@@ -3,6 +3,7 @@ Events
 
 Table of Contents
 -----------------
+ - [Where to find](#where-to-find)
  - [AFTER_ENTITY_PAGE_LOADED](#after-entity-page-loaded)
  - [BEFORE_NORMALIZE_ENTITY](#before-normalize-entity)
  - [AFTER_NORMALIZE_ENTITY](#after-normalize-entity)
@@ -15,6 +16,10 @@ Table of Contents
  - [BEFORE_IMPORT_FORMAT_CONVERSION](#before-import-format-conversion)
  - [AFTER_IMPORT_FORMAT_CONVERSION](#after-import-format-conversion)
  - [AFTER_JOB_EXECUTION](#after-job-execution)
+
+Where to find
+--------
+All events are available in Oro\Bundle\ImportExportBundle\Event\Events class.
 
 AFTER_ENTITY_PAGE_LOADED
 ------------------------
