@@ -109,6 +109,12 @@ UPGRADE FROM 1.10 to 2.0
 - Added interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface` with method `FactoryWithTypesInterface::getTypes()`
 - Class `Oro\Component\ConfigExpression\ExpressionFactory` now implements interface `Oro\Component\ConfigExpression\FactoryWithTypesInterface`
 
+####ConfigBundle
+- Class `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager`:
+    - added third argument `EventDispatcherInterface $eventDispatcher`
+    - abstract service `oro_config.scope_manager.abstract` now has third argument defined as `@event_dispatcher`
+- Class `ConfigManagerScopeIdUpdateEvent` was added
+ 
 ####EntitySerializer Component
 - Method `isMetadataProperty` of `Oro\Component\EntitySerializer\ConfigUtil` marked as deprecated. Use `isMetadataProperty` of `Oro\Component\EntitySerializer\FieldAccessor` instead
 
