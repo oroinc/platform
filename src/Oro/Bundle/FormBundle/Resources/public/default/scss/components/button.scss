@@ -115,6 +115,7 @@
 
         @include element-state('focus') {
             background-color: transparent;
+            border-color: transparent;
         }
 
         @include element-state('active') {

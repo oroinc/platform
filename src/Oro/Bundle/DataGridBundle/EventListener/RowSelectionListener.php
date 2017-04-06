@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
  * Event listener applied to all grids with "rowSelection" option. If this option is specified this listener will add:
@@ -56,6 +58,19 @@ class RowSelectionListener
     const GRID_PARAM_DATA_NOT_IN = 'data_not_in';
 
     /**
+     * @var DoctrineHelper
+     */
+    private $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
      * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
@@ -87,6 +102,7 @@ class RowSelectionListener
         }
 
         $config->offsetSetByPath(self::REQUIREJS_MODULES_MODULES_OPTION_PATH, $requireJsModules);
+        $defaultParameter = $this->getDefaultParameter($config);
 
         // bind parameters for selection
         $datasource->bindParameters(
@@ -94,14 +110,45 @@ class RowSelectionListener
                 'data_in' => [
                     'name' => self::GRID_PARAM_DATA_IN,
                     'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . self::GRID_PARAM_DATA_IN,
-                    'default' => [0],
+                    'default' => $defaultParameter
                 ],
                 'data_not_in' => [
                     'name' => self::GRID_PARAM_DATA_NOT_IN,
                     'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . self::GRID_PARAM_DATA_NOT_IN,
-                    'default' => [0],
+                    'default' => $defaultParameter
                 ],
             ]
         );
+    }
+
+    /**
+     * Default parameter's type must match, so if identity field has `string` type - it has to be `string` either.
+     * Otherwise integer is used.
+     *
+     * @param DatagridConfiguration $config
+     * @return array
+     */
+    private function getDefaultParameter(DatagridConfiguration $config)
+    {
+        $tableFrom = $config->getOrmQuery()->getFrom();
+
+        // backward compatibility with previous version
+        if (!$tableFrom) {
+            return [0];
+        }
+
+        $targetEntityClass = reset($tableFrom)['table'];
+
+        $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetEntityClass);
+        $hasStringFieldType = false;
+
+        foreach ($classMetadata->getIdentifier() as $identifier) {
+            if ($classMetadata->getTypeOfField($identifier) === 'string') {
+                $hasStringFieldType = true;
+                break;
+            }
+        }
+
+        return $hasStringFieldType ? [''] : [0];
     }
 }

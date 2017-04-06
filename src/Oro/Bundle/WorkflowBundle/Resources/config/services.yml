@@ -544,3 +544,9 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@form.factory'
             - '@oro_workflow.serializer.data.serializer'
+
+    oro_workflow.helper.workflow_deactivation:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper'
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@oro_workflow.helper.translation'

@@ -199,11 +199,12 @@ define([
 
     // updates place for message label before show message
     $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(func, element, message) {
+        message = '<span><span>' + message + '</span></span>';
         var label = this.errorsFor(element);
         if (message && label.length) {
             this.settings.errorPlacement(label, element);
         }
-        return func.apply(this, _.rest(arguments));
+        return func.call(this, element, message);
     });
 
     // fixes focus on select2 element

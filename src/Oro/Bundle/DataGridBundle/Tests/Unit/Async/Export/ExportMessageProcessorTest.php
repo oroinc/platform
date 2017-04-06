@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Export;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -17,7 +15,6 @@ use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Job\JobStorage;
 use Oro\Component\MessageQueue\Transport\Null\NullMessage;
@@ -33,40 +30,54 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function messageBodyLoggerCriticalDataProvider()
+    public function invalidMessageProvider()
     {
         return [
             [
                 '[DataGridExportMessageProcessor] Got invalid message: '
-                    .'"{"parameters":{"gridName":"grid_name"},"format":"csv"}"',
-                ['parameters' => ['gridName' => 'grid_name'], 'format' => 'csv'],
+                .'"{"securityToken":"token","parameters":{"gridName":"grid_name"},"format":"csv"}"',
+                ['securityToken' => 'token', 'parameters' => ['gridName' => 'grid_name'], 'format' => 'csv'],
             ],
             [
                 '[DataGridExportMessageProcessor] Got invalid message: '
-                    .'"{"userId":1,"parameters":"must_be_array","format":"csv"}"',
-                ['userId' => 1, 'parameters' => 'must_be_array', 'format' => 'csv'],
+                    .'"{"jobId":1,"parameters":{"gridName":"grid_name"},"format":"csv"}"',
+                ['jobId' => 1, 'parameters' => ['gridName' => 'grid_name'], 'format' => 'csv'],
             ],
             [
                 '[DataGridExportMessageProcessor] Got invalid message: '
-                    .'"{"userId":1,"parameters":{"not_gridName":"value"},"format":"csv"}"',
-                ['userId' => 1, 'parameters' => ['not_gridName' => 'value'], 'format' => 'csv'],
+                .'"{"jobId":1,"securityToken":"token","format":"csv"}"',
+                ['jobId' => 1, 'securityToken' => 'token', 'format' => 'csv'],
+            ],
+            [
+                '[DataGridExportMessageProcessor] Got invalid message: '
+                    .'"{"jobId":1,"securityToken":"token","parameters":{"gridName":"grid_name"}}"',
+                ['jobId' => 1, 'securityToken' => 'token', 'parameters' => ['gridName' => 'grid_name']],
             ],
         ];
     }
 
     /**
-     * @dataProvider messageBodyLoggerCriticalDataProvider
+     * @dataProvider invalidMessageProvider
+     *
+     * @param string $loggerMessage
+     * @param array $messageBody
      */
-    public function testShouldRejectMessageAndLogCriticalIfRequiredParametersAreMissing($loggerMessage, $messageBody)
+    public function testShouldRejectMessageAndLogCriticalIfInvalidMessage($loggerMessage, $messageBody)
     {
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with($loggerMessage)
+            ->with($this->equalTo($loggerMessage))
         ;
 
-        $processor = $this->createExportMessageProcessorStub(['logger' => $logger]);
+        $processor = new ExportMessageProcessor(
+            $this->createJobRunnerMock(),
+            $this->createJobStorageMock(),
+            $this->createTokenStorageMock(),
+            $this->createTokenSerializerMock(),
+            $logger
+        );
 
         $message = new NullMessage();
         $message->setBody(json_encode($messageBody));
@@ -76,34 +87,38 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ExportMessageProcessor::REJECT, $result);
     }
 
-    public function testShouldRejectMessageAndLogCriticalIfWriterNotFound()
+    public function testShouldRejectMessageAndLogCriticalIfInvalidWriter()
     {
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DataGridExportMessageProcessor] Invalid format: "csv"')
+            ->with($this->equalTo('[DataGridExportMessageProcessor] Invalid format: "invalid_format"'))
         ;
 
         $writerChain = $this->createWriterChainMock();
         $writerChain
             ->expects($this->once())
             ->method('getWriter')
-            ->with('csv')
+            ->with($this->equalTo('invalid_format'))
             ->willReturn(null)
         ;
 
-        $processor = $this->createExportMessageProcessorStub([
-            'logger' => $logger,
-            'writerChain' => $writerChain,
-        ]);
+        $processor = new ExportMessageProcessor(
+            $this->createJobRunnerMock(),
+            $this->createJobStorageMock(),
+            $this->createTokenStorageMock(),
+            $this->createTokenSerializerMock(),
+            $logger
+        );
+        $processor->setWriterChain($writerChain);
 
         $message = new NullMessage();
         $message->setBody(json_encode([
             'jobId' => 1,
-            'securityToken' => 'test',
+            'securityToken' => 'token',
             'parameters' => ['gridName' => 'grid_name'],
-            'format' => 'csv'
+            'format' => 'invalid_format',
         ]));
 
         $result = $processor->process($message, $this->createSessionMock());
@@ -111,55 +126,30 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(ExportMessageProcessor::REJECT, $result);
     }
 
-    public function testShouldRejectMessageAndLogCriticalIfWriterNotInstanceOfFileWriter()
+    public function testShouldRejectMessageAndLogCriticalIfInvalidToken()
     {
         $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('critical')
-            ->with('[DataGridExportMessageProcessor] Invalid format: "csv"')
+            ->with($this->equalTo('[DataGridExportMessageProcessor] Cannot set security token'))
         ;
+
+        $fileStreamWriter = $this->createFileStreamWriterMock();
 
         $writerChain = $this->createWriterChainMock();
         $writerChain
             ->expects($this->once())
             ->method('getWriter')
-            ->with('csv')
-            ->willReturn($this->createMock(ItemWriterInterface::class))
-        ;
-
-        $processor = $this->createExportMessageProcessorStub([
-            'logger' => $logger,
-            'writerChain' => $writerChain,
-        ]);
-
-        $message = new NullMessage();
-        $message->setBody(json_encode([
-            'jobId' => 1,
-            'securityToken' => 'test',
-            'parameters' => ['gridName' => 'grid_name'],
-            'format' => 'csv'
-        ]));
-
-        $result = $processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(ExportMessageProcessor::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageAndLogCriticalIfSecurityTokenCannotBeSet()
-    {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with($this->stringContains('Cannot set security token'))
+            ->with($this->equalTo('invalid_format'))
+            ->willReturn($fileStreamWriter)
         ;
 
         $tokenSerializer = $this->createTokenSerializerMock();
         $tokenSerializer
             ->expects($this->once())
             ->method('deserialize')
-            ->with($this->equalTo('serialized_security_token'))
+            ->with($this->equalTo('token'))
             ->willReturn(null)
         ;
 
@@ -169,79 +159,64 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('setToken')
         ;
 
-        $writerChain = $this->createWriterChainMock();
-        $writerChain
-            ->expects($this->once())
-            ->method('getWriter')
-            ->with($this->equalTo('csv'))
-            ->willReturn($this->createFileStreamWriterMock())
-        ;
+        $processor = new ExportMessageProcessor(
+            $this->createJobRunnerMock(),
+            $this->createJobStorageMock(),
+            $tokenStorage,
+            $tokenSerializer,
+            $logger
+        );
+        $processor->setWriterChain($writerChain);
 
         $message = new NullMessage();
         $message->setBody(json_encode([
             'jobId' => 1,
-            'securityToken' => 'serialized_security_token',
+            'securityToken' => 'token',
             'parameters' => ['gridName' => 'grid_name'],
-            'format' => 'csv',
+            'format' => 'invalid_format',
         ]));
-
-        $processor = new ExportMessageProcessor(
-            $this->createExportHandlerMock(),
-            $this->createJobRunnerMock(),
-            $this->createDatagridExportConnectorMock(),
-            $this->createExportProcessorMock(),
-            $writerChain,
-            $tokenStorage,
-            $this->createJobStorageMock(),
-            $logger
-        );
-        $processor->setTokenSerializer($tokenSerializer);
 
         $result = $processor->process($message, $this->createSessionMock());
 
         $this->assertEquals(ExportMessageProcessor::REJECT, $result);
     }
 
-    public function exportHandlerResultProvider()
+    public function testShouldProcessExportAndReturnACK()
     {
-        return [
-            [
-                ['success' => false],
-                'Export result. Success: No.',
-                ExportMessageProcessor::REJECT,
-            ],
-            [
-                ['success' => true],
-                'Export result. Success: Yes.',
-                ExportMessageProcessor::ACK,
-            ],
-        ];
-    }
+        $exportResult = ['success' => true, 'readsCount' => 10, 'errorsCount' => 0];
 
-    /**
-     * @dataProvider exportHandlerResultProvider
-     *
-     * @param array $handleResult
-     * @param string $loggerMessage
-     * @param string $expectedResult
-     */
-    public function testShouldRejectMessageIfExportResultIsNotSuccessful($handleResult, $loggerMessage, $expectedResult)
-    {
-        $user = new User();
-        $user->setId(1);
+        $logger = $this->createLoggerMock();
+        $logger
+            ->expects($this->once())
+            ->method('info')
+            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'))
+        ;
+
+        $job = new Job();
+
+        $jobRunner = $this->createJobRunnerMock();
+        $jobRunner
+            ->expects($this->once())
+            ->method('runDelayed')
+            ->with($this->equalTo(1))
+            ->will($this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
+                return $callback($jobRunner, $job);
+            }))
+        ;
+
+        $jobStorage = $this->createJobStorageMock();
+        $jobStorage
+            ->expects($this->once())
+            ->method('saveJob')
+        ;
 
         $token = $this->createTokenMock();
-        $token
-            ->expects($this->once())
-            ->method('getUser')
-            ->willReturn($user)
-        ;
 
         $tokenSerializer = $this->createTokenSerializerMock();
         $tokenSerializer
             ->expects($this->once())
             ->method('deserialize')
-            ->with($this->equalTo('serialized_security_token'))
+            ->with($this->equalTo('token'))
             ->willReturn($token)
         ;
 
@@ -251,117 +226,47 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('setToken')
             ->with($this->equalTo($token))
         ;
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token)
-        ;
+
+        $fileStreamWriter = $this->createFileStreamWriterMock();
 
         $writerChain = $this->createWriterChainMock();
         $writerChain
             ->expects($this->once())
             ->method('getWriter')
             ->with($this->equalTo('csv'))
-            ->willReturn($this->createFileStreamWriterMock())
-        ;
-
-        $job = new Job();
-
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
-            ->method('runDelayed')
-            ->will($this->returnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
-                return $callback($jobRunner, $job);
-            }))
+            ->willReturn($fileStreamWriter)
         ;
 
         $exportHandler = $this->createExportHandlerMock();
         $exportHandler
             ->expects($this->once())
             ->method('handle')
-            ->willReturn($handleResult)
+            ->willReturn($exportResult)
         ;
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
-            ->method('info')
-            ->with($this->stringContains($loggerMessage))
-        ;
-
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
-            ->expects($this->once())
-            ->method('saveJob')
-        ;
+        $processor = new ExportMessageProcessor(
+            $jobRunner,
+            $jobStorage,
+            $tokenStorage,
+            $tokenSerializer,
+            $logger
+        );
+        $processor->setWriterChain($writerChain);
+        $processor->setExportHandler($exportHandler);
+        $processor->setExportProcessor($this->createExportProcessorMock());
+        $processor->setExportConnector($this->createExportConnectorMock());
 
         $message = new NullMessage();
         $message->setBody(json_encode([
             'jobId' => 1,
-            'securityToken' => 'serialized_security_token',
+            'securityToken' => 'token',
             'parameters' => ['gridName' => 'grid_name'],
             'format' => 'csv',
         ]));
 
-        $processor = new ExportMessageProcessor(
-            $exportHandler,
-            $jobRunner,
-            $this->createDatagridExportConnectorMock(),
-            $this->createExportProcessorMock(),
-            $writerChain,
-            $tokenStorage,
-            $jobStorage,
-            $logger
-        );
-        $processor->setTokenSerializer($tokenSerializer);
-
         $result = $processor->process($message, $this->createSessionMock());
 
-        $this->assertEquals($expectedResult, $result);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExportMessageProcessor
-     */
-    private function createExportMessageProcessorStub(array $arguments = [])
-    {
-        $arguments = array_merge(
-            [
-                'exportHandler' => $this->createExportHandlerMock(),
-                'jobRunner' => $this->createJobRunnerMock(),
-                'exportConnector' => $this->createDatagridExportConnectorMock(),
-                'exportProcessor' => $this->createExportProcessorMock(),
-                'writerChain' => $this->createWriterChainMock(),
-                'tokenStorage' => $this->createTokenStorageMock(),
-                'jobStorage' => $this->createJobStorageMock(),
-                'logger' => $this->createLoggerMock()
-            ],
-            $arguments
-        );
-
-        return $this
-            ->getMockBuilder(ExportMessageProcessor::class)
-            ->setMethods(['getSubscribedTopics'])
-            ->setConstructorArgs($arguments)
-            ->getMock()
-        ;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|WriterChain
-     */
-    private function createWriterChainMock()
-    {
-        return $this->createMock(WriterChain::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExportHandler
-     */
-    private function createExportHandlerMock()
-    {
-        return $this->createMock(ExportHandler::class);
+        $this->assertEquals(ExportMessageProcessor::ACK, $result);
     }
 
     /**
@@ -373,19 +278,11 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|DatagridExportConnector
+     * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
      */
-    private function createDatagridExportConnectorMock()
+    private function createJobStorageMock()
     {
-        return $this->createMock(DatagridExportConnector::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ExportProcessor
-     */
-    private function createExportProcessorMock()
-    {
-        return $this->createMock(ExportProcessor::class);
+        return $this->createMock(JobStorage::class);
     }
 
     /**
@@ -394,6 +291,14 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     private function createTokenStorageMock()
     {
         return $this->createMock(TokenStorageInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
+     */
+    private function createTokenSerializerMock()
+    {
+        return $this->createMock(TokenSerializerInterface::class);
     }
 
     /**
@@ -413,11 +318,11 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|JobStorage
+     * @return \PHPUnit_Framework_MockObject_MockObject|WriterChain
      */
-    private function createJobStorageMock()
+    private function createWriterChainMock()
     {
-        return $this->createMock(JobStorage::class);
+        return $this->createMock(WriterChain::class);
     }
 
     /**
@@ -429,18 +334,34 @@ class ExportMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExportHandler
+     */
+    private function createExportHandlerMock()
+    {
+        return $this->createMock(ExportHandler::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExportProcessor
+     */
+    private function createExportProcessorMock()
+    {
+        return $this->createMock(ExportProcessor::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|DatagridExportConnector
+     */
+    private function createExportConnectorMock()
+    {
+        return $this->createMock(DatagridExportConnector::class);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|TokenInterface
      */
     private function createTokenMock()
     {
         return $this->createMock(TokenInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TokenSerializerInterface
-     */
-    private function createTokenSerializerMock()
-    {
-        return $this->createMock(TokenSerializerInterface::class);
     }
 }

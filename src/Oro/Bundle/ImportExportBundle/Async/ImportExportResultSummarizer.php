@@ -1,11 +1,14 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Gaufrette\Exception\FileNotFound;
+
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 
@@ -27,13 +30,19 @@ class ImportExportResultSummarizer
     protected $configManager;
 
     /**
+     * @var FileManager
+     */
+    protected $fileManager;
+
+    /**
      * @param Router $router
      * @param ConfigManager $configManager
      */
-    public function __construct(Router $router, ConfigManager $configManager)
+    public function __construct(Router $router, ConfigManager $configManager, FileManager $fileManager)
     {
         $this->router = $router;
         $this->configManager = $configManager;
+        $this->fileManager = $fileManager;
     }
 
     /**
@@ -80,22 +89,30 @@ class ImportExportResultSummarizer
     /**
      * @param Job $job
      *
+     * @throws FileNotFound
+     *
      * @return null|string
      */
     public function getErrorLog(Job $job)
     {
         $errorLog = null;
-        $i = 0;
+        $job = $job->isRoot() ? $job : $job->getRootJob();
         foreach ($job->getChildJobs() as $childrenJob) {
             $childrenJobData = $childrenJob->getData();
             if (empty($childrenJobData)) {
                 continue;
             }
-            $i++;
+            $fileName = $childrenJobData['errorLogFile'];
 
-            foreach ($childrenJobData['errors'] as $errorMessage) {
-                $errorLog .= $errorMessage.PHP_EOL;
+            if (! $this->fileManager->isFileExist($fileName)) {
+                $errorLog .=  sprintf('Log file of job id: "%s" was not found.', $childrenJob->getId()) . PHP_EOL;
+                continue;
             }
+
+            $errorLog .= implode(
+                PHP_EOL,
+                json_decode($this->fileManager->getContent($fileName), true)
+            ). PHP_EOL;
         }
 
         return $errorLog;
@@ -144,9 +161,6 @@ class ImportExportResultSummarizer
             $data['successParts'] += (int)$childrenJobData['success'];
             $data['totalParts'] += 1;
             $totalDataImportJob = $childrenJobData['counts'];
-            if (count($childrenJobData['errors'])) {
-                $data['hasError'] = true;
-            }
             $data['errors'] += isset($totalDataImportJob['errors']) ? $totalDataImportJob['errors'] : 0;
             $data['process'] += isset($totalDataImportJob['process']) ? $totalDataImportJob['process'] : 0;
             $data['read'] += isset($totalDataImportJob['read']) ? $totalDataImportJob['read'] : 0;
@@ -157,6 +171,8 @@ class ImportExportResultSummarizer
             $data['error_entries'] += isset($totalDataImportJob['error_entries']) ?
                 $totalDataImportJob['error_entries'] : 0;
         }
+
+            $data['hasError'] = !!$data['errors'];
 
         return $data;
     }
@@ -183,9 +199,9 @@ class ImportExportResultSummarizer
             $data['readsCount'] += $childrenJobData['readsCount'];
             $data['errorsCount'] += $childrenJobData['errorsCount'];
             $data['success']  += $childrenJobData['success'];
+            $data['entities'] = isset($childrenJobData['entities']) ? $childrenJobData['entities'] : $data['entities'];
         }
 
-        $data['entities'] = isset($childrenJobData['entities']) ? $childrenJobData['entities'] : null;
         $data['success'] = !!$data['success'];
 
         return $data;

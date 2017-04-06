@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridColumnManager;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\MultipleChoice;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
@@ -15,6 +16,7 @@ use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridPaginator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
+
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -759,6 +761,32 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $columnManager->open();
         $columnManager->hideAllColumns($exceptions);
         $columnManager->close();
+    }
+
+    /**
+     * Asserts per page value on current page with provided amount
+     *
+     * @Then /^per page amount should be (\d+)$/
+     */
+    public function perPageAmountShouldBe($expectedAmount)
+    {
+        $perPage = $this->elementFactory->createElement('GridToolBarTools')->getPerPageAmount();
+
+        self::assertNotNull($perPage, 'Grid per page control elements not found on current page');
+        self::assertEquals($expectedAmount, $perPage);
+    }
+
+    /**
+     * Records in table on current page should match the count.
+     * Example: Then records in grid should be 5
+     *
+     * @Then records in current page grid should be :count
+     */
+    public function recordsInGridShouldBe($count)
+    {
+        $gridRows = $this->getPage()->findAll('css', '.grid-container tbody tr');
+
+        self::assertCount((int) $count, $gridRows);
     }
 
     /**
