@@ -54,13 +54,14 @@ abstract class AbstractImportTest extends WebTestCase
         $entities = $this->repository->findBy([], ['id' => 'ASC']);
         $entitiesToAssert = $this->getEntityArray();
 
-        $this->assertCount(count($entitiesToAssert[0]), $entities);
+        /** We need to add 1, since there is one Customer User in DB */
+        $this->assertCount(count($entitiesToAssert) + 1, $entities);
         foreach ($entitiesToAssert as $entityProperties) {
+            next($entities); //Let's skip user in DB
             foreach ($entityProperties as $propertyName => $propertyValue) {
                 $entityPropertyValue = $this->propertyAccessor->getValue(current($entities), $propertyName);
                 $this->assertEquals($propertyValue, $entityPropertyValue);
             }
-            next($entities);
         }
     }
 
