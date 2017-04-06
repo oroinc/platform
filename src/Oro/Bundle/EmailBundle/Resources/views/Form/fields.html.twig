@@ -38,14 +38,12 @@
     {% endif %}
 {% endblock %}
 
-{% block _oro_email_autoresponserule_conditions_entry_field_row %}
-    {{ form_widget(form) }}
-{% endblock %}
+{% block _oro_email_autoresponserule_template_new_entity_translations_widget %}
+    {% import 'OroEmailBundle::macros.html.twig' as email %}
+    {% set entityNameForm = form.parent.entityName %}
 
-{% block _oro_email_autoresponserule_conditions_entry_filter_row %}
-    {% for child in form %}
-        {{ form_widget(child, {'attr': {'class': child.vars['name']}}) }}
-    {% endfor %}
+    {{ form_widget(form) }}
+    {{ email.renderAvailableVariablesWidget(entityNameForm.vars.value, entityNameForm.vars.id) }}
 {% endblock %}
 
 {% block oro_email_template_list_row %}

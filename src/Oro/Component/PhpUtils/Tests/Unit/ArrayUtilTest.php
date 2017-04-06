@@ -6,6 +6,30 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class ArrayUtilTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @dataProvider interposeDataProvider
+     */
+    public function testInterpose($separator, $array, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::interpose($separator, $array));
+    }
+
+    public function interposeDataProvider()
+    {
+        return [
+            [
+                ',',
+                ['a', 'b', 'c', 'd'],
+                ['a', ',', 'b', ',', 'c', ',', 'd'],
+            ],
+            [
+                ['array'],
+                ['a', 'b', 'c', ['d']],
+                ['a', ['array'], 'b', ['array'], 'c', ['array'], ['d']],
+            ],
+        ];
+    }
+
     public function testCreateOrderedComparator()
     {
         $order = array_flip(['a', 'z', 'd', 'e']);

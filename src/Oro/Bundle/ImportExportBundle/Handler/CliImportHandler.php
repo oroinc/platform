@@ -7,7 +7,6 @@ use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
 class CliImportHandler extends AbstractImportHandler
 {
-
     /**
      * {@inheritdoc}
      */

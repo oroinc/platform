@@ -39,6 +39,10 @@ class MaintenanceExtension extends AbstractExtension
     public function setFilePathServerLockFromConfig($configurationFilePath)
     {
         $lockFilePath = null;
+        if (!file_exists($configurationFilePath)) {
+            // configuration file path can be unavailable
+            return;
+        }
         $iniArray = parse_ini_file($configurationFilePath);
         if (isset($iniArray['LOCK_FILE'])) {
             $lockFilePath = $this->trimComment($iniArray['LOCK_FILE']);
@@ -75,7 +79,7 @@ class MaintenanceExtension extends AbstractExtension
     public function onBeforeReceive(Context $context)
     {
         $interrupt = false;
-        while ($this->maintenance->isOn() || $this->isMaintenanceServer()) {
+        while ($this->isMaintenance()) {
             $context->getLogger()->debug(
                 '[MaintenanceExtension] Maintenance mode has been activated.',
                 ['context' => $context]
@@ -88,6 +92,22 @@ class MaintenanceExtension extends AbstractExtension
             $context->setExecutionInterrupted(true);
             $context->setInterruptedReason('Maintenance mode has been deactivated.');
         }
+    }
+
+    /**
+     * Returns true if system in maintenance mode.
+     *
+     * @return bool
+     */
+    protected function isMaintenance()
+    {
+        $result = $this->maintenance->isOn();
+
+        if (!$result && $this->filePathServerLock) {
+            $result = $this->isMaintenanceServer();
+        }
+
+        return $result;
     }
 
     /**
