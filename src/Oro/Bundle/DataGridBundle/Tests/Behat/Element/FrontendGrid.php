@@ -4,11 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
 
-/**
- * @method GridRow getRowByNumber($rowNumber) @see Table::getRowByNumber($rowNumber)
- * @method GridRow getRowByContent($content) @see Table::getRowByContent($content)
- * @method GridRow[] getRows() @see Table::getRows()
- */
 class FrontendGrid extends Table
 {
     const TABLE_ROW_ELEMENT = 'GridRow';

@@ -59,17 +59,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: Then there is one record in grid
      * Example: And there are two records in grid
      * Example: And there are 7 records in grid
-     * Example: And there are 7 records in Quote Grid
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in (?P<name>(?:grid|[\s\w]+Grid))$/
+     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in grid$/
      */
-    public function numberOfRecordsShouldBe($number, $name = 'GridPaginator')
+    public function numberOfRecordsShouldBe($number)
     {
-        $name = $name == 'grid' ? 'GridPaginator' : $name;
-        $grid = $this->elementFactory->createElement($name);
-        self::assertEquals($this->getCount($number), $grid->getTotalRecordsCount());
+        self::assertEquals($this->getCount($number), $this->getGridPaginator()->getTotalRecordsCount());
     }
 
     /**
@@ -250,7 +247,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: But when I sort grid by First Name again
      * Example: When I sort Quotes Grid by Updated At
      *
-     * @When /^(?:|when )(?:|I )sort (grid|(?P<name>[\s\w]+)) by (?P<field>([\w\s]*[^again]))(?:| again)$/
+     * @When /^(?:|when )(?:|I )sort (?P<name>grid|[\s\w]+) by (?P<field>([\w\s]*[^again]))(?:| again)$/
      */
     public function sortGridBy($field, $name = 'Grid')
     {
@@ -790,13 +787,15 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Records in table on current page should match the count.
-     * Example: Then records in grid should be 5
+     * Example: Then records in current page grid should be 5
+     *          Then records in current Customer Quotes grid should be 1
      *
-     * @Then records in current page grid should be :count
+     * @Then /^records in current (?P<name>(?:page|[\s\w]+)) (grid )?should be (?P<count>(?:\d+))$/
      */
-    public function recordsInGridShouldBe($count)
+    public function recordsInGridShouldBe($name, $count)
     {
-        $gridRows = $this->getPage()->findAll('css', '.grid-container tbody tr');
+        $grid = $this->elementFactory->createElement($name);
+        $gridRows = $grid->findAll('css', 'tbody tr');
 
         self::assertCount((int) $count, $gridRows);
     }
