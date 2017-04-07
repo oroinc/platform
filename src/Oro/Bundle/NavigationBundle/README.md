@@ -190,7 +190,7 @@ You can get the breadcrumbs through any existing [menu alias](#menu-declaration-
 
 ### Usage of breadcrumb provider
 
-For using breadcrumb provider you should create layout update with predefined block type **breadcrumbs** and required option **menu_name**:
+For using breadcrumb provider you should create layout update with predefined block type **breadcrumbs** and option **menu_name**:
 
 ```yml
 # CustomerBundle/Resources/views/layouts/blank/imports/oro_customer_page/oro_customer_page.yml
@@ -206,7 +206,26 @@ layout:
             parentId: page_main_header
             blockType: breadcrumbs                         #block type
             options:
-                menu_name: "oro_customer_breadcrumbs_menu" #required menu alias
+                menu_name: "oro_customer_breadcrumbs_menu" #menu alias
+```
+
+### Usage of breadcrumbs block type
+
+You can avoid usage of breadcrumb provider. For that you should create layout update with predefined block type **breadcrumbs** and option **breadcrumbs**:
+
+```yml
+# WebCatalogBundle/Resources/views/layouts/blank/oro_product_frontend_product_index/product_index.yml
+
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'product_index.html.twig'
+        - '@addTree':
+            items:
+                category_breadcrumbs:
+                    blockType: breadcrumbs
+                    options:
+                        breadcrumbs: '=data["category_breadcrumbs"].getItems()'
 ```
 After rendering of breadcrumbs block type you should see menu labels separated by slashes. All breadcrumb items can be clickable,
 except the last one, which represents a current page.
