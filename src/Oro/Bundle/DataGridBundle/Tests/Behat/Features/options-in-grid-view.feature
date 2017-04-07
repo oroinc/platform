@@ -3,6 +3,7 @@ Feature: Options in Grid View
   Scenario: Create new grid view
     Given I login as administrator
     And I go to System/Entities/Entity Management
+    And I should not see "Set as default" in grid view options
     When I filter Name as contains "Test"
     And I click Options in grid view
     And I click on "Save As" in grid view options
