@@ -9,7 +9,13 @@ class FtpHandler implements ArtifactsHandlerInterface
      */
     protected $ftpConnection;
 
-    protected $ftpConfig;
+    protected $ftpHost;
+
+    protected $ftpUsername;
+
+    protected $ftpPassword;
+
+    protected $ftpDirectory;
 
     /**
      * @var string
@@ -18,17 +24,10 @@ class FtpHandler implements ArtifactsHandlerInterface
 
     public function __construct(array $ftpConfig)
     {
-        $this->ftpConfig = $ftpConfig;
-        $this->ftpConnection = ftp_connect($ftpConfig['host']);
-
-        if (!ftp_login($this->ftpConnection, $ftpConfig['username'], $ftpConfig['password'])) {
-            $this->ftpConnection = null;
-            echo "Can't connect to ftp server";
-            return;
-        }
-
-        ftp_chdir($this->ftpConnection, $ftpConfig['directory']);
-        ftp_pasv($this->ftpConnection, true);
+        $this->ftpHost = $ftpConfig['host'];
+        $this->ftpUsername = $ftpConfig['username'];
+        $this->ftpPassword = $ftpConfig['password'];
+        $this->ftpDirectory = $ftpConfig['directory'];
         $this->screenshotRemoteBaseUrl = trim($ftpConfig['base_url'], " \t\n\r\0\x0B\\");
     }
 
@@ -41,11 +40,16 @@ class FtpHandler implements ArtifactsHandlerInterface
         $localFile = sys_get_temp_dir().'/'.$fileName;
         file_put_contents($localFile, $data);
 
-        if (!ftp_put($this->ftpConnection, $fileName, $localFile, FTP_BINARY)) {
-            echo "There was a problem while uploading $data\n";
+        if (!$ftpConnection = $this->getFtpConnection()) {
+            echo "There is issue with ftp connection";
         }
 
-        ftp_chmod($this->ftpConnection, 0644, $fileName);
+        if (!ftp_put($ftpConnection, $fileName, $localFile, FTP_BINARY)) {
+            return "There was a problem while uploading screenshot to ftp server\n";
+        }
+
+        ftp_chmod($ftpConnection, 0644, $fileName);
+        ftp_close($ftpConnection);
 
         return $this->screenshotRemoteBaseUrl.'/'.$fileName;
     }
@@ -58,12 +62,21 @@ class FtpHandler implements ArtifactsHandlerInterface
         return 'ftp';
     }
 
-    public function __destruct()
+    /**
+     * @return false|resource
+     */
+    private function getFtpConnection()
     {
-        if (!$this->ftpConnection) {
-            return;
+        $connection = ftp_connect($this->ftpHost);
+
+        if (!ftp_login($connection, $this->ftpUsername, $this->ftpPassword)) {
+            $connection = null;
+            return false;
         }
 
-        ftp_close($this->ftpConnection);
+        ftp_chdir($connection, $this->ftpDirectory);
+        ftp_pasv($connection, true);
+
+        return $connection;
     }
 }
