@@ -63,10 +63,11 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And number of records should be 34
      *
      * @Given number of records should be :number
-     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in (grid|(?P<name>[\s\w]+Grid))$/
+     * @Given /^there (are|is) (?P<number>(?:|zero|one|two|\d+)) record(?:|s) in (?P<name>(?:grid|[\s\w]+Grid))$/
      */
     public function numberOfRecordsShouldBe($number, $name = 'GridPaginator')
     {
+        $name = $name == 'grid' ? 'GridPaginator' : $name;
         $grid = $this->elementFactory->createElement($name);
         self::assertEquals($this->getCount($number), $grid->getTotalRecordsCount());
     }
