@@ -35,6 +35,7 @@ class ImapEmailFolderRepository extends EntityRepository
      * @param EmailOrigin $origin
      * @param bool        $withOutdated
      * @param bool|null   $syncEnabled
+     * @param bool        $sortByFailedCount
      *
      * @return ImapEmailFolder[]
      */
@@ -57,9 +58,9 @@ class ImapEmailFolderRepository extends EntityRepository
         }
         $qb->addOrderBy('nullsFirstDate', Criteria::ASC);
 
+        $imapFolders = $qb->getQuery()->getResult();
         if ($sortByFailedCount) {
-            $imapFolders = $qb->getQuery()->getResult();
-            usort($imapFolders, function ($imapFolder1, $imapFolder2) {
+            usort($imapFolders, function (ImapEmailFolder $imapFolder1, ImapEmailFolder $imapFolder2) {
                 $failedCount1 = $imapFolder1->getFolder()->getFailedCount();
                 $failedCount2 = $imapFolder2->getFolder()->getFailedCount();
                 if ($failedCount1 === $failedCount2) {
@@ -68,11 +69,9 @@ class ImapEmailFolderRepository extends EntityRepository
 
                 return ($failedCount1 < $failedCount2) ? -1 : 1;
             });
-
-            return $imapFolders;
         }
 
-        return $qb->getQuery()->getResult();
+        return $imapFolders;
     }
 
     /**
