@@ -46,7 +46,7 @@
       }
       &.highlight {
         background: #fff9e9;
-        .title {
+        .title, .empty-subject {
           color: #a38c62;
         }
         .description {
@@ -68,13 +68,16 @@
           }
         }
       }
-      .info .title {
-        cursor: pointer;
+      .info {
+        min-height: 12px;
+        .title, .empty-subject {
+          cursor: pointer;
+        }
       }
       .body {
         padding-right: 20px;
       }
-      .title {
+      .title, .empty-subject {
         color: #4d4c4c;
         line-height: 14px;
         text-overflow: ellipsis;

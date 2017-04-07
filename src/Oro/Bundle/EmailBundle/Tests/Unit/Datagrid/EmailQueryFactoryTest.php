@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
@@ -47,11 +50,18 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var FormFactoryInterface $formFactory */
+        $formFactory   = $this->getMockForAbstractClass(FormFactoryInterface::class);
+
+        $filterUtility = new FilterUtility();
+
         $this->factory = new EmailQueryFactory(
             $this->providerStorage,
             $this->entityNameResolver,
             $this->mailboxManager,
-            $this->securityFacade
+            $this->securityFacade,
+            $formFactory,
+            $filterUtility
         );
     }
 

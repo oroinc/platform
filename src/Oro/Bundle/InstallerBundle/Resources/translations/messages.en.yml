@@ -98,7 +98,7 @@ process:
             header:        Finish
             greeting:      Success!!!
             content:       'You are now ready to start using Oro.<br>For help please join our community <a href="http://www.orocrm.com/forums">forums</a>.'
-            check-background-command: 'Make sure that consumer command was running "oro:message-queue:consume" <a href="https://www.orocrm.com/documentation/current/book/installation#activating-background-tasks" class="helper">?</a>'
+            check-background-command: 'Make sure that consumer command "oro:message-queue:consume" was running <a href="https://www.orocrm.com/documentation/current/book/installation#activating-background-tasks" class="helper">?</a>'
     button:
         back:              Back
         next:              Next

@@ -10,7 +10,9 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+
 use Doctrine\Common\Inflector\Inflector;
+
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
@@ -23,6 +25,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
@@ -36,6 +39,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
@@ -109,6 +113,17 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message')
     {
+        $this->iShouldSeeFlashMessageWithTimeLimit($title, 15, $flashMessageElement);
+    }
+
+    /**
+     * Example: Then I should see "Attachment created successfully" flash message
+     * Example: Then I should see "The email was sent" flash message
+     *
+     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message with time limit (?P<timeLimit>\d+)$/
+     */
+    public function iShouldSeeFlashMessageWithTimeLimit($title, $timeLimit, $flashMessageElement = 'Flash Message')
+    {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */
         $flashMessage = $this->spin(
@@ -128,7 +143,7 @@ class OroMainContext extends MinkContext implements
 
                 return null;
             },
-            15
+            $timeLimit
         );
 
         self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
@@ -680,6 +695,7 @@ class OroMainContext extends MinkContext implements
     public function iSaveForm()
     {
         $this->createOroForm()->save();
+        $this->waitForAjax();
     }
 
     /**
@@ -1017,6 +1033,72 @@ class OroMainContext extends MinkContext implements
     protected function waitForAjax($time = 60000)
     {
         return $this->getSession()->getDriver()->waitForAjax($time);
+    }
+
+    /**
+     * Unselect a value in the multiselect box
+     * Example: And unselect "Color" option from "Attributes"
+     * Example: When I unselect "Color" option from "Attributes"
+     *
+     * @When /^(?:|I )unselect "(?P<option>(?:[^"]|\\")*)" option from "(?P<select>(?:[^"]|\\")*)"$/
+     */
+    public function unselectOption($select, $option)
+    {
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        $field = $this->getSession()->getPage()->findField($select);
+
+        if (null === $field) {
+            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $select);
+        }
+
+        $selectOptionXpath = '//option[contains(.,"%s")]';
+        $selectOption = $field->find(
+            'xpath',
+            sprintf($selectOptionXpath, $option)
+        );
+
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $driver,
+                'select option',
+                'id|name|label|value|placeholder',
+                sprintf($selectOptionXpath, $option)
+            );
+        }
+
+        $optionValue = $selectOption->getValue();
+
+        $values = $field->getValue();
+        if ($values !== null && is_array($values)) {
+            foreach ($values as $key => $value) {
+                if ($value === $optionValue) {
+                    unset($values[$key]);
+                    break;
+                }
+            }
+
+            $field->setValue(array_values($values));
+        }
+    }
+
+    /**
+     * Confirm schema update and wait for success message
+     * Example: And I confirm schema update
+     *
+     * @Then /^(?:|I )confirm schema update$/
+     */
+    public function iConfirmSchemaUpdate()
+    {
+        $this->pressButton('Update schema');
+        $this->assertPageContainsText('Schema update confirmation');
+        $this->pressButton('Yes, Proceed');
+        $this->iShouldSeeFlashMessageWithTimeLimit('Schema updated', 60);
+
+        // Workaround to manually restart message queue consumer after it is stopped during schema update
+        // TODO: Should be removed after BAP-14042 is done
+        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
     }
 
     /**
