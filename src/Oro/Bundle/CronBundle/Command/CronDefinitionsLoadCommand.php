@@ -1,16 +1,26 @@
 <?php
+
 namespace Oro\Bundle\CronBundle\Command;
+
+use Psr\Log\LogLevel;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Oro\Bundle\CronBundle\Entity\Schedule;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
+use Oro\Bundle\CronBundle\Entity\Schedule;
 
 class CronDefinitionsLoadCommand extends ContainerAwareCommand
 {
+    /** @var DeferredScheduler */
+    protected $deferred;
+
     /**
      * {@inheritdoc}
      */
@@ -18,8 +28,7 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:cron:definitions:load')
-            ->setDescription('Loads cron commands definitions from application to database.')
-        ;
+            ->setDescription('Loads cron commands definitions from application to database.');
     }
 
     /**
@@ -27,78 +36,72 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<info>Removing all previously loaded commands...</info>');
-        $this->getRepository('OroCronBundle:Schedule')->createQueryBuilder('d')->delete()->getQuery()->execute();
+        $deferred = $this->getDeferredScheduler($output);
+        $this->removeOrphanedCronCommands($deferred);
+        $this->loadCronCommands($deferred);
+        $deferred->flush();
 
-        $applicationCommands = $this->getApplication()->all('oro:cron');
-        $em = $this->getEntityManager('OroCronBundle:Schedule');
+        $output->writeln('<info>The cron command definitions were successfully loaded.</info>');
+    }
 
-        foreach ($applicationCommands as $name => $command) {
-            $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
-            if ($this->checkCommand($output, $command)) {
-                $schedule = $this->createSchedule($output, $command, $name);
-                $em->persist($schedule);
+    /**
+     * @param DeferredScheduler $deferredScheduler
+     */
+    protected function removeOrphanedCronCommands(DeferredScheduler $deferredScheduler)
+    {
+        $schedulesForDelete = array_filter(
+            $this->getRepository('OroCronBundle:Schedule')->findAll(),
+            function (Schedule $schedule) {
+                try {
+                    $command = $this->getApplication()->get($schedule->getCommand());
+                    if ($command instanceof CronCommandInterface &&
+                        $command->getDefaultDefinition() !== $schedule->getDefinition() &&
+                        preg_match('/^oro:cron/', $schedule->getCommand())
+                    ) {
+                        return true;
+                    }
+                } catch (CommandNotFoundException $e) {
+                    return true;
+                }
+
+                return false;
+            }
+        );
+
+        /** @var Schedule $schedule */
+        foreach ($schedulesForDelete as $schedule) {
+            $deferredScheduler->removeSchedule(
+                $schedule->getCommand(),
+                $schedule->getArguments(),
+                $schedule->getDefinition()
+            );
+        }
+    }
+
+    /**
+     * @param DeferredScheduler $deferredScheduler
+     */
+    protected function loadCronCommands(DeferredScheduler $deferredScheduler)
+    {
+        $cronCommands = $this->getApplication()->all('oro:cron');
+        foreach ($cronCommands as $command) {
+            if ($command instanceof CronCommandInterface &&
+                $command->getDefaultDefinition()
+            ) {
+                $deferredScheduler->addSchedule(
+                    $command->getName(),
+                    [],
+                    $command->getDefaultDefinition()
+                );
             }
         }
-
-        $em->flush();
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param CronCommandInterface $command
-     * @param string $name
-     * @param array $arguments
-     *
-     * @return Schedule
-     */
-    private function createSchedule(
-        OutputInterface $output,
-        CronCommandInterface $command,
-        $name,
-        array $arguments = []
-    ) {
-        $output->writeln('<comment>setting up schedule..</comment>');
-
-        $schedule = new Schedule();
-        $schedule
-            ->setCommand($name)
-            ->setDefinition($command->getDefaultDefinition())
-            ->setArguments($arguments);
-
-        return $schedule;
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param Command $command
-     *
-     * @return bool
-     */
-    private function checkCommand(OutputInterface $output, Command $command)
-    {
-        if (!$command instanceof CronCommandInterface) {
-            $output->writeln(
-                '<info>Skipping, the command does not implement CronCommandInterface</info>'
-            );
-
-            return false;
-        }
-
-        if (!$command->getDefaultDefinition()) {
-            $output->writeln('<error>no cron definition found, check command</error>');
-
-            return false;
-        }
-
-        return true;
     }
 
     /**
      * @param string $className
      * @return ObjectManager
      */
-    private function getEntityManager($className)
+    protected function getEntityManager($className)
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($className);
     }
@@ -107,8 +110,33 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
      * @param string $className
      * @return ObjectRepository
      */
-    private function getRepository($className)
+    protected function getRepository($className)
     {
         return $this->getEntityManager($className)->getRepository($className);
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return DeferredScheduler
+     */
+    protected function getDeferredScheduler(OutputInterface $output)
+    {
+        if (null === $this->deferred) {
+            $logger = new ConsoleLogger($output, [
+                LogLevel::EMERGENCY => OutputInterface::VERBOSITY_QUIET,
+                LogLevel::ALERT => OutputInterface::VERBOSITY_QUIET,
+                LogLevel::CRITICAL => OutputInterface::VERBOSITY_QUIET,
+                LogLevel::ERROR => OutputInterface::VERBOSITY_QUIET,
+                LogLevel::WARNING => OutputInterface::VERBOSITY_QUIET,
+                LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
+                LogLevel::INFO => OutputInterface::VERBOSITY_NORMAL,
+                LogLevel::DEBUG => OutputInterface::VERBOSITY_NORMAL,
+            ]);
+
+            $this->deferred = $this->getContainer()->get('oro_cron.deferred_scheduler');
+            $this->deferred->setLogger($logger);
+        }
+
+        return $this->deferred;
     }
 }
