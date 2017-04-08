@@ -9,12 +9,24 @@ class FtpHandler implements ArtifactsHandlerInterface
      */
     protected $ftpConnection;
 
+    /**
+     * @var string
+     */
     protected $ftpHost;
 
+    /**
+     * @var string
+     */
     protected $ftpUsername;
 
+    /**
+     * @var string
+     */
     protected $ftpPassword;
 
+    /**
+     * @var string
+     */
     protected $ftpDirectory;
 
     /**
@@ -22,6 +34,9 @@ class FtpHandler implements ArtifactsHandlerInterface
      */
     protected $screenshotRemoteBaseUrl;
 
+    /**
+     * @param array $ftpConfig
+     */
     public function __construct(array $ftpConfig)
     {
         $this->ftpHost = $ftpConfig['host'];
