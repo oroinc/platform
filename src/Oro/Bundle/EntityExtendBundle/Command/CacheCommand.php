@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Doctrine\Common\Cache\ClearableCache;
 
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -47,11 +48,15 @@ abstract class CacheCommand extends ContainerAwareCommand
      */
     protected function warmup(OutputInterface $output)
     {
-        $this->warmupExtendedEntityCache($output);
-        // Doctrine metadata, proxies and dependent caches might be invalid after extended entities cache generation
-        $this->warmupMetadataCache($output);
-        $this->warmupProxies($output);
-        $this->warmupEntityAliasesCache($output);
+        $callable = function () use ($output) {
+            $this->warmupExtendedEntityCache($output);
+            // Doctrine metadata, proxies and dependent caches might be invalid after extended entities cache generation
+            $this->warmupMetadataCache($output);
+            $this->warmupProxies($output);
+            $this->warmupEntityAliasesCache($output);
+        };
+
+        SafeDatabaseChecker::safeDatabaseCallable($callable);
     }
 
     /**

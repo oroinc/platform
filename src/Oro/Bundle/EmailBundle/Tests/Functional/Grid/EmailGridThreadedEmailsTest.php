@@ -5,14 +5,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Functional\AbstractDatagridTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EmailGridTest extends AbstractDatagridTestCase
+class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
 {
     const AUTH_USER = 'simple_user';
-    const AUTH_PW = 'simple_password';
+    const AUTH_PW   = 'simple_password';
 
-    /**
-     * @var User
-     */
+    /** @var User */
     protected $user;
 
     protected function setUp()
@@ -20,7 +18,7 @@ class EmailGridTest extends AbstractDatagridTestCase
         parent::setUp();
 
         $this->loadFixtures([
-            'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData',
+            'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailThreadedData',
         ]);
 
         $this->user = $this->getReference('simple_user');
@@ -44,38 +42,53 @@ class EmailGridTest extends AbstractDatagridTestCase
     public function gridProvider()
     {
         return [
-            'Email grid' => [
+            'Email grid w/o filters' => [
                 [
                     'gridParameters' => [
                         'gridName' => 'user-email-grid',
                     ],
                     'gridFilters' => [],
                     'assert' => [],
-                    'expectedResultCount' => 10,
+                    'expectedResultCount' => 3,
                 ],
             ],
-            'Email grid filtered by from (admin)' => [
+            'Email grid filter by subject contains `Introduction` (in head email)' => [
                 [
                     'gridParameters' => [
                         'gridName' => 'user-email-grid'
                     ],
                     'gridFilters' => [
-                        'user-email-grid[_filter][from][value]' => 'admin',
+                        'user-email-grid[_filter][subject][value]' => 'Introduction',
+                        'user-email-grid[_filter][subject][type]' => 1,
                     ],
                     'assert' => [],
-                    'expectedResultCount' => 0,
+                    'expectedResultCount' => 2,
                 ],
             ],
-            'Email grid filtered by to' => [
+            'Email grid filtered by subject contains `Order` (not in head email), ' => [
                 [
                     'gridParameters' => [
                         'gridName' => 'user-email-grid'
                     ],
                     'gridFilters' => [
-                        'user-email-grid[_filter][to][value]' => 'simple_user@example.com',
+                        'user-email-grid[_filter][subject][value]' => 'Order',
+                        'user-email-grid[_filter][subject][type]' => 1,
                     ],
                     'assert' => [],
-                    'expectedResultCount' => 10,
+                    'expectedResultCount' => 2,
+                ],
+            ],
+            'Email grid filtered by subject contains `Opportunities` (not in head email), ' => [
+                [
+                    'gridParameters' => [
+                        'gridName' => 'user-email-grid'
+                    ],
+                    'gridFilters' => [
+                        'user-email-grid[_filter][subject][value]' => 'Confirmation',
+                        'user-email-grid[_filter][subject][type]' => 1,
+                    ],
+                    'assert' => [],
+                    'expectedResultCount' => 1,
                 ],
             ],
         ];

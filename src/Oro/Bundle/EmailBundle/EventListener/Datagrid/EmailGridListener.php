@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
@@ -86,18 +87,25 @@ class EmailGridListener implements FeatureToggleableInterface
             return;
         }
 
+        /** @var DatagridInterface $datagrid */
+        $datagrid = $event->getDatagrid();
+
         /** @var OrmDatasource $ormDataSource */
-        $ormDataSource = $event->getDatagrid()->getDatasource();
+        $ormDataSource = $datagrid->getDatasource();
         $queryBuilder  = $ormDataSource->getQueryBuilder();
         $countQb       = $ormDataSource->getCountQb();
-        $parameters    = $event->getDatagrid()->getParameters();
+        $parameters    = $datagrid->getParameters();
 
         $isThreadGroupingEnabled = $this->configManager && $this->configManager->get('oro_email.threads_grouping');
 
         $this->factory->addEmailsCount($queryBuilder, $isThreadGroupingEnabled);
 
         if ($isThreadGroupingEnabled) {
-            $this->factory->applyAclThreadsGrouping($queryBuilder);
+            $this->factory->applyAclThreadsGrouping(
+                $queryBuilder,
+                $datagrid,
+                $this->getFilters($parameters)
+            );
             if ($countQb) {
                 $this->factory->applyAclThreadsGrouping($countQb);
             }
@@ -128,10 +136,7 @@ class EmailGridListener implements FeatureToggleableInterface
      */
     protected function prepareQueryToFilter($parameters, QueryBuilder $queryBuilder, QueryBuilder $countQb = null)
     {
-        $filters = $parameters->get('_filter');
-        if (!$filters || !is_array($filters)) {
-            $filters = $this->getGridViewFiltersData();
-        }
+        $filters = $this->getFilters($parameters);
         if (!$filters) {
             return;
         }
@@ -169,6 +174,21 @@ class EmailGridListener implements FeatureToggleableInterface
             $queryBuilder->leftJoin('eu.folders', 'f');
             $this->filterJoins['eu'][] = 'f';
         }
+    }
+
+    /**
+     * @param ParameterBag $parameters
+     *
+     * @return array
+     */
+    protected function getFilters($parameters)
+    {
+        $filters = $parameters->get('_filter');
+        if (!$filters || !is_array($filters)) {
+            $filters = $this->getGridViewFiltersData();
+        }
+
+        return $filters;
     }
 
     /**
