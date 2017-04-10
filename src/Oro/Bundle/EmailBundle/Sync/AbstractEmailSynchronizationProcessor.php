@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -39,6 +38,9 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
 
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
+
+    /** @var KnownEmailAddressCheckerInterface */
+    protected $knownEmailAddressChecker;
 
     /** @var int Number of seconds passed to store last emails batch */
     protected $dbBatchSaveTime = -1;
@@ -369,8 +371,8 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             'Oro\Bundle\EmailBundle\Entity\Email',
             'Oro\Bundle\EmailBundle\Entity\EmailUser',
             'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
-            'Oro\Bundle\ImapBundle\Entity\ImapEmail',
             'Oro\Bundle\EmailBundle\Entity\EmailBody',
+            $this->emailEntityBuilder->getEmailAddressEntityClass(),
         ];
     }
 
