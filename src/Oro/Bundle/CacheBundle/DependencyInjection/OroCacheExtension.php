@@ -47,7 +47,7 @@ class OroCacheExtension extends Extension implements PrependExtensionInterface
         $container->prependExtensionConfig('framework', $validationConfig);
         $container->prependExtensionConfig(
             'jms_serializer',
-            ['metadata' => ['cache' => 'oro.cache.jms_serializer_adapter']]
+            ['metadata' => ['cache' => 'oro_cache.jms_serializer_adapter']]
         );
     }
 }
