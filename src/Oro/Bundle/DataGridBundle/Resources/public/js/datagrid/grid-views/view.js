@@ -225,7 +225,7 @@ define(function(require) {
          * @param {Event} e
          */
         onSave: function(e) {
-            var model = this._getEditableViewModel($(e.currentTarget));
+            var model = this._getEditableViewModel(e.currentTarget);
 
             this._onSaveModel(model);
         },
@@ -304,7 +304,7 @@ define(function(require) {
          * @param {Event} e
          */
         onShare: function(e) {
-            var model = this._getEditableViewModel($(e.currentTarget));
+            var model = this._getEditableViewModel(e.currentTarget);
             var self = this;
 
             model.save({
@@ -322,7 +322,7 @@ define(function(require) {
          * @param {Event} e
          */
         onUnshare: function(e) {
-            var model = this._getEditableViewModel($(e.currentTarget));
+            var model = this._getEditableViewModel(e.currentTarget);
             var self = this;
 
             model.save({
@@ -340,7 +340,7 @@ define(function(require) {
          * @param {Event} e
          */
         onDelete: function(e) {
-            var model = this._getModelForDelete($(e.currentTarget));
+            var model = this._getModelForDelete(e.currentTarget);
 
             var confirm = new this.DeleteConfirmation(this.defaults.DeleteConfirmationOptions);
             confirm.on('ok', _.bind(function() {
@@ -369,7 +369,7 @@ define(function(require) {
          */
         onRename: function(e) {
             var self = this;
-            var model = this._getEditableViewModel($(e.currentTarget));
+            var model = this._getEditableViewModel(e.currentTarget);
             var modal = new ViewNameModal({
                 defaultValue: model.get('label'),
                 defaultChecked: model.get('is_default')
@@ -459,7 +459,7 @@ define(function(require) {
             var isDefault = 1;
             var defaultModel = this._getCurrentDefaultViewModel();
             var gridName = this.gridName;
-            var currentViewModel = this._getEditableViewModel($(e.currentTarget));
+            var currentViewModel = this._getEditableViewModel(e.currentTarget);
             var id = currentViewModel.id;
             if (this._isCurrentViewSystem()) {
                 // in this case we need to set default to false on current default view
