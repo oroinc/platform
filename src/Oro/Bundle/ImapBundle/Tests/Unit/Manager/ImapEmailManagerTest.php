@@ -279,6 +279,30 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(998, mb_strlen($email->getSubject()));
     }
 
+    public function testConvertToEmailWithSeveralSubjects()
+    {
+        $msg = $this->getMessageMock(
+            [
+                ['UID', $this->getHeader('123')],
+                ['Subject', $this->getMultiValueHeader(['Subject1', 'Subject2'])],
+                ['From', $this->getHeader('fromEmail')],
+                ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
+                ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
+                ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
+                ['Message-ID', $this->getHeader('MessageId')],
+                ['Importance', false],
+                ['References', $this->getHeader('References')],
+                ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
+                ['X-GM-THR-ID', $this->getHeader('XThrId1')],
+                ['X-GM-LABELS', false],
+                ['Accept-Language', $this->getMultiValueHeader(['en-US', 'en-US'])],
+            ]
+        );
+
+        $email = $this->manager->convertToEmail($msg);
+        $this->assertEquals('Subject1', $email->getSubject());
+    }
+
     public function getEmailsProvider()
     {
         return [
@@ -313,7 +337,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $headers = [];
         foreach ($values as $value) {
             $header = $this->createMock('Zend\Mail\Header\HeaderInterface');
-            $header->expects($this->once())
+            $header->expects($this->any())
                 ->method('getFieldValue')
                 ->will($this->returnValue($value));
             $headers[] = $header;

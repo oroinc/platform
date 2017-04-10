@@ -102,7 +102,16 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        $driver->waitForAjax();
+        $start = microtime(true);
+        $result = $driver->waitForAjax();
+        $timeElapsedSecs = microtime(true) - $start;
+
+        if (!$result) {
+            var_dump(sprintf(
+                'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                $timeElapsedSecs
+            ));
+        }
     }
 
     /**
@@ -111,18 +120,7 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
-    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message')
-    {
-        $this->iShouldSeeFlashMessageWithTimeLimit($title, 15, $flashMessageElement);
-    }
-
-    /**
-     * Example: Then I should see "Attachment created successfully" flash message
-     * Example: Then I should see "The email was sent" flash message
-     *
-     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message with time limit (?P<timeLimit>\d+)$/
-     */
-    public function iShouldSeeFlashMessageWithTimeLimit($title, $timeLimit, $flashMessageElement = 'Flash Message')
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */
@@ -695,7 +693,6 @@ class OroMainContext extends MinkContext implements
     public function iSaveForm()
     {
         $this->createOroForm()->save();
-        $this->waitForAjax();
     }
 
     /**
@@ -807,7 +804,6 @@ class OroMainContext extends MinkContext implements
 
         $row->setCellValue($field, $value);
         $this->iShouldSeeFlashMessage('Inline edits are being saved');
-        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -1094,7 +1090,7 @@ class OroMainContext extends MinkContext implements
         $this->pressButton('Update schema');
         $this->assertPageContainsText('Schema update confirmation');
         $this->pressButton('Yes, Proceed');
-        $this->iShouldSeeFlashMessageWithTimeLimit('Schema updated', 60);
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
 
         // Workaround to manually restart message queue consumer after it is stopped during schema update
         // TODO: Should be removed after BAP-14042 is done

@@ -74,15 +74,16 @@ define(function(require) {
             if (options.position) {
                 var _new;
                 var old;
-                var iterations = 5;
                 // try to find position for overlay in several iterations
-                do {
+                for (var i = 0; i < 5; i++) {
                     old = _new || ($overlayContent.css('top') + '.' + $overlayContent.css('left'));
                     $overlayContent.position(options.position);
                     _new = $overlayContent.css('top') + '.' + $overlayContent.css('left');
+                    if (old === _new) {
+                        break;
+                    }
                     $overlayContent.trigger('updatePosition');
-                    iterations--;
-                } while (old !== _new && iterations > 0);
+                }
             }
         },
 
