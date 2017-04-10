@@ -35,11 +35,8 @@ services:
             - { name: event_dispatcher.subscriber, priority: 10 }
             - { name: 'message_queue_isolator_aware' }
 
-    oro_test.listener.messagequeue_subscriber:
+    oro_test.listener.messagequeue_run_check_subscriber:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\MessageQueueRunCheckSubscriber
-        arguments:
-            - '@mink'
-            - '@symfony2_extension.kernel'
         tags:
             - { name: event_dispatcher.subscriber, priority: 20 }
             - { name: 'message_queue_isolator_aware' }
