@@ -51,7 +51,11 @@ class GridRow extends TableRow
             new InputValue(InputMethod::TYPE, $value)
         );
 
-        $this->getDriver()->waitForAjax();
-        $cell->find('css', 'button[title="Save changes"]')->click();
+        $saveButton = $this->spin(function (GridRow $gridRow) {
+            return $gridRow->find('css', 'button[title="Save changes"]');
+        });
+
+        self::assertNotNull($saveButton, sprintf('Save button for "%s" inline edit not found', $header));
+        $saveButton->click();
     }
 }

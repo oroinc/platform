@@ -218,3 +218,9 @@ EmailBundle
 - template `Resources/views/AutoResponseRule/dialog/update.html.twig` was changed
 - template `Resources/views/Configuration/Mailbox/update.html.twig` was changed
 - template `EmailBundle/Resources/views/Form/fields.html.twig` was changed
+
+TranslationBundle
+-----------------
+- Signature of class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` was changed:
+    - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
+    - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`

@@ -45,7 +45,10 @@ define(function(require) {
         createPopover: function() {
             var $popoverTrigger = this.subviews[0].$el;
             var popoverConfig = _.extend({
-                placement: 'left',
+                placement: {
+                    placement: 'left',
+                    collision: 'flip'
+                },
                 hideOnScroll: false,
                 container: 'body',
                 animation: false,

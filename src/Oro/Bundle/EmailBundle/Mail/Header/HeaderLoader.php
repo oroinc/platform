@@ -15,8 +15,8 @@ class HeaderLoader extends BaseHeaderLoader
      * @var array Pre-aliased Header plugins
      */
     protected $plugins = array(
-        'bcc'          => 'Zend\Mail\Header\Bcc',
-        'cc'           => 'Zend\Mail\Header\Cc',
+        'bcc'          => 'Oro\Bundle\EmailBundle\Mail\Header\Bcc',
+        'cc'           => 'Oro\Bundle\EmailBundle\Mail\Header\Cc',
         'contenttype'  => 'Oro\Bundle\EmailBundle\Mail\Header\ContentType',
         'content_type' => 'Oro\Bundle\EmailBundle\Mail\Header\ContentType',
         'content-type' => 'Oro\Bundle\EmailBundle\Mail\Header\ContentType',
