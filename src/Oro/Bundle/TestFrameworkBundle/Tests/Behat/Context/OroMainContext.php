@@ -1091,10 +1091,6 @@ class OroMainContext extends MinkContext implements
         $this->assertPageContainsText('Schema update confirmation');
         $this->pressButton('Yes, Proceed');
         $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
-
-        // Workaround to manually restart message queue consumer after it is stopped during schema update
-        // TODO: Should be removed after BAP-14042 is done
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
     }
 
     /**
