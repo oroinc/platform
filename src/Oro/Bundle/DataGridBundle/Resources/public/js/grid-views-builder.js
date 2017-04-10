@@ -12,10 +12,13 @@ define(function(require) {
 
     var config = require('module').config();
     config = _.extend({
-        View: GridViewsView
+        GridViewsView: GridViewsView
     }, config);
 
     var gridViewsBuilder = {
+        /** @property */
+        GridViewsView: config.GridViewsView,
+
         /**
          * Runs grid views builder
          * Builder interface implementation
@@ -40,15 +43,8 @@ define(function(require) {
                 showInNavbar: options.showViewsInNavbar,
                 showInCustomElement: options.showViewsInCustomElement,
                 buildViews: function(grid) {
-                    if (_.isString(config.View)) {
-                        tools.loadModules(config.View, function(View) {
-                            var gridViews = gridViewsBuilder.build.call(self, View, grid.collection);
-                            deferred.resolve(gridViews);
-                        });
-                    } else {
-                        var gridViews = gridViewsBuilder.build.call(this, config.View, grid.collection);
-                        deferred.resolve(gridViews);
-                    }
+                    var gridViews = gridViewsBuilder.build.call(this, grid.collection);
+                    deferred.resolve(gridViews);
                 }
             };
 
@@ -82,29 +78,45 @@ define(function(require) {
          * @param {orodatagrid.PageableCollection} collection
          * @returns {orodatagrid.datagrid.GridViewsView}
          */
-        build: function(View, collection) {
+        build: function(collection) {
+            var self = this;
+            var GridViewsView;
             var gridViews;
             var $gridViews;
             var options = gridViewsBuilder.combineGridViewsOptions.call(this);
-            if (!$.isEmptyObject(options) && this.metadata.filters && this.enableViews && options.permissions.VIEW) {
-                var gridViewsOptions = _.extend({collection: collection}, options);
+            var deferred = $.Deferred();
 
-                if (this.showInNavbar) {
-                    $gridViews = $(gridGridViewsSelector);
-                    gridViewsOptions.title = $gridViews.text();
-
-                    gridViews = new View(gridViewsOptions);
-                    $gridViews.html(gridViews.render().$el);
-                } else if (this.showInCustomElement) {
-                    gridViews = new View(gridViewsOptions);
-                    $gridViews = $(this.showInCustomElement);
-                    $gridViews.html(gridViews.render().$el);
-                } else {
-                    gridViews = new View(gridViewsOptions);
-                    this.$gridEl.prepend(gridViews.render().$el);
-                }
+            if (_.isString(gridViewsBuilder.GridViewsView)) {
+                tools.loadModules(gridViewsBuilder.GridViewsView, function(View) {
+                    GridViewsView = View;
+                    deferred.resolve();
+                });
+            } else {
+                GridViewsView = gridViewsBuilder.GridViewsView;
+                deferred.resolve();
             }
-            return gridViews;
+
+            deferred.done(function() {
+                if (!$.isEmptyObject(options) && self.metadata.filters && self.enableViews && options.permissions.VIEW) {
+                    var gridViewsOptions = _.extend({collection: collection}, options);
+
+                    if (self.showInNavbar) {
+                        $gridViews = $(gridGridViewsSelector);
+                        gridViewsOptions.title = $gridViews.text();
+
+                        gridViews = new GridViewsView(gridViewsOptions);
+                        $gridViews.html(gridViews.render().$el);
+                    } else if (self.showInCustomElement) {
+                        gridViews = new GridViewsView(gridViewsOptions);
+                        $gridViews = $(self.showInCustomElement);
+                        $gridViews.html(gridViews.render().$el);
+                    } else {
+                        gridViews = new GridViewsView(gridViewsOptions);
+                        self.$gridEl.prepend(gridViews.render().$el);
+                    }
+                }
+                return gridViews;
+            });
         },
 
         /**

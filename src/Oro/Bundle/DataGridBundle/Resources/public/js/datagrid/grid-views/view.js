@@ -225,7 +225,7 @@ define(function(require) {
          * @param {Event} e
          */
         onSave: function(e) {
-            var model = this._getEditableViewModel(e);
+            var model = this._getEditableViewModel($(e.currentTarget));
 
             this._onSaveModel(model);
         },
@@ -249,37 +249,28 @@ define(function(require) {
             });
         },
 
-        /**
-         * @param {Event} e
-         */
-        onSaveAs: function(e) {
+        onSaveAs: function() {
             var modal = new ViewNameModal();
             var self = this;
 
-            modal.on('ok', function(e) {
-                self._onSaveAsModel.call(self, modal);
+            modal.on('ok', function() {
+                var data = self.getInputData(modal.$el);
+                var model = self._createBaseViewModel(data);
+
+                self._onSaveAsModel(model);
             });
 
             modal.open();
             $('#gridViewName').focus();
         },
 
-        _onSaveAsModel: function(container) {
+        /**
+         * @param {Object} model
+         * @private
+         */
+        _onSaveAsModel: function(model) {
             var self = this;
 
-            var model = self._createViewModel({
-                label: $('input[name=name]', container.$el).val(),
-                is_default: $('input[name=is_default]', container.$el).is(':checked'),
-                type: 'private',
-                grid_name: this.gridName,
-                filters: this.collection.state.filters,
-                sorters: this.collection.state.sorters,
-                columns: this.collection.state.columns,
-                appearanceType: this.collection.state.appearanceType,
-                appearanceData: this.collection.state.appearanceData,
-                editable: this.permissions.EDIT,
-                deletable: this.permissions.DELETE
-            });
             model.save(null, {
                 wait: true,
                 success: function(model) {
@@ -313,7 +304,7 @@ define(function(require) {
          * @param {Event} e
          */
         onShare: function(e) {
-            var model = this._getEditableViewModel(e);
+            var model = this._getEditableViewModel($(e.currentTarget));
             var self = this;
 
             model.save({
@@ -331,7 +322,7 @@ define(function(require) {
          * @param {Event} e
          */
         onUnshare: function(e) {
-            var model = this._getEditableViewModel(e);
+            var model = this._getEditableViewModel($(e.currentTarget));
             var self = this;
 
             model.save({
@@ -349,7 +340,7 @@ define(function(require) {
          * @param {Event} e
          */
         onDelete: function(e) {
-            var model = this._getModelForDelete(e);
+            var model = this._getModelForDelete($(e.currentTarget));
 
             var confirm = new this.DeleteConfirmation(this.defaults.DeleteConfirmationOptions);
             confirm.on('ok', _.bind(function() {
@@ -363,10 +354,11 @@ define(function(require) {
             confirm.open();
         },
 
-        /**
-         * @param {Event} e
+        /** Accepts a property (element) that is can used in inherited views
+         *
+         * @param {HTML} element
          */
-        _getModelForDelete: function(e) {
+        _getModelForDelete: function(element) {
             var id = this._getCurrentView().value;
 
             return this.viewsCollection.get(id);
@@ -376,31 +368,31 @@ define(function(require) {
          * @param {Event} e
          */
         onRename: function(e) {
-            var model = this._getEditableViewModel(e);
             var self = this;
-
+            var model = this._getEditableViewModel($(e.currentTarget));
             var modal = new ViewNameModal({
                 defaultValue: model.get('label'),
                 defaultChecked: model.get('is_default')
             });
-            modal.on('ok', function() {
-                self._onRenameSaveModel(model, modal);
-            });
 
+            modal.on('ok', function() {
+                var data = self.getInputData(modal.$el);
+
+                self._onRenameSaveModel(model, data);
+            });
             modal.open();
         },
 
         /**
          * @param {object} model
-         * @param {object} context
+         * @param {object} data
+         * @private
          */
-        _onRenameSaveModel: function(model, container) {
+        _onRenameSaveModel: function(model, data) {
             var self = this;
 
-            model.save({
-                label: $('input[name=name]', container.$el).val(),
-                is_default: $('input[name=is_default]', container.$el).is(':checked')
-            }, {
+            model.save(
+                data, {
                 wait: true,
                 success: function() {
                     var currentDefaultViewModel = self._getCurrentDefaultViewModel();
@@ -467,7 +459,7 @@ define(function(require) {
             var isDefault = 1;
             var defaultModel = this._getCurrentDefaultViewModel();
             var gridName = this.gridName;
-            var currentViewModel = this._getEditableViewModel(e);
+            var currentViewModel = this._getEditableViewModel($(e.currentTarget));
             var id = currentViewModel.id;
             if (this._isCurrentViewSystem()) {
                 // in this case we need to set default to false on current default view
@@ -615,24 +607,24 @@ define(function(require) {
          * @returns {Array}
          */
         _getCurrentActions: function() {
-            var currentView = this._getCurrentViewModel();
+            var currentGridView = this._getCurrentViewModel();
 
-            return this._getActions(currentView);
+            return this._getActions(currentGridView);
         },
 
         /**
-         * @param View
+         * @param GridView
          * @returns {*[]}
          * @private
          */
-        _getActions: function(View) {
+        _getActions: function(GridView) {
             return [
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
                     name: 'save',
-                    enabled: this._getViewIsDirty(View) &&
-                             typeof View !== 'undefined' &&
-                             View.get('editable')
+                    enabled: this._getViewIsDirty(GridView) &&
+                             typeof GridView !== 'undefined' &&
+                            GridView.get('editable')
                 },
                 {
                     label: __('oro.datagrid.action.save_grid_view_as'),
@@ -642,39 +634,39 @@ define(function(require) {
                 {
                     label: __('oro.datagrid.action.rename_grid_view'),
                     name: 'rename',
-                    enabled: typeof View !== 'undefined' &&
-                             View.get('editable')
+                    enabled: typeof GridView !== 'undefined' &&
+                        GridView.get('editable')
                 },
                 {
                     label: __('oro.datagrid.action.share_grid_view'),
                     name: 'share',
-                    enabled: typeof View !== 'undefined' &&
-                             View.get('type') === 'private' &&
+                    enabled: typeof GridView !== 'undefined' &&
+                            GridView.get('type') === 'private' &&
                              this.permissions.SHARE
                 },
                 {
                     label: __('oro.datagrid.action.unshare_grid_view'),
                     name: 'unshare',
-                    enabled: typeof View !== 'undefined' &&
-                             View.get('editable') &&
-                             View.get('type') === 'public' &&
+                    enabled: typeof GridView !== 'undefined' &&
+                            GridView.get('editable') &&
+                            GridView.get('type') === 'public' &&
                             this.permissions.SHARE
                 },
                 {
                     label: __('oro.datagrid.action.discard_grid_view_changes'),
                     name: 'discard_changes',
-                    enabled: this._getViewIsDirty(View)
+                    enabled: this._getViewIsDirty(GridView)
                 },
                 {
                     label: __('oro.datagrid.action.delete_grid_view'),
                     name: 'delete',
-                    enabled: typeof View !== 'undefined' &&
-                             View.get('deletable')
+                    enabled: typeof GridView !== 'undefined' &&
+                        GridView.get('deletable')
                 },
                 {
                     label: __('oro.datagrid.action.set_as_default_grid_view'),
                     name: 'use_as_default',
-                    enabled: typeof View !== 'undefined' && !View.get('is_default')
+                    enabled: typeof GridView !== 'undefined' && !GridView.get('is_default')
                 }
             ];
         },
@@ -690,10 +682,38 @@ define(function(require) {
         },
 
         /**
+         * Create GridView model with basic properties
+         * @protected
+         *
+         * @param   {Object} data
+         * @returns {GridViewModel}
+         */
+        _createBaseViewModel: function(data) {
+            return this._createViewModel(
+                    {
+                        label: _.isUndefined(data.label) ? __('oro.datagrid.gridView.all') : data.label,
+                        is_default: _.isUndefined(data.is_default) ? false : data.is_default,
+                        type: 'private',
+                        grid_name: this.gridName,
+                        filters: this.collection.state.filters,
+                        sorters: this.collection.state.sorters,
+                        columns: this.collection.state.columns,
+                        appearanceType: this.collection.state.appearanceType,
+                        appearanceData: this.collection.state.appearanceData,
+                        editable: this.permissions.EDIT,
+                        deletable: this.permissions.DELETE
+                    }
+            );
+        },
+
+        /**
+         * Check a GridView is dirty
+         *
+         * @param {object} GridView
          * @returns {boolean|*}
          * @private
          */
-        _getViewIsDirty: function(View) {
+        _getViewIsDirty: function(GridView) {
             return this.viewDirty;
         },
 
@@ -713,11 +733,13 @@ define(function(require) {
         },
 
         /**
+         * Accepts a property (element) that is can used in inherited views
+         * @params {HTML} element
          * @private
          *
          * @returns {undefined|GridViewModel}
          */
-        _getEditableViewModel: function() {
+        _getEditableViewModel: function(element) {
             return this._getCurrentViewModel();
         },
 
@@ -908,6 +930,19 @@ define(function(require) {
 
             var newTitle = this._createTitle();
             mediator.execute('adjustTitle', newTitle, true);
+        },
+
+        /**
+         *  Get data from UI
+         * @param container
+         * @returns {{label: *, is_default: *}}
+         */
+
+        getInputData: function(container) {
+            return {
+                label: $('input[name=name]', container).val(),
+                is_default: $('input[name=is_default]', container).is(':checked')
+            }
         }
     });
 
