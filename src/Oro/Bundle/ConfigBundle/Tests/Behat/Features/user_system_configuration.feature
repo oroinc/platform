@@ -7,7 +7,7 @@ Feature: User system settings manage
     Given I login as administrator
     And I go to System/Configuration
     And I click "User Settings"
-    When I set configuration to:
+    When I fill "System Config Form" with:
       | Minimal password length      | 10   |
       | Require a number             | true |
       | Require a lower case letter  | true |
