@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_8;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
+use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
@@ -28,34 +28,53 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $ids = $this->getDuplicates();
-        if ($ids) {
-            $queries->addPreQuery(
-                new ParametrizedSqlMigrationQuery(
-                    'DELETE FROM oro_audit WHERE id IN (:ids)',
-                    ['ids' => $ids],
-                    ['ids' => Connection::PARAM_STR_ARRAY]
-                )
-            );
-        }
+        $this->resolveDuplicates();
 
         $auditTable = $schema->getTable('oro_audit');
         $auditTable->addUniqueIndex(['object_id', 'object_class', 'version'], 'idx_oro_audit_version');
     }
 
-    /**
-     * @return string[]
-     */
-    protected function getDuplicates()
+    protected function resolveDuplicates()
     {
-        $sql = 'SELECT MAX(id) AS id FROM oro_audit GROUP BY object_id, object_class, version HAVING COUNT(*) > 1';
-
-        $result = [];
-        $rows   = $this->connection->fetchAll($sql);
-        foreach ($rows as $row) {
-            $result[] = $row['id'];
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
         }
 
-        return $result;
+        while (true) {
+            $sql = 'SELECT object_id, object_class FROM oro_audit '.
+                'GROUP BY object_id, object_class, version HAVING COUNT(*) > 1 LIMIT 25';
+            $rows = $this->connection->fetchAll($sql);
+            if (!$rows) {
+                break;
+            }
+
+            foreach ($rows as $row) {
+                if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+                    $this->connection->exec(
+                        'UPDATE oro_audit SET version = 0 ' .
+                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
+                                  'object_class = \'' . $row['object_class'] . '\';' .
+                        'SELECT setval(\'seq_temp_version\', 1);' .
+                        'UPDATE oro_audit SET version = nextval(\'seq_temp_version\') - 1 ' .
+                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
+                                  'object_class = \'' . $row['object_class'] . '\';'
+                    );
+                } else {
+                    $this->connection->exec(
+                        'UPDATE oro_audit SET version = 0 ' .
+                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
+                                  'object_class = \'' . $row['object_class'] . '\';' .
+                        'SET @version = 0;' .
+                        'UPDATE oro_audit SET version = @version:=@version+1 ' .
+                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
+                                  'object_class = \'' . $row['object_class'] . '\';'
+                    );
+                }
+            }
+        }
+
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            $this->connection->exec('DROP SEQUENCE seq_temp_version');
+        }
     }
 }
