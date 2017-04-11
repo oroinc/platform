@@ -113,20 +113,12 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         if (!$this->alreadyDenied($options)) {
             $newOptions = [];
 
-            $localCache = $this->getGlobalCacheKey($options);
-            if ($this->cache && $this->cache->contains($localCache)) {
-                $newOptions = $this->cache->fetch($localCache);
-            } else {
-                $this->processAcl($newOptions, $options);
+            $this->processAcl($newOptions, $options);
 
-                if ($newOptions['extras']['isAllowed'] && !empty($options['route'])) {
-                    $this->processRoute($newOptions, $options);
-                }
-
-                if ($this->cache) {
-                    $this->cache->save($localCache, $newOptions);
-                }
+            if ($newOptions['extras']['isAllowed'] && !empty($options['route'])) {
+                $this->processRoute($newOptions, $options);
             }
+
             $options = array_merge_recursive($newOptions, $options);
         }
 
