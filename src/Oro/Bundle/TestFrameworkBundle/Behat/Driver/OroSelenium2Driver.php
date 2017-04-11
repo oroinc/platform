@@ -232,10 +232,15 @@ JS;
     /**
      * Wait AJAX request
      * @param int $time Time should be in milliseconds
+     * @param int $attempts
+     * @return bool
      */
-    public function waitForAjax($time = 60000)
+    public function waitForAjax($time = 120000, $attempts = 5)
     {
         $this->waitPageToLoad($time);
+        $attemptsNumber = $attempts;
+        $start = microtime(true);
+        $end = $start + $time / 1000.0;
 
         $jsAppActiveCheck = <<<JS
         (function () {
@@ -256,7 +261,17 @@ JS;
             return !(jQuery && (jQuery.active || jQuery(document.body).hasClass('loading'))) && !isAppActive;
         })();
 JS;
-        $this->wait($time, $jsAppActiveCheck);
+
+        $result = false;
+        while (microtime(true) < $end && $attemptsNumber > 0) {
+            if ($result = $this->wait($time, $jsAppActiveCheck)) {
+                    $attemptsNumber--;
+            } else {
+                $attemptsNumber = $attempts;
+            }
+        }
+
+        return $result;
     }
 
     /**

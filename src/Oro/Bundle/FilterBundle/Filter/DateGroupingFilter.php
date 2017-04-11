@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Parameter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -97,7 +99,7 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_MONTH],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                );
+                )->addGroupBy($columnName);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_MONTH);
                 break;
@@ -111,7 +113,7 @@ class DateGroupingFilter extends ChoiceFilter
                         $this->groupingNames[DateGroupingFilterType::TYPE_QUARTER],
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                );
+                )->addGroupBy($columnName);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_QUARTER;
                 $this->addWhereClause($qb, DateGroupingFilterType::TYPE_QUARTER);
@@ -124,7 +126,7 @@ class DateGroupingFilter extends ChoiceFilter
                         "%s as $columnName",
                         $this->groupingNames[DateGroupingFilterType::TYPE_YEAR]
                     )
-                );
+                )->addGroupBy($columnName);
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_MONTH;
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_QUARTER;
                 $this->specificDateExpressions[] = DateGroupingFilterType::TYPE_YEAR;
@@ -167,9 +169,6 @@ class DateGroupingFilter extends ChoiceFilter
         foreach ($selects as $select) {
             $qb->add('select', $select, true);
         }
-
-        // Add groupBy without cast , required for postgres
-        $qb->addGroupBy($configDataName);
     }
 
     /**
@@ -204,9 +203,9 @@ class DateGroupingFilter extends ChoiceFilter
      */
     protected function addWhereClause(QueryBuilder $qb, $filterType)
     {
-        $whereClauseParameters = $qb->getParameters();
         $extraWhereClauses = !$qb->getDQLPart('where') ? null :
             $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts());
+        $whereClauseParameters = $this->getExtraWhereParameters($qb->getParameters(), $extraWhereClauses);
         $usedDates = $this->getUsedDates(
             $filterType,
             $this->config['calendar_table_for_grouping'],
@@ -216,6 +215,10 @@ class DateGroupingFilter extends ChoiceFilter
             $extraWhereClauses,
             $whereClauseParameters
         );
+
+        if (!$usedDates) {
+            return;
+        }
 
         $qb->andWhere(
             $qb->expr()->orX(
@@ -327,9 +330,8 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         $datesArray = $subQueryBuilder->getQuery()->getArrayResult();
-        $datesArray = $this->arrayFlatten($datesArray);
 
-        return !empty($datesArray) ? $datesArray : [''];
+        return $this->arrayFlatten($datesArray);
     }
 
     /**
@@ -375,6 +377,25 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         return $extraWhereClauses;
+    }
+
+    /**
+     * @param ArrayCollection $parameters
+     * @param string $whereClauseParts
+     * @return ArrayCollection
+     */
+    protected function getExtraWhereParameters(ArrayCollection $parameters, $whereClauseParts)
+    {
+        $extraParameters = new ArrayCollection();
+
+        foreach ($parameters as $parameter) {
+            /* @var $parameter Parameter */
+            if (false !== strpos($whereClauseParts, sprintf(':%s', $parameter->getName()))) {
+                $extraParameters->add($parameter);
+            }
+        }
+
+        return $extraParameters;
     }
 
     /**

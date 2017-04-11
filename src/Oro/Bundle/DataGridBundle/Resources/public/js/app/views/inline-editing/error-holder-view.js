@@ -6,6 +6,29 @@ define(function(require) {
     var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
     var template = require('tpl!orodatagrid/templates/inline-editing/error-holder.html');
+
+    /* The same like `getBoundingClientRect` but takes in account all child nodes, i.e. calculates real occupied rect
+     *  for case when a child goes beyond its parent
+     */
+    function getTreeRect(el) {
+        if (!el || !_.isFunction(el.getBoundingClientRect)) {
+            return null;
+        }
+        var rect = _.pick(el.getBoundingClientRect(), ['top', 'right', 'bottom',  'left', 'width', 'height']);
+        _.forEach(el.childNodes, function(child) {
+            var childRect = getTreeRect(child);
+            if (childRect) {
+                rect.top = Math.min(rect.top, childRect.top);
+                rect.left = Math.min(rect.left, childRect.left);
+                rect.right = Math.max(rect.right, childRect.right);
+                rect.bottom = Math.max(rect.bottom, childRect.bottom);
+            }
+        });
+        rect.width = rect.right - rect.left;
+        rect.height = rect.bottom - rect.top;
+        return rect;
+    }
+
     require('jquery-ui');
 
     InlineEditorErrorHolderView = BaseView.extend({
@@ -109,28 +132,32 @@ define(function(require) {
         },
 
         updatePosition: function() {
-            if (!this.getErrorMessageElements().length) {
+            var errorMessageElements = this.getErrorMessageElements();
+            if (errorMessageElements.length === 0) {
                 return;
             }
-
             var withinRect = this.getWithinRect();
             var classes = [this.POSITION_TOP, this.POSITION_RIGHT, this.POSITION_BOTTOM, this.POSITION_LEFT].join(' ');
+            var initialOpacity = errorMessageElements.css('opacity');
+            errorMessageElements.css('opacity', 0);
             this.$el.removeClass(classes);
             $.Deferred().resolve(false).promise()
                 .then(_.bind(this.tryTop, this, withinRect))
                 .then(_.bind(this.tryBottom, this, withinRect))
                 .then(_.bind(this.tryRight, this, withinRect))
-                .then(_.bind(this.tryLeft, this, withinRect));
+                .then(_.bind(this.tryLeft, this, withinRect))
+                .then(function() {
+                    errorMessageElements.css('opacity', initialOpacity);
+                });
         },
 
         tryTop: function(withinRect, done) {
             if (done || this.$(this.DROPUPS.join(', ')).length) {
                 return done;
             }
-
             this.$el.addClass(this.POSITION_TOP);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.top >= withinRect.top) {
+            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
+            if (messageRect && messageRect.top >= withinRect.top && messageRect.right <= withinRect.right) {
                 done = true;
             } else {
                 this.$el.removeClass(this.POSITION_TOP);
@@ -143,10 +170,9 @@ define(function(require) {
             if (done || this.$(this.DROPDOWNS.join(', ')).length) {
                 return done;
             }
-
             this.$el.addClass(this.POSITION_BOTTOM);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.bottom <= withinRect.bottom) {
+            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
+            if (messageRect && messageRect.bottom <= withinRect.bottom && messageRect.right <= withinRect.right) {
                 done = true;
             } else {
                 this.$el.removeClass(this.POSITION_BOTTOM);
@@ -161,8 +187,8 @@ define(function(require) {
             }
 
             this.$el.addClass(this.POSITION_RIGHT);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.right <= withinRect.right) {
+            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
+            if (messageRect && messageRect.right <= withinRect.right) {
                 done = true;
             } else {
                 this.$el.removeClass(this.POSITION_RIGHT);
@@ -177,8 +203,8 @@ define(function(require) {
             }
 
             this.$el.addClass(this.POSITION_LEFT);
-            var messageRect = this.getErrorMessageElements()[0].getBoundingClientRect();
-            if (messageRect.left >= withinRect.left) {
+            var messageRect = getTreeRect(this.getErrorMessageElements()[0]);
+            if (messageRect && messageRect.left >= withinRect.left) {
                 done = true;
             } else {
                 this.$el.removeClass(this.POSITION_LEFT);
