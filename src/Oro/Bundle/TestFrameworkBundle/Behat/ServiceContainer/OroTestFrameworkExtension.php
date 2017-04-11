@@ -113,27 +113,8 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('handlers')
-                        ->addDefaultsIfNotSet()
-                            ->children()
-                                ->arrayNode('local')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->scalarNode('directory')->end()
-                                        ->scalarNode('base_url')->end()
-                                        ->booleanNode('auto_clear')->end()
-                                    ->end()
-                                ->end()
-                                ->arrayNode('ftp')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->scalarNode('host')->end()
-                                        ->scalarNode('username')->end()
-                                        ->scalarNode('password')->end()
-                                        ->scalarNode('directory')->end()
-                                        ->scalarNode('base_url')->end()
-                                    ->end()
-                                ->end()
-                            ->end()
+                        ->useAttributeAsKey('name')
+                            ->prototype('variable')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -210,6 +191,10 @@ class OroTestFrameworkExtension implements TestworkExtension
 
             /** @var ArtifactsHandlerInterface $handlerClass */
             if (empty($handlerConfigurations[$handlerClass::getConfigKey()])) {
+                continue;
+            }
+
+            if (false === $handlerConfigurations[$handlerClass::getConfigKey()]) {
                 continue;
             }
 

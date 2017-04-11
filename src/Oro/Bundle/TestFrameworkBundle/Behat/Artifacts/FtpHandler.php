@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Artifacts;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+
 class FtpHandler implements ArtifactsHandlerInterface
 {
     /**
@@ -39,11 +41,14 @@ class FtpHandler implements ArtifactsHandlerInterface
      */
     public function __construct(array $ftpConfig)
     {
-        $this->ftpHost = $ftpConfig['host'];
-        $this->ftpUsername = $ftpConfig['username'];
-        $this->ftpPassword = $ftpConfig['password'];
-        $this->ftpDirectory = $ftpConfig['directory'];
-        $this->screenshotRemoteBaseUrl = trim($ftpConfig['base_url'], " \t\n\r\0\x0B\\");
+        $this->ftpHost = $this->getConfigValue($ftpConfig, 'host', true);
+        $this->ftpUsername = $this->getConfigValue($ftpConfig, 'username');
+        $this->ftpPassword = $this->getConfigValue($ftpConfig, 'password');
+        $this->ftpDirectory = $this->getConfigValue($ftpConfig, 'directory', 'true');
+        $this->screenshotRemoteBaseUrl = trim(
+            $this->getConfigValue($ftpConfig, 'base_url', true),
+            " \t\n\r\0\x0B\\"
+        );
     }
 
     /**
@@ -93,5 +98,37 @@ class FtpHandler implements ArtifactsHandlerInterface
         ftp_pasv($connection, true);
 
         return $connection;
+    }
+
+    /**
+     * @param array $config
+     * @param string $key
+     * @param bool $isMandatory
+     * @return mixed|null|string
+     */
+    private function getConfigValue(array $config, $key, $isMandatory = false)
+    {
+        if (!array_key_exists($key, $config)) {
+            if ($isMandatory) {
+                throw new InvalidArgumentException(sprintf(
+                    'Setting "%s" is mandatory',
+                    $key
+                ));
+            }
+
+            return null;
+        }
+
+        $value = $config[$key];
+
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        if (0 === strpos($value, 'env(') && ')' === substr($value, -1) && 'env()' !== $value) {
+            $value = getenv(substr($value, 4, -1));
+        }
+
+        return $value;
     }
 }
