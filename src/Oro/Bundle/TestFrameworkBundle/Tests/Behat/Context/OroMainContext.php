@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
@@ -1104,5 +1105,37 @@ class OroMainContext extends MinkContext implements
         $element = $this->getPage()->findVisible('css', $selector);
 
         return !is_null($element);
+    }
+
+    /**
+     * Drag and Drop one element before another
+     * Example: When I drag and drop "Products" before "Clearance"
+     *
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" before "(?P<dropZoneName>[\w\s]+)"$/
+     * @param string $elementName
+     * @param string $dropZoneName
+     */
+    public function iDragAndDropElementBeforeAnotherOne($elementName, $dropZoneName)
+    {
+        $element = $this->createElement($elementName);
+        $dropZone = $this->createElement($dropZoneName);
+
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $webDriverSession = $driver->getWebDriverSession();
+
+        $source      = $webDriverSession->element('xpath', $element->getXpath());
+        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+        $webDriverSession->moveto(array(
+            'element' => $source->getID()
+        ));
+        $webDriverSession->buttondown();
+        $webDriverSession->moveto([
+            'element' => $destination->getID(),
+            'xoffset' => 1,
+            'yoffset' => 1,
+        ]);
+        $webDriverSession->buttonup();
     }
 }
