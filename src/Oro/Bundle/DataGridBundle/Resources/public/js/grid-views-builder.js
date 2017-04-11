@@ -83,7 +83,7 @@ define(function(require) {
             var GridViewsView;
             var gridViews;
             var $gridViews;
-            var options = gridViewsBuilder.combineGridViewsOptions.call(this);
+            var opts = gridViewsBuilder.combineGridViewsOptions.call(this);
             var deferred = $.Deferred();
 
             if (_.isString(gridViewsBuilder.GridViewsView)) {
@@ -97,8 +97,8 @@ define(function(require) {
             }
 
             deferred.done(function() {
-                if (!$.isEmptyObject(options) && self.metadata.filters && self.enableViews && options.permissions.VIEW) {
-                    var gridViewsOptions = _.extend({collection: collection}, options);
+                if (!$.isEmptyObject(opts) && self.metadata.filters && self.enableViews && opts.permissions.VIEW) {
+                    var gridViewsOptions = _.extend({collection: collection}, opts);
 
                     if (self.showInNavbar) {
                         $gridViews = $(gridGridViewsSelector);
