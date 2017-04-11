@@ -3,7 +3,7 @@
 namespace Oro\Component\Action\Action;
 
 use Oro\Component\Action\Event\ExtendableActionEvent;
-use Oro\Component\Action\Exception\ExtendableEventNameMissingException;
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 class ExtendableAction extends AbstractAction
 {
@@ -30,19 +30,23 @@ class ExtendableAction extends AbstractAction
     }
 
     /**
-     * Allowed options:
-     *  - events (required) list of events the action dispatches
+     * {@inheritDoc}
      */
     public function initialize(array $options)
     {
         if (!array_key_exists('events', $options)) {
-            throw new ExtendableEventNameMissingException(
+            throw new InvalidParameterException('The required option "events" is missing.');
+        }
+
+        if (!is_array($options['events'])) {
+            throw new InvalidParameterException(
                 sprintf(
-                    'You need to specify a list of event names for the "@%s" action type with "events" config key',
-                    self::NAME
+                    'The option "events" is expected to be of type "array", "%s" given.',
+                    gettype($options['events'])
                 )
             );
         }
+
         $this->subscribedEvents = $options['events'];
 
         return $this;

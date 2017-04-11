@@ -541,6 +541,7 @@ define(function(require) {
          */
         _getCurrentActions: function() {
             var currentView = this._getCurrentViewModel();
+            var currentDefaultView = this._getCurrentDefaultViewModel();
 
             return [
                 {
@@ -590,7 +591,9 @@ define(function(require) {
                 {
                     label: __('oro.datagrid.action.set_as_default_grid_view'),
                     name: 'use_as_default',
-                    enabled: typeof currentView !== 'undefined' && !currentView.get('is_default')
+                    enabled: typeof currentView !== 'undefined' &&
+                            !currentView.get('is_default') &&
+                            (!this._isCurrentViewSystem() || currentDefaultView)
                 }
             ];
         },
