@@ -3,6 +3,7 @@ define(function(require) {
 
     var ColumnManagerView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
     var module = require('module');
     var config = module.config();
