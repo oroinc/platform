@@ -87,6 +87,9 @@ define(function(require) {
             }
         },
 
+        /** @property */
+        modal: null,
+
         /**
          * Initializer.
          *
@@ -262,6 +265,8 @@ define(function(require) {
 
             modal.open();
             $('#gridViewName').focus();
+
+            this.modal = modal;
         },
 
         /**
@@ -291,7 +296,7 @@ define(function(require) {
                     }
                 },
                 error: function(model, response, options) {
-                    self.onError(container, model, response, options);
+                    self.onError(model, response, options);
                 }
             });
         },
@@ -354,11 +359,11 @@ define(function(require) {
             confirm.open();
         },
 
-        /** Accepts a property (element) that is can used in inherited views
-         *
+        /**
          * @param {HTML} element
          */
         _getModelForDelete: function(element) {
+            // Accepts a element, that is can used for users extends
             var id = this._getCurrentView().value;
 
             return this.viewsCollection.get(id);
@@ -378,21 +383,25 @@ define(function(require) {
             modal.on('ok', function() {
                 var data = self.getInputData(modal.$el);
 
-                self._onRenameSaveModel(model, data);
+                _.each(data, function(value, attribute) {
+                    model.set(attribute, value);
+                }, self);
+
+                self._onRenameSaveModel(model);
             });
             modal.open();
+            this.modal = modal;
         },
 
         /**
          * @param {object} model
-         * @param {object} data
          * @private
          */
-        _onRenameSaveModel: function(model, data) {
+        _onRenameSaveModel: function(model) {
             var self = this;
 
             model.save(
-                data, {
+                null, {
                 wait: true,
                 success: function() {
                     var currentDefaultViewModel = self._getCurrentDefaultViewModel();
@@ -409,16 +418,16 @@ define(function(require) {
                     self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 },
                 error: function(model, response, options) {
-                    self.onError(container, model, response, options);
+                    self.onError(model, response, options);
                 }
             });
         },
 
-        onError: function(modal, model, response, options) {
-            if (_.isObject(modal)) {
-                modal.open();
+        onError: function(model, response, options) {
+            if (_.isObject(this.modal)) {
+                this.modal.open();
             }
-            this._showNameError(modal, response);
+            this._showNameError(this.modal, response);
         },
 
         /**
@@ -690,30 +699,29 @@ define(function(require) {
          */
         _createBaseViewModel: function(data) {
             return this._createViewModel(
-                    {
-                        label: _.isUndefined(data.label) ? __('oro.datagrid.gridView.all') : data.label,
-                        is_default: _.isUndefined(data.is_default) ? false : data.is_default,
-                        type: 'private',
-                        grid_name: this.gridName,
-                        filters: this.collection.state.filters,
-                        sorters: this.collection.state.sorters,
-                        columns: this.collection.state.columns,
-                        appearanceType: this.collection.state.appearanceType,
-                        appearanceData: this.collection.state.appearanceData,
-                        editable: this.permissions.EDIT,
-                        deletable: this.permissions.DELETE
-                    }
+                {
+                    label: _.isUndefined(data.label) ? __('oro.datagrid.gridView.all') : data.label,
+                    is_default: _.isUndefined(data.is_default) ? false : data.is_default,
+                    type: 'private',
+                    grid_name: this.gridName,
+                    filters: this.collection.state.filters,
+                    sorters: this.collection.state.sorters,
+                    columns: this.collection.state.columns,
+                    appearanceType: this.collection.state.appearanceType,
+                    appearanceData: this.collection.state.appearanceData,
+                    editable: this.permissions.EDIT,
+                    deletable: this.permissions.DELETE
+                }
             );
         },
 
         /**
-         * Check a GridView is dirty
-         *
          * @param {object} GridView
          * @returns {boolean|*}
          * @private
          */
         _getViewIsDirty: function(GridView) {
+            // Accepts a GridView, that is can used for users extends
             return this.viewDirty;
         },
 
@@ -733,13 +741,13 @@ define(function(require) {
         },
 
         /**
-         * Accepts a property (element) that is can used in inherited views
          * @params {HTML} element
          * @private
          *
          * @returns {undefined|GridViewModel}
          */
         _getEditableViewModel: function(element) {
+            // Accepts a element, that is can used for users extends
             return this._getCurrentViewModel();
         },
 
@@ -942,7 +950,7 @@ define(function(require) {
             return {
                 label: $('input[name=name]', container).val(),
                 is_default: $('input[name=is_default]', container).is(':checked')
-            }
+            };
         }
     });
 
