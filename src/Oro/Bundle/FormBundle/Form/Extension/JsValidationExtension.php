@@ -117,8 +117,7 @@ class JsValidationExtension extends AbstractTypeExtension
 
         if (isset($view->vars['attr']['data-validation']) && is_array($view->vars['attr']['data-validation'])) {
             $view->vars['attr']['data-validation'] = json_encode(
-                $view->vars['attr']['data-validation'],
-                JSON_FORCE_OBJECT
+                $view->vars['attr']['data-validation']
             );
         }
     }
@@ -133,10 +132,18 @@ class JsValidationExtension extends AbstractTypeExtension
     {
         $constraints = $this->constraintsProvider->getFormConstraints($form);
 
-        $value = array();
+        $value = [];
         foreach ($constraints as $constraint) {
             $name = $this->getConstraintName($constraint);
-            $value[$name] = $this->getConstraintProperties($constraint);
+            $constraintProperties = $this->getConstraintProperties($constraint);
+
+            if (isset($value[$name][0])) {
+                $value[$name][] = $constraintProperties;
+            } elseif (isset($value[$name])) {
+                $value[$name] = [$value[$name], $constraintProperties];
+            } else {
+                $value[$name] = $constraintProperties;
+            }
         }
 
         return $value;

@@ -72,5 +72,3 @@ Feature: Business Unit crud
     When click delete Demo Business Unit in grid
     And confirm deletion
     Then number of records should be 1
-
-
