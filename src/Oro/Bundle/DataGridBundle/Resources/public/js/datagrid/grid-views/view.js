@@ -383,10 +383,7 @@ define(function(require) {
             modal.on('ok', function() {
                 var data = self.getInputData(modal.$el);
 
-                _.each(data, function(value, attribute) {
-                    model.set(attribute, value);
-                }, self);
-
+                model.set(data);
                 self._onRenameSaveModel(model);
             });
             modal.open();
