@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element\Transformers;
 
-class PageSuffixTransformerInterface implements NamePartsTransformerInterface
+class PageSuffixTransformer implements NamePartsTransformerInterface
 {
     /** {@inheritdoc} */
     public function isApplicable(array $nameParts)
