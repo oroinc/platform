@@ -36,7 +36,9 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
 
     protected function resolveDuplicates()
     {
-        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+        $platform = $this->connection->getDatabasePlatform();
+
+        if ($platform instanceof PostgreSqlPlatform) {
             $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
         }
 
@@ -49,7 +51,7 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
             }
 
             foreach ($rows as $row) {
-                if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+                if ($platform instanceof PostgreSqlPlatform) {
                     $sql = 'UPDATE oro_audit SET version = 0 ' .
                         'WHERE object_id = :object_id AND '.
                                   'object_class = :object_class;' .
@@ -81,7 +83,7 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
             }
         }
 
-        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+        if ($platform instanceof PostgreSqlPlatform) {
             $this->connection->exec('DROP SEQUENCE seq_temp_version');
         }
     }
