@@ -186,7 +186,8 @@ define(function(require) {
         toggleFallback: function() {
             var hasVisibleItems = Boolean(this.visibleItems.length);
             // to hide table's header once no visible data
-            this.$('[data-role="column-manager-table-header-wrapper"], [data-role="column-manager-table-wrapper"]').toggle(hasVisibleItems);
+            this.$('[data-role="column-manager-table-header-wrapper"], [data-role="column-manager-table-wrapper"]')
+                .toggle(hasVisibleItems);
             ColumnManagerCollectionView.__super__.toggleFallback.apply(this, arguments);
         },
 

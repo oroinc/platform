@@ -16,7 +16,6 @@ define(function(require) {
     config = _.extend({
         enableFilters: true
     }, config);
-
     /**
      * @class ColumnManagerComponent
      * @extends BaseComponent
@@ -52,6 +51,7 @@ define(function(require) {
          */
         enableFilters: config.enableFilters,
 
+        columnManagerView: ColumnManagerView,
         /**
          * @inheritDoc
          */
@@ -90,7 +90,6 @@ define(function(require) {
             // remove properties to prevent disposing them with the columns manager
             delete this.columns;
             delete this.grid;
-
             ColumnManagerComponent.__super__.dispose.apply(this, arguments);
         },
 
@@ -116,7 +115,7 @@ define(function(require) {
         _createViews: function(options) {
             // index of first manageable column
             var orderShift = this.managedColumns[0] ? this.managedColumns[0].get('order') : 0;
-            this.columnManagerView = new ColumnManagerView({
+            this.columnManagerView = new this.columnManagerView({
                 el: options._sourceElement,
                 collection: this.managedColumns,
                 columnFilterModel: this.columnFilterModel
@@ -144,7 +143,7 @@ define(function(require) {
                 this.createViews();
             }
             this.columnManagerCollectionView.updateHeaderWidths();
-            this.columnManagerView.adjustListHeight();
+            this.columnManagerView.updateStateView();
         },
 
         /**

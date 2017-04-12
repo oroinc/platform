@@ -66,6 +66,9 @@ define(function(require) {
             $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight, 40) + 'px');
         },
 
+        updateStateView: function() {
+            this.adjustListHeight();
+        },
         /**
          * Handles renderable change of column models
          *  - updates the view

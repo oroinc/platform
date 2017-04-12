@@ -27,7 +27,7 @@ define(function(require) {
             var options = {
                 datagrid: this.main,
                 launcherOptions: _.extend(config, {
-                    componentConstructor: ColumnManagerComponent,
+                    componentConstructor: toolbarOptions.componentConstructor || ColumnManagerComponent,
                     columns: this.main.columns,
                     managedColumns: this.managedColumns,
                     addSorting: true
