@@ -7,6 +7,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var array */
     private $config = array(
         'Oro\Bundle\DataBundle\Entity\Product' => array(
             'alias' => 'test_alias',
@@ -121,7 +122,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testStringCleanup()
     {
-        $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again';
+        $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again RE FW Re';
 
         $clearedValue     = Query::clearString($testString);
         $textAllDataField = sprintf('%s %s', $testString, $clearedValue);
@@ -137,6 +138,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($testString, $result);
+    }
+
+    /**
+     * @dataProvider dataProviderForClearString
+     *
+     * @param string $textToClear
+     * @param string $expected
+     */
+    public function testClearString($textToClear, $expected)
+    {
+        $this->assertEquals($expected, Query::clearString($textToClear));
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForClearString()
+    {
+        return [
+            ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re FW Test One äöü ßü abc 3 again'],
+            ['text with ___ \' special chars \/ "', 'text with special chars'],
+            ['at @ * . test', 'at test'],
+        ];
     }
 
     public function testAddingSelect()

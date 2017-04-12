@@ -11,8 +11,13 @@ use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
 {
+    /** @var array */
     public $columns = [];
+
+    /** @var string */
     public $needle;
+
+    /** @var string */
     public $mode;
 
     /**
@@ -60,7 +65,7 @@ class PdoPgsql extends BaseDriver
     {
         $useFieldName = $searchCondition['fieldName'] !== '*';
         $condition = $searchCondition['condition'];
-        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldName'], $searchCondition['fieldValue']);
 
         switch ($condition) {
             case Query::OPERATOR_CONTAINS:
@@ -218,7 +223,7 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true)) {
+        if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true) && $fieldValue) {
             $searchArray = explode(Query::DELIMITER, $fieldValue);
 
             foreach ($searchArray as $key => $string) {

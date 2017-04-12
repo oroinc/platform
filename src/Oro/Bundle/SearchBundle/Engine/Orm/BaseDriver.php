@@ -222,12 +222,18 @@ abstract class BaseDriver
     }
 
     /**
+     * @param string $fieldName
      * @param array|string $fieldValue
      *
      * @return array|string
      */
-    protected function filterTextFieldValue($fieldValue)
+    protected function filterTextFieldValue($fieldName, $fieldValue)
     {
+        // BB-7272: do not clear fields other than `all_text_*`
+        if (strpos($fieldName, 'all_text') !== 0) {
+            return $fieldValue;
+        }
+
         if (is_string($fieldValue)) {
             $fieldValue = Query::clearString($fieldValue);
         } elseif (is_array($fieldValue)) {
@@ -309,6 +315,7 @@ abstract class BaseDriver
      * @param $joinAlias
      * @param $index
      * @param $condition
+     * @param $operator
      *
      * @return string
      */
