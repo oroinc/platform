@@ -111,6 +111,7 @@ Full
 ----
 
 All fields of the related entity are exported. Fields with [Excluded](#excluded) option are skipped.
+If **full** is set to *false* (default value), only fields with identity will be exported. 
 
 ```php
     use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
