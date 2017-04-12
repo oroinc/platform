@@ -9,6 +9,8 @@ define(function(require) {
         defaults: {
             name: null,
             label: null,
+            button_label: null,
+            button_title: null,
             display_type: 'dialog',
             destination_page: '',
             step_to: null,

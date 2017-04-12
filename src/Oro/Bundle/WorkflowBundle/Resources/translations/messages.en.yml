@@ -300,6 +300,8 @@ oro:
 
         form:
             name.label: Name
+            button_label.label: Button label
+            button_title.label: Button title
             from_step.label: From step
             to_step.label: To step
             view_form.label: View form
