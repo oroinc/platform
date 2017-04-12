@@ -627,6 +627,8 @@ define(function(require) {
          * @private
          */
         _getActions: function(GridView) {
+            var currentDefaultView = this._getCurrentDefaultViewModel();
+
             return [
                 {
                     label: __('oro.datagrid.action.save_grid_view'),
@@ -675,7 +677,9 @@ define(function(require) {
                 {
                     label: __('oro.datagrid.action.set_as_default_grid_view'),
                     name: 'use_as_default',
-                    enabled: typeof GridView !== 'undefined' && !GridView.get('is_default')
+                    enabled: typeof GridView !== 'undefined' &&
+                            !GridView.get('is_default') &&
+                            (!this._isCurrentViewSystem() || currentDefaultView)
                 }
             ];
         },

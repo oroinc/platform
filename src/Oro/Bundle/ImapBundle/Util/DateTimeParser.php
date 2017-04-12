@@ -20,10 +20,22 @@ class DateTimeParser
     {
         $originalVal = $value;
 
+        // remove "quoted-printable" encoded spaces if any
+        $pos = strpos($value, '=20');
+        if (false !== $pos) {
+            $value = str_replace('=20', ' ', $value);
+            if (strrpos($value, '?=') === strlen($value) - 2) {
+                $value = substr($value, 0, -2);
+                if (strrpos($value, '+') === strlen($value) - 4 || strrpos($value, '+') === strlen($value) - 4) {
+                    $value .= '0';
+                }
+            }
+        }
         // remove time zone comments if any
         $pos = strrpos($value, ')');
         if (false !== $pos) {
-            if (false !== $start = strrpos($value, '(')) {
+            $start = strrpos($value, '(');
+            if (false !== $start) {
                 $value = rtrim(substr_replace($value, '', $start, $pos - $start + 1));
             }
         }
@@ -46,7 +58,7 @@ class DateTimeParser
 
         $date = self::parseDateTime($value);
         if (!$date) {
-            $err  = self::getDateTimeLastError($value);
+            $err = self::getDateTimeLastError($value);
 
             // replace leading whitespace with zero in minutes and seconds
             $value = preg_replace('#: (\d)#', ':0$1', $value);
@@ -54,7 +66,7 @@ class DateTimeParser
 
             if (!$date && false !== strpos($value, ',')) {
                 // handle case when invalid short day name given
-                $value                 = substr($value, strpos($value, ',') + 1);
+                $value = substr($value, strpos($value, ',') + 1);
                 $alphabeticalCharsLeft = trim(preg_replace('#[\W0-9]+#', '', $value));
                 if (strlen($alphabeticalCharsLeft) > 0) {
                     $date = self::parseDateTime(ltrim($value), 'd M Y H:i:s O');

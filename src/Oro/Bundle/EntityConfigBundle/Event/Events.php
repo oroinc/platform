@@ -5,6 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Event;
 final class Events
 {
     /**
+     * This event occurs at 2nd step of creating new attribute form.
+     */
+    const BEFORE_SAVE_ATTRIBUTE = 'oro.entity_config.entity.attribute.before_save';
+
+    /**
      * This event occurs when a new configurable entity is found and its configuration attributes are loaded,
      * but before they are stored in a database.
      */

@@ -43,6 +43,30 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: And I should see following grid:
+     *            | First name | Last name | Primary Email     | Enabled | Status |
+     *            | John       | Doe       | admin@example.com | Enabled | Active |
+     *
+     * @Then /^(?:|I )should see following grid:$/
+     * @Then /^(?:|I )should see following "(?P<gridName>([\w\s]+))" grid:$/
+     */
+    public function iShouldSeeFollowingGrid(TableNode $table, $gridName = 'Grid')
+    {
+        $grid = $this->getGrid($gridName);
+
+        foreach ($table as $index => $row) {
+            $rowNumber = $index + 1;
+            foreach ($row as $columnTitle => $value) {
+                self::assertEquals(
+                    $value,
+                    $grid->getRowByNumber($rowNumber)->getCellValue($columnTitle),
+                    sprintf('Unexpected value at %d row in grid', $rowNumber)
+                );
+            }
+        }
+    }
+
+    /**
      * Example: When I click "Delete" link from mass action dropdown
      * Example: And click Delete mass action
      *
@@ -809,10 +833,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @param string|null $grid
      * @return Grid
      */
-    private function getGrid($grid = null)
+    private function getGrid($grid = 'Grid')
     {
-        $grid = $grid ?: 'Grid';
-
         return $this->elementFactory->createElement($grid);
     }
 

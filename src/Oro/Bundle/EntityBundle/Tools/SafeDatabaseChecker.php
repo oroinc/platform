@@ -20,52 +20,43 @@ class SafeDatabaseChecker
     /**
      * Checks whether a database connection can be established and all given tables exist in the database.
      *
-     * @param Connection           $connection
+     * @param Connection $connection
      * @param string[]|string|null $tables
      *
      * @return bool
      */
     public static function tablesExist(Connection $connection, $tables)
     {
-        $result = false;
-        if (!empty($tables)) {
-            try {
-                $connection->connect();
-                $result = $connection->getSchemaManager()->tablesExist($tables);
-            } catch (\PDOException $e) {
-            } catch (DBALException $e) {
+        return self::safeDatabaseCallable(function () use ($connection, $tables) {
+            if (!$tables) {
+                return false;
             }
-        }
 
-        return $result;
+            $connection->connect();
+            return $connection->getSchemaManager()->tablesExist($tables);
+        }, false);
     }
 
     /**
      * Returns the table name for a given entity.
      *
      * @param ManagerRegistry $doctrine
-     * @param string          $entityName
+     * @param string $entityName
      *
      * @return string|null the table name or NULL if it cannot be determined
      */
     public static function getTableName(ManagerRegistry $doctrine, $entityName)
     {
-        $result = null;
-
-        if (!empty($entityName)) {
-            try {
+        return self::safeDatabaseExtendCallable(function () use ($doctrine, $entityName) {
+            if (!empty($entityName)) {
                 $em = $doctrine->getManagerForClass($entityName);
                 if ($em instanceof EntityManagerInterface) {
-                    $result = $em->getClassMetadata($entityName)->getTableName();
+                    return $em->getClassMetadata($entityName)->getTableName();
                 }
-            } catch (\PDOException $e) {
-            } catch (DBALException $e) {
-            } catch (ORMException $e) {
-            } catch (\ReflectionException $e) {
             }
-        }
 
-        return $result;
+            return null;
+        });
     }
 
     /**
@@ -77,15 +68,42 @@ class SafeDatabaseChecker
      */
     public static function getAllMetadata(ObjectManager $manager)
     {
-        $allMetadata = [];
+        return self::safeDatabaseExtendCallable(function () use ($manager) {
+            return $manager->getMetadataFactory()->getAllMetadata();
+        }, []);
+    }
+
+    /**
+     * @param callable $callable
+     * @param null $emptyValue
+     * @return mixed|null
+     */
+    public static function safeDatabaseCallable(callable $callable, $emptyValue = null)
+    {
         try {
-            $allMetadata = $manager->getMetadataFactory()->getAllMetadata();
+            return call_user_func($callable);
+        } catch (\PDOException $e) {
+        } catch (DBALException $e) {
+        }
+
+        return $emptyValue;
+    }
+
+    /**
+     * @param callable $callable
+     * @param null $emptyValue
+     * @return mixed|null
+     */
+    public static function safeDatabaseExtendCallable(callable $callable, $emptyValue = null)
+    {
+        try {
+            return call_user_func($callable);
         } catch (\PDOException $e) {
         } catch (DBALException $e) {
         } catch (ORMException $e) {
         } catch (\ReflectionException $e) {
         }
 
-        return $allMetadata;
+        return $emptyValue;
     }
 }

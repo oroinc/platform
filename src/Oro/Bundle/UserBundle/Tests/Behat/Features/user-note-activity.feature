@@ -1,5 +1,3 @@
-@skip
-# TODO: unskip when BAP-14042 will be resolved
 Feature: User Notes
   In order to have ability to manage notes
   As OroCRM sales rep
