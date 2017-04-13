@@ -114,6 +114,7 @@ class ChannelType extends AbstractType
             [
                 'data_class'         => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
                 'intention'          => 'channel',
+                'cascade_validation' => true,
             ]
         );
     }

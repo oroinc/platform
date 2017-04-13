@@ -3,6 +3,7 @@ define(function(require) {
 
     var ColumnManagerView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
     var module = require('module');
     var config = module.config();
@@ -23,7 +24,8 @@ define(function(require) {
         },
 
         listen: {
-            'change:renderable collection': 'onRenderableChange'
+            'change:renderable collection': 'onRenderableChange',
+            'layout:reposition mediator': 'adjustListHeight'
         },
 
         initialize: function(options) {
@@ -56,6 +58,18 @@ define(function(require) {
             this.$('[data-role="column-manager-reset"]').toggleClass('disabled', !hasChanged);
         },
 
+        adjustListHeight: function() {
+            var windowHeight = $(window).height();
+            var $wrapper = this.$('[data-role="column-manager-table-wrapper"]');
+            var $footerHeight = this.$('[data-role="column-manager-footer"]').outerHeight() || 0;
+            var rect = $wrapper[0].getBoundingClientRect();
+            var margin = (this.$('[data-role="column-manager-table"]').outerHeight(true) - rect.height) / 2;
+            $wrapper.css('max-height', Math.max(windowHeight - rect.top - margin - $footerHeight, 40) + 'px');
+        },
+
+        updateStateView: function() {
+            this.adjustListHeight();
+        },
         /**
          * Handles renderable change of column models
          *  - updates the view

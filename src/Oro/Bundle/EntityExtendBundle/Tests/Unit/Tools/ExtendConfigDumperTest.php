@@ -76,6 +76,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
     public function testCheckConfigWhenAliasesExists()
     {
         $fs = new Filesystem();
+        $fs->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         $fs->touch(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
 
         $this->configProvider->addEntityConfig(
@@ -94,7 +95,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->dumper->checkConfig();
 
-        $fs->remove(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
+        $fs->remove(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
     }
 
     public function testCheckConfig()

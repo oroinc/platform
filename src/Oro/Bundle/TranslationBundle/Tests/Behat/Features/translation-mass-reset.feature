@@ -35,7 +35,7 @@ Feature: Mass reset translations
     And I click "Reset Translation" link from mass action dropdown
     Then I should see "Reset Confirmation"
     When I click "Reset" in modal window
-    Then I have to wait for ajax up to "300" seconds
+    Then I have to wait for ajax up to "600" seconds
     And I should see "Selected translations were reset to their original values." flash message
     And there is zero records in grid
     When I reset Domain filter
@@ -48,6 +48,6 @@ Feature: Mass reset translations
     And I click "Reset Translation" link from mass action dropdown
     Then I should see "Reset Confirmation"
     When I click "Reset" in modal window
-    Then I have to wait for ajax up to "300" seconds
+    Then I have to wait for ajax up to "600" seconds
     And I should see "Selected translations were reset to their original values." flash message
     And there is zero records in grid

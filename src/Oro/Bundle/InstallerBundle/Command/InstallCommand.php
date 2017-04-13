@@ -111,7 +111,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $output->writeln('');
 
         $this
-            ->checkStep($output)
+            ->checkStep($input, $output)
             ->prepareStep($input, $output)
             ->loadDataStep($commandExecutor, $output)
             ->finalStep($commandExecutor, $output, $input, $skipAssets);
@@ -170,12 +170,11 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
-     *
      * @return InstallCommand
-     * @throws \RuntimeException
      */
-    protected function checkStep(OutputInterface $output)
+    protected function checkStep(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Oro requirements check:</info>');
 
@@ -185,7 +184,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 . 'OroRequirements.php';
         }
 
-        $collection = new \OroRequirements();
+        $collection = new \OroRequirements($input->getOption('env'));
 
         $this->renderTable($collection->getMandatoryRequirements(), 'Mandatory requirements', $output);
         $this->renderTable($collection->getPhpIniRequirements(), 'PHP settings', $output);
