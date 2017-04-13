@@ -132,18 +132,16 @@ class WorkflowStepHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $name
      * @param Step $stepTo
-     * @return Transition
+     * @return Transition|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getTransition($name, Step $stepTo)
     {
-        return $this->getEntity(
-            Transition::class,
-            [
-                'name' => $name,
-                'label' => $name . 'Label',
-                'stepTo' => $stepTo
-            ]
-        );
+        $transition = $this->createMock(Transition::class);
+        $transition->expects($this->any())->method('getName')->willReturn($name);
+        $transition->expects($this->any())->method('getLabel')->willReturn($name . 'Label');
+        $transition->expects($this->any())->method('getStepTo')->willReturn($stepTo);
+
+        return $transition;
     }
 
     /**

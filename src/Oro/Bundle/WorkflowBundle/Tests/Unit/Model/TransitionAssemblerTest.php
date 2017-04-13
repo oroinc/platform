@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
@@ -99,11 +100,15 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['assemble'])
             ->getMock();
 
+        /** @var TransitionOptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionsResolver */
+        $optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
             $this->actionFactory,
-            $this->formConfigurationAssembler
+            $this->formConfigurationAssembler,
+            $optionsResolver
         );
     }
 
