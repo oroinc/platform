@@ -28,17 +28,8 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetTransitions()
     {
-        $transitionOne = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->getMock();
-        $transitionOne->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('transition1'));
-
-        $transitionTwo = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->getMock();
-        $transitionTwo->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('transition2'));
+        $transitionOne = $this->getTransitionMock('transition1');
+        $transitionTwo = $this->getTransitionMock('transition2');
 
         $transitionsManager = new TransitionManager();
 
@@ -82,25 +73,8 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStartTransitions()
     {
-        $allowedStartTransition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $allowedStartTransition->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('test_start'));
-        $allowedStartTransition->expects($this->once())
-            ->method('isStart')
-            ->will($this->returnValue(true));
-
-        $allowedTransition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $allowedTransition->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('test'));
-        $allowedTransition->expects($this->once())
-            ->method('isStart')
-            ->will($this->returnValue(false));
+        $allowedStartTransition = $this->getTransitionMock('test_start', true);
+        $allowedTransition = $this->getTransitionMock('test', false);
 
         $transitions = new ArrayCollection(
             array(
@@ -139,9 +113,7 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testExtractTransition()
     {
-        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transition = $this->getTransitionMock('test');
         $transitionsManager = new TransitionManager();
         $this->assertSame($transition, $transitionsManager->extractTransition($transition));
     }
@@ -149,12 +121,7 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
     public function testExtractTransitionString()
     {
         $transitionName = 'test';
-        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $transition->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($transitionName));
+        $transition = $this->getTransitionMock($transitionName);
         $transitionsManager = new TransitionManager(new ArrayCollection(array($transition)));
 
         $this->assertSame($transition, $transitionsManager->extractTransition($transitionName));
@@ -165,11 +132,7 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
         $transitionsManager = new TransitionManager();
         $this->assertNull($transitionsManager->getDefaultStartTransition());
 
-        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $transition->expects($this->any())->method('getName')
-            ->will($this->returnValue(TransitionManager::DEFAULT_START_TRANSITION_NAME));
+        $transition = $this->getTransitionMock(TransitionManager::DEFAULT_START_TRANSITION_NAME);
 
         $transitionsManager->setTransitions(new ArrayCollection(array($transition)));
         $this->assertEquals($transition, $transitionsManager->getDefaultStartTransition());
