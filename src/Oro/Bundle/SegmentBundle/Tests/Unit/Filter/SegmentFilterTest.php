@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
@@ -353,6 +354,51 @@ class SegmentFilterTest extends OrmTestCase
         static::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
     }
 
+    public function testDynamicApplyWithNoLimit()
+    {
+        $segment = new Segment();
+        $segment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
+        $segment->setEntity('Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser');
+
+        $filterData = ['value' => $segment];
+
+        $em = $this->getEM();
+        $qb = $em->createQueryBuilder()
+            ->select(['t1.name'])
+            ->from('OroSegmentBundle:CmsUser', 't1');
+
+        $queryBuilder = new QueryBuilder($em);
+        $queryBuilder->select(['ts1.id', 'ts1.name'])
+            ->from('OroSegmentBundle:SegmentSnapshot', 'ts1')
+            ->andWhere('ts1.segmentId = :segment')
+            ->orderBy('ts1.name')
+            ->setParameter('segment', self::TEST_PARAM_VALUE);
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+
+        $this->dynamicSegmentQueryBuilder
+            ->expects(static::once())
+            ->method('getQueryBuilder')
+            ->with($segment)
+            ->will(static::returnValue($queryBuilder));
+
+        $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
+        $this->filter->apply($ds, $filterData);
+
+        $expectedResult = [
+            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
+            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :segment)'
+        ];
+        $expectedResult = implode(' ', $expectedResult);
+
+        static::assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
+
+        $params = $ds->getQueryBuilder()->getParameters();
+
+        static::assertCount(1, $params, 'Should pass params to main query builder');
+        static::assertEquals(self::TEST_PARAM_VALUE, $params[0]->getValue());
+    }
+
     /**
      * @return \Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock
      */
@@ -402,7 +448,7 @@ class SegmentFilterTest extends OrmTestCase
             ->method('getQuery')
             ->willReturn($queryMock);
 
-        $queryMock->expects($this->once())
+        $queryBuilderMock->expects($this->once())
             ->method('getEntityManager')
             ->willReturn($em);
 
@@ -453,7 +499,7 @@ class SegmentFilterTest extends OrmTestCase
             ->method('getQuery')
             ->willReturn($queryMock);
 
-        $queryMock->expects($this->once())
+        $queryBuilderMock->expects($this->once())
             ->method('getEntityManager')
             ->willReturn($em);
 

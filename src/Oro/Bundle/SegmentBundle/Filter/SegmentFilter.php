@@ -179,22 +179,27 @@ class SegmentFilter extends EntityFilter
 
         $queryBuilder = $this->getSegmentQueryBuilder($segment);
         $query        = $queryBuilder->getQuery();
+        $em = $queryBuilder->getEntityManager();
+        $classMetadata = $em->getClassMetadata($segment->getEntity());
+        $identifier = $classMetadata->getSingleIdentifierFieldName();
 
-        if (!$this->isDynamic($segment)) {
-            $subquery = $query->getDQL();
-            $params = $query->getParameters();
-            /** @var Parameter $param */
-            foreach ($params as $param) {
-                $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
-            }
-        } else {
-            $classMetadata = $query->getEntityManager()->getClassMetadata($segment->getEntity());
-            $identifiers   = $classMetadata->getIdentifier();
-            $identifier = reset($identifiers);
+        if ($segment->getRecordsLimit() && $this->isDynamic($segment)) {
             $idsResult = $query->getArrayResult();
             $subquery = array_column($idsResult, $identifier);
             if (!$subquery) {
                 $subquery = [0];
+            }
+        } else {
+            if ($this->isDynamic($segment)) {
+                $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+                $queryBuilder->resetDQLParts(['orderBy', 'select']);
+                $queryBuilder->select($tableAlias . '.' . $identifier);
+            }
+            $subquery = $queryBuilder->getDQL();
+            $params = $query->getParameters();
+            /** @var Parameter $param */
+            foreach ($params as $param) {
+                $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
             }
         }
 
