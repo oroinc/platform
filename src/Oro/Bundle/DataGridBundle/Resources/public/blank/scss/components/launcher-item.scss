@@ -1,0 +1,90 @@
+// @theme: blank;
+
+.launcher-item {
+    @mixin launcher-separator($enabled: false) {
+        @include list-separator(
+            $enabled: $enabled,
+            $top: $launcher-item-separator-top,
+            $bottom: $launcher-item-separator-bottom,
+            $left: $launcher-item-separator-left,
+            $border: $launcher-item-separator-border-left
+        );
+    }
+
+    position: relative;
+
+    display: block;
+    margin: $launcher-item-offset;
+
+    &.mode-text-only,
+    &.mode-icon-only {
+        display: inline-block;
+        margin: 0;
+
+        padding: $launcher-item-action-inner-offset;
+
+        &:last-child {
+            padding-right: 0;
+        }
+    }
+
+    &.mode-text-only {
+        @include launcher-separator($enabled: $launcher-item-separator-text-only);
+    }
+
+    &.mode-icon-only {
+        @include launcher-separator($enabled: $launcher-item-separator-icon-only);
+    }
+
+    &.mode-icon-text {
+        @include launcher-separator($enabled: $launcher-item-separator-icon-text);
+    }
+
+    .action {
+        display: block;
+
+        &.mode-icon-only {
+            color: $launcher-item-icon-color;
+
+            @include hover-focus {
+                text-decoration: none;
+
+                color: $launcher-item-icon-hover-focus-color;
+            }
+
+            [class^="fa-"],
+            [class*=" fa-"] {
+                margin-right: 0;
+
+                &:before {
+                    font-size: $launcher-item-icon-size;
+                    line-height: strip-units($launcher-item-icon-size / 10);
+                }
+            }
+        }
+    }
+
+    .dropdown-menu & {
+        &.mode-text-only {
+            display: block;
+            padding: 0;
+
+            @include launcher-separator($enabled: $launcher-item-separator-dropdown-text-only);
+        }
+
+        &.mode-icon-only {
+            @include launcher-separator($enabled: $launcher-item-separator-dropdown-icon-only);
+        }
+
+        &.mode-icon-text {
+            @include launcher-separator($enabled: $launcher-item-separator-dropdown-icon-text);
+        }
+
+        .action {
+            &.mode-icon-text,
+            &.mode-text-only {
+                padding: $launcher-item-action-inner-offset;
+            }
+        }
+    }
+}

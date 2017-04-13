@@ -11,6 +11,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -38,8 +39,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         $buttons = [];
 
         if ($expected) {
-            $transition = new Transition();
-            $transition->setName('transition1')
+            $transition = $this->getTransition('transition1')
                 ->setInitEntities($entityClass ? [$entityClass] : [])
                 ->setInitRoutes($routeName ? [$routeName] : [])
                 ->setInitDatagrids($datagrid ? [$datagrid] : []);

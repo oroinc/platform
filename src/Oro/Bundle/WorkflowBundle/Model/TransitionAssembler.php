@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
@@ -18,42 +19,40 @@ use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class TransitionAssembler extends BaseAbstractAssembler
 {
-    /**
-     * @var FormOptionsAssembler
-     */
+    /** @var FormOptionsAssembler */
     protected $formOptionsAssembler;
 
-    /**
-     * @var ConditionFactory
-     */
+    /** @var ConditionFactory */
     protected $conditionFactory;
 
-    /**
-     * @var ActionFactoryInterface
-     */
+    /** @var ActionFactoryInterface */
     protected $actionFactory;
 
-    /**
-     * @var FormOptionsConfigurationAssembler
-     */
+    /** @var FormOptionsConfigurationAssembler */
     protected $formOptionsConfigurationAssembler;
+
+    /** @var TransitionOptionsResolver */
+    protected $optionsResolver;
 
     /**
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param ConditionFactory $conditionFactory
      * @param ActionFactoryInterface $actionFactory
      * @param FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
+     * @param TransitionOptionsResolver $optionsResolver
      */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
         ActionFactoryInterface $actionFactory,
-        FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
+        FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler,
+        TransitionOptionsResolver $optionsResolver
     ) {
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->conditionFactory = $conditionFactory;
         $this->actionFactory = $actionFactory;
         $this->formOptionsConfigurationAssembler = $formOptionsConfigurationAssembler;
+        $this->optionsResolver = $optionsResolver;
     }
 
     /**
@@ -167,7 +166,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             throw new AssemblerException(sprintf('Step "%s" not found', $stepToName));
         }
 
-        $transition = new Transition();
+        $transition = new Transition($this->optionsResolver);
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
             ->setLabel($this->getOption($options, 'label'))
