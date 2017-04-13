@@ -8,8 +8,7 @@ Feature: Disable Email system functionality
     Given I login as administrator
     When I go to Dashboards/Dashboard
     Then should see "Recent Emails"
-# uncomment when BAP-14051 merged
-#    And I should see an "Recent Emails" element
+    And I should see an "Recent Emails" element
     When I go to System/Scheduled Tasks
     Then I should see following records in grid:
       | oro:cron:email-body-sync |
