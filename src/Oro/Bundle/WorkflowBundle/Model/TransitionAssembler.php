@@ -171,13 +171,11 @@ class TransitionAssembler extends BaseAbstractAssembler
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
             ->setLabel($this->getOption($options, 'label'))
-            ->setMessage($this->getOption($options, 'message'))
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
-            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()))
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
@@ -188,6 +186,8 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setInitRoutes($this->getOption($options, WorkflowConfiguration::NODE_INIT_ROUTES, []))
             ->setInitDatagrids($this->getOption($options, WorkflowConfiguration::NODE_INIT_DATAGRIDS, []))
             ->setInitContextAttribute($this->getOption($options, WorkflowConfiguration::NODE_INIT_CONTEXT_ATTRIBUTE));
+
+        $this->processFrontendOptions($transition, $options);
 
         if (!empty($definition['preactions'])) {
             $preAction = $this->actionFactory->create(ConfigurableAction::ALIAS, $definition['preactions']);
@@ -220,6 +220,29 @@ class TransitionAssembler extends BaseAbstractAssembler
             $this->formOptionsConfigurationAssembler->assemble($options);
         }
         return $transition;
+    }
+
+    /**
+     * @param Transition $transition
+     * @param array $options
+     */
+    protected function processFrontendOptions(Transition $transition, array $options)
+    {
+        $frontendOptions = $this->getOption($options, 'frontend_options', []);
+
+        if ($this->getOption($options, 'message')) {
+            $frontendOptions['message'] = array_merge(
+                $this->getOption($frontendOptions, 'message', []),
+                [
+                    'message' => $this->getOption($options, 'message'),
+                    'message_parameters' => $this->getOption($options, 'message_parameters', []),
+                ]
+            );
+        }
+
+        $transition
+            ->setMessage($this->getOption($options, 'message'))
+            ->setFrontendOptions($frontendOptions);
     }
 
     /**

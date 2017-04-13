@@ -86,6 +86,11 @@ class OptionsHelper
                     'url' => $dialogUrl,
                 ]
             );
+        } elseif (null !== ($message = $this->getMessage($button, $frontendOptions))) {
+            $options['message'] = [
+                'title' => $this->getTitle($button, $frontendOptions),
+                'content' => $message,
+            ];
         }
 
         $this->addOption($options, $frontendOptions, 'confirmation');
@@ -105,6 +110,28 @@ class OptionsHelper
         $titleParams = isset($frontendOptions['title_parameters']) ? $frontendOptions['title_parameters'] : [];
 
         return $this->translator->trans($title, $titleParams, $button->getTranslationDomain());
+    }
+
+    /**
+     * @param ButtonInterface $button
+     * @param array $frontendOptions
+     * @return string|null
+     */
+    protected function getMessage(ButtonInterface $button, array $frontendOptions)
+    {
+        if (empty($frontendOptions['message']['message'])) {
+            return;
+        }
+
+        $messageOptions = $frontendOptions['message'];
+
+        $message = $this->translator->trans(
+            $messageOptions['message'],
+            isset($messageOptions['message_parameters']) ? $messageOptions['message_parameters'] : [],
+            $button->getTranslationDomain()
+        );
+
+        return $message !== $messageOptions['message'] ? $message : null;
     }
 
     /**

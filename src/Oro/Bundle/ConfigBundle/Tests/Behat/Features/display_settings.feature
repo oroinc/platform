@@ -88,7 +88,7 @@ Feature: Display settings manage
     When I go to Customers/Contacts
     And I click View Charlie in grid
     Then there is 10 records in activity list
-    And activity list must be sorted descending by updated date
+    And Activity List must be sorted descending by updated date
     When I go to System/Configuration
     And I click "Display settings"
     And I fill "System Config Form" with:
@@ -98,7 +98,7 @@ Feature: Display settings manage
     And I go to Customers/Contacts
     And click View Charlie in grid
     Then there is 13 records in activity list
-    And activity list must be sorted ascending by updated date
+    And Activity List must be sorted ascending by updated date
     When I go to System/Configuration
     And I click "Display settings"
     And I fill "System Config Form" with:

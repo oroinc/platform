@@ -29,7 +29,7 @@ trait LoadTestCaseDataTrait
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
-            $cases[$file->getRelativePathname()] = Yaml::parse($file->getContents());
+            yield $file->getRelativePathname() => Yaml::parse($file->getContents());
         }
 
         return $cases;

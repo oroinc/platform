@@ -279,10 +279,14 @@ define(function(require) {
             model.save(null, {
                 wait: true,
                 success: function(model) {
+                    var currentModel = self._getCurrentDefaultViewModel();
                     var icon = self._getAppearanceIcon(model.get('appearanceType'));
                     model.set('name', model.get('id'));
                     model.set('icon', icon);
                     model.unset('id');
+                    if (model.get('is_default') && currentModel) {
+                        currentModel.set({is_default: false});
+                    }
                     self.viewsCollection.add(model);
                     self.changeView(model.get('name'));
                     self.collection.state.gridView = model.get('name');
@@ -290,10 +294,6 @@ define(function(require) {
                     self._updateTitle();
                     self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
                     mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
-
-                    if (model.get('is_default')) {
-                        self._getCurrentDefaultViewModel().set({is_default: false});
-                    }
                 },
                 error: function(model, response, options) {
                     self.onError(model, response, options);

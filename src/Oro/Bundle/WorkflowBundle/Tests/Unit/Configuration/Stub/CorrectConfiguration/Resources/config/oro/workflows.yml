@@ -85,6 +85,8 @@ workflows:
                 destination_page: index
                 page_template: Workflow:Test:pageTemplate.html.twig
                 dialog_template: Workflow:Test:dialogTemplate.html.twig
+                message_parameters:
+                    test: param
                 init_entities:
                     - entity1
                 init_routes:

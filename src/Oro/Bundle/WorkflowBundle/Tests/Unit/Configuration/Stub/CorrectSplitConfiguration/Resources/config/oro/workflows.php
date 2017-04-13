@@ -79,6 +79,7 @@ return [
                     'frontend_options' => [],
                     'form_type' => 'oro_workflow_transition',
                     'display_type' => 'dialog',
+                    'message_parameters' => [],
                     'form_options' => [
                         WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
                             'handler' => 'handler',
@@ -163,6 +164,7 @@ return [
                 'dialog_template' => null,
                 'form_type' => WorkflowTransitionType::NAME,
                 'form_options' => [],
+                'message_parameters' => [],
             ]
         ],
         'transition_definitions' => [
