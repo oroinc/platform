@@ -28,6 +28,8 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_segment.query_builder_registry'
+        calls:
+            - ['setLogger', ['@?logger']]
 
     oro_segment.segment_manager.api:
         class: %oro_segment.segment_manager.api.class%
