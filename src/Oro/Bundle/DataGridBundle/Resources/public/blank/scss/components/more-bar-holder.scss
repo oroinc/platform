@@ -1,44 +1,44 @@
 // @theme: blank;
 
 .more-bar-holder {
-  position: relative;
+    position: relative;
 
-  display: inline-block;
-
-  .dropdown-toggle {
     display: inline-block;
-    vertical-align: middle;
 
-    padding: $more-bar-holder-toggle-offset;
-    height: $more-bar-holder-toggle-size;
+    .dropdown-toggle {
+        display: inline-block;
+        vertical-align: middle;
 
-    font-size: $more-bar-holder-toggle-size;
-    line-height: 0;
-    text-decoration: none;
+        padding: $more-bar-holder-toggle-offset;
+        height: $more-bar-holder-toggle-size;
 
-    color: inherit;
+        font-size: $more-bar-holder-toggle-size;
+        line-height: 0;
+        text-decoration: none;
 
-    &:after {
-      content: none;
+        color: inherit;
+
+        &:after {
+            content: none;
+        }
+
+        .action-cell & {
+            margin: 0;
+        }
     }
 
-    .action-cell & {
-      margin: 0;
+    .dropdown {
+        display: inline-block;
     }
-  }
 
-  .dropdown {
-    display: inline-block;
-  }
+    .launchers-dropdown-menu {
+        top: -10px;
+        right: calc(100% - 5px);
+        left: auto;
+    }
 
-  .launchers-dropdown-menu {
-    top: -10px;
-    right: calc(100% - 5px);
-    left: auto;
-  }
-
-  .dropdown-menu__placeholder + .dropdown-toggle,
-  .dropdown-toggle:hover {
-    text-decoration: none;
-  }
+    .dropdown-menu__placeholder + .dropdown-toggle,
+    .dropdown-toggle:hover {
+        text-decoration: none;
+    }
 }

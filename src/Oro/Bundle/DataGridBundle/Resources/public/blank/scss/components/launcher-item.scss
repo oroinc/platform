@@ -1,16 +1,16 @@
 // @theme: blank;
 
-@mixin launcher-separator($enabled: false) {
-    @include list-separator(
-        $enabled: $enabled,
-        $top: $launcher-item-separator-top,
-        $bottom: $launcher-item-separator-bottom,
-        $left: $launcher-item-separator-left,
-        $border: $launcher-item-separator-border-left
-    );
-}
-
 .launcher-item {
+    @mixin launcher-separator($enabled: false) {
+        @include list-separator(
+            $enabled: $enabled,
+            $top: $launcher-item-separator-top,
+            $bottom: $launcher-item-separator-bottom,
+            $left: $launcher-item-separator-left,
+            $border: $launcher-item-separator-border-left
+        );
+    }
+
     position: relative;
 
     display: block;
