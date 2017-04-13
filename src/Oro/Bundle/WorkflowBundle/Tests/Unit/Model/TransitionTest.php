@@ -45,6 +45,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
                 ['initEntities', ['TEST_ENTITY_1', 'TEST_ENTITY_2', 'TEST_ENTITY_3']],
                 ['initRoutes', ['TEST_ROUTE_1', 'TEST_ROUTE_2', 'TEST_ROUTE_3']],
                 ['initContextAttribute', 'testInitContextAttribute'],
+                ['message', 'test message'],
             ]
         );
     }

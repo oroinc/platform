@@ -376,6 +376,10 @@ Transition configuration has next options:
 * **message** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message`
     Notification message, that will be shown at frontend before transition execution.
+    This field can be filled only in translation file.
+* **message_parameters**
+    *array*
+    List of parameters for translating value from option `message`.
 * **init_routes**
     *array*
     List of routes where will be displayed transition button. It's needed for start workflow from entities that not 
