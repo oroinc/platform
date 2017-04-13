@@ -2,9 +2,11 @@ operations:
     DELETE:
         exclude_datagrids:
             - owner-users-select-grid
+            - users-grid
         exclude_entities:
             - Oro\Bundle\UserBundle\Entity\Role
             - Oro\Bundle\UserBundle\Entity\User
+
     clone_role:
         extends: CLONE
         order: 4
@@ -80,6 +82,7 @@ operations:
             attribute_fields:
                 entity:
                     form_type: form
+
     oro_user_edit_role:
         label: oro.user.role.actions.edit
         routes:
@@ -96,10 +99,11 @@ operations:
                     route: oro_user_role_update
                     route_parameters:
                         id: $id
+
     reset_password:
         exclude_datagrids:
             - owner-users-select-grid
-            - users--select-grid
+            - users-select-grid
         label: oro.user.password.reset_password.label
         entities:
             - Oro\Bundle\UserBundle\Entity\User
@@ -188,6 +192,20 @@ operations:
         button_options:
             icon: fa-check
             class: btn-success icons-holder-text
+        datagrid_options:
+            mass_action:
+                type: enableusers
+                label: oro.user.mass_actions.enable_users.label
+                handler: oro_datagrid.mass_action.users_enable_switch.handler.enable
+                route_parameters: []
+                icon: check
+                data_identifier: u.id
+                object_identifier: u
+                defaultMessages:
+                    confirm_title: oro.user.mass_actions.enable_users.confirm_title
+                    confirm_content: oro.user.mass_actions.enable_users.confirm_content
+                    confirm_ok: oro.user.mass_actions.enable_users.confirm_ok
+                acl_resource: oro_user_user_update
         preconditions:
             '@equal': [false, $isEnabled]
         actions:
@@ -229,6 +247,20 @@ operations:
         button_options:
             icon: fa-ban
             class: btn-danger icons-holder-text
+        datagrid_options:
+            mass_action:
+                type: disableusers
+                label: oro.user.mass_actions.disable_users.label
+                handler: oro_datagrid.mass_action.users_enable_switch.handler.disable
+                route_parameters: []
+                icon: ban
+                data_identifier: u.id
+                object_identifier: u
+                defaultMessages:
+                    confirm_title: oro.user.mass_actions.disable_users.confirm_title
+                    confirm_content: oro.user.mass_actions.disable_users.confirm_content
+                    confirm_ok: oro.user.mass_actions.disable_users.confirm_ok
+                acl_resource: oro_user_user_update
         preactions:
             - '@get_active_user': $.currentUser
         preconditions:
@@ -307,6 +339,7 @@ action_groups:
                         action_group: resetPassword
                         parameters_mapping:
                             data: $.data
+
     disableUser:
         parameters:
             data:

@@ -58,7 +58,9 @@ DataGridBundle
 - Interface `Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface`
     - the signature of method `getDatagrid` was changed - added new parameter `array $additionalParameters = []`.
 - Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used. 
-- Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export`, `setExportConnector` with `@oro_datagrid.importexport.export_connector`, `setExportProcessor` with `@oro_datagrid.importexport.processor.export` and `setWriterChain`  with `@oro_importexport.writer.writer_chain` were added. The constructor was removed, the parent class constructor is used.   
+- Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export`, `setExportConnector` with `@oro_datagrid.importexport.export_connector`, `setExportProcessor` with `@oro_datagrid.importexport.processor.export` and `setWriterChain`  with `@oro_importexport.writer.writer_chain` were added. The constructor was removed, the parent class constructor is used.
+- Class `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher`
+    - the signature of `getDatagridQuery` method was changed, added parameter `string $objectIdentifier = null`
 
 ImportExportBundle
 ------------------
@@ -126,6 +128,14 @@ ImportExportBundle
 - Class `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_importexport.handler.export` and `setDoctrineHelper` with `@oro_entity.doctrine_helper` were added. The constructor was removed, the parent class constructor is used. 
 - Class `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_importexport.handler.export` and `setDoctrineHelper` with `@oro_entity.doctrine_helper` were added.  The constructor was removed, the parent class constructor is used. 
 
+
+InstallerBundle
+---------------
+- The option `--force` was removed from `oro:install` cli command.
+- Class `Oro\Bundle\InstallerBundle\Command\InstallCommand`
+    - Signature of `prepareStep` method was changed, removed parameter `CommandExecutor $commandExecutor`.
+
+
 IntegrationBundle
 -----------------
 - Class `Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor`
@@ -136,6 +146,7 @@ IntegrationBundle
         - `JobRunner` $jobRunner,
         - `TokenStorageInterface` $tokenStorage,
         - `LoggerInterface` $logger
+
 
 NavigationBundle
 --------------
@@ -218,3 +229,9 @@ EmailBundle
 - template `Resources/views/AutoResponseRule/dialog/update.html.twig` was changed
 - template `Resources/views/Configuration/Mailbox/update.html.twig` was changed
 - template `EmailBundle/Resources/views/Form/fields.html.twig` was changed
+
+TranslationBundle
+-----------------
+- Signature of class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` was changed:
+    - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
+    - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`

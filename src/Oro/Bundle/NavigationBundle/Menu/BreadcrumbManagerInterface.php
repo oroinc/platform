@@ -17,9 +17,10 @@ interface BreadcrumbManagerInterface
     /**
      * @param string $menuName
      * @param bool $isInverse
+     * @param string|null $route
      * @return array
      */
-    public function getBreadcrumbs($menuName, $isInverse = true);
+    public function getBreadcrumbs($menuName, $isInverse = true, $route = null);
 
     /**
      * @param ItemInterface|string $menu

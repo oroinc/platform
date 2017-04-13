@@ -131,6 +131,8 @@ services:
 
     oro_datagrid.event_listener.row_selection:
         class: %oro_datagrid.event_listener.row_selection.class%
+        arguments:
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
 

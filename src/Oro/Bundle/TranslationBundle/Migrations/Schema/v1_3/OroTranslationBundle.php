@@ -51,6 +51,7 @@ class OroTranslationBundle implements Migration, OrderedMigrationInterface
 
     /**
      * @param Schema $schema
+     * @param QueryBag $queries
      */
     protected function updateOroTranslationTable(Schema $schema, QueryBag $queries)
     {

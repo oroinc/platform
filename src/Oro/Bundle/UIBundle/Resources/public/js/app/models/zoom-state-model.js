@@ -40,6 +40,18 @@ define(function(require) {
                 zoomSpeed: 1.1,
 
                 /**
+                 * Minimal allowed zoom level
+                 * @type {number}
+                 */
+                minZoom: 0.01,
+
+                /**
+                 * Maximal allowed zoom level
+                 * @type {number}
+                 */
+                maxZoom: 100,
+
+                /**
                  * X position of zoomable area center
                  * @type {number}
                  */
@@ -195,7 +207,8 @@ define(function(require) {
             var currentZoom = this.get('zoom');
             var zoomSpeed = zoom / currentZoom;
             var center = this.getCenter();
-            //console.log(center, dx, dy);
+            zoom = Math.min(zoom, this.get('maxZoom'));
+            zoom = Math.max(zoom, this.get('minZoom'));
             this.set({
                 dx: this.get('dx') - (center.x - dx) * (1 - zoomSpeed),
                 dy: this.get('dy') - (center.y - dy) * (1 - zoomSpeed),

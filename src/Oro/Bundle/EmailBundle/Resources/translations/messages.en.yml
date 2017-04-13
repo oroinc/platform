@@ -21,6 +21,8 @@ oro:
             emailtemplate.saved.message: "Template saved"
             job_scheduled.message: "The job has been added to the queue"
             job_progress: Check progress
+        recent_emails_widget:
+            no_subject: "no subject"
         form:
             choose_template:                     ""
             add_signature:                       Add Signature
