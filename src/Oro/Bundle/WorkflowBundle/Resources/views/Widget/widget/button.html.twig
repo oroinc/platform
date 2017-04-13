@@ -11,7 +11,6 @@
 
             {% set transitionData = {
                 'enabled': data.isAllowed,
-                'transition-label': data.transition.label|trans({},'workflows'),
                 'message': transitionMessage|nl2br,
                 'transition-condition-messages': data.errors
             } %}

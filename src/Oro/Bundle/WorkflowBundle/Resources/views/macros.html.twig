@@ -59,7 +59,15 @@
         }) %}
     {% endif %}
 
-    {% set label = transition.label|trans({},'workflows') %}
+    {% set label = transition.buttonLabel|trans({},'workflows') %}
+    {% if label is empty or label == transition.buttonLabel %}
+        {% set label = transition.label|trans({},'workflows') %}
+    {% endif %}
+
+    {% set title = transition.buttonTitle|trans({},'workflows') %}
+    {% if title is empty or title == transition.buttonTitle %}
+        {% set title = label %}
+    {% endif %}
 
     {% set class %}
         {{ aClass }}
@@ -77,7 +85,7 @@
         'path': 'javascript:void(0);',
         'id': 'transition-%s-%s'|format(workflow.name, transition.name),
         'iCss': iCss,
-        'title': label,
+        'title': title,
         'class': class,
         'data': data,
         'label': label,
