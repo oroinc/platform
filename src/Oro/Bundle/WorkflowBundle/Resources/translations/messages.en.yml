@@ -195,6 +195,7 @@ oro:
             exclusive_record_groups.label: "Exclusive Record Groups"
             scopes.label:                 Workflow Scopes
             applications.label:           "Applications"
+            transition_name.label:        Transition Name
 
             attribute:
                 property_path.tooltip:    "This is the field of the workflow entity or its related entities that will be appear on the view form of the transition. Use these if you want user to add or edit some entity data in the transition."
