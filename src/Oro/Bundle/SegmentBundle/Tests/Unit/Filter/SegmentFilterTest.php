@@ -179,6 +179,9 @@ class SegmentFilterTest extends OrmTestCase
             ->method('getIdentifierFieldNames')
             ->will($this->returnValue(['id']));
         $classMetaData->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('id'));
+        $classMetaData->expects($this->any())
             ->method('getTypeOfField')
             ->will($this->returnValue('integer'));
 
@@ -403,10 +406,6 @@ class SegmentFilterTest extends OrmTestCase
         $queryBuilderMock->expects($this->once())
             ->method('getQuery')
             ->willReturn($queryMock);
-
-        $queryBuilderMock->expects($this->once())
-            ->method('getEntityManager')
-            ->willReturn($em);
 
         $queryMock->expects($this->once())
             ->method('getArrayResult')
