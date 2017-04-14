@@ -162,4 +162,11 @@ abstract class AbstractTransitionButton implements ButtonInterface
     {
         return $this->transition;
     }
+
+    public function __clone()
+    {
+        if ($this->transition) {
+            $this->transition = clone $this->transition;
+        }
+    }
 }

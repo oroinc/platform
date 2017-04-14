@@ -20,6 +20,7 @@ use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 /**
  * @Route("/workflowwidget")
@@ -123,6 +124,8 @@ class WidgetController extends Controller
             }
         }
 
+        $this->getTransitionOptionsResolver()->resolveTransitionOptions($transition, $workflowItem);
+
         $params = [
             'transition' => $transition,
             'data' => $data,
@@ -169,6 +172,9 @@ class WidgetController extends Controller
                 return $response;
             }
         }
+
+        $this->getTransitionOptionsResolver()->resolveTransitionOptions($transition, $workflowItem);
+
         $params = [
             'transition' => $transition,
             'saved' => $saved,
@@ -275,6 +281,14 @@ class WidgetController extends Controller
     protected function getTransitionWidgetHelper()
     {
         return $this->get('oro_workflow.helper.transition_widget');
+    }
+
+    /**
+     * @return TransitionOptionsResolver
+     */
+    protected function getTransitionOptionsResolver()
+    {
+        return $this->get('oro_workflow.resolver.transition_options_resolver');
     }
 
     /**

@@ -23,6 +23,11 @@ ActionBundle
 - Class `Oro\Bundle\ActionBundle\Model\AttributeGuesser`:
     - now extends `Oro\Bundle\ActionBundle\Model\AbstractGuesser`
     - service `oro_action.attribute_guesser` has parent defined as `oro_action.abstract_guesser`
+- Class `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension` (`oro_action.provider.button.extension.operation`):
+    - changed constructor signature:
+        - added `OptionsResolver $optionsResolver`;
+        - removed `OptionsAssembler $optionsAssembler`;
+        - removed `ContextAccessor $contextAccessor`;
 
 ActivityBundle
 --------------
@@ -226,7 +231,13 @@ WorkflowBundle
 - Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`
 - Class `Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler` was removed
 - Class `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType` renamed to `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType`
-    
+- Class `Oro\Bundle\WorkflowBundle\Model\Transition`:
+    - changed constructor signature:
+        - added `TransitionOptionsResolver $optionsResolver`;
+- Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler` (`oro_workflow.transition_assembler`):
+    - changed constructor signature:
+        - added `TransitionOptionsResolver $optionsResolver`;
+
 
 PlatformBundle
 --------------
