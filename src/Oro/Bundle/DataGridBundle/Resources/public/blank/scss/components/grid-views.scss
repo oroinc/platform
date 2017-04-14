@@ -1,0 +1,148 @@
+// @theme: blank;
+
+.grid-views {
+    position: relative;
+
+    margin: $grid-views-offset;
+
+    border-bottom: $grid-views-border-bottom;
+
+    @include clearfix;
+
+    &__header {
+        display: inline-block;
+        padding: $offset-y-m 0;
+    }
+
+    &__aditional {
+        float: right;
+
+        margin-left: $offset-y;
+    }
+
+    &__dropdown {
+        width: $grid-views-dropdown-width;
+        padding: 0;
+    }
+
+    &__title {
+        font-size: $grid-views-title-font-size;
+        font-family: $grid-views-title-font-family;
+        text-transform: $grid-views-title-text-transform;
+
+        cursor: pointer;
+
+        &.has-icon {
+            position: relative;
+            padding-left: $grid-views-title-icon-inner-offset;
+        }
+    }
+
+    &__piece {
+        position: absolute;
+        top: -3px;
+        left: 0;
+    }
+
+    &__title-text {
+        vertical-align: middle;
+
+        [class^="fa-"],
+        [class*=" fa-"] {
+            color: get-color('additional', 'middle');
+        }
+
+        @include hover-focus {
+            [class^="fa-"],
+            [class*=" fa-"] {
+                color: get-color('additional', 'dark');
+            }
+        }
+    }
+
+    &__subtitle {
+        padding: $grid-views-subtitle-offset-inner;
+    }
+
+    &__edit-label {
+        color: $grid-views-edit-label-color;
+    }
+
+    &__close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+
+        font-size: 15px;
+
+        color: get-color('additional', 'middle');
+
+        cursor: pointer;
+
+        @include hover-focus {
+            color: get-color('additional', 'dark');
+        }
+    }
+
+    &__list {
+        border-top: $grid-views-dropdown-list-item-border;
+    }
+
+    &__item {
+        display: flex;
+
+        padding: $grid-views-dropdown-list-item-offset-inner;
+
+        border-bottom: $grid-views-dropdown-list-item-border;
+    }
+
+    &__actions {
+        color: $grid-views-actions-color;
+    }
+
+    &__label {
+        flex-basis: 55%;
+        flex: 1;
+    }
+
+    &__footer {
+        padding: $grid-views-dropdown-footer-offset-inner;
+    }
+
+    &__edit-container {
+        display: none;
+
+        &-content {
+            padding: $grid-views-dropdown-form-content-offset-inner;
+
+            @include clearfix();
+        }
+    }
+
+    &__toggle-container {
+        text-align: center;
+
+        &.opened {
+            display: none;
+
+             + .grid-views__form {
+                display: block;
+            }
+        }
+    }
+
+    .custom-checkbox {
+        padding-top: 4px;
+    }
+}
+
+@include breakpoint('mobile') {
+    .grid-views {
+        &__dropdown {
+            top: -6px;
+            left: -1px;
+
+            width: $grid-views-dropdown-mobile-width;
+        }
+    }
+}

@@ -1,16 +1,27 @@
 define([
+    'module',
     'backbone',
     'underscore',
     'routing',
     'orotranslation/js/translator'
-], function(Backbone, _, routing, __) {
+], function(module, Backbone, _, routing, __) {
     'use strict';
 
     var GridViewsModel;
+    var config = module.config();
+
+    config = _.extend({
+        route: 'oro_datagrid_api_rest_gridview_post'
+    }, config);
 
     GridViewsModel = Backbone.Model.extend({
-        route: 'oro_datagrid_api_rest_gridview_post',
+        /** @property */
+        route: config.route,
+
+        /** @property */
         urlRoot: null,
+
+        /** @property */
         sharedByLabel: 'oro.datagrid.grid_views.shared_by.label',
 
         /** @property */

@@ -7,4 +7,5 @@ styles:
         - 'bundles/orodatagrid/blank/scss/variables/datagrid-row-config.scss'
         - 'bundles/orodatagrid/blank/scss/variables/launcher-item-config.scss'
         - 'bundles/orodatagrid/blank/scss/variables/more-bar-holder-config.scss'
+        - 'bundles/orodatagrid/blank/scss/variables/grid-views-config.scss'
         - 'bundles/orodatagrid/blank/scss/styles.scss'
