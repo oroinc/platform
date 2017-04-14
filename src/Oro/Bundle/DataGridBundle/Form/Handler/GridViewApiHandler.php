@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 
 class GridViewApiHandler
@@ -50,11 +50,11 @@ class GridViewApiHandler
     }
 
     /**
-     * @param GridView $entity
+     * @param AbstractGridView $entity
      *
      * @return boolean
      */
-    public function process(GridView $entity)
+    public function process(AbstractGridView $entity)
     {
         $entity->setFiltersData();
         $entity->setSortersData();
@@ -80,9 +80,9 @@ class GridViewApiHandler
     }
 
     /**
-     * @param GridView $entity
+     * @param AbstractGridView $entity
      */
-    protected function onSuccess(GridView $entity)
+    protected function onSuccess(AbstractGridView $entity)
     {
         $default = $this->form->get('is_default')->getData();
         $this->setDefaultGridView($entity, $default);
@@ -94,10 +94,10 @@ class GridViewApiHandler
     }
 
     /**
-     * @param GridView $gridView
-     * @param bool     $default
+     * @param AbstractGridView $gridView
+     * @param bool $default
      */
-    protected function setDefaultGridView(GridView $gridView, $default)
+    protected function setDefaultGridView(AbstractGridView $gridView, $default)
     {
         $user = $this->tokenStorage->getToken()->getUser();
         $this->gridViewManager->setDefaultGridView($user, $gridView, $default);
@@ -109,9 +109,9 @@ class GridViewApiHandler
      *       look in CollectionFiltersManager._onChangeFilterSelect()
      *       Added fix for dictionary filters also.
      *
-     * @param GridView $gridView
+     * @param AbstractGridView $gridView
      */
-    protected function fixFilters(GridView $gridView)
+    protected function fixFilters(AbstractGridView $gridView)
     {
         $filters = $gridView->getFiltersData();
         foreach ($filters as $name => $filter) {
