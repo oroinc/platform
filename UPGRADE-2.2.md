@@ -23,6 +23,11 @@ ActionBundle
 - Class `Oro\Bundle\ActionBundle\Model\AttributeGuesser`:
     - now extends `Oro\Bundle\ActionBundle\Model\AbstractGuesser`
     - service `oro_action.attribute_guesser` has parent defined as `oro_action.abstract_guesser`
+- Class `Oro\Bundle\ActionBundle\Extension\OperationButtonProviderExtension` (`oro_action.provider.button.extension.operation`):
+    - changed constructor signature:
+        - added `OptionsResolver $optionsResolver`;
+        - removed `OptionsAssembler $optionsAssembler`;
+        - removed `ContextAccessor $contextAccessor`;
 
 ActivityBundle
 --------------
@@ -128,6 +133,14 @@ ImportExportBundle
 - Class `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_importexport.handler.export` and `setDoctrineHelper` with `@oro_entity.doctrine_helper` were added. The constructor was removed, the parent class constructor is used. 
 - Class `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_importexport.handler.export` and `setDoctrineHelper` with `@oro_entity.doctrine_helper` were added.  The constructor was removed, the parent class constructor is used. 
 
+
+InstallerBundle
+---------------
+- The option `--force` was removed from `oro:install` cli command.
+- Class `Oro\Bundle\InstallerBundle\Command\InstallCommand`
+    - Signature of `prepareStep` method was changed, removed parameter `CommandExecutor $commandExecutor`.
+
+
 IntegrationBundle
 -----------------
 - Class `Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor`
@@ -138,6 +151,7 @@ IntegrationBundle
         - `JobRunner` $jobRunner,
         - `TokenStorageInterface` $tokenStorage,
         - `LoggerInterface` $logger
+
 
 NavigationBundle
 --------------
@@ -187,7 +201,13 @@ WorkflowBundle
 - Service `oro_workflow.cache` added with standard `\Doctrine\Common\Cache\Cache` interface under namespace `oro_workflow`
 - Class `Oro\Bundle\WorkflowBundle\Autocomplete\WorkflowReplacementSearchHandler` was removed
 - Class `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementSelectType` renamed to `Oro\Bundle\WorkflowBundle\Form\Type\WorkflowReplacementType`
-    
+- Class `Oro\Bundle\WorkflowBundle\Model\Transition`:
+    - changed constructor signature:
+        - added `TransitionOptionsResolver $optionsResolver`;
+- Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler` (`oro_workflow.transition_assembler`):
+    - changed constructor signature:
+        - added `TransitionOptionsResolver $optionsResolver`;
+
 
 PlatformBundle
 --------------

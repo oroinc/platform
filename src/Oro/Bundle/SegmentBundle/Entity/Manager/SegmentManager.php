@@ -248,16 +248,19 @@ class SegmentManager
             $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
             $queryBuilder->setMaxResults($segment->getRecordsLimit());
 
-            if ($segment->isDynamic()) {
-                $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($segment->getEntity());
-                $identifiers = $classMetadata->getIdentifier();
-                $identifier = reset($identifiers);
+            $identifier = $this->getIdentifierFieldName($segment->getEntity());
+            if ($segment->isDynamic() && $segment->getRecordsLimit()) {
                 $idsResult = $queryBuilder->getQuery()->getArrayResult();
                 if (!$idsResult) {
                     return [0];
                 }
                 $subQuery = array_column($idsResult, $identifier);
             } else {
+                if ($segment->isDynamic()) {
+                    $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+                    $queryBuilder->resetDQLParts(['orderBy', 'select']);
+                    $queryBuilder->select($tableAlias . '.' . $identifier);
+                }
                 $subQuery = $queryBuilder->getDQL();
                 /** @var Parameter[] $params */
                 $params = $queryBuilder->getParameters();

@@ -36,7 +36,8 @@ class TransitionDataProvider
         $transitionsData = [];
 
         $transitions = $workflow->getTransitionManager()->getStartTransitions();
-        /** @var Transition $transition */
+        $workflowItem = $workflow->createWorkflowItem($entity);
+
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {
                 $transitionData = $this->getStartTransitionData($workflow, $transition, $entity);
@@ -56,7 +57,7 @@ class TransitionDataProvider
                 } elseif ($showDisabled) {
                     $transitionsData[$defaultStartTransition->getName()] = [
                         'workflow' => $workflow,
-                        'transition' => $transition,
+                        'transition' => $defaultStartTransition,
                         'isAllowed' => false,
                         'errors' => new ArrayCollection()
                     ];
