@@ -31,6 +31,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_26\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_27\OroEmailBundle as OroEmailBundle127;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_28\OroEmailBundle as OroEmailBundle128;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_29\OroEmailBundle as OroEmailBundle129;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_31\OroEmailBundle as OroEmailBundle131;
 
 /**
  * Class OroEmailBundleInstaller
@@ -45,7 +46,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_30';
+        return 'v1_31';
     }
 
     /**
@@ -107,7 +108,6 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle116_1::addEmailUserMailboxOwnerColumn($schema);
 
         OroEmailBundle116_2::oroEmailAutoResponseRuleTable($schema);
-        OroEmailBundle116_2::oroEmailAutoResponseRuleConditionTable($schema);
         OroEmailBundle116_2::oroEmailTemplateTable($schema);
         OroEmailBundle116_2::oroEmailTable($schema);
 
@@ -125,5 +125,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle127::oroEmailFolderTable($schema);
 
         OroEmailBundle128::oroEmailFolderChangeColumn($schema);
+
+        OroEmailBundle131::oroAutoResponseRuleTable($schema);
     }
 }

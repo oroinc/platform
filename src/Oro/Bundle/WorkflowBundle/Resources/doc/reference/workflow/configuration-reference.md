@@ -376,6 +376,10 @@ Transition configuration has next options:
 * **message** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.warning_message`
     Notification message, that will be shown at frontend before transition execution.
+    This field can be filled only in translation file.
+* **message_parameters**
+    *array*
+    List of parameters for translating value from option `message`.
 * **init_routes**
     *array*
     List of routes where will be displayed transition button. It's needed for start workflow from entities that not 
@@ -832,9 +836,6 @@ A single variable can be described with the following configuration:
     * **multiple**
         *boolean*
         Indicates whether several entities are supported. Allowed only when type is entity.
-    * **virtual**
-        *boolean*
-        Such attribute will not be saved in the database and available only on current transition. Default value is false.
     * **identifier**
         *string*
         Applies to entities only. Class identifier specifies the identity field which will be used to query for the desired entity, in case a default entity needs to be loaded upon workflow assembling.
@@ -873,7 +874,7 @@ Using a variable:
         '@and':
             ...
             - '@not':
-                - '@less_total_limit': [$entity, $.data.threshold]
+                - '@some_condition': [$entity, $.data.admin_user]
 ```
 
 Example Workflow Configuration

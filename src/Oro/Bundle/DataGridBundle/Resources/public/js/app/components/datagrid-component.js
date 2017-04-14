@@ -29,6 +29,9 @@ define(function(require) {
         },
         actionType: function(type) {
             return type + 'Action';
+        },
+        customType: function(type) {
+            return type + 'Custom';
         }
     };
 
@@ -154,16 +157,22 @@ define(function(require) {
             this.inputName = options.inputName;
             this.data = options.data;
 
+            this.themeOptions = options.themeOptions || {};
+
+            var customModules =  _.extend(options.metadata.customModules || {}, this.themeOptions.customModules);
+
             this.metadata = _.defaults(options.metadata, {
                 columns: [],
                 options: {},
                 state: {},
                 initialState: {},
                 rowActions: {},
-                massActions: {}
+                massActions: {},
+                customModules: customModules
             });
-            this.themeOptions = options.themeOptions || {};
+
             this.metadataModel = new MetadataModel(this.metadata);
+
             this.modules = {};
 
             this.collectModules();
@@ -206,6 +215,13 @@ define(function(require) {
                 var type = action.frontend_type;
                 modules[helpers.actionType(type)] = mapActionModuleName(type);
             });
+
+            // Collect custom modules for datagrid or child components  if there are present.
+            _.each(metadata.customModules, function(module, type) {
+                if (_.isString(module)) {
+                    modules[helpers.customType(type)] = module;
+                }
+            });
         },
 
         /**
@@ -227,7 +243,7 @@ define(function(require) {
                 collectionModels = this.data.data;
             }
 
-            collectionOptions = this.combineCollectionOptions();
+            collectionOptions = this.combineCollectionOptions(modules);
             if (this.data && this.data.options) {
                 _.extend(collectionOptions, this.data.options);
             }
@@ -326,7 +342,7 @@ define(function(require) {
          *
          * @returns {Object}
          */
-        combineCollectionOptions: function() {
+        combineCollectionOptions: function(modules) {
             var options = _.extend({
                 /*
                  * gridName contains extended information "inputName + scopeName"
@@ -341,7 +357,8 @@ define(function(require) {
                     columns: {}
                 }, this.metadata.state),
                 initialState: this.metadata.initialState,
-                mode: this.metadata.mode || 'server'
+                mode: this.metadata.mode || 'server',
+                modules: modules
             }, this.metadata.options);
             return options;
         },

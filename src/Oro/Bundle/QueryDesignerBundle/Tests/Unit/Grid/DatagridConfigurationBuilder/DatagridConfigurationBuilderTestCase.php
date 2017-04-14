@@ -24,11 +24,14 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTest
         $doctrine = null,
         $functionProvider = null,
         $virtualFieldProvider = null,
-        array $guessers = []
+        array $guessers = [],
+        $entityNameResolver = null
     ) {
-        $entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        if (!isset($entityNameResolver)) {
+            $entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
+                ->disableOriginalConstructor()
+                ->getMock();
+        }
 
         $builder = new DatagridConfigurationBuilder(
             $functionProvider ? : $this->getFunctionProvider(),

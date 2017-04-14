@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
-use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 
 class MassActionExtension extends ActionExtension
 {
@@ -44,7 +44,7 @@ class MassActionExtension extends ActionExtension
      * @param string           $name
      * @param DatagridInterface $datagrid
      *
-     * @return bool|ActionInterface
+     * @return MassActionInterface|false
      */
     public function getMassAction($name, DatagridInterface $datagrid)
     {

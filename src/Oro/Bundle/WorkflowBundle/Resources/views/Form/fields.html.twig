@@ -13,3 +13,52 @@
     {{ form_widget(form) }}
     <span id="workflow_translate_link_label"></span>
 {% endblock %}
+
+{% block oro_workflow_replacement_row %}
+    {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-error">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
+
+    <div class="alert workflow-deactivation-message">
+        <div class="message">
+            {% if workflowsToDeactivation %}
+                <p>
+                    {{ 'oro.workflow.workflowdefinition.form.workflow_to_deactivation_message'|trans }}
+                    <ul>
+                        {% for workflowToDeactivation in workflowsToDeactivation %}
+                            <li>
+                                <a href="{{ path('oro_workflow_definition_view', {name: workflowToDeactivation.name}) }}">{{ workflowToDeactivation.label|trans({},'workflows') }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </p>
+            {% endif %}
+            <p>{{ 'oro.workflow.workflowdefinition.form.replace_message'|trans }}</p>
+        </div>
+    </div>
+
+    <form method="{{ form.vars.method }}"
+          id="{{ form.vars.id }}"
+          name="{{ form.vars.name }}"
+          action="{{ app.request.uri }}"
+          data-collect="true"
+          class="form-dialog"
+          {{ form_enctype(form) }}
+    >
+        <fieldset class="form-horizontal">
+            {{ form_widget(form) }}
+        </fieldset>
+
+        <div class="hidden">
+            {{ form_rest(form) }}
+        </div>
+
+        <div class="widget-actions">
+            <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
+            <button type="button" data-action-name="activate" class="btn btn-success">{{ 'oro.workflow.workflowdefinition.datagrid.activate'|trans }}</button>
+        </div>
+    </form>
+    {{ oro_form_js_validation(form) }}
+{% endblock %}

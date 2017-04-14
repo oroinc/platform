@@ -33,6 +33,11 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     protected $preparedRelativeFilePaths;
 
     /**
+     * @var array
+     */
+    protected $registeredRelativeFilePaths = [];
+
+    /**
      * @var string
      *
      * not serializable. it sets in initialize method
@@ -115,7 +120,8 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
         foreach ($this->fileResourceLoaders as $loader) {
-            $split = $this->preparedRelativeFilePaths[(string)$loader->getResource()];
+            $pathKey = (string)$loader->getResource();
+            $split = $this->preparedRelativeFilePaths[$pathKey];
             if (!$split['folder']) {
                 $loader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
             } else {
@@ -132,6 +138,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
                             try {
                                 $loader->setRelativeFilePath($currentRelativeFilePath);
                                 $loader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
+                                $this->registeredRelativeFilePaths[$pathKey][$currentRelativeFilePath] = true;
                             } catch (\Exception $e) {
                                 $loader->setRelativeFilePath($originalRelativeFilePath);
                                 throw $e;
@@ -149,57 +156,40 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      */
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
-        $checked = [];
-        // check exist and new resources
         foreach ($this->fileResourceLoaders as $loader) {
-            $split = $this->preparedRelativeFilePaths[(string)$loader->getResource()];
+            $pathKey = (string)$loader->getResource();
+            $split = $this->preparedRelativeFilePaths[$pathKey];
             if (!$split['folder']) {
-                $checked[$bundleDir . $loader->getRelativeFilePath()] = true;
                 if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
                     return false;
                 }
-            } else {
+            }
+
+            if (array_key_exists($pathKey, $this->registeredRelativeFilePaths)) {
+                /** @var array $registeredRelativeFilePaths */
+                $registeredRelativeFilePaths = $this->registeredRelativeFilePaths[$pathKey];
+
                 $dir = $bundleDir . $split['baseDir'];
-                if (is_dir($dir)) {
-                    $folderPattern = $this->getFolderPattern($split['folder']);
-                    $iterator      = new \DirectoryIterator($dir);
-                    /** @var \DirectoryIterator $file */
-                    foreach ($iterator as $file) {
-                        if ($this->isApplicableFolder($file, $folderPattern)) {
-                            $originalRelativeFilePath = $loader->getRelativeFilePath();
-                            $currentRelativeFilePath  =
-                                $split['baseDir'] . DIRECTORY_SEPARATOR . $file->getFilename() . $split['relPath'];
+                if ($this->isNewDirectoryCreated($dir, $split, $registeredRelativeFilePaths)) {
+                    return false;
+                }
 
-                            $checked[$bundleDir . $currentRelativeFilePath] = true;
-                            try {
-                                $loader->setRelativeFilePath($currentRelativeFilePath);
-                                if (!$loader->isResourceFresh(
-                                    $bundleClass,
-                                    $bundleDir,
-                                    $bundleAppDir,
-                                    $resource,
-                                    $timestamp
-                                )
-                                ) {
-                                    $loader->setRelativeFilePath($originalRelativeFilePath);
-
-                                    return false;
-                                }
-                            } catch (\Exception $e) {
-                                $loader->setRelativeFilePath($originalRelativeFilePath);
-                                throw $e;
-                            }
+                $originalRelativeFilePath = $loader->getRelativeFilePath();
+                foreach ($registeredRelativeFilePaths as $relativeFilePath => $value) {
+                    try {
+                        $loader->setRelativeFilePath($relativeFilePath);
+                        if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
                             $loader->setRelativeFilePath($originalRelativeFilePath);
+
+                            return false;
                         }
+                    } catch (\Exception $e) {
+                        $loader->setRelativeFilePath($originalRelativeFilePath);
+                        throw $e;
                     }
                 }
-            }
-        }
-        // check removed resources
-        $found = $resource->getFound($bundleClass);
-        foreach ($found as $path) {
-            if (!isset($checked[$path])) {
-                return false;
+
+                $loader->setRelativeFilePath($originalRelativeFilePath);
             }
         }
 
@@ -211,7 +201,12 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      */
     public function serialize()
     {
-        return serialize([$this->folderPlaceholder, $this->folderPattern, $this->fileResourceLoaders]);
+        return serialize([
+            $this->folderPlaceholder,
+            $this->folderPattern,
+            $this->fileResourceLoaders,
+            $this->registeredRelativeFilePaths
+        ]);
     }
 
     /**
@@ -219,7 +214,12 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      */
     public function unserialize($serialized)
     {
-        list($this->folderPlaceholder, $this->folderPattern, $this->fileResourceLoaders) = unserialize($serialized);
+        list(
+            $this->folderPlaceholder,
+            $this->folderPattern,
+            $this->fileResourceLoaders,
+            $this->registeredRelativeFilePaths
+            ) = unserialize($serialized);
         $this->initialize();
     }
 
@@ -314,5 +314,32 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
             '/^%s$/',
             substr(str_replace($this->folderPlaceholder, $this->folderPattern, $folder), 1)
         );
+    }
+
+    /**
+     * @param string $dir
+     * @param array  $split
+     * @param array  $registeredRelativeFilePaths
+     *
+     * @return bool
+     */
+    protected function isNewDirectoryCreated($dir, $split, $registeredRelativeFilePaths)
+    {
+        if (is_dir($dir)) {
+            $folderPattern = $this->getFolderPattern($split['folder']);
+            $iterator = new \DirectoryIterator($dir);
+            /** @var \DirectoryIterator $file */
+            foreach ($iterator as $file) {
+                if ($this->isApplicableFolder($file, $folderPattern)) {
+                    $relativeFilePath  =
+                        $split['baseDir'] . DIRECTORY_SEPARATOR . $file->getFilename() . $split['relPath'];
+                    if (!array_key_exists($relativeFilePath, $registeredRelativeFilePaths)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

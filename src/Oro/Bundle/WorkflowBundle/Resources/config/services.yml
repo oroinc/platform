@@ -533,6 +533,11 @@ services:
         tags:
             - { name: oro_form.form_template_data_provider, alias: transition_page_form }
 
+    oro_workflow.resolver.transition_options_resolver:
+        class: 'Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver'
+        arguments:
+            - '@oro_action.resolver.options_resolver'
+
     oro_workflow.handler.transition.form.page_form:
         class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionCustomFormHandler'
         arguments:
@@ -544,3 +549,9 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@form.factory'
             - '@oro_workflow.serializer.data.serializer'
+
+    oro_workflow.helper.workflow_deactivation:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper'
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@oro_workflow.helper.translation'

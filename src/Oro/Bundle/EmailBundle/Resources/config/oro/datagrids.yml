@@ -61,7 +61,7 @@ datagrids:
                             modal:         true
                             dblclick:      maximize
                             maximizedHeightDecreaseBy: minimize-bar
-                            width: 700
+                            width: 1000
             delete:
                 type:         delete
                 acl_resource: oro_email_autoresponserule_delete

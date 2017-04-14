@@ -28,6 +28,9 @@ define([
         /** @property {Array} */
         actions: undefined,
 
+        /** @property {Boolean} */
+        isDropdownActions: null,
+
         /** @property Integer */
         actionsHideCount: 3,
 
@@ -83,7 +86,7 @@ define([
 
         /** @property */
         launcherItemTemplate: _.template(
-            '<li class="launcher-item <% if (className) { %> <%= \'mode-\' + className %> <% } %>"></li>'
+            '<li class="launcher-item<% if (className) { %> <%= \'mode-\' + className %><% } %>"></li>'
         ),
 
         /** @property */
@@ -204,17 +207,15 @@ define([
                 return this;
             }
 
-            var switchToSimpleMode = this.actions.length < this.actionsHideCount;
+            this.isDropdownActions = this.actions.length >= this.actionsHideCount;
 
             if (this.actionsState === 'show') {
-                switchToSimpleMode = true;
+                this.isDropdownActions = false;
+            } else if (this.actionsState === 'hide') {
+                this.isDropdownActions = true;
             }
 
-            if (this.actionsState === 'hide') {
-                switchToSimpleMode = false;
-            }
-
-            if (switchToSimpleMode) {
+            if (!this.isDropdownActions) {
                 isSimplifiedMarkupApplied = true;
                 this.baseMarkup = this.simpleBaseMarkup;
                 this.launchersListTemplate = this.simpleLaunchersListTemplate;
@@ -327,6 +328,7 @@ define([
             if (!this.$('.dropdown-toggle').parent().hasClass('open')) {
                 this.$('.dropdown-toggle').dropdown('toggle');
             }
+            this.model.set('isDropdownActions', this.isDropdownActions);
             e.stopPropagation();
         },
 
