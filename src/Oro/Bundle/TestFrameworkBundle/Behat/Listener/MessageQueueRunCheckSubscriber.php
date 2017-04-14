@@ -35,7 +35,11 @@ class MessageQueueRunCheckSubscriber implements EventSubscriberInterface, Messag
         $mqProcess = $this->messageQueueIsolator->getProcess();
 
         if ($mqProcess->getStatus() == Process::STATUS_TERMINATED) {
-            $mqProcess->start();
+            $mqProcess->start(function ($type, $buffer) {
+                if (Process::ERR === $type) {
+                    echo 'MessageQueueConsumer ERR > '.$buffer;
+                }
+            });
         }
     }
 
