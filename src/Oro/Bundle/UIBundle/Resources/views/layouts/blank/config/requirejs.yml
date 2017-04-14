@@ -30,10 +30,13 @@ config:
             'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
             'bootstrap': 'oroui/js/extend/bootstrap'
+            'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/jquery-ui':
             'jquery-ui': 'jquery-ui'
+        'oroui/js/jquery-ui-datepicker-l10n':
+            'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/extend/chaplin':
             'chaplin': 'chaplin'
         'oroui/js/extend/underscore':
