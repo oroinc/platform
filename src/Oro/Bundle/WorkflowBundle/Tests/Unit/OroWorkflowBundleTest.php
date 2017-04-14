@@ -4,7 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler as Compiler;
+use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
+use Oro\Bundle\WorkflowBundle\Async\Topics;
+use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
 
 class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
@@ -64,6 +68,20 @@ class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
                     Compiler\WorkflowDefinitionBuilderExtensionCompilerPass::class
                 )
             );
+
+        $containerBuilder->expects($this->at(6))
+            ->method('addCompilerPass')
+            ->with(
+                new LoadProcessorsCompilerPass(
+                    'oro_workflow.processor_bag',
+                    'oro_workflow.processor'
+                )
+            );
+
+        $addTopicMetaPass = AddTopicMetaPass::create();
+        $addTopicMetaPass->add(Topics::EXECUTE_PROCESS_JOB);
+
+        $containerBuilder->expects($this->at(7))->method('addCompilerPass')->with($addTopicMetaPass);
 
         $bundle = new OroWorkflowBundle();
         $bundle->build($containerBuilder);
