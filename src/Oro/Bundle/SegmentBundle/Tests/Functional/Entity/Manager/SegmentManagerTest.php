@@ -51,6 +51,8 @@ class SegmentManagerTest extends WebTestCase
         $dynamicSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
         /** @var Segment $staticSegment */
         $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+        /** @var Segment $staticSegmentWithFilter */
+        $staticSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING);
 
         $this->assertEquals(
             [
@@ -68,6 +70,11 @@ class SegmentManagerTest extends WebTestCase
                     [
                         'id'   => 'segment_' . $staticSegment->getId(),
                         'text' => $staticSegment->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id'   => 'segment_' . $staticSegmentWithFilter->getId(),
+                        'text' => $staticSegmentWithFilter->getName(),
                         'type' => 'segment',
                     ]
                 ],
