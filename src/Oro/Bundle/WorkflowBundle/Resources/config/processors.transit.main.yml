@@ -144,6 +144,13 @@ services:
             - { name: oro_workflow.processor, action: transit, group: normalize, state: failure }
             - { name: monolog.logger, channel: oro_workflow.processor }
 
+    oro_workflow.transit.normalize.resolve_frontend_options:
+        class: Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionOptionsResolveProcessor
+        arguments:
+            - '@oro_workflow.resolver.transition_options_resolver'
+        tags:
+            - { name: oro_workflow.processor, action: transit, group: normalize, state: ok, priority: 200 }
+
     # RESULT PROVIDERS
     # RESULT: failure http response
     oro_workflow.transit.result.error.processor:
