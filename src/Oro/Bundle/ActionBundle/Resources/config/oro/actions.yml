@@ -80,6 +80,8 @@ operations:
             confirmation:
                 title: oro.action.delete_entity
                 message: oro.action.delete_confirm
+                okText: oro.action.button.delete
+                component: oroui/js/delete-confirmation
                 message_parameters:
                     entityLabel: $.entityLabel
         button_options:

@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -32,20 +33,19 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var  CurrentApplicationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $applicationProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TransitionOptionsResolver */
+    protected $optionsResolver;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp()
     {
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-
         $this->destinationPageResolver = $this->createMock(DestinationPageResolver::class);
-
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
+        $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
 
         $this->extension = $this->createExtension();
         $this->extension->setApplicationProvider($this->applicationProvider);
@@ -107,9 +107,8 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
      */
     protected function getTransition($name)
     {
-        $transition = new Transition();
-        $transition->setName($name);
+        $transition = new Transition($this->optionsResolver);
 
-        return $transition;
+        return $transition->setName($name);
     }
 }

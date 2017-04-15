@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
@@ -102,7 +103,16 @@ class OroMainContext extends MinkContext implements
             return;
         }
 
-        $driver->waitForAjax();
+        $start = microtime(true);
+        $result = $driver->waitForAjax();
+        $timeElapsedSecs = microtime(true) - $start;
+
+        if (!$result) {
+            var_dump(sprintf(
+                'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                $timeElapsedSecs
+            ));
+        }
     }
 
     /**
@@ -111,18 +121,7 @@ class OroMainContext extends MinkContext implements
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
-    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message')
-    {
-        $this->iShouldSeeFlashMessageWithTimeLimit($title, 15, $flashMessageElement);
-    }
-
-    /**
-     * Example: Then I should see "Attachment created successfully" flash message
-     * Example: Then I should see "The email was sent" flash message
-     *
-     * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message with time limit (?P<timeLimit>\d+)$/
-     */
-    public function iShouldSeeFlashMessageWithTimeLimit($title, $timeLimit, $flashMessageElement = 'Flash Message')
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
         $actualFlashMessages = [];
         /** @var Element|null $flashMessage */
@@ -577,18 +576,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Wait for ajax
-     *
-     * @Then /^(?:|I )have to wait for ajax$/
-     * @Then /^(?:|I )have to wait for ajax up to "(?P<timeInSec>(?:[^"]|\\")*)" seconds$/
-     */
-    public function iHaveToWaitForAjax($timeInSec = 60)
-    {
-        $timeInMs = $timeInSec * 1000;
-        $this->waitForAjax($timeInMs);
-    }
-
-    /**
      * Navigate through menu navigation
      * Every menu link must be separated by slash symbol "/"
      * Example: Given I go to System/ Channels
@@ -695,7 +682,6 @@ class OroMainContext extends MinkContext implements
     public function iSaveForm()
     {
         $this->createOroForm()->save();
-        $this->waitForAjax();
     }
 
     /**
@@ -807,7 +793,6 @@ class OroMainContext extends MinkContext implements
 
         $row->setCellValue($field, $value);
         $this->iShouldSeeFlashMessage('Inline edits are being saved');
-        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -914,8 +899,12 @@ class OroMainContext extends MinkContext implements
      */
     public function assertElementOnPage($element)
     {
+        $isVisible = $this->spin(function (OroMainContext $context) use ($element) {
+            return $context->createElement($element)->isVisible();
+        });
+
         self::assertTrue(
-            $this->createElement($element)->isVisible(),
+            $isVisible,
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
     }
@@ -1094,11 +1083,7 @@ class OroMainContext extends MinkContext implements
         $this->pressButton('Update schema');
         $this->assertPageContainsText('Schema update confirmation');
         $this->pressButton('Yes, Proceed');
-        $this->iShouldSeeFlashMessageWithTimeLimit('Schema updated', 60);
-
-        // Workaround to manually restart message queue consumer after it is stopped during schema update
-        // TODO: Should be removed after BAP-14042 is done
-        $this->messageQueueIsolator->beforeTest(new BeforeIsolatedTestEvent(null));
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
     }
 
     /**
@@ -1112,5 +1097,37 @@ class OroMainContext extends MinkContext implements
         $element = $this->getPage()->findVisible('css', $selector);
 
         return !is_null($element);
+    }
+
+    /**
+     * Drag and Drop one element before another
+     * Example: When I drag and drop "Products" before "Clearance"
+     *
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" before "(?P<dropZoneName>[\w\s]+)"$/
+     * @param string $elementName
+     * @param string $dropZoneName
+     */
+    public function iDragAndDropElementBeforeAnotherOne($elementName, $dropZoneName)
+    {
+        $element = $this->createElement($elementName);
+        $dropZone = $this->createElement($dropZoneName);
+
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $webDriverSession = $driver->getWebDriverSession();
+
+        $source      = $webDriverSession->element('xpath', $element->getXpath());
+        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+        $webDriverSession->moveto(array(
+            'element' => $source->getID()
+        ));
+        $webDriverSession->buttondown();
+        $webDriverSession->moveto([
+            'element' => $destination->getID(),
+            'xoffset' => 1,
+            'yoffset' => 1,
+        ]);
+        $webDriverSession->buttonup();
     }
 }

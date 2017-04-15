@@ -89,7 +89,9 @@ operations:
         routes:
             - oro_integration_update
         frontend_options:
-            confirmation: oro.integration.delete_sync_integration_window.content
+            confirmation:
+                message: oro.integration.delete_sync_integration_window.content
+                component: oroui/js/delete-confirmation
             show_dialog: true
         button_options:
             icon: fa-trash-o

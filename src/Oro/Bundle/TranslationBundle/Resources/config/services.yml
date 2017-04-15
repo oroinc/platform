@@ -268,7 +268,7 @@ services:
     oro_translation.provider.language:
         class: 'Oro\Bundle\TranslationBundle\Provider\LanguageProvider'
         arguments:
-            - '@oro_translation.repository.language'
+            - '@doctrine'
             - '@oro_locale.settings'
             - '@oro_security.acl_helper'
 
@@ -334,5 +334,4 @@ services:
         arguments:
            - '@oro_translation.manager.translation'
            - '@translator'
-           - '@oro_entity.doctrine_helper'
-           - '@oro_security.security_facade'
+           - '@oro_security.acl_helper'

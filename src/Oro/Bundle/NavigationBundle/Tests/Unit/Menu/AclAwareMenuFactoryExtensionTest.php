@@ -473,7 +473,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $cache = $this->getMockBuilder('Doctrine\Common\Cache\ArrayCache')
             ->getMock();
 
-        $cache->expects($this->exactly(2))
+        $cache->expects($this->exactly(1))
             ->method('contains')
             ->willReturnMap([
                 [$globalCacheKey, false],
@@ -488,7 +488,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
                     $this->returnValue('controller::action')
                 ]);
         } else {
-            $cache->expects($this->exactly(2))
+            $cache->expects($this->exactly(1))
                 ->method('save')
                 ->willReturnMap([
                     [$cacheKey, 'controller::action'],
@@ -538,7 +538,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $cache = $this->getMockBuilder('Doctrine\Common\Cache\ArrayCache')
             ->getMock();
 
-        $cache->expects($this->exactly(3))
+        $cache->expects($this->exactly(2))
             ->method('contains')
             ->will(
                 $this->returnValueMap(
@@ -562,7 +562,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
                     )
                 );
         } else {
-            $cache->expects($this->exactly(3))
+            $cache->expects($this->exactly(2))
                 ->method('save')
                 ->with(
                     $this->logicalOr(

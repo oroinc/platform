@@ -527,6 +527,11 @@ services:
         tags:
             - { name: oro_form.form_template_data_provider, alias: transition_page_form }
 
+    oro_workflow.resolver.transition_options_resolver:
+        class: 'Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver'
+        arguments:
+            - '@oro_action.resolver.options_resolver'
+
     oro_workflow.helper.transition_widget:
         class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper'
         arguments:

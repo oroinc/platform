@@ -72,6 +72,11 @@ class DateTimeExtension extends \Twig_Extension
     /**
      * Formats date time according to locale settings.
      *
+     * To format datetime given from `Date` or `Time` sql types, you can omit `timeZone` option,
+     * e.g. `formatDateTime($date)`
+     * To format the date and time of `DateTime` sql type value, you have to specify timeZone directly,
+     * e.g. `formatDateTime($date, ['timeZone' => 'UTC']`
+     *
      * Options format:
      * array(
      *     'dateType' => <dateType>,
@@ -97,6 +102,11 @@ class DateTimeExtension extends \Twig_Extension
 
     /**
      * Formats date time according to locale settings.
+     *
+     * To format date given from `Date` sql type, you can omit `timeZone` option,
+     * e.g. `formatDate($date)`
+     * To format the date part of `DateTime` sql type value, you have to specify timeZone directly,
+     * e.g. `formatDate($date, ['timeZone' => 'UTC']`
      *
      * Options format:
      * array(
@@ -144,6 +154,11 @@ class DateTimeExtension extends \Twig_Extension
 
     /**
      * Formats date time according to locale settings.
+     *
+     * To format time given from `Time` sql type, you can omit `timeZone` option,
+     * e.g. `formatTime($date)`
+     * To format the time part of `DateTime` sql type value, you have to specify timeZone directly,
+     * e.g. `formatTime($date, ['timeZone' => 'UTC']`
      *
      * Options format:
      * array(

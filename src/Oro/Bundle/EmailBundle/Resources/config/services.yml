@@ -589,6 +589,8 @@ services:
             - '@oro_entity.entity_name_resolver'
             - '@oro_email.mailbox.manager'
             - '@oro_security.security_facade'
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%

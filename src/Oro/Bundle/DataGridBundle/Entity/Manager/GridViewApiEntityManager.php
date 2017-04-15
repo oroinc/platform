@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class GridViewApiEntityManager extends ApiEntityManager
 {
@@ -26,10 +26,10 @@ class GridViewApiEntityManager extends ApiEntityManager
     }
 
     /**
-     * @param User $user
+     * @param AbstractUser $user
      * @param ViewInterface $gridView
      */
-    public function setDefaultGridView(User $user, ViewInterface $gridView)
+    public function setDefaultGridView(AbstractUser $user, ViewInterface $gridView)
     {
         $this->gridViewManager->setDefaultGridView($user, $gridView);
 

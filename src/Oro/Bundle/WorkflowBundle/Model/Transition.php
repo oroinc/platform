@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
@@ -95,6 +96,17 @@ class Transition
 
     /** @var bool */
     protected $hasFormConfiguration = false;
+
+    /** @var TransitionOptionsResolver */
+    protected $optionsResolver;
+
+    /**
+     * @param TransitionOptionsResolver $optionsResolver
+     */
+    public function __construct(TransitionOptionsResolver $optionsResolver)
+    {
+        $this->optionsResolver = $optionsResolver;
+    }
 
     /**
      * Set label.
@@ -300,11 +312,13 @@ class Transition
      */
     public function isAvailable(WorkflowItem $workflowItem, Collection $errors = null)
     {
-        if ($this->hasForm()) {
-            return $this->isPreConditionAllowed($workflowItem, $errors);
-        } else {
-            return $this->isAllowed($workflowItem, $errors);
-        }
+        $result = $this->hasForm()
+            ? $this->isPreConditionAllowed($workflowItem, $errors)
+            : $this->isAllowed($workflowItem, $errors);
+
+        $this->optionsResolver->resolveTransitionOptions($this, $workflowItem);
+
+        return $result;
     }
 
     /**
