@@ -54,7 +54,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
      */
     public function getVersion()
     {
-        return '1.1';
+        return '1.2';
     }
 
     /**
