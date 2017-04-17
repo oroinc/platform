@@ -166,6 +166,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
+                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -221,6 +222,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
+                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -318,6 +320,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             'label' => 'label',
                             'renderable' => true,
                             'required' => false,
+                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -390,6 +393,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             'label' => 'label',
                             'renderable' => true,
                             'required' => false,
+                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -448,6 +452,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit_Framework_TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField_target_field',
+                            'order' => 0
                         ],
                     ],
                     'sorters' => [

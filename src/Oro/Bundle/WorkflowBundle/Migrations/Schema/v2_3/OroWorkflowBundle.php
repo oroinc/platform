@@ -43,11 +43,15 @@ class OroWorkflowBundle implements Migration, ExtendExtensionAwareInterface
             [
                 'entity' => ['label' => 'oro.workflow.workflowdefinition.entity_label'],
                 'extend' => [
-                    'owner' => ExtendScope::OWNER_SYSTEM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                     'is_extend' => true,
                     'nullable' => true
                 ],
-                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                'datagrid' => [
+                    'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                    'show_filter' => true,
+                    'order' => 30
+                ],
                 'form' => ['is_enabled' => false],
                 'view' => ['is_displayable' => false],
                 'merge' => ['display' => false],
@@ -64,11 +68,15 @@ class OroWorkflowBundle implements Migration, ExtendExtensionAwareInterface
                     ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
                     'entity' => ['label' => 'oro.workflow.workflowdefinition.transition_name.label'],
                     'extend' => [
-                        'owner' => ExtendScope::OWNER_SYSTEM,
+                        'owner' => ExtendScope::OWNER_CUSTOM,
                         'is_extend' => true,
                         'length' => 255
                     ],
-                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                    'datagrid' => [
+                        'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                        'show_filter' => true,
+                        'order' => 40
+                    ],
                     'form' => ['is_enabled' => false],
                     'view' => ['is_displayable' => false],
                     'merge' => ['display' => false],

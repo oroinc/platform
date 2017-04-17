@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -534,11 +535,15 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
             [
                 'entity' => ['label' => 'oro.workflow.workflowdefinition.entity_label'],
                 'extend' => [
-                    'owner' => ExtendScope::OWNER_SYSTEM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                     'is_extend' => true,
                     'nullable' => true
                 ],
-                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                'datagrid' => [
+                    'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                    'show_filter' => true,
+                    'order' => 30
+                ],
                 'form' => ['is_enabled' => false],
                 'view' => ['is_displayable' => false],
                 'merge' => ['display' => false],
@@ -555,11 +560,15 @@ class OroWorkflowBundleInstaller implements Installation, ExtendExtensionAwareIn
                     ExtendOptionsManager::MODE_OPTION => ConfigModel::MODE_READONLY,
                     'entity' => ['label' => 'oro.workflow.workflowdefinition.transition_name.label'],
                     'extend' => [
-                        'owner' => ExtendScope::OWNER_SYSTEM,
+                        'owner' => ExtendScope::OWNER_CUSTOM,
                         'is_extend' => true,
                         'length' => 255
                     ],
-                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                    'datagrid' => [
+                        'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                        'show_filter' => true,
+                        'order' => 40
+                    ],
                     'form' => ['is_enabled' => false],
                     'view' => ['is_displayable' => false],
                     'merge' => ['display' => false],

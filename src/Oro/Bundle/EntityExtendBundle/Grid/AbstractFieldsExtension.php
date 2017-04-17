@@ -231,6 +231,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     'label' => $this->getFieldConfig('entity', $field)->get('label', false, $fieldName),
                     'renderable' => $isRenderable,
                     'required' => $isRequired,
+                    'order' => $this->getFieldConfig('datagrid', $field)->get('order', false, 0),
                 ],
                 DatagridGuesser::SORTER => [
                     'data_name' => $fieldName,
