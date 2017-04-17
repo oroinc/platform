@@ -18,6 +18,7 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -87,8 +88,7 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framew
         ButtonSearchContext $searchContext,
         $application = CurrentApplicationProviderInterface::DEFAULT_APPLICATION
     ) {
-        $transition = new Transition();
-        $transition->setName('transition1');
+        $transition = $this->createStartTransition();
 
         $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($expected ? $this->once() : $this->never())
@@ -168,16 +168,17 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framew
     /**
      * @dataProvider isAvailableDataProvider
      *
-     * @param Workflow $workflow
+     * @param Workflow|\PHPUnit_Framework_MockObject_MockObject $workflow
      * @param ButtonSearchContext $searchContext
      * @param bool $expected
      */
     public function testIsAvailable(Workflow $workflow, ButtonSearchContext $searchContext, $expected)
     {
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $workflow->expects($this->once())->method('createWorkflowItem')->willReturn($workflowItem);
         $button = $this->createMock(StartTransitionButton::class);
         $button->expects($this->any())->method('getWorkflow')->willReturn($workflow);
-        $button->expects($this->any())->method('getTransition')
-            ->willReturn((new Transition())->setStart(true));
+        $button->expects($this->any())->method('getTransition')->willReturn($this->createStartTransition());
 
         $this->assertSame($expected, $this->extension->isAvailable($button, $searchContext));
     }
@@ -253,5 +254,15 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit_Framew
         $workflowDefinition->expects($this->any())->method('getExclusiveRecordGroups')->willReturn([]);
 
         return $workflowDefinition;
+    }
+
+    /**
+     * @return Transition
+     */
+    private function createStartTransition()
+    {
+        $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
+
+        return $transition->setStart(true);
     }
 }

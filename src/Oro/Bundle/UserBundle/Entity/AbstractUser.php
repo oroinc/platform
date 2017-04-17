@@ -134,7 +134,7 @@ abstract class AbstractUser implements
     /**
      * @var RoleInterface[]|Collection
      *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role")
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Role", inversedBy="users")
      * @ORM\JoinTable(name="oro_user_access_role",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}

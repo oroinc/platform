@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
+use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
 
 class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,9 +23,11 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(0))->method('add')
             ->with('label', 'text', array('required' => true, 'label' => 'oro.user.role.role.label'));
         $builder->expects($this->at(1))->method('add')
-            ->with(
-                'appendUsers'
-            );
+            ->with('appendUsers');
+        $builder->expects($this->once())
+            ->method('addEventSubscriber')
+            ->with($this->isInstanceOf(ChangeRoleSubscriber::class));
+
         $this->formType->buildForm($builder, array());
     }
 
