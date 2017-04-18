@@ -12,7 +12,6 @@ interface EventHandlerInterface
      *
      * @param NotificationEvent $event
      * @param EmailNotification[] $matchedNotifications
-     * @return mixed
      */
     public function handle(NotificationEvent $event, $matchedNotifications);
 }

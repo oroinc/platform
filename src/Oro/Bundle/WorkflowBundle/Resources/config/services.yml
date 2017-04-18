@@ -204,6 +204,13 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
 
+    oro_workflow.handler.workflow_notification_handler:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowNotificationHandler'
+        parent: oro_notification.email_handler
+        public: false
+        tags:
+            - { name: notification.handler, alias: workflow_notification_handler, priority: -100 }
+
     oro_workflow.database_checker:
         public: false
         class: Oro\Bundle\EntityBundle\Tools\DatabaseChecker

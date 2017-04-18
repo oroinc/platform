@@ -2,71 +2,41 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\NotificationHandlerPass;
 
-class NotificationHandlerPassTest extends \PHPUnit_Framework_TestCase
+use Oro\Component\DependencyInjection\Tests\Unit\AbstractExtensionCompilerPassTest;
+
+class NotificationHandlerPassTest extends AbstractExtensionCompilerPassTest
 {
-    const TEST_SERVICE_ID = 'test.id';
+    public function testProcess()
+    {
+        $this->assertServiceDefinitionMethodCalled('addHandler');
+        $this->assertContainerBuilderCalled();
+
+        $this->getCompilerPass()->process($this->containerBuilder);
+    }
 
     /**
-     * @var NotificationHandlerPass
+     * {@inheritdoc}
      */
-    private $compiler;
-
-    protected function setUp()
+    protected function getCompilerPass()
     {
-        $this->compiler = new NotificationHandlerPass();
+        return new NotificationHandlerPass();
     }
 
-    protected function tearDown()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getServiceId()
     {
-        unset($this->compiler);
+        return NotificationHandlerPass::SERVICE_KEY;
     }
 
-    public function testCompile()
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTagName()
     {
-        $container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
-
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_notification.manager')
-            ->will($this->returnValue(true));
-
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_notification.manager')
-            ->will($this->returnValue($definition));
-
-        $container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with('notification.handler')
-            ->will($this->returnValue(array(self::TEST_SERVICE_ID => null)));
-
-        $definition->expects($this->once())
-            ->method('addMethodCall')
-            ->with(
-                'addHandler',
-                array(new Reference(self::TEST_SERVICE_ID))
-            );
-
-        $this->compiler->process($container);
-    }
-
-    public function testCompileManagerNotDefined()
-    {
-        $container  = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-
-        $container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('oro_notification.manager')
-            ->will($this->returnValue(false));
-
-        $container->expects($this->never())
-            ->method('getDefinition');
-
-        $this->compiler->process($container);
+        return NotificationHandlerPass::TAG;
     }
 }
