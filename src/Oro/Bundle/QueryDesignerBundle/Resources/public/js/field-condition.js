@@ -181,6 +181,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             this.$filterContainer.empty().append(this.filter.$el);
 
             this.filter.on('update', _.bind(this._onUpdate, this));
+            this.filter.on('onClickChoiceValue', _.bind(this._onUpdate, this));
             this._onUpdate();
         },
 
