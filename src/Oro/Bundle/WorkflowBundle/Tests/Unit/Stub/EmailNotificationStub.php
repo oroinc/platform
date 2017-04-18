@@ -17,10 +17,12 @@ class EmailNotificationStub extends EmailNotification
      * @param string $workflowName
      * @param string $transitionName
      */
-    public function __construct($workflowName, $transitionName)
+    public function __construct($workflowName = null, $transitionName = null)
     {
-        $this->workflowDefinition = new WorkflowDefinition();
-        $this->workflowDefinition->setName($workflowName);
+        if ($workflowName) {
+            $this->workflowDefinition = new WorkflowDefinition();
+            $this->workflowDefinition->setName($workflowName);
+        }
 
         $this->transitionName = $transitionName;
     }

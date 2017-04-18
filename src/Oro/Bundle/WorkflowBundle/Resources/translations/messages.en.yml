@@ -130,6 +130,11 @@ oro:
 
             show_step_in_grid.label: 'Workflow step in grid'
 
+
+        event:
+            notification:
+                workflow_transition: Workflow transition
+
         menu:
             process_definition_list.description:  Process management UI
             workflow_definition_list.description: Workflow management UI

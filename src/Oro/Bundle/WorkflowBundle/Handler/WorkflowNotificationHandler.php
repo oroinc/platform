@@ -18,8 +18,9 @@ class WorkflowNotificationHandler extends EmailNotificationHandler
             return;
         }
 
-        $workflowName = $event->getTransitionRecord()->getWorkflowItem()->getWorkflowName();
-        $transitionName = $event->getTransitionRecord()->getTransitionName();
+        $transitionRecord = $event->getTransitionRecord();
+        $workflowName = $transitionRecord->getWorkflowItem()->getWorkflowName();
+        $transitionName = $transitionRecord->getTransitionName();
 
         // convert notification rules to a list of EmailNotificationInterface
         $notifications = [];
@@ -29,8 +30,10 @@ class WorkflowNotificationHandler extends EmailNotificationHandler
             }
         }
 
-        // send notifications
-        $this->manager->process($event->getEntity(), $notifications);
+        if ($notifications) {
+            // send notifications
+            $this->manager->process($event->getEntity(), $notifications);
+        }
 
         $event->stopPropagation();
     }
@@ -44,9 +47,13 @@ class WorkflowNotificationHandler extends EmailNotificationHandler
      */
     private function isApplicable(EmailNotification $notification, $workflowName, $transitionName)
     {
-        $expectedWorkflowName = $notification->getWorkflowDefinition()->getName();
+        $expectedWorkflowDefinition = $notification->getWorkflowDefinition();
         $expectedTransitionName = $notification->getWorkflowTransitionName();
 
-        return $workflowName === $expectedWorkflowName && $transitionName === $expectedTransitionName;
+        if (!$expectedWorkflowDefinition || !$expectedTransitionName) {
+            return false;
+        }
+
+        return $workflowName === $expectedWorkflowDefinition->getName() && $transitionName === $expectedTransitionName;
     }
 }

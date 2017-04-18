@@ -35,9 +35,6 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var EmailNotificationManager|\PHPUnit_Framework_MockObject_MockObject */
     private $manager;
 
-    /** @var WorkflowTransitionRecord|\PHPUnit_Framework_MockObject_MockObject */
-    private $transitionRecord;
-
     /** @var WorkflowNotificationHandler */
     private $handler;
 
@@ -47,11 +44,8 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->entity = new \stdClass();
 
-        $this->transitionRecord = $this->getTransitionRecord();
-
         $this->event = $this->createMock(WorkflowNotificationEvent::class);
         $this->event->expects($this->any())->method('getEntity')->willReturn($this->entity);
-        $this->event->expects($this->any())->method('getTransitionRecord')->willReturn($this->transitionRecord);
 
         $this->manager = $this->createMock(EmailNotificationManager::class);
 
@@ -78,8 +72,11 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
             $expected
         );
 
-        $this->manager->expects($this->once())->method('process')->with($this->entity, $expected);
+        $this->manager->expects($expected ? $this->once() : $this->never())
+            ->method('process')
+            ->with($this->entity, $expected);
 
+        $this->event->expects($this->once())->method('getTransitionRecord')->willReturn($this->getTransitionRecord());
         $this->event->expects($this->once())->method('stopPropagation');
 
         $this->handler->handle($this->event, $notifications);
@@ -106,9 +103,8 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testHandleNotApplicable()
+    public function testHandleNotSupportedNotification()
     {
-        $this->transitionRecord->expects($this->never())->method('getWorkflowItem');
         $this->manager->expects($this->never())->method('process');
 
         /** @var NotificationEvent|\PHPUnit_Framework_MockObject_MockObject $event */
@@ -116,6 +112,16 @@ class WorkflowNotificationHandlerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->never())->method('stopPropagation');
 
         $this->handler->handle($event, []);
+    }
+
+    public function testHandleInvalidTransitionRecord()
+    {
+        $this->manager->expects($this->never())->method('process')->with($this->entity, []);
+
+        $this->event->expects($this->once())->method('getTransitionRecord')->willReturn($this->getTransitionRecord());
+        $this->event->expects($this->once())->method('stopPropagation');
+
+        $this->handler->handle($this->event, [new EmailNotificationStub()]);
     }
 
     /**
