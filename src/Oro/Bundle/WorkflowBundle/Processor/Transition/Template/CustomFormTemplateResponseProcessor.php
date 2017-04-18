@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Processor\Transition;
+namespace Oro\Bundle\WorkflowBundle\Processor\Transition\Template;
 
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;

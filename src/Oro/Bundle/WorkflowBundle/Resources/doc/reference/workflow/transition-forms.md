@@ -1,6 +1,14 @@
 Transition Forms
 ================
 
+- Configuring
+  - [Simple Example (filling the attribute)](#simple-example---filling-the-attribute)
+  - [Reach Example (form_init)](#reach-example)
+  - [Custom Form Type Example](#custom-form-type-example)
+  - [A Form Reuse Recommendation](#recommendations)
+- Transition Forms and Layouts
+
+## Configuring
 It is often happens, that for a business flow is not enough the data that present in the system to move flow farther 
 automatically by pressing a single button.
 So the user usually forced to provide additional data in UI forms for proceeding. It might be a few fields or complex 
@@ -10,8 +18,7 @@ Workflow Transitions can be configured to handle custom data filled by a user by
 transition commit happens.
 Here we will show you common ways to configure transition forms in a few examples.
 
-Simple Example - filling the attribute:
---------------------------------------
+### Simple Example - filling the attribute:
 Suppose we have a workflow that handles only one required data input from a user.
 
 ```YML
@@ -52,8 +59,7 @@ After form send we should see a `@flash_message` with the text we prompt on the 
 `display_type`) that is flashed on the entity view page.
 
 
-Reach Example:
---------------
+### Reach Example:
  **Custom types and `form_init`:**
 ```YML
 workflows:
@@ -107,8 +113,7 @@ Here you can prepare your data before form render. At sample configuration we ar
 So that on our custom `"my_date_picker"` type we will se the day after today predefined on form.
 
 
-Custom Form Type Example:
-------------------------
+### Custom Form Type Example:
 
 Also there is possibility to use your custom form type for a whole transition handling.
 We bring here a simple working example of commerce pseudo flow:
@@ -182,8 +187,38 @@ See more about form update handler in corresponding [OroFormBundle doc page](../
 It should return all necessary data for specified template as controllers usually do.
 - `data_attribute` - the name of data attribute where form data payload should be taken from by workflow engine to pass into form and putting to as result of handling.
 
+#### A Form Reuse Recommendation
+
 In general, ***the main recommendation*** when you creating a new entity management (entity controller) while developing: 
 The best approach would be to use our `Oro\Bundle\FormBundle\Model\UpdateHandler::update` method functionality. 
 So that if you encapsulate your logic to proper parts of form handling process then you should be able to create a 
 workflow with the custom form type easily. As custom form workflow transition handling is based on reusing those parts in transition configuration.   
 
+## Transition Forms and Layouts
+
+For layout based sites you can use the [Layout Update](../../../../../LayoutBundle/Resources/doc/layout_update.md) 
+functionality to the UI customization capabilities of a transition form.
+
+First of all, you need to be familiar with the [layout update](../../../../../LayoutBundle/Resources/doc/layout_update.md) type of interface build so that you should proceed further to manage layout based transition forms there.
+
+## Imports for new Controllers
+There are several major imports that can handle next types of transition forms:
+ - [oro_workflow_transition_form](../../../views/layouts/default/imports/oro_workflow_transition_form) - for regular transition
+ - [oro_workflow_start_transition_form](../../../views/layouts/default/imports/oro_workflow_transition_form) - for start transition
+ 
+Please consider adding them to your custom transition form controller.
+
+## The context`s data
+The following layout context variables are available for transition forms:
+- `workflowName` - the name of a workflow
+- `transitionName` - the name of a transition
+- `transitionFormView` - the form view instance (used in rendering)
+- `transition` - the instance of [Transition](../../../../Model/Transition.php) class that current transit corresponds to
+- `workflowItem` - the instance of [WorkflowItem](../../../../Entity/WorkflowItem.php) - current workflow record representation
+- `formRouteName` - the route that should be populated by LayoutTransitionContext processor in [TransitionContext](../../../../Processor/Context/TransitionContext.php)
+
+### Limitations
+A workflow transition form **does not have layout form provider**. So you cannot reuse it in other layouts.
+It is a known drawback, but transition process is quite complex, and transition form reusage could make data dependency management quite complicated. So this is more a favor that drawback ;)
+
+Also see [custom form type configuration of workflow](#custom-form-type-example).

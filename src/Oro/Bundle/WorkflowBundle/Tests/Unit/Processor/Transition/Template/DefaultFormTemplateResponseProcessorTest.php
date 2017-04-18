@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition\Template;
 
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
-use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormTemplateResponseProcessor;
+use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor;
 use Symfony\Component\HttpFoundation\Response;
 
 class DefaultFormTemplateResponseProcessorTest extends \PHPUnit_Framework_TestCase
