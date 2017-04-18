@@ -5,6 +5,7 @@ You must select at least {{ limit }} role:  You must select at least {{ limit }}
 oro:
     user:
         message:
+            user_without_role: You cannot remove last role from {{ userName }}
             password_mismatch: The passwords must match.
             invalid_username: This email is already registered by another user. Please provide unique email address.
             invalid_password:
