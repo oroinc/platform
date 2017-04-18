@@ -57,6 +57,8 @@ workflows:
                 init_datagrids:
                     - datagrid1
                 init_context_attribute: test_init_context
+                message_parameters:
+                    test: param
                 form_options:
                     attribute_fields:
                         first_attribute:

@@ -15,6 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Table;
  */
 class Grid extends Table
 {
+    const TABLE_HEADER_ELEMENT = 'GridHeader';
     const TABLE_ROW_ELEMENT = 'GridRow';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in grid";
     const ERROR_NO_ROW_CONTENT = 'Grid has no record with "%s" content';
@@ -54,11 +55,38 @@ class Grid extends Table
     }
 
     /**
+     * @param int $number
+     * @param int $cellNumber
+     */
+    public function uncheckFirstRecords($number, $cellNumber = 0)
+    {
+        $rows = $this->getRows();
+
+        self::assertGreaterThanOrEqual(
+            $number,
+            count($rows),
+            sprintf('Can\'t uncheck %s records, because grid has only %s records', $number, count($rows))
+        );
+
+        for ($i = 0; $i < $number; $i++) {
+            $rows[$i]->uncheckMassActionCheckbox($cellNumber);
+        }
+    }
+
+    /**
      * @param string $content
      */
     public function checkRecord($content)
     {
         $this->getRowByContent($content)->checkMassActionCheckbox();
+    }
+
+    /**
+     * @param string $content
+     */
+    public function uncheckRecord($content)
+    {
+        $this->getRowByContent($content)->uncheckMassActionCheckbox();
     }
 
     /**

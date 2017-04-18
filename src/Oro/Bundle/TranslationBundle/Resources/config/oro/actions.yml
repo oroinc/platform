@@ -321,6 +321,7 @@ operations:
                 title: oro.translation.action.reset.confirm_title
                 message: oro.translation.action.reset.message
                 okText: oro.translation.action.reset.confirm_ok
+                component: oroui/js/delete-confirmation
         acl_resource: [TRANSLATE, $language]
         applications: [default]
         datagrids:

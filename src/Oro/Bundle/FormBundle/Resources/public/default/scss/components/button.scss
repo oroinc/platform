@@ -128,6 +128,15 @@
     }
 
     &--size {
+        &-xs {
+            padding: 3px 11px;
+
+            font-size: $base-font-size - 1;
+            line-height: 18px;
+
+            border-radius: 3px;
+        }
+
         &-s {
             padding: 0 10px;
 
@@ -147,7 +156,6 @@
             padding: 10px 15px;
             line-height: 54px;
         }
-
     }
 
     &--offset {

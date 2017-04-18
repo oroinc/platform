@@ -334,5 +334,4 @@ services:
         arguments:
            - '@oro_translation.manager.translation'
            - '@translator'
-           - '@oro_entity.doctrine_helper'
-           - '@oro_security.security_facade'
+           - '@oro_security.acl_helper'

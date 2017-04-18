@@ -6,6 +6,7 @@ use Behat\Mink\Element\NodeElement;
 
 class Table extends Element
 {
+    const TABLE_HEADER_ELEMENT = 'TableHeader';
     const TABLE_ROW_ELEMENT = 'TableRow';
     const ERROR_NO_ROW = "Can't get %s row, because there are only %s rows in table";
     const ERROR_NO_ROW_CONTENT = 'Table has no record with "%s" content';

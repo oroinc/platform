@@ -162,9 +162,11 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function addOrderByColumn($columnAlias, $columnSorting)
     {
-        $columnNames = array_flip($this->columnAliases);
-        $columnName = $columnNames[$columnAlias];
-        $prefixedColumnName = $this->getTableAliasForColumn($columnName) . '.' . $columnName;
-        $this->qb->addOrderBy($prefixedColumnName, $columnSorting);
+        if ($this->columnAliases && $columnAlias) {
+            $columnNames = array_flip($this->columnAliases);
+            $columnName = $columnNames[$columnAlias];
+            $prefixedColumnName = $this->getTableAliasForColumn($columnName) . '.' . $columnName;
+            $this->qb->addOrderBy($prefixedColumnName, $columnSorting);
+        }
     }
 }

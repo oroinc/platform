@@ -15,7 +15,7 @@
     {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
 
     {% if toolbarPosition != 'bottom' %}
-        <div class="grid__toolbar-side" data-section="left-side">
+        <div class="datagrid-toolbar__side" data-section="left-side">
             {{ block_widget(block) }}
         </div>
     {% endif %}
@@ -25,7 +25,7 @@
     {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
 
     {% if toolbarPosition != 'bottom' %}
-        <div class="grid__toolbar-rightside" data-section="right-side">
+        <div class="datagrid-toolbar__rightside" data-section="right-side">
             {{ block_widget(block) }}
         </div>
     {% endif %}

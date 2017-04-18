@@ -1,7 +1,7 @@
 // @theme: blank;
 
 .hidden {
-    display: none;
+    display: none !important; // override inline styles
 }
 
 .disabled-overlay {
@@ -9,6 +9,7 @@
 }
 
 .disabled {
+    position: relative;
     .disabled-overlay {
         display: block;
         position: absolute;
