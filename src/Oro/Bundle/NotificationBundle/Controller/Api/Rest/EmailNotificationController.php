@@ -57,7 +57,7 @@ class EmailNotificationController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_notification.form.email_notification.api');
+        throw new \BadMethodCallException('Form is not available.');
     }
 
     /**
@@ -65,6 +65,6 @@ class EmailNotificationController extends RestController
      */
     public function getFormHandler()
     {
-        return $this->get('oro_notification.form.handler.email_notification.api');
+        throw new \BadMethodCallException('FormHandler is not available.');
     }
 }

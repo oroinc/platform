@@ -5,7 +5,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
@@ -20,16 +20,16 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationT
 class BuildTemplateFormSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var SecurityContextInterface
+     * @var TokenStorageInterface
      */
-    protected $securityContext;
+    protected $tokenStorage;
 
     /**
-     * @param SecurityContextInterface $securityContext
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(SecurityContextInterface $securityContext)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -85,22 +85,27 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
     protected function initChoicesByEntityName($entityName, $fieldName, FormInterface $form)
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token        = $this->securityContext->getToken();
+        $token        = $this->tokenStorage->getToken();
         $organization = $token->getOrganizationContext();
+
+        $options = [
+            'query_builder'  =>
+                function (EmailTemplateRepository $templateRepository) use (
+                    $entityName,
+                    $organization
+                ) {
+                    return $templateRepository->getEntityTemplatesQueryBuilder($entityName, $organization);
+                },
+        ];
+
+        if ($form->get($fieldName)->getConfig()->hasOption('selectedEntity')) {
+            $options['selectedEntity'] = $entityName;
+        }
 
         FormUtils::replaceField(
             $form,
             $fieldName,
-            [
-                'selectedEntity' => $entityName,
-                'query_builder'  =>
-                    function (EmailTemplateRepository $templateRepository) use (
-                        $entityName,
-                        $organization
-                    ) {
-                        return $templateRepository->getEntityTemplatesQueryBuilder($entityName, $organization);
-                    },
-            ],
+            $options,
             ['choice_list', 'choices']
         );
     }

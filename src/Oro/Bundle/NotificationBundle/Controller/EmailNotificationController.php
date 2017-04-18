@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\NotificationBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/email")
@@ -27,6 +28,8 @@ class EmailNotificationController extends Controller
      *      permission="VIEW"
      * )
      * @Template()
+     *
+     * @return array
      */
     public function indexAction()
     {
@@ -44,10 +47,15 @@ class EmailNotificationController extends Controller
      *      permission="EDIT"
      * )
      * @Template()
+     *
+     * @param EmailNotification $entity
+     * @param Request $request
+     *
+     * @return array
      */
-    public function updateAction(EmailNotification $entity)
+    public function updateAction(EmailNotification $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -59,30 +67,37 @@ class EmailNotificationController extends Controller
      *      permission="CREATE"
      * )
      * @Template("OroNotificationBundle:EmailNotification:update.html.twig")
+     *
+     * @param Request $request
+     *
+     * @return array
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new EmailNotification());
+        return $this->update(new EmailNotification(), $request);
     }
 
     /**
      * @param EmailNotification $entity
+     * @param Request $request
+     *
      * @return array
      */
-    protected function update(EmailNotification $entity)
+    protected function update(EmailNotification $entity, Request $request)
     {
-        if ($this->get('oro_notification.form.handler.email_notification')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.notification.controller.emailnotification.saved.message')
-            );
-
-            return $this->get('oro_ui.router')->redirect($entity);
+        $form = $this->createForm(EmailNotificationType::NAME, $entity);
+        if ($request->get(EmailNotificationType::NAME)) {
+            $form->submit($request);
+            $form = $this->createForm(EmailNotificationType::NAME, $form->getData());
         }
 
-        return array(
-            'entity' => $entity,
-            'form' => $this->get('oro_notification.form.email_notification')->createView(),
-        );
+        return $this->get('oro_form.update_handler')
+            ->update(
+                $entity,
+                $form,
+                $this->get('translator')->trans('oro.notification.controller.emailnotification.saved.message'),
+                $request,
+                'oro_notification.form.handler.email_notification'
+            );
     }
 }
