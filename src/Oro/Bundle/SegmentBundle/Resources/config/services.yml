@@ -126,3 +126,10 @@ services:
             - '@oro_segment.segment_manager'
         tags:
             - { name: layout.data_provider, alias: segment }
+
+    oro_segment.provider.segment_snapshot_delta_provider:
+        class: Oro\Bundle\SegmentBundle\Provider\SegmentSnapshotDeltaProvider
+        public: false
+        arguments:
+            - '@doctrine'
+            - '@oro_segment.query.dynamic_segment.query_builder'

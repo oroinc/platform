@@ -225,6 +225,9 @@ This method is used inside a processor for a message which was sent with createD
 The `$runCallback` closure usually returns true or false, the job status depends on the returned value.
 See [Jobs statuses](#jobs-statuses) section for the details.
 
+To reuse existing processor logic in scope of job it may be decorated with `DelayedJobRunnerDecoratingProcessor` which will execute
+runDelayed, pass control to given processor and then handle result in format applicable for `runDelayed`  
+
 ###Dependent Job
 
 Use dependent job when your job flow has several steps but you want to send a new message
