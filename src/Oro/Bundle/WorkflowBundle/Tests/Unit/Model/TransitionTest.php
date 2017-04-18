@@ -37,6 +37,8 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             $this->transition,
             [
                 ['name', 'test'],
+                ['buttonLabel', 'test_button_label'],
+                ['buttonTitle', 'test_button_title'],
                 ['hidden', true, false],
                 ['start', true, false],
                 ['unavailableHidden', true],

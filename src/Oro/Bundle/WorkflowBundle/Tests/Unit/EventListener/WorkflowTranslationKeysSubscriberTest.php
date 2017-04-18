@@ -57,25 +57,63 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit_Framework_TestCase
             ->setName('test_workflow')
             ->setLabel('test_workflow_label_translation_key')
             ->setConfiguration(
-                ['transitions' => ['transition_2' => ['label' => 'test_workflow_transition_2_translation_key']]]
+                [
+                    'transitions' => [
+                        'transition_2' => [
+                            'label' => 'test_workflow_transition_2_translation_key',
+                            'button_label' => 'test_workflow_transition_2_translation_button_label_key',
+                            'button_title' => 'test_workflow_transition_2_translation_button_title_key',
+                            'message' => 'test_workflow_transition_2_translation_message_key'
+                        ]
+                    ]
+                ]
             );
 
         $changes = new WorkflowChangesEvent($updatedDefinition, $previousDefinition);
 
-        $this->translationManager->expects($this->at(0))
-            ->method('findTranslationKey')
-            ->with('test_workflow_label_translation_key', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-        $this->translationManager->expects($this->at(1))
-            ->method('findTranslationKey')
-            ->with('test_workflow_transition_1_translation_key', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        $findTranslationKeys = [];
+        $removeTranslationKeys = [];
 
-        $this->translationManager->expects($this->at(3))
+        $this->translationManager->expects($this->any())
+            ->method('findTranslationKey')
+            ->willReturnCallback(
+                function ($key, $domain) use (&$findTranslationKeys) {
+                    $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
+
+                    $findTranslationKeys[] = $key;
+                }
+            );
+
+        $this->translationManager->expects($this->any())
             ->method('removeTranslationKey')
-            ->with('test_workflow_transition_2_translation_key', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+            ->willReturnCallback(
+                function ($key, $domain) use (&$removeTranslationKeys) {
+                    $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
+
+                    $removeTranslationKeys[] = $key;
+                }
+            );
 
         $this->translationManager->expects($this->once())->method('flush');
 
         $this->translationKeysSubscriber->clearTranslationKeys($changes);
+
+        $this->assertEquals(
+            [
+                'test_workflow_label_translation_key',
+                'test_workflow_transition_1_translation_key'
+            ],
+            array_filter($findTranslationKeys)
+        );
+        $this->assertEquals(
+            [
+                'test_workflow_transition_2_translation_key',
+                'test_workflow_transition_2_translation_button_label_key',
+                'test_workflow_transition_2_translation_button_title_key',
+                'test_workflow_transition_2_translation_message_key'
+            ],
+            $removeTranslationKeys
+        );
     }
 
     /**

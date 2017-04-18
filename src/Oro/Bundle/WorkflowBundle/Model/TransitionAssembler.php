@@ -170,6 +170,8 @@ class TransitionAssembler extends BaseAbstractAssembler
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
             ->setLabel($this->getOption($options, 'label'))
+            ->setButtonLabel($this->getOption($options, 'button_label'))
+            ->setButtonTitle($this->getOption($options, 'button_title'))
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))

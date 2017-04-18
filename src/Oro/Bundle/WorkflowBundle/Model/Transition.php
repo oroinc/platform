@@ -28,6 +28,12 @@ class Transition
     /** @var string */
     protected $label;
 
+    /** @var string */
+    protected $buttonLabel;
+
+    /** @var string */
+    protected $buttonTitle;
+
     /** @var ExpressionInterface|null */
     protected $condition;
 
@@ -128,6 +134,44 @@ class Transition
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * @param string $buttonLabel
+     *
+     * @return Transition
+     */
+    public function setButtonLabel($buttonLabel)
+    {
+        $this->buttonLabel = $buttonLabel;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButtonLabel()
+    {
+        return $this->buttonLabel;
+    }
+
+    /**
+     * @param string $buttonTitle
+     *
+     * @return Transition
+     */
+    public function setButtonTitle($buttonTitle)
+    {
+        $this->buttonTitle = $buttonTitle;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButtonTitle()
+    {
+        return $this->buttonTitle;
     }
 
     /**

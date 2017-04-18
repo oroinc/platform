@@ -48,6 +48,8 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                     'transitions' => [
                         'transition_1' => [
                             'label' => 'transition_1_label',
+                            'button_label' => 'transition_1_button_label',
+                            'button_title' => 'transition_1_button_title',
                             'message' => 'transition_1_message'
                         ],
                         'transition_2' => [
@@ -97,7 +99,15 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                     'oro.workflow.test_workflow.step.step_2.label' => null,
                     'oro.workflow.test_workflow.transition.transition_2.warning_message' => null,
                     'oro.workflow.test_workflow.transition.transition_four.warning_message' => null,
-                    'oro.workflow.test_workflow.variable.var1.label' => 'my_var'
+                    'oro.workflow.test_workflow.variable.var1.label' => 'my_var',
+                    'oro.workflow.test_workflow.transition.transition_1.button_label' => 'transition_1_button_label',
+                    'oro.workflow.test_workflow.transition.transition_1.button_title' => 'transition_1_button_title',
+                    'oro.workflow.test_workflow.transition.transition_2.button_label' => null,
+                    'oro.workflow.test_workflow.transition.transition_2.button_title' => null,
+                    'oro.workflow.test_workflow.transition.transition_3.button_label' => null,
+                    'oro.workflow.test_workflow.transition.transition_3.button_title' => null,
+                    'oro.workflow.test_workflow.transition.transition_four.button_label' => null,
+                    'oro.workflow.test_workflow.transition.transition_four.button_title' => null
                 ]
             ]
         ];
@@ -145,6 +155,8 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                     'transitions' => [
                         'transition_1' => [
                             'label' => 'transition_1_label',
+                            'button_label' => 'transition_1_button_label',
+                            'button_title' => 'transition_1_button_title',
                             'message' => 'transition_1_message'
                         ],
                         'transition_2' => [
@@ -185,18 +197,26 @@ class WorkflowConfigurationTranslationFieldsIteratorTest extends \PHPUnit_Framew
                     'transitions' => [
                         'transition_1' => [
                             'label' => '*modified*transition_1_label',
+                            'button_label' => '*modified*transition_1_button_label',
+                            'button_title' => '*modified*transition_1_button_title',
                             'message' => '*modified*transition_1_message'
                         ],
                         'transition_2' => [
                             'label' => '*modified*transition_2_label',
+                            'button_label' => '*modified*',
+                            'button_title' => '*modified*',
                             'message' => '*modified*'
                         ],
                         'transition_3' => [
                             'label' => '*modified*',
+                            'button_label' => '*modified*',
+                            'button_title' => '*modified*',
                             'message' => '*modified*transition_3_message'
                         ],
                         'transition_four' => [
                             'label' => '*modified*',
+                            'button_label' => '*modified*',
+                            'button_title' => '*modified*',
                             'message' => '*modified*',
                             'form_options' => [
                                 'attribute_fields' => [
