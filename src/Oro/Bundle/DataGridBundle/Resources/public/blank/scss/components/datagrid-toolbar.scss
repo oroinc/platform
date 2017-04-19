@@ -1,0 +1,124 @@
+// @theme: blank;
+
+.datagrid-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+    justify-content: center;
+
+    margin: 10px 0;
+    padding: 0;
+
+    &__side,
+    &__rightside {
+        display: flex;
+        // 0px value for fix bug in IE11
+        flex: 1 0 0px;
+        flex-wrap: wrap;
+        align-items: center;
+
+        min-width: 200px;
+    }
+
+    &__rightside {
+        justify-content: flex-end;
+    }
+
+    &__base {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+    }
+
+    &.extended {
+        .datagrid-tool {
+            flex-grow: 0;
+
+            &:first-child {
+                position: relative;
+
+                flex-grow: 1;
+            }
+        }
+    }
+
+    &--offset {
+        &-s {
+            margin: $offset-y-s 0;
+        }
+    }
+
+    &.simplistic {
+        .datagrid-tool {
+            flex-grow: 1;
+
+            &:first-child {
+                flex-grow: 3;
+            }
+        }
+    }
+
+    .page-size {
+        font-size: $base-font-size - 2px;
+
+        flex-grow: 0;
+    }
+
+}
+
+.datagrid-tool {
+    margin: 3px 0;
+
+    &:not(:first-child) {
+        margin-left: $offset-x-s;
+    }
+
+    &:first-child {
+        position: relative;
+    }
+
+    &:last-child {
+        flex-grow: 0;
+    }
+}
+
+@include breakpoint('desktop') {
+    .datagrid-toolbar {
+        &.simplistic {
+            .datagrid-tool {
+                &:first-child {
+                    flex-basis: 100%;
+                    margin: 0 0 10px;
+                }
+            }
+        }
+    }
+}
+
+@include breakpoint('tablet') {
+    .datagrid-toolbar {
+        &.extended {
+            .datagrid-tool {
+                &:last-child {
+                    flex-basis: auto;
+                }
+            }
+        }
+
+        .grid-toolbar-mass-actions {
+            order: 3;
+            flex-basis: calc(100% - 138px);
+            margin: 0 0 10px;
+
+            text-align: right;
+        }
+    }
+}
+
+@include breakpoint('mobile') {
+    .datagrid-tool {
+        .action-selectbox_custom_in-pager {
+            margin-right: $offset-x-s;
+        }
+    }
+}

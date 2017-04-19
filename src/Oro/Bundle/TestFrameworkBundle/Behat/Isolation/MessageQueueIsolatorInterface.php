@@ -15,7 +15,7 @@ interface MessageQueueIsolatorInterface extends IsolatorInterface
     public function waitWhileProcessingMessages($timeLimit = 60);
 
     /**
-     * @return Process
+     * @return Process|null
      */
     public function getProcess();
 }

@@ -26,3 +26,11 @@ oro_behat_extension:
     Localization Config:
       class: Oro\Bundle\LocaleBundle\Tests\Behat\Page\LocalizationConfig
       route: 'oro_config_configuration_system'
+
+  suites:
+      OroLocaleBundle:
+        contexts:
+          - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+          - OroDataGridBundle::GridContext
+        paths:
+          - '@OroLocaleBundle/Tests/Behat/Features'

@@ -20,7 +20,7 @@ class LocalizationConfig extends Page
         $this->waitForAjax();
 
         $this->elementFactory->getPage()
-            ->findVisible('xpath', "//a[@href='/config/system/platform/localization']")
+            ->findVisible('xpath', "//a[contains(@href, '/platform/localization')]")
             ->click();
     }
 }

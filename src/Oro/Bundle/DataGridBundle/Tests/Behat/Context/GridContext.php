@@ -115,6 +115,22 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^(?:|I )check (?P<content>\S+) record in grid$/
+     */
+    public function checkRecordInGrid($content)
+    {
+        $this->getGrid()->checkRecord($content);
+    }
+
+    /**
+     * @Then /^(?:|I )uncheck (?P<content>\S+) record in grid$/
+     */
+    public function uncheckRecordInGrid($content)
+    {
+        $this->getGrid()->uncheckRecord($content);
+    }
+
+    /**
      * Check two records in grid by one step
      * E.g. to check check accounts with "Columbia Pictures" and "Warner Brothers" content in it
      * Example: And check Warner Brothers and Columbia Pictures in grid
@@ -162,7 +178,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iUncheckFirstRecordsInColumn($number, $column)
     {
-        $this->getGrid()->checkFirstRecords($number, $column);
+        $this->getGrid()->uncheckFirstRecords($number, $column);
     }
 
     /**
@@ -172,7 +188,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iUncheckFirstRecordsInGrid($number)
     {
-        $this->getGrid()->checkFirstRecords($number);
+        $this->getGrid()->uncheckFirstRecords($number);
     }
 
     /**
