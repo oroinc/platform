@@ -1,0 +1,4 @@
+oro_behat_extension:
+  elements:
+    Filters condition builder:
+        selector: "div[id='oro_report-condition-builder']"
