@@ -812,3 +812,8 @@ services:
         class: Oro\Bundle\SecurityBundle\Authentication\TokenSerializer
         arguments:
             - '@doctrine'
+
+    oro_security.generator.random_token:
+        class: Oro\Bundle\SecurityBundle\Generator\RandomTokenGenerator
+        arguments:
+            - '@oro_security.encoder.mcrypt'
