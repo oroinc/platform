@@ -165,7 +165,8 @@ class SegmentManager
         $queryBuilderRootAliases = $queryBuilder->getRootAliases();
         $queryBuilderRootAlias = reset($queryBuilderRootAliases);
 
-        if ($this->getQueryBuilderFrom($queryBuilder) !== $this->getQueryBuilderFrom($segmentQueryBuilder)) {
+        if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC
+            && $this->getQueryBuilderFrom($queryBuilder) !== $this->getQueryBuilderFrom($segmentQueryBuilder)) {
             throw new \LogicException(
                 'Query Builder "FROM" part should be the same as Segment Query Builder "FROM" part'
             );
