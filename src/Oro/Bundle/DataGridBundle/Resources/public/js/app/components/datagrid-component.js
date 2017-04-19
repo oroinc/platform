@@ -40,6 +40,41 @@ define(function(require) {
         currentApperanceId: void 0,
         changeAppearanceEnabled: false,
         initialize: function(options) {
+            options.metadata.massActions = {
+                'delete': {
+                    'type': 'delete',
+                    'label': 'Delete',
+                    'entity_name': 'Oro\\Bundle\\TaxBundle\\Entity\\Tax',
+                    'data_identifier': 'tax.id',
+                    'name': 'delete',
+                    'handler': 'oro_datagrid.extension.mass_action.handler.delete',
+                    'frontend_type': 'delete-mass',
+                    'frontend_handle': 'ajax',
+                    'route': 'oro_datagrid_mass_action',
+                    'route_parameters': [],
+                    'confirmation': true,
+                    'launcherOptions': {
+                        'iconClassName': 'fa-trash-o'
+                    }
+                },
+                'rename': {
+                    'type': 'rename',
+                    'label': 'Rename',
+                    'entity_name': 'Oro\\Bundle\\TaxBundle\\Entity\\Tax',
+                    'data_identifier': 'tax.id',
+                    'name': 'delete',
+                    'handler': 'oro_datagrid.extension.mass_action.handler.delete',
+                    'frontend_type': 'delete-mass',
+                    'frontend_handle': 'ajax',
+                    'route': 'oro_datagrid_mass_action',
+                    'route_parameters': [],
+                    'confirmation': true,
+                    'launcherOptions': {
+                        'iconClassName': 'fa-pencil'
+                    }
+                }
+            };
+
             this.pluginManager = new PluginManager(this);
             this.changeAppearanceEnabled = 'appearanceData' in options.metadata.state;
             if (!options.enableFilters) {
