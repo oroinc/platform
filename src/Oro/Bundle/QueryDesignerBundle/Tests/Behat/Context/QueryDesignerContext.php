@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
-class FeatureContext extends OroFeatureContext implements OroPageObjectAware
+class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 
@@ -33,27 +33,19 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     private function addColumn($column)
     {
         $this->clickLinkInColumnDesigner('Choose a field');
-        $this->selectValue($column);
-        $this->clickLinkInColumnDesigner('Add');
-    }
-
-    /**
-     * @param string $value
-     */
-    private function selectValue($value)
-    {
         $this->getPage()
             ->find(
                 'xpath',
                 "//div[@id='select2-drop']/div/input"
             )
-            ->setValue($value);
+            ->setValue($column);
         $this->getPage()
             ->find(
                 'xpath',
-                "//div[@id='select2-drop']//div[contains(., '{$value}')]"
+                "//div[@id='select2-drop']//div[contains(., '{$column}')]"
             )
             ->click();
+        $this->clickLinkInColumnDesigner('Add');
     }
 
     /**

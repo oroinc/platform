@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
-class FeatureContext extends OroFeatureContext implements OroPageObjectAware
+class FilterContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
 
@@ -23,25 +23,6 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
             list($filter, $column, $type) = $row;
             $this->addFilter($filter, $column, $type);
         }
-    }
-
-    /**
-     * @param string $value
-     */
-    private function selectValue($value)
-    {
-        $this->getPage()
-            ->find(
-                'xpath',
-                "//div[@id='select2-drop']/div/input"
-            )
-            ->setValue($value);
-        $this->getPage()
-            ->find(
-                'xpath',
-                "//div[@id='select2-drop']//div[contains(., '{$value}')]"
-            )
-            ->click();
     }
 
     /**
@@ -78,7 +59,18 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     private function chooseFilterColumn($column)
     {
         $this->clickLinkInFiltersZone('Choose a field');
-        $this->selectValue($column);
+        $this->getPage()
+            ->find(
+                'xpath',
+                "//div[@id='select2-drop']/div/input"
+            )
+            ->setValue($column);
+        $this->getPage()
+            ->find(
+                'xpath',
+                "//div[@id='select2-drop']//div[contains(., '{$column}')]"
+            )
+            ->click();
     }
 
     /**

@@ -1,18 +1,19 @@
 Feature: Create report
-  In order to manage orders
+  In order to manage reports
   As administrator
   I need to be able to create report
 
-  Scenario: Success create with is empty filter
+  Scenario: Success create with filter "is empty"
     Given I login as administrator
     And I go to Reports & Segments/ Manage Custom Reports
     And I press "Create Report"
-    And I fill out the report form with the following data:
-      | Name                | Entity      | Report Type |
-      | Opportunity budget  | Opportunity | Table       |
+    And I fill "Report Form" with:
+      | Name        | Accounts Report |
+      | Entity      | Account         |
+      | Report Type | Table           |
     And I add the following columns:
-      | Columns                           |
-      | Opportunity / Customer > Name     |
-      | Opportunity / Customer > ID       |
-      | Opportunity > Base Budget Amount  |
-    And I press "Save And Close" button
+      | Account name |
+    And I add the following filters:
+      | Field Condition | Id | is empty |
+    When I save form
+    Then I should see "Report saved" flash message
