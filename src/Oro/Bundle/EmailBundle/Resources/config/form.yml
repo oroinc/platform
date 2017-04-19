@@ -34,7 +34,7 @@ services:
     oro_email.form.subscriber.emailtemplate:
         class: %oro_email.form.subscriber.emailtemplate.class%
         arguments:
-            - '@security.context'
+            - '@security.token_storage'
 
     oro_email.form.subscriber.autoresponserule:
         class: %oro_email.form.subscriber.autoresponserule.class%

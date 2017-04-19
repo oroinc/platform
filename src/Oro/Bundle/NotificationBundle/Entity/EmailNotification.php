@@ -120,7 +120,7 @@ class EmailNotification extends ExtendEmailNotification
      * @param Event $event
      * @return EmailNotification
      */
-    public function setEvent(Event $event)
+    public function setEvent(Event $event = null)
     {
         $this->event = $event;
 
@@ -144,7 +144,7 @@ class EmailNotification extends ExtendEmailNotification
      *
      * @return EmailNotification
      */
-    public function setTemplate(EmailTemplate $template)
+    public function setTemplate(EmailTemplate $template = null)
     {
         $this->template = $template;
 
