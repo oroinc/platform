@@ -29,14 +29,28 @@ class Select2Entity extends Element
             }
 
             foreach ($results as $result) {
-                if ($result->getText() == $value) {
+                if (trim($result->getText()) == $value) {
                     $result->click();
 
                     return;
                 }
             }
 
-            self::fail(sprintf('Many results "%s" was found, but no one exactly match', $value));
+            self::fail(
+                sprintf(
+                    'Expected "%s" value, but got "%s" values',
+                    $value,
+                    implode(
+                        ', ',
+                        array_map(
+                            function (NodeElement $result) {
+                                return trim($result->getText());
+                            },
+                            $results
+                        )
+                    )
+                )
+            );
         }
 
         self::assertNotCount(0, $results, sprintf('Not found result for "%s"', $value));
@@ -114,7 +128,7 @@ class Select2Entity extends Element
         if (!$this->isOpen()) {
             $openArrow = $this->getParent()->find('css', '.select2-arrow');
             // Although ajax is already loaded element need some extra time to appear by js animation
-            $openArrow->waitFor(1500, function (NodeElement $element) {
+            $openArrow->waitFor(60, function (NodeElement $element) {
                 return $element->isVisible();
             });
             $openArrow->click();

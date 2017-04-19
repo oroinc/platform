@@ -9,6 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 class ConfigurationBuilder implements BuilderInterface
@@ -56,9 +57,10 @@ class ConfigurationBuilder implements BuilderInterface
     {
         $tree = $this->menuConfiguration->getTree();
         $items = $this->menuConfiguration->getItems();
+
         if (!empty($tree) && !empty($items)) {
             foreach ($tree as $menuTreeName => $menuTreeElement) {
-                if ($menuTreeName === $alias) {
+                if ($menuTreeName == $alias) {
                     if (!empty($menuTreeElement['extras'])) {
                         $menu->setExtras($menuTreeElement['extras']);
                     }

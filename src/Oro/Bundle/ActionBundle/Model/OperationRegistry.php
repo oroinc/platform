@@ -99,9 +99,11 @@ class OperationRegistry
 
     /**
      * @param string $name
+     * @param OperationFindCriteria $criteria
+     *
      * @return null|Operation
      */
-    public function findByName($name)
+    public function findByName($name, OperationFindCriteria $criteria = null)
     {
         $this->loadConfiguration();
 
@@ -114,6 +116,12 @@ class OperationRegistry
 
                 $this->operations[$name] = $operation;
             }
+        }
+
+        if ($operation && $criteria &&
+            (!$this->isApplicable($this->configuration[$name], $criteria) || !$this->filter([$operation], $criteria))
+        ) {
+            $operation = null;
         }
 
         return $operation;
@@ -157,9 +165,11 @@ class OperationRegistry
             return false;
         }
 
-        return $this->isEntityClassMatched($findCriteria, $config) ||
+        $applicable = $this->isEntityClassMatched($findCriteria, $config) ||
             $this->isRouteMatched($findCriteria, $config) ||
             $this->isDatagridMatched($findCriteria, $config);
+
+        return $applicable && $this->isNotExcluded($findCriteria->getDatagrid(), (array)$config['exclude_datagrids']);
     }
 
     /**
@@ -169,11 +179,15 @@ class OperationRegistry
      */
     private function isEntityClassMatched(OperationFindCriteria $criteria, array $config)
     {
-        return $this->match(
+        $applicable = $this->match(
             $criteria->getEntityClass(),
             $this->filterEntities((array)$config['entities']),
-            $this->filterEntities((array)$config['exclude_entities']),
             (bool)$config['for_all_entities']
+        );
+
+        return $applicable && $this->isNotExcluded(
+            $criteria->getEntityClass(),
+            $this->filterEntities((array)$config['exclude_entities'])
         );
     }
 
@@ -198,7 +212,6 @@ class OperationRegistry
         return $this->match(
             $criteria->getDatagrid(),
             (array)$config['datagrids'],
-            (array)$config['exclude_datagrids'],
             (bool)$config['for_all_datagrids']
         );
     }
@@ -206,17 +219,30 @@ class OperationRegistry
     /**
      * @param string $value
      * @param array $inclusion
-     * @param array $exclusion
      * @param bool $forAll
      * @return bool
      */
-    protected function match($value, array $inclusion, array $exclusion, $forAll)
+    protected function match($value, array $inclusion, $forAll)
     {
         if (!$value) {
             return false;
         }
 
-        return ($forAll && !in_array($value, $exclusion, true)) || (!$forAll && in_array($value, $inclusion, true));
+        return $forAll || (!$forAll && in_array($value, $inclusion, true));
+    }
+
+    /**
+     * @param string $value
+     * @param array $exclusion
+     * @return bool
+     */
+    protected function isNotExcluded($value, array $exclusion)
+    {
+        if (!$value) {
+            return true;
+        }
+
+        return !in_array($value, $exclusion, true);
     }
 
     /**

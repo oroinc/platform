@@ -30,13 +30,19 @@ datagrids:
                 frontend_type: boolean
             createdAt:
                 label: oro.message_queue_job.grid.columns.createdAt
-                frontend_type: datetime
+                type: callback
+                callable: ['@oro_locale.twig.date_time', 'dateTimeMediumFormat']
+                params: {fieldName: createdAt}
             startedAt:
                 label: oro.message_queue_job.grid.columns.startedAt
-                frontend_type: datetime
+                type: callback
+                callable: ['@oro_locale.twig.date_time', 'dateTimeMediumFormat']
+                params: {fieldName: startedAt}
             stoppedAt:
                 label: oro.message_queue_job.grid.columns.stoppedAt
-                frontend_type: datetime
+                type: callback
+                callable: ['@oro_locale.twig.date_time', 'dateTimeMediumFormat']
+                params: {fieldName: stoppedAt}
             percent:
                 label: 'Progress'
                 type: twig
@@ -128,13 +134,19 @@ datagrids:
                 frontend_type: html
             createdAt:
                 label: oro.message_queue_job.grid.columns.createdAt
-                frontend_type: datetime
+                type: callback
+                callable: ['@oro_locale.twig.date_time', 'dateTimeMediumFormat']
+                params: {fieldName: createdAt}
             startedAt:
                 label: oro.message_queue_job.grid.columns.startedAt
-                frontend_type: datetime
+                type: callback
+                callable: ['@oro_locale.twig.date_time', 'dateTimeMediumFormat']
+                params: {fieldName: startedAt}
             stoppedAt:
                 label: oro.message_queue_job.grid.columns.stoppedAt
-                frontend_type: datetime
+                type: callback
+                callable: ['@oro_locale.twig.date_time', 'dateTimeMediumFormat']
+                params: {fieldName: stoppedAt}
         sorters:
             columns:
                 id: { data_name: j.id }

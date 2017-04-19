@@ -4,8 +4,6 @@ namespace Oro\Bundle\ActionBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 
-use Oro\Component\Action\Action\ActionFactory;
-
 class DebugActionCommand extends AbstractDebugCommand
 {
     const COMMAND_NAME = 'oro:debug:action';

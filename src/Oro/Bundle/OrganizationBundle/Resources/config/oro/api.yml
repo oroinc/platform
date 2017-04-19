@@ -1,7 +1,9 @@
 api:
     entities:
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+            documentation_resource: '@OroOrganizationBundle/Resources/doc/api/business_unit.md'
             delete_handler: oro_organization.business_unit.handler.delete
+
             fields:
                 createdAt:
                     form_options:
@@ -20,6 +22,7 @@ api:
                     exclude: false # set manually because this entity is marked as a dictionary
 
         Oro\Bundle\OrganizationBundle\Entity\Organization:
+            documentation_resource: '@OroOrganizationBundle/Resources/doc/api/organization.md'
             actions:
                 delete: false
                 delete_list: false

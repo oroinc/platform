@@ -78,4 +78,18 @@ class ProcessLoggerTest extends \PHPUnit_Framework_TestCase
             'without logger'               => array('hasLogger' => false),
         );
     }
+
+    public function testNotEnabled()
+    {
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
+        $logger->expects($this->never())->method('debug');
+        $processLogger = new ProcessLogger($doctrineHelper, null);
+        $processLogger->setEnabled(false);
+        $trigger = new ProcessTrigger();
+        $data = new ProcessData();
+        $processLogger->debug('message', $trigger, $data);
+    }
 }

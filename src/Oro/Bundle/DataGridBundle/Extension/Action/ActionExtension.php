@@ -3,17 +3,12 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Action;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
-use Oro\Bundle\DataGridBundle\Extension\Action\Event\ConfigureActionsBefore;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -37,11 +32,11 @@ class ActionExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
     /** @var array */
     protected $actions = [];
+
+    /** @var DatagridActionProviderInterface[] */
+    protected $actionsProviders = [];
 
     /** @var array */
     protected static $excludeParams = [ActionInterface::ACL_KEY];
@@ -50,18 +45,15 @@ class ActionExtension extends AbstractExtension
      * @param ContainerInterface $container
      * @param SecurityFacade $securityFacade
      * @param TranslatorInterface $translator
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         ContainerInterface $container,
         SecurityFacade $securityFacade,
-        TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher
+        TranslatorInterface $translator
     ) {
-        $this->container      = $container;
+        $this->container = $container;
         $this->securityFacade = $securityFacade;
-        $this->translator     = $translator;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->translator = $translator;
     }
 
     /**
@@ -73,11 +65,9 @@ class ActionExtension extends AbstractExtension
             return false;
         }
 
-        $this->eventDispatcher->dispatch(ConfigureActionsBefore::NAME, new ConfigureActionsBefore($config));
+        $actionsProviders = $this->getApplicableActionProviders($config);
 
-        $actions = $config->offsetGetOr(static::ACTION_KEY, []);
-
-        return !empty($actions);
+        return !empty($actionsProviders) || !empty($config->offsetGetOr(ActionExtension::ACTION_KEY));
     }
 
     /**
@@ -85,25 +75,23 @@ class ActionExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        $actionConfiguration = $config->offsetGetOr(static::ACTION_CONFIGURATION_KEY);
-
-        if ($actionConfiguration && is_callable($actionConfiguration)) {
-            $callable = function (ResultRecordInterface $record) use ($actionConfiguration, $config) {
-                $result = call_user_func($actionConfiguration, $record, $config->offsetGetOr(static::ACTION_KEY, []));
-
-                return is_array($result) ? $result : [];
-            };
-
-            $propertyConfig = [
-                'type'                               => 'callback',
-                'callable'                           => $callable,
-                PropertyInterface::FRONTEND_TYPE_KEY => 'row_array'
-            ];
-            $config->offsetAddToArrayByPath(
-                sprintf('[%s][%s]', Configuration::PROPERTIES_KEY, static::METADATA_ACTION_CONFIGURATION_KEY),
-                $propertyConfig
-            );
+        foreach ($this->getApplicableActionProviders($config) as $provider) {
+            $provider->applyActions($config);
         }
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @return array|DatagridActionProviderInterface[]
+     */
+    protected function getApplicableActionProviders(DatagridConfiguration $config)
+    {
+        return array_filter(
+            $this->actionsProviders,
+            function (DatagridActionProviderInterface $provider) use ($config) {
+                return $provider->hasActions($config);
+            }
+        );
     }
 
     /**
@@ -229,5 +217,13 @@ class ActionExtension extends AbstractExtension
         }
 
         return $this->securityFacade->isGranted($aclResource);
+    }
+
+    /**
+     * @param DatagridActionProviderInterface $actionsProvider
+     */
+    public function addActionProvider(DatagridActionProviderInterface $actionsProvider)
+    {
+        $this->actionsProviders[] = $actionsProvider;
     }
 }

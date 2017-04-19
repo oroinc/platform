@@ -33,6 +33,7 @@ oro:
                 field:
                     items:
                         label: Label
+                        label.tooltip: To keep the attribute content unlabeled on the Front Store, prefix the label text with an underscore (e.g. _Video Review, _Img Front View, _Img Rare View).
                         description: Description
                         description.tooltip: When filled in, description will be used as a field tooltip on entity forms
             datagrid:

@@ -23,6 +23,9 @@
 
 {% oro_title_set({params : {"%workflow_title%": pageTitle ~ ' - ' ~ indexLabel} }) %}
 
+{% block pin_button %}
+{% endblock pin_button %}
+
 {% block navButtons %}
     {% if indexPath %}
         {{ UI.cancelButton(indexPath) }}
@@ -104,17 +107,19 @@
         </script>
         </div>
     {% endset %}
-
-    {% set dataBlocks = [
-        {
-            'title': 'General Information'|trans,
-            'class': 'active',
-            'subblocks': [{'data' : [transitionFormWidget] }]
-        }
-    ] %}
-
-    {% set id = 'transitionPage' %}
-    {% set data = {'dataBlocks': dataBlocks} %}
-
-    {{ parent() }}
+    {% if transition.hasFormConfiguration() %}
+        {{ transitionFormWidget }}
+    {% else %}
+        {% set dataBlocks = [
+            {
+                'title': 'General Information'|trans,
+                'class': 'active',
+                'subblocks': [{'data' : [transitionFormWidget] }]
+            }
+        ] %}
+    
+        {% set id = 'transitionPage' %}
+        {% set data = {'dataBlocks': dataBlocks} %}
+        {{ parent() }}
+    {% endif %}
 {% endblock content_data %}

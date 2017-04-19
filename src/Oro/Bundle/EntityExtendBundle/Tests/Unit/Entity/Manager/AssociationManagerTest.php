@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
@@ -76,11 +77,19 @@ class AssociationManagerTest extends OrmTestCase
             ->method('getService')
             ->willReturn($this->aclHelper);
 
+        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->will($this->returnValue(true));
+
         $this->associationManager = new AssociationManager(
             $this->configManager,
             $aclHelperLink,
             $this->doctrineHelper,
-            $this->entityNameResolver
+            $this->entityNameResolver,
+            $featureChecker
         );
     }
 

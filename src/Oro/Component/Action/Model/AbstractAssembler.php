@@ -2,6 +2,7 @@
 
 namespace  Oro\Component\Action\Model;
 
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Oro\Component\Action\Exception\AssemblerException;
 
@@ -107,5 +108,70 @@ abstract class AbstractAssembler
             return $options[$key];
         }
         return $default;
+    }
+
+    /**
+     * @param ParameterInterface $parameter
+     * @param array $optionNames
+     *
+     * @throws AssemblerException If parameter is invalid
+     */
+    protected function assertParameterHasOptions(ParameterInterface $parameter, array $optionNames)
+    {
+        foreach ($optionNames as $optionName) {
+            if (!$parameter->hasOption($optionName)) {
+                throw new AssemblerException(
+                    sprintf(
+                        'Option "%s" is required in %s "%s"',
+                        $optionName,
+                        $parameter->getInternalType(),
+                        $parameter->getName()
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ParameterInterface $parameter
+     * @param array $optionNames
+     *
+     * @throws AssemblerException
+     */
+    protected function assertParameterHasNoOptions(ParameterInterface $parameter, array $optionNames)
+    {
+        foreach ($optionNames as $optionName) {
+            if ($parameter->hasOption($optionName)) {
+                throw new AssemblerException(
+                    sprintf(
+                        'Option "%s" cannot be used in %s "%s"',
+                        $optionName,
+                        $parameter->getInternalType(),
+                        $parameter->getName()
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ParameterInterface $parameter
+     *
+     * @throws AssemblerException
+     */
+    protected function assertParameterHasClassOption(ParameterInterface $parameter)
+    {
+        $this->assertParameterHasOptions($parameter, ['class']);
+
+        if (!class_exists($parameter->getOption('class'))) {
+            throw new AssemblerException(
+                sprintf(
+                    'Class "%s" referenced by "class" option in %s "%s" not found',
+                    $parameter->getOption('class'),
+                    $parameter->getInternalType(),
+                    $parameter->getName()
+                )
+            );
+        }
     }
 }

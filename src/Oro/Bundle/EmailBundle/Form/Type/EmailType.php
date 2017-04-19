@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailType extends AbstractType
 {
@@ -67,7 +68,11 @@ class EmailType extends AbstractType
             ->add('entityId', 'hidden', ['required' => false])
             ->add(
                 'from',
-                'oro_email_email_address_from',
+                'hidden'
+            )
+            ->add(
+                'origin',
+                'oro_email_email_origin_from',
                 [
                     'required' => true,
                     'label' => 'oro.email.from_email_address.label',
@@ -133,6 +138,9 @@ class EmailType extends AbstractType
                 'required' => false,
                 'allow_add' => true,
                 'prototype' => false,
+                'constraints' => [
+                    new Valid()
+                ],
                 'options' => [
                     'required' => false,
                 ],
@@ -178,6 +186,13 @@ class EmailType extends AbstractType
             is_array($data) && empty($data['entityClass']) ||
             is_object($data) && null === $data->getEntityClass()) {
             return;
+        }
+
+        if (is_array($data) && isset($data['origin'])) {
+            $value = $data['origin'];
+            $values =  explode('|', $value);
+            $data['from'] = $values[1];
+            $event->setData($data);
         }
 
         $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
@@ -244,7 +259,6 @@ class EmailType extends AbstractType
                 'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
                 'intention'          => 'email',
                 'csrf_protection'    => true,
-                'cascade_validation' => true,
             ]
         );
     }

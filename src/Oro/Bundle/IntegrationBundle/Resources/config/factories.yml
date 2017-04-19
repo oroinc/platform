@@ -1,0 +1,12 @@
+services:
+    oro_integration.factory.event.channel_delete:
+        class: 'Oro\Bundle\IntegrationBundle\Factory\Event\ChannelDeleteEventFactory'
+        public: false
+
+    oro_integration.factory.event.channel_disable:
+        class: 'Oro\Bundle\IntegrationBundle\Factory\Event\ChannelDisableEventFactory'
+        public: false
+
+    oro_integration.factory.event.channel_enable:
+        class: 'Oro\Bundle\IntegrationBundle\Factory\Event\ChannelEnableEventFactory'
+        public: false

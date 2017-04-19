@@ -12,15 +12,16 @@ use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\ServiceContainer\ServiceProcessor;
+use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -32,6 +33,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     const ISOLATOR_TAG = 'oro_behat.isolator';
     const SUITE_AWARE_TAG = 'suite_aware';
     const CONFIG_PATH = '/Tests/Behat/behat.yml';
+    const MESSAGE_QUEUE_ISOLATOR_AWARE_TAG = 'message_queue_isolator_aware';
     const ELEMENTS_CONFIG_ROOT = 'elements';
     const PAGES_CONFIG_ROOT = 'pages';
     const SUITES_CONFIG_ROOT = 'suites';
@@ -63,6 +65,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processIsolationSubscribers($container);
         $this->processSuiteAwareSubscriber($container);
         $this->processClassResolvers($container);
+        $this->processArtifactHandlers($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -106,6 +109,15 @@ class OroTestFrameworkExtension implements TestworkExtension
                 ->scalarNode('reference_initializer_class')
                     ->defaultValue('Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer')
                 ->end()
+                ->arrayNode('artifacts')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('handlers')
+                        ->useAttributeAsKey('name')
+                            ->prototype('variable')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
     }
 
@@ -117,10 +129,12 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
         $loader->load('services.yml');
         $loader->load('isolators.yml');
+        $loader->load('artifacts.yml');
         $loader->load('kernel_services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.application_suites', $config['application_suites']);
+        $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers']);
         $container->setParameter('oro_test.reference_initializer_class', $config['reference_initializer_class']);
         // Remove reboot kernel after scenario because we have isolation in feature layer instead of scenario
         $container->getDefinition('symfony2_extension.context_initializer.kernel_aware')
@@ -129,11 +143,6 @@ class OroTestFrameworkExtension implements TestworkExtension
 
     /**
      * @param ContainerBuilder $container
-     */
-    /**
-     * @param ContainerBuilder $container
-     * @throws OutOfBoundsException When
-     * @throws InvalidArgumentException
      */
     private function processIsolationSubscribers(ContainerBuilder $container)
     {
@@ -163,27 +172,70 @@ class OroTestFrameworkExtension implements TestworkExtension
     /**
      * @param ContainerBuilder $container
      */
+    private function processArtifactHandlers(ContainerBuilder $container)
+    {
+        $handlerConfigurations = $container->getParameter('oro_test.artifacts.handler_configs');
+        $prettySubscriberDefinition = $container->getDefinition('oro_test.artifacts.pretty_artifacts_subscriber');
+        $progressSubscriberDefinition = $container->getDefinition('oro_test.artifacts.progress_artifacts_subscriber');
+
+        foreach ($container->findTaggedServiceIds('artifacts_handler') as $id => $attributes) {
+            $handlerClass = $container->getDefinition($id)->getClass();
+
+            if (!in_array(ArtifactsHandlerInterface::class, class_implements($handlerClass))) {
+                throw new InvalidArgumentException(sprintf(
+                    '"%s" should implement "%s"',
+                    $handlerClass,
+                    ArtifactsHandlerInterface::class
+                ));
+            }
+
+            /** @var ArtifactsHandlerInterface $handlerClass */
+            if (empty($handlerConfigurations[$handlerClass::getConfigKey()])) {
+                continue;
+            }
+
+            if (false === $handlerConfigurations[$handlerClass::getConfigKey()]) {
+                continue;
+            }
+
+            $container->getDefinition($id)->replaceArgument(0, $handlerConfigurations[$handlerClass::getConfigKey()]);
+            $prettySubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
+            $progressSubscriberDefinition->addMethodCall('addArtifactHandler', [new Reference($id)]);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
     private function injectMessageQueueIsolator(ContainerBuilder $container)
     {
         $applicationContainer = $container->get(Symfony2Extension::KERNEL_ID)->getContainer();
+        $applicableIsolatorId = null;
 
         foreach ($container->findTaggedServiceIds(self::ISOLATOR_TAG) as $id => $attributes) {
             /** @var IsolatorInterface $isolator */
             $isolator = $container->get($id);
 
             if ($isolator->isApplicable($applicationContainer) && $isolator instanceof MessageQueueIsolatorInterface) {
-                $container
-                    ->getDefinition('oro_test.context.fixture_loader')
-                    ->replaceArgument(4, new Reference($id));
-                $container
-                    ->getDefinition('oro_behat_extension.isolation.inital_massage_queue_isolator')
-                    ->replaceArgument(0, new Reference($id));
-
-                return;
+                $applicableIsolatorId = $id;
+                break;
             }
         }
 
-        throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
+        if (null === $applicableIsolatorId) {
+            throw new RuntimeException('Not found any MessageQueue Isolator to inject into FixtureLoader');
+        }
+
+        foreach ($container->findTaggedServiceIds(self::MESSAGE_QUEUE_ISOLATOR_AWARE_TAG) as $id => $attributes) {
+            if (!$container->hasDefinition($id)) {
+                continue;
+            }
+            $definition = $container->getDefinition($id);
+
+            if (is_a($definition->getClass(), MessageQueueIsolatorAwareInterface::class, true)) {
+                $definition->addMethodCall('setMessageQueueIsolator', [new Reference($applicableIsolatorId)]);
+            }
+        }
     }
 
     private function processSuiteAwareSubscriber(ContainerBuilder $container)

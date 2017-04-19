@@ -79,4 +79,12 @@ class KernelIsolator implements IsolatorInterface
     {
         return 'Kernel';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTag()
+    {
+        return 'kernel';
+    }
 }

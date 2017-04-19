@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
@@ -124,8 +125,12 @@ class ConfigurationType extends AbstractType
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('password', 'password', [
-                'label' => 'oro.imap.configuration.password.label', 'required' => true,
-                'attr' => ['class' => 'check-connection']
+                'label' => 'oro.imap.configuration.password.label',
+                'required' => true,
+                'attr' => [
+                    'class' => 'check-connection',
+                    'autocomplete' => 'new-password'
+                ]
             ]);
         if ($options['add_check_button']) {
             $builder->add('check_connection', 'oro_imap_configuration_check', [
@@ -341,7 +346,9 @@ class ConfigurationType extends AbstractType
         $resolver->setDefaults([
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'          => false,
+            'constraints'       => new Valid(),
             'add_check_button'  => true,
+            'skip_folders_validation' => false,
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];
 
@@ -352,7 +359,9 @@ class ConfigurationType extends AbstractType
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Smtp';
                 }
-
+                if (!$form->getConfig()->getOption('skip_folders_validation')) {
+                    $groups[] = 'CheckFolderSelection';
+                }
                 return $groups;
             },
         ]);

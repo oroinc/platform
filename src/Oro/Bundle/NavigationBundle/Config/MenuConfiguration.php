@@ -2,17 +2,19 @@
 
 namespace Oro\Bundle\NavigationBundle\Config;
 
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+
 class MenuConfiguration
 {
-    /** @var array */
-    private $config;
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
 
     /**
-     * @param array $config
+     * @param ConfigurationProvider $configurationProvider
      */
-    public function __construct(array $config)
+    public function __construct(ConfigurationProvider $configurationProvider)
     {
-        $this->config = $config;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -20,11 +22,12 @@ class MenuConfiguration
      */
     public function getTree()
     {
-        if (!array_key_exists('tree', $this->config)) {
+        $menuConfig = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
+        if (!array_key_exists('tree', $menuConfig)) {
             return [];
         }
 
-        return $this->config['tree'];
+        return $menuConfig['tree'];
     }
 
     /**
@@ -32,11 +35,12 @@ class MenuConfiguration
      */
     public function getItems()
     {
-        if (!array_key_exists('items', $this->config)) {
+        $menuConfig = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
+        if (!array_key_exists('items', $menuConfig)) {
             return [];
         }
 
-        return $this->config['items'];
+        return $menuConfig['items'];
     }
 
     /**
@@ -44,11 +48,11 @@ class MenuConfiguration
      */
     public function getTemplates()
     {
-        if (!array_key_exists('templates', $this->config)) {
+        $menuConfig = $this->configurationProvider->getConfiguration(ConfigurationProvider::MENU_CONFIG_KEY);
+        if (!array_key_exists('templates', $menuConfig)) {
             return [];
         }
 
-
-        return $this->config['templates'];
+        return $menuConfig['templates'];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Oro\Bundle\WorkflowBundle\Model\VariableManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -25,6 +26,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRecordContext;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
 /**
@@ -142,10 +144,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = new WorkflowItem();
         $workflowItem->setWorkflowName($workflowName);
 
-        $transition = new Transition();
-        $transition->setName('test_transition');
-
-        $transitions = new ArrayCollection([$transition]);
+        $transitions = new ArrayCollection([$this->createTransition('test_transition')]);
 
         $workflow = $this->createWorkflow($workflowName);
         $workflow->expects($this->once())
@@ -173,8 +172,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $errors = new ArrayCollection();
 
-        $transition = new Transition();
-        $transition->setName('test_transition');
+        $transition = $this->createTransition('test_transition');
 
         $workflow = $this->createWorkflow($workflowName);
         $workflow->expects($this->once())
@@ -402,8 +400,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = new WorkflowItem();
         $workflowItem->getData()->add($workflowData);
 
-        $transition = new Transition();
-        $transition->setName($transitionName);
+        $transition = $this->createTransition($transitionName);
 
         $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME, [], [$transition]);
         $workflow->expects($this->once())
@@ -447,8 +444,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = new WorkflowItem();
         $workflowItem->getData()->add($workflowData);
 
-        $transition = new Transition();
-        $transition->setName($transitionName);
+        $transition = $this->createTransition($transitionName);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME, [], [$transition]);
@@ -494,9 +490,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = new WorkflowItem();
         $workflowItem->getData()->add($workflowData);
 
-        $transition = new Transition();
-        $transition->setName($transitionName);
-        $transition->setInitEntities([EntityStub::class]);
+        $transition = $this->createTransition($transitionName)->setInitEntities([EntityStub::class]);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflow = $this->createWorkflow(self::TEST_WORKFLOW_NAME, [], [$transition]);
@@ -591,11 +585,8 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             foreach ($expected as $iteration => $row) {
                 $workflowDefinition = new WorkflowDefinition();
 
-                $transition = new Transition();
-                $transition->setName('start');
-
                 $workflowName = $row['workflow'];
-                $workflow = $this->createWorkflow($workflowName, [], [$transition]);
+                $workflow = $this->createWorkflow($workflowName, [], [$this->createTransition('start')]);
                 $workflow->expects($this->any())
                     ->method('isStartTransitionAvailable')
                     ->willReturn($row['startTransitionAllowed']);
@@ -1175,10 +1166,21 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var VariableManager|\PHPUnit_Framework_MockObject_MockObject $restrictionManager */
+        $variableManager = $this->getMockBuilder(VariableManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(
-                [$doctrineHelper, $aclManager, $restrictionManager, null, $attributeManager, $transitionManager]
-            )
+            ->setConstructorArgs([
+                $doctrineHelper,
+                    $aclManager,
+                    $restrictionManager,
+                    null,
+                    $attributeManager,
+                    $transitionManager,
+                    $variableManager
+                ])
             ->setMethods(
                 [
                     'isTransitionAllowed',
@@ -1241,11 +1243,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function getStartTransition()
     {
-        $startTransition = new Transition();
-        $startTransition->setName('__start__');
-        $startTransition->setStart(true);
-
-        return $startTransition;
+        return $this->createTransition('__start__')->setStart(true);
     }
 
     /**
@@ -1279,5 +1277,17 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityRepository')
             ->with(WorkflowItem::class)
             ->will($this->returnValue($workflowItemsRepository));
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Transition
+     */
+    private function createTransition($name)
+    {
+        $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
+
+        return $transition->setName($name);
     }
 }

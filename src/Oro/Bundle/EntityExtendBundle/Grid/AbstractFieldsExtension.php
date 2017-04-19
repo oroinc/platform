@@ -29,6 +29,9 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     /** @var DatagridGuesser */
     protected $datagridGuesser;
 
+    /** @var FieldsHelper */
+    protected $fieldsHelper;
+
     /**
      * @param ConfigManager       $configManager
      * @param EntityClassResolver $entityClassResolver
@@ -37,11 +40,13 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     public function __construct(
         ConfigManager $configManager,
         EntityClassResolver $entityClassResolver,
-        DatagridGuesser $datagridGuesser
+        DatagridGuesser $datagridGuesser,
+        FieldsHelper $fieldsHelper
     ) {
         $this->configManager       = $configManager;
         $this->entityClassResolver = $entityClassResolver;
         $this->datagridGuesser     = $datagridGuesser;
+        $this->fieldsHelper = $fieldsHelper;
     }
 
     /**
@@ -113,6 +118,8 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     $sorterDataName = sprintf('%s.%s', $joinAlias, $extendFieldConfig->get('target_field'));
                     $selectExpr = sprintf('IDENTITY(%s.%s) as %s', $alias, $fieldName, $fieldName);
                     $filterDataName = sprintf('%s.%s', $alias, $fieldName);
+                    // adding $filterDataName to select list to allow sorting by this column and avoid GROUP BY error
+                    $selectExpr = [$selectExpr, $sorterDataName];
                     break;
                 case 'multiEnum':
                     $columnDataName = ExtendHelper::getMultiEnumSnapshotFieldName($fieldName);
@@ -197,7 +204,10 @@ abstract class AbstractFieldsExtension extends AbstractExtension
      *
      * @return FieldConfigId[]
      */
-    abstract protected function getFields(DatagridConfiguration $config);
+    protected function getFields(DatagridConfiguration $config)
+    {
+        return $this->fieldsHelper->getFields($this->getEntityName($config));
+    }
 
     /**
      * @param FieldConfigId $field

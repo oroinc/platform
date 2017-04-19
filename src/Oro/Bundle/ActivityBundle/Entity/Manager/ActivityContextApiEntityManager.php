@@ -16,6 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
@@ -41,6 +42,9 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param ObjectManager                 $om
      * @param ActivityManager               $activityManager
@@ -50,6 +54,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
      * @param EntityAliasResolver           $entityAliasResolver
      * @param EntityNameResolver            $entityNameResolver
      * @param DoctrineHelper                $doctrineHelper
+     * @param FeatureChecker                $featureChecker
      */
     public function __construct(
         ObjectManager $om,
@@ -59,7 +64,8 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         RouterInterface $router,
         EntityAliasResolver $entityAliasResolver,
         EntityNameResolver $entityNameResolver,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        FeatureChecker $featureChecker
     ) {
         parent::__construct(null, $om);
 
@@ -70,6 +76,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $this->entityAliasResolver  = $entityAliasResolver;
         $this->entityNameResolver   = $entityNameResolver;
         $this->doctrineHelper       = $doctrineHelper;
+        $this->featureChecker       = $featureChecker;
     }
 
     /**
@@ -97,6 +104,10 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         foreach ($targets as $target) {
             $targetClass = ClassUtils::getClass($target);
             $targetId = $target->getId();
+
+            if (!$this->featureChecker->isResourceEnabled($targetClass, 'entities')) {
+                continue;
+            }
 
             if ($userClass === $targetClass && $currentUser->getId() === $targetId) {
                 continue;

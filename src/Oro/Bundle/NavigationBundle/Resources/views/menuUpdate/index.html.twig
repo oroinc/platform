@@ -16,14 +16,16 @@
                 <div class="pull-left pull-left-extra">
                     {{ include('OroNavigationBundle:menuUpdate:pageHeader.html.twig') }}
                 </div>
-                <div class="pull-right title-buttons-container invisible"
-                     data-page-component-module="oroui/js/app/components/view-component"
-                     data-page-component-options="{{ {'view': 'oroui/js/app/views/hidden-initialization-view'}|json_encode }}"
-                     data-layout="separate">
-                    {% placeholder index_navButtons_before with buttonsPlaceholderData %}
-                    {% block navButtons %}{% endblock navButtons %}
-                    {% placeholder index_navButtons_after with buttonsPlaceholderData %}
-                </div>
+                {% if entityClass is defined %}
+                    <div class="pull-right title-buttons-container invisible"
+                         data-page-component-module="oroui/js/app/components/view-component"
+                         data-page-component-options="{{ {'view': 'oroui/js/app/views/hidden-initialization-view'}|json_encode }}"
+                         data-layout="separate">
+                        {% placeholder index_navButtons_before with buttonsPlaceholderData %}
+                        {% block navButtons %}{% endblock navButtons %}
+                        {% placeholder index_navButtons_after with buttonsPlaceholderData %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -19,12 +19,6 @@ abstract class AbstractIndexInteger implements ItemFieldInterface
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Item", inversedBy="integerFields")
-     * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
-     */
-    protected $item;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="field", type="string", length=250, nullable=false)

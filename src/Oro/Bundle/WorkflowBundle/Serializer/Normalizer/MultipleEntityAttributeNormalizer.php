@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
@@ -35,7 +35,7 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function normalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         if (null === $attributeValue) {
             return null;
@@ -54,7 +54,7 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function denormalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         if (null === $attributeValue || !is_array($attributeValue)) {
             return null;
@@ -73,7 +73,7 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function supportsNormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         return $attribute->getType() == 'entity' && $attribute->getOption('multiple');
     }
@@ -81,7 +81,7 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
+    public function supportsDenormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         return $attribute->getType() == 'entity' && $attribute->getOption('multiple');
     }
@@ -90,11 +90,11 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
      * Returns EntityManager for entity.
      *
      * @param Workflow $workflow
-     * @param Attribute $attribute
+     * @param ParameterInterface $attribute
      * @param mixed $attributeValue
      * @throws SerializerException
      */
-    protected function validateAttributeValue(Workflow $workflow, Attribute $attribute, $attributeValue)
+    protected function validateAttributeValue(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
     {
         if (!is_array($attributeValue) && !$attributeValue instanceof \Traversable) {
             throw new SerializerException(
@@ -127,11 +127,11 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
      * Returns EntityManager for entity.
      *
      * @param Workflow $workflow
-     * @param Attribute $attribute
+     * @param ParameterInterface $attribute
      * @return EntityManager
      * @throws SerializerException
      */
-    protected function getEntityManager(Workflow $workflow, Attribute $attribute)
+    protected function getEntityManager(Workflow $workflow, ParameterInterface $attribute)
     {
         $entityClass = $attribute->getOption('class');
         $result = $this->registry->getManagerForClass($entityClass);

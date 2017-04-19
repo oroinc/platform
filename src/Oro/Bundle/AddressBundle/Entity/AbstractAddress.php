@@ -22,6 +22,7 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressInterface
 {
@@ -773,6 +774,15 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
         $validator->validate($this, $constraint);
     }
 
+    public function __clone()
+    {
+        if ($this->id) {
+            $this->id = null;
+            $this->created = null;
+            $this->updated = null;
+        }
+    }
+
     /**
      * Convert address to string
      * @todo: Address format must be used here
@@ -781,7 +791,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function __toString()
     {
-        $data = array(
+        $data = [
             $this->getFirstName(),
             $this->getLastName(),
             ',',
@@ -792,17 +802,17 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
             ',',
             $this->getCountry(),
             $this->getPostalCode(),
-        );
+        ];
 
-        $str = implode(' ', $data);
-        $check = trim(str_replace(',', '', $str));
-        return empty($check) ? '' : $str;
+        return trim(implode(' ', $data), " \t\n\r\0\x0B,");
     }
 
     /**
      * Check if entity is empty.
      *
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isEmpty()
     {

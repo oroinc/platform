@@ -1,8 +1,8 @@
 layout:
     imports:
-         -
-             id: datagrid_toolbar
-             root: __root
+        -
+            id: datagrid_toolbar
+            root: __root
 
     actions:
         - '@addTree':

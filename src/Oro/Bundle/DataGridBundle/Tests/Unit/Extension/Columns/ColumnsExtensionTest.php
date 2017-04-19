@@ -192,8 +192,8 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->visitMetadata($config, $data);
 
-        static::assertEquals($data->offsetGet('state'), $stateResult);
-        static::assertEquals($data->offsetGet('initialState'), $initialStateResult);
+        static::assertEquals($stateResult, $data->offsetGet('state'));
+        static::assertEquals($initialStateResult, $data->offsetGet('initialState'));
 
         $gridViews = $data->offsetGet('gridViews');
         if ($isGridView) {
@@ -208,17 +208,25 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testVisitMetadataNotCurrentUser()
     {
-        $this->securityFacade->expects($this->once())
+        $this->securityFacade->expects($this->exactly(3))
             ->method('getLoggedUser')
             ->will($this->returnValue(null));
 
         $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
+        $config
+            ->expects(static::exactly(2))
+            ->method('offsetGet')
+            ->with('columns')
+            ->will(static::returnValue(['name'  => ['order' => 2, 'renderable' => true]]));
 
         $data = MetadataObject::createNamed('test-grid', []);
+        $this->extension->setParameters(new ParameterBag([]));
         $result = $this->extension->visitMetadata($config, $data);
         $this->assertEquals(null, $result);
+        $initState = ['columns' => ['name' => ['order' => 2, 'renderable' => true]]];
+        $this->assertEquals($data->offsetGet('initialState'), $initState);
     }
 
     /**

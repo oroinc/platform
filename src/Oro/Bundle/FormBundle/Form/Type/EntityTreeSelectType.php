@@ -45,8 +45,8 @@ class EntityTreeSelectType extends AbstractType
             $treeData = $options['tree_data'];
         }
 
-        $view->vars['pageComponentModule'] = $options['page_component_module'];
         $view->vars['treeOptions'] = [
+            'view' => $options['page_component_module'],
             'key' => $options['tree_key'],
             'data' => $treeData,
             'nodeId' => $form->getData() ? $form->getData()->getId() : null,

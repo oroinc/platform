@@ -9,7 +9,8 @@ Feature: User configuration
     And I go to System/User Management/Users
     And I click Configuration on admin in grid "Grid"
     And I click "Display settings"
-    And I uncheck "look_and_feel[oro_ui___navbar_position][use_parent_scope_value]"
-    And I select "Left" from "Position"
+    And I fill "User Config Form" with:
+      | Use parent scope for Position | false   |
+      | Position                      | Left    |
     When I press "Save settings"
-    Then I should see 1 "div.main-menu-sided" elements
+    Then I should see a "Sided Main Menu" element

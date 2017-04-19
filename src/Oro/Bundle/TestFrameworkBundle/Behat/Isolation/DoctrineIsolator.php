@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Behat\Testwork\Suite\Suite;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\SuiteAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureFinder;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\OroAliceLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\ReferenceRepositoryInitializer;
@@ -16,13 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Console\Exception\RuntimeException;
 
-class DoctrineIsolator implements IsolatorInterface, SuiteAwareInterface
+class DoctrineIsolator implements IsolatorInterface
 {
-    /**
-     * @var Suite
-     */
-    protected $suite;
-
     /**
      * @var KernelInterface
      */
@@ -110,20 +106,17 @@ class DoctrineIsolator implements IsolatorInterface, SuiteAwareInterface
         return 'Doctrine';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setSuite(Suite $suite)
+    /** {@inheritdoc} */
+    public function getTag()
     {
-        $this->suite = $suite;
+        return 'doctrine';
     }
 
     /**
-     * @param Suite $suite
      * @param array $tags
      * @return array
      */
-    protected function getFixtureFiles(Suite $suite, array $tags)
+    private function getFixtureFiles(array $tags)
     {
         if (!$tags) {
             return [];
@@ -137,52 +130,7 @@ class DoctrineIsolator implements IsolatorInterface, SuiteAwareInterface
             return null;
         }, $tags));
 
-        return array_map(
-            [$this, 'findFile'],
-            $fixturesFileNames,
-            array_fill(
-                0,
-                count($fixturesFileNames),
-                $suite
-            )
-        );
-    }
-
-    /**
-     * @param string $filename
-     * @return string Real path to file with fuxtures
-     * @throws \InvalidArgumentException
-     */
-    public static function findFile($filename, Suite $suite)
-    {
-        $suitePaths = $suite->getSetting('paths');
-
-        if (!$file = self::findFileInPath($filename, $suitePaths)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Can\'t find "%s" in pahts "%s"',
-                $filename,
-                implode(',', $suitePaths)
-            ));
-        }
-
-        return $file;
-    }
-
-    /**
-     * @param string $filename
-     * @param array $paths
-     * @return string|null
-     */
-    public static function findFileInPath($filename, array $paths)
-    {
-        foreach ($paths as $path) {
-            $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
-            if (is_file($file)) {
-                return $file;
-            }
-        }
-
-        return null;
+        return $fixturesFileNames;
     }
 
     /**
@@ -190,11 +138,11 @@ class DoctrineIsolator implements IsolatorInterface, SuiteAwareInterface
      */
     private function loadFixtures(BeforeIsolatedTestEvent $event)
     {
-        $fixtureFiles = $this->getFixtureFiles($this->suite, $event->getTags());
+        $fixtureFiles = $this->getFixtureFiles($event->getTags());
 
         foreach ($fixtureFiles as $fixtureFile) {
             try {
-                $this->fixtureLoader->loadFile($fixtureFile);
+                $this->fixtureLoader->loadFixtureFile($fixtureFile);
             } catch (\Exception $e) {
                 throw new RuntimeException(
                     sprintf('Exception while loading "%s" fixture file', $fixtureFile),

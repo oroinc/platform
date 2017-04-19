@@ -38,7 +38,7 @@ composer install
 Install application without fixture in prod mode:
 
 ```bash
-app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=OroCRM --env=prod --sample-data=n
+app/console oro:install  --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=ORO --env=prod --sample-data=n
 ```
 
 ### Run tests
@@ -155,7 +155,7 @@ Every bundle has its own test suite and can be run separately:
 #### Suites autoload
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
-During initialization, Extension will create [test suite](http://docs.behat.org/en/v3.0/guides/5.suites.html) with bundle name if any ```Tests/Behat/Features``` directory exits.
+During initialization, Extension will create test suite with bundle name if any ```Tests/Behat/Features``` directory exits.
 Thus, if bundle has no Features directory - no test suite would be created for it.
 
 If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
@@ -175,7 +175,7 @@ default: &default
         - OroDataGridBundle::GridContext
         - AcmeDemoBundle::FeatureContext
       paths:
-        - '@AcmeDemoBundle/Tests/Behat/Features'
+        - 'vendor/Acme/DemoBundle/Tests/Behat/Features'
 ```
 
 Or in bundle behat configuration ```{BundleName}/Tests/Behat/behat.yml```:
@@ -273,6 +273,11 @@ and restoring the cache and database after execution of each feature.
 Every isolator must implement ```Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface``` and ```oro_behat.isolator``` tag with priority.
 See [TestFrameworkBundle/Behat/ServiceContainer/config/isolators.yml](../../../Behat/ServiceContainer/config/isolators.yml)
 
+#### Disable feature isolation
+
+You can disable feature isolation by adding ```--skip-isolators=database,cache``` option to behat console command
+In this case feature should run much faster, but you should care by yourself about database and cache consistency.
+
 ### Write your first feature
 
 Every bundle should hold its own features at ```{BundleName}/Tests/Behat/Features/``` directory
@@ -299,7 +304,7 @@ Feature: User login
 
 Scenario: Success login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
@@ -307,7 +312,7 @@ Scenario: Success login
 
 Scenario Outline: Fail login
   Given I am on "/user/login"
-  When I fill "Login" form with:
+  When I fill "Login Form" with:
       | Username | <login>    |
       | Password | <password> |
   And I press "Log in"
@@ -369,12 +374,21 @@ Alice is a library that allows you easily create fixtures in yml format.
 See [Alice Documentation](https://github.com/nelmio/alice/blob/2.x/README.md).
 
 Fixtures should be located in ```{BundleName}/Tests/Behat/Features/Fixtures``` directory.
-For load fixture before feature add tag with fixture file name and ```@fixture-``` prefix.
+For load fixture before feature add tag with fixture file name and ```@fixture-``` prefix e.g. ```@fixture-mass_action.yml```
 
 ```gherkin
-#package/crm/src/OroCRM/Bundle/ContactBundle/Tests/Behat/Features/contact-grid.feature
-@fixture-contacts.yml
-Feature: Contacts grid
+#package/crm/src/Oro/Bundle/CRMBundle/Tests/Behat/Features/mass_delete.feature
+@fixture-mass_action.yml
+Feature: Mass Delete records
+```
+
+Also it is possible to load fixtures for other bundles using shortcut syntax ```@fixture-OroOrganizationBundle:BusinessUnit.yml```
+
+```gherkin
+#package/platform/src/Oro/Bundle/WorkflowBundle/Tests/Behat/Features/workflow-with-attributes.feature
+@fixture-OroUserBundle:user.yml
+@fixture-OroOrganizationBundle:BusinessUnit.yml
+Feature: Adding attributes for workflow transition
 ```
 
 #### Entity references

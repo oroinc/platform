@@ -1,24 +1,23 @@
 <?php
 namespace Oro\Bundle\ImportExportBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Gaufrette\Exception\FileNotFound;
+
+use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Routing\Router;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-
-use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\Router;
 
 class ImportExportResultSummarizer
 {
     const TEMPLATE_IMPORT_RESULT = 'import_result';
     const TEMPLATE_IMPORT_VALIDATION_RESULT = 'import_validation_result';
     const TEMPLATE_EXPORT_RESULT = 'export_result';
+    const TEMPLATE_IMPORT_ERROR = 'import_error';
 
     /**
      * @var Router
@@ -31,108 +30,110 @@ class ImportExportResultSummarizer
     protected $configManager;
 
     /**
-     * @var EmailRenderer
+     * @var FileManager
      */
-    protected $renderer;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $managerRegistry;
+    protected $fileManager;
 
     /**
      * @param Router $router
      * @param ConfigManager $configManager
-     * @param EmailRenderer $renderer,
-     * @param ManagerRegistry $managerRegistry,
      */
-    public function __construct(
-        Router $router,
-        ConfigManager $configManager,
-        EmailRenderer $renderer,
-        ManagerRegistry $managerRegistry
-    ) {
+    public function __construct(Router $router, ConfigManager $configManager, FileManager $fileManager)
+    {
         $this->router = $router;
         $this->configManager = $configManager;
-        $this->renderer = $renderer;
-        $this->managerRegistry = $managerRegistry;
-    }
-
-    /**
-     * @param string $emailTemplateName
-     *
-     * @return EmailTemplateInterface
-     */
-    protected function findEmailTemplateByName($emailTemplateName)
-    {
-        return $this->managerRegistry
-            ->getManagerForClass(EmailTemplate::class)
-            ->getRepository(EmailTemplate::class)
-            ->findOneBy(['name' => $emailTemplateName]);
+        $this->fileManager = $fileManager;
     }
 
     /**
      * @param Job $job
-     * @param $fileName
-     * @param $template
-     * @return array |[$body, $subject]
+     * @param string $fileName
+     *
+     * @return array
      */
-    public function getSummaryResultForNotification(Job $job, $fileName, $template)
+    public function getSummaryResultForNotification(Job $job, $fileName)
     {
         $job = $job->isRoot() ? $job : $job->getRootJob();
+
         $data = $this->getImportResultAsArray($job);
         $data['fileName'] = $fileName;
-        $data['downloadLogUrl'] = $this->getImportDownloadLogUrl($job->getId());
-        $emailTemplate = $this->findEmailTemplateByName($template);
+        $data['downloadLogUrl'] = $this->getDownloadErrorLogUrl($job->getId());
 
-//        TODO refactor in https://magecore.atlassian.net/browse/BAP-13215
-        return $this->renderer->compileMessage($emailTemplate, ['data' => $data]);
+        return ['data' => $data];
     }
 
     /**
-     * @param string $jobUniqueName
-     * @param array $exportResult
-     * @return array |[$body, $subject]
+     * @param Job $job
+     * @param string $fileName
+     *
+     * @return array
      */
-    public function processSummaryExportResultForNotification($jobUniqueName, array $exportResult)
+    public function processSummaryExportResultForNotification(Job $job, $fileName)
     {
-        $emailTemplate = $this->findEmailTemplateByName(self::TEMPLATE_EXPORT_RESULT);
+        $job = $job->isRoot() ? $job : $job->getRootJob();
+        $data = $this->getExportResultAsArray($job);
+        $data['fileName'] = $fileName;
 
-        return $this->renderer->compileMessage(
-            $emailTemplate,
-            ['exportResult' => $exportResult, 'jobName' => $jobUniqueName, ]
-        );
+        $url = $this->configManager->get('oro_ui.application_url') .
+            $this->router->generate('oro_importexport_export_download', ['fileName' => basename($fileName)]);
+
+        $data['url'] = $url;
+        $data['downloadLogUrl'] = $this->getDownloadErrorLogUrl($job->getId());
+        if (! $data['success']) {
+            $data['url'] = $data['downloadLogUrl'];
+        }
+
+        return ['exportResult' => $data, 'jobName' => $job->getName()];
     }
 
+    /**
+     * @param Job $job
+     *
+     * @throws FileNotFound
+     *
+     * @return null|string
+     */
     public function getErrorLog(Job $job)
     {
         $errorLog = null;
-        $i = 0;
+        $job = $job->isRoot() ? $job : $job->getRootJob();
         foreach ($job->getChildJobs() as $childrenJob) {
             $childrenJobData = $childrenJob->getData();
             if (empty($childrenJobData)) {
                 continue;
             }
-            $i++;
-            foreach ($childrenJobData['errors'] as $errorMessage) {
-                $errorLog .= sprintf("error in part #%s: %s\n\r", $i, $errorMessage);
+            $fileName = $childrenJobData['errorLogFile'];
+
+            if (! $this->fileManager->isFileExist($fileName)) {
+                $errorLog .=  sprintf('Log file of job id: "%s" was not found.', $childrenJob->getId()) . PHP_EOL;
+                continue;
             }
+
+            $errorLog .= implode(
+                PHP_EOL,
+                json_decode($this->fileManager->getContent($fileName), true)
+            ). PHP_EOL;
         }
+
         return $errorLog;
     }
 
-    protected function getImportDownloadLogUrl($jobId)
+    /**
+     * @param integer $jobId
+     *
+     * @return string
+     */
+    protected function getDownloadErrorLogUrl($jobId)
     {
-        $url = $this->configManager->get('oro_ui.application_url') . $this->router->generate(
-            'oro_importexport_import_error_log',
-            ['jobId' => $jobId]
-        );
+        $url = $this->configManager->get('oro_ui.application_url') .
+            $this->router->generate('oro_importexport_job_error_log', ['jobId' => $jobId]);
 
         return $url;
     }
 
     /**
      * @param Job $job
+     *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -160,9 +161,6 @@ class ImportExportResultSummarizer
             $data['successParts'] += (int)$childrenJobData['success'];
             $data['totalParts'] += 1;
             $totalDataImportJob = $childrenJobData['counts'];
-            if (count($childrenJobData['errors'])) {
-                $data['hasError'] = true;
-            }
             $data['errors'] += isset($totalDataImportJob['errors']) ? $totalDataImportJob['errors'] : 0;
             $data['process'] += isset($totalDataImportJob['process']) ? $totalDataImportJob['process'] : 0;
             $data['read'] += isset($totalDataImportJob['read']) ? $totalDataImportJob['read'] : 0;
@@ -174,10 +172,49 @@ class ImportExportResultSummarizer
                 $totalDataImportJob['error_entries'] : 0;
         }
 
+            $data['hasError'] = !!$data['errors'];
+
         return $data;
     }
 
-    public function getSummaryMessage(array $data, $process, LoggerInterface $logger)
+    /**
+     * @param Job $job
+     *
+     * @return array
+     */
+    protected function getExportResultAsArray(Job $job)
+    {
+        $data = [];
+        $data['readsCount'] = 0;
+        $data['errorsCount'] = 0;
+        $data['entities'] = null;
+        $data['success'] = 0;
+
+        foreach ($job->getChildJobs() as $childrenJob) {
+            $childrenJobData = $childrenJob->getData();
+            if (empty($childrenJobData)) {
+                continue;
+            }
+
+            $data['readsCount'] += $childrenJobData['readsCount'];
+            $data['errorsCount'] += $childrenJobData['errorsCount'];
+            $data['success']  += $childrenJobData['success'];
+            $data['entities'] = isset($childrenJobData['entities']) ? $childrenJobData['entities'] : $data['entities'];
+        }
+
+        $data['success'] = !!$data['success'];
+
+        return $data;
+    }
+
+    /**
+     * @param array $data
+     * @param string $process
+     * @param LoggerInterface $logger
+     *
+     * @return string
+     */
+    public function getImportSummaryMessage(array $data, $process, LoggerInterface $logger)
     {
         switch ($process) {
             case ProcessorRegistry::TYPE_IMPORT:

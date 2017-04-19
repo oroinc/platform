@@ -22,10 +22,10 @@ class UserRoleForm extends Form
 
         /** @var NodeElement $level */
         foreach ($levels as $level) {
-            $availableLevel = $level->getText();
-            $availableLevels[] = $availableLevel;
+            $levelCaption = strip_tags($level->getHtml());
+            $availableLevels[] = $levelCaption;
 
-            if (preg_match(sprintf('/%s/i', $accessLevel), $level->getText())) {
+            if (preg_match(sprintf('/%s/i', $accessLevel), $levelCaption)) {
                 $level->mouseOver();
                 $level->click();
                 return;
@@ -41,6 +41,16 @@ class UserRoleForm extends Form
     }
 
     /**
+     * Checks capability permission checkbox
+     *
+     * @param $name
+     */
+    public function setCheckBoxPermission($name)
+    {
+        $this->findLabel($name)->find('css', 'input')->check();
+    }
+
+    /**
      * @param NodeElement $entityRow
      * @param string $action
      * @return NodeElement
@@ -52,7 +62,10 @@ class UserRoleForm extends Form
             if (preg_match(sprintf('/%s/i', $action), $label->getText())) {
                 $label->click();
 
-                return $label->getParent()->getParent()->find('css', 'div.dropdown-menu');
+                $dropDown = $this->getPage()->findVisible('css', 'div.dropdown-menu');
+                self::assertNotNull($dropDown, "Visible permission list dropdown not found for $action");
+
+                return $dropDown;
             }
         }
 

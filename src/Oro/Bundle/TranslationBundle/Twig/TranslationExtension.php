@@ -23,6 +23,7 @@ class TranslationExtension extends \Twig_Extension
      */
     public function __construct(ContainerInterface $container, $debugTranslator)
     {
+        $this->debugTranslator = $debugTranslator;
         $this->container = $container;
     }
 

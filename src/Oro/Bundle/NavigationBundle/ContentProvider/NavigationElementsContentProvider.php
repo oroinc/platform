@@ -4,27 +4,23 @@ namespace Oro\Bundle\NavigationBundle\ContentProvider;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
 use Oro\Bundle\UIBundle\ContentProvider\AbstractContentProvider;
 
 class NavigationElementsContentProvider extends AbstractContentProvider
 {
-    /** @var array */
-    protected $configuration;
+    /** @var ConfigurationProvider */
+    private $configurationProvider;
 
     /** @var Request */
     protected $request;
 
     /**
-     * @param array $configuration array of current configuration comes from navigation.yml configs.
-     *                             Example: [
-     *                                 'pinBar' => [
-     *                                    'routes'  => ['page_with_pinbar' => true, 'page_without_pinbar' => false]
-     *                                    'default' => true
-     *                             ]
+     * @param ConfigurationProvider $configurationProvider
      */
-    public function __construct(array $configuration)
+    public function __construct(ConfigurationProvider $configurationProvider)
     {
-        $this->configuration = $configuration;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -40,17 +36,25 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     public function getContent()
     {
-        $elements      = array_keys($this->configuration);
+        $navigationElements = $this->configurationProvider
+            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+
+        $elements = array_keys($navigationElements);
         $defaultValues = $values = array_map(
             function ($item) {
                 return $item['default'];
             },
-            $this->configuration
+            $navigationElements
         );
 
         if (null !== $this->request) {
             $attributes = $this->request->attributes;
-            $routeName  = $attributes->get('_route') ?: $attributes->get('_master_request_route') ?: '' ;
+
+            $routeName  = $attributes->get('_route');
+            if (!$routeName) {
+                $routeName = $attributes->get('_master_request_route') ?: '' ;
+            }
+
             $hasErrors  = $attributes->get('exception');
 
             foreach ($elements as $elementName) {
@@ -82,7 +86,10 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     protected function hasConfigValue($element, $route)
     {
-        return isset($this->configuration[$element], $this->configuration[$element]['routes'][$route]);
+        $navigationElements = $this->configurationProvider
+            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+
+        return isset($navigationElements[$element], $navigationElements[$element]['routes'][$route]);
     }
 
     /**
@@ -93,6 +100,9 @@ class NavigationElementsContentProvider extends AbstractContentProvider
      */
     protected function getConfigValue($element, $route)
     {
-        return $this->hasConfigValue($element, $route) ? (bool)$this->configuration[$element]['routes'][$route] : null;
+        $navigationElements = $this->configurationProvider
+            ->getConfiguration(ConfigurationProvider::NAVIGATION_ELEMENTS_KEY);
+
+        return $this->hasConfigValue($element, $route) ? (bool)$navigationElements[$element]['routes'][$route] : null;
     }
 }

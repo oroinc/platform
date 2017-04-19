@@ -67,5 +67,5 @@ Configuration Load
 To load or update configurable permissions configuration to cache execute a command:
 
 ```
-oro:configurable-permission:load
+security:configurable-permission:load
 ```

@@ -11,3 +11,49 @@
         {{ block_widget(block) }}
     </div>
 {% endblock %}
+
+{% block page_subtitle_widget %}
+    {% set attr = layout_attr_defaults(attr, {'~class': ' page-subtitle'}) %}
+    <h2 {{ block('block_attributes') }}>
+        {% if icon %}<span class="badge {{ badge ? 'badge--' ~ badge }}"><i class="fa-{{ icon }}"></i></span>{% endif %}
+        <span class="page-subtitle__text">{{ text|block_text(translation_domain) }}</span>
+        {{ block('container_widget') }}
+    </h2>
+{% endblock %}
+
+{% block breadcrumbs_widget %}
+    {% if breadcrumbs is empty %}
+        {% set breadcrumbs = blocks.title.vars.value|split(' - ')|reverse %}
+    {% endif %}
+
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' breadcrumbs'
+    }) %}
+    <div {{ block('block_attributes') }}>
+        <span class="breadcrumbs__item">
+            {% if breadcrumbs is not iterable %}
+                {{ breadcrumbs }}
+            {% else %}
+                {% for breadcrumb in breadcrumbs %}
+                    {{ not loop.first ? ' / ' }}
+                    {% if breadcrumb.label is defined %}
+                        {% if breadcrumb.uri is defined %}
+                            {% set url = breadcrumb.uri %}
+                        {% else %}
+                            {% set url = breadcrumb.url %}
+                        {% endif %}
+
+                        {% if url and not loop.last %}
+                            <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
+                        {% else %}
+                            {{ breadcrumb.label|trans }}
+                        {% endif %}
+                    {%  else %}
+                        {{ breadcrumb }}
+                    {%  endif %}
+                {% endfor %}
+            {% endif %}
+        </span>
+        {{ block('container_widget') }}
+    </div>
+{% endblock %}

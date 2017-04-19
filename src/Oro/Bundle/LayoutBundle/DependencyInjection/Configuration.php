@@ -13,6 +13,8 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
     const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
 
+    const AUTO = 'auto';
+
     /**
      * {@inheritdoc}
      */
@@ -211,7 +213,7 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         $widthHeightValidator = function ($value) {
-            return !is_null($value) && !is_int($value);
+            return !is_null($value) && !is_int($value) && self::AUTO !== $value;
         };
 
         $imagesNode
@@ -232,18 +234,27 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('dimensions')
                     ->useAttributeAsKey('name')
                     ->prototype('array')
+                        ->validate()
+                            ->ifTrue(function (array $dimension) {
+                                return self::AUTO === $dimension['width'] && self::AUTO === $dimension['height'];
+                            })
+                            ->thenInvalid('Either width or height can be set to \'auto\', not both.')
+                        ->end()
                         ->children()
                             ->scalarNode('width')
                                 ->validate()
                                     ->ifTrue($widthHeightValidator)
-                                    ->thenInvalid('Width value can be null or integer only')
+                                    ->thenInvalid('Width value can be null, \'auto\' or integer only')
                                 ->end()
                             ->end()
                             ->scalarNode('height')
                                 ->validate()
                                     ->ifTrue($widthHeightValidator)
-                                    ->thenInvalid('Height value can be null or integer only')
+                                    ->thenInvalid('Height value can be null, \'auto\' or integer only')
                                 ->end()
+                            ->end()
+                            ->arrayNode('options')
+                                ->prototype('variable')
                             ->end()
                         ->end()
                     ->end()

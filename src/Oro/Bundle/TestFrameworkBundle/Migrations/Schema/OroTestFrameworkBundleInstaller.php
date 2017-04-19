@@ -16,6 +16,10 @@ use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareInterface;
 use Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtensionAwareTrait;
 
 /**
+ * IMPORTANT!!!
+ * Please, do not create new migrations in `Migrations/Schema` folder!
+ * Add new schema migrations to this installer instead.
+ *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
@@ -54,7 +58,7 @@ class OroTestFrameworkBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_0';
     }
 
     /**

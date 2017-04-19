@@ -36,4 +36,25 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(TranslationExtension::NAME, $this->extension->getName());
     }
+
+    /**
+     * @dataProvider isDebugTranslatorDataProvider
+     *
+     * @param bool $debugTranslator
+     */
+    public function testIsDebugTranslator($debugTranslator)
+    {
+        $extension = new TranslationExtension(self::getContainerBuilder()->getContainer($this), $debugTranslator);
+
+        $this->assertEquals($debugTranslator, $extension->isDebugTranslator());
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function isDebugTranslatorDataProvider()
+    {
+        yield 'translator debug enabled' => ['debugTranslator' => true];
+        yield 'translator debug disabled' => ['debugTranslator' => false];
+    }
 }

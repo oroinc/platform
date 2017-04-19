@@ -1,15 +1,22 @@
 oro:
     comment:
-        entity_label: Comment
-        entity_plural_label: Comments
-        id.label: Id
+        entity_label:         Comment
+        entity_plural_label:  Comments
+        entity_description:   The written remarks related to specific entity records.
+        id:
+            label:            Id
+            description:      The unique identifier of the comment record.
         message:
-            label: Message
-            description: The message body content
-        organization.label: Organization
-        owner.label: Owner
-        updated_by.label: Updated by
-        attachment.label: Attachment
+            label:            Message
+            description:      The comment text.
+        organization.label:   Organization
+        owner.label:          Owner
+        updated_by:
+            label:            Updated by
+            description:      The user who last updated the comment.
+        attachment:
+            label:            Attachment
+            description:      The file that is attached to the comment.
 
         message.placeholder: Enter your comment...
         enabled: Enable comments

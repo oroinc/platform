@@ -72,18 +72,6 @@ class EmailFolderApiType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            [
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
-            ]
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();

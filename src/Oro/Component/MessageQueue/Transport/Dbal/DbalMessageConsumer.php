@@ -54,6 +54,14 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
+     * @return string
+     */
+    public function getConsumerId()
+    {
+        return $this->consumerId;
+    }
+
+    /**
      * Set polling interval in milliseconds
      *
      * @param int $msec
@@ -130,10 +138,39 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
 
-        $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
-            'id' => Type::INTEGER,
-        ]);
+        $this->dbal->beginTransaction();
 
+        $sql = sprintf(
+            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
+            $this->connection->getTableName()
+        );
+
+        $row = $this->dbal->executeQuery(
+            $sql,
+            ['id' => $message->getId(), ],
+            ['id' => Type::INTEGER, ]
+        )->fetch();
+        $affectedRows = null;
+        if (count($row)) {
+            try {
+                $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
+                    'id' => Type::INTEGER,
+                ]);
+                $this->dbal->commit();
+            } catch (\Exception $e) {
+                sleep(1);
+                try {
+                    $affectedRows = $this->dbal->delete(
+                        $this->connection->getTableName(),
+                        ['id' => $message->getId()],
+                        ['id' => Type::INTEGER, ]
+                    );
+                    $this->dbal->commit();
+                } catch (\Exception $e) {
+                    $this->dbal->rollBack();
+                }
+            }
+        }
         if (1 !== $affectedRows) {
             throw new \LogicException(sprintf(
                 'Expected record was removed but it is not. id: "%s"',
@@ -151,15 +188,49 @@ class DbalMessageConsumer implements MessageConsumerInterface
     {
         InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
 
-        $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()]);
+        $this->dbal->beginTransaction();
 
+        $sql = sprintf(
+            'SELECT id FROM %s WHERE id=:id FOR UPDATE',
+            $this->connection->getTableName()
+        );
+
+        $row = $this->dbal->executeQuery(
+            $sql,
+            [
+                'id' => $message->getId(),
+            ],
+            [
+                'id' => Type::INTEGER,
+            ]
+        )->fetch();
+        $affectedRows = null;
+        if (count($row)) {
+            try {
+                $affectedRows = $this->dbal->delete($this->connection->getTableName(), ['id' => $message->getId()], [
+                    'id' => Type::INTEGER,
+                ]);
+                $this->dbal->commit();
+            } catch (\Exception $e) {
+                sleep(1);
+                try {
+                    $affectedRows = $this->dbal->delete(
+                        $this->connection->getTableName(),
+                        ['id' => $message->getId()],
+                        ['id' => Type::INTEGER, ]
+                    );
+                    $this->dbal->commit();
+                } catch (\Exception $e) {
+                    $this->dbal->rollBack();
+                }
+            }
+        }
         if (1 !== $affectedRows) {
             throw new \LogicException(sprintf(
                 'Expected record was removed but it is not. id: "%s"',
                 $message->getId()
             ));
         }
-
         if ($requeue) {
             $dbalMessage = [
                 'body' => $message->getBody(),
@@ -229,7 +300,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
                 $messageId = $row['id'];
 
                 $sql = sprintf(
-                    'UPDATE %s SET consumer_id=:consumerId, delivered_at=:deliveredAt WHERE id = :messageId',
+                    'UPDATE %s SET consumer_id=:consumerId  WHERE id = :messageId',
                     $this->connection->getTableName()
                 );
 
@@ -237,13 +308,11 @@ class DbalMessageConsumer implements MessageConsumerInterface
                     $sql,
                     [
                         'messageId' => $messageId,
-                        'consumerId' => $this->consumerId,
-                        'deliveredAt' => $now,
+                        'consumerId' => $this->consumerId
                     ],
                     [
                         'messageId' => Type::STRING,
-                        'consumerId' => Type::STRING,
-                        'deliveredAt' => Type::INTEGER,
+                        'consumerId' => Type::STRING
                     ]
                 );
 
@@ -307,5 +376,13 @@ class DbalMessageConsumer implements MessageConsumerInterface
         }
 
         return $message;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->consumerId;
     }
 }

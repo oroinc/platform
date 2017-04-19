@@ -21,10 +21,6 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Util\DateTimeParser;
 
 /**
- * Class ImapEmailManager
- *
- * @package Oro\Bundle\ImapBundle\Manager
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -55,7 +51,7 @@ class ImapEmailManager
      */
     public function hasCapability($capability)
     {
-        return in_array($capability, $this->connector->getCapability());
+        return in_array($capability, $this->connector->getCapability(), true);
     }
 
     /**
@@ -206,7 +202,7 @@ class ImapEmailManager
                         $this->connector->getUidValidity()
                     )
                 )
-                ->setSubject($this->getString($headers, 'Subject', self::SUBJECT_MAX_LENGTH))
+                ->setSubject($this->getString($headers, 'Subject', self::SUBJECT_MAX_LENGTH, false))
                 ->setFrom($this->getString($headers, 'From'))
                 ->setSentAt($this->getDateTime($headers, 'Date'))
                 ->setReceivedAt($this->getReceivedAt($headers))
@@ -217,7 +213,7 @@ class ImapEmailManager
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'))
                 ->setMessageId($this->getMessageId($headers, 'Message-ID'))
                 ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'))
-                ->setAcceptLanguageHeader($this->getAcceptLanguageHeader($headers));
+                ->setAcceptLanguageHeader($this->getAcceptLanguage($headers));
 
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);
@@ -250,7 +246,7 @@ class ImapEmailManager
      *
      * @return string
      */
-    protected function getAcceptLanguageHeader(Headers $headers)
+    protected function getAcceptLanguage(Headers $headers)
     {
         $header = $headers->get('Accept-Language');
 
@@ -276,36 +272,49 @@ class ImapEmailManager
      * Gets a string representation of an email header
      *
      * @param Headers $headers
-     * @param string $name
-     * @param int $lengthLimit if more than 0 returns part of header specified length
+     * @param string  $name
+     * @param int     $lengthLimit If more than 0 returns part of header specified length
+     * @param bool    $strict      If FALSE and there are several headers exist
+     *                             than the value of the first header is returned
      *
      * @return string
      *
      * @throws \RuntimeException if a value of the requested header cannot be converted to a string
      */
-    protected function getString(Headers $headers, $name, $lengthLimit = 0)
+    protected function getString(Headers $headers, $name, $lengthLimit = 0, $strict = true)
     {
         $header = $headers->get($name);
         if ($header === false) {
             return '';
-        } elseif ($header instanceof \ArrayIterator) {
-            $values = [];
-            $header->rewind();
-            while ($header->valid()) {
-                $values[] = sprintf('"%s"', $header->current()->getFieldValue());
-                $header->next();
-            }
-            throw new \RuntimeException(
-                sprintf(
-                    'It is expected that the header "%s" has a string value, '
-                    . 'but several values are returned. Values: %s.',
-                    $name,
-                    implode(', ', $values)
-                )
-            );
         }
 
-        $headerValue = $header->getFieldValue();
+        $headerValue = '';
+        if ($header instanceof \ArrayIterator) {
+            if ($strict) {
+                $values = [];
+                $header->rewind();
+                while ($header->valid()) {
+                    $values[] = sprintf('"%s"', $header->current()->getFieldValue());
+                    $header->next();
+                }
+                throw new \RuntimeException(
+                    sprintf(
+                        'It is expected that the header "%s" has a string value, '
+                        . 'but several values are returned. Values: %s.',
+                        $name,
+                        implode(', ', $values)
+                    )
+                );
+            } else {
+                $header->rewind();
+                if ($header->valid()) {
+                    $headerValue = $header->current()->getFieldValue();
+                }
+            }
+        } else {
+            $headerValue = $header->getFieldValue();
+        }
+
         if ($lengthLimit > 0 && $lengthLimit < mb_strlen($headerValue)) {
             $headerValue = mb_strcut($headerValue, 0, $lengthLimit);
         }

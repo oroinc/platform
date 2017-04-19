@@ -73,8 +73,14 @@ define([
         if ($widgetContainer) {
             $target = $widgetContainer;
         }
-        if ($target.parent().is('.input-append, .input-prepend')) {
-            $target = $target.parent();
+        var $parent = $target.parent();
+        if ($parent.is('.input-append, .input-prepend')) {
+            $target = $parent;
+        }
+        var $validateGroup;
+        if ($target.is(element) && ($validateGroup = $target.closest('.validate-group')).length) {
+            // the element inside validate group -- pass delegate validation to it
+            $target = $validateGroup;
         }
 
         return $target;
@@ -172,11 +178,11 @@ define([
      * @returns {jQuery}
      */
     $.validator.prototype.elementsOf = function(element) {
-        var $additionalElements = $(this.currentForm).find(':input[data-validate-element]');
-        return $(element).find('input, select, textarea')
+        var $element = $(element);
+        return $element.find('input, select, textarea')
             .not(':submit, :reset, :image, [disabled]')
             .not(this.settings.ignore)
-            .add($additionalElements);
+            .add($element.find(':input[data-validate-element]'));
     };
 
     // translates default messages
@@ -193,11 +199,12 @@ define([
 
     // updates place for message label before show message
     $.validator.prototype.showLabel = _.wrap($.validator.prototype.showLabel, function(func, element, message) {
+        message = '<span><span>' + message + '</span></span>';
         var label = this.errorsFor(element);
         if (message && label.length) {
             this.settings.errorPlacement(label, element);
         }
-        return func.apply(this, _.rest(arguments));
+        return func.call(this, element, message);
     });
 
     // fixes focus on select2 element
@@ -285,7 +292,13 @@ define([
             });
         })(errors);
 
-        this.showErrors(result);
+        result = _.omit(result, function(message, name) {
+            return !this.findByName(name)[0];
+        }, this);
+
+        if (!_.isEmpty(result)) {
+            this.showErrors(result);
+        }
     };
 
     $.validator.prototype.collectPristineValues = function() {
@@ -359,7 +372,12 @@ define([
         onfocusout: function(element, event) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {
-                    var realField = $(element).closest('.select2-container').parent()
+                    var $selectContainer = $(element).closest('.select2-container');
+                    // prevent validation if selection still in progress
+                    if ($selectContainer.hasClass('select2-dropdown-open')) {
+                        return;
+                    }
+                    var realField = $selectContainer.parent()
                         .find('.select2[type=hidden], select.select2')[0];
                     this.element(realField ? realField : element);
                 } else {
@@ -441,6 +459,49 @@ define([
             });
         }
         return rules;
+    });
+
+    /**
+     * Extend original addMethod method and implements
+     *
+     * - validation methods:
+     *     method can resolve array of params in same validation method
+     *
+     * @type {Function}
+     */
+    $.validator.addMethod = _.wrap($.validator.addMethod, function(addMethod, name, method, message) {
+        method = _.wrap(method, function(method, value, element, params) {
+            if (!_.isArray(params)) {
+                return method.call(this, value, element, params);
+            }
+            return _.every(params, function(param, index) {
+                var result = method.call(this, value, element, param);
+                if (!result) {
+                    params.failedIndex = index;
+                }
+                return result;
+            }, this);
+        });
+
+        if (_.isFunction(message)) {
+            message = _.wrap(message, function(message, params, element) {
+                if (!_.isArray(params)) {
+                    return message.call(this, params, element);
+                }
+                var param = params[params.failedIndex];
+                delete params.failedIndex;
+                if (param === undefined) {
+                    var e = new Error(
+                        'For multi-rule validations you should call rule "method" function before access to message.'
+                    );
+                    error.showErrorInConsole(e);
+                    throw e;
+                }
+                return message.call(this, param, element);
+            });
+        }
+
+        return addMethod.call(this, name, method, message);
     });
 
     $.fn.validateDelegate = _.wrap($.fn.validateDelegate, function(validateDelegate, delegate, type, handler) {

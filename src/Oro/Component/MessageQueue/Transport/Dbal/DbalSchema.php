@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
-use Doctrine\DBAL\Connection;
 
 class DbalSchema extends BaseSchema
 {
@@ -55,22 +55,20 @@ class DbalSchema extends BaseSchema
     private function addQueueTable()
     {
         $table = $this->createTable($this->tableName);
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true,]);
-        $table->addColumn('body', 'text', ['notnull' => false,]);
-        $table->addColumn('headers', 'text', ['notnull' => false,]);
-        $table->addColumn('properties', 'text', ['notnull' => false,]);
-        $table->addColumn('consumer_id', 'string', ['notnull' => false,]);
-        $table->addColumn('redelivered', 'boolean', ['notnull' => false,]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true, ]);
+        $table->addColumn('body', 'text', ['notnull' => false, ]);
+        $table->addColumn('headers', 'text', ['notnull' => false, ]);
+        $table->addColumn('properties', 'text', ['notnull' => false, ]);
+        $table->addColumn('consumer_id', 'string', ['notnull' => false, ]);
+        $table->addColumn('redelivered', 'boolean', ['notnull' => false, ]);
         $table->addColumn('queue', 'string');
         $table->addColumn('priority', 'smallint');
-        $table->addColumn('delivered_at', 'integer', ['notnull' => false,]);
-        $table->addColumn('delayed_until', 'integer', ['notnull' => false,]);
+        $table->addColumn('delayed_until', 'integer', ['notnull' => false, ]);
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['consumer_id']);
         $table->addIndex(['queue']);
         $table->addIndex(['priority']);
-        $table->addIndex(['delivered_at']);
         $table->addIndex(['delayed_until']);
     }
 }

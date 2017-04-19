@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ReportBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-
 use Knp\Menu\ItemInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -27,22 +26,28 @@ class NavigationListener
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param EntityManager    $entityManager
      * @param ConfigProvider   $entityConfigProvider
      * @param SecurityFacade   $securityFacade
      * @param AclHelper        $aclHelper
+     * @param FeatureChecker   $featureChecker
      */
     public function __construct(
         EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
         SecurityFacade $securityFacade,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        FeatureChecker $featureChecker
     ) {
         $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->securityFacade       = $securityFacade;
         $this->aclHelper            = $aclHelper;
+        $this->featureChecker       = $featureChecker;
     }
 
     /**
@@ -55,6 +60,14 @@ class NavigationListener
             $qb = $this->em->getRepository('OroReportBundle:Report')
                 ->createQueryBuilder('report')
                 ->orderBy('report.name', 'ASC');
+
+            $excludedEntities = $this->featureChecker->getDisabledResourcesByType('entities');
+            if ($excludedEntities) {
+                $qb
+                    ->andWhere($qb->expr()->notIn('report.entity', ':excluded_entities'))
+                    ->setParameter('excluded_entities', $excludedEntities);
+            }
+
             $reports = $this->aclHelper->apply($qb)->execute();
 
             if (!empty($reports)) {

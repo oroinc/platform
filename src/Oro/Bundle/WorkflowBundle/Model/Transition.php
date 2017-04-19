@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
@@ -91,6 +93,20 @@ class Transition
 
     /** @var string */
     protected $initContextAttribute;
+
+    /** @var bool */
+    protected $hasFormConfiguration = false;
+
+    /** @var TransitionOptionsResolver */
+    protected $optionsResolver;
+
+    /**
+     * @param TransitionOptionsResolver $optionsResolver
+     */
+    public function __construct(TransitionOptionsResolver $optionsResolver)
+    {
+        $this->optionsResolver = $optionsResolver;
+    }
 
     /**
      * Set label.
@@ -296,11 +312,13 @@ class Transition
      */
     public function isAvailable(WorkflowItem $workflowItem, Collection $errors = null)
     {
-        if ($this->hasForm()) {
-            return $this->isPreConditionAllowed($workflowItem, $errors);
-        } else {
-            return $this->isAllowed($workflowItem, $errors);
-        }
+        $result = $this->hasForm()
+            ? $this->isPreConditionAllowed($workflowItem, $errors)
+            : $this->isAllowed($workflowItem, $errors);
+
+        $this->optionsResolver->resolveTransitionOptions($this, $workflowItem);
+
+        return $result;
     }
 
     /**
@@ -372,7 +390,8 @@ class Transition
      */
     public function hasForm()
     {
-        return !empty($this->formOptions) && !empty($this->formOptions['attribute_fields']);
+        return (!empty($this->formOptions) && !empty($this->formOptions['attribute_fields']))
+            || $this->hasFormConfiguration();
     }
 
     /**
@@ -692,5 +711,45 @@ class Transition
         $this->initContextAttribute = $initContextAttribute;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormHandler()
+    {
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['handler'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormDataAttribute()
+    {
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['data_attribute'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormTemplate()
+    {
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['template'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormDataProvider()
+    {
+        return $this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]['data_provider'];
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasFormConfiguration()
+    {
+        return !empty($this->formOptions[WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION]);
     }
 }

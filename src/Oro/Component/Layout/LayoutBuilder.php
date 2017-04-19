@@ -352,4 +352,12 @@ class LayoutBuilder implements LayoutBuilderInterface
 
         return null;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotAppliedActions()
+    {
+        return $this->layoutManipulator->getNotAppliedActions();
+    }
 }

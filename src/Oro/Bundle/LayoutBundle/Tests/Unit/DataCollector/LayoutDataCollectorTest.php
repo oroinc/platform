@@ -64,20 +64,19 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $contextData = [
             'string' => 'string',
-            'array' => ['array'],
-            'object' => new \stdClass()
+            'array' => [],
+            'object' => \stdClass::class
         ];
         foreach ($contextData as $name => $item) {
             $context->data()->set($name, $item);
         }
-        $contextData['array'] = json_encode($contextData['array']);
-        $contextData['object'] = get_class($contextData['object']);
 
         $this->contextHolder
             ->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
 
+        $this->dataCollector->setNotAppliedActions(['action1', 'action2']);
         $this->dataCollector->collect($this->getMockRequest(), $this->getMockResponse());
 
         $result = [
@@ -86,7 +85,9 @@ class LayoutDataCollectorTest extends \PHPUnit_Framework_TestCase
                 'data' => $contextData
             ],
             'views' => [],
-            'count' => 0
+            'count' => 0,
+            'not_applied_actions_count' => 2,
+            'not_applied_actions' => ['action1', 'action2']
         ];
 
         $this->assertEquals($result, $this->dataCollector->getData());

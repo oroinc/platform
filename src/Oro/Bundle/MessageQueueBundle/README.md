@@ -4,6 +4,7 @@
 
  - [Overview](#overview)
  - [Usage](#usage)
+ - [Cunsomer options](#cunsomer-options)
  - [Supervisord](#supervisord)
  - [Internals](#internals)
    - [Structure](#structure)
@@ -101,12 +102,57 @@ Now you can start consuming messages:
 
 _**Note**: Add -vvv to find out what is going while you are consuming messages. There is a lot of valuable debug info there._
 
+### Consumer options
+
+* `--message-limit=MESSAGE-LIMIT`                Consume n messages and exit
+* `--time-limit=TIME-LIMIT`                      Consume messages during this time
+* `--memory-limit=MEMORY-LIMIT`                  Consume messages until process reaches this memory limit in MB
+
+The `--memory-limit` option is recommended for the normal consumer usage. If the option is set a consumer checks
+the used memory amount after each message processing and terminates if it is exceeded. For example if a consumer
+was run:
+
+```bash
+./app/console oro:message-queue:consume --memory-limit=700
+``` 
+
+then:
+
+* The consumer processing a message
+* The cunsomer checks the used memory amount
+* If it exceeds the option value (i.e. 705 MB or 780Mb or 1300 Mb) the consumer terminates (and Supervisord re-runs it)
+* Otherwise it continues message processing.
+ 
+We recommend to always set this option to the value 2-3 times less than php memory limit. It will help to avoid php memory 
+limit error during message processing.
+
+We recommend to set the `--time-limit` option to 5-10 minutes if using the `DBAL` transport to avoid database connection issues 
+
+### Consumer interruption
+
+Consumers can normally interrupt the message procession by many reasons:
+
+* Out of memory (if the option is set)
+* Timeout (if the option is set)
+* Messages limit exceeded (if the option is set)
+* Forcefully by an event:
+  * If a cache was cleared
+  * If a schema was updated
+  * If a maintenance mode was turned off
+  
+The normal interruption occurs only after a message was processed. If an event was fired during a message processing a 
+consumer completes the message processing and interrupts after the processing is done.
+  
+Also a consumer interrupts **if an exception was thrown during a message processing**. 
+
 ### Supervisord
 
-As you read before you must keep running `oro:message-queue:consume` command and to do this best
-we advise you to delegate this responsibility to [Supervisord](http://supervisord.org/).
-With next program configuration supervisord keeps running four simultaneous instances of
-`oro:message-queue:consume` command and cares about relaunch if instance has dead by any reason.
+As you read before consumers can normally interrupt the message procession by many reasons.
+In the all cases above the interrupted consumer should be re-run. So you must keep running 
+`oro:message-queue:consume` command and to do this best we advise you to delegate this responsibility 
+to [Supervisord](http://supervisord.org/). With next program configuration supervisord keeps running 
+four simultaneous instances of `oro:message-queue:consume` command and cares about relaunch if instance 
+has dead by any reason.
 
 ```ini
 [program:oro_message_consumer]

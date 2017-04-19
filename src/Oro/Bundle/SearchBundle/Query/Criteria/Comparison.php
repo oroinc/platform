@@ -11,6 +11,7 @@ class Comparison extends BaseComparison
     const EXISTS  = 'EXISTS';
     const NOT_EXISTS  = 'NOT EXISTS';
     const LIKE = 'LIKE';
+    const NOT_LIKE = 'NOT LIKE';
 
     /** @var array */
     public static $filteringOperators = [

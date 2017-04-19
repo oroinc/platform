@@ -28,4 +28,4 @@ navigation:
 
     titles:
         oro_message_queue_root_jobs: ~
-        oro_message_queue_child_jobs: 'Job "%%name%%"'
+        oro_message_queue_child_jobs: 'Job "%name%"'

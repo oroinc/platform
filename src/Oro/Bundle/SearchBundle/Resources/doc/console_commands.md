@@ -47,3 +47,12 @@ One entity reindexation:
 Started reindex task for "OroUserBundle:User" entity
 
 ```
+
+Normally, reindexation is performed immediately after the reindex command
+is issued. However, it can also be scheduled to be 
+performed in the background by the queue message consumers.
+Use the following parameter:
+```
+> app/console oro:search:reindex --scheduled
+
+```

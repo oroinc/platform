@@ -342,10 +342,7 @@ define(function(require) {
             if (form.find('[type="file"]').length) {
                 this.trigger('beforeContentLoad', this);
                 form.ajaxSubmit({
-                    data: {
-                        '_widgetContainer': this.options.type,
-                        '_wid': this.getWid()
-                    },
+                    data: this._getWidgetData(),
                     success: _.bind(this._onContentLoad, this),
                     errorHandlerMessage: false,
                     error: _.bind(this._onContentLoadFail, this)
@@ -679,9 +676,22 @@ define(function(require) {
                 errorHandlerMessage: false
             };
 
-            options.data += '_widgetContainer=' + this.options.type + '&_wid=' + this.getWid();
+            options.data += $.param(this._getWidgetData());
 
             return options;
+        },
+
+        _getWidgetData: function() {
+            var data = {
+                _widgetContainer: this.options.type,
+                _wid: this.getWid()
+            };
+
+            if (this.options.widgetTemplate) {
+                data._widgetContainerTemplate = this.options.widgetTemplate;
+            }
+
+            return data;
         },
 
         /**
@@ -721,9 +731,11 @@ define(function(require) {
             if (this.deferredRender) {
                 this.deferredRender
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(function() {
-                        throw new Error('Widget rendering failed');
-                    });
+                    .fail(_.bind(function() {
+                        if (!this.disposing && !this.disposed) {
+                            throw new Error('Widget rendering failed');
+                        }
+                    }, this));
             } else {
                 this._triggerContentLoadEvents();
             }

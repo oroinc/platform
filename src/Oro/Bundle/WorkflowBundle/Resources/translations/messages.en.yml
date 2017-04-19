@@ -33,7 +33,7 @@ Name: Name
 Final: Final
 Start: Start
 Inactive: Inactive
-Configuration: Configuration
+Configuration: Steps & Transitions
 Transitions: Transitions
 Add transition: Add transition
 Add transition to this step: Add transition to this step
@@ -76,6 +76,8 @@ Show Transition Labels: Show Transition Labels
 oro:
     workflow:
         permission:
+            update_configuration:
+                label: Configure
             VIEW_WORKFLOW: View Workflow
             PERFORM_TRANSITIONS: Perform transitions
             PERFORM_TRANSITION: Perform transition
@@ -161,6 +163,10 @@ oro:
             queued.label:         Queued
             time_shift.label:     Time shift
             cron.label:           Cron Expression
+
+        variable:
+            save:
+                success_message: "Workflow configuration successfully updated."
 
         transition:
             start: "Start %workflow%"

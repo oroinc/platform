@@ -45,7 +45,7 @@ class PasswordComplexityValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, PasswordComplexity::class);
         }
 
-        if (empty($value)) {
+        if (null === $value || '' === $value) {
             return;
         }
 

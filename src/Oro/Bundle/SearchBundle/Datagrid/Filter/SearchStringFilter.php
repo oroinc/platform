@@ -49,7 +49,7 @@ class SearchStringFilter extends AbstractFilter
                 return;
 
             case TextFilterType::TYPE_NOT_CONTAINS:
-                $ds->addRestriction($builder->notContains($fieldName, $data['value']), FilterUtility::CONDITION_AND);
+                $this->addRestrictionForNotContains($ds, $builder, $data['value']);
 
                 return;
         }
@@ -69,6 +69,23 @@ class SearchStringFilter extends AbstractFilter
             $ds->addRestriction($builder->like($fieldName, $value), FilterUtility::CONDITION_AND);
         } else {
             $ds->addRestriction($builder->contains($fieldName, $value), FilterUtility::CONDITION_AND);
+        }
+    }
+
+    /**
+     * @param SearchFilterDatasourceAdapter $ds
+     * @param ExpressionBuilder             $builder
+     * @param string                        $value
+     */
+    private function addRestrictionForNotContains(SearchFilterDatasourceAdapter $ds, ExpressionBuilder $builder, $value)
+    {
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        $forceLikeOption = $this->get(FilterUtility::FORCE_LIKE_KEY);
+
+        if ($forceLikeOption) {
+            $ds->addRestriction($builder->notLike($fieldName, $value), FilterUtility::CONDITION_AND);
+        } else {
+            $ds->addRestriction($builder->notContains($fieldName, $value), FilterUtility::CONDITION_AND);
         }
     }
 }

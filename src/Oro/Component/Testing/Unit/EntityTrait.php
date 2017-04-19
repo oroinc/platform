@@ -26,7 +26,11 @@ trait EntityTrait
         }
 
         if ($reflectionMethod && $reflectionMethod->isPublic()) {
-            $entity = $reflectionClass->newInstance($constructorArgs);
+            if (empty($constructorArgs)) {
+                $entity = $reflectionClass->newInstance($constructorArgs);
+            } else {
+                $entity = $reflectionClass->newInstanceArgs($constructorArgs);
+            }
         } else {
             $entity = $reflectionClass->newInstanceWithoutConstructor();
         }

@@ -77,7 +77,7 @@ define([
          */
         initFocus: function() {
             var activeElement = document.activeElement;
-            if ($(activeElement)[0].hasAttribute('autofocus')) {
+            if (tools.isTouchDevice() || $(activeElement)[0].hasAttribute('autofocus')) {
                 return;
             }
 

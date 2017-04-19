@@ -252,7 +252,8 @@ class WorkflowStepColumnListener
                     'field_type' => WorkflowStepSelectType::NAME,
                     'field_options' => [
                         'workflow_entity_class' => $rootEntity,
-                        'multiple' => true
+                        'multiple' => true,
+                        'translatable_options' => false
                     ]
                 ]
             ];

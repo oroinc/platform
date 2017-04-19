@@ -1,11 +1,11 @@
 # offset test case
 request:
     supported_engines: [orm]
-    search: \"item1@mail.com\"
+    search: \"item1@mail.net\"
     offset: 0
     max_results: 1
 response:
-    records_count: 1
+    records_count: 9
     count: 1
     rest:
         data:

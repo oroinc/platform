@@ -3,58 +3,17 @@ define(function(require) {
 
     var ActivityContextComponent;
     var $ = require('jquery');
-    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var routing = require('routing');
     var widgetManager = require('oroui/js/widget-manager');
     var messenger = require('oroui/js/messenger');
     var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ActivityContextView = require('oroactivity/js/app/views/activity-context-view');
+    var MultiGridComponent = require('orodatagrid/js/app/components/multi-grid-component');
 
     /**
      * @exports ActivityContextComponent
      */
-    ActivityContextComponent = BaseComponent.extend({
-        contextView: null,
-
-        initialize: function(options) {
-            this.options = options;
-            this.init();
-        },
-
-        init: function() {
-            this.initView();
-            this.contextView.render();
-            this._bindGridEvent();
-        },
-
-        initView: function() {
-            this.contextView = new ActivityContextView({
-                items: this.options.items || [],
-                el: this.options._sourceElement,
-                params: this.options.params || [],
-                dialogWidgetName: this.options.dialogWidgetName,
-                gridWidgetName: this.options.gridWidgetName
-            });
-        },
-
-        /**
-         * Bind event handlers on grid widget
-         * @protected
-         */
-        _bindGridEvent: function() {
-            var self = this;
-            var gridWidgetName = this.options.gridWidgetName;
-            if (!gridWidgetName) {
-                return;
-            }
-
-            widgetManager.getWidgetInstanceByAlias(gridWidgetName, function(widget) {
-                widget.on('grid-row-select', _.bind(self.onRowSelect, self, widget));
-            });
-        },
-
+    ActivityContextComponent = MultiGridComponent.extend({
         /**
          * Handles row selection on a grid
          *

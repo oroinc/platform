@@ -22,21 +22,19 @@ class ConfigSettingsListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $testSettings
-     * @param array $expectedSettings
+     * @param string $given
+     * @param string $expected
      * @dataProvider onBeforeDataProvider
      */
-    public function testOnBeforeMethod($testSettings = [], $expectedSettings = [])
+    public function testOnBeforeMethod($given, $expected)
     {
-        $configManagerMock = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject $configManagerMock */
+        $configManagerMock = $this->createMock(ConfigManager::class);
 
-        $event = new ConfigSettingsUpdateEvent($configManagerMock, $testSettings);
-
+        $event = new ConfigSettingsUpdateEvent($configManagerMock, ['value' => $given]);
         $this->configSettingsListener->onBeforeSave($event);
 
-        $this->assertEquals($expectedSettings, $event->getSettings());
+        $this->assertEquals($expected, $event->getSettings()['value']);
     }
 
     /**
@@ -45,42 +43,9 @@ class ConfigSettingsListenerTest extends \PHPUnit_Framework_TestCase
     public function onBeforeDataProvider()
     {
         return [
-            'Does not affect non-target config fields' => [
-                [
-                    'some_config_key' => [
-                        'value' => 'some value',
-                    ],
-                    'another_config_key' => [
-                        'value' => 'http://localhost///',
-                    ],
-                ],
-                [
-                    'some_config_key' => [
-                        'value' => 'some value',
-                    ],
-                    'another_config_key' => [
-                        'value' => 'http://localhost///',
-                    ],
-                ],
-            ],
-            'Affects oro_ui.application_url config field' =>[
-                [
-                    'oro_ui.application_url' => [
-                        'value' => 'http://localhost///',
-                    ],
-                    'another_config_key' => [
-                        'value' => '/another value/',
-                    ],
-                ],
-                [
-                    'oro_ui.application_url' => [
-                        'value' => 'http://localhost',
-                    ],
-                    'another_config_key' => [
-                        'value' => '/another value/',
-                    ],
-                ]
-            ]
+            ['http://localhost', 'http://localhost'],
+            ['http://localhost/', 'http://localhost'],
+            ['http://localhost//', 'http://localhost'],
         ];
     }
 }

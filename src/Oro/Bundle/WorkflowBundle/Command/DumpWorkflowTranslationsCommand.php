@@ -12,7 +12,6 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
@@ -53,64 +52,14 @@ class DumpWorkflowTranslationsCommand extends ContainerAwareCommand
         /* @var $workflowManager WorkflowManager */
         $workflowManager = $this->getContainer()->get('oro_workflow.manager');
 
-        $keys = $this->collectKeys($workflowManager->getWorkflow($workflowName)->getDefinition());
-        $translations = $this->processKeys($this->getContainer()->get('translator.default'), $keys, $locale);
+        /** @var WorkflowTranslationHelper $workflowTranslationHelper */
+        $workflowTranslationHelper = $this->getContainer()->get('oro_workflow.helper.translation');
+
+        $keys = $workflowTranslationHelper->generateDefinitionTranslationKeys(
+            $workflowManager->getWorkflow($workflowName)->getDefinition()
+        );
+        $translations = $workflowTranslationHelper->generateDefinitionTranslations($keys, $locale);
 
         $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), self::INLINE_LEVEL));
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     *
-     * @return array
-     */
-    protected function collectKeys(WorkflowDefinition $definition)
-    {
-        $config = $definition->getConfiguration();
-
-        $keys = [
-            $definition->getLabel(),
-        ];
-
-        foreach ($config['steps'] as $item) {
-            $keys[] = $item['label'];
-        }
-
-        foreach ($config['attributes'] as $item) {
-            $keys[] = $item['label'];
-        }
-
-        foreach ($config['transitions'] as $item) {
-            $keys[] = $item['label'];
-            $keys[] = $item['message'];
-        }
-
-        return $keys;
-    }
-
-    /**
-     * @param Translator $translator
-     * @param array $keys
-     * @param string|null $locale
-     *
-     * @return array
-     */
-    protected function processKeys(Translator $translator, array $keys, $locale)
-    {
-        $translations = [];
-        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
-        foreach ($keys as $key) {
-            if ($translator->hasTrans($key, $domain, $locale)) {
-                $translation = $translator->trans($key, [], $domain, $locale);
-            } elseif ($translator->hasTrans($key, $domain, Translator::DEFAULT_LOCALE)) {
-                $translation = $translator->trans($key, [], $domain, Translator::DEFAULT_LOCALE);
-            } else {
-                $translation = '';
-            }
-
-            $translations[$key] = $translation;
-        }
-
-        return $translations;
     }
 }

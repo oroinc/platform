@@ -15,7 +15,7 @@ use Oro\Bundle\SegmentBundle\Model\ExtendSegment;
  * Segment
  *
  * @ORM\Table(name="oro_segment")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository")
  * @ORM\HasLifecycleCallbacks
  * @Config(
  *      routeName="oro_segment_index",
@@ -136,6 +136,13 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="records_limit", type="integer", nullable=true)
+     */
+    protected $recordsLimit;
 
     /**
      * {@inheritdoc}
@@ -410,5 +417,37 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     public function isStaticType()
     {
         return $this->getType() && $this->getType()->getName() == SegmentType::TYPE_STATIC;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRecordsLimit()
+    {
+        return $this->recordsLimit;
+    }
+
+    /**
+     * @param int|null $recordsLimit
+     *
+     * @return $this
+     */
+    public function setRecordsLimit($recordsLimit)
+    {
+        $this->recordsLimit = $recordsLimit;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDynamic()
+    {
+        if ($this->getType()) {
+            return $this->getType()->getName() === SegmentType::TYPE_DYNAMIC;
+        }
+
+        return false;
     }
 }

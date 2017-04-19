@@ -1,8 +1,8 @@
-genaral_section_scalar_value:
+general_section_scalar_value:
     section: general
     value: Company name
 
-genaral_section_array_value:
+general_section_array_value:
     section: general
     value:
         - USD

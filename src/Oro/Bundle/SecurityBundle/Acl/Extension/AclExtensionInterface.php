@@ -183,11 +183,12 @@ interface AclExtensionInterface
      * Gets all permissions allowed for a domain object represented by te given object identity.
      *
      * @param ObjectIdentity $oid
-     * @param string|null    $fieldName
-     *
+     * @param string|null $fieldName
+     * @param string|null $aclGroup
+
      * @return string[]
      */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null);
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null);
 
     /**
      * Gets default permission.

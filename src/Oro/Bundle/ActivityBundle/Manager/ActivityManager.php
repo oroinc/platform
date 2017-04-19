@@ -7,9 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
 use Oro\Bundle\ActivityBundle\Event\Events;
-use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -19,6 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -49,6 +50,9 @@ class ActivityManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var FeatureChecker */
+    protected $featureChecker;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param EntityClassResolver $entityClassResolver
@@ -57,6 +61,7 @@ class ActivityManager
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param AssociationManager  $associationManager
+     * @param FeatureChecker      $featureChecker
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -65,7 +70,8 @@ class ActivityManager
         ConfigProvider $groupingConfigProvider,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
-        AssociationManager $associationManager
+        AssociationManager $associationManager,
+        FeatureChecker $featureChecker
     ) {
         $this->doctrineHelper         = $doctrineHelper;
         $this->entityClassResolver    = $entityClassResolver;
@@ -74,6 +80,7 @@ class ActivityManager
         $this->entityConfigProvider   = $entityConfigProvider;
         $this->extendConfigProvider   = $extendConfigProvider;
         $this->associationManager     = $associationManager;
+        $this->featureChecker         = $featureChecker;
     }
 
     /**
@@ -135,6 +142,7 @@ class ActivityManager
         if ($targetEntity !== null
             && $activityEntity->supportActivityTarget(get_class($targetEntity))
             && !$activityEntity->hasActivityTarget($targetEntity)
+            && $this->featureChecker->isResourceEnabled(ClassUtils::getClass($targetEntity), 'entities')
         ) {
             $activityEntity->addActivityTarget($targetEntity);
 
@@ -187,7 +195,7 @@ class ActivityManager
         $oldTargetEntities = $activityEntity->getActivityTargets();
 
         foreach ($oldTargetEntities as $oldTargetEntity) {
-            if (!in_array($oldTargetEntity, $targetEntities)) {
+            if (!in_array($oldTargetEntity, $targetEntities, true)) {
                 $this->removeActivityTarget($activityEntity, $oldTargetEntity);
                 $hasChanges = true;
             }
@@ -214,6 +222,7 @@ class ActivityManager
         if ($targetEntity !== null
             && $activityEntity->supportActivityTarget(get_class($targetEntity))
             && $activityEntity->hasActivityTarget($targetEntity)
+            && $this->featureChecker->isResourceEnabled(ClassUtils::getClass($targetEntity), 'entities')
         ) {
             $activityEntity->removeActivityTarget($targetEntity);
             if ($this->eventDispatcher) {

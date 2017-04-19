@@ -899,6 +899,7 @@ footer {
   min-width: 250px;
   width: 100% !important;
   height: calc(~"100% - 81px") !important;
+  min-height: 118px; // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
   .ui-resizable-handle {
     cursor: move;
   }
@@ -1315,6 +1316,7 @@ footer {
     width: 23px;
     height: 19px;
     float: left;
+
     &:hover,
     &:focus {
       border: 0;
@@ -1329,6 +1331,7 @@ footer {
     float: none;
     display: table-cell;
   }
+
   .nav-pills {
     padding:0 10px;
   }
@@ -1344,6 +1347,7 @@ footer {
     }
   }
 }
+
 .launchers-dropdown-menu {
   min-width: 35px;
   &.detach .nav {
@@ -1916,7 +1920,11 @@ footer {
     padding:0 4px 0 0;
   }
   .top-row {
-    overflow: hidden;
+    &:after {
+      clear: both;
+      display: block;
+      content:"";
+    }
   }
   .sub-title {
     font-size: 17px;
@@ -2138,7 +2146,12 @@ label.required em,
 .form-horizontal .span6 .oro-multiselect-holder input[type="password"] {
   margin: 0 0 5px 0;
 }*/
-input, textarea, .uneditable-input { width:280px; }
+input,
+textarea,
+.uneditable-input {
+  width: @widthInput;
+}
+
 body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
@@ -3284,7 +3297,9 @@ label .popover-content {
 }
 
 .entity-create-or-select-container {
-  .entity-create-btn, .entity-create-btn[disabled], .entity-create-btn[disabled]:active {
+  .entity-create-btn,
+  .entity-create-btn[disabled],
+  .entity-create-btn[disabled]:active {
     padding: 0 6px;
     margin-left: 3px;
     height: 30px;
@@ -3322,9 +3337,18 @@ label .popover-content {
   }
 }
 
-.entity-create-enabled .input-prepend .select2-container,
-.entity-create-enabled .input-append .select2-container {
-  width: 228px;
+.entity-create-enabled {
+  .input-prepend .select2-container,
+  .input-append .select2-container {
+    width: 229px;
+  }
+}
+
+.control-group-justified {
+  .input-prepend .select2-container,
+  .input-append .select2-container {
+    width: 263px;
+  }
 }
 
 .invisible {
@@ -3404,17 +3428,31 @@ label .popover-content {
   }
 
   &.expanded [data-collapse-container] {
-    overflow: scroll;
+    overflow: auto;
     max-height: none;
   }
 
   .toggle-more, .toggle-less, .toggle-collapse {
     display: none;
   }
+
   &.expanded .toggle-less,
   &.expanded .toggle-collapse,
   &.overflows .toggle-more,
   &.overflows .toggle-collapse {
     display: block;
+  }
+}
+
+.customer-content {
+  .grid-views {
+    .edited-label {
+      vertical-align: top;
+      line-height: 21px;
+    }
+
+    .btn-link {
+      line-height: 21px;
+    }
   }
 }

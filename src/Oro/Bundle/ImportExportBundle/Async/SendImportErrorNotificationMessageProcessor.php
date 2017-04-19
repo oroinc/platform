@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
-
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -13,11 +15,9 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * toDo: a temporary solution, send directly to the NotificationBundle after implementing BAP-13215
+ * @deprecated since 2.1, will be removed in 2.3
  */
 class SendImportErrorNotificationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
@@ -88,8 +88,6 @@ class SendImportErrorNotificationMessageProcessor implements MessageProcessorInt
         } else {
             $notifyEmail = $body['notifyEmail'];
         }
-
-//        TODO refactor in https://magecore.atlassian.net/browse/BAP-13215. should use template
         $subject = sprintf('Cannot Import file %s', $body['file']);
         $this->sendNotification($notifyEmail, $body['error'], $subject);
 

@@ -63,7 +63,19 @@ class LocalizationController extends Controller
      */
     public function createAction()
     {
-        return $this->update(new Localization());
+        $response = $this->update(new Localization());
+
+        if ($response instanceof RedirectResponse) {
+            $message = $this->get('translator')->trans(
+                'oro.translation.translation.rebuild_cache_required',
+                [
+                    '%path%' => $this->generateUrl('oro_translation_translation_index'),
+                ]
+            );
+            $this->get('session')->getFlashBag()->add('warning', $message);
+        }
+
+        return $response;
     }
 
     /**

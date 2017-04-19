@@ -219,20 +219,34 @@ class ConfigManager
         }
 
         $oldValues = [];
-        foreach ($settings as $name => $value) {
+        foreach ($settings as $name => $setting) {
             $oldValues[$name] = $this->getValue($name, false, false, $scopeIdentifier);
+
+            $eventName = sprintf('%s.%s', ConfigSettingsUpdateEvent::BEFORE_SAVE, $name);
+            $settings[$name] = $this->dispatchConfigSettingsUpdateEvent($eventName, $setting);
         }
 
-        $event = new ConfigSettingsUpdateEvent($this, $settings);
-        $this->eventDispatcher->dispatch(ConfigSettingsUpdateEvent::BEFORE_SAVE, $event);
+        $settings = $this->dispatchConfigSettingsUpdateEvent(ConfigSettingsUpdateEvent::BEFORE_SAVE, $settings);
 
-        list($updated, $removed) = $this->getScopeManager()->save($event->getSettings(), $scopeIdentifier);
+        list($updated, $removed) = $this->getScopeManager()->save($settings, $scopeIdentifier);
 
         $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
         $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->getScopeId());
         $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
 
         return $changeSet;
+    }
+
+    /**
+     * @param string $eventName
+     * @param array $settings
+     * @return array
+     */
+    protected function dispatchConfigSettingsUpdateEvent($eventName, array $settings)
+    {
+        $event = new ConfigSettingsUpdateEvent($this, $settings);
+        $this->eventDispatcher->dispatch($eventName, $event);
+        return $event->getSettings();
     }
 
     /**

@@ -89,7 +89,7 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         return $this->permissions;
     }

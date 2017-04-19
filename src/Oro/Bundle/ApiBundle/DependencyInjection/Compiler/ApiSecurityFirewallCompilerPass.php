@@ -89,7 +89,7 @@ class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
-     * @param string           $contextKey
+     * @param string $contextKey
      *
      * @return string
      */
@@ -99,7 +99,7 @@ class ApiSecurityFirewallCompilerPass implements CompilerPassInterface
             return $this->contextListeners[$contextKey];
         }
 
-        $listenerId = 'security.context_listener_.' . count($this->contextListeners);
+        $listenerId = 'oro_security.context_listener.' . $contextKey;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
 

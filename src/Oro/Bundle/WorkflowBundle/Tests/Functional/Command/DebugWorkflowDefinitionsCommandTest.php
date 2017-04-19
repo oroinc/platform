@@ -61,7 +61,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
 
-        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName, '--no-ansi']);
+        $result = $this->runCommand(DebugWorkflowDefinitionsCommand::NAME, [$workflowName], false);
 
         if ($exists) {
             $this->assertNotContains('No workflow definitions found.', $result);

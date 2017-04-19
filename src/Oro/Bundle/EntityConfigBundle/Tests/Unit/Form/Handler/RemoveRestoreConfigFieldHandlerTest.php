@@ -119,49 +119,18 @@ class RemoveRestoreConfigFieldHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
     }
 
-    /**
-     * @return array
-     */
-    public function removeDataProvider()
-    {
-        return [
-            'fieldIsNotUpgradeable' => [
-                'fields' => [],
-                'isUpgradeable' => false
-            ],
-            'fieldIsUpgradeable' => [
-                'fields' => [
-                    'some' => 'field'
-                ],
-                'isUpgradeable' => true
-            ]
-        ];
-    }
-
-    /**
-     * @dataProvider removeDataProvider
-     *
-     * @param $fields
-     * @param bool $isUpgradeable
-     */
-    public function testHandleRemove($fields, $isUpgradeable)
+    public function testHandleRemove()
     {
         $this->validationHelper->expects($this->once())
             ->method('getRemoveFieldValidationErrors')
             ->with($this->fieldConfigModel)
             ->willReturn([]);
 
-        $this->configHelper
-            ->expects($this->once())
-            ->method('filterEntityConfigByField')
-            ->with($this->fieldConfigModel, 'extend')
-            ->willReturn($fields);
-
         $entityConfig = $this->createMock(ConfigInterface::class);
         $entityConfig
             ->expects($this->once())
             ->method('set')
-            ->with('upgradeable', $isUpgradeable);
+            ->with('upgradeable', true);
 
         $this->configHelper
             ->expects($this->once())

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\EntityManager;
 use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\EntityBundle\ORM\Registry;
@@ -40,11 +41,18 @@ class ReferenceRepositoryInitializer
     {
         $this->referenceRepository->clear();
 
-        $user = $this->getDefaultUser();
+        try {
+            $user = $this->getDefaultUser();
+            $userRole = $this->getRole(User::ROLE_DEFAULT);
+            $adminRole = $this->getRole(User::ROLE_ADMINISTRATOR);
+        } catch (TableNotFoundException $e) {
+            // Schema is not initialized yet
+            return;
+        }
 
         $this->referenceRepository->set('admin', $user);
-        $this->referenceRepository->set('userRole', $this->getRole(User::ROLE_DEFAULT));
-        $this->referenceRepository->set('adminRole', $this->getRole(User::ROLE_ADMINISTRATOR));
+        $this->referenceRepository->set('userRole', $userRole);
+        $this->referenceRepository->set('adminRole', $adminRole);
         $this->referenceRepository->set('organization', $user->getOrganization());
         $this->referenceRepository->set('business_unit', $user->getOwner());
         $this->referenceRepository->set(

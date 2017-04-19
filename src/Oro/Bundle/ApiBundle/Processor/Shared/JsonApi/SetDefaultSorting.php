@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultSorting as BaseSetDefaultSorting;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 
 /**
  * Sets default sorting for JSON API requests: sort = id ASC.
@@ -24,6 +25,6 @@ class SetDefaultSorting extends BaseSetDefaultSorting
      */
     protected function getDefaultValue($entityClass)
     {
-        return ['id' => 'ASC'];
+        return [JsonApiDoc::ID => 'ASC'];
     }
 }

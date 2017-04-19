@@ -20,7 +20,6 @@ datagrids:
             view_options:
                 permissions:
                     oro_tag_create: true
-                    oro_tag_unassign_global: true
           save_api_accessor:
               # usual save api configuration
               route: 'oro_api_post_taggable'
@@ -45,7 +44,6 @@ Column option name                                  | Description
 inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 inline_editing.editor.permissions      | Permissions
 inline_editing.editor.permissions.oro_tag_create | Allows user to create new tag
-inline_editing.editor.permissions.oro_tag_unassign_global | Allows user to edit tags assigned by all users
 
 ### Constructor parameters
 

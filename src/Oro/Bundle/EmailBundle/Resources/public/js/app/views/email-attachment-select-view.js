@@ -102,7 +102,7 @@ define(function(require) {
 
         getTemplateFunction: function() {
             if (!this.template) {
-                this.template = $('#email-attachment-select-view').html();
+                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-select-view.html');
             }
 
             return EmailAttachmentSelectView.__super__.getTemplateFunction.call(this);

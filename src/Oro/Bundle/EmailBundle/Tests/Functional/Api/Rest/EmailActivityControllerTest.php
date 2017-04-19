@@ -25,11 +25,6 @@ class EmailActivityControllerTest extends WebTestCase
         $this->enableEmailFeature();
     }
 
-    protected function tearDown()
-    {
-        $this->resetEmailFeature();
-    }
-
     public function testGetEntities()
     {
         $this->client->request('GET', $this->baseUrl . '?messageId=email1@orocrm-pro.func-test');

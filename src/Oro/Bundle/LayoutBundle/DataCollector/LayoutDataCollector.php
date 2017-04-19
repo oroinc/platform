@@ -36,6 +36,9 @@ class LayoutDataCollector extends DataCollector
     private $rootBlockView;
 
     /** @var array */
+    private $notAppliedActions = [];
+
+    /** @var array */
     private $excludedOptions = [
         'block',
         'blocks',
@@ -96,6 +99,8 @@ class LayoutDataCollector extends DataCollector
         $this->buildFinalBlockTree();
 
         $this->data['count'] = count($this->dataByBlock);
+        $this->data['not_applied_actions_count'] = count($this->notAppliedActions);
+        $this->data['not_applied_actions'] = $this->notAppliedActions;
     }
 
     /**
@@ -282,13 +287,10 @@ class LayoutDataCollector extends DataCollector
         $property->setAccessible(true);
 
         foreach ($property->getValue($context->data()) as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            } elseif (is_object($value)) {
+            if (is_object($value)) {
                 $value = get_class($value);
             }
-
-            $this->data['context']['data'][$key] = $value;
+            $this->data['context']['data'][$key] =  $value;
         }
     }
 
@@ -302,5 +304,16 @@ class LayoutDataCollector extends DataCollector
         }
 
         return $this->debugDeveloperToolbar;
+    }
+
+    /**
+     * @param array $notAppliedActions
+     * @return $this
+     */
+    public function setNotAppliedActions(array $notAppliedActions)
+    {
+        $this->notAppliedActions = $notAppliedActions;
+
+        return $this;
     }
 }

@@ -57,12 +57,17 @@ class TitleExtension extends \Twig_Extension
     /**
      * Renders title
      *
-     * @param null $titleData
+     * @param string|null $titleData
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function render($titleData = null)
+    public function render($titleData = null, $menuName = null)
     {
+        $route = $this->getCurrenRoute();
+
         return $this->getTitleService()
+            ->loadByRoute($route, $menuName)
             ->setData($this->getTitleData())
             ->render([], $titleData, null, null, true);
     }
@@ -70,12 +75,17 @@ class TitleExtension extends \Twig_Extension
     /**
      * Renders short title
      *
-     * @param null $titleData
+     * @param string|null $titleData
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function renderShort($titleData = null)
+    public function renderShort($titleData = null, $menuName = null)
     {
+        $route = $this->getCurrenRoute();
+
         return $this->getTitleService()
+            ->loadByRoute($route, $menuName)
             ->setData($this->getTitleData())
             ->render([], $titleData, null, null, true, true);
     }
@@ -83,11 +93,16 @@ class TitleExtension extends \Twig_Extension
     /**
      * Returns json serialized data
      *
+     * @param string|null $menuName
+     *
      * @return string
      */
-    public function renderSerialized()
+    public function renderSerialized($menuName = null)
     {
+        $route = $this->getCurrenRoute();
+
         return $this->getTitleService()
+            ->loadByRoute($route, $menuName)
             ->setData($this->getTitleData())
             ->getSerialized();
     }
@@ -146,6 +161,17 @@ class TitleExtension extends \Twig_Extension
             }
         }
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    private function getCurrenRoute()
+    {
+        return $this->container
+            ->get('request_stack')
+            ->getCurrentRequest()
+            ->get('_route');
     }
 
     /**

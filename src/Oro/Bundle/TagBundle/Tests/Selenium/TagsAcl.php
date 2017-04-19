@@ -118,9 +118,6 @@ class TagsAcl extends Selenium2TestCase
             case 'view list':
                 $this->viewListAcl($login, $roleName, $username);
                 break;
-            case 'unassign global':
-                $this->unassignGlobalAcl($login, $roleName, $tagName);
-                break;
             case 'assign unassign':
                 $this->assignAcl($login, $roleName, $username);
                 break;
@@ -191,44 +188,6 @@ class TagsAcl extends Selenium2TestCase
             ->assertTitle('403 - Forbidden');
     }
 
-    public function unassignGlobalAcl($login, $roleName, $tagName)
-    {
-        $username = 'user' . mt_rand();
-        /** @var Roles $login*/
-        $login = $login->openRoles('Oro\Bundle\UserBundle')
-            ->filterBy('Label', $roleName)
-            ->open(array($roleName))
-            ->setCapability(array('Unassign all tags from entities'), 'None')
-            ->save();
-        /** @var Users $login*/
-        $login = $login->openUsers('Oro\Bundle\UserBundle')
-            ->add()
-            ->setUsername($username)
-            ->enable()
-            ->setOwner('Main')
-            ->setFirstpassword('123123q')
-            ->setSecondpassword('123123q')
-            ->setFirstName('First_'.$username)
-            ->setLastName('Last_'.$username)
-            ->setEmail($username.'@mail.com')
-            ->setRoles(array($roleName))
-            ->setTag($tagName)
-            ->save()
-            ->logout()
-            ->setUsername($username)
-            ->setPassword('123123q')
-            ->submit();
-
-        $login->openUsers('Oro\Bundle\UserBundle')
-            ->filterBy('Username', $username)
-            ->open(array($username))
-            ->edit()
-            ->assertElementNotPresent(
-                "//div[starts-with(@id,'s2id_oro_user_user_form_tags')]//li[contains(., '{$tagName}')]" .
-                "/a[@class='select2-search-choice-close']"
-            );
-    }
-
     public function assignAcl($login, $role, $username)
     {
         /** @var Roles $login*/
@@ -256,7 +215,6 @@ class TagsAcl extends Selenium2TestCase
     public function columnTitle()
     {
         return array(
-            'unassign global' => array('unassign global'),
             'assign unassign' => array('assign unassign'),
             'delete' => array('delete'),
             'update' => array('update'),

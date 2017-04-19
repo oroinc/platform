@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
+use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowVariableLabelTemplate;
 
 class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTranslationFieldsIterator
 {
@@ -13,6 +14,11 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
      * @var WorkflowDefinition
      */
     private $workflowDefinition;
+
+    /**
+     * @var bool
+     */
+    private $configModified = false;
 
     /**
      * @param WorkflowDefinition $workflowDefinition
@@ -38,23 +44,15 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
 
         $configuration = $this->workflowDefinition->getConfiguration();
 
-        $configModified = false;
-
         foreach ($this->attributeFields($configuration, $context) as $key => &$attrField) {
             yield $key => $attrField;
-            if ($this->hasChanges()) {
-                $configModified = true;
-                $attrField = $this->pickChangedValue();
-            }
+            $this->getUpdatedValue($attrField);
         }
         unset($attrField);
 
         foreach ($this->transitionFields($configuration, $context) as $key => &$transitionField) {
             yield $key => $transitionField;
-            if ($this->hasChanges()) {
-                $configModified = true;
-                $transitionField = $this->pickChangedValue();
-            }
+            $this->getUpdatedValue($transitionField);
         }
         unset($transitionField);
 
@@ -63,7 +61,7 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
 
             yield $this->makeKey(StepLabelTemplate::class, $context) => $step->getLabel();
             if ($this->hasChanges()) {
-                $configModified = true;
+                $this->configModified = true;
                 $newValue = $this->pickChangedValue();
                 $step->setLabel($newValue);
                 $this->setStepField($configuration, $step->getName(), 'label', $newValue);
@@ -72,8 +70,25 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
             unset($context['step_name']);
         }
 
-        if ($configModified) {
+        foreach ($this->variableFields($configuration, $context) as $key => &$varField) {
+            yield $key => $varField;
+            $this->getUpdatedValue($varField);
+        }
+        unset($varField);
+
+        if ($this->configModified) {
             $this->workflowDefinition->setConfiguration($configuration);
+        }
+    }
+
+    /**
+     * @param $field
+     */
+    private function getUpdatedValue(&$field)
+    {
+        if ($this->hasChanges()) {
+            $this->configModified = true;
+            $field = $this->pickChangedValue();
         }
     }
 

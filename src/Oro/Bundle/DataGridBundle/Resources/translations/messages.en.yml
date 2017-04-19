@@ -1,7 +1,7 @@
 "Item deleted": "Item deleted"
 oro_datagrid:
     no_data_hint %entityHint%: "No %entityHint% exists."
-    not_found_hint %entityHint%:  "No %entityHint% was found to match your search. Try modifying your search criteria ..."
+    not_found_hint %entityHint%:  "No %entityHint% were found to match your search. Try modifying your search criteria ..."
     label_add_filter: Manage filters
     label_loading_mask: "Loading . . ."
 oro:
@@ -19,6 +19,7 @@ oro:
             organization.label: Organization
             sorters_data.label: Sorters
             type.label: Type
+            discr_type.label: Discriminator Type
             shared_by: %name% (Shared by %owner%)
             columns_data.label: Columns data
             appearance_type.label: Appearance type
@@ -31,8 +32,11 @@ oro:
             label: Page
             totalPages: of %totalPages%
             totalRecords: Total of %totalRecords% records
+            prev: Prev
+            next: Next
         pagesize:
             label: View per page
+            labelShort: Per page
     grid:
         mass_action:
             label: Mass Actions
@@ -58,11 +62,8 @@ oro:
             delete: Delete
             clone: Clone
             gridview_create_public:
-                label: Share grid view
-                description: Share custom grid views with other users
-            gridview_edit_public:
-                label: Unshare grid view
-                description: Unshare custom grid views
+                label: Share data view
+                description: Share custom data views with other users
             gridview_export:
                 label: Export grid view
                 description: Export data from Grid view

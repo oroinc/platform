@@ -1,0 +1,131 @@
+operations:
+    oro_integration_activate:
+        label: oro.integration.activate
+        applications: [default]
+        acl_resource: [EDIT, $.data]
+        order: 20
+        datagrids:
+            - oro-integration-grid
+        routes:
+            - oro_integration_update
+        button_options:
+            icon: fa-check
+        attributes:
+            actionAllowed:
+                label: oro.integration.operation.attribute.actionAllowed.label
+                type: boolean
+            actionSuccess:
+                label: oro.integration.operation.attribute.actionSuccess.label
+                type: boolean
+        preactions:
+            - '@call_service_method':
+                service: oro_integration.utils.edit_mode
+                method: isSwitchEnableAllowed
+                method_parameters: [$.data.editMode]
+                attribute: $.actionAllowed
+        preconditions:
+            '@and':
+                - '@equal': [$.actionAllowed, true]
+                - '@equal': [$.data.enabled, false]
+        actions:
+            - '@call_service_method':
+                service: oro_integration.action_handler.channel_enable
+                method: handleAction
+                method_parameters: [$.data]
+                attribute: $.actionSuccess
+            - '@flash_message':
+                conditions:
+                    '@equal': [$.actionSuccess, true]
+                message: oro.integration.notification.channel.activated
+                type: 'success'
+
+    oro_integration_deactivate:
+        label: oro.integration.deactivate
+        applications: [default]
+        acl_resource: [EDIT, $.data]
+        order: 20
+        datagrids:
+            - oro-integration-grid
+        routes:
+            - oro_integration_update
+        button_options:
+            icon: fa-close
+        attributes:
+            actionAllowed:
+                label: oro.integration.operation.attribute.actionAllowed.label
+                type: boolean
+            actionSuccess:
+                label: oro.integration.operation.attribute.actionSuccess.label
+                type: boolean
+        preactions:
+            - '@call_service_method':
+                service: oro_integration.utils.edit_mode
+                method: isSwitchEnableAllowed
+                method_parameters: [$.data.editMode]
+                attribute: $.actionAllowed
+        preconditions:
+            '@and':
+                - '@equal': [$.actionAllowed, true]
+                - '@equal': [$.data.enabled, true]
+        actions:
+            - '@call_service_method':
+                service: oro_integration.action_handler.channel_disable
+                method: handleAction
+                method_parameters: [$.data]
+                attribute: $.actionSuccess
+            - '@flash_message':
+                conditions:
+                    '@equal': [$.actionSuccess, true]
+                message: oro.integration.notification.channel.deactivated
+                type: 'success'
+
+    oro_integration_delete:
+        label: oro.integration.delete
+        applications: [default]
+        acl_resource: [DELETE, $.data]
+        order: 50
+        datagrids:
+            - oro-integration-grid
+        routes:
+            - oro_integration_update
+        frontend_options:
+            confirmation:
+                message: oro.integration.delete_sync_integration_window.content
+                component: oroui/js/delete-confirmation
+            show_dialog: true
+        button_options:
+            icon: fa-trash-o
+        attributes:
+            actionAllowed:
+                label: oro.integration.operation.attribute.actionAllowed.label
+                type: boolean
+            actionSuccess:
+                label: oro.integration.operation.attribute.actionSuccess.label
+                type: boolean
+        preactions:
+            - '@call_service_method':
+                service: oro_integration.utils.edit_mode
+                method: isEditAllowed
+                method_parameters: [$.data.editMode]
+                attribute: $.actionAllowed
+        preconditions:
+            '@and':
+                - '@equal': [$.actionAllowed, true]
+        actions:
+            - '@call_service_method':
+                service: oro_integration.action_handler.channel_delete
+                method: handleAction
+                method_parameters: [$.data]
+                attribute: $.actionSuccess
+            - '@flash_message':
+                conditions:
+                    '@equal': [$.actionSuccess, true]
+                message: oro.integration.notification.channel.deleted
+                type: 'success'
+            - '@redirect': {route: oro_integration_index}
+
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\IntegrationBundle\Entity\Channel
+        exclude_datagrids:
+            - oro-integration-grid

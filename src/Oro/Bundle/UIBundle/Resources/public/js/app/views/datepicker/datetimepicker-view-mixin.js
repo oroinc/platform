@@ -83,6 +83,7 @@ define(function(require) {
             this.$frontTimeField.off().remove();
             if (this.$frontDateField.data('isWrapped')) {
                 this.$frontDateField.unwrap();
+                this.$frontDateField.removeData('isWrapped');
             }
             this._super().dispose.apply(this, arguments);
         },
@@ -165,6 +166,10 @@ define(function(require) {
          * Destroys picker widget
          */
         destroyTimePickerWidget: function() {
+            if (!this.$frontTimeField.data('timepicker-settings')) {
+                // the widget was already removed.
+                return;
+            }
             // this will trigger hide event before remove
             // that is not done by default implementation
             this.$frontTimeField.timepicker('hide');
@@ -280,6 +285,9 @@ define(function(require) {
         getFrontendMoment: function() {
             var date = this.$frontDateField.val();
             var time = this.$frontTimeField.val();
+            if (_.isEmpty(_.trim(date + time))) {
+                return null;
+            }
             var value = date + this.getSeparatorFormat() + time;
             var format = this.getDateTimeFormat();
             var momentInstance = moment.utc(value, format, true);

@@ -218,4 +218,39 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($childView->vars['class_prefix'], 'foo');
         $this->assertEquals($prototypeView->vars['class_prefix'], 'foo');
     }
+
+    /**
+     * @dataProvider convertValueToStringDataProvider
+     * @param $value
+     * @param $expectedConvertedValue
+     */
+    public function testConvertValueToString($value, $expectedConvertedValue)
+    {
+        $this->assertSame($expectedConvertedValue, $this->extension->convertValueToString($value));
+    }
+
+    /**
+     * @return array
+     */
+    public function convertValueToStringDataProvider()
+    {
+        return [
+            'object conversion' => [
+                new \stdClass(),
+                'stdClass'
+            ],
+            'array conversion'  => [
+                ['Foo', 'Bar'],
+                '["Foo","Bar"]'
+            ],
+            'null conversion' => [
+                null,
+                'NULL'
+            ],
+            'string' => [
+                'some string',
+                'some string'
+            ]
+        ];
+    }
 }

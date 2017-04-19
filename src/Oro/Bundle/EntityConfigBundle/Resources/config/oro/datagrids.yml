@@ -2,8 +2,10 @@ datagrids:
     # Entity config entities grid
     entityconfig-grid:
         options:
-            entityHint: entity
+            entityHint: entities
         acl_resource: oro_entityconfig_manage
+        features:
+            entity_class_name_path: ce.className
         source:
             type: orm
             query:
@@ -169,7 +171,7 @@ datagrids:
     # Audit entity log grid
     entity-audit-grid:
         options:
-            entityHint: history
+            entityHint: histories
         acl_resource: oro_entityconfig_manage
         source:
             type: orm

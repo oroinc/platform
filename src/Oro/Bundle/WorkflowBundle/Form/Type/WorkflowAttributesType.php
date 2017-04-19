@@ -289,7 +289,33 @@ class WorkflowAttributesType extends AbstractType
         }
 
         // update form label
-        $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        $attributeOptions = $this->resolveLabel($attribute, $attributeOptions);
+
+        // update required option
+        if (!array_key_exists('required', $attributeOptions['options'])) {
+            $attributeOptions['options']['required'] = false;
+        }
+
+        // set disabled option
+        if ($options['disable_attribute_fields']) {
+            $attributeOptions['options']['disabled'] = true;
+        }
+
+        return $this->resolveContextValue($options['workflow_item'], $attributeOptions);
+    }
+
+    /**
+     * @param Attribute $attribute
+     * @param array $attributeOptions
+     * @return array
+     */
+    protected function resolveLabel(Attribute $attribute, array $attributeOptions)
+    {
+        if (isset($attributeOptions['options']['translation_domain'])) {
+            $domain = $attributeOptions['options']['translation_domain'];
+        } else {
+            $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
+        }
 
         if (isset($attributeOptions['label'])) {
             $attributeOptions['options']['label'] = $attributeOptions['label'];
@@ -311,17 +337,7 @@ class WorkflowAttributesType extends AbstractType
             $attributeOptions['options']['translation_domain'] = $domain;
         }
 
-        // update required option
-        if (!array_key_exists('required', $attributeOptions['options'])) {
-            $attributeOptions['options']['required'] = false;
-        }
-
-        // set disabled option
-        if ($options['disable_attribute_fields']) {
-            $attributeOptions['options']['disabled'] = true;
-        }
-
-        return $this->resolveContextValue($options['workflow_item'], $attributeOptions);
+        return $attributeOptions;
     }
 
     /**

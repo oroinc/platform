@@ -22,7 +22,7 @@ A new relationship may be created between two entities when at least the entity 
 
 |                           | Extendable entity | Non-extendable entity                 |
 | --------------------------|:-----------------:|:-------------------------------------:|
-| **Extendable entity**     | Any relationship<br>(bidirectional and unidirectional <br>many-to-many, many-to-one, <br>and one-to-many)| Many-to-many and many-to-one <br>relationships, unidirectional only |
+| **Extendable entity**     | Bidirectional and unidirectional many-to-many, <br>bidirectional and unidirectional many-to-one, <br>bidirectional one-to-many| Many-to-many and many-to-one <br>relationships, unidirectional only |
 | **Non-extendable entity** | None              | None                                  |
 
 

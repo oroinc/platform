@@ -5,13 +5,16 @@ namespace Oro\Bundle\CronBundle\Command;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
-use Oro\Bundle\CronBundle\Entity\Schedule;
-use Oro\Bundle\CronBundle\Helper\CronHelper;
+
 use Psr\Log\LoggerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
+use Oro\Bundle\CronBundle\Entity\Schedule;
+use Oro\Bundle\CronBundle\Helper\CronHelper;
 
 class CronCommand extends ContainerAwareCommand
 {
@@ -53,33 +56,23 @@ class CronCommand extends ContainerAwareCommand
                 /** @var CronCommandInterface $command */
                 $command = $this->getApplication()->get($schedule->getCommand());
 
-                if (!$command instanceof ActiveCronCommandInterface) {
-                    $message = sprintf(
-                        'The cron command %s must be implements ActiveCronCommandInterface',
-                        $schedule->getCommand()
+                // TODO: Should be properly refactored at BAP-13973
+                if ($command instanceof CronCommandInterface && !$command->isActive()) {
+                    $output->writeln(
+                        'Skipping not enabled command ' . $schedule->getCommand(),
+                        OutputInterface::VERBOSITY_DEBUG
                     );
-
-                    $output->writeln(sprintf('<error>%s</error>', $message));
-                    $logger->error($message);
-
                     continue;
                 }
 
-                if ($command->isActive()) {
-                    $output->writeln(
-                        'Scheduling run for command ' . $schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                    $this->getCommandRunner()->run(
-                        $schedule->getCommand(),
-                        $this->resolveOptions($schedule->getArguments())
-                    );
-                } else {
-                    $output->writeln(
-                        'Skipping not enabled command '.$schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                }
+                $output->writeln(
+                    'Scheduling run for command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                $this->getCommandRunner()->run(
+                    $schedule->getCommand(),
+                    $this->resolveOptions($schedule->getArguments())
+                );
             } else {
                 $output->writeln('Skipping not due command '.$schedule->getCommand(), OutputInterface::VERBOSITY_DEBUG);
             }

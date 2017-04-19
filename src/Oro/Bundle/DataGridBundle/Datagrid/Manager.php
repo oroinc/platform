@@ -55,7 +55,7 @@ class Manager implements ManagerInterface
     /**
      * {@inheritDoc}
      */
-    public function getDatagrid($name, $parameters = null)
+    public function getDatagrid($name, $parameters = null, array $additionalParameters = [])
     {
         if (null === $parameters) {
             $parameters = new ParameterBag();
@@ -67,7 +67,7 @@ class Manager implements ManagerInterface
 
         $configuration = $this->getConfigurationForGrid($name);
 
-        $datagrid = $this->datagridBuilder->build($configuration, $parameters);
+        $datagrid = $this->datagridBuilder->build($configuration, $parameters, $additionalParameters);
 
         return $datagrid;
     }
@@ -120,7 +120,7 @@ class Manager implements ManagerInterface
 
         $parameters->add($additionalParameters);
 
-        return $this->getDatagrid($name, $parameters);
+        return $this->getDatagrid($name, $parameters, $additionalParameters);
     }
 
     /**

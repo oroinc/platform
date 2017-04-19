@@ -29,8 +29,16 @@ class OrmEntityClassProvider implements EntityClassProviderInterface
     {
         $result = [];
         $managers = $this->managerBag->getManagers();
+        if (!$managers) {
+            return $result;
+        }
+
         foreach ($managers as $om) {
             $allMetadata = $this->doctrineHelper->getAllShortMetadata($om);
+            if (!$allMetadata) {
+                continue;
+            }
+
             foreach ($allMetadata as $metadata) {
                 if (!$metadata->isMappedSuperclass) {
                     $result[] = $metadata->name;

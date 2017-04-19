@@ -26,6 +26,7 @@ define(function(require) {
     var scrollHelper = require('oroui/js/tools/scroll-helper');
     var PageableCollection =  require('../pageable-collection');
     var util = require('./util');
+    var tools = require('oroui/js/tools');
 
     /**
      * Basic grid class.
@@ -115,6 +116,22 @@ define(function(require) {
                     bottom: false
                 }
             },
+            actionOptions: {
+                refreshAction: {
+                    launcherOptions: {
+                        label: __('oro_datagrid.action.refresh'),
+                        className: 'btn',
+                        iconClassName: 'fa-repeat'
+                    }
+                },
+                resetAction: {
+                    launcherOptions: {
+                        label: __('oro_datagrid.action.reset'),
+                        className: 'btn',
+                        iconClassName: 'fa-refresh'
+                    }
+                }
+            },
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
@@ -196,7 +213,7 @@ define(function(require) {
         },
 
         /**
-         * @param {Object} options
+         * @param {Object} opts
          * @private
          */
         _validateOptions: function(opts) {
@@ -226,6 +243,7 @@ define(function(require) {
 
             _.extend(this, this.defaults, opts);
             this._initToolbars(opts);
+            this._initActions(opts);
             this.exportOptions = {};
             _.extend(this.exportOptions, opts.exportOptions);
 
@@ -316,8 +334,10 @@ define(function(require) {
             });
         },
 
-        onCollectionUpdateState: function() {
-            this.selectState.reset();
+        onCollectionUpdateState: function(collection, state) {
+            if (this.stateIsResettable(collection.previousState, state)) {
+                this.selectNone();
+            }
         },
 
         onCollectionModelRemove: function(model) {
@@ -405,6 +425,20 @@ define(function(require) {
         },
 
         /**
+         * @param {*} previousState
+         * @param {*} state
+         * @returns {boolean} TRUE if values are not equal, otherwise - FALSE
+         */
+        stateIsResettable: function(previousState, state) {
+            var fields = ['filters', 'gridView', 'pageSize'];
+
+            return !tools.isEqualsLoosely(
+                _.pick(previousState, fields),
+                _.pick(state, fields)
+            );
+        },
+
+        /**
          * @param {Object} opts
          * @private
          */
@@ -412,6 +446,16 @@ define(function(require) {
             this.toolbars = {};
             this.toolbarOptions = {};
             _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
+        },
+
+        /**
+         * @param {Object} opts
+         * @private
+         */
+        _initActions: function(opts) {
+            if (_.isObject(opts.themeOptions)) {
+                _.extend(this.actionOptions, opts.themeOptions.actionOptions);
+            }
         },
 
         /**
@@ -591,6 +635,7 @@ define(function(require) {
          * @private
          */
         _createToolbar: function(options) {
+            var ComponentConstructor =  this.collection.options.modules.columnManagerComponentCustom || null;
             var toolbar;
             var sortActions = this.sortActions;
             var toolbarOptions = {
@@ -598,6 +643,7 @@ define(function(require) {
                 actions:      this._getToolbarActions(),
                 extraActions: this._getToolbarExtraActions(),
                 columns:      this.columns,
+                componentConstructor: ComponentConstructor,
                 addToolbarAction: function(action) {
                     toolbarOptions.actions.push(action);
                     sortActions(toolbarOptions.actions);
@@ -702,11 +748,7 @@ define(function(require) {
             if (!this.refreshAction) {
                 this.refreshAction = new RefreshCollectionAction({
                     datagrid: this,
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.refresh'),
-                        className: 'btn',
-                        iconClassName: 'fa-repeat'
-                    },
+                    launcherOptions: this.actionOptions.refreshAction.launcherOptions,
                     order: 100
                 });
                 this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
@@ -732,11 +774,7 @@ define(function(require) {
             if (!this.resetAction) {
                 this.resetAction = new ResetCollectionAction({
                     datagrid: this,
-                    launcherOptions: {
-                        label: __('oro_datagrid.action.reset'),
-                        className: 'btn',
-                        iconClassName: 'fa-refresh'
-                    },
+                    launcherOptions: this.actionOptions.resetAction.launcherOptions,
                     order: 200
                 });
 

@@ -240,23 +240,7 @@ class WorkflowAssembler extends BaseAbstractAssembler
      */
     protected function assembleTransitions(array $configuration, Collection $steps, Collection $attributes)
     {
-        $transitionsConfiguration = $this->getOption(
-            $configuration,
-            WorkflowConfiguration::NODE_TRANSITIONS,
-            []
-        );
-        $transitionDefinitionsConfiguration = $this->getOption(
-            $configuration,
-            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
-            []
-        );
-
-        return $this->transitionAssembler->assemble(
-            $transitionsConfiguration,
-            $transitionDefinitionsConfiguration,
-            $steps,
-            $attributes
-        );
+        return $this->transitionAssembler->assemble($configuration, $steps, $attributes);
     }
 
     /**

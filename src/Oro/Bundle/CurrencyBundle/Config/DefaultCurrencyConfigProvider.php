@@ -40,4 +40,13 @@ class DefaultCurrencyConfigProvider implements CurrencyProviderInterface
     {
         return (array) $this->getDefaultCurrency();
     }
+
+    /**
+     * @return array
+     */
+    public function getCurrencies()
+    {
+        $currencies = $this->getCurrencyList();
+        return array_combine($currencies, $currencies);
+    }
 }

@@ -40,8 +40,8 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
             [
                 LoadWorkflowTranslations::WORKFLOW4,
                 '--locale' => LoadLanguages::LANGUAGE2,
-                '--no-ansi'
-            ]
+            ],
+            false
         );
 
         $this->assertNotEmpty($result);

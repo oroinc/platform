@@ -80,6 +80,9 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
     public function testViewAction()
     {
+        //Workaround until BAP-14050 is resolved
+        $this->translateStepLabels();
+
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_workflow_definition_view', ['name' => LoadWorkflowDefinitions::MULTISTEP]),
@@ -99,6 +102,41 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         if ($workflow->getStepManager()->getStartStep()) {
             $this->assertContains($workflow->getStepManager()->getStartStep()->getName(), $crawler->html());
         }
+    }
+
+    public function testConfigurationAction()
+    {
+        //Workaround until BAP-14050 is resolved
+        $this->translateStepLabels();
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_workflow_definition_configure', ['name' => LoadWorkflowDefinitions::MULTISTEP]),
+            [],
+            [],
+            $this->generateBasicAuthHeader()
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+
+        $this->assertNotEmpty($crawler->html());
+
+        $this->assertContains('Var1Value', $crawler->html());
+        $this->assertContains('test_flow', $crawler->html());
+
+        // update variable value
+        $form = $crawler->selectButton('Save')->form([
+            'oro_workflow_variables[var1]' => 'Var1NewValue',
+            'oro_workflow_variables[entity_var]' => 'test_multistep_flow',
+        ]);
+
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form);
+
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $this->assertContains('Var1NewValue', $crawler->html());
+        $this->assertContains('test_multistep_flow', $crawler->html());
     }
 
     public function testActivateFormAction()
@@ -121,7 +159,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->assertNotEmpty($crawler->html());
         $this->assertContains(LoadWorkflowDefinitions::WITH_GROUPS2, $crawler->html());
-        $this->assertContains('name="oro_workflow_replacement_select"', $crawler->html());
+        $this->assertContains('name="oro_workflow_replacement"', $crawler->html());
         $this->assertContains('Activate', $crawler->html());
         $this->assertContains('Cancel', $crawler->html());
         $this->assertContains('The following workflows will be deactivated', $crawler->html());
@@ -166,5 +204,34 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     private function getObjectManager($className)
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+    }
+
+    /**
+     * Translates step labels for test workflow
+     */
+    private function translateStepLabels()
+    {
+        $translationsManager = $this->client->getContainer()->get('oro_translation.manager.translation');
+        $translationsManager->saveTranslation(
+            'oro.workflow.test_multistep_flow.step.starting_point.label',
+            'Step starting point',
+            'en',
+            'workflows'
+        );
+        $translationsManager->saveTranslation(
+            'oro.workflow.test_multistep_flow.step.second_point.label',
+            'Second step',
+            'en',
+            'workflows'
+        );
+        $translationsManager->saveTranslation(
+            'oro.workflow.test_multistep_flow.step.third_point.label',
+            'Third step',
+            'en',
+            'workflows'
+        );
+
+        $translationsManager->flush();
+        $this->client->getContainer()->get('translator.default')->rebuildCache();
     }
 }

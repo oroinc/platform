@@ -297,7 +297,12 @@
                     <div class="workflow-flowchart-controls clearfix"></div>
                     <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
                             'module': 'oroui/js/app/components/view-component',
-                            'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                            'options': {
+                                'view': 'oroui/js/app/views/zoomable-area-view',
+                                'autozoom': true,
+                                'minZoom': 0.05,
+                                'maxZoom': 5
+                            }
                         }) }}
                     >
                         <div class="workflow-flowchart clearfix"></div>
@@ -325,6 +330,41 @@
             ]
         },
     ] %}
+
+    {% if variables is defined and variables|length %}
+        {% set variablesInfo %}
+            <div class="widget-content">
+                <div class="row-fluid form-horizontal">
+                    <div class="responsive-block">
+                        {% for variable in variables %}
+                            <div class="control-group">
+                                <label class="control-label">
+                                    {% if variable.options.form_options is defined and variable.options.form_options.tooltip is defined %}
+                                        {{ UI.tooltip(variable.options.form_options.tooltip) }}
+                                    {% endif %}
+                                    {{ variable.label }}
+                                </label>
+                                <div class="controls">
+                                    <div class="control-label">
+                                        {{ ((variable.value is iterable) ? variable.value|join(', ') : variable.value) }}
+                                        {{ workflowMacros.renderGoToTranslationsIconByLink(translateLinks.variable_definitions.variables[variable.name]) }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'oro.workflow.workflowdefinition.configuration.label'|trans,
+            'subblocks': [
+                {'data':  [variablesInfo]},
+            ]
+        }]) %}
+
+    {% endif %}
 
     {% set id = 'workflowDefinitionView' %}
     {% set data = {'dataBlocks': dataBlocks} %}

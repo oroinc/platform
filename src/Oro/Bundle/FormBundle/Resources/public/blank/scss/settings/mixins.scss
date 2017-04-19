@@ -6,8 +6,9 @@
 }
 
 @mixin appearance() {
-    appearance: none;
     -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
 }
 
 @mixin base-disabled-style($opacity: .5) {
@@ -25,7 +26,8 @@
     $border:           $base-ui-element-border,
     $border-radius:    $base-ui-element-border-radius,
     $background-color: $base-ui-element-bg-color,
-    $color:            $base-ui-element-color
+    $color:            $base-ui-element-color,
+    $appearance:       true
     ) {
     @if ($use-base-style) {
         display: inline-block;
@@ -50,7 +52,9 @@
 
         box-sizing: border-box;
 
-        -webkit-appearance: none;
+        @if ($appearance) {
+            @include appearance();
+        }
 
         &--full,
         &.full {

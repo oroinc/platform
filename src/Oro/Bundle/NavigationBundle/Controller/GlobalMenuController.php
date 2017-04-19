@@ -8,8 +8,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 /**
  * @Route("/menu/global")
  */
@@ -18,7 +16,6 @@ class GlobalMenuController extends AbstractMenuController
     /**
      * @Route("/", name="oro_navigation_global_menu_index")
      * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @return array
      */
@@ -30,7 +27,6 @@ class GlobalMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}", name="oro_navigation_global_menu_view")
      * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      *
@@ -44,9 +40,8 @@ class GlobalMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_global_menu_create")
      * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
-     * @AclAncestor("oro_navigation_manage_menus")
      *
-     * @param string $menuName
+     * @param string      $menuName
      * @param string|null $parentKey
      *
      * @return array|RedirectResponse
@@ -59,7 +54,6 @@ class GlobalMenuController extends AbstractMenuController
     /**
      * @Route("/{menuName}/update/{key}", name="oro_navigation_global_menu_update")
      * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param string $menuName
      * @param string $key
@@ -73,8 +67,6 @@ class GlobalMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/move", name="oro_navigation_global_menu_move")
-     * @Template
-     * @AclAncestor("oro_navigation_manage_menus")
      *
      * @param Request $request
      * @param string  $menuName
@@ -87,28 +79,13 @@ class GlobalMenuController extends AbstractMenuController
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getScopeType()
-    {
-        return $this->getParameter('oro_navigation.menu_update.scope_type');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getMenuUpdateManager()
-    {
-        return $this->get('oro_navigation.manager.menu_update');
-    }
-
-    /**
      * {@inheritDoc}
      */
-    protected function checkAcl()
+    protected function checkAcl(array $context)
     {
         if (!$this->get('oro_security.security_facade')->isGranted('oro_config_system')) {
             throw $this->createAccessDeniedException();
         }
+        parent::checkAcl($context);
     }
 }

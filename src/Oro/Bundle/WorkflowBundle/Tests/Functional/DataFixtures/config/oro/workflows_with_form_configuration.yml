@@ -1,0 +1,62 @@
+workflows:
+    test_workflow_with_form_configuration:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        entity_attribute: entity
+        defaults: {active: true}
+        attributes:
+           data_value_one:
+               type:  entity
+               options:
+                   class: 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity'
+        steps:
+            step1:
+                allowed_transitions:
+                    - transition_1
+        transitions:
+            start_transition:
+                step_to: step1
+                is_start: true
+                transition_definition: transition_1_definition
+                frontend_options:
+                    icon: 'fa-bolt'
+                display_type: dialog
+                form_options:
+                    attribute_fields: ~
+                    form_init:
+                        - '@create_object':
+                            class: 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity'
+                            attribute: $.data.data_value_one
+                            parameters: ~
+                    configuration:
+                        handler: 'default'
+                        template: 'OroWorkflowBundle:actions:update.html.twig'
+                        data_provider: 'transition_page_form'
+                        data_attribute: 'data_value_one'
+                form_type: 'Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType'
+            transition_1:
+                step_to: step1
+                transition_definition: transition_1_definition
+                frontend_options:
+                    icon: 'fa-bell'
+                display_type: page
+                form_options:
+                    attribute_fields: ~
+                    form_init:
+                        - '@tree':
+                            conditions:
+                                '@empty': [$data_value_one]
+                            actions:
+                                - '@create_object':
+                                    class: 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity'
+                                    attribute: $data_value_one
+                                    parameters: ~
+                    configuration:
+                        data_provider: 'transition_page_form'
+                        data_attribute: 'data_value_one'
+                form_type: 'Oro\Bundle\TestFrameworkBundle\Form\Type\WorkflowAwareEntityType'
+        transition_definitions:
+            transition_1_definition:
+                actions:
+                    - '@flash_message':
+                        message: 'Workflow was transited'
+                        type: 'success'

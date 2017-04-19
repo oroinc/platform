@@ -5,12 +5,13 @@ namespace Oro\Bundle\ImportExportBundle\Processor;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
+use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
-class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwareInterface
+class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwareInterface, ClosableInterface
 {
     /**
      * @var ProcessorRegistry
@@ -93,5 +94,16 @@ class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwar
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $delegateProcessor = $this->getDelegateProcessor();
+        if ($delegateProcessor instanceof ClosableInterface) {
+            $delegateProcessor->close();
+        }
     }
 }

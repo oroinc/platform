@@ -20,6 +20,9 @@ class LayoutContext implements ContextInterface
     /** @var boolean */
     protected $resolved = false;
 
+    /** @var string */
+    protected $hash;
+
     /**
      * @param array         $parameters Context items
      * @param null|string[] $vars Array of allowed layout context variables
@@ -76,6 +79,7 @@ class LayoutContext implements ContextInterface
             }
 
             $this->resolved = true;
+            $this->hash = $this->generateHash();
         } catch (OptionsResolverException $e) {
             throw new Exception\LogicException(
                 sprintf('Failed to resolve the context variables. Reason: %s', $e->getMessage()),
@@ -212,6 +216,14 @@ class LayoutContext implements ContextInterface
             throw new Exception\LogicException('The context is not resolved.');
         }
 
+        return $this->hash;
+    }
+
+    /**
+     * @return string
+     */
+    protected function generateHash()
+    {
         $items = $this->items;
         foreach ($items as &$item) {
             if ($item instanceof ContextItemInterface) {

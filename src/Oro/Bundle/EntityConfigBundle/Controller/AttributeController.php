@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
-use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\BeforeEntityAttributeSaveEvent;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
+use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * @Route("/attribute")
@@ -63,7 +64,18 @@ class AttributeController extends Controller
         $redirectUrl = $this->generateUrl('oro_attribute_create', ['alias' => $alias]);
         $successMessage = $this->get('translator')->trans('oro.entity_config.attribute.successfully_saved');
         $formAction = $this->generateUrl('oro_attribute_save', ['alias' => $alias]);
+
         $options['attribute'] = ['is_attribute' => true];
+        $event = new BeforeEntityAttributeSaveEvent(
+            $alias,
+            $entityConfigModel,
+            $options
+        );
+        $this->get('event_dispatcher')->dispatch(
+            Events::BEFORE_SAVE_ATTRIBUTE,
+            $event
+        );
+        $options = $event->getOptions();
 
         $response = $this
             ->get('oro_entity_config.form.handler.create_update_config_field_handler')

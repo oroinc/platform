@@ -9,22 +9,14 @@ define(function(require) {
 
     AttributeGroupTabsComponent = BaseComponent.extend({
         /**
-         * @type {Object}
-         */
-        current: null,
-
-        /**
          * @param {Object} options
          */
         initialize: function(options) {
-            var groups  = options.data;
+            this.groups = new BaseCollection(options.data);
 
-            var first = groups[0];
-            first.active = true;
-            this.current = first.id;
-            this.trigger(this.current);
-
-            this.groups = new BaseCollection(groups);
+            var first = this.groups.first();
+            first.set('active', true);
+            this.trigger(first, true);
 
             this.view = new TabCollectionView({
                 el: options._sourceElement,
@@ -33,20 +25,17 @@ define(function(require) {
             });
 
             this.listenTo(this.groups, 'change', this.onGroupChange);
+            this.listenTo(this.groups, 'select', this.onGroupChange);
         },
 
         onGroupChange: function(model) {
-            if (model.hasChanged('active') && model.get('active') === true) {
-                this.trigger(this.current);
-                this.trigger(model.get('id'));
-                this.current = model.get('id');
+            if (model.get('active') === true) {
+                this.trigger(model);
             }
         },
 
-        trigger: function(code) {
-            mediator.trigger('entity-config:attribute-group:changed', {
-                id: code
-            });
+        trigger: function(model, initialize) {
+            mediator.trigger('entity-config:attribute-group:changed', model, initialize);
         }
     });
 

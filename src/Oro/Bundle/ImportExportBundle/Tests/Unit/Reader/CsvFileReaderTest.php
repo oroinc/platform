@@ -21,7 +21,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
             ->disableOriginalConstructor()
-            ->setMethods(array('getByStepExecution'))
+            ->setMethods(['getByStepExecution'])
             ->getMock();
 
         $this->reader = new CsvFileReader($this->contextRegistry);
@@ -29,11 +29,11 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of CSV reader must contain "filePath".
+     * @expectedExceptionMessage Configuration of reader must contain "filePath".
      */
     public function testSetStepExecutionNoFileException()
     {
-        $context = $this->getContextWithOptionsMock(array());
+        $context = $this->getContextWithOptionsMock([]);
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
 
@@ -43,20 +43,20 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnknownFileException()
     {
-        $context = $this->getContextWithOptionsMock(array('filePath' => 'unknown_file.csv'));
+        $context = $this->getContextWithOptionsMock(['filePath' => 'unknown_file.csv']);
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
 
     public function testSetStepExecution()
     {
-        $options = array(
+        $options = [
             'filePath' => __DIR__ . '/fixtures/import_correct.csv',
             'delimiter' => ',',
             'enclosure' => "'''",
             'escape' => ';',
             'firstLineIsHeader' => false,
-            'header' => array('one', 'two')
-        );
+            'header' => ['one', 'two']
+        ];
 
         $this->assertAttributeEquals(',', 'delimiter', $this->reader);
         $this->assertAttributeEquals('"', 'enclosure', $this->reader);
@@ -90,7 +90,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
             ->method('incrementReadCount');
         $stepExecution->expects($this->never())
             ->method('addReaderWarning');
-        $data = array();
+        $data = [];
         while (($dataRow = $this->reader->read($stepExecution)) !== null) {
             $data[] = $dataRow;
         }
@@ -99,71 +99,71 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
 
     public function optionsDataProvider()
     {
-        return array(
-            array(
-                array('filePath' => __DIR__ . '/fixtures/import_correct.csv'),
-                array(
-                    array(
+        return [
+            [
+                ['filePath' => __DIR__ . '/fixtures/import_correct.csv'],
+                [
+                    [
                         'field_one' => '1',
                         'field_two' => '2',
                         'field_three' => '3',
-                    ),
-                    array(
+                    ],
+                    [
                         'field_one' => 'test1',
                         'field_two' => 'test2',
                         'field_three' => 'test3',
-                    ),
-                    array(),
-                    array(
+                    ],
+                    [],
+                    [
                         'field_one' => 'after_new1',
                         'field_two' => 'after_new2',
                         'field_three' => 'after_new3',
-                    ),
-                )
-            ),
-            array(
-                array(
+                    ],
+                ]
+            ],
+            [
+                [
                     'filePath' => __DIR__ . '/fixtures/import_correct.csv',
-                    'header' => array('h1', 'h2', 'h3')
-                ),
-                array(
-                    array(
+                    'header' => ['h1', 'h2', 'h3']
+                ],
+                [
+                    [
                         'h1' => 'field_one',
                         'h2' => 'field_two',
                         'h3' => 'field_three'
-                    ),
-                    array(
+                    ],
+                    [
                         'h1' => '1',
                         'h2' => '2',
                         'h3' => '3',
-                    ),
-                    array(
+                    ],
+                    [
                         'h1' => 'test1',
                         'h2' => 'test2',
                         'h3' => 'test3',
-                    ),
-                    array(),
-                    array(
+                    ],
+                    [],
+                    [
                         'h1' => 'after_new1',
                         'h2' => 'after_new2',
                         'h3' => 'after_new3',
-                    ),
-                )
-            ),
-            array(
-                array(
+                    ],
+                ]
+            ],
+            [
+                [
                     'filePath' => __DIR__ . '/fixtures/import_correct.csv',
                     'firstLineIsHeader' => false
-                ),
-                array(
-                    array('field_one', 'field_two', 'field_three'),
-                    array('1', '2', '3'),
-                    array('test1', 'test2', 'test3'),
-                    array(),
-                    array('after_new1', 'after_new2', 'after_new3'),
-                )
-            )
-        );
+                ],
+                [
+                    ['field_one', 'field_two', 'field_three'],
+                    ['1', '2', '3'],
+                    ['test1', 'test2', 'test3'],
+                    [],
+                    ['after_new1', 'after_new2', 'after_new3'],
+                ]
+            ]
+        ];
     }
 
     /**
@@ -172,7 +172,7 @@ class CsvFileReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadError()
     {
-        $context = $this->getContextWithOptionsMock(array('filePath' => __DIR__ . '/fixtures/import_incorrect.csv'));
+        $context = $this->getContextWithOptionsMock(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
         $stepExecution = $this->getMockStepExecution($context);
         $this->reader->setStepExecution($stepExecution);
         $this->reader->read($stepExecution);

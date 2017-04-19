@@ -23,7 +23,6 @@ use Oro\Bundle\TagBundle\Helper\TaggableHelper;
  */
 class TagManager
 {
-    const ACL_RESOURCE_REMOVE_ID_KEY = 'oro_tag_unassign_global';
     const ACL_RESOURCE_CREATE_ID_KEY = 'oro_tag_create';
     const ACL_RESOURCE_ASSIGN_ID_KEY = 'oro_tag_assign_unassign';
 
@@ -361,34 +360,11 @@ class TagManager
      */
     protected function persistDeleteTags($entity, Collection $tags)
     {
-        $owner = $this->getUser();
-
-        // Current assigned tags(taggings) for this owner
-        $assignedOwnerTags = $this->fetchTags($entity, $owner, false);
-
-        $ownerTags = $tags->filter(
-            function (Tag $tag) use ($assignedOwnerTags) {
-                return $assignedOwnerTags->exists($this->getComparePredicate($tag));
-            }
-        );
-        if (!$ownerTags->isEmpty()) {
+        if (!$tags->isEmpty()) {
             if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
                 throw new AccessDeniedException("User does not have access to assign/unassign tags.");
             }
-            $this->deleteTagging($entity, $ownerTags, $owner);
-        }
-
-        $anotherTags = $tags->filter(
-            function (Tag $tag) use ($assignedOwnerTags) {
-                return !$assignedOwnerTags->exists($this->getComparePredicate($tag));
-            }
-        );
-        // Delete 'not mine' taggings
-        if (!$anotherTags->isEmpty()) {
-            if (!$this->securityFacade->isGranted(self::ACL_RESOURCE_REMOVE_ID_KEY)) {
-                throw new AccessDeniedException("User does not have access to remove another's tags.");
-            }
-            $this->deleteTagging($entity, $anotherTags);
+            $this->deleteTagging($entity, $tags);
         }
     }
 

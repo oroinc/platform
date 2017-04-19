@@ -225,6 +225,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             WorkflowConfiguration::NODE_INIT_ENTITIES,
             WorkflowConfiguration::NODE_INIT_ROUTES,
             WorkflowConfiguration::NODE_INIT_DATAGRIDS,
+            WorkflowConfiguration::NODE_VARIABLES,
+            WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS,
         ];
 
         return array_intersect_key($configuration, array_flip($configurationKeys));

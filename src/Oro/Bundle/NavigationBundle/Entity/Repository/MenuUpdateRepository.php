@@ -17,6 +17,9 @@ class MenuUpdateRepository extends EntityRepository
      */
     private $queryResultCache;
 
+    /**
+     * @param CacheProvider $queryResultCache
+     */
     public function setQueryResultCache(CacheProvider $queryResultCache)
     {
         $this->queryResultCache = $queryResultCache;
@@ -31,7 +34,7 @@ class MenuUpdateRepository extends EntityRepository
     public function findMenuUpdatesByScopeIds($menuName, array $scopeIds)
     {
         $result = [];
-
+        $scopeIds = array_reverse($scopeIds);
         foreach ($scopeIds as $scopeId) {
             $result = array_merge(
                 $result,

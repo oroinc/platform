@@ -8,31 +8,86 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class MainMenu extends Element
 {
+    /** @var Element */
+    private $dropDown = null;
+
+    /**
+     * @inheritdoc
+     */
+    protected function init()
+    {
+        $this->dropDown = $this;
+    }
+
     /**
      * @param string $path
      * @throws ElementNotFoundException
-     * @return NodeElement|null
+     * @return NodeElement
      */
     public function openAndClick($path)
     {
+        $this->dropDown = $this;
         $items = explode('/', $path);
         $linkLocator = trim(array_pop($items));
-        $that = $this;
+
+        $this->moveByMenuTree($path);
+
+        $link = $this->findVisibleLink($linkLocator);
+        $link->click();
+
+        return $link;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasLink($path)
+    {
+        try {
+            $this->moveByMenuTree($path);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    private function moveByMenuTree($path)
+    {
+        $items = explode('/', $path);
+        array_pop($items);
 
         while ($item = array_shift($items)) {
             /** @var NodeElement $link */
-            $link = $that->findLink(trim($item));
+            $link = $this->findVisibleLink($item);
+            $link->mouseOver();
+            $this->dropDown = $this->elementFactory->wrapElement(
+                'MainMenuDropdown',
+                $link->getParent()->find('css', '.dropdown-menu')
+            );
+        }
+    }
 
-            if (null === $link) {
-                throw new ElementNotFoundException($this->getDriver(), 'link', 'id|title|alt|text', trim($item));
+    /**
+     * @param string $title
+     * @return NodeElement
+     */
+    protected function findVisibleLink($title)
+    {
+        $title = trim($title);
+
+        /** @var NodeElement $link */
+        $link = $this->dropDown->spin(function (NodeElement $element) use ($title) {
+            $link = $element->findLink($title);
+
+            if ($link && $link->isVisible()) {
+                return $link;
             }
 
-            $link->mouseOver();
-            $that = $link->getParent();
-        }
+            return null;
+        }, 5);
 
-        $that->clickLink(trim($linkLocator));
+        self::assertNotNull($link, sprintf('Menu item "%s" not found', $title));
 
-        return $that->findLink($linkLocator);
+        return $link;
     }
 }

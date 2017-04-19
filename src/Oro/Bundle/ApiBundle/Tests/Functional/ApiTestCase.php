@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Parser;
 
+use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -257,7 +258,7 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Assert response status code equals
+     * Asserts response status code equals.
      *
      * @param Response  $response
      * @param int|int[] $statusCode
@@ -290,6 +291,18 @@ abstract class ApiTestCase extends WebTestCase
             }
             throw $e;
         }
+    }
+
+    /**
+     * Asserts an array contains the expected array.
+     *
+     * @param array  $expected
+     * @param mixed  $actual
+     * @param string $message
+     */
+    protected static function assertArrayContains(array $expected, $actual, $message = '')
+    {
+        self::assertThat($actual, new ArrayContainsConstraint($expected, false), $message);
     }
 
     /**

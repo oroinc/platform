@@ -4,63 +4,135 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 
 class LoadSegmentData extends AbstractFixture
 {
-    const COUNT = 50;
+    const SEGMENT_DYNAMIC = 'segment_dynamic';
+    const SEGMENT_DYNAMIC_WITH_FILTER = 'segment_dynamic_with_filter';
+    const SEGMENT_STATIC = 'segment_static';
+    const SEGMENT_STATIC_WITH_FILTER_AND_SORTING = 'segment_static_with_filter_and_sorting';
+
+    /** @var array */
+    private static $segments = [
+        self::SEGMENT_DYNAMIC => [
+            'name' => 'Dynamic Segment',
+            'description' => 'Dynamic Segment Description',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_DYNAMIC,
+            'definition' => [
+                'columns' => [
+                    [
+                        'func' => null,
+                        'label' => 'Label',
+                        'name' => 'id',
+                        'sorting' => ''
+                    ]
+                ],
+                'filters' =>[]
+            ]
+        ],
+        self::SEGMENT_DYNAMIC_WITH_FILTER => [
+            'name' => 'Dynamic Segment with Filter',
+            'description' => 'Dynamic Segment Description',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_DYNAMIC,
+            'definition' => [
+                'columns' => [
+                    [
+                        'func' => null,
+                        'label' => 'Label',
+                        'name' => 'name',
+                        'sorting' => 'DESC'
+                    ]
+                ],
+                'filters' =>[
+                    [
+                        'columnName' => 'name',
+                        'criterion' => [
+                            'filter' => 'string',
+                            'data' => [
+                                'value' => 'Some not existing name',
+                                'type' => 1,
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        self::SEGMENT_STATIC => [
+            'name' => 'Static Segment',
+            'description' => 'Static Segment Description',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_STATIC,
+            'definition' => [
+                'columns' => [
+                    [
+                        'func' => null,
+                        'label' => 'Label',
+                        'name' => 'id',
+                        'sorting' => ''
+                    ]
+                ],
+                'filters' =>[]
+            ]
+        ],
+        self::SEGMENT_STATIC_WITH_FILTER_AND_SORTING => [
+            'name' => 'Static Segment with Filter',
+            'description' => 'Static Segment Description',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_STATIC,
+            'definition' => [
+                'columns' => [
+                    [
+                        'func' => null,
+                        'label' => 'Label',
+                        'name' => 'name',
+                        'sorting' => 'DESC'
+                    ]
+                ],
+                'filters' =>[
+                    [
+                        'columnName' => 'name',
+                        'criterion' => [
+                            'filter' => 'string',
+                            'data' => [
+                                'value' => 'entity',
+                                'type' => 1,
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
     public function load(ObjectManager $manager)
     {
-        $staticType = $manager->getRepository('OroSegmentBundle:SegmentType')->find(SegmentType::TYPE_STATIC);
+        $organization = $manager->getRepository(Organization::class)->getFirst();
+        $owner = $organization->getBusinessUnits()->first();
 
-        if (!$staticType) {
-            $staticType  = new SegmentType(SegmentType::TYPE_STATIC);
-            $staticType->setLabel('Static');
-            $manager->persist($staticType);
-        }
-
-        $dynamicType = $manager->getRepository('OroSegmentBundle:SegmentType')->find(SegmentType::TYPE_DYNAMIC);
-        if (!$dynamicType) {
-            $dynamicType = new SegmentType(SegmentType::TYPE_DYNAMIC);
-            $dynamicType->setLabel('Dynamic');
-            $manager->persist($dynamicType);
-        }
-
-        $organisation = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-
-        $owner = $manager->getRepository('OroOrganizationBundle:BusinessUnit')->findOneBy(array('name' => 'Test'));
-        if (!$owner) {
-            $owner = new BusinessUnit();
-            $owner->setName('Test');
-            $owner->setOrganization($organisation);
-            $manager->persist($owner);
-        }
-
-        for ($i = 1; $i <= self::COUNT; $i++) {
-            $definition = array(
-                'columns' => array(
-                    'func'    => null,
-                    'label'   => 'label' . $i,
-                    'name'    => '',
-                    'sorting' => ''
-                ),
-                'filters' => array()
-            );
+        foreach (self::$segments as $segmentReference => $data) {
+            $segmentType = $manager->getRepository(SegmentType::class)->find($data['type']);
 
             $entity = new Segment();
-            $entity->setCreatedAt(new \DateTime('now'));
-            $entity->setDefinition(json_encode($definition));
-            $entity->setDescription('description_' . $i);
-            $entity->setEntity('Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity');
-            $entity->setLastRun(new \DateTime('now'));
-            $entity->setName('segment_' . $i);
+            $entity->setName($data['name']);
+            $entity->setDescription($data['description']);
+            $entity->setEntity($data['entity']);
             $entity->setOwner($owner);
-            $entity->setType((rand(0, 100) % 2) ? $staticType : $dynamicType);
-            $entity->setUpdatedAt(new \DateTime('now'));
-            $entity->setOrganization($organisation);
+            $entity->setType($segmentType);
+            $entity->setOrganization($organization);
+            $entity->setDefinition(json_encode($data['definition']));
+
+            $this->setReference($segmentReference, $entity);
+
             $manager->persist($entity);
         }
 

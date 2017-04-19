@@ -2,40 +2,77 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Handler;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\Transition;
 
-class TransitionFormHandler
+class TransitionFormHandler implements TransitionFormHandlerInterface
 {
-    /** @var RequestStack */
-    private $requestStack;
-
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
     /**
-     * @param RequestStack $requestStack
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(RequestStack $requestStack, DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->requestStack = $requestStack;
         $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
-     * @param Form $transitionForm
+     * {@inheritDoc}
+     */
+    public function processStartTransitionForm(
+        FormInterface $form,
+        WorkflowItem $workflowItem,
+        Transition $transition,
+        Request $request
+    ) {
+        $formOptions = $transition->getFormOptions();
+        $attributeNames = isset($formOptions['attribute_fields']) ? array_keys($formOptions['attribute_fields']) : [];
+
+        return $this->handleStartTransitionForm($form, $attributeNames, $request);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function processTransitionForm(
+        FormInterface $form,
+        WorkflowItem $workflowItem,
+        Transition $transition,
+        Request $request
+    ) {
+        if ($request->isMethod('POST')) {
+            $form->submit($request);
+
+            if ($form->isValid()) {
+                $workflowItem->setUpdated();
+                $this->doctrineHelper->getEntityManager(WorkflowItem::class)->flush();
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param FormInterface $transitionForm
      * @param array $attributeNames
+     * @param Request $request
+     *
      * @return bool
      */
-    public function handleTransitionForm(Form $transitionForm, array $attributeNames)
+    protected function handleStartTransitionForm(FormInterface $transitionForm, array $attributeNames, Request $request)
     {
-        $request = $this->requestStack->getCurrentRequest();
         if (!$request->isMethod('POST')) {
             return false;
         }
+
         $doctrineHelper = $this->doctrineHelper;
         $transitionForm->submit($request);
         if ($transitionForm->isValid()) {
@@ -55,8 +92,10 @@ class TransitionFormHandler
                     }
                 }
             }
+
             return true;
         }
+
         return false;
     }
 }

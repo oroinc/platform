@@ -3,21 +3,21 @@
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
 use Knp\Menu\ItemInterface;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
-use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 
 class MenuUpdateType extends AbstractType
 {
-    const NAME = 'oro_navigation_menu_update';
-
     /**
      * {@inheritdoc}
      */
@@ -39,7 +39,7 @@ class MenuUpdateType extends AbstractType
                 $form = $event->getForm();
                 /** @var ItemInterface $menuItem */
                 $menuItem = $options['menu_item'];
-                /** @var MenuUpdate $menuUpdate */
+                /** @var MenuUpdateInterface $menuUpdate */
                 $menuUpdate = $event->getData();
                 $form->add(
                     'uri',
@@ -92,11 +92,18 @@ class MenuUpdateType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => MenuUpdate::class,
+                'data_class' => function (Options $options) {
+                    // for loading apropriate validation metadata we need to specify exact entity class in data_class
+                    if ($options['data'] instanceof MenuUpdateInterface) {
+                        return get_class($options['data']);
+                    }
+
+                    return null;
+                },
                 'menu_item' => null,
                 'validation_groups' => function (FormInterface $form) {
                     $groups = ['Default'];
-                    /** @var MenuUpdate $menuUpdate */
+                    /** @var MenuUpdateInterface $menuUpdate */
                     $menuUpdate = $form->getData();
                     if (null === $menuUpdate || true === $menuUpdate->isCustom()) {
                         $groups[] = 'UserDefined';
@@ -106,13 +113,5 @@ class MenuUpdateType extends AbstractType
                 }
             ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 }

@@ -1,6 +1,16 @@
 UPGRADE FROM 2.0 to 2.1
 ========================
 
+####General
+- Changed minimum required php version to 7.0
+- Updated dependency to [fxpio/composer-asset-plugin](https://github.com/fxpio/composer-asset-plugin) composer plugin to version 1.3.
+- Composer updated to version 1.4.
+
+```
+    composer self-update
+    composer global require "fxp/composer-asset-plugin"
+```
+
 MessageQueue Component
 ----------------------
 - Class `Oro\Component\MessageQueue\Client\Meta\DestinationsCommand`
@@ -16,6 +26,44 @@ MessageQueue Component
 - Class `Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand`
     - removed the constructor
     - removed property `protected $consumer`
+- Unify percentage value for `Job::$jobProgress`. Now 100% is stored as 1 instead of 100.
+- Unused class `Oro\Component\MessageQueue\Job\CalculateRootJobProgressService` was removed
+- Class `Oro\Component\MessageQueue\Job\CalculateRootJobStatusService` was renamed to `Oro\Component\MessageQueue\Job\RootJobStatusCalculator`
+
+ChainProcessor Component
+------------------------
+- Fixed an issue with invalid execution order of processors. The issue was that processors from different groups are intersected. During the fix the calculation of internal priorities of processors was changed, this may affect existing configuration of processors in case if you have common (not bound to any action) processors and ungrouped processors which should work with regular grouped processors.
+
+    The previous priority rules:
+
+    | Processor type | Processor priority | Group priority |
+    |----------------|--------------------|----------------|
+    | initial common processors | from -255 to 255 |  |
+    | initial ungrouped processors | from -255 to 255 |  |
+    | grouped processors | from -255 to 255 | from -254 to 252 |
+    | final ungrouped processors | from -65535 to -65280 |  |
+    | final common processors | from min int to -65536 |  |
+
+    The new priority rules:
+
+    | Processor type | Processor priority | Group priority |
+    |----------------|--------------------|----------------|
+    | initial common processors | greater than or equals to 0 |  |
+    | initial ungrouped processors | greater than or equals to 0 |  |
+    | grouped processors | from -255 to 255 | from -255 to 255 |
+    | final ungrouped processors | less than 0 |  |
+    | final common processors | less than 0 |  |
+
+    So, the new rules means that
+
+        - common and ungrouped processors with the priority greater than or equals to 0 will be executed before grouped processors
+        - common and ungrouped processors with the priority less than 0 will be executed after grouped processors
+        - now there are no any magic numbers for priorities of any processors
+
+Action Component
+----------------
+- Added interface `Oro\Component\Action\Model\DoctrineTypeMappingExtensionInterface`.
+- Added Class `Oro\Component\Action\Model\DoctrineTypeMappingExtension`. That can be used as base for services definitions
 
 ActionBundle
 ------------
@@ -32,6 +80,11 @@ ActionBundle
     - removed property `protected $optionsHelper`
     - removed property `protected $buttonProvider`
     - removed property `protected $searchContextProvider`
+- Added interfaces `Oro\Bundle\ActionBundle\Model\ParameterInterface` and `Oro\Bundle\ActionBundle\Model\EntityParameterInterface`
+- Implemented `Oro\Bundle\ActionBundle\Model\EntityParameterInterface` interface in `Oro\Bundle\ActionBundle\Model\Attribute` class
+- Added `getInternalType()` method to `Oro\Bundle\ActionBundle\Model\Attribute` class
+- Added new tag `oro.action.extension.doctrine_type_mapping` to collect custom doctrine type mappings used to resolve types for serialization at `Oro\Bundle\ActionBundle\Model\AttributeGuesser` 
+- Added second optional argument `Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria $criteria = null` to method `Oro\Bundle\ActionBundle\Model\OperationRegistry`
 
 ActivityListBundle
 ------------------
@@ -69,6 +122,8 @@ AttachmentBundle
     - removed property `protected $manager`
     - removed property `protected $attachmentConfigProvider`
     - removed property `protected $doctrine`
+- Class `Oro\Bundle\AttachmentBundle\Manager\FileManager`
+    - method `writeStreamToStorage` was changed to `public`
 
 BatchBundle
 -----------
@@ -107,6 +162,10 @@ DashboardBundle
     - removed property `protected $converter`
     - removed property `protected $managerLink`
     - removed property `protected $entityProvider`
+- Class `Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor`
+    - construction signature was changed. The parameter `OwnerHelper $ownerHelper` was removed
+    - removed property `protected $ownerHelper`
+
 
 DataAuditBundle
 ---------------
@@ -120,15 +179,6 @@ DataGridBundle
 --------------
 - `Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult` is deprecated. Use `Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator` instead
 - Class `Oro\Bundle\DataGridBundle\Engine\Orm\PdoMysql\GroupConcat` was removed. Use `GroupConcat` from package `oro/doctrine-extensions` instead.
-- Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
-    - construction signature was changed now it takes next arguments:
-        - `ServiceLink` $managerLink,
-        - `NameStrategyInterface` $nameStrategy,
-        - `RouterInterface` $router,
-        - `SecurityFacade` $securityFacade,
-        - `DatagridRouteHelper` $datagridRouteHelper,
-        - `RequestStack` $requestStack,
-        - `LoggerInterface` $logger = null
 - The service `oro_datagrid.twig.datagrid` was marked as `private`
 - Class `Oro\Bundle\DataGridBundle\Twig\DataGridExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
@@ -139,7 +189,27 @@ DataGridBundle
     - removed property `protected $datagridRouteHelper`
     - removed property `protected $requestStack`
     - removed property `protected $logger`
+- Added method `public function getName()::string` to interface `Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface`
+- Class `Oro\Bundle\DataGridBundle\Controller\GridController`
+   - renamed method `filterMetadata` to `filterMetadataAction`
+- Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor`
+    - construction signature was changed now it takes next arguments:
+        - ExportHandler $exportHandler,
+        - JobRunner $jobRunner,
+        - DatagridExportConnector $exportConnector,
+        - ExportProcessor $exportProcessor,
+        - WriterChain $writerChain,
+        - TokenStorageInterface $tokenStorage,
+        - JobStorage $jobStorage,
+        - LoggerInterface $logger
+- Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` and its service `oro_datagrid.async.pre_export` were added.
+- Class `Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher` and its service `oro_datagrid.importexport.export_id_fetcher` were added.
+- Class `Oro\Bundle\DataGridBundle\Handler\ExportHandler` (service `oro_datagrid.handler`) changed its service calls: it doesn't call `setRouter` and `setConfigManager` any more but calls `setFileManager` now.
+- Topic `oro.datagrid.export` doesn't start datagrid export any more. Use `oro.datagrid.pre_export` topic instead.
 
+DistributionBundle
+------------------
+- The method `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handle` is deprecated. Use `Oro\Bundle\DistributionBundle\Error\ErrorHandler::handleErrors` instead.
 
 EmailBundle
 -----------
@@ -194,6 +264,17 @@ EntityBundle
     - removed property `protected $entityRoutingHelper`
     - removed property `protected $entityNameResolver`
     - removed property `protected $entityAliasResolver`
+- Added class `Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener' that should be used for entities with single table inheritance.
+  Example:
+```yml
+oro_acme.my_entity.discriminator_map_listener:
+    class: 'Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener'
+    public: false
+    calls:
+        - [ addClass, ['oro_acme_entity', '%oro_acme.entity.acme_entity.class%'] ]
+    tags:
+        - { name: doctrine.event_listener, event: loadClassMetadata }
+```
 
 EntityConfigBundle
 ------------------
@@ -230,6 +311,9 @@ EntityExtendBundle
     To create bidirectional relation you _MUST_ call `*InverseRelation` method respectively
     - call to `addOneToManyRelation` creates bidirectional relation according to Doctrine [documentation](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html#one-to-many-bidirectional)
     - deprecated `addOneToManyInverseRelation`
+    - throw exception when trying to use not allowed option while creating relation in migration
+- To be able to create bidirectional relation between entities and use "Reuse existing relation" functionality on UI
+    you _MUST_ select "bidirectional" field while creating relation
 - The parameter `oro_entity_extend.twig.extension.dynamic_fields.class` was removed from DIC
 - The parameter `oro_entity_extend.twig.extension.enum.class` was removed from DIC
 - The service `oro_entity_extend.twig.extension.dynamic_fields` was marked as `private`
@@ -246,6 +330,12 @@ EntityExtendBundle
     - removed property `protected $propertyAccessor`
     - removed property `protected $eventDispatcher`
     - removed property `protected $securityFacade`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension`
+- Added parameter `FeatureChecker $featureChecker` to the constructor of `Oro\Bundle\EntityExtendBundle\Form\Extension`
+- Class `Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension`
+    - the construction signature of was changed. Added fourth argument `FieldsHelper $fieldsHelper`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension`
+- Added parameter `FieldsHelper $fieldsHelper` to the constructor of `Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension`
 
 EntityMergeBundle
 -----------------
@@ -283,6 +373,7 @@ FeatureToggleBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $featureChecker`
 
+
 FormBundle
 ----------
 - The parameter `oro_form.twig.form.class` was removed from DIC
@@ -290,6 +381,27 @@ FormBundle
 - The service `oro_form.twig.form_extension` was marked as `private`
 - The service `oro_form.twig.js_validation_extension` was removed
 - Class `Oro\Bundle\FormBundle\Twig\JsValidationExtension` was removed. Its functionality was moved to `Oro\Bundle\FormBundle\Twig\FormExtension`
+
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` added as a replacement of standard `Oro\Bundle\FormBundle\Model\UpdateHandler`.
+So please consider to use it when for a new entity management development.
+
+- Class `Oro\Bundle\FormBundle\Model\UpdateHandler`
+    - marked as deprecated, use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` (service `oro_form.update_handler`) instead
+    - changed `__constructor` signature: 
+        - first argument changed from `Symfony\Component\HttpFoundation\Request` to `Symfony\Component\HttpFoundation\RequestStack`
+        - fifth argument changed from `Symfony\Component\EventDispatcher\EventDispatcherInterface` to `Oro\Bundle\FormBundle\Form\Handler\FormHandler` as from handling encapsulation.
+ 
+- Interface `Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface` added for standard form handlers.
+- Class `Oro\Bundle\FormBundle\Form\Handler\FormHandler` added (service 'oro_form.form.handler.default') as default form processing mechanism.
+- Tag `oro_form.form.handler` added to register custom form handlers under its `alias`.
+- Class `Oro\Bundle\FormBundle\Model\FormHandlerRegistry` added to collect tagged with `oro_form.form.handler` services.
+- Class `Oro\Bundle\FormBundle\Form\Handler\CallbackFormHandler` added as interface compatibility helper for callable.
+
+- Interface `Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface`  added for common update template data population.
+- Class `Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider` (service `oro_form.provider.from_template_data.default`) as default update template data provider.
+- Tag `oro_form.form_template_data_provider` added to register custom update template data providers.
+- Class `Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry` added to collect tagged with `oro_form.form_template_data_provider` services.
+- Class `Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider` added as interface compatibility helper for callable.
 
 HelpBundle
 ----------
@@ -307,12 +419,12 @@ ImportExportBundle
 ------------------
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor`
     - construction signature was changed now it takes next arguments: 
-        - `CliImportHandler $cliImportHandler`,
-        - `JobRunner $jobRunner`,
-        - `ImportExportResultSummarizer` $importExportResultSummarizer,
-        - `JobStorage` $jobStorage,
-        - `LoggerInterface` $logger,
-        - `FileManager` $fileManager
+        - CliImportHandler $cliImportHandler,
+        - JobRunner $jobRunner,
+        - ImportExportResultSummarizer $importExportResultSummarizer,
+        - JobStorage $jobStorage,
+        - LoggerInterface $logger,
+        - FileManager $fileManager
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`
     - construction signature was changed now it takes next arguments: 
         - HttpImportHandler $httpImportHandler,
@@ -330,12 +442,26 @@ ImportExportBundle
         - ProcessorRegistry $processorRegistry,
         - ConfigProvider $entityConfigProvider,
         - TranslatorInterface $translator
+        - WriterChain $writerChain,
+        - ReaderChain $readerChain,
+        - BatchFileManager $batchFileManager
+- Class `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor`
+    - changed the namespace from `Oro\Bundle\ImportExportBundle\Async` to `Oro\Bundle\ImportExportBundle\Async\Export`
+    - construction signature was changed now it takes next arguments:
+        - ExportHandler $exportHandler,
+        - JobRunner $jobRunner,
+        - DoctrineHelper $doctrineHelper,
+        - TokenStorageInterface $tokenStorage,
+        - LoggerInterface $logger,
+        - JobStorage $jobStorage
+- Class `Oro\Bundle\ImportExportBundle\Handler\AbstractImportHandler` (service `oro_importexport.handler.import.abstract`) changed its service calls: it doesn't call `setRouter` and `setConfigManager` any more but calls `setReaderChain` now.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\PreCliImportMessageProcessor` and its service `oro_importexport.async.pre_cli_import` were added.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and its service `oro_importexport.async.pre_http_import` were added.
 - Class `Oro\Bundle\ImportExportBundle\Splitter\SplitterChain` and its service `oro_importexport.async.send_import_error_notification` were added.
 - Class `Oro\Bundle\ImportExportBundle\File\FileManager` and its service `oro_importexport.file.file_manager` were added. We should use it instead of the `Oro\Bundle\ImportExportBundle\File\FileSystemOperator`
 - Class `Oro\Bundle\ImportExportBundle\File\FileSystemOperator` is deprecated now. Use `Oro\Bundle\ImportExportBundle\File\FileManager` instead.
-- Command `oro:import:csv` (class `Oro\Bundle\ImportExportBundle\Command\ImportCommand`) was renamed to `oro:import:file`        
+- Command `oro:cron:import-clean-up-storage` (class `Oro\Bundle\ImportExportBundle\Command\Cron\CleanupStorageCommand`) was added.
+- Command `oro:import:csv` (class `Oro\Bundle\ImportExportBundle\Command\ImportCommand`) was renamed to `oro:import:file`
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\AbstractPreparingHttpImportMessageProcessor` and its service `oro_importexport.async.abstract_preparing_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportMessageProcessor` and its service `oro_importexport.async.preparing_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\PreparingHttpImportValidationMessageProcessor` and its service `oro_importexport.async.preparing_http_import_validation` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
@@ -343,7 +469,9 @@ ImportExportBundle
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportMessageProcessor` and its service `oro_importexport.async.chunck_http_import` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\ChunkHttpImportValidationMessageProcessor` and its service `oro_importexport.async.chunck_http_import_validation` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreHttpImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\HttpImportMessageProcessor`.
 - Class `Oro\Bundle\ImportExportBundle\Async\Import\CliImportValidationMessageProcessor` and its service `oro_importexport.async.cli_import_validation` were removed. You can use `Oro\Bundle\ImportExportBundle\Async\Import\PreCliImportMessageProcessor` and `Oro\Bundle\ImportExportBundle\Async\Import\CliImportMessageProcessor`.
+- Class `Oro\Bundle\ImportExportBundle\Splitter\SplitterCsvFiler` and its service `oro_importexport.splitter.csv` were removed. You can use `Oro\Bundle\ImportExportBundle\File\BatchFileManager` instead.
 - Class `Oro\Bundle\ImportExportBundle\Async\ImportExportJobSummaryResultService` was renamed to `ImportExportResultSummarizer`. It will be moved after add supporting templates in notification process.
+- Route `oro_importexport_import_error_log` with path `/import_export/import-error/{jobId}.log` was renamed to `oro_importexport_job_error_log` with path `/import_export/job-error-log/{jobId}.log`
 
 InstallerBundle
 ---------------
@@ -391,6 +519,7 @@ LayoutBundle
     - removed property `protected $configManager`
     - removed property `protected $profilerEnabled`
 - Changed default value option name for `page_title` block type, from `text` to `defaultValue`
+- Added alias `layout` for `oro_layout.layout_manager` service to make it more convenient to access it from container
 
 LocaleBundle
 ------------
@@ -451,6 +580,16 @@ LocaleBundle
 - Class `Oro\Bundle\LocaleBundle\Twig\NumberExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $formatter`
+- Class `Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider`
+    - changed `__constructor` signature:
+        - the third argument changed from `Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter` to `Oro\Bundle\TranslationBundle\Provider\LanguageProvider`
+- The service `oro_translation.event_listener.language_change` was removed
+- The class `Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener` was removed
+
+MessageQueueBundle
+------------------
+- The service `oro_message_queue.job.calculate_root_job_status_service` was renamed to `oro_message_queue.job.root_job_status_calculator` and marked as `private`
+- The service `oro_message_queue.job.calculate_root_job_progress_service` was renamed to `oro_message_queue.job.root_job_progress_calculator` and marked as `private`
 
 MigrationBundle
 ---------------
@@ -543,6 +682,8 @@ SearchBundle
 `Oro\Bundle\SearchBundle\Engine\OrmIndexer` `setDrivers` method and `$drivers` and injected directly to `Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository`
 - The parameter `oro_search.twig_extension.class` was removed from DIC
 - The service `oro_search.twig.search_extension` was marked as `private`
+- `Oro\Bundle\SearchBundle\Engine\PdoMysql` `getWords` method is deprecated. All non alphanumeric chars are removed in `Oro\Bundle\SearchBundle\Engine\BaseDriver` `filterTextFieldValue` from fulltext search for MySQL and PgSQL
+- The `oro:search:reindex` command now works synchronously by default. Use the `--scheduled` parameter if you need the old, async behaviour
 
 ScopeBundle
 -----------
@@ -613,6 +754,11 @@ SecurityBundle
 - Class `Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $securityFacade`
+- Interface `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`
+    - signature of method `getAllowedPermissions` changed, added third argument `string|null aclGroup` default `null`
+- Class `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`
+    - signature of method `getPermissionsForType` changed, added second argument `string|null aclGroup` default `null`
+
 
 SegmentBundle
 -------------
@@ -657,6 +803,10 @@ ThemeBundle
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $themeRegistry`
 
+LayoutBundle
+-----------------
+- Class `Oro\Bundle\LayoutBundle\DependencyInjection\CompilerOverrideServiceCompilerPass` was removed
+
 TranslationBundle
 -----------------
 - Added parameter `ConfigDatabaseChecker $databaseChecker` to the constructor of `Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader`
@@ -664,6 +814,19 @@ TranslationBundle
 - Class `Oro\Bundle\TranslationBundle\Twig\TranslationExtension`
     - the construction signature of was changed. Old signature `$debugTranslator, TranslationsDatagridRouteHelper $translationRouteHelper`. New signature `ContainerInterface $container, $debugTranslator`
     - removed property `protected $translationRouteHelper`
+- Added `array $filtersType = []` parameter to the `generate` method, that receives an array of filter types to be applies on the route in order to support 
+filters such as `contains` when generating routes
+- Class `Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType`
+   - The signature of constructor was changed, added:
+        - third parameter is instance of `TranslationStatisticProvider`
+        - fourth parameter is instance of `TranslatorInterface`
+   - Changed parent from type from `locale` to `oro_choice`
+- Class `Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension`
+    - removed constant `PACKAGE_NAME`
+    - added constructor
+    - added method `public function addPackage(string $packageAlias, string $packageName, string $suffix = '')`
+- Updated service definition for `oro_translation.extension.transtation_packages_provider`
+    - changed publicity to `false`
 
 UIBundle
 --------
@@ -766,6 +929,9 @@ UserBundle
     - removed property `protected $genderProvider`
     - removed property `protected $securityContext`
 - Added Configurable Permission `default` for View and Edit pages of User Role (see [configurable-permissions.md](./src/Oro/Bundle/SecurityBundle/Resources/doc/configurable-permissions.md))
+- Class `Oro\Bundle\UserBundle\Controller\StatusController`
+    - renamed method `setCurrentStatus` to `setCurrentStatusAction`
+    - renamed method `clearCurrentStatus` to `clearCurrentStatusAction`
 
 WindowsBundle
 -------------
@@ -801,12 +967,65 @@ WorkflowBundle
 - Added third argument `Oro\Bundle\ActionBundle\Resolver\DestinationPageResolver $destinationPageResolver` to constructor of `Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension`
 - Class `Oro\Bundle\WorkflowBundle\Provider\WorkflowDataProvider`
     - first argument argument `WorkflowManager $workflowManager` replaced by `WorkflowManagerRegistry $workflowManagerRegistry`
+- Added `variable_definitions` to workflow definition
+- Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler`
+    - Changed `assemble` method signature from `assemble(array $configuration, array $definitionsConfiguration, $steps, $attributes)` to `assemble(array $configuration, $steps, $attributes)`, where `$configuration` is now the full workflow configuration
+- Class `Oro\Bundle\WorkflowBundle\Model\Workflow`:
+    - added `TransitionManager $transitionManager = null` as constructor's 6th parameter
+    - added `VariableManager $variableManager = null` as constructor's 7th parameter
+- Added new `CONFIGURE` permission for workflows
+- Interface `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\MultipleEntityAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `validateAttributeValue`
+        - `getEntityManager`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalize`
+        - `denormalize`
+        - `supportsNormalization`
+        - `supportsDenormalization`
+        - `normalizeObject`
+        - `denormalizeObject`
+- Class `Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowDataNormalizer`:
+    - changed 2nd parameter in method's signature from `Attribute $attribute` to `ParameterInterface $attribute` in next methods:
+        - `normalizeAttribute`
+        - `denormalizeAttribute`
+        - `findAttributeNormalizer`
+    - added protected method `getVariablesNamesFromConfiguration(array $configuration)`
+- Abstract class `Oro\Bundle\WorkflowBundle\Translation\AbstractWorkflowTranslationFieldsIterator`:
+    - added protected method `&variableFields(array &$configuration, \ArrayObject $context)`
 - Class `Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionEntityListener`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
 - The service `oro_workflow.twig.extension.workflow` was marked as `private`
 - Class `Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension`
     - the construction signature of was changed. Now the constructor has only `ContainerInterface $container` parameter
     - removed property `protected $workflowManager`
+- Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand`.
+- Removed implementation of `Oro\Bundle\CronBundle\Command\CronCommandInterface` from `Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand`.
+- Class `\Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor`:
+    - Signature of method `translateWorkflowDefinitionFields` changed, now it accept optional boolean parameter `$useKeyAsTranslation`
+- Class `\Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper`:
+    - added public method `generateDefinitionTranslationKeys`
+    - added public method `generateDefinitionTranslations`
+    - changed access level from `private` to `public` for method `findValue`
 
 TestFrameworkBundle
 -------------------
@@ -844,3 +1063,37 @@ QueryDesignerBundle
         `ManagerRegistry` $doctrine,
         `DatagridGuesser` $datagridGuesser,
         `EntityNameResolver` $entityNameResolver
+
+CronBundle
+-------------------
+ - Interface `Oro\Bundle\CronBundle\Command\CronCommandInterface`
+    - deprecated method `isActive`
+
+TagBundle
+---------
+- Class `Oro\Bundle\TagBundle\Grid\AbstractTagsExtension`
+    - removed method `isReportOrSegmentGrid`
+    - removed method `addReportOrSegmentGridPrefix`
+    - added UnsupportedGridPrefixesTrait
+
+TranslationBundle
+-----------------
+- Class `Oro\Bundle\TranslationBundle\ImportExport\Reader\TranslationReader`
+    - signature of constructor was changed. The second argument replaced with `LanguageRepository $languageRepository`
+
+Tree Component
+--------------
+- `Oro\Component\Tree\Handler\AbstractTreeHandler`:
+    - added method `getTreeItemList`
+
+DependencyInjection Component
+-----------------------------
+- Class `Oro\Component\DependencyInjection\ServiceLinkRegistry` together with
+`Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface` for injection awareness. Can be used to provide
+injection of a collection of services that are registered in system, but there no need to instantiate
+all of them on every runtime. The registry has `@service_container` dependency (`Symfony\Component\DependencyInjection\ContainerInterface`)
+and uses `Oro\Component\DependencyInjection\ServiceLink` instances internally. It can register public services by `ServiceLinkRegistry::add`
+with `service_id` and `alias`. Later service can be resolved from registry by its alias on demand (method `::get($alias)`).
+- Class `Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass` to easily setup a tag by 
+which services will be gathered into `Oro\Component\DependencyInjection\ServiceLinkRegistry` and then injected to 
+provided service (usually that implements `Oro\Component\DependencyInjection\ServiceLinkRegistryAwareInterface`).

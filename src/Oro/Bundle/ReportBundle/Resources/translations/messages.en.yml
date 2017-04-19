@@ -49,16 +49,22 @@ oro:
                 name:               Name
                 entity:             Entity
                 report_type:        Report type
+                time_period.label:  Time Period
             row:
                 action:
                     view:           View
         form:
             designer:               Designer
             chart_designer:         Chart Designer
+            date_grouping:          Date grouping
             columns:                Columns
             grouping:               Grouping
             filters:                Filters
             choose_report_type:     Choose a report type...
+            use_skip_empty_periods.label:  Allow to skip empty time periods
+            use_date_grouping_filter.label: Enable grouping by date
+            date_grouping_field.label: Date field
+            date_group_section.label: Grouping by date
 
         chart_options.label: Chart Options
         definition.label:    Definition
@@ -92,6 +98,9 @@ oro:
             fields:
                 display_sql_query.label: Display SQL in Reports and Segments
                 display_sql_query.tooltip: Displays SQL query of a report or segment on its View page
+        filter:
+            grouping.label: Grouping
+            skip_empty_periods.label: Skip Empty Periods
 
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports

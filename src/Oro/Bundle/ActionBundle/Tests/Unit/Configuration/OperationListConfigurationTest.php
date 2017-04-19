@@ -74,6 +74,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'exclude_datagrids' => [],
                         'order' => 0,
                         'enabled' => true,
+                        'page_reload' => true,
                         OperationDefinition::PREACTIONS => [],
                         OperationDefinition::PRECONDITIONS => [],
                         OperationDefinition::CONDITIONS => [],
@@ -113,6 +114,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'exclude_datagrids' => ['datagrid_3'],
                         'order' => 15,
                         'enabled' => false,
+                        'page_reload' => false,
                         'frontend_options' => [
                             'template' => 'template',
                             'title' => 'dialog title',
@@ -194,6 +196,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'exclude_datagrids' => ['datagrid_3'],
                         'order' => 15,
                         'enabled' => false,
+                        'page_reload' => false,
                         OperationDefinition::PREACTIONS => [
                             '@create_date' => [],
                         ],

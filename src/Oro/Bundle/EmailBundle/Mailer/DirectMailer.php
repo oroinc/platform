@@ -303,9 +303,13 @@ class DirectMailer extends \Swift_Mailer
      */
     protected function configureTransportLocalDomain(\Swift_Transport_AbstractSmtpTransport $transport)
     {
+        if (php_sapi_name() === 'cli') {
+            return;
+        }
+        $host = $this->container->get('request')->server->get('HTTP_HOST');
         // fix local domain when wild-card vhost is used and auto-detection fails
-        if (0 === strpos($transport->getLocalDomain(), '*') && !empty($_SERVER['HTTP_HOST'])) {
-            $transport->setLocalDomain($_SERVER['HTTP_HOST']);
+        if (0 === strpos($transport->getLocalDomain(), '*') && !empty($host)) {
+            $transport->setLocalDomain($host);
         }
     }
 }

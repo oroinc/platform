@@ -128,7 +128,7 @@ class ControllersTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('John Doe - Users - User Management - System', $result->getContent());
+        $this->assertContains('John Doe - View - Users - User Management - System', $result->getContent());
     }
 
     public function testUpdateProfile()

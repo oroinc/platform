@@ -343,7 +343,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             $result = array_keys($this->getPermissionsToIdentityMap());
@@ -360,7 +360,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
             }
         }
 
-        $allowed = $this->getPermissionsForType($oid->getType());
+        $allowed = $this->getPermissionsForType($oid->getType(), $aclGroup);
 
         return array_values(array_intersect($result, $allowed));
     }
@@ -377,11 +377,12 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
 
     /**
      * @param string $type
+     * @param string|null $aclGroup
      * @return array
      */
-    protected function getPermissionsForType($type)
+    protected function getPermissionsForType($type, $aclGroup = null)
     {
-        $group = $this->groupProvider->getGroup();
+        $group = $aclGroup ?: $this->groupProvider->getGroup();
 
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             $permissions = $this->permissionManager->getPermissionsForGroup($group);

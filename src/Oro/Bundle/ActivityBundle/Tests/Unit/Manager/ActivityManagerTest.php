@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -16,9 +15,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class ActivityManagerTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
@@ -94,6 +97,10 @@ class ActivityManagerTest extends OrmTestCase
             $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $featureChecker = $this->createMock(FeatureChecker::class);
+        $featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->will($this->returnValue(true));
 
         $this->manager = new ActivityManager(
             new DoctrineHelper($doctrine),
@@ -102,7 +109,8 @@ class ActivityManagerTest extends OrmTestCase
             $this->groupingConfigProvider,
             $this->entityConfigProvider,
             $this->extendConfigProvider,
-            $this->associationManager
+            $this->associationManager,
+            $featureChecker
         );
 
         $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')

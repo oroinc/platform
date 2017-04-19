@@ -6,10 +6,10 @@ define(function(require) {
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
-    var layout = require('oroui/js/layout');
     var widgetManager = require('oroui/js/widget-manager');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
+    var layoutHelper = require('oroui/js/tools/layout-helper');
 
     GridSidebarComponent = BaseComponent.extend({
         /**
@@ -61,7 +61,7 @@ define(function(require) {
             this.$container.find('.control-maximize').click(_.bind(this.maximize, this));
 
             if (this.options.fixSidebarHeight) {
-                this._fixSidebarHeight();
+                layoutHelper.setAvailableHeight('.' + this.options.sidebar);
             }
 
             this._maximizeOrMaximize(null);
@@ -90,8 +90,8 @@ define(function(require) {
         onSidebarChange: function(data) {
             var params = _.extend(
                 this._getQueryParamsFromUrl(location.search),
-                data.params,
-                this._getDatagridParams()
+                this._getDatagridParams(),
+                data.params
             );
             var widgetParams = _.extend(
                 _.omit(this.options.widgetRouteParameters, this.options.gridParam),
@@ -183,30 +183,6 @@ define(function(require) {
             }
 
             this._pushState(params);
-        },
-
-        /**
-         * @private
-         */
-        _fixSidebarHeight: function() {
-            var $pageContainer = $('#container');
-            var $pageTitle = $('.page-title', $pageContainer);
-            var container = $('.' + this.options.container);
-            var $sidebar = $('.' + this.options.sidebar, $pageContainer);
-
-            var fixHeight = function() {
-                $sidebar
-                    .height(container.height())
-                    .css('min-height', $pageContainer.height() - $pageTitle.height() + 'px');
-            };
-
-            layout.onPageRendered(fixHeight);
-            $(window).on('resize', _.debounce(fixHeight, 50));
-            mediator.on('page:afterChange', fixHeight);
-            mediator.on('layout:adjustReloaded', fixHeight);
-            mediator.on('layout:adjustHeight', fixHeight);
-
-            fixHeight();
         },
 
         /**

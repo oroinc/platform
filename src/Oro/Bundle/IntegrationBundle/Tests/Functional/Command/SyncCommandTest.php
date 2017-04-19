@@ -25,7 +25,7 @@ class SyncCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:cron:integration:sync', ['--help']);
 
-        $this->assertContains("Usage:\n  oro:cron:integration:sync [options]", $result);
+        $this->assertContains("Usage: oro:cron:integration:sync [options]", $result);
     }
 
     public function testShouldSendSyncIntegrationWithoutAnyAdditionalOptions()

@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -54,7 +55,7 @@ class NormalizeFilterKeys implements ProcessorInterface
         foreach ($filters as $filterKey => $filter) {
             $filterCollection->remove($filterKey);
             if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
-                $filterKey = 'id';
+                $filterKey = JsonApiDoc::ID;
                 $filter->setDescription(self::ID_FILTER_DESCRIPTION);
             }
             $filterCollection->add(

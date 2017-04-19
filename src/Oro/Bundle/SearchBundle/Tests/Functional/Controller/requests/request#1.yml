@@ -1,12 +1,12 @@
 # common test case
 request:
     supported_engines: [orm]
-    search: \"item9@mail.com\"
+    search: \"item9@mail.net\"
     offset: ~
     max_results: ~
 response:
-    records_count: 1
-    count: 1
+    records_count: 9
+    count: 9
     rest:
         data:
             -

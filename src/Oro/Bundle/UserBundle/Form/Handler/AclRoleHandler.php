@@ -328,7 +328,7 @@ class AclRoleHandler
      */
     protected function getRolePrivileges(AbstractRole $role)
     {
-        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
+        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role), $this->getAclGroup());
     }
 
     /**
@@ -475,6 +475,7 @@ class AclRoleHandler
      * Encode array of AclPrivilege objects into array of plain privileges
      *
      * @param array $allPrivileges
+     * @param bool $addExtensionName
      *
      * @return array
      */

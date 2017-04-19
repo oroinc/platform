@@ -3,7 +3,11 @@
 <script type="text/template" id="email-notification-item-template">
     <div class="info" data-id="<%- id %>">
         <div class="body">
-            <div class="title nowrap-ellipsis"><%- subject %></div>
+            <% if (subject) { %>
+                <div class="title nowrap-ellipsis"><%- subject %></div>
+            <% } else { %>
+                <div class="empty-subject nowrap-ellipsis">({{ 'oro.email.recent_emails_widget.no_subject'|trans }})</div>
+            <% } %>
             <div class="description nowrap-ellipsis"><%= bodyContent %></div>
         </div>
         <% if (seen) {  %>
@@ -13,83 +17,85 @@
         <% } %>
     </div>
     <div class="footer row-fluid">
-        <span class="pull-left fromName">
+        <span class="pull-left from-name">
             <% if (linkFromName) { %>
                 <a href="<%- linkFromName %>"><%- fromName %></a>
             <% } else { %>
                 <%- fromName %>
             <% } %>
         </span>
-        <span class="pull-right reply-all-action">
-            {{- UI.clientLink({
-                'dataUrlRaw': "<%= replyAllRoute %>",
-                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-                'label': 'oro.email.reply_all'|trans,
-                'widget': {
-                    'type': 'dialog',
-                    'multiple': false,
-                    'options': {
-                        'alias': 'reply-dialog',
-                        'dialogOptions' : {
-                            'title' : 'oro.email.reply'|trans,
-                            'allowMaximize': true,
-                            'allowMinimize': true,
-                            'dblclick': 'maximize',
-                            'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+        <span class="pull-right">
+            <span class="forward-action">
+                {{- UI.clientLink({
+                    'dataUrlRaw': "<%= forwardRoute %>",
+                    'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                    'label': 'oro.email.forward'|trans,
+                    'widget': {
+                        'type': 'dialog',
+                        'multiple': false,
+                        'options': {
+                            'alias': 'reply-dialog',
+                            'dialogOptions' : {
+                                'title' : 'oro.email.forward'|trans,
+                                'allowMaximize': true,
+                                'allowMinimize': true,
+                                'dblclick': 'maximize',
+                                'maximizedHeightDecreaseBy': 'minimize-bar',
+                                'width': 1000
+                            }
                         }
                     }
-                }
-            }) -}}
-        </span>
-        <span class="pull-right reply-action">
-            {{- UI.clientLink({
-                'dataUrlRaw': "<%= replyRoute %>",
-                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-                'label': 'oro.email.reply'|trans,
-                'widget': {
-                    'type': 'dialog',
-                    'multiple': false,
-                    'options': {
-                        'alias': 'reply-dialog',
-                        'dialogOptions' : {
-                            'title' : 'oro.email.reply_all'|trans,
-                            'allowMaximize': true,
-                            'allowMinimize': true,
-                            'dblclick': 'maximize',
-                            'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+                }) -}}
+            </span>
+            <span class="reply-action">
+                {{- UI.clientLink({
+                    'dataUrlRaw': "<%= replyRoute %>",
+                    'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                    'label': 'oro.email.reply'|trans,
+                    'widget': {
+                        'type': 'dialog',
+                        'multiple': false,
+                        'options': {
+                            'alias': 'reply-dialog',
+                            'dialogOptions' : {
+                                'title' : 'oro.email.reply_all'|trans,
+                                'allowMaximize': true,
+                                'allowMinimize': true,
+                                'dblclick': 'maximize',
+                                'maximizedHeightDecreaseBy': 'minimize-bar',
+                                'width': 1000
+                            }
                         }
                     }
-                }
-            }) -}}
-        </span>
-        <span class="pull-right forward-action">
-            {{- UI.clientLink({
-                'dataUrlRaw': "<%= forwardRoute %>",
-                'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-                'label': 'oro.email.forward'|trans,
-                'widget': {
-                    'type': 'dialog',
-                    'multiple': false,
-                    'options': {
-                        'alias': 'reply-dialog',
-                        'dialogOptions' : {
-                            'title' : 'oro.email.forward'|trans,
-                            'allowMaximize': true,
-                            'allowMinimize': true,
-                            'dblclick': 'maximize',
-                            'maximizedHeightDecreaseBy': 'minimize-bar',
-                            'width': 1000
+                }) -}}
+            </span>
+            <span class="reply-all-action">
+                {{- UI.clientLink({
+                    'dataUrlRaw': "<%= replyAllRoute %>",
+                    'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+                    'label': 'oro.email.reply_all'|trans,
+                    'widget': {
+                        'type': 'dialog',
+                        'multiple': false,
+                        'options': {
+                            'alias': 'reply-dialog',
+                            'dialogOptions' : {
+                                'title' : 'oro.email.reply'|trans,
+                                'allowMaximize': true,
+                                'allowMinimize': true,
+                                'dblclick': 'maximize',
+                                'maximizedHeightDecreaseBy': 'minimize-bar',
+                                'width': 1000
+                            }
                         }
                     }
-                }
-            }) -}}
+                }) -}}
+            </span>
         </span>
     </div>
 </script>
 {% endif %}
-{% if oro_config_value('oro_email.show_recent_emails_in_user_bar') and feature_enabled('email') %}
+{% if feature_enabled('email') and oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
 <li class="email-notification-menu dropdown"
     title="{{ 'oro.email.notification.menu_item.hint'|trans }}"
     data-page-component-options="{{ {

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowManagerRegistry
 {

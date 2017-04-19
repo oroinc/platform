@@ -12,27 +12,18 @@ trait EmailFeatureTrait
 {
     public function enableEmailFeature()
     {
-        $this->getContainer()->get('oro_config.user')->set(Configuration::getConfigKeyByName('feature_enabled'), true);
-        $this->getContainer()->get('oro_config.user')->flush();
-        $this->getContainer()->get('oro_config.user')->reload();
+        $this->getContainer()->get('oro_config.manager')
+            ->set(Configuration::getConfigKeyByName('feature_enabled'), true);
+        $this->getContainer()->get('oro_config.manager')->flush();
         $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->resetCache();
     }
 
 
     public function disableEmailFeature()
     {
-        $this->getContainer()->get('oro_config.user')->set(Configuration::getConfigKeyByName('feature_enabled'), false);
-        $this->getContainer()->get('oro_config.user')->flush();
-        $this->getContainer()->get('oro_config.user')->reload();
-        $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->resetCache();
-    }
-
-
-    public function resetEmailFeature()
-    {
-        $this->getContainer()->get('oro_config.user')->reset(Configuration::getConfigKeyByName('feature_enabled'));
-        $this->getContainer()->get('oro_config.user')->flush();
-        $this->getContainer()->get('oro_config.user')->reload();
+        $this->getContainer()->get('oro_config.manager')
+            ->set(Configuration::getConfigKeyByName('feature_enabled'), false);
+        $this->getContainer()->get('oro_config.manager')->flush();
         $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->resetCache();
     }
 }

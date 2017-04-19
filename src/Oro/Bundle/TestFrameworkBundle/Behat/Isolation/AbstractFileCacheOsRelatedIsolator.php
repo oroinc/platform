@@ -33,7 +33,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     {
         $this->cacheDir     = realpath($kernel->getCacheDir());
         $this->cacheTempDir = $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Temp';
-        $this->cacheDumpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'oro_application_cache_dump';
+        $this->cacheDumpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'oro_application_cache_dump_'.uniqid();
     }
 
     /** {@inheritdoc} */
@@ -101,6 +101,11 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         }
 
         return false;
+    }
+
+    public function getTag()
+    {
+        return 'cache';
     }
 
     /**

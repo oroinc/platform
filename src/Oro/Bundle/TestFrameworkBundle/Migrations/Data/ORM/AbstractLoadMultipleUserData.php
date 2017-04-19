@@ -15,6 +15,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractLoadMultipleUserData extends AbstractFixture implements ContainerAwareInterface
 {
+    const ACL_PERMISSION = 'permission';
+    const ACL_LEVEL = 'level';
+
     /**
      * @var ContainerInterface
      */
@@ -128,17 +131,41 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
      */
     protected function setRolePermissions(AclManager $aclManager, Role $role, $className, array $allowedAcls)
     {
-        if ($aclManager->isAclEnabled()) {
-            $sid = $aclManager->getSid($role);
-            $oid = $aclManager->getOid('entity:' . $className);
-
-            $builder = $aclManager->getMaskBuilder($oid);
-            $mask = $builder->reset()->get();
-            foreach ($allowedAcls as $acl) {
-                $mask = $builder->add($acl)->get();
-            }
-            $aclManager->setPermission($sid, $oid, $mask);
+        if (!$aclManager->isAclEnabled()) {
+            return;
         }
+
+        $sid = $aclManager->getSid($role);
+        $oid = $aclManager->getOid($this->getOidDescriptorByClassname($className));
+        $extension = $aclManager->getExtensionSelector()->select($oid);
+        $maskBuilders = $extension->getAllMaskBuilders();
+
+        foreach ($maskBuilders as $maskBuilder) {
+            $maskBuilder->reset();
+
+            foreach ($allowedAcls as $acl) {
+                $permission = $acl[self::ACL_PERMISSION];
+                $level = $acl[self::ACL_LEVEL];
+
+                $maskName = $permission . '_' . $level;
+
+                if ($maskBuilder->hasMask('MASK_' . $maskName)) {
+                    $maskBuilder->add($maskName);
+                }
+            }
+
+            $aclManager->setPermission($sid, $oid, $maskBuilder->get());
+        }
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return string
+     */
+    protected function getOidDescriptorByClassname($className)
+    {
+        return 'entity:' . $className;
     }
 
     /**

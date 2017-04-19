@@ -110,6 +110,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition3
             ->setName('maximum_name_and_acl')
             ->setEnabled(false)
+            ->setPageReload(false)
             ->setAttributes(['config_attr'])
             ->setConditions(
                 OperationDefinition::PRECONDITIONS,
@@ -212,6 +213,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         'frontend_options' => ['config_frontend_options'],
                         'order' => 77,
                         'acl_resource' => 'test_acl',
+                        'page_reload' => false
                     ]
                 ],
                 'expected' => [

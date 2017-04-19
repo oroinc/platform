@@ -99,7 +99,6 @@ class OrganizationType extends AbstractType
             array(
                 'data_class'         => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
                 'intention'          => 'organization',
-                'cascade_validation' => true,
             )
         );
     }

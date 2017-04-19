@@ -36,7 +36,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -201,7 +201,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
             $schema->getTable('oro_search_item'),
             ['item_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => null]
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 
@@ -217,7 +217,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
             $schema->getTable('oro_search_item'),
             ['item_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => null]
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 
@@ -233,7 +233,7 @@ class OroSearchBundleInstaller implements Installation, ContainerAwareInterface,
             $schema->getTable('oro_search_item'),
             ['item_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => null]
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 

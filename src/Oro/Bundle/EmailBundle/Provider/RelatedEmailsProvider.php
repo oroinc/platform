@@ -147,6 +147,7 @@ class RelatedEmailsProvider
         $recipients = $this->getRecipients($object, $depth, $ignoreAcl);
 
         $emails = [];
+        /** @var Recipient $recipient */
         foreach ($recipients as $recipient) {
             $emails[$recipient->getEmail()] = $recipient->getId();
         }

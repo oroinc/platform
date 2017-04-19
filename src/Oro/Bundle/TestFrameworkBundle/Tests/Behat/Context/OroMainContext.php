@@ -3,34 +3,58 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Element\NodeElement;
-use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+
 use Doctrine\Common\Inflector\Inflector;
+
 use Oro\Bundle\AttachmentBundle\Tests\Behat\Element\AttachmentItem;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProviderAwareTrait;
+use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\MessageQueueIsolatorInterface;
 use Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup;
 use Oro\Bundle\UserBundle\Tests\Behat\Element\UserMenu;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class OroMainContext extends MinkContext implements
     SnippetAcceptingContext,
     OroPageObjectAware,
-    KernelAwareContext
+    KernelAwareContext,
+    SessionAliasProviderAwareInterface,
+    MessageQueueIsolatorAwareInterface
 {
-    use AssertTrait, KernelDictionary, PageObjectDictionary;
+    use AssertTrait, KernelDictionary, PageObjectDictionary, SessionAliasProviderAwareTrait;
+
+    /**
+     * @var MessageQueueIsolatorInterface
+     */
+    protected $messageQueueIsolator;
 
     /**
      * @BeforeScenario
@@ -41,38 +65,102 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setMessageQueueIsolator(MessageQueueIsolatorInterface $messageQueueIsolator)
+    {
+        $this->messageQueueIsolator = $messageQueueIsolator;
+    }
+
+    /**
+     * @BeforeStep
+     * @param BeforeStepScope $scope
+     */
+    public function beforeStep(BeforeStepScope $scope)
+    {
+        $this->messageQueueIsolator->waitWhileProcessingMessages(30);
+
+        if (false === $this->getMink()->isSessionStarted('first_session')) {
+            return;
+        }
+
+        $session = $this->getMink()->getSession('first_session');
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        $url = $session->getCurrentUrl();
+
+        if (1 === preg_match('/^[\S]*\/user\/login\/?$/i', $url)) {
+            $driver->waitPageToLoad();
+
+            return;
+        } elseif (0 === preg_match('/^https?:\/\//', $url)) {
+            return;
+        }
+
+        // Don't wait when we need assert the flash message, because it can disappear until ajax in process
+        if (preg_match('/^(?:|I )should see ".+"(?:| flash message| error message)$/', $scope->getStep()->getText())) {
+            return;
+        }
+
+        $start = microtime(true);
+        $result = $driver->waitForAjax();
+        $timeElapsedSecs = microtime(true) - $start;
+
+        if (!$result) {
+            var_dump(sprintf(
+                'Wait for ajax %d seconds, and it assume that ajax was NOT passed',
+                $timeElapsedSecs
+            ));
+        }
+    }
+
+    /**
      * Example: Then I should see "Attachment created successfully" flash message
      * Example: Then I should see "The email was sent" flash message
      *
      * @Then /^(?:|I )should see "(?P<title>[^"]+)" flash message$/
      */
-    public function iShouldSeeFlashMessage($title)
+    public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 15)
     {
-        /** @var NodeElement|false $messageElement */
-        $messageElement = $this->spin(function (OroMainContext $context) use ($title) {
-            $flashMessage = $context->findElementContains('Flash Message', $title);
+        $actualFlashMessages = [];
+        /** @var Element|null $flashMessage */
+        $flashMessage = $this->spin(
+            function (OroMainContext $context) use ($title, &$actualFlashMessages, $flashMessageElement) {
+                $flashMessages = $context->findAllElements($flashMessageElement);
 
-            if ($flashMessage->isValid() && $flashMessage->isVisible()) {
-                return $flashMessage;
-            }
+                foreach ($flashMessages as $flashMessage) {
+                    if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                        $actualFlashMessageText = $flashMessage->getText();
+                        $actualFlashMessages[$actualFlashMessageText] = $flashMessage;
 
-            return false;
-        });
+                        if (false !== stripos($actualFlashMessageText, $title)) {
+                            return $flashMessage;
+                        }
+                    }
+                }
 
-        self::assertNotFalse($messageElement, 'Flash message not found on page');
-        $flashMessage = $messageElement->getText();
+                return null;
+            },
+            $timeLimit
+        );
 
-        $closeButton = $messageElement->find('css', 'button.close');
-
-        if ($closeButton->isVisible()) {
-            $closeButton->press();
-        }
-
-        self::assertContains($title, $flashMessage, sprintf(
-            'Expect that "%s" flash message contains "%s" string, but it isn\'t',
-            $flashMessage,
-            $title
+        self::assertNotCount(0, $actualFlashMessages, 'No flash messages founded on page');
+        self::assertNotNull($flashMessage, sprintf(
+            'Expected "%s" message but got "%s" messages',
+            $title,
+            implode(',', array_keys($actualFlashMessages))
         ));
+
+        try {
+            /** @var NodeElement $closeButton */
+            $closeButton = $flashMessage->find('css', 'button.close');
+            $closeButton->press();
+        } catch (\Throwable $e) {
+            //No worries, flash message can disappeared till time next call
+        } catch (\Exception $e) {
+            //No worries, flash message can disappeared till time next call
+        }
     }
 
     /**
@@ -117,12 +205,13 @@ class OroMainContext extends MinkContext implements
 
     /**
      * @param \Closure $lambda
+     * @param int $timeLimit
      * @return false|mixed Return false if closure throw error or return not true value.
      *                     Return value that return closure
      */
-    public function spin(\Closure $lambda)
+    public function spin(\Closure $lambda, $timeLimit = 60)
     {
-        $time = 60;
+        $time = $timeLimit;
 
         while ($time > 0) {
             try {
@@ -305,15 +394,40 @@ class OroMainContext extends MinkContext implements
      * Example: Given I login as "charlie" user
      *
      * @Given /^(?:|I )login as "(?P<loginAndPassword>(?:[^"]|\\")*)" user$/
+     * @Given /^(?:|I )login to dashboard as "(?P<loginAndPassword>(?:[^"]|\\")*)" user$/
      * @Given /^(?:|I )login as administrator$/
+     * @Given /^(?:|I )login to dashboard as administrator$/
+     *
+     * @param string $loginAndPassword
      */
     public function loginAsUserWithPassword($loginAndPassword = 'admin')
     {
-        $uri = $this->getContainer()->get('router')->generate('oro_user_security_login');
-        $this->visit($uri);
+        $router = $this->getContainer()->get('router');
+
+        $this->visit($router->generate('oro_user_security_logout'));
+        $this->visit($router->generate('oro_default'));
         $this->fillField('_username', $loginAndPassword);
         $this->fillField('_password', $loginAndPassword);
         $this->pressButton('_submit');
+    }
+
+    /**
+     * Login with credentials under specified session name and session alias
+     * Registers an alias switches to specified session and performs the login procedure
+     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::switchToActorWindowSession
+     *
+     * @Given /^(?:|I )login as "(?P<credential>(?:[^"]|\\")*)" and use in (?P<session>\w+) as (?P<alias>\w+)$/
+     * @Given /^(?:|I )login as administrator and use in "(?P<session>[^"]*)" as "(?P<alias>[^"]*)"$/
+     *
+     * @param string $session
+     * @param string $alias
+     * @param string $credential
+     */
+    public function loginAsUserWithPasswordInSession($session, $alias, $credential = 'admin')
+    {
+        $this->sessionAliasProvider->setSessionAlias($this->getMink(), $session, $alias);
+        $this->sessionAliasProvider->switchSessionByAlias($this->getMink(), $alias);
+        $this->loginAsUserWithPassword($credential);
     }
 
     /**
@@ -384,6 +498,24 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: Then I should see that "Header" contains "Some Text"
+     * @Then /^I should see that "(?P<elementName>[^"]*)" contains "(?P<text>[^"]*)"$/
+     *
+     * @param string $elementName
+     * @param string $text
+     */
+    public function assertDefinedElementContainsText($elementName, $text)
+    {
+        $this->waitForAjax();
+        $element = $this->elementFactory->createElement($elementName);
+        self::assertContains(
+            $text,
+            $element->getText(),
+            sprintf('Element %s does not contains text %s', $elementName, $text)
+        );
+    }
+
+    /**
      * Assert that download link in attachment works properly
      * Example: And download link for "cat.jpg" attachment should work
      * Example: And download link for "note-attachment.jpg" attachment should work
@@ -399,12 +531,12 @@ class OroMainContext extends MinkContext implements
         $attachmentItem->checkDownloadLink();
     }
 
-     /**
-      * Click on button or link
-      * Example: Given I click "Edit"
-      * Example: When I click "Save and Close"
-      *
-      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
+    /**
+     * Click on button or link
+     * Example: Given I click "Edit"
+     * Example: When I click "Save and Close"
+     *
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      */
     public function pressButton($button)
     {
@@ -413,6 +545,30 @@ class OroMainContext extends MinkContext implements
         } catch (ElementNotFoundException $e) {
             if ($this->getSession()->getPage()->hasLink($button)) {
                 $this->clickLink($button);
+            } elseif ($this->elementFactory->hasElement($button)) {
+                $this->elementFactory->createElement($button)->click();
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Click on button in modal window
+     * Example: Given I click "Edit" in modal window
+     * Example: When I click "Save and Close" in modal window
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" in modal window$/
+     */
+    public function pressButtonInModalWindow($button)
+    {
+        $modalWindow = $this->getSession()->getPage()->find('css', 'div.modal');
+        self::assertTrue($modalWindow->isVisible(), 'There is no visible modal window on page at this moment');
+        try {
+            $button = $this->fixStepArgument($button);
+            $modalWindow->pressButton($button);
+        } catch (ElementNotFoundException $e) {
+            if ($modalWindow->hasLink($button)) {
+                $modalWindow->clickLink($button);
             } else {
                 throw $e;
             }
@@ -444,6 +600,7 @@ class OroMainContext extends MinkContext implements
     public function assertPage($page)
     {
         $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
+        $urlPath = preg_replace('/^.*\.php/', '', $urlPath);
         $route = $this->getContainer()->get('router')->match($urlPath);
 
         self::assertEquals($this->getPage($page)->getRoute(), $route['_route']);
@@ -459,7 +616,7 @@ class OroMainContext extends MinkContext implements
         $urlPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
         $route = $this->getContainer()->get('router')->match($urlPath);
 
-        self::assertEquals($this->getPage($page.' View')->getRoute(), $route['_route']);
+        self::assertEquals($this->getPage($page . ' View')->getRoute(), $route['_route']);
 
         $actualEntityTitle = $this->getSession()->getPage()->find('css', 'h1.user-name');
         self::assertNotNull($actualEntityTitle, sprintf('Entity title not found on "%s" view page', $page));
@@ -485,7 +642,19 @@ class OroMainContext extends MinkContext implements
      */
     public function openEntityEditPage($title, $entity)
     {
-        $pageName = preg_replace('/\s+/', ' ', ucwords($entity)).' Edit';
+        $pageName = preg_replace('/\s+/', ' ', ucwords($entity)) . ' Edit';
+        $this->getPage($pageName)->open(['title' => $title]);
+    }
+
+    /**
+     * Example: Given I open "Charlie" Account view page
+     * Example: When I open "Supper sale" opportunity view page
+     *
+     * @Given /^(?:|I )open "(?P<title>[\w\s]+)" (?P<entity>[\w\s]+) view page$/
+     */
+    public function openEntityViewPage($title, $entity)
+    {
+        $pageName = preg_replace('/\s+/', ' ', ucwords($entity)) . ' View';
         $this->getPage($pageName)->open(['title' => $title]);
     }
 
@@ -567,7 +736,7 @@ class OroMainContext extends MinkContext implements
                 if ($label->hasAttribute('for')) {
                     return $this->getSession()
                         ->getPage()
-                        ->find('css', '#'.$label->getAttribute('for'))
+                        ->find('css', '#' . $label->getAttribute('for'))
                         ->getValue();
                 }
 
@@ -616,15 +785,14 @@ class OroMainContext extends MinkContext implements
             $row = $grid->getRowByContent($entityTitle);
         } else {
             $rows = $grid->getRows();
-            self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.'.
-                PHP_EOL.'You can specify row content for edit field in specific row.'));
+            self::assertCount(1, $rows, sprintf('Expect one row in grid but got %s.' .
+                PHP_EOL . 'You can specify row content for edit field in specific row.'));
 
             $row = array_shift($rows);
         }
 
         $row->setCellValue($field, $value);
         $this->iShouldSeeFlashMessage('Inline edits are being saved');
-        $this->iShouldSeeFlashMessage('Record has been succesfully updated');
     }
 
     /**
@@ -658,7 +826,7 @@ class OroMainContext extends MinkContext implements
                     $labelElement->getParent()->find('css', 'div.controls div.control-label')
                 );
 
-                if (true === $controlLabel->compareValues(Form::normalizeValue($value))) {
+                if (true === $controlLabel->compareValues(Form::normalizeValue($value, $label))) {
                     continue 2;
                 }
             }
@@ -713,7 +881,7 @@ class OroMainContext extends MinkContext implements
     {
         $locator = $this->fixStepArgument($locator);
         $value = $this->fixStepArgument($value);
-        $field = $this->getPage()->find('named', array('field', $locator));
+        $field = $this->getPage()->find('named', ['field', $locator]);
         /** @var OroSelenium2Driver $driver */
         $driver = $this->getSession()->getDriver();
 
@@ -731,10 +899,36 @@ class OroMainContext extends MinkContext implements
      */
     public function assertElementOnPage($element)
     {
+        $isVisible = $this->spin(function (OroMainContext $context) use ($element) {
+            return $context->createElement($element)->isVisible();
+        });
+
         self::assertTrue(
-            $this->createElement($element)->isVisible(),
+            $isVisible,
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
+    }
+
+    /**
+     * Presses button with specified id|name|title|alt|value in some named section
+     * Example: When I press "Add" in "General Information" section
+     * Example: And I press "Add" in "General Information" section
+     *
+     * @When /^(?:|I )press "(?P<button>(?:[^"]|\\")*)" in "(?P<section>[^"]+)" section$/
+     */
+    public function pressButtonInSection($button, $section)
+    {
+        $button = $this->fixStepArgument($button);
+        $section = $this->fixStepArgument($section);
+        $page = $this->getSession()->getPage();
+
+        $sectionContainer = $page->find('xpath', '//h4[text()="' . $section . '"]')->getParent();
+
+        if ($sectionContainer->hasButton($button)) {
+            $sectionContainer->pressButton($button);
+        } else {
+            $sectionContainer->clickLink($button);
+        }
     }
 
     /**.
@@ -759,8 +953,67 @@ class OroMainContext extends MinkContext implements
             case 'two':
                 return 2;
             default:
-                return (int) $count;
+                return (int)$count;
         }
+    }
+
+    /**
+     * Sets aliases to the correspond sessions
+     * Example: Given sessions:
+     * | First User  | first_session  |
+     * | Second User | second_session |
+     *
+     * @Given sessions active:
+     * @Given sessions:
+     * @Given sessions has aliases:
+     * @param TableNode $table
+     */
+    public function sessionsInit(TableNode $table)
+    {
+        $mink = $this->getMink();
+        foreach ($table->getRows() as list($alias, $name)) {
+            $this->sessionAliasProvider->setSessionAlias($mink, $name, $alias);
+        }
+    }
+
+    /**
+     * @Given /^(I |)operate as "(?P<actor>[^"]*)" under "(?P<session>[^"])"$/
+     * @Given /^here is the "(?P<actor>[^"]*)" under "(?P<session>[^"])"$/
+     *
+     * @param string $actor
+     * @param string $session
+     */
+    public function iOperateAsActorUnderSession($actor, $session)
+    {
+        $mink = $this->getMink();
+        $this->sessionAliasProvider->setSessionAlias($mink, $session, $actor);
+        $this->sessionAliasProvider->switchSessionByAlias($mink, $actor);
+    }
+
+    /**
+     * Switch to named session window (aliases must be initialized earlier)
+     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::iOperateAsActorUnderSession
+     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::sessionsInit
+     * @see \Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext::loginAsUserWithPasswordInSession
+     * To define session aliases
+     *
+     * Example1: I operate as the Manager
+     * Example2: I act like a boss
+     * Example3: I continue as the Accountant
+     * Example4: I proceed as the User
+     * Example5: I switch to the "Beginning" session
+     *
+     * @Then /^I operate as the (\w+)$/
+     * @Then /^I act like a (\w+)$/
+     * @Then /^I continue as the (\w+)$/
+     * @Then /^I proceed as the ([^"]*)$/
+     * @Then /^I switch to the "([^"]*)" session$/
+     *
+     * @param string $sessionAlias
+     */
+    public function switchToActorWindowSession($sessionAlias)
+    {
+        $this->sessionAliasProvider->switchSessionByAlias($this->getMink(), $sessionAlias);
     }
 
     /**
@@ -769,5 +1022,112 @@ class OroMainContext extends MinkContext implements
     protected function waitForAjax($time = 60000)
     {
         return $this->getSession()->getDriver()->waitForAjax($time);
+    }
+
+    /**
+     * Unselect a value in the multiselect box
+     * Example: And unselect "Color" option from "Attributes"
+     * Example: When I unselect "Color" option from "Attributes"
+     *
+     * @When /^(?:|I )unselect "(?P<option>(?:[^"]|\\")*)" option from "(?P<select>(?:[^"]|\\")*)"$/
+     */
+    public function unselectOption($select, $option)
+    {
+        /** @var OroSelenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+
+        $field = $this->getSession()->getPage()->findField($select);
+
+        if (null === $field) {
+            throw new ElementNotFoundException($driver, 'form field', 'id|name|label|value|placeholder', $select);
+        }
+
+        $selectOptionXpath = '//option[contains(.,"%s")]';
+        $selectOption = $field->find(
+            'xpath',
+            sprintf($selectOptionXpath, $option)
+        );
+
+        if (null === $field) {
+            throw new ElementNotFoundException(
+                $driver,
+                'select option',
+                'id|name|label|value|placeholder',
+                sprintf($selectOptionXpath, $option)
+            );
+        }
+
+        $optionValue = $selectOption->getValue();
+
+        $values = $field->getValue();
+        if ($values !== null && is_array($values)) {
+            foreach ($values as $key => $value) {
+                if ($value === $optionValue) {
+                    unset($values[$key]);
+                    break;
+                }
+            }
+
+            $field->setValue(array_values($values));
+        }
+    }
+
+    /**
+     * Confirm schema update and wait for success message
+     * Example: And I confirm schema update
+     *
+     * @Then /^(?:|I )confirm schema update$/
+     */
+    public function iConfirmSchemaUpdate()
+    {
+        $this->pressButton('Update schema');
+        $this->assertPageContainsText('Schema update confirmation');
+        $this->pressButton('Yes, Proceed');
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+    }
+
+    /**
+     * Checks that element on page exists and visible
+     *
+     * @param string $selector
+     * @return bool
+     */
+    public function isNodeVisible($selector)
+    {
+        $element = $this->getPage()->findVisible('css', $selector);
+
+        return !is_null($element);
+    }
+
+    /**
+     * Drag and Drop one element before another
+     * Example: When I drag and drop "Products" before "Clearance"
+     *
+     * @When /^(?:|I )drag and drop "(?P<elementName>[\w\s]+)" before "(?P<dropZoneName>[\w\s]+)"$/
+     * @param string $elementName
+     * @param string $dropZoneName
+     */
+    public function iDragAndDropElementBeforeAnotherOne($elementName, $dropZoneName)
+    {
+        $element = $this->createElement($elementName);
+        $dropZone = $this->createElement($dropZoneName);
+
+        /** @var Selenium2Driver $driver */
+        $driver = $this->getSession()->getDriver();
+        $webDriverSession = $driver->getWebDriverSession();
+
+        $source      = $webDriverSession->element('xpath', $element->getXpath());
+        $destination = $webDriverSession->element('xpath', $dropZone->getXpath());
+
+        $webDriverSession->moveto(array(
+            'element' => $source->getID()
+        ));
+        $webDriverSession->buttondown();
+        $webDriverSession->moveto([
+            'element' => $destination->getID(),
+            'xoffset' => 1,
+            'yoffset' => 1,
+        ]);
+        $webDriverSession->buttonup();
     }
 }

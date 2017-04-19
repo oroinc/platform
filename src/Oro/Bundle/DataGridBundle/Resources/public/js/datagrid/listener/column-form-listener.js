@@ -69,7 +69,7 @@ define([
          * @inheritDoc
          */
         _processValue: function(id, model) {
-            id = parseInt(id, 10);
+            id = String(id);
 
             var included = this.get('included');
             var excluded = this.get('excluded');
@@ -133,7 +133,7 @@ define([
             if (!string) {
                 return [];
             }
-            return _.map(string.split(','), function(val) { return val ? parseInt(val, 10) : null; });
+            return _.map(string.split(','), function(val) { return val ? String(val) : null; });
         },
 
         /**
@@ -156,7 +156,7 @@ define([
 
             _.each(this.grid.collection.models, function(model) {
                 var isActive = model.get(columnName);
-                var modelId = parseInt(model.id, 10);
+                var modelId = String(model.id);
                 if (!isActive && _.contains(included, modelId)) {
                     model.set(columnName, true);
                 }

@@ -138,7 +138,7 @@ services:
             - '@oro_datagrid.datagrid.manager.link'
             - '@oro_datagrid.datagrid.builder'
         tags:
-            - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad }
+            - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad, priority: 100 }
 
     oro_dashboard.event_listener.widget_items_load_data:
         class: %oro_dashboard.event_listener.widget_items_load_data.class%
@@ -286,7 +286,6 @@ services:
         arguments:
             - '@oro_dashboard.provider.big_number.formatter'
             - '@oro_dashboard.provider.big_number.date_helper'
-            - '@oro_user.dashboard.owner_helper'
 
     oro_dashboard.provider.big_number.formatter:
         class: %oro_dashboard.provider.big_number.formatter.class%
@@ -329,3 +328,13 @@ services:
         class: 'Oro\Bundle\DashboardBundle\Configuration\FeatureConfigurationExtension'
         tags:
             - { name: oro_feature.config_extension }
+
+    oro_dashboard.widget_provider.filter_manager:
+        class: 'Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterManager'
+
+    oro_dashboard.widget_provider.filter.owners:
+        class: 'Oro\Bundle\DashboardBundle\Filter\OwnersWidgetProviderFilter'
+        arguments:
+            - '@oro_user.dashboard.owner_helper'
+        tags:
+            - { name: oro_dashboard.widget_provider.filter }

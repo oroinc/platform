@@ -31,16 +31,7 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->factory = $this->createMock(FactoryWithTypesInterface::class);
-
         $this->container = $this->createMock(ContainerInterface::class);
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(
-                function ($serviceId) {
-                    return $serviceId === $this->getFactoryServiceId() ? $this->factory : new TestEntity1();
-                }
-            );
-
         $this->input = $this->createMock(InputInterface::class);
         $this->output = new OutputStub();
         $this->command = $this->getCommandInstance();
@@ -51,14 +42,31 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
      * @param array $types
      * @param array $expected
      * @param string|null $argument
+     * @param \TypeError|\ErrorException $exception
      *
      * @dataProvider executeProvider
      */
-    public function testExecute(array $types, array $expected, $argument = null)
+    public function testExecute(array $types, array $expected, $argument = null, $exception = null)
     {
         $this->factory->expects($this->once())->method('getTypes')->willReturn($types);
 
         $this->input->expects($this->once())->method('getArgument')->willReturn($argument);
+
+        $this->container->expects($this->any())
+            ->method('get')
+            ->willReturnCallback(
+                function ($serviceId) use ($exception) {
+                    if ($serviceId === $this->getFactoryServiceId()) {
+                        return $this->factory;
+                    }
+
+                    if ($exception) {
+                        throw $exception;
+                    }
+
+                    return new TestEntity1();
+                }
+            );
 
         $this->command->run($this->input, $this->output);
 
@@ -112,6 +120,30 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit_Framework_TestCase
                     'Class TestEntity1',
                 ],
                 'argument' => 'name1',
+            ],
+            'type error exception' => [
+                'types' => [
+                    'name1' => 'type1',
+                    'name2' => 'type2',
+                ],
+                'expected' => [
+                    'Can not load Service "type1": test message1',
+                    'Short Description'
+                ],
+                'argument' => null,
+                'exception' => new \TypeError('test message1')
+            ],
+            'error exception' => [
+                'types' => [
+                    'name1' => 'type1',
+                    'name2' => 'type2',
+                ],
+                'expected' => [
+                    'Can not load Service "type1": test message2',
+                    'Short Description'
+                ],
+                'argument' => null,
+                'exception' => new \ErrorException('test message2')
             ],
         ];
     }

@@ -99,21 +99,14 @@ class EntityProcessor
     {
         $commands = [
             'oro:entity-extend:update-config' => ['--update-custom' => true],
-            'oro:entity-extend:cache:warmup'  => [],
+            'oro:entity-extend:cache:warmup' => [],
             'oro:entity-extend:update-schema' => []
         ];
 
-      /*  Should be changed in scope of #BB-6620
-      if ($attributesOnly) {
-            $commands = [
-                'oro:entity-extend:update-config' => [
-                        '--update-custom' => true,
-                        '--attributes-only' => true
-                ],
-                'oro:entity-extend:cache:warmup'  => [],
-                'oro:entity-extend:update-schema' => ['--attributes-only' => true]
-            ];
-        }*/
+        if ($attributesOnly) {
+            $commands['oro:entity-extend:update-config']['--attributes-only'] = true;
+            $commands['oro:entity-extend:update-schema']['--attributes-only'] = true;
+        }
 
         if ($warmUpConfigCache) {
             $commands = array_merge(
@@ -128,7 +121,7 @@ class EntityProcessor
             $commands = array_merge(
                 $commands,
                 [
-                    'router:cache:clear'  => [],
+                    'router:cache:clear' => [],
                     'fos:js-routing:dump' => []
                 ]
             );

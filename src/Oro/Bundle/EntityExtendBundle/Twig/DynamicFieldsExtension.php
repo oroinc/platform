@@ -8,16 +8,18 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
@@ -100,6 +102,14 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
     }
 
     /**
+     * @return FeatureChecker
+     */
+    private function getFeatureChecker()
+    {
+        return $this->container->get('oro_featuretoggle.checker.feature_checker');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFields($entity, $entityClass = null)
@@ -169,6 +179,13 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
 
         // skip relations if they are referenced to not accessible entity
         $underlyingFieldType = $this->getFieldTypeHelper()->getUnderlyingType($fieldConfigId->getFieldType());
+
+        // skip disabled entities by feature flags
+        if ($extendConfig->has('target_entity')
+            && !$this->getFeatureChecker()->isResourceEnabled($extendConfig->get('target_entity'), 'entities')
+        ) {
+            return false;
+        }
 
         return
             !in_array($underlyingFieldType, RelationType::$anyToAnyRelations, true)

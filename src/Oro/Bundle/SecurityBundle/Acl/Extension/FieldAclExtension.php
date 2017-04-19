@@ -132,7 +132,7 @@ class FieldAclExtension extends AbstractSimpleAccessLevelAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         $fields = $this->entityMetadataProvider->getMetadata($oid->getType())->getFields();
         $result = $fields[$fieldName]->getPermissions();

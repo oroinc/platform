@@ -119,17 +119,20 @@ define([
          */
         submitHandler: function() {
             if (this.options.pageReload) {
-                mediator.once('config-form:init', function(options) {
-                    if (options.isFormValid) {
-                        messenger.notificationMessage('info', __('Please wait until page will be reloaded...'));
-                        // force reload without hash navigation
-                        window.location.reload();
+                mediator.off('config-form:init', this.onInitAfterSubmit)
+                    .once('config-form:init', this.onInitAfterSubmit);
+            }
+        },
 
-                        this.once('page:afterChange', function() {
-                            // Show loading until page is fully reloaded
-                            this.execute('showLoading');
-                        });
-                    }
+        onInitAfterSubmit: function(options) {
+            if (options.isFormValid) {
+                messenger.notificationMessage('info', __('Please wait until page will be reloaded...'));
+                // force reload without hash navigation
+                window.location.reload();
+
+                this.once('page:afterChange', function() {
+                    // Show loading until page is fully reloaded
+                    this.execute('showLoading');
                 });
             }
         }

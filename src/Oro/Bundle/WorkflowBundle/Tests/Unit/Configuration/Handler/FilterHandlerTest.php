@@ -96,6 +96,27 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'unknown' => 'fv',
                             'actions' => []
                         ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_var' => [
+                                'name' => 'var_name',
+                                'type' => 'string',
+                                'value' => 'test',
+                                'options' => []
+                            ],
+                            'test_entity_var' => [
+                                'name' => 'entity_var_name',
+                                'type' => 'entity',
+                                'value' => 1,
+                                'property_path' => 'entity.test_variable',
+                                'entity_acl' => [
+                                    'delete' => false,
+                                ],
+                                'options' => [],
+                                'unknownKey' => 'unkownValue',
+                            ]
+                        ]
                     ]
                 ],
                 'expected' => [
@@ -155,6 +176,26 @@ class FilterHandlerTest extends \PHPUnit_Framework_TestCase
                             'preactions' => [],
                             'preconditions' => [],
                             'actions' => []
+                        ]
+                    ],
+                    WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS => [
+                        WorkflowConfiguration::NODE_VARIABLES => [
+                            'test_var' => [
+                                'name' => 'var_name',
+                                'type' => 'string',
+                                'value' => 'test',
+                                'options' => []
+                            ],
+                            'test_entity_var' => [
+                                'name' => 'entity_var_name',
+                                'type' => 'entity',
+                                'value' => 1,
+                                'property_path' => 'entity.test_variable',
+                                'entity_acl' => [
+                                    'delete' => false,
+                                ],
+                                'options' => []
+                            ]
                         ]
                     ]
                 ]

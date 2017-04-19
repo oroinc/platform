@@ -65,10 +65,6 @@ class LocalizationScopeCriteriaProviderTest extends \PHPUnit_Framework_TestCase
                 'context' => ['localization' => $localization],
                 'criteria' => ['localization' => $localization],
             ],
-            'array_context_with_localization_key_invalid_value' => [
-                'context' => ['localization' => 123],
-                'criteria' => [],
-            ],
             'array_context_without_localization_key' => [
                 'context' => [],
                 'criteria' => [],

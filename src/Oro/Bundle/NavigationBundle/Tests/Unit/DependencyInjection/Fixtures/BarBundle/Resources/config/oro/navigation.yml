@@ -1,13 +1,35 @@
 navigation:
     menu_config:
+        items:
+            default_tab:
+                label: 'Default'
+            to_replace:
+                label: 'To replace'
+            to_replace_child:
+                label: 'To replace child'
+            to_move_top:
+                label: 'To move'
+            to_move_top_child:
+                label: 'To move top child'
         tree:
             application_menu:
                 type: application_menu
                 scope_type: default
+                children:
+                    default_tab:
+                        children:
+                            to_replace:
+                                children:
+                                    to_replace: ~
+                            to_move_top:
+                                children:
+                                    to_move_top_child: ~
 
             shortcuts:
                 type: shortcuts
                 scope_type: custom
+                children:
+                    shortcut_call_list: ~
 
     navigation_elements:
         favoriteButton:

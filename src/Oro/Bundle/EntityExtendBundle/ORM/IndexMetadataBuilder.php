@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\ORM;
 
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 
+use Oro\Bundle\EntityBundle\EntityConfig\IndexScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -46,15 +47,19 @@ class IndexMetadataBuilder implements MetadataBuilderInterface
         $indices   = $extendConfig->get('index');
         // TODO: need to be changed to fieldName => columnName
         // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3940
-        foreach ($indices as $columnName => $enabled) {
+        foreach ($indices as $columnName => $indexType) {
             $fieldConfig = $this->extendConfigProvider->getConfig($className, $columnName);
 
-            if ($enabled && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+            if ($indexType && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
                 $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
                     $className,
                     $columnName
                 );
-                $metadataBuilder->addIndex([$columnName], $indexName);
+                if ((int)$indexType === IndexScope::INDEX_UNIQUE) {
+                    $metadataBuilder->addUniqueConstraint([$columnName], $indexName);
+                } else {
+                    $metadataBuilder->addIndex([$columnName], $indexName);
+                }
             }
         }
     }

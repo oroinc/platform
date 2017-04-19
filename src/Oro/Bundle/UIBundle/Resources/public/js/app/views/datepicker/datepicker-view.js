@@ -190,7 +190,7 @@ define(function(require) {
          */
         updateOrigin: function(e) {
             var backendFormattedValue = this.getBackendFormattedValue();
-            if (this.$el.val() !== backendFormattedValue) {
+            if (!_.isUndefined(backendFormattedValue) && this.$el.val() !== backendFormattedValue) {
                 this._preventFrontendUpdate = true;
                 this.$el.val(backendFormattedValue).trigger('change');
                 this._preventFrontendUpdate = false;
@@ -222,13 +222,13 @@ define(function(require) {
          * @returns {string}
          */
         getBackendFormattedValue: function() {
-            var value = '';
             var momentInstance = this.getFrontendMoment();
             var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
-                value = momentInstance.utc().format(format);
+                return momentInstance.utc().format(format);
+            } else if (momentInstance === null) {
+                return '';
             }
-            return value;
         },
 
         /**

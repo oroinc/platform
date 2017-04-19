@@ -8,18 +8,18 @@ use Knp\Menu\MenuItem;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Component\Config\Resolver\SystemAwareResolver;
 use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
+
+use Oro\Component\Config\Resolver\SystemAwareResolver;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigurationBuilder */
     protected $configurationBuilder;
 
-    /** @var AclAwareMenuFactoryExtension */
+    /** @var MenuFactory */
     protected $factory;
 
     /** @var FactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
@@ -112,6 +112,9 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedArea, $menu->getExtra('scope_type'));
     }
 
+    /**
+     * @return array
+     */
     public function setAreaToExtraProvider()
     {
         return [

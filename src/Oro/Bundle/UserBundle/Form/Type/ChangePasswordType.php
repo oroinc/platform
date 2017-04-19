@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class ChangePasswordType extends AbstractType
 {
@@ -71,7 +72,6 @@ class ChangePasswordType extends AbstractType
                     'second_options' => ['label' => $options['second_options_label'],
                     ],
                     'mapped' => false,
-                    'cascade_validation' => true,
                 ]
             );
     }
@@ -100,7 +100,6 @@ class ChangePasswordType extends AbstractType
         $resolver->setDefaults(
             [
                 'inherit_data' => true,
-                'cascade_validation' => true,
                 'current_password_label' => 'oro.user.password.label',
                 'plain_password_invalid_message' => 'oro.user.message.password_mismatch',
                 'first_options_label' => 'oro.user.new_password.label',

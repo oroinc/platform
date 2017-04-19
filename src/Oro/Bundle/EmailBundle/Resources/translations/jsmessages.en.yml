@@ -26,8 +26,14 @@ oro:
                 label: Expand All
                 tooltip: Expand all emails in the thread
         to: To
+        form:
+            attach: 'Attach'
+            no_attachments: 'No available attachments'
+            record_attachments: 'Record Attachments'
+            thread_attachments: 'Thread Attachments'
         attachment:
-            added: Attachment added
+            added: 'Attachment added'
+            select_file: 'Select file'
         send_email: Send email
         menu.shortcut_compose_email.label: Compose Email
         action:
@@ -50,6 +56,7 @@ oro:
             reply: Reply
             forward: Forward
             description: "This widget allows you to see most recent additions to your inbox and outbox"
+            no_subject: "no subject"
         notification:
             menu_item.hint: Recent Emails
             mark_read.label: Mark all as Read

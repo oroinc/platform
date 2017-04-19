@@ -16,13 +16,13 @@ return [
             'active' => true,
         ],
         'scopes' => [
-           [
-               'scope1' => 'value1',
-               'scope2' => 'value2',
-           ],
-           [
-               'scope1' => 'value3',
-           ],
+            [
+                'scope1' => 'value1',
+                'scope2' => 'value2',
+            ],
+            [
+                'scope1' => 'value3',
+            ],
         ],
         'datagrids' => ['datagrid1', 'datagrid2'],
         'steps' => [
@@ -57,6 +57,48 @@ return [
                 ]
             ]
         ],
+        'variable_definitions' => [
+            'variables' => [
+                'var1' => [
+                    'type' => 'string',
+                    'value' => 'Var1Value',
+                    'options' => [],
+                    'property_path' => null,
+                ],
+                'var2' => [
+                    'type' => 'array',
+                    'value' => [1,2,3,4,5],
+                    'options' => [],
+                    'property_path' => null,
+                ],
+                'var3' => [
+                    'type' => 'string',
+                    'value' => null,
+                    'options' => [],
+                    'property_path' => null,
+                ],
+                'first_object' => [
+                    'type' => 'object',
+                    'property_path' => null,
+                    'value' => '2017-03-15 00:00:00',
+                    'options' => [
+                        'class' => 'DateTime'
+                    ]
+                ],
+                'var_entity' => [
+                    'type' => 'entity',
+                    'property_path' => null,
+                    'entity_acl' => [
+                        'update' => true,
+                        'delete' => false
+                    ],
+                    'options' => [
+                        'class' => 'Oro\Bundle\UserBundle\Entity\User'
+                    ],
+                    'value' => 1
+                ]
+            ]
+        ],
         'disable_operations' => [
             'operation1' => ['entity1', 'entity2']
         ],
@@ -72,6 +114,7 @@ return [
                 'frontend_options' => [
                     'class' => 'foo'
                 ],
+                'message_parameters' => ['test' => 'param'],
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
                 'destination_page' => 'name',
@@ -134,7 +177,65 @@ return [
                         'require' => null
                     ]
                 ]
-            ]
+            ],
+            'transition_with_form_options_configuration' =>
+                [
+                    'step_to' => 'first_step',
+                    'transition_definition' => 'first_transition_definition',
+                    'is_start' => false,
+                    'is_hidden' => false,
+                    'is_unavailable_hidden' => false,
+                    'acl_message' => null,
+                    'frontend_options' => [],
+                    'form_type' => 'oro_workflow_transition',
+                    'display_type' => 'dialog',
+                    'form_options' => [
+                        WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                            'handler' => 'handler',
+                            'template' => 'template',
+                            'data_provider' => 'data_provider',
+                            'data_attribute' => 'form_data',
+                        ],
+                    ],
+                    'page_template' => null,
+                    'dialog_template' => null,
+                    'init_entities' => [],
+                    'init_routes' => [],
+                    'init_datagrids' => [],
+                    'init_context_attribute' => 'init_context',
+                    'triggers' => [],
+                    'destination_page' => '',
+                    'message_parameters' => [],
+                ],
+            'transition_with_form_options_configuration_defaults' =>
+                [
+                    'step_to' => 'first_step',
+                    'transition_definition' => 'first_transition_definition',
+                    'is_start' => false,
+                    'is_hidden' => false,
+                    'is_unavailable_hidden' => false,
+                    'acl_message' => null,
+                    'frontend_options' => [],
+                    'form_type' => 'oro_workflow_transition',
+                    'display_type' => 'dialog',
+                    'form_options' => [
+                        WorkflowConfiguration::NODE_FORM_OPTIONS_CONFIGURATION => [
+                            'handler' => WorkflowConfiguration::DEFAULT_FORM_CONFIGURATION_HANDLER,
+                            'template' => WorkflowConfiguration::DEFAULT_FORM_CONFIGURATION_TEMPLATE,
+                            'data_provider' => 'data_provider',
+                            'data_attribute' => 'form_data',
+                        ],
+                    ],
+                    'page_template' => null,
+                    'dialog_template' => null,
+                    'init_entities' => [],
+                    'init_routes' => [],
+                    'init_datagrids' => [],
+                    'init_context_attribute' => 'init_context',
+                    'triggers' => [],
+                    'destination_page' => '',
+                    'message_parameters' => [],
+                ],
         ],
         'transition_definitions' => [
             'first_transition_definition' => [
@@ -217,6 +318,7 @@ return [
                 'init_routes' => [],
                 'init_datagrids' => [],
                 'init_context_attribute' => 'init_context',
+                'message_parameters' => [],
             ]
         ],
         'transition_definitions' => [

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Query;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -217,15 +218,26 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->method('getIdentifierFieldNames')
             ->will($this->returnValue(['id']));
 
+        $emConfiguration = $this->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
         $entityManager->expects($this->once())->method('getClassMetadata')
             ->with($entityName)
             ->will($this->returnValue($classMetadata));
+        $entityManager->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($emConfiguration));
+
+        $query = new Query($entityManager);
 
         $queryBuilder = $this
             ->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
+        $queryBuilder->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())->method('createQueryBuilder')
@@ -245,9 +257,9 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->at(1))->method('getOption')
             ->with('entityName')
             ->will($this->returnValue($entityName));
+        $context->expects($this->at(3))->method('getOption')->with('ids', [])->will($this->returnValue([]));
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
-
         $this->assertAttributeInstanceOf(
             'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
             'sourceIterator',
@@ -255,7 +267,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertAttributeEquals(
-            $queryBuilder,
+            $query,
             'source',
             self::readAttribute($this->reader, 'sourceIterator')
         );
@@ -331,20 +343,28 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->with('o')
             ->will($this->returnValue($queryBuilder));
 
+        $emConfiguration = $this->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
 
         $entityManager->expects($this->once())
             ->method('getRepository')
             ->with($name)
             ->will($this->returnValue($repository));
-
         $entityManager->expects($this->once())->method('getClassMetadata')
             ->with($name)
             ->will($this->returnValue($classMetadata));
+        $entityManager->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($emConfiguration));
 
         $this->managerRegistry->expects($this->once())->method('getManagerForClass')
             ->with($name)
             ->will($this->returnValue($entityManager));
+
+        $query = new Query($entityManager);
 
         $organization = new Organization();
         $ownershipMetadata = new OwnershipMetadata('', '', '', 'organization');
@@ -359,6 +379,9 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->method('setParameter')
             ->with('organization', $organization)
             ->will($this->returnValue($queryBuilder));
+        $queryBuilder->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
 
         $this->reader->setSourceEntityName($name, $organization);
     }

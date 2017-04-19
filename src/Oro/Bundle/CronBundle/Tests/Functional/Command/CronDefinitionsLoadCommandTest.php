@@ -55,7 +55,7 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron:definitions:load');
         $this->assertNotEmpty($result);
 
-        $this->assertContains("Removing all previously loaded commands...\n", $result);
+        $this->assertContains("Removing all previously loaded commands...", $result);
     }
 
     /**

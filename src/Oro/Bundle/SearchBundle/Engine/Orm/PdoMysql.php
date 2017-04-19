@@ -67,13 +67,21 @@ class PdoMysql extends BaseDriver
     {
         $fieldValue = $searchCondition['fieldValue'];
         $condition = $searchCondition['condition'];
-        $words = $this->getWords($this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue), $condition);
+
+        $words = array_filter(
+            explode(' ', $this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue)),
+            'strlen'
+        );
 
         switch ($condition) {
             case Query::OPERATOR_LIKE:
                 $whereExpr = $this->createLikeExpr($qb, $searchCondition['fieldValue'], $index);
                 break;
-            
+
+            case Query::OPERATOR_NOT_LIKE:
+                $whereExpr = $this->createNotLikeExpr($qb, $searchCondition['fieldValue'], $index);
+                break;
+
             case Query::OPERATOR_CONTAINS:
                 $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
                 $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
@@ -116,15 +124,40 @@ class PdoMysql extends BaseDriver
      */
     protected function createLikeExpr(QueryBuilder $qb, $fieldValue, $index)
     {
-        $parameterName = 'value' . $index;
-        $parameterValue = '%' . $fieldValue . '%';
-        
-        $qb->setParameter($parameterName, $parameterValue);
-        
+        $this->setLikeExpParameters($qb, $fieldValue, $index);
         return parent::createContainsStringQuery($index, false);
     }
 
     /**
+     * Uses whole string for not like expression. Does not operate on words.
+     *
+     * @param QueryBuilder $qb
+     * @param string $fieldValue
+     * @param $index
+     *
+     * @return string
+     */
+    protected function createNotLikeExpr(QueryBuilder $qb, $fieldValue, $index)
+    {
+        $this->setLikeExpParameters($qb, $fieldValue, $index);
+        return parent::createNotContainsStringQuery($index, false);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $fieldValue
+     * @param string $index
+     */
+    protected function setLikeExpParameters(QueryBuilder $qb, $fieldValue, $index)
+    {
+        $parameterName = 'value' . $index;
+        $parameterValue = '%' . $fieldValue . '%';
+
+        $qb->setParameter($parameterName, $parameterValue);
+    }
+
+    /**
+     * @deprecated
      * Get array of words retrieved from $value string
      *
      * @param  string $value
@@ -215,7 +248,11 @@ class PdoMysql extends BaseDriver
         $valueParameter = 'value' . $index;
 
         $result = "MATCH_AGAINST($joinAlias.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
-        $qb->setParameter($valueParameter, implode('* ', $words) . '*');
+        if ($words) {
+            $qb->setParameter($valueParameter, implode('* ', $words) . '*');
+        } else {
+            $qb->setParameter($valueParameter, '');
+        }
 
         if ($this->isConcreteField($fieldName)) {
             $result = $qb->expr()->andX(
@@ -257,7 +294,7 @@ class PdoMysql extends BaseDriver
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
             $result->add("$joinAlias.value LIKE :$valueParameter");
-            $qb->setParameter($valueParameter, $value . '%');
+            $qb->setParameter($valueParameter, "%$value%");
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
             $fieldParameter = 'field' . $index;

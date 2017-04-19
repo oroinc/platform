@@ -28,6 +28,7 @@ define(function(require) {
             dialogUrl: '',
             executionUrl: '',
             confirmation: {},
+            message: {},
             showDialog: false,
             hasDialog: false,
             dialogOptions: {},
@@ -40,7 +41,7 @@ define(function(require) {
         messages: {
             confirm_title: 'oro.action.confirm_title',
             confirm_content: 'oro.action.confirm_content',
-            confirm_ok: 'Yes, Delete',
+            confirm_ok: 'Yes',
             confirm_cancel: 'Cancel'
         },
 
@@ -52,7 +53,7 @@ define(function(require) {
         /**
          * @type {String}
          */
-        confirmComponent: 'oroui/js/delete-confirmation',
+        confirmComponent: 'oroui/js/standart-confirmation',
 
         /**
          * @type {Function}
@@ -71,11 +72,15 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         execute: function(e) {
-            if (!_.isEmpty(this.options.confirmation)) {
+            if (this.hasConfirmDialog()) {
                 this.showConfirmDialog(_.bind(this.doExecute, this, e));
             } else {
                 this.doExecute(e);
             }
+        },
+
+        hasConfirmDialog: function() {
+            return !_.isEmpty(this.options.confirmation) || !_.isEmpty(this.options.message);
         },
 
         /**
@@ -108,9 +113,9 @@ define(function(require) {
                         this.doResponse(response, e);
                     }, this))
                     .fail(_.bind(function(jqXHR) {
-                        var response = _.defaults(jqXHR.responseJSON, {
+                        var response = _.defaults(jqXHR.responseJSON || {}, {
                             success: false,
-                            message: ''
+                            message: this.options.action ? this.options.action.label : ''
                         });
 
                         response.message = __('Could not perform action') + ': ' + response.message;
@@ -158,7 +163,7 @@ define(function(require) {
                 });
                 this.doWidgetReload();
             } else {
-                this.doPageReload();
+                this.doPageReload(response);
             }
         },
 
@@ -169,8 +174,20 @@ define(function(require) {
             mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
         },
 
-        doPageReload: function() {
-            mediator.execute('refreshPage', {fullRedirect: this.options.fullRedirect});
+        /**
+         * @param {Object} response
+         */
+        doPageReload: function(response) {
+            var pageReload = true;
+            if (response.pageReload !== undefined) {
+                pageReload = Boolean(response.pageReload);
+            }
+
+            if (pageReload) {
+                mediator.execute('refreshPage', {fullRedirect: this.options.fullRedirect});
+            } else {
+                mediator.execute('hideLoading');
+            }
         },
 
         doWidgetReload: function() {
@@ -183,18 +200,28 @@ define(function(require) {
          * @param {function} callback
          */
         showConfirmDialog: function(callback) {
-            var placeholders = this.options.confirmation.message_parameters || {};
+            var messages = {};
+            if (!_.isEmpty(this.options.confirmation)) {
+                var placeholders = this.options.confirmation.message_parameters || {};
 
-            var messages = {
-                title: (this.options.confirmation.title || this.messages.confirm_title),
-                content: (this.options.confirmation.message || this.messages.confirm_content),
-                okText: (this.options.confirmation.okText || this.messages.confirm_ok),
-                cancelText: (this.options.confirmation.cancelText || this.messages.confirm_cancel)
-            };
+                messages = {
+                    title: (this.options.confirmation.title || this.messages.confirm_title),
+                    content: (this.options.confirmation.message || this.messages.confirm_content),
+                    okText: (this.options.confirmation.okText || this.messages.confirm_ok),
+                    cancelText: (this.options.confirmation.cancelText || this.messages.confirm_cancel)
+                };
 
-            _.each(messages, function(item, key, list) {
-                list[key] = __(item, $.extend({}, placeholders));
-            });
+                _.each(messages, function(item, key, list) {
+                    list[key] = __(item, $.extend({}, placeholders));
+                });
+            } else {
+                messages = {
+                    content: this.options.message.content || __(this.messages.confirm_content),
+                    title: this.options.message.title || __(this.messages.confirm_title),
+                    okText: this.options.message.okText || __(this.messages.confirm_ok),
+                    cancelText: this.options.message.cancelText || __(this.messages.confirm_cancel)
+                };
+            }
 
             this.confirmModal = (new this.confirmModalConstructor(messages));
             Backbone.listenTo(this.confirmModal, 'ok', callback);

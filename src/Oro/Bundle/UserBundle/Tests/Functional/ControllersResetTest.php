@@ -9,6 +9,9 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 
 use Symfony\Component\DomCrawler\Form;
 
+/**
+ * @dbIsolationPerTest
+ */
 class ControllersResetTest extends WebTestCase
 {
     protected function setUp()
@@ -204,5 +207,50 @@ class ControllersResetTest extends WebTestCase
 
         $newPassword = $user->getPassword();
         $this->assertNotEquals($oldPassword, $newPassword);
+    }
+
+    public function testResetActionWithEmptyFields()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_reset_reset', ['token' => LoadUserData::CONFIRMATION_TOKEN]),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $this->assertContains('name="oro_user_reset_form[plainPassword][first]"', $result->getContent());
+        $this->assertContains('name="oro_user_reset_form[plainPassword][second]"', $result->getContent());
+
+        /** @var Form $form */
+        $form = $crawler->selectButton('Reset')->form();
+
+        $form['oro_user_reset_form[plainPassword][first]'] = '';
+        $form['oro_user_reset_form[plainPassword][second]'] = '';
+
+        // This is instead of submit($form) to be able to pass noHashNavigationHeader
+        $crawler = $this->client->request(
+            $form->getMethod(),
+            $form->getUri(),
+            $form->getPhpValues(),
+            $form->getPhpFiles(),
+            $this->generateNoHashNavigationHeader()
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        $this->assertContains('This value should not be blank.', $result->getContent());
+
+        // @codingStandardsIgnoreStarts
+        $errorDiv = $crawler->filterXPath(
+            "//*/form[contains(@class, 'form-reset')]/*/div[contains(@class, 'input-prepend')][2][contains(@class, 'error')]"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(1, $errorDiv->count());
     }
 }

@@ -5,11 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\CronBundle\Command\ActiveCronCommandInterface;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -260,16 +258,5 @@ class HandleProcessTriggerCommandTest extends \PHPUnit_Framework_TestCase
                 ['doctrine', 1, $this->managerRegistry],
                 ['oro_workflow.process.process_handler', 1, $this->processHandler],
             ]);
-    }
-
-    public function testCommandImplementsProperInterface()
-    {
-        $this->assertInstanceOf(ActiveCronCommandInterface::class, $this->command);
-        $this->assertNotInstanceOf(CronCommandInterface::class, $this->command);
-    }
-
-    public function testIsActive()
-    {
-        $this->assertTrue($this->command->isActive());
     }
 }

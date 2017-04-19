@@ -254,12 +254,24 @@ services:
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
 
+    oro_form.extension.extra_fields_validation:
+        class: Oro\Bundle\FormBundle\Form\Extension\ExtraFieldsValidationExtension
+        tags:
+            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
     oro_form.type.encoded_password:
         class: %oro_form.type.encoded_password.class%
         arguments:
             - '@oro_security.encoder.mcrypt'
         tags:
             - { name: form.type, alias: oro_encoded_password }
+
+    oro_form.type.encoded_placeholder_password:
+        class: 'Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType'
+        arguments:
+            - '@oro_security.encoder.mcrypt'
+        tags:
+            - { name: form.type, alias: oro_encoded_placeholder_password }
 
     oro_form.type.textlist:
         class: %oro_form.type.textlist.class%

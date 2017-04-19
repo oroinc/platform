@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerManager;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\Driver\PdoMysql;
+use Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoMysql;
 
 class EntityTriggerManagerTest extends \PHPUnit_Framework_TestCase
 {

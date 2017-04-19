@@ -1,0 +1,26 @@
+workflows:
+    first_workflow:
+        variable_definitions:
+            variables:
+                var1:
+                    type: 'string'
+                    value: 'Var1Value'
+                var2:
+                    type: 'array'
+                    value: [1,2,3,4,5]
+                var3:
+                    type: 'string'
+                    value: ~
+                first_object:
+                    type: object
+                    value: '2017-03-15 00:00:00'
+                    options:
+                        class: DateTime
+                var_entity:
+                    type: entity
+                    property_path: null
+                    value: 1
+                    entity_acl:
+                        delete: false
+                    options:
+                        class: Oro\Bundle\UserBundle\Entity\User

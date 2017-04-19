@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
+use Oro\Bundle\LayoutBundle\DataCollector\LayoutDataCollector;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
 use Oro\Component\Layout\Layout;
@@ -21,6 +22,9 @@ class LayoutManagerTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutManager */
     private $manager;
 
+    /** @var LayoutDataCollector|\PHPUnit_Framework_MockObject_MockObject */
+    private $layoutDataCollector;
+
     protected function setUp()
     {
         $this->builder = $this->createMock(LayoutBuilderInterface::class);
@@ -36,7 +40,11 @@ class LayoutManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getLayoutFactory')
             ->willReturn($factory);
 
-        $this->manager = new LayoutManager($factoryBuilder, $this->contextHolder);
+        $this->layoutDataCollector = $this->getMockBuilder(LayoutDataCollector::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->manager = new LayoutManager($factoryBuilder, $this->contextHolder, $this->layoutDataCollector);
     }
 
     public function testGetLayout()
@@ -52,6 +60,13 @@ class LayoutManagerTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->once())
             ->method('add')
             ->with('root', null, 'root');
+
+        $this->builder->expects($this->once())
+            ->method('getNotAppliedActions')
+            ->willReturn([]);
+
+        $this->layoutDataCollector->expects($this->once())
+            ->method('setNotAppliedActions');
 
         $this->contextHolder->expects($this->once())
             ->method('setContext')
@@ -83,6 +98,13 @@ class LayoutManagerTest extends \PHPUnit_Framework_TestCase
         $this->builder->expects($this->once())
             ->method('add')
             ->with('root', null, 'root');
+
+        $this->builder->expects($this->once())
+            ->method('getNotAppliedActions')
+            ->willReturn([]);
+
+        $this->layoutDataCollector->expects($this->once())
+            ->method('setNotAppliedActions');
 
         $this->contextHolder->expects($this->once())
             ->method('setContext')

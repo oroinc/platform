@@ -10,6 +10,8 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
 /**
  * This trait contains common code that repeats in
  * the listeners used for creating indexes.
+ * @deprecated 1.1.0    IndexationListenerTrait is deprecated. Logic moved to the listener. Entities' fields to be
+ *                      updated weren't translated into an array of fields to be indexed.
  */
 trait IndexationListenerTrait
 {
@@ -32,19 +34,7 @@ trait IndexationListenerTrait
             if (!$this->mappingProvider->hasFieldsMapping($className)) {
                 continue;
             }
-
-            $entityConfig = $this->mappingProvider->getEntityConfig($className);
-
-            $indexedFields = [];
-            foreach ($entityConfig['fields'] as $fieldConfig) {
-                $indexedFields[] = $fieldConfig['name'];
-            }
-
-            $changeSet = $uow->getEntityChangeSet($entity);
-            $fieldsToReindex = array_intersect($indexedFields, array_keys($changeSet));
-            if ($fieldsToReindex) {
-                $entitiesToReindex[$hash] = $entity;
-            }
+            $entitiesToReindex[$hash] = $entity;
         }
 
         return $entitiesToReindex;

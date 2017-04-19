@@ -57,7 +57,6 @@ class CollectionType extends AbstractType
                 'by_reference'         => false,
                 'prototype'            => true,
                 'prototype_name'       => '__name__',
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'handle_primary'       => true,
                 'show_form_when_empty' => true,
                 'add_label'            => '',

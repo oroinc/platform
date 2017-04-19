@@ -55,7 +55,7 @@
 
     {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
         {% set data = data|merge({
-            'data-dialog-options': transition.frontendOptions.dialog|json_encode|raw
+            'dialog-options': transition.frontendOptions.dialog|json_encode|raw
         }) %}
     {% endif %}
 

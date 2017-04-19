@@ -20,11 +20,6 @@ class EmailBodySyncCommandTest extends WebTestCase
         ]);
     }
 
-    protected function tearDown()
-    {
-        $this->resetEmailFeature();
-    }
-
     /**
      * @dataProvider paramProvider
      *
@@ -45,7 +40,7 @@ class EmailBodySyncCommandTest extends WebTestCase
     public function testCommandOutputWithEmailFeatureDisabled()
     {
         $this->disableEmailFeature();
-        $result = $this->runCommand('oro:cron:email-body-sync', []);
+        $result = $this->runCommand('oro:cron:email-body-sync');
 
         $this->assertContains('The email feature is disabled. The command will not run.', $result);
     }
@@ -57,7 +52,7 @@ class EmailBodySyncCommandTest extends WebTestCase
     {
         return [
             'should show help' => [
-                '$expectedContent' => "Usage:\n  oro:cron:email-body-sync [options]",
+                '$expectedContent' => 'Usage: oro:cron:email-body-sync [options]',
                 '$params'          => ['--help'],
             ],
             'should show success message' => [

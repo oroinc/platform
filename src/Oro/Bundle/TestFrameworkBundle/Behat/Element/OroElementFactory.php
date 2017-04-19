@@ -13,7 +13,7 @@ class OroElementFactory implements SuiteAwareInterface
     /**
      * @var Mink
      */
-    private $mink = null;
+    private $mink;
 
     /**
      * @var SelectorsHandler
@@ -35,6 +35,9 @@ class OroElementFactory implements SuiteAwareInterface
      */
     private $selectorManipulator;
 
+    /** @var string[] */
+    private $aliases = [];
+
     /**
      * @param Mink $mink
      * @param SelectorsHandler $selectorsHandler
@@ -55,7 +58,7 @@ class OroElementFactory implements SuiteAwareInterface
      */
     public function hasElement($name)
     {
-        return array_key_exists($name, $this->configuration);
+        return null !== $this->guessElement($name);
     }
 
     /**
@@ -66,14 +69,15 @@ class OroElementFactory implements SuiteAwareInterface
      */
     public function createElement($name, NodeElement $context = null)
     {
-        if (!$this->hasElement($name)) {
+        $configName = $this->guessElement($name);
+        if (!$configName) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find element with "%s" name',
                 $name
             ));
         }
 
-        $elementConfig = $this->configuration[$name];
+        $elementConfig = $this->configuration[$configName];
 
         if ($context) {
             $elementConfig['selector'] = $this->prepend($elementConfig['selector'], $context);
@@ -83,6 +87,25 @@ class OroElementFactory implements SuiteAwareInterface
         $this->injectSuite($element);
 
         return $element;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    protected function guessElement($name)
+    {
+        if (isset($this->aliases[$name])) {
+            return $this->aliases[$name];
+        }
+        $variantsIterator = new NameVariantsIterator($name, ['', ' ']);
+        foreach ($variantsIterator as $variant) {
+            if (array_key_exists($variant, $this->configuration)) {
+                return $this->aliases[$name] = $variant;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -121,14 +144,16 @@ class OroElementFactory implements SuiteAwareInterface
             );
         }
 
-        if (!$this->hasElement($name)) {
+        $configName = $this->guessElement($name);
+
+        if (!$configName) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find element with "%s" name',
                 $name
             ));
         }
 
-        $elementClass = $this->configuration[$name]['class'];
+        $elementClass = $this->configuration[$configName]['class'];
 
         $element = new $elementClass(
             $this->mink->getSession(),
@@ -149,16 +174,18 @@ class OroElementFactory implements SuiteAwareInterface
      */
     public function findElementContains($name, $text, Element $context = null)
     {
-        if (!$this->hasElement($name)) {
+        $configName = $this->guessElement($name);
+
+        if (!$configName) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find element with "%s" name',
                 $name
             ));
         }
 
-        $elementClass = $this->configuration[$name]['class'];
+        $elementClass = $this->configuration[$configName]['class'];
         $elementSelector = $this->selectorManipulator->addContainsSuffix(
-            $this->configuration[$name]['selector'],
+            $this->configuration[$configName]['selector'],
             $text
         );
 
@@ -170,9 +197,40 @@ class OroElementFactory implements SuiteAwareInterface
 
         $this
             ->injectSuite($element)
-            ->injectOptions($element, $this->configuration[$name]);
+            ->injectOptions($element, $this->configuration[$configName]);
 
         return $element;
+    }
+
+    /**
+     * @param string $name
+     * @param NodeElement|null $context
+     * @return Element[]
+     */
+    public function findAllElements($name, NodeElement $context = null)
+    {
+        $configName = $this->guessElement($name);
+
+        if (!$configName) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not find element with "%s" name',
+                $name
+            ));
+        }
+
+        $elementSelector = $this->configuration[$configName]['selector'];
+        if ($context) {
+            $elementSelector = $this->prepend($elementSelector, $context);
+        }
+
+        $elements = $this->mink->getSession()->getPage()->findAll(
+            $elementSelector['type'],
+            $elementSelector['locator']
+        );
+
+        return array_map(function (NodeElement $element) use ($configName) {
+            return $this->wrapElement($configName, $element);
+        }, $elements);
     }
 
     /**

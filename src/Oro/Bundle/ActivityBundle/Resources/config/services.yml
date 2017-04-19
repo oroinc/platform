@@ -25,6 +25,7 @@ services:
             - '@oro_entity_config.provider.entity'
             - '@oro_entity_config.provider.extend'
             - '@oro_entity_extend.association_manager'
+            - '@oro_featuretoggle.checker.feature_checker'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
 
@@ -73,6 +74,8 @@ services:
             - '@oro_entity.entity_provider'
             - '@oro_entity_config.provider.grid'
             - '@oro_security.security_facade'
+            - '@oro_activity.manager'
+            - '@oro_datagrid.multi_grid_provider'
 
     oro_activity.listener.context_grid:
         class: Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
@@ -202,7 +205,7 @@ services:
             - '@oro_entity.entity_alias_resolver'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
-            - '@translator'
+            - '@oro_featuretoggle.checker.feature_checker'
         calls:
             - [setEventDispatcher, ['@event_dispatcher']]
 

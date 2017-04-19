@@ -2,16 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Symfony\Component\Routing\Route;
-
-use Doctrine\Common\Persistence\ObjectManager;
-
+use Knp\Menu\ItemInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\NavigationBundle\Entity\Title;
-use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
-use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
+
+use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -33,11 +29,9 @@ class TitleService implements TitleServiceInterface
     private $shortTemplate;
 
     /**
-     * Title data readers
-     *
-     * @var array
+     * @var TitleReaderRegistry
      */
-    private $readers = [];
+    private $titleReaderRegistry;
 
     /**
      * Current title template params
@@ -61,19 +55,9 @@ class TitleService implements TitleServiceInterface
     private $prefix;
 
     /**
-     * @var TitleProvider
-     */
-    private $titleProvider;
-
-    /**
      * @var TitleTranslator
      */
     private $titleTranslator;
-
-    /**
-     * @var ObjectManager
-     */
-    private $em;
 
     /**
      * @var ServiceLink
@@ -86,51 +70,27 @@ class TitleService implements TitleServiceInterface
     protected $userConfigManager;
 
     /**
-     * @param AnnotationsReader $reader
-     * @param ConfigReader $configReader
-     * @param TitleTranslator $titleTranslator
-     * @param ObjectManager $em
-     * @param $userConfigManager
-     * @param ServiceLink $breadcrumbManagerLink
-     * @param TitleProvider $titleProvider
+     * @param TitleReaderRegistry $titleReaderRegistry
+     * @param TitleTranslator     $titleTranslator
+     * @param ConfigManager       $userConfigManager
+     * @param ServiceLink         $breadcrumbManagerLink
      */
     public function __construct(
-        AnnotationsReader $reader,
-        ConfigReader $configReader,
+        TitleReaderRegistry $titleReaderRegistry,
         TitleTranslator $titleTranslator,
-        ObjectManager $em,
-        $userConfigManager,
-        ServiceLink $breadcrumbManagerLink,
-        TitleProvider $titleProvider
+        ConfigManager $userConfigManager,
+        ServiceLink $breadcrumbManagerLink
     ) {
-        $this->readers = [$reader, $configReader];
+        $this->titleReaderRegistry = $titleReaderRegistry;
         $this->titleTranslator = $titleTranslator;
-        $this->em = $em;
         $this->userConfigManager = $userConfigManager;
         $this->breadcrumbManagerLink = $breadcrumbManagerLink;
-        $this->titleProvider = $titleProvider;
     }
 
     /**
-     * @param BreadcrumbManagerInterface $breadcrumbManager
+     * {@inheritdoc}
      *
-     * @deprecated since 1.8 will be moved to constructor
-     */
-    public function setBreadcrumbManager(BreadcrumbManagerInterface $breadcrumbManager)
-    {
-        $this->breadcrumbManager = $breadcrumbManager;
-    }
-
-    /**
-     * Return rendered translated title
-     *
-     * @param array  $params
-     * @param string $title
-     * @param string $prefix
-     * @param string $suffix
-     * @param bool   $isJSON
-     * @param bool   $isShort
-     * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function render(
         $params = [],
@@ -143,6 +103,7 @@ class TitleService implements TitleServiceInterface
         if (null !== $title && $isJSON) {
             try {
                 $data = $this->jsonDecode($title);
+                $this->checkRenderParams($data, $isShort);
                 $params = $data['params'];
                 if ($isShort) {
                     $title = $data['short_template'];
@@ -187,10 +148,7 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * Set properties from array
-     *
-     * @param array $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function setData(array $values)
     {
@@ -303,147 +261,120 @@ class TitleService implements TitleServiceInterface
      *
      * @param array $params
      * @return $this
+     * @throws \InvalidArgumentException
      */
     public function setParams(array $params)
     {
+        $this->validateParams($params);
+
         $this->params = $params;
 
         return $this;
     }
 
     /**
-     * Load title template from database, fallback to config values
-     *
-     * @param string $route
+     * {@inheritdoc}
      */
-    public function loadByRoute($route)
+    public function loadByRoute($route, $menuName = null)
     {
-        $templates = $this->titleProvider->getTitleTemplates($route);
-        if (!empty($templates)) {
-            $this->setTemplate($templates['title']);
-            $this->setShortTemplate($templates['short_title']);
+        $title = $this->titleReaderRegistry->getTitleByRoute($route);
+
+        $this->setTemplate($this->createTitle($route, $title, $menuName));
+        $this->setShortTemplate($this->getShortTitle($route, $title, $menuName));
+
+        return $this;
+    }
+
+    /**
+     * Create title template for current route and menu name
+     *
+     * @param string      $route
+     * @param string      $title
+     * @param string|null $menuName
+     *
+     * @return string
+     */
+    public function createTitle($route, $title, $menuName = null)
+    {
+        $titleData = $this->mergeTitleWithBreadcrumbLabels($route, $title, $menuName);
+
+        $globalTitleSuffix = $this->userConfigManager->get('oro_navigation.title_suffix');
+        if ($globalTitleSuffix) {
+            $titleData[] = $globalTitleSuffix;
+        }
+
+        return implode(' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ', $titleData);
+    }
+
+    /**
+     * @param array $data
+     * @param bool $isShort
+     *
+     * @throws \RuntimeException
+     */
+    protected function checkRenderParams(array $data, $isShort)
+    {
+        if (!isset($data['params'])) {
+            throw new \RuntimeException('Missing key "params" in JSON title.');
+        }
+
+        if ($isShort) {
+            if (!array_key_exists('short_template', $data)) {
+                throw new \RuntimeException('Missing key "short_template" in JSON title.');
+            }
+        } elseif (!array_key_exists('template', $data)) {
+            throw new \RuntimeException('Missing key "template" in JSON title.');
         }
     }
 
     /**
-     * Return stored titles repository
+     * @param string      $route
+     * @param string|null $menuName
      *
-     * @return \Doctrine\ORM\EntityRepository
-     */
-    public function getStoredTitlesRepository()
-    {
-        return $this->em->getRepository('Oro\Bundle\NavigationBundle\Entity\Title');
-    }
-
-    /**
-     * Updates title index
-     *
-     * @param array $routes
-     */
-    public function update($routes)
-    {
-        $data = $routes;
-
-        foreach ($this->readers as $reader) {
-            /** @var $reader  \Oro\Bundle\NavigationBundle\Title\TitleReader\ReaderInterface */
-            $data = array_merge($data, $reader->getData($routes));
-        }
-
-        $dbData = $this->getStoredTitlesRepository()->findAll();
-
-        /** @var $entity Title */
-        foreach ($dbData as $entity) {
-            if (!array_key_exists($entity->getRoute(), $data)) {
-                // remove not existing entries
-                $this->em->remove($entity);
-
-                continue;
-            }
-
-            $route = $entity->getRoute();
-            $title = '';
-
-            if (!$data[$route] instanceof Route) {
-                $title = $data[$route];
-            }
-
-            // update existing system titles
-            if ($entity->getIsSystem()) {
-                $entity->setShortTitle($this->getShortTitle($title, $route));
-                $title = $this->createTitle($route, $title);
-                if (!$title) {
-                    $title = '';
-                }
-                $entity->setTitle($title);
-                $this->em->persist($entity);
-            }
-
-            unset($data[$route]);
-        }
-
-        // create title items for new routes
-        foreach ($data as $route => $title) {
-            if ($fullTitle = $this->createTitle($route, $title)) {
-                $entity = new Title();
-                $entity->setShortTitle($this->getShortTitle($title, $route));
-                $entity->setTitle($fullTitle);
-                $entity->setRoute($route);
-                $entity->setIsSystem(true);
-
-                $this->em->persist($entity);
-            }
-        }
-
-        $this->em->flush();
-    }
-
-    protected function createTitle($route, $title)
-    {
-        if (!($title instanceof Route)) {
-            $titleData = [];
-
-            if ($title) {
-                $titleData[] = $title;
-            }
-
-            $breadcrumbLabels = $this->getBreadcrumbs($route);
-            if (count($breadcrumbLabels)) {
-                $titleData = array_merge($titleData, $breadcrumbLabels);
-            }
-
-            if ($globalTitleSuffix = $this->userConfigManager->get('oro_navigation.title_suffix')) {
-                $titleData[] = $globalTitleSuffix;
-            }
-
-            return implode(' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ', $titleData);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $route
      * @return array
      */
-    protected function getBreadcrumbs($route)
+    protected function getBreadcrumbLabels($route, $menuName = null)
     {
-        return $this->breadcrumbManagerLink->getService()->getBreadcrumbLabels(
-            $this->userConfigManager->get('oro_navigation.breadcrumb_menu'),
-            $route
-        );
+        if (!$menuName) {
+            $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
+        }
+
+        /** @var BreadcrumbManagerInterface $breadcrumbManager */
+        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
+        return $breadcrumbManager->getBreadcrumbLabels($menuName, $route);
+    }
+
+    /**
+     * @param string|null $menuName
+     * @param bool $isInverse
+     * @param string|null $route
+     *
+     * @return array
+     */
+    protected function getBreadcrumbs($menuName = null, $isInverse = true, $route = null)
+    {
+        if (!$menuName) {
+            $menuName = $this->userConfigManager->get('oro_navigation.breadcrumb_menu');
+        }
+
+        /** @var BreadcrumbManagerInterface $breadcrumbManager */
+        $breadcrumbManager = $this->breadcrumbManagerLink->getService();
+        return $breadcrumbManager->getBreadcrumbs($menuName, $isInverse, $route);
     }
 
     /**
      * Get short title
      *
-     * @param string $title
-     * @param string $route
+     * @param string      $route
+     * @param string      $title
+     * @param string|null $menuName
+     *
      * @return string
      */
-    protected function getShortTitle($title, $route)
+    private function getShortTitle($route, $title, $menuName = null)
     {
         if (!$title) {
-            $breadcrumbs = $this->getBreadcrumbs($route);
+            $breadcrumbs = $this->getBreadcrumbLabels($route, $menuName);
             if (count($breadcrumbs)) {
                 $title = $breadcrumbs[0];
             }
@@ -453,16 +384,19 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
-     * Return serialized title data
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getSerialized()
     {
+        $params = [];
+        foreach ($this->getParams() as $paramName => $paramValue) {
+            //Explicitly case object to string because json_encode can not serialize it correct
+            $params[$paramName] = is_object($paramValue) ? (string)$paramValue : $paramValue;
+        }
         $data = [
             'template'       => $this->getTemplate(),
             'short_template' => $this->getShortTemplate(),
-            'params'         => $this->getParams()
+            'params'         => $params
         ];
         if ($this->prefix) {
             $data['prefix'] = $this->prefix;
@@ -510,5 +444,55 @@ class TitleService implements TitleServiceInterface
         }
 
         return $data;
+    }
+
+    /**
+     * @param string $route
+     * @param string $title
+     * @param string $menuName
+     *
+     * @return array
+     */
+    protected function mergeTitleWithBreadcrumbLabels($route, $title, $menuName)
+    {
+        $titleData = [];
+        if ($title) {
+            $titleData[] = $title;
+        }
+        $breadcrumbLabels = $this->getBreadcrumbLabels($route, $menuName);
+        if (count($breadcrumbLabels)) {
+            $breadcrumbs = $this->getBreadcrumbs($menuName, false, $route);
+            if (count($breadcrumbs)) {
+                /** @var ItemInterface $menuItem */
+                $menuItem = $breadcrumbs[0]['item'];
+                $routes = $menuItem->getExtra('routes', []);
+                if ($routes === [$route] && $title) {
+                    unset($breadcrumbLabels[0]);
+                }
+            }
+
+            $titleData = array_merge($titleData, $breadcrumbLabels);
+        }
+
+        return $titleData;
+    }
+
+    /**
+     * @param array $params
+     * @throws \InvalidArgumentException
+     */
+    private function validateParams(array $params)
+    {
+        foreach ($params as $key => $value) {
+            if (is_object($value) && !method_exists($value, '__toString')) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Object of type %s used for "%s" title param don\'t have __toString() method.',
+                        get_class($value),
+                        $key
+                    )
+                );
+            }
+        }
     }
 }

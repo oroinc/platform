@@ -77,7 +77,7 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv' => true]);
         $this->assertNotEmpty($result);
 
-        $this->assertContains("All commands scheduled\n", $result);
+        $this->assertContains("All commands scheduled", $result);
     }
 
     /**

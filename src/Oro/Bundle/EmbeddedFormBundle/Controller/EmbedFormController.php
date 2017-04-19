@@ -24,6 +24,10 @@ class EmbedFormController extends Controller
 {
     /**
      * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="[-\d\w]+"})
+     *
+     * @param EmbeddedForm $formEntity
+     * @param Request $request
+     * @return Response
      */
     public function formAction(EmbeddedForm $formEntity, Request $request)
     {
@@ -111,6 +115,10 @@ class EmbedFormController extends Controller
 
     /**
      * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
+     *
+     * @param EmbeddedForm $formEntity
+     * @param Request $request
+     * @return Response
      */
     public function formSuccessAction(EmbeddedForm $formEntity, Request $request)
     {

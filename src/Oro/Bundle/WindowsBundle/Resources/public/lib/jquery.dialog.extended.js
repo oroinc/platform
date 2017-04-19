@@ -307,7 +307,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _,
         },
 
         _size: function() {
-            var cssProperties = _.pick(this.options, ['width', 'height', 'minWidth']);
+            var cssProperties = _.pick(this.options, ['width', 'height', 'maxWidth', 'minWidth']);
             this.uiDialog.css(cssProperties);
             if ( this.uiDialog.is( ":data(ui-resizable)" ) ) {
                 this.uiDialog.resizable( "option", "minHeight", this._minHeight() );

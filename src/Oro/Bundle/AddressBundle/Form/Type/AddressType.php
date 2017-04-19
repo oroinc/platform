@@ -64,7 +64,6 @@ class AddressType extends AbstractType
             array(
                 'data_class' => 'Oro\Bundle\AddressBundle\Entity\Address',
                 'intention' => 'address',
-                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'single_form' => true,
                 'region_route' => 'oro_api_country_get_regions',
                 'validation_groups' => [Constraint::DEFAULT_GROUP, self::ABSTRACT_ADDRESS_GROUP],

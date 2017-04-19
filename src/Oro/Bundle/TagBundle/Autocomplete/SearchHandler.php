@@ -62,9 +62,6 @@ class SearchHandler extends BaseSearchHandler
      */
     public function convertItem($item)
     {
-        $isGranted = $this->securityFacade->isGranted('oro_tag_unassign_global');
-        $isOwner   = $this->propertyAccessor->getValue($item, 'owner');
-
         return [
             'id'     => json_encode(
                 [
@@ -72,8 +69,7 @@ class SearchHandler extends BaseSearchHandler
                     'name' => $this->propertyAccessor->getValue($item, 'name'),
                 ]
             ),
-            'name'   => $this->propertyAccessor->getValue($item, 'name'),
-            'locked' => !($isGranted || $isOwner)
+            'name'   => $this->propertyAccessor->getValue($item, 'name')
         ];
     }
 }

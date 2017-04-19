@@ -66,6 +66,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
 
         $children->vars = [
             'choices' => [
+                new ChoiceView([], 'Value2', 'Locale Label2'),
                 new ChoiceView([], 'Value', 'Locale Label'),
             ],
         ];
@@ -74,6 +75,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
             ->method('formatLocale')
             ->will($this->returnValueMap([
                 ['Locale Label', 'Formatted Locale Label'],
+                ['Locale Label2', 'Formatted Locale Label2'],
             ]));
 
         $this->type->finishView($view, $this->createMock(FormInterface::class), []);
@@ -82,6 +84,7 @@ class LanguageFilterTypeTest extends FormIntegrationTestCase
             [
                 'choices' => [
                     new ChoiceView([], 'Value', 'Formatted Locale Label'),
+                    new ChoiceView([], 'Value2', 'Formatted Locale Label2'),
                 ],
             ],
             $children->vars

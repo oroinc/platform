@@ -50,10 +50,36 @@ class SaveEntityTest extends FormProcessorTestCase
         $user = $this->getMockBuilder(User::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $plainPassword = 'some_password';
 
+        $user->expects(self::once())
+            ->method('setPlainPassword')
+            ->with($plainPassword);
+
+        $this->userManager->expects(self::once())
+            ->method('generatePassword')
+            ->willReturn($plainPassword);
         $this->userManager->expects(self::once())
             ->method('updateUser')
             ->with(self::identicalTo($user));
+
+        $this->context->setResult($user);
+        $this->processor->process($this->context);
+    }
+
+    public function testPasswordAlreadySet()
+    {
+        $user = $this->getMockBuilder(User::class)
+            ->getMock();
+        $user->expects(self::once())
+            ->method('getPassword')
+            ->willReturn('test_password');
+
+        $user->expects(self::never())
+            ->method('setPlainPassword');
+
+        $this->userManager->expects(self::never())
+            ->method('generatePassword');
 
         $this->context->setResult($user);
         $this->processor->process($this->context);

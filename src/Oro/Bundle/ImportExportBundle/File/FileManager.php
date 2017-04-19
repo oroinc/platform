@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\File;
 
+use Gaufrette\Adapter;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream;
 
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
-use Symfony\Component\HttpFoundation\File\File as SymfonyComponentFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileManager
 {
@@ -26,17 +27,71 @@ class FileManager
     /**
      * Saves the given file in a temporary directory and returns its name
      *
-     * @param SymfonyComponentFile $file
+     * @param UploadedFile $file
      *
      * @return string
      */
-    public function saveImportingFile(SymfonyComponentFile $file)
+    public function saveImportingFile(UploadedFile $file)
     {
-        $this->normalizeLineEndings($file->getRealPath());
         $tmpFileName = self::generateUniqueFileName($file->getClientOriginalExtension());
         $this->saveFileToStorage($file, $tmpFileName);
 
         return $tmpFileName;
+    }
+
+    /**
+     * @param File|string $file
+     * @return null|int
+     */
+    public function getModifyDataFile($file)
+    {
+        if (! $file instanceof File) {
+            $file = $this->filesystem->get($file);
+        }
+
+        if (! $file instanceof File) {
+            return null;
+        }
+
+        $file->getMtime();
+    }
+
+
+    /**
+     * @return Adapter
+     */
+    public function getAdapter()
+    {
+        return $this->filesystem->getAdapter();
+    }
+
+    /**
+     * @param \DateTime $from
+     * @param \DateTime $to
+     * @return array [fileName => File]
+     */
+    public function getFilesByPeriod(\DateTime $from = null, \DateTime $to = null)
+    {
+        $files = [];
+
+        foreach ($this->filesystem->keys() as $fileName) {
+            if (($file = $this->filesystem->get($fileName)) instanceof File) {
+                $mtime = $file->getMtime();
+                $mDateTime = new \DateTime();
+                $mDateTime->setTimestamp($mtime);
+
+                if ($from && $mDateTime < $from) {
+                    continue;
+                }
+                if ($to && $mDateTime > $to) {
+                    continue;
+                }
+
+                $files[$fileName] = $file;
+            }
+        }
+
+        return $files;
     }
 
     /**
@@ -60,13 +115,21 @@ class FileManager
     }
 
     /**
+     * @return Filesystem
+     */
+    public function getFileSystem()
+    {
+        return $this->filesystem;
+    }
+
+    /**
      * @param string $fileName
      * @return string
      */
     public function writeToTmpLocalStorage($fileName)
     {
         $content = $this->filesystem->read($fileName);
-        $pathFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName;
+        $pathFile = self::generateTmpFilePath($fileName);
         @file_put_contents($pathFile, $content);
 
         return $pathFile;
@@ -130,49 +193,26 @@ class FileManager
     }
 
     /**
-     * @param string $fileName
+     * @param string|File $file
      */
-    public function deleteFile($fileName)
+    public function deleteFile($file)
     {
-        if ($fileName && $this->filesystem->has($fileName)) {
-            $this->filesystem->delete($fileName);
+        if ($file instanceof File) {
+            $file = $file->getKey();
+        }
+
+        if ($file && $this->filesystem->has($file)) {
+            $this->filesystem->delete($file);
         }
     }
 
     /**
-     * Convert the ending-lines CR and LF in CRLF.
+     * @param $fileName
      *
-     * @param string $filename Name of the file
+     * @return bool
      */
-    protected function normalizeLineEndings($filename)
+    public function isFileExist($fileName)
     {
-        //Load the content of the file into a string
-        $fileContents = file_get_contents($filename);
-
-        if (!$fileContents) {
-            return;
-        }
-
-        //Replace all the CRLF ending-lines by something uncommon
-        $dontReplaceThisString = "\r\n";
-        $specialString = "!£#!Dont_wanna_replace_that!#£!";
-        $fileContents = str_replace($dontReplaceThisString, $specialString, $fileContents);
-
-        //Convert the CR ending-lines into CRLF ones
-        $fileContents = str_replace("\r", "\r\n", $fileContents);
-
-        //Replace all the CRLF ending-lines by something uncommon
-        $fileContents = str_replace($dontReplaceThisString, $specialString, $fileContents);
-
-        //Convert the LF ending-lines into CRLF ones
-        $fileContents = str_replace("\n", "\r\n", $fileContents);
-
-        //Restore the CRLF ending-lines
-        $fileContents = str_replace($specialString, $dontReplaceThisString, $fileContents);
-
-        //Update the file contents
-        file_put_contents($filename, $fileContents);
-
-        return;
+        return $this->filesystem->has($fileName);
     }
 }

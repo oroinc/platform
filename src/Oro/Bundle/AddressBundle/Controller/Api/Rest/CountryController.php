@@ -26,7 +26,6 @@ class CountryController extends FOSRestController
      *      description="Get countries",
      *      resource=true
      * )
-     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function cgetAction()
@@ -47,7 +46,6 @@ class CountryController extends FOSRestController
      *      description="Get country",
      *      resource=true
      * )
-     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function getAction($id)

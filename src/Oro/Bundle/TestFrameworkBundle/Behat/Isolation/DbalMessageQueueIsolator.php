@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
@@ -45,11 +46,11 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $command = sprintf(
-            'php ./console oro:message-queue:consume --env=%s %s',
-            $this->kernel->getEnvironment(),
-            ''
+            'php %s/console oro:message-queue:consume --env=%s',
+            realpath($this->kernel->getRootDir()),
+            $this->kernel->getEnvironment()
         );
-        $this->process = new Process($command, $this->kernel->getRootDir());
+        $this->process = new Process($command);
         $this->process->start(function ($type, $buffer) {
             if (Process::ERR === $type) {
                 echo 'MessageQueueConsumer ERR > '.$buffer;
@@ -65,7 +66,7 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
         if (self::WINDOWS_OS === $this->getOs()) {
             $killCommand = sprintf('TASKKILL /PID %d /T /F', $this->process->getPid());
         } else {
-            $killCommand = 'pkill -f oro:message-queue:consume';
+            $killCommand = sprintf('pkill -f "%s/console oro:message-queue:consume"', $this->kernel->getRootDir());
         }
 
         // Process::stop() might not work as expected
@@ -116,6 +117,14 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
     /**
      * {@inheritdoc}
      */
+    public function getTag()
+    {
+        return 'message-queue';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getApplicableOs()
     {
         return [
@@ -133,7 +142,14 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
         $time = $timeLimit;
         /** @var Connection $connection */
         $connection = $this->kernel->getContainer()->get('doctrine')->getManager()->getConnection();
-        $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
+
+        try {
+            $result = $connection->executeQuery("SELECT * FROM oro_message_queue")->rowCount();
+        } catch (TableNotFoundException $e) {
+            // Schema is not initialized yet
+            return;
+        }
+
 
         while (0 !== $result) {
             if ($time <= 0) {
@@ -144,5 +160,13 @@ class DbalMessageQueueIsolator extends AbstractOsRelatedIsolator implements
             usleep(250000);
             $time -= 0.25;
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getProcess()
+    {
+        return $this->process;
     }
 }

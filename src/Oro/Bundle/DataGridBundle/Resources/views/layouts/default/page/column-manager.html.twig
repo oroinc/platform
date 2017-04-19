@@ -1,45 +1,63 @@
 {% block _commerce_column_manager_widget %}
-    <script type="text/template" id="commerce-column-manager-tpl">
+    <script type="text/template" id="frontend-column-manager-tpl">
         <div class="column-manager">
-            <div class="column-manager__title"><%= _.__('oro_frontend.column_manager.title') %></div>
-            <span class="close">×</span>
+            <div class="column-manager__header">
+                <div class="column-manager__title"><%= _.__('oro_frontend.column_manager.title') %></div>
+                <span class="close">×</span>
+            </div>
             <div class="column-manager__actions">
                 <a href="#" data-role="column-manager-select-all"><%= _.__('oro.datagrid.column_manager.select_all')%></a>
                 <span class="column-manager__separator">|</span>
                 <a href="#" data-role="column-manager-unselect-all"><%= _.__('oro.datagrid.column_manager.deselect_all')%></a>
             </div>
-            <div class="column-manager-table"></div>
-            <div class="column-manager-reset">
-                <span class="link" data-role="column-manager-reset">
+            <div class="column-manager-table" data-role="column-manager-table"></div>
+            <div class="column-manager__footer" data-role="column-manager-footer">
+                <a href="#" class="link" data-role="column-manager-reset">
                     <i class="fa fa-refresh"></i>
-                    <a href="#"><%= _.__('oro.datagrid.column_manager.reset')%></a>
-                </span>
+                    <span><%= _.__('oro.datagrid.column_manager.reset')%></span>
+                </a>
             </div>
         </div>
     </script>
 {% endblock %}
 
+{% block _commerce_column_manager_collection_widget %}
+    <script type="text/template" id="frontend-column-manager-collection-tpl">
+        <div class="table-wrapper" data-role="column-manager-table-wrapper">
+            <table class="table">
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="column-manager-no-columns"><span><%= _.__('oro.datagrid.column_manager.empty_list') %></span></div>
+    </script>
+{% endblock %}
+
 {% block _commerce_column_manager_item_widget %}
-<script type="text/template" id="commerce-column-manager-item-tpl">
+<script type="text/template" id="frontend-column-manager-item-tpl">
     <td class="column-manager__item">
         <div class="column-manager__container">
             <span class="column-manager__handle handle"></span>
-            <label for="column-<%= cid  %>"
-                   data-checkbox
-                   class="custom-checkbox ">
-                <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
-                <% if (disabledVisibilityChange) { %> disabled <% } %>
-                <% if (renderable) { %> checked <% } %>
-                    class="custom-checkbox__input"
-                />
-                <span class="custom-checkbox__icon"></span>
-                <span class="custom-checkbox__text"><%= label %></span>
-            </label>
+            <div class="column-manager__label">
+                <label data-checkbox
+                       class="custom-checkbox ">
+                    <input type="checkbox" data-role="renderable"
+                    <% if (disabledVisibilityChange) { %> disabled <% } %>
+                    <% if (renderable) { %> checked <% } %>
+                        class="custom-checkbox__input"
+                    />
+                    <span class="custom-checkbox__icon"></span>
+                    <span class="custom-checkbox__text"><%= label %></span>
+                </label>
+            </div>
 
-            <% if (_.isMobile()) { %>
-                <span class="btn move-up" data-role="moveUp" title="Move column up"><i class="fa-chevron-up"></i></span>
-                <span class="btn move-down" data-role="moveDown" title="Move column down"><i class="fa-chevron-down"></i></span>
-            <% } %>
+            <div class="column-manager__move">
+                <span class="column-manager__move-btn column-manager__move-up" data-role="moveUp" title="Move column up">
+                    <i class="fa-long-arrow-up"></i>
+                </span>
+                <span class="column-manager__move-btn column-manager__move-down" data-role="moveDown" title="Move column down">
+                    <i class="fa-long-arrow-down"></i>
+                </span>
+            </div>
         </div>
     </td>
 </script>

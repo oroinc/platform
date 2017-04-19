@@ -2,13 +2,3 @@ oro_integration_bundle:
     resource:     "@OroIntegrationBundle/Controller"
     type:         annotation
     prefix:       /
-
-oro_integration_bundle_api:
-    resource: "@OroIntegrationBundle/Controller/Api/Rest/IntegrationController.php"
-    type:     rest
-    prefix:   api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version: latest

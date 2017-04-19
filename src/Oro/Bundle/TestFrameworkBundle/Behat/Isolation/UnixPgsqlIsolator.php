@@ -123,6 +123,12 @@ final class UnixPgsqlIsolator extends AbstractOsRelatedIsolator implements Isola
     }
 
     /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
+    }
+
+    /** {@inheritdoc} */
     protected function getApplicableOs()
     {
         return [

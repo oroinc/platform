@@ -1,0 +1,11 @@
+oro_behat_extension:
+  elements:
+    Localization Form:
+      selector: 'form[name="oro_localization"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Name: 'oro_localization[name]'
+          Title: 'oro_localization[titles][values][default]'
+          Language: 'oro_localization[language]'
+          Formatting: 'oro_localization[formattingCode]'

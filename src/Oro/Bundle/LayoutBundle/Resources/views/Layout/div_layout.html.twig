@@ -127,7 +127,10 @@
 
 {% block page_title_widget -%}
     {% spaceless %}
-        <h3>{{ value|block_text(translation_domain) }}</h3>
+        {% set value = value|block_text(translation_domain) %}
+        {% if value|length %}
+            {{ value }}
+        {% endif %}
     {% endspaceless %}
 {%- endblock %}
 
@@ -356,6 +359,12 @@
     {% if type is defined %}
         {% set attr = attr|merge({
             type: type
+        }) %}
+    {% endif %}
+
+    {% if hreflang is defined %}
+        {% set attr = attr|merge({
+        hreflang: hreflang
         }) %}
     {% endif %}
 

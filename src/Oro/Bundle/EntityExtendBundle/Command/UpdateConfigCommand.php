@@ -54,11 +54,13 @@ class UpdateConfigCommand extends ContainerAwareCommand
         $output->writeln($this->getDescription());
 
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->updateConfig(
-            $this->getFilter($input),
-            $input->getOption('update-custom'),
-            $input->getOption('attributes-only')
-        );
+        //Force provider to return configs for attribute extend entities if argument is passed
+        if ($input->getOption('attributes-only')) {
+            $this->getContainer()
+                ->get('oro_entity_config.provider.extend_entity_config_provider')
+                ->enableAttributesOnly();
+        }
+        $dumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
     }
 
     /**

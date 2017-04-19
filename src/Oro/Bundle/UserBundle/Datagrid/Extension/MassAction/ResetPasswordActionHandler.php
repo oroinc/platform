@@ -99,9 +99,9 @@ class ResetPasswordActionHandler implements MassActionHandlerInterface
     protected function generateResponse($count)
     {
         if ($count > 0) {
-            return new MassActionResponse(true, $this->translator->trans(self::SUCCESS_MESSAGE), ['count' => $count]);
+            return new MassActionResponse(true, $this->translator->trans(self::SUCCESS_MESSAGE, ['%count%' => $count]));
         }
 
-        return new MassActionResponse(false, $this->translator->trans(self::ERROR_MESSAGE), ['count' => $count]);
+        return new MassActionResponse(false, $this->translator->trans(self::ERROR_MESSAGE, ['%count%' => $count]));
     }
 }

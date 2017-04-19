@@ -2,6 +2,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
 class SegmentTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +32,7 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->entity->getUpdatedAt());
         $this->assertNull($this->entity->getLastRun());
         $this->assertNull($this->entity->getOrganization());
+        $this->assertNull($this->entity->getRecordsLimit());
 
         $testData = uniqid('name');
         $this->entity->setName($testData);
@@ -71,6 +73,10 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $testData = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
         $this->entity->setOrganization($testData);
         $this->assertSame($testData, $this->entity->getOrganization());
+
+        $testData = 10;
+        $this->entity->setRecordsLimit($testData);
+        $this->assertSame($testData, $this->entity->getRecordsLimit());
     }
 
     public function testLifecycleCallbacks()
@@ -86,5 +92,24 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $segment->doUpdate();
         $this->assertEmpty($segment->getCreatedAt());
         $this->assertInstanceOf('\DateTime', $segment->getUpdatedAt());
+    }
+
+    public function testIsDynamicFalse()
+    {
+        $segmentType = new SegmentType(SegmentType::TYPE_STATIC);
+        $segment = new Segment();
+
+        $this->assertFalse($segment->isDynamic());
+        $segment->setType($segmentType);
+        $this->assertFalse($segment->isDynamic());
+    }
+
+    public function testIsDynamicTrue()
+    {
+        $segmentType = new SegmentType(SegmentType::TYPE_DYNAMIC);
+        $segment = new Segment();
+        $segment->setType($segmentType);
+
+        $this->assertTrue($segment->isDynamic());
     }
 }

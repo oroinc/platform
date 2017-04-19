@@ -8,14 +8,14 @@
     {% set classOfBar = 'label-info'%}
 {% elseif job.status is constant('STATUS_CANCELLED', job) %}
     {% set class = 'label-inverse' %}
-{% elseif job.jobProgress == 100 %}
+{% elseif job.jobProgress == 1 %}
     {% set classOfBar = 'label-success'%}
 {% else %}
     {% set classOfBar = '' %}
 {% endif %}
 
 <div class="progress job-progress">
-    <div class="label {{ classOfBar }}" style="width:{{ job.jobProgress }}%;">
-        <span> {{ job.jobProgress }}%</span>
+    <div class="label {{ classOfBar }}" style="width:{{ job.jobProgress * 100 }}%;">
+        <span> {{ job.jobProgress * 100 }}%</span>
     </div>
 </div>

@@ -68,6 +68,9 @@ class OroEncodedPasswordType extends AbstractType
 
         $resolver->setDefaults([
             'encode' => true,
+            'attr' => [
+                'autocomplete' => 'new-password'
+            ]
         ]);
     }
 

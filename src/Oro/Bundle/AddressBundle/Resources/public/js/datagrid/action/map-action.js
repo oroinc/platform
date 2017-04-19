@@ -39,11 +39,16 @@ define(function(require) {
             if (!this.subviews.length) {
                 return;
             }
+            this.createPopover();
+        },
 
+        createPopover: function() {
             var $popoverTrigger = this.subviews[0].$el;
-
-            $popoverTrigger.popover({
-                placement: 'left',
+            var popoverConfig = _.extend({
+                placement: {
+                    placement: 'left',
+                    collision: 'flip'
+                },
                 hideOnScroll: false,
                 container: 'body',
                 animation: false,
@@ -51,7 +56,9 @@ define(function(require) {
                 closeButton: true,
                 class: 'map-popover',
                 content: this.$mapContainerFrame
-            }).on('shown.bs.popover', _.bind(function() {
+            }, this.popoverTpl ? {template: this.popoverTpl} : {});
+
+            $popoverTrigger.popover(popoverConfig).on('shown.bs.popover', _.bind(function() {
                 this.mapView.updateMap(this.getAddress(), this.model.get('label'));
 
                 $(document).on('mouseup', _.bind(function(e) {

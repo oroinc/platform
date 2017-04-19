@@ -58,7 +58,7 @@
                 {% for error in errors %}
                     {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error.message : error.message %}
                 {% endfor %}
-                <span class="validation-failed">{{ combinedError }}</span>
+                <span class="validation-failed"><span><span>{{ combinedError }}</span></span></span>
             {% else %}
                 {{ parent() }}
             {% endif %}

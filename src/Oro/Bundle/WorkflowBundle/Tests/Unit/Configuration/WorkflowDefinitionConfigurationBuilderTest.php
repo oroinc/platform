@@ -17,6 +17,7 @@ use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -416,7 +417,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $transitions = [];
         if (!empty($configuration[WorkflowConfiguration::NODE_TRANSITIONS])) {
             foreach ($configuration[WorkflowConfiguration::NODE_TRANSITIONS] as $transitionData) {
-                $transition = new Transition();
+                $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
                 $transition
                     ->setStart($this->getOption($transitionData, 'is_start', false))
                     ->setName($transitionData['name'])

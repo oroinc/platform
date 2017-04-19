@@ -5,12 +5,15 @@ namespace Oro\Bundle\TagBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\UnsupportedGridPrefixesTrait;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractTagsExtension extends AbstractExtension
 {
+    use UnsupportedGridPrefixesTrait;
+
     const GRID_FILTERS_PATH = '[filters][columns]';
     const GRID_SORTERS_PATH = '[sorters][columns]';
     /** @deprecated since 1.10. Use config->getName() instead */
@@ -26,12 +29,6 @@ abstract class AbstractTagsExtension extends AbstractExtension
 
     /** @var string|null */
     protected $entityClassName;
-
-    /** @var string */
-    protected $reportOrSegmentPrefixes = [
-        'oro_report',
-        'oro_segment',
-    ];
 
     /**
      * @param TagManager          $tagManager
@@ -51,33 +48,6 @@ abstract class AbstractTagsExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         return $config->isOrmDatasource();
-    }
-
-    /**
-     * @param string $prefix
-     */
-    public function addReportOrSegmentGridPrefix($prefix)
-    {
-        $this->reportOrSegmentPrefixes[] = $prefix;
-    }
-
-    /**
-     * Checks if configuration is for report or segment grid
-     *
-     * @param DatagridConfiguration $config
-     *
-     * @return bool
-     */
-    protected function isReportOrSegmentGrid(DatagridConfiguration $config)
-    {
-        $gridName = $config->getName();
-
-        return ArrayUtil::some(
-            function ($prefix) use ($gridName) {
-                return strpos($gridName, $prefix) === 0;
-            },
-            $this->reportOrSegmentPrefixes
-        );
     }
 
     /**

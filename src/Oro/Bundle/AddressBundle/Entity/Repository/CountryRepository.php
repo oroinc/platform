@@ -24,4 +24,15 @@ class CountryRepository extends EntityRepository
 
         return $query->execute();
     }
+
+    /**
+     * @return array
+     */
+    public function getAllCountryNamesArray()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.iso2Code, c.iso3Code, c.name')
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

@@ -45,16 +45,11 @@ class RestrictionSegmentProxy extends AbstractSegmentProxy
 
             // only not composite identifiers are supported
             $identifier = reset($identifiers);
+            $required['columns'][] = ['name' => $identifier, 'distinct' => true];
 
-            $this->preparedDefinition = array_merge(
-                $decoded,
-                [
-                    'columns' => [
-                        ['name' => $identifier, 'distinct' => true]
-                    ]
-                ]
-            );
-            $this->preparedDefinition = json_encode($this->preparedDefinition);
+            $decoded = array_merge_recursive($decoded, $required);
+
+            $this->preparedDefinition = json_encode($decoded);
         }
 
         return $this->preparedDefinition;

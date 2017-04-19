@@ -468,14 +468,14 @@ services:
         arguments:
             - [] # database checkers. filled by DatabaseCheckerCompilerPass
 
-    oro_entity.database.driver.mysql:
-        class: 'Oro\Bundle\EntityBundle\ORM\Driver\PdoMysql'
+    oro_entity.database.trigger_driver.mysql:
+        class: 'Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoMysql'
         public: false
         arguments:
              - '@oro_entity.doctrine_helper'
 
-    oro_entity.database.driver.pgsql:
-        class: 'Oro\Bundle\EntityBundle\ORM\Driver\PdoPgsql'
+    oro_entity.database.trigger_driver.pgsql:
+        class: 'Oro\Bundle\EntityBundle\ORM\TriggerDriver\PdoPgsql'
         public: false
         arguments:
              - '@oro_entity.doctrine_helper'
@@ -484,5 +484,11 @@ services:
         class: 'Oro\Bundle\EntityBundle\Manager\Db\EntityTriggerManager'
         abstract: true
         calls:
-            - [addDriver, ['@oro_entity.database.driver.mysql']]
-            - [addDriver, ['@oro_entity.database.driver.pgsql']]
+            - [addDriver, ['@oro_entity.database.trigger_driver.mysql']]
+            - [addDriver, ['@oro_entity.database.trigger_driver.pgsql']]
+
+    oro_entity.doctrine.field_updates_checker:
+        class: Oro\Component\DoctrineUtils\ORM\FieldUpdatesChecker
+        arguments:
+            - '@doctrine'
+            - '@property_accessor'

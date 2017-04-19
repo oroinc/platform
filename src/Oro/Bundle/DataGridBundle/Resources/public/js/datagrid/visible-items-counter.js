@@ -27,6 +27,14 @@ define([
         /** @property */
         className: 'visible-items-counter pagination-centered',
 
+        /** @property */
+        themeOptions: {
+            optionPrefix: 'itemscounter'
+        },
+
+        /** @property */
+        transTemplate: null,
+
         /**
          * Initializer.
          *
@@ -38,10 +46,18 @@ define([
         initialize: function(options) {
             options = options || {};
             this.hidden = options.hidden !== false;
+
+            if (options.template) {
+                this.template = options.template;
+            }
+
+            if (options.transTemplate) {
+                this.transTemplate = options.transTemplate;
+            }
+
             if (!options.collection) {
                 throw new TypeError('"collection" is required');
             }
-
             this.collection = options.collection;
             this.listenTo(this.collection, 'add', this.render);
             this.listenTo(this.collection, 'remove', this.render);
@@ -86,7 +102,8 @@ define([
             this.$el.empty();
             this.$el.html(this.template({
                 disabled: !this.enabled || !state.totalRecords,
-                state: _.extend({length: this.collection.length}, state)
+                state: _.extend({length: this.collection.length}, state),
+                transTemplate: this.transTemplate
             }));
 
             if (this.hidden) {

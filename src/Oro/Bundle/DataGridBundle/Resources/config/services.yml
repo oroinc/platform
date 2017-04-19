@@ -1,4 +1,6 @@
 parameters:
+    oro_datagrid.export.size_of_batch: 200
+
     oro_datagrid.datagrid.base.class:                             Oro\Bundle\DataGridBundle\Datagrid\Datagrid
     oro_datagrid.extension.acceptor.class:                        Oro\Bundle\DataGridBundle\Extension\Acceptor
 
@@ -25,6 +27,7 @@ parameters:
     oro_datagrid.form.type.sorting_type.class:                    Oro\Bundle\DataGridBundle\Form\Type\GridSortingType
     oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
+    oro_datagrid.grid_view_user.entity.class:                     Oro\Bundle\DataGridBundle\Entity\GridViewUser
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
     oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
     oro_datagrid.choice.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ChoiceFieldHelper
@@ -129,6 +132,8 @@ services:
 
     oro_datagrid.event_listener.row_selection:
         class: %oro_datagrid.event_listener.row_selection.class%
+        arguments:
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
 
@@ -265,12 +270,9 @@ services:
 
     oro_datagrid.handler.export:
         class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
-        arguments:
-            - '@oro_importexport.file.file_manager'
         calls:
-            - [setRouter, ['@router']]
+            - [setFileManager, ['@oro_importexport.file.file_manager']]
             - [setLogger, ['@logger']]
-            - [setConfigManager, ['@oro_config.global']]
 
     oro_datagrid.columns.helper:
         class: %oro_datagrid.columns.helper.class%
@@ -325,22 +327,25 @@ services:
         arguments:
             - '@router.default'
 
-    oro_datagrid.async.export:
-        class: Oro\Bundle\DataGridBundle\Async\ExportMessageProcessor
-        arguments:
-            - '@oro_datagrid.handler.export'
-            - '@oro_message_queue.job.runner'
-            - '@oro_message_queue.client.message_producer'
-            - '@oro_config.user'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_datagrid.importexport.export_connector'
-            - '@oro_datagrid.importexport.processor.export'
-            - '@oro_importexport.writer.writer_chain'
-            - '@security.token_storage'
-            - '@logger'
-            - '@oro_email.email_renderer'
+    oro_datagrid.async.pre_export:
+        class: 'Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor'
+        parent: oro_importexport.async.pre_export_abstract
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+        calls:
+            - [setExportHandler, ['@oro_datagrid.handler.export']]
+            - [setExportIdFetcher, ['@oro_datagrid.importexport.export_id_fetcher']]
+
+    oro_datagrid.async.export:
+        class: 'Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor'
+        parent: oro_importexport.async.export_abstract
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+        calls:
+            - [setExportHandler, ['@oro_datagrid.handler.export']]
+            - [setExportConnector, ['@oro_datagrid.importexport.export_connector']]
+            - [setExportProcessor, ['@oro_datagrid.importexport.processor.export']]
+            - [setWriterChain, ['@oro_importexport.writer.writer_chain']]
 
     oro_datagrid.layout_context_configurator.data:
         class: Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator
@@ -348,3 +353,14 @@ services:
             - '@oro_datagrid.datagrid.manager'
         tags:
             - { name: layout.context_configurator }
+
+    oro_datagrid.multi_grid_provider:
+        class: Oro\Bundle\DataGridBundle\Provider\MultiGridProvider
+        arguments:
+            - '@oro_security.security_facade'
+            - '@oro_entity_config.config_manager'
+            - '@oro_datagrid.datagrid.manager'
+
+    oro_datagrid.multi_grid_provider.link:
+        tags:
+            - { name: oro_service_link, service: oro_datagrid.multi_grid_provider }

@@ -65,3 +65,14 @@ services:
             - [setFileLocator, ['@file_locator']]
             - [addProcessor, ['@oro_test.alice_reference_processor']]
             - [addProcessor, ['@oro_test.alice_to_string_processor']]
+
+    oro_test.config_cache:
+        decorates: oro_config.cache
+        parent: doctrine_cache.abstract.array
+        calls:
+            - [setNamespace, [ 'oro_config' ] ]
+
+    oro_test.transport_provider:
+        class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider
+        tags:
+            - { name: oro_integration.transport, type: aType, channel_type: aType }

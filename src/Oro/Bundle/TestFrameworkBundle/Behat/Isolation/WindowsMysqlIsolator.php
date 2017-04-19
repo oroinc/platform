@@ -135,6 +135,12 @@ class WindowsMysqlIsolator extends AbstractOsRelatedIsolator implements Isolator
         return is_file($this->dbDump);
     }
 
+    /** {@inheritdoc} */
+    public function getTag()
+    {
+        return 'database';
+    }
+
     /**
      * @param string $commandline The command line to run
      * @param int $timeout The timeout in seconds

@@ -116,6 +116,7 @@ class FlushEntityTest extends \PHPUnit_Framework_TestCase
         } else {
             $entityManager->expects($this->once())->method('persist');
             $entityManager->expects($this->once())->method('flush');
+            $entityManager->expects($this->once())->method('refresh');
             $entityManager->expects($this->once())->method('commit');
         }
 

@@ -202,7 +202,6 @@ services:
     oro_workflow.handler.transition.form:
         class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler'
         arguments:
-            - '@request_stack'
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.database_checker:
@@ -235,6 +234,13 @@ services:
 
     oro_workflow.handler.workflow_definition:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler'
+        arguments:
+            - '@oro_workflow.changes.event.dispatcher'
+            - '@doctrine'
+            - '@oro_workflow.manager'
+
+    oro_workflow.handler.workflow_variables:
+        class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler'
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
@@ -507,3 +513,45 @@ services:
         arguments:
             - '@oro_workflow.registry.workflow_manager'
             - '@oro_workflow.transition_data.provider'
+
+    oro_workflow.variable_guesser:
+            class: 'Oro\Bundle\WorkflowBundle\Model\VariableGuesser'
+            parent: oro_action.abstract_guesser
+            calls:
+                # mapping from variable type to form parameters
+                # an additional array with form options can be added
+                - [addFormTypeMapping, ['string', 'Symfony\Component\Form\Extension\Core\Type\TextType']]
+                - [addFormTypeMapping, ['int', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+                - [addFormTypeMapping, ['integer', 'Symfony\Component\Form\Extension\Core\Type\IntegerType']]
+                - [addFormTypeMapping, ['bool', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+                - [addFormTypeMapping, ['boolean', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType']]
+                - [addFormTypeMapping, ['float', 'Symfony\Component\Form\Extension\Core\Type\NumberType']]
+                - [addFormTypeMapping, ['array', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', {allow_add: true, allow_delete: true, prototype: true}]]
+
+    oro_workflow.transition_form.data_provider.transition_page_form:
+        class: 'Oro\Bundle\WorkflowBundle\Provider\TransitionPageFormTemplateDataProvider'
+        tags:
+            - { name: oro_form.form_template_data_provider, alias: transition_page_form }
+
+    oro_workflow.resolver.transition_options_resolver:
+        class: 'Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver'
+        arguments:
+            - '@oro_action.resolver.options_resolver'
+
+    oro_workflow.handler.transition.form.page_form:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Handler\TransitionCustomFormHandler'
+        arguments:
+            - '@oro_form.registry.form_handler'
+
+    oro_workflow.helper.transition_widget:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@form.factory'
+            - '@oro_workflow.serializer.data.serializer'
+
+    oro_workflow.helper.workflow_deactivation:
+        class: 'Oro\Bundle\WorkflowBundle\Helper\WorkflowDeactivationHelper'
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@oro_workflow.helper.translation'
