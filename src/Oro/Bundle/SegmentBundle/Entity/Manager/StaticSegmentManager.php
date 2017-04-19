@@ -3,7 +3,9 @@
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Parameter;
@@ -47,11 +49,10 @@ class StaticSegmentManager
      * Doctrine does not supports insert in DQL. To increase the speed of query here uses plain sql query.
      *
      * @param Segment $segment
-     *
-     * @throws \LogicException
+     * @param array $entityIds
      * @throws \Exception
      */
-    public function run(Segment $segment)
+    public function run(Segment $segment, array $entityIds = [])
     {
         if ($segment->getType()->getName() !== SegmentType::TYPE_STATIC) {
             throw new \LogicException('Only static segments could have snapshots.');
@@ -62,9 +63,11 @@ class StaticSegmentManager
             throw new \LogicException('Only entities with single identifier supports.');
         }
 
-        $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment);
+        $this->em->getRepository('OroSegmentBundle:SegmentSnapshot')->removeBySegment($segment, $entityIds);
+
         try {
             $this->em->beginTransaction();
+
             $date       = new \DateTime('now', new \DateTimeZone('UTC'));
             $dateString = '\'' . $date->format('Y-m-d H:i:s') . '\'';
 
@@ -81,8 +84,17 @@ class StaticSegmentManager
             $qb = $this->dynamicSegmentQB->getQueryBuilder($segment);
 
             $this->applyOrganizationLimit($segment, $qb);
-            $originalQuery = $qb->getQuery();
+
+            $tableAlias = $this->getFromTableAlias($qb);
             $identifier = $entityMetadata->getSingleIdentifierFieldName();
+
+            if ($entityIds) {
+                $qb->andWhere($qb->expr()->in($tableAlias . '.' . $identifier, ':entityIds'))
+                    ->setParameter('entityIds', $entityIds, Type::TARRAY);
+            }
+
+            $originalQuery = $qb->getQuery();
+
             $selectSql = $this->getSelectSql($qb, $segment, $identifier);
             $selectSql = substr_replace($selectSql, $insertString, stripos($selectSql, 'from'), 0);
 
@@ -95,9 +107,14 @@ class StaticSegmentManager
             $dbQuery = 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) (%s)';
             $dbQuery = sprintf($dbQuery, $selectSql);
 
-            $statement = $this->em->getConnection()->prepare($dbQuery);
-            $this->bindParameters($statement, $originalQuery->getParameters());
-            $statement->execute();
+            $values = [];
+            $types = [];
+            foreach ($originalQuery->getParameters() as $parameter) {
+                $values[] = $parameter->getValue();
+                $types[]  = $parameter->getType() == Type::TARRAY ? Connection::PARAM_STR_ARRAY : $parameter->getType();
+            }
+
+            $this->em->getConnection()->executeQuery($dbQuery, $values, $types);
 
             $this->em->commit();
         } catch (\Exception $exception) {
@@ -122,7 +139,7 @@ class StaticSegmentManager
      */
     private function getSelectSql(QueryBuilder $queryBuilder, Segment $segment, $identifier)
     {
-        $tableAlias = current($queryBuilder->getDQLPart('from'))->getAlias();
+        $tableAlias = $this->getFromTableAlias($queryBuilder);
 
         if (!$segment->getRecordsLimit()) {
             $queryBuilder->resetDQLParts(['orderBy', 'select']);
@@ -143,6 +160,15 @@ class StaticSegmentManager
         }
 
         return $finalSelectSql;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @return mixed
+     */
+    private function getFromTableAlias(QueryBuilder $queryBuilder)
+    {
+        return current($queryBuilder->getDQLPart('from'))->getAlias();
     }
 
     /**
@@ -187,6 +213,8 @@ class StaticSegmentManager
      *
      * @param Statement       $stmt
      * @param ArrayCollection $parameters
+     *
+     * @deprecated Deprecated since version 2.2
      */
     public function bindParameters(Statement $stmt, ArrayCollection $parameters)
     {

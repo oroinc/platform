@@ -281,3 +281,11 @@ TranslationBundle
 - Signature of class `Oro\Bundle\TranslationBundle\Provider\LanguageProvider` was changed:
     - use `Doctrine\Common\Persistence\ManagerRegistry` as first argument instead of `Doctrine\Common\Persistence\ObjectRepository`
     - use `@doctrine` as first service argument instead of `@oro_translation.repository.language`
+
+SegmentBundle
+-------------
+- Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
+    - changed signature of method `run`, added parameter `$entityIds` (array) with default empty array.
+    - method `bindParameters` is deprecated and will be removed. 
+- Class `Oro/Bundle/SegmentBundle/Entity/Repository/SegmentSnapshotRepository`:
+    - changed signature of method `removeBySegment`, added parameter `$entityIds` (array) with default empty array.
