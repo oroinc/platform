@@ -29,6 +29,14 @@ services:
         tags:
             - { name: form.type, alias: oro_workflow_transition }
 
+    oro_workflow.form.type.transition_select:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionSelectType'
+        arguments:
+            - '@oro_workflow.registry.system'
+            - '@translator'
+        tags:
+            - { name: form.type, alias: oro_workflow_transition_select }
+
     oro_workflow.form.type.workflow_step_select:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType'
         arguments:
@@ -44,6 +52,13 @@ services:
             - '@translator'
         tags:
             - { name: form.type, alias: oro_workflow_definition_select }
+
+    oro_workflow.form.type.definition_notification_select:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType'
+        arguments:
+            - '@oro_workflow.registry.system'
+        tags:
+            - { name: form.type, alias: oro_workflow_definition_notification_select }
 
     oro_workflow.form.type.workflow_select:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType'
