@@ -975,7 +975,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'option1' => 'value1',
                     'message' => [
-                        'message' => 'warning message',
+                        'content' => 'warning message',
                         'message_parameters' => ['param1' => 'value1'],
                     ],
                 ],
@@ -997,7 +997,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'option1' => 'value1',
                     'message' => [
-                        'message' => 'warning message',
+                        'content' => 'warning message',
                         'message_parameters' => ['param1' => 'value1'],
                         'title' => 'message title',
                     ],

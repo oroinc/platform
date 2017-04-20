@@ -25,7 +25,7 @@ define([
 
         var showDialog = function() {
             var dialogOptions = {
-                title: element.data('transition-label') || element.html(),
+                title: element.attr('title') || element.html(),
                 url: element.data('dialog-url'),
                 stateEnabled: false,
                 incrementalPosition: false,

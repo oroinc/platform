@@ -46,7 +46,7 @@ abstract class AbstractTransitionButton implements ButtonInterface
      */
     public function getLabel()
     {
-        return $this->transition->getLabel();
+        return $this->transition->getButtonTitle();
     }
 
     /**

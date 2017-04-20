@@ -72,7 +72,7 @@ class TransitionButtonTest extends \PHPUnit_Framework_TestCase
     public function testGetLabel()
     {
         $label = 'test_label';
-        $this->transition->expects($this->once())->method('getLabel')->willReturn($label);
+        $this->transition->expects($this->once())->method('getButtonTitle')->willReturn($label);
 
         $this->assertEquals($label, $this->button->getLabel());
     }

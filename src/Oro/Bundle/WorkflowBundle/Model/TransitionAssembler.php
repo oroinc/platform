@@ -235,7 +235,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             $frontendOptions['message'] = array_merge(
                 $this->getOption($frontendOptions, 'message', []),
                 [
-                    'message' => $this->getOption($options, 'message'),
+                    'content' => $this->getOption($options, 'message'),
                     'message_parameters' => $this->getOption($options, 'message_parameters', []),
                 ]
             );
