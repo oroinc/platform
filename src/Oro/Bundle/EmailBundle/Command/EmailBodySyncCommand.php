@@ -17,7 +17,7 @@ use Oro\Component\Log\OutputLogger;
 class EmailBodySyncCommand extends ContainerAwareCommand
 {
     /**
-     * {@internaldoc}
+     * {@inheritDoc}
      */
     protected function configure()
     {
@@ -36,7 +36,7 @@ class EmailBodySyncCommand extends ContainerAwareCommand
     }
 
     /**
-     * {@internaldoc}
+     * {@inheritDoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

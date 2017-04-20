@@ -240,6 +240,16 @@ EmailBundle
 - template `Resources/views/AutoResponseRule/dialog/update.html.twig` was changed
 - template `Resources/views/Configuration/Mailbox/update.html.twig` was changed
 - template `EmailBundle/Resources/views/Form/fields.html.twig` was changed
+- Class `Oro\Bundle\EmailBundle\Provider\EmailRenderer`
+    - construction signature was changed now it takes next arguments:
+        - `\Twig_LoaderInterface` $loader,
+        - $options,
+        - `VariablesProvider` $variablesProvider,
+        - `Cache` $cache,
+        - $cacheKey,
+        - `\Twig_Extension_Sandbox` $sandbox,
+        - `TranslatorInterface` $translator,
+        - `VariableProcessorRegistry` $variableProcessorRegistry
 
 TranslationBundle
 -----------------

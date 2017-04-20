@@ -163,6 +163,9 @@ oro:
             variables:
                 system: 'System variables'
                 entity: 'Entity variables'
+                url:
+                    index.label: 'Entity Grid Page'
+                    view.label: 'Entity View Page'
 
             action:
                 preview: Preview
