@@ -56,28 +56,19 @@ class JobRunner
         if ($rootJob->isInterrupted()) {
             $this->jobProcessor->cancelAllActiveChildJobs($rootJob);
 
-            return;
+            return null;
         }
 
-        if (! $childJob->getStartedAt() || $childJob->getStatus() === Job::STATUS_FAILED_REDELIVERED) {
+        if ($this->isReadyForStart($childJob)) {
             $this->jobProcessor->startChildJob($childJob);
         }
 
-        $jobRunner = new JobRunner($this->jobProcessor, $rootJob);
-
-        try {
-            $result = call_user_func($runCallback, $jobRunner, $childJob);
-        } catch (\Exception $e) {
-            $this->jobProcessor->failAndRedeliveryChildJob($childJob);
-
-            throw $e;
-        }
+        $result = $this->callbackResult($runCallback, $childJob);
 
         if (! $childJob->getStoppedAt()) {
             $result
                 ? $this->jobProcessor->successChildJob($childJob)
                 : $this->jobProcessor->failChildJob($childJob);
-            ;
         }
 
         $lockHandler->release();
@@ -123,24 +114,48 @@ class JobRunner
             return null;
         }
 
-        if (! $job->getStartedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED) {
+        if ($this->isReadyForStart($job)) {
             $this->jobProcessor->startChildJob($job);
         }
-        $jobRunner = new JobRunner($this->jobProcessor, $job->getRootJob());
 
+        $result = $this->callbackResult($runCallback, $job);
+
+        if (! $job->getStoppedAt()) {
+            $result
+                ? $this->jobProcessor->successChildJob($job)
+                : $this->jobProcessor->failChildJob($job);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Job $job
+     *
+     * @return bool
+     */
+    private function isReadyForStart(Job $job)
+    {
+        return !$job->getStartedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED;
+    }
+
+    /**
+     * @param \Closure $runCallback
+     * @param Job $job
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    private function callbackResult($runCallback, $job)
+    {
+        $jobRunner = new JobRunner($this->jobProcessor, $job->getRootJob());
         try {
             $result = call_user_func($runCallback, $jobRunner, $job);
         } catch (\Exception $e) {
             $this->jobProcessor->failAndRedeliveryChildJob($job);
 
             throw $e;
-        }
-
-        if (! $job->getStoppedAt()) {
-            $result
-                ? $this->jobProcessor->successChildJob($job)
-                : $this->jobProcessor->failChildJob($job);
-            ;
         }
 
         return $result;
