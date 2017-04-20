@@ -130,7 +130,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                 continue;
             }
 
-            $fieldValue = $this->fieldHelper->getObjectValue($object, $fieldName);
+            $fieldValue = $this->getFieldValueFromObject($object, $fieldName);
             if (is_object($fieldValue)) {
                 $fieldContext = $context;
 
@@ -270,5 +270,16 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         }
 
         return $result;
+    }
+
+    /**
+     * @param object $object
+     * @param string $fieldName
+     *
+     * @return mixed
+     */
+    protected function getFieldValueFromObject($object, $fieldName)
+    {
+        return $this->fieldHelper->getObjectValue($object, $fieldName);
     }
 }

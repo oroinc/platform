@@ -8,5 +8,3 @@ OroImportExportBundle Documentation
 - [How to use] (./reference/how-to-use.md)
 - [Fields Configuration] (./reference/fields-configuration.md)
 - [Events] (./reference/events.md)
-- [Testing Export] (./reference/testing-export.md)
-- [Testing Import] (./reference/testing-import.md)
