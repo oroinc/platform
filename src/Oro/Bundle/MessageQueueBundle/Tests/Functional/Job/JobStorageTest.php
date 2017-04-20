@@ -11,9 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
-/**
- * @dbIsolation
- */
 class JobStorageTest extends WebTestCase
 {
     /** @var EntityManager */
@@ -51,7 +48,7 @@ class JobStorageTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getObjectManager()
+    protected function getEntityManager()
     {
         return $this->entityManager;
     }
