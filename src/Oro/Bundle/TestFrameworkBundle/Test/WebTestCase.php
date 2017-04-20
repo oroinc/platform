@@ -527,7 +527,7 @@ abstract class WebTestCase extends BaseWebTestCase
             $loader->addFixture($fixture);
         }
 
-        $executor = new DataFixturesExecutor($this->getObjectManager());
+        $executor = new DataFixturesExecutor($this->getEntityManager());
         $executor->execute($loader->getFixtures(), true);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
@@ -536,7 +536,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /**
      * @return EntityManagerInterface
      */
-    protected function getObjectManager()
+    protected function getEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManager();
     }

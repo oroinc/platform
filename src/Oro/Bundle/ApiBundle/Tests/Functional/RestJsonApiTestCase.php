@@ -259,14 +259,6 @@ class RestJsonApiTestCase extends ApiTestCase
     }
 
     /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->getContainer()->get('doctrine')->getManager();
-    }
-
-    /**
      * @param ResponseHeaderBag $headers
      *
      * @return bool
