@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Tests\Functional;
+namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
@@ -10,14 +10,18 @@ use Symfony\Component\DomCrawler\Form;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\NotificationBundle\Entity\Event;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowEmailTemplates;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
 use Oro\Component\Testing\ResponseExtension;
 
-class ControllersTest extends WebTestCase
+class EmailNotificationControllerTest extends WebTestCase
 {
     use ResponseExtension;
 
-    const ENTITY_NAME = 'Oro\Bundle\UserBundle\Entity\User';
+    const ENTITY_NAME = WorkflowAwareEntity::class;
+    const EVENT_NAME = 'oro.workflow.event.notification.workflow_transition';
 
     /** @var  Registry */
     protected $doctrine;
@@ -27,26 +31,16 @@ class ControllersTest extends WebTestCase
         $this->initClient([], array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1]));
         $this->client->useHashNavigation(true);
         $this->doctrine = $this->getContainer()->get('doctrine');
+        $this->loadFixtures([LoadWorkflowDefinitions::class, LoadWorkflowEmailTemplates::class]);
     }
 
-    public function testIndex()
-    {
-        $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_index'));
-
-        $this->assertLastResponseStatus(200);
-        $this->assertLastResponseContentTypeHtml();
-    }
-
-    /**
-     * @depends testIndex
-     */
     public function testCreate()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_notification_emailnotification_create'));
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
 
-        $event = $this->getEvent('oro.notification.event.entity_post_persist');
+        $event = $this->getEvent(self::EVENT_NAME);
 
         $this->assertFormSubmission($event, $crawler);
     }
@@ -74,7 +68,7 @@ class ControllersTest extends WebTestCase
         $this->assertLastResponseStatus(200);
         $this->assertLastResponseContentTypeHtml();
 
-        $event = $this->getEvent('oro.notification.event.entity_post_update');
+        $event = $this->getEvent(self::EVENT_NAME);
 
         $this->assertFormSubmission($event, $crawler);
     }
@@ -120,9 +114,7 @@ class ControllersTest extends WebTestCase
      */
     protected function getTemplate()
     {
-        return $this->doctrine
-            ->getRepository(EmailTemplate::class)
-            ->findOneBy(['entityName' => self::ENTITY_NAME]);
+        return $this->getReference(LoadWorkflowEmailTemplates::WFA_EMAIL_TEMPLATE_NAME);
     }
 
     /**
@@ -141,6 +133,8 @@ class ControllersTest extends WebTestCase
         $formValues['emailnotification']['recipientList']['users'] = 1;
         $formValues['emailnotification']['recipientList']['groups'][0] = 1;
         $formValues['emailnotification']['recipientList']['email'] = 'admin@example.com';
+        $formValues['emailnotification']['workflow_definition'] = 'test_multistep_flow';
+        $formValues['emailnotification']['workflow_transition_name'] = 'starting_point_transition';
 
         $this->client->followRedirects(true);
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);

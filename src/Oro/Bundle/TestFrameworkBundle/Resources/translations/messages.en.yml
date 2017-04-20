@@ -1,0 +1,7 @@
+oro:
+    testframework:
+        workflowawareentity:
+            entity_label: 'Workflow Aware Entity'
+            entity_plural_label: 'Workflow Aware Entities'
+            name.label: 'Name'
+

@@ -50,7 +50,7 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
 
         $params = [];
 
-        if (!preg_match('/^.*_index$/', $definition['route'])) {
+        if (!preg_match('/^.*(_index|_create)$/', $definition['route'])) {
             $params = [
                 'id' => $this->doctrineHelper->getSingleEntityIdentifier($data['entity'], false),
             ];
@@ -70,7 +70,7 @@ class EntityRouteVariableProcessor implements VariableProcessorInterface
             'entity.url.index',
             'entity.url.view',
             'entity.url.create',
-            'entity.url.edit',
+            'entity.url.update',
             'entity.url.delete',
         ], true);
     }

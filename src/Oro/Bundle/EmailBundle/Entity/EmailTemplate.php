@@ -386,7 +386,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      *
      * @param boolean $isEditable
      *
-     * @return EmailTemplate
+     * @return $this
      */
     public function setIsEditable($isEditable)
     {
