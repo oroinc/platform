@@ -287,5 +287,6 @@ SegmentBundle
 - Class `Oro/Bundle/SegmentBundle/Entity/Manager/StaticSegmentManager`:
     - changed signature of method `run`, added parameter `$entityIds` (array) with default empty array.
     - method `bindParameters` is deprecated and will be removed. 
+    - method `run` now accept also a dynamic segment
 - Class `Oro/Bundle/SegmentBundle/Entity/Repository/SegmentSnapshotRepository`:
     - changed signature of method `removeBySegment`, added parameter `$entityIds` (array) with default empty array.

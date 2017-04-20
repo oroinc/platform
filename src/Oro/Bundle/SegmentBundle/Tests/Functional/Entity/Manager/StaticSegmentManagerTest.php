@@ -139,15 +139,4 @@ class StaticSegmentManagerTest extends WebTestCase
         $this->assertSnapshotsCount(2);
         $this->assertNotNull($staticSegment->getLastRun());
     }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Only static segments could have snapshots.
-     */
-    public function testOnlyStaticSegmentsException()
-    {
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
-        $this->manager->run($dynamicSegment);
-    }
 }

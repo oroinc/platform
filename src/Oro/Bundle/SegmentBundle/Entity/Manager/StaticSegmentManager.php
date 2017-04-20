@@ -13,7 +13,6 @@ use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 
 class StaticSegmentManager
@@ -54,9 +53,6 @@ class StaticSegmentManager
      */
     public function run(Segment $segment, array $entityIds = [])
     {
-        if ($segment->getType()->getName() !== SegmentType::TYPE_STATIC) {
-            throw new \LogicException('Only static segments could have snapshots.');
-        }
         $entityMetadata = $this->em->getClassMetadata($segment->getEntity());
 
         if (count($entityMetadata->getIdentifierFieldNames()) > 1) {
