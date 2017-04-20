@@ -65,6 +65,35 @@ class JobProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('owner-id', $job->getOwnerId());
     }
 
+    public function testFindRootJobByUniqueName()
+    {
+        $job = new Job();
+
+        $storage = $this->createJobStorage();
+        $storage
+            ->expects($this->once())
+            ->method('findRootJobByUniqueJobName')
+            ->with('job-name')
+            ->will($this->returnValue($job))
+        ;
+
+        $processor = new JobProcessor($storage, $this->createMessageProducerMock());
+
+        $result = $processor->findRootJobByUniqueName('job-name');
+
+        $this->assertSame($job, $result);
+    }
+
+    public function testFindRootJobByUniqueNameThrowIfNameIsEmpty()
+    {
+        $processor = new JobProcessor($this->createJobStorage(), $this->createMessageProducerMock());
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Job name must not be empty');
+
+        $processor->findRootJobByUniqueName(null);
+    }
+
     public function testShouldCatchDuplicateJobAndTryToFindJobByOwnerId()
     {
         $job = new Job();

@@ -1,46 +1,72 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Job;
 
+use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadJobData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
 /**
- * @dbIsolationPerTest
+ * @dbIsolation
  */
 class JobStorageTest extends WebTestCase
 {
-    public function setUp()
+    /** @var EntityManager */
+    private $entityManager;
+
+    /** @var JobStorage */
+    private $jobStorage;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
         $this->initClient();
+
+        $this->entityManager = $this->getContainer()->get('doctrine.orm.message_queue_job_entity_manager');
+        $this->jobStorage = $this->getContainer()->get('oro_message_queue.job.storage');
+
+        $this->loadFixtures([
+            LoadJobData::class
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->entityManager = null;
+        $this->jobStorage = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getObjectManager()
+    {
+        return $this->entityManager;
     }
 
     public function testCouldGetJobStorageAsServiceFromContainer()
     {
-        $storage = $this->getJobStorage();
-
-        $this->assertInstanceOf(JobStorage::class, $storage);
+        $this->assertInstanceOf(JobStorage::class, $this->jobStorage);
     }
 
     public function testShouldFindJobById()
     {
-        $job = new Job();
-        $job->setName('name');
-        $job->setStatus(Job::STATUS_NEW);
-        $job->setCreatedAt(new \DateTime());
-
-        $this->getEntityManager()->persist($job);
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
-
-        $this->assertNotEmpty($job->getId());
-
-        $resultJob = $this->getJobStorage()->findJobById($job->getId());
-
-        $this->assertEquals($job->getId(), $resultJob->getId());
-        $this->assertEquals('name', $resultJob->getName());
-        $this->assertEquals(Job::STATUS_NEW, $resultJob->getStatus());
+        /** @var Job $referenceJob */
+        $referenceJob = $this->getReference(LoadJobData::JOB_1);
+        $resultJob = $this->jobStorage->findJobById($referenceJob->getId());
+        $this->assertSame($referenceJob, $resultJob);
     }
 
     public function testCouldCreateJobWithoutLock()
@@ -51,7 +77,7 @@ class JobStorageTest extends WebTestCase
         $rootJob->setStatus(Job::STATUS_NEW);
         $rootJob->setCreatedAt(new \DateTime());
 
-        $this->getJobStorage()->saveJob($rootJob);
+        $this->jobStorage->saveJob($rootJob);
 
         $job = new Job();
         $job->setName('name');
@@ -59,10 +85,9 @@ class JobStorageTest extends WebTestCase
         $job->setCreatedAt(new \DateTime());
         $job->setRootJob($rootJob);
 
-        $this->getJobStorage()->saveJob($job);
-        $this->getEntityManager()->clear();
+        $this->jobStorage->saveJob($job);
 
-        $resultJob = $this->getJobStorage()->findJobById($job->getId());
+        $resultJob = $this->jobStorage->findJobById($job->getId());
 
         $this->assertNotEmpty($job->getId());
         $this->assertEquals($job->getId(), $resultJob->getId());
@@ -70,28 +95,12 @@ class JobStorageTest extends WebTestCase
 
     public function testCouldUpdateJobWithoutLock()
     {
-        $rootJob = new Job();
-        $rootJob->setOwnerId('owner-id');
-        $rootJob->setName('name');
-        $rootJob->setStatus(Job::STATUS_NEW);
-        $rootJob->setCreatedAt(new \DateTime());
-
-        $this->getJobStorage()->saveJob($rootJob);
-
-        $job = new Job();
-        $job->setName('name');
-        $job->setStatus(Job::STATUS_NEW);
-        $job->setCreatedAt(new \DateTime());
-        $job->setRootJob($rootJob);
-
-        $this->getJobStorage()->saveJob($job);
+        $job = $this->getReference(LoadJobData::JOB_3);
 
         $job->setStatus(Job::STATUS_FAILED);
-        $this->getJobStorage()->saveJob($job);
+        $this->jobStorage->saveJob($job);
 
-        $this->getEntityManager()->clear();
-
-        $resultJob = $this->getJobStorage()->findJobById($job->getId());
+        $resultJob = $this->jobStorage->findJobById($job->getId());
 
         $this->assertNotEmpty($job->getId());
         $this->assertEquals($job->getId(), $resultJob->getId());
@@ -100,62 +109,40 @@ class JobStorageTest extends WebTestCase
 
     public function testCouldUpdateJobWithLock()
     {
-        $job = new Job();
-        $job->setOwnerId('owner-id');
-        $job->setName('name');
-        $job->setStatus(Job::STATUS_NEW);
-        $job->setCreatedAt(new \DateTime());
+        $job = $this->getReference(LoadJobData::JOB_4);
 
-        $this->getJobStorage()->saveJob($job);
-
-        $this->getJobStorage()->saveJob($job, function (Job $job) {
+        $this->jobStorage->saveJob($job, function (Job $job) {
             $job->setStatus(Job::STATUS_CANCELLED);
         });
 
-        $this->getEntityManager()->clear();
-
-        $resultJob = $this->getJobStorage()->findJobById($job->getId());
+        $resultJob = $this->jobStorage->findJobById($job->getId());
 
         $this->assertNotEmpty($job->getId());
         $this->assertEquals($job->getId(), $resultJob->getId());
         $this->assertEquals(Job::STATUS_CANCELLED, $resultJob->getStatus());
     }
 
+    public function testFindRootJobByUniqueJobName()
+    {
+        /** @var Job $referenceJob */
+        $referenceJob = $this->getReference(LoadJobData::JOB_1);
+        $resultJob = $this->jobStorage->findRootJobByUniqueJobName($referenceJob->getName());
+        $this->assertSame($referenceJob, $resultJob);
+    }
+
     public function testShouldThrowIfDuplicateJob()
     {
-        $job1 = new Job();
-        $job1->setOwnerId('owner-id1');
-        $job1->setName('name');
-        $job1->setUnique(true);
-        $job1->setStatus(Job::STATUS_NEW);
-        $job1->setCreatedAt(new \DateTime());
+        /** @var Job $existedJob */
+        $existedJob = $this->getReference(LoadJobData::JOB_1);
 
-        $this->getJobStorage()->saveJob($job1);
-
-        $job2 = new Job();
-        $job2->setOwnerId('owner-id2');
-        $job2->setName('name');
-        $job2->setUnique(true);
-        $job2->setStatus(Job::STATUS_NEW);
-        $job2->setCreatedAt(new \DateTime());
+        $job = new Job();
+        $job->setOwnerId($existedJob->getOwnerId());
+        $job->setName($existedJob->getName());
+        $job->setUnique(true);
+        $job->setStatus(Job::STATUS_NEW);
+        $job->setCreatedAt(new \DateTime());
 
         $this->expectException(DuplicateJobException::class);
-        $this->getJobStorage()->saveJob($job2);
-    }
-
-    /**
-     * @return \Doctrine\ORM\EntityManager
-     */
-    private function getEntityManager()
-    {
-        return $this->getContainer()->get('doctrine.orm.message_queue_job_entity_manager');
-    }
-
-    /**
-     * @return \Oro\Component\MessageQueue\Job\JobStorage
-     */
-    private function getJobStorage()
-    {
-        return $this->getContainer()->get('oro_message_queue.job.storage');
+        $this->jobStorage->saveJob($job);
     }
 }
