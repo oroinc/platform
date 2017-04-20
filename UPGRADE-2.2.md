@@ -54,6 +54,11 @@ DataAuditBundle
 A new string field `ownerDescription` with the database column `owner_description` was added to the entity 
 `Oro\Bundle\DataAuditBundle\Entity\Audit` and to the base class `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit`
 
+ApiBundle
+---------
+- Added class `Oro\Bundle\ApiBundle\Processor\ApiFormBuilderSubscriberProcessor`
+    - can be used to add subscribers to `FormContext`
+
 DataGridBundle
 --------------
 - Interface `Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface` added.
@@ -62,10 +67,40 @@ DataGridBundle
 - Removed event `oro_datagrid.datagrid.extension.action.configure-actions.before`, now it is a call of `Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface::hasActions` of registered through a `oro_datagrid.extension.action.provider` tag services.
 - Interface `Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface`
     - the signature of method `getDatagrid` was changed - added new parameter `array $additionalParameters = []`.
+
+- Added abstract entity class `Oro\Bundle\DataGridBundle\Entity\AbstractGridView`
+    - entity `Oro\Bundle\DataGridBundle\Entity\GridView` extends from it
+- Added abstract entity class `Oro\Bundle\DataGridBundle\Entity\AbstractGridViewUser`
+    - entity `Oro\Bundle\DataGridBundle\Entity\GridViewUser` extends from it
+- Class `Oro\Bundle\DataGridBundle\Controller\Api\Rest\GridViewController`
+    - added argument `Request $request` for methods:
+        - `public function postAction(Request $request)`
+        - `public function putAction(Request $request, $id)`
+    - changed type hint of first argument of method `checkEditPublicAccess()` from `GridView $gridView` to `AbstractGridView $gridView`
+- Changed type hint for first argument of `Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager::setDefaultGridView()` from `User $user` to `AbstractUser $user`
+- Class `Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager`
+    - changed type hint for:
+        - first argument of method `public funtion setDefaultGridView()` from `User $user` to `AbstractUser $user`
+        - second argument of method `protected function isViewDefault()` from `User $user` to `AbstractUser $user`
+        - first argument of method `public funtion getAllGridViews()` from `User $user` to `AbstractUser $user`
+        - first argument of method `public funtion getDefaultView()` from `User $user` to `AbstractUser $user`
+- Class `Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository`
+    - changed type hint for third argument of method `public funtion findDefaultGridViews()` from `GridView $gridView` to `AbstractGridView $gridView`
+- Class `Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository`
+    - added method `findByGridViewAndUser(AbstractGridView $view, UserInterface $user)`
+- Class `Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler`
+    - changed type hint for:
+        - first argument of method `protected funtion onSuccess()` from `GridView $entity` to `AbstractGridView $entity`
+        - first argument of method `protected funtion setDefaultGridView()` from `GridView $entity` to `AbstractGridView $entity`
+        - first argument of method `protected funtion fixFilters()` from `GridView $entity` to `AbstractGridView $entity`
 - Class `Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export` and `setExportIdFetcher` with `@oro_datagrid.importexport.export_id_fetcher` were added. The constructor was removed, the parent class constructor is used. 
 - Class `Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor` now extends `Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract` instead of implementing `ExportMessageProcessorAbstract` and `TopicSubscriberInterface`. Service calls `setExportHandler` with `@oro_datagrid.handler.export`, `setExportConnector` with `@oro_datagrid.importexport.export_connector`, `setExportProcessor` with `@oro_datagrid.importexport.processor.export` and `setWriterChain`  with `@oro_importexport.writer.writer_chain` were added. The constructor was removed, the parent class constructor is used.
 - Class `Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher`
     - the signature of `getDatagridQuery` method was changed, added parameter `string $objectIdentifier = null`
+
+TestFrameworkBundle
+-------------------
+- added fourth (boolean) parameter to `\Oro\Bundle\TestFrameworkBundle\Test\WebTestCase::runCommand` `$exceptionOnError` to throw `\RuntimeException` when command should executes as utility one.
 
 ImportExportBundle
 ------------------

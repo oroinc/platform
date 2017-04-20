@@ -9,11 +9,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
 use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
-use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsLoadListener
@@ -125,12 +124,12 @@ class GridViewsLoadListener
     }
 
     /**
-     * @return User
+     * @return AbstractUser
      */
     protected function getCurrentUser()
     {
         $user = $this->securityFacade->getLoggedUser();
-        if ($user instanceof User) {
+        if ($user instanceof AbstractUser) {
             return $user;
         }
 

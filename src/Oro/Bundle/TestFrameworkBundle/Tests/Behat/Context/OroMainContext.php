@@ -576,18 +576,6 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Wait for ajax
-     *
-     * @Then /^(?:|I )have to wait for ajax$/
-     * @Then /^(?:|I )have to wait for ajax up to "(?P<timeInSec>(?:[^"]|\\")*)" seconds$/
-     */
-    public function iHaveToWaitForAjax($timeInSec = 60)
-    {
-        $timeInMs = $timeInSec * 1000;
-        $this->waitForAjax($timeInMs);
-    }
-
-    /**
      * Navigate through menu navigation
      * Every menu link must be separated by slash symbol "/"
      * Example: Given I go to System/ Channels
@@ -911,8 +899,12 @@ class OroMainContext extends MinkContext implements
      */
     public function assertElementOnPage($element)
     {
+        $isVisible = $this->spin(function (OroMainContext $context) use ($element) {
+            return $context->createElement($element)->isVisible();
+        });
+
         self::assertTrue(
-            $this->createElement($element)->isVisible(),
+            $isVisible,
             sprintf('Element "%s" is not visible, or not present on the page', $element)
         );
     }

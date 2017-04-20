@@ -3,6 +3,8 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
@@ -71,6 +73,13 @@ class Role extends ExtendRole
     protected $label;
 
     /**
+     * @var User[]|Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="roles")
+     */
+    protected $users;
+
+    /**
      * Populate the role field
      *
      * @param string $role ROLE_FOO etc
@@ -79,8 +88,9 @@ class Role extends ExtendRole
     {
         parent::__construct($role);
 
-        $this->role  =
+        $this->role =
         $this->label = $role;
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -143,5 +153,41 @@ class Role extends ExtendRole
     public function getPrefix()
     {
         return static::PREFIX_ROLE;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function addUser(User $user)
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function removeUser(User $user)
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }
