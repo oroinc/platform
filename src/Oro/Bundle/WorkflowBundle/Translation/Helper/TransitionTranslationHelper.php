@@ -29,7 +29,7 @@ class TransitionTranslationHelper
         if (null !== $buttonLabel) {
             $transition->setButtonLabel($buttonLabel);
         } else {
-            $transition->setButtonLabel($this->trans($transition->getLabel()));
+            $transition->setButtonLabel($this->trans($transition->getLabel(), true));
         }
 
         $buttonTitle = $this->trans($transition->getButtonTitle());
@@ -48,13 +48,13 @@ class TransitionTranslationHelper
 
     /**
      * @param string $id
-     * @param array $parameters
+     * @param bool $allowEmptyTranslate
      * @return string|null
      */
-    protected function trans($id, array $parameters = [])
+    protected function trans($id, $allowEmptyTranslate = false)
     {
-        $translate = $this->translator->trans($id, $parameters, WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        $translate = $this->translator->trans($id, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
 
-        return !$translate || $translate === $id ? null : $translate;
+        return $allowEmptyTranslate || $translate && $translate !== $id ? $translate : null;
     }
 }
