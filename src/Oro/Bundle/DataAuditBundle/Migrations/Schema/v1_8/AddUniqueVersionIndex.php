@@ -36,7 +36,9 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
 
     protected function resolveDuplicates()
     {
-        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+        $platform = $this->connection->getDatabasePlatform();
+
+        if ($platform instanceof PostgreSqlPlatform) {
             $this->connection->exec('CREATE TEMPORARY SEQUENCE seq_temp_version START 1');
         }
 
@@ -49,31 +51,39 @@ class AddUniqueVersionIndex implements Migration, ConnectionAwareInterface
             }
 
             foreach ($rows as $row) {
-                if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
-                    $this->connection->exec(
-                        'UPDATE oro_audit SET version = 0 ' .
-                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
-                                  'object_class = \'' . $row['object_class'] . '\';' .
+                if ($platform instanceof PostgreSqlPlatform) {
+                    $sql = 'UPDATE oro_audit SET version = 0 ' .
+                        'WHERE object_id = :object_id AND '.
+                                  'object_class = :object_class;' .
                         'SELECT setval(\'seq_temp_version\', 1);' .
                         'UPDATE oro_audit SET version = nextval(\'seq_temp_version\') - 1 ' .
-                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
-                                  'object_class = \'' . $row['object_class'] . '\';'
-                    );
+                            'WHERE object_id = :object_id AND '.
+                                  'object_class = :object_class;';
                 } else {
-                    $this->connection->exec(
-                        'UPDATE oro_audit SET version = 0 ' .
-                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
-                                  'object_class = \'' . $row['object_class'] . '\';' .
-                        'SET @version = 0;' .
-                        'UPDATE oro_audit SET version = @version:=@version+1 ' .
-                            'WHERE object_id = \'' . $row['object_id'] . '\' AND '.
-                                  'object_class = \'' . $row['object_class'] . '\';'
-                    );
+                    $sql = 'UPDATE oro_audit SET version = 0 ' .
+                        'WHERE object_id = :object_id AND '.
+                            'object_class = :object_class;'.
+                        'SET @version = 0;'.
+                        'UPDATE oro_audit SET version = @version:=@version+1 '.
+                            'WHERE object_id = :object_id AND '.
+                                  'object_class = :object_class;';
                 }
+
+                $this->connection->executeUpdate(
+                    $sql,
+                    [
+                        'object_id' => $row['object_id'],
+                        'object_class' => $row['object_class'],
+                    ],
+                    [
+                        'object_id' => 'integer',
+                        'object_class' => 'string',
+                    ]
+                );
             }
         }
 
-        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+        if ($platform instanceof PostgreSqlPlatform) {
             $this->connection->exec('DROP SEQUENCE seq_temp_version');
         }
     }
