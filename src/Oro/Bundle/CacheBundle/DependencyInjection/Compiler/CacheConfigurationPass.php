@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\CacheBundle\DependencyInjection\Compiler;
 
+use Doctrine\Common\Cache\CacheProvider;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
+
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
+use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 
 class CacheConfigurationPass implements CompilerPassInterface
 {
@@ -34,14 +39,9 @@ class CacheConfigurationPass implements CompilerPassInterface
      */
     protected function ensureAbstractFileCacheExists(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::FILE_CACHE_SERVICE)) {
-            $definition = new Definition(
-                'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
-                ['%kernel.cache_dir%/oro']
-            );
-            $definition->setAbstract(true);
-            $container->setDefinition(self::FILE_CACHE_SERVICE, $definition);
-        }
+        $cacheProviders = $this->getCacheProviders($container, static::FILE_CACHE_SERVICE);
+
+        $container->setDefinition(self::FILE_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProviders));
     }
 
     /**
@@ -51,14 +51,9 @@ class CacheConfigurationPass implements CompilerPassInterface
      */
     protected function ensureAbstractDataCacheExists(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::DATA_CACHE_SERVICE)) {
-            $definition = new Definition(
-                'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
-                ['%kernel.cache_dir%/oro_data']
-            );
-            $definition->setAbstract(true);
-            $container->setDefinition(self::DATA_CACHE_SERVICE, $definition);
-        }
+        $cacheProviders = $this->getCacheProviders($container, static::DATA_CACHE_SERVICE);
+
+        $container->setDefinition(self::DATA_CACHE_SERVICE, $this->getMemoryCacheChain($cacheProviders));
     }
 
     /**
@@ -85,5 +80,68 @@ class CacheConfigurationPass implements CompilerPassInterface
                 );
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string           $cacheDefinitionId
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function getCacheProviders(ContainerBuilder $container, $cacheDefinitionId)
+    {
+        $cacheProviders = [];
+        if ($container->hasDefinition($cacheDefinitionId)) {
+            $cacheDefinition = $container->getDefinition($cacheDefinitionId);
+
+            if (!in_array(CacheProvider::class, class_parents($cacheDefinition->getClass()), true)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Cache providers for `%s` should extend doctrine CacheProvider::class. `%s` given',
+                    $cacheDefinitionId,
+                    $cacheDefinition->getClass()
+                ));
+            }
+
+            $cacheProviders[] = $cacheDefinition;
+        } else {
+            $cacheProviders[] = $this->getFilesystemCache($cacheDefinitionId);
+        }
+
+        return $cacheProviders;
+    }
+
+    /**
+     * @param string $cacheDefinitionId
+     *
+     * @return Definition
+     */
+    private function getFilesystemCache($cacheDefinitionId)
+    {
+        $path = $cacheDefinitionId === static::FILE_CACHE_SERVICE ? 'oro' : 'oro_data';
+
+        $cacheDefinition = new Definition(
+            FilesystemCache::class,
+            [sprintf('%%kernel.cache_dir%%/%s', $path)]
+        );
+        $cacheDefinition->setAbstract(true);
+
+        return $cacheDefinition;
+    }
+
+    /**
+     * @param array $cacheProviders
+     *
+     * @return Definition
+     */
+    private function getMemoryCacheChain(array $cacheProviders)
+    {
+        $definition = new Definition(
+            MemoryCacheChain::class,
+            [$cacheProviders]
+        );
+        $definition->setAbstract(true);
+
+        return $definition;
     }
 }
