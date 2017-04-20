@@ -84,6 +84,7 @@ services:
         class: %oro_segment.event_listener.doctrine_pre_remove.class%
         arguments:
             - '@oro_entity_config.config_manager'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: doctrine.event_listener, event: preRemove }
             - { name: doctrine.event_listener, event: postFlush }
