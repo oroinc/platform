@@ -531,9 +531,3 @@ services:
         class: 'Oro\Bundle\NavigationBundle\EventListener\MenuGridListener'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.menu-by-scope-grid, method: onPreBuild }
-
-    oro_navigation.event_listener.acl_cache_clear:
-        class: 'Oro\Bundle\NavigationBundle\EventListener\AclCacheClearListener'
-        arguments: ['@oro_menu.cache']
-        tags:
-            - { name: kernel.event_listener, event: oro_security.acl_cache.clear, method: onCacheClear }
