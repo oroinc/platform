@@ -116,9 +116,29 @@
 }
 
 @include breakpoint('mobile') {
-    .datagrid-tool {
+    .datagrid-toolbar {
+        justify-content: space-between;
+
+        &__side,
+        &__rightside {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+
+            min-width: 0;
+        }
+    }
+
+    .grid-toolbar {
+        justify-content: space-between;
+
         .action-selectbox_custom_in-pager {
             margin-right: $offset-x-s;
+        }
+    }
+
+    .form-horizontal { //Platform override
+        .oro-items-counter {
+            display: none;
         }
     }
 }

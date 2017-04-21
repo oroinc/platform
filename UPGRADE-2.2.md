@@ -54,6 +54,11 @@ DataAuditBundle
 A new string field `ownerDescription` with the database column `owner_description` was added to the entity 
 `Oro\Bundle\DataAuditBundle\Entity\Audit` and to the base class `Oro\Bundle\DataAuditBundle\Entity\AbstractAudit`
 
+ApiBundle
+---------
+- Added class `Oro\Bundle\ApiBundle\Processor\ApiFormBuilderSubscriberProcessor`
+    - can be used to add subscribers to `FormContext`
+
 DataGridBundle
 --------------
 - Interface `Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface` added.
