@@ -13,7 +13,6 @@ use Oro\Component\Action\Action\ActionInterface;
 
 class TransitionFormProvider extends AbstractFormProvider
 {
-
     /** @var WorkflowManager */
     protected $workflowManager;
 

@@ -9,9 +9,6 @@ use Oro\Component\ChainProcessor\Context;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @noinspection LongInheritanceChainInspection
- */
 class TransitionContext extends Context
 {
     const WORKFLOW_NAME = 'workflowName';

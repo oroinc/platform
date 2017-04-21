@@ -263,7 +263,6 @@ WorkflowBundle
     - `processWorkflowData` - managed by processors
 - Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
 
-    
 
 PlatformBundle
 --------------

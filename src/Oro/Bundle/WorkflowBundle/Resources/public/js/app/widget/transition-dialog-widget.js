@@ -13,16 +13,30 @@ define(function(require) {
             'transitionSuccess': 'onTransitionSuccess',
             'transitionFailure': 'onTransitionFailure'
         },
+
+        /**
+         * @param {Object} response
+         */
         onTransitionSuccess: function(response) {
             var element = $('<div>');
             this.hide();
             TransitionEventHandlers.getOnSuccess(element)(response);
         },
+
+        /**
+         * @param {XMLHttpRequest} jqxhr
+         */
         onTransitionFailure: function(jqxhr) {
             var element = $('<div>');
             this.hide();
             TransitionEventHandlers.getOnFailure(element)(jqxhr);
         },
+
+        /**
+         * @param {Object} content
+         * @returns {Object}
+         * @private
+         */
         _onContentLoad: function(content) {
             if (_.has(content, 'workflowItem')) {
                 var element = $('<div>');

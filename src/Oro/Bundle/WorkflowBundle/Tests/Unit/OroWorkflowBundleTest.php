@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
-
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
 use Oro\Bundle\WorkflowBundle\OroWorkflowBundle;
+use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroWorkflowBundleTest extends \PHPUnit_Framework_TestCase
 {

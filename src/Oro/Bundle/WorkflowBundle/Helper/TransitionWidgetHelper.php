@@ -12,8 +12,6 @@ class TransitionWidgetHelper
     protected $doctrineHelper;
 
     /**
-     * TransitionWidgetHelper constructor.
-     *
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(DoctrineHelper $doctrineHelper)
