@@ -5,22 +5,20 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\FormInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
-use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandlerInterface;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
+use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
+use Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor;
 use Oro\Bundle\WorkflowBundle\Translation\Helper\TransitionTranslationHelper;
 
 /**
@@ -98,57 +96,14 @@ class WidgetController extends Controller
      */
     public function startTransitionFormAction($transitionName, $workflowName, Request $request)
     {
-        $entityId = $request->get('entityId', 0);
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
-        $workflow = $workflowManager->getWorkflow($workflowName);
-        $entityClass = $workflow->getDefinition()->getRelatedEntity();
-        $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
-        $dataArray = [];
+        $processor = $this->getProcessor();
 
-        if (!$transition->isEmptyInitOptions()) {
-            $contextAttribute = $transition->getInitContextAttribute();
-            $dataArray[$contextAttribute] = $this->get('oro_action.provider.button_search_context')
-                ->getButtonSearchContext();
-            $entityId = null;
-        }
+        $context = $this->createProcessorContext($processor, $request, $transitionName);
+        $context->setWorkflowName($workflowName);
 
-        $entity = $this->getTransitionWidgetHelper()->getOrCreateEntityReference($entityClass, $entityId);
-        $workflowItem = $workflow->createWorkflowItem($entity, $dataArray);
+        $processor->process($context);
 
-        $transitionForm = $this->getTransitionWidgetHelper()->getTransitionForm($workflowItem, $transition);
-
-        $saved = $this->getTransitionFormHandler($transition)
-            ->processStartTransitionForm($transitionForm, $workflowItem, $transition, $request);
-
-        $data = null;
-        if ($saved) {
-            $data = $this->getTransitionWidgetHelper()
-                ->processWorkflowData($workflow, $transition, $transitionForm, $dataArray);
-
-            $response = $this->get('oro_workflow.handler.start_transition_handler')
-                ->handle($workflow, $transition, $data, $entity);
-
-            if ($response) {
-                return $response;
-            }
-        }
-
-        $this->getTransitionOptionsResolver()->resolveTransitionOptions($transition, $workflowItem);
-
-        $params = [
-            'transition' => $transition,
-            'data' => $data,
-            'saved' => $saved,
-            'workflowItem' => $workflowItem,
-            'form' => $transitionForm->createView(),
-            'formErrors' => $transitionForm->getErrors(true),
-        ];
-
-        return $this->render(
-            $this->getTransitionWidgetHelper()->getTransitionFormTemplate($transition),
-            array_merge($this->getPageFormData($transition, $workflowItem, $transitionForm, $request), $params)
-        );
+        return $context->getResult();
     }
 
     /**
@@ -166,37 +121,40 @@ class WidgetController extends Controller
      */
     public function transitionFormAction($transitionName, WorkflowItem $workflowItem, Request $request)
     {
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
-        $workflow = $workflowManager->getWorkflow($workflowItem);
+        $processor = $this->getProcessor();
 
-        $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
-        $transitionForm = $this->getTransitionWidgetHelper()->getTransitionForm($workflowItem, $transition);
+        $context = $this->createProcessorContext($processor, $request, $transitionName);
+        $context->setWorkflowItem($workflowItem);
 
-        $saved = $this->getTransitionFormHandler($transition)
-            ->processTransitionForm($transitionForm, $workflowItem, $transition, $request);
+        $processor->process($context);
 
-        if ($saved) {
-            $response = $this->get('oro_workflow.handler.transition_handler')->handle($transition, $workflowItem);
-            if ($response) {
-                return $response;
-            }
-        }
+        return $context->getResult();
+    }
 
-        $this->getTransitionOptionsResolver()->resolveTransitionOptions($transition, $workflowItem);
+    /**
+     * @return TransitActionProcessor
+     */
+    private function getProcessor()
+    {
+        return $this->get('oro_workflow.transit.action_processor');
+    }
 
-        $params = [
-            'transition' => $transition,
-            'saved' => $saved,
-            'workflowItem' => $workflowItem,
-            'form' => $transitionForm->createView(),
-            'formErrors' => $transitionForm->getErrors(true),
-        ];
+    /**
+     * @param TransitActionProcessor $processor
+     * @param Request $request
+     * @param string $transitionName
+     *
+     * @return TransitionContext
+     */
+    private function createProcessorContext(TransitActionProcessor $processor, Request $request, $transitionName)
+    {
+        /** @var TransitionContext $context */
+        $context = $processor->createContext();
+        $context->setTransitionName($transitionName);
+        $context->setRequest($request);
+        $context->setResultType(new TemplateResultType());
 
-        return $this->render(
-            $this->getTransitionWidgetHelper()->getTransitionFormTemplate($transition),
-            array_merge($this->getPageFormData($transition, $workflowItem, $transitionForm, $request), $params)
-        );
+        return $context;
     }
 
     /**
@@ -260,70 +218,10 @@ class WidgetController extends Controller
     }
 
     /**
-     * @param Transition $transition
-     *
-     * @return TransitionFormHandlerInterface|object
-     */
-    protected function getTransitionFormHandler(Transition $transition)
-    {
-        $handlerName = 'oro_workflow.handler.transition.form';
-        if ($transition->hasFormConfiguration()) {
-            $handlerName = 'oro_workflow.handler.transition.form.page_form';
-        }
-
-        return $this->get($handlerName);
-    }
-
-    /**
-     * @param $providerAlias
-     *
-     * @return FormTemplateDataProviderInterface
-     */
-    protected function getFormTemplateDataProvider($providerAlias)
-    {
-        return $this->get('oro_form.registry.form_template_data_provider')
-            ->get($providerAlias);
-    }
-
-    /**
      * @return TransitionWidgetHelper
      */
     protected function getTransitionWidgetHelper()
     {
         return $this->get('oro_workflow.helper.transition_widget');
-    }
-
-    /**
-     * @return TransitionOptionsResolver
-     */
-    protected function getTransitionOptionsResolver()
-    {
-        return $this->get('oro_workflow.resolver.transition_options_resolver');
-    }
-
-    /**
-     * @param Transition $transition
-     * @param WorkflowItem $workflowItem
-     * @param FormInterface $transitionForm
-     * @param Request $request
-     *
-     * @return array
-     */
-    private function getPageFormData(
-        Transition $transition,
-        WorkflowItem $workflowItem,
-        FormInterface $transitionForm,
-        Request $request
-    ) {
-        if ($transition->hasFormConfiguration()) {
-            return $this->getFormTemplateDataProvider($transition->getFormDataProvider())
-                ->getData(
-                    $workflowItem->getData()->get($transition->getFormDataAttribute()),
-                    $transitionForm,
-                    $request
-                );
-        }
-
-        return [];
     }
 }
