@@ -32,6 +32,8 @@ oro_behat_extension:
           View form: 'display_type'
           Destination Page: 'destination_page'
           Warning message: 'message'
+          Button Label: 'button_label'
+          Button Title: 'button_title'
 
     Workflow Transition Edit Attributes Form:
       selector: 'div[id="transition-attributes"] form'

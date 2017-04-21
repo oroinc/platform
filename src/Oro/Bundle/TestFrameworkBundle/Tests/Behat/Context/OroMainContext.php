@@ -317,7 +317,7 @@ class OroMainContext extends MinkContext implements
 
     /**
      * Assert form fields values
-     * Example: And "User" form must contains values:
+     * Example: And "User Form" must contains values:
      *            | Username          | charlie           |
      *            | First Name        | Charlie           |
      *            | Last Name         | Sheen             |
@@ -529,6 +529,59 @@ class OroMainContext extends MinkContext implements
         self::assertTrue($attachmentItem->isValid(), sprintf('Attachment with "%s" text not found', $text));
 
         $attachmentItem->checkDownloadLink();
+    }
+
+    /**
+     * Example: And I should see "UiDialog" with elements:
+     *            | Title        | Dialog title   |
+     *            | Content      | Dialog content |
+     *            | okButton     | Yes, Confirm   |
+     *            | cancelButton | Cancel         |
+     *
+     * @When /^(?:|I )should see "(?P<dialogName>[^"]*)" with elements:$/
+     */
+    public function iShouldSeeModalWithElements($dialogName, TableNode $table)
+    {
+        $modal = $this->elementFactory->createElement($dialogName);
+
+        self::assertTrue($modal->isValid(), 'There is no modal on page at this moment');
+        self::assertTrue($modal->isVisible(), 'There is no visible modal on page at this moment');
+
+        foreach ($table->getRows() as $row) {
+            list($elementName, $expectedTitle) = $row;
+
+            $element = $modal->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
+            self::assertTrue($element->isValid(), sprintf('Element with "%s" text not found', $expectedTitle));
+        }
+    }
+
+    /**
+     * Example: And I should see "My Link" button with attributes:
+     *            | title | Button title |
+     *            | alt   | Button alt   |
+     *
+     * @When /^(?:|I )should see "(?P<buttonName>[^"]*)" button with attributes:$/
+     */
+    public function iShouldSeeButtonWithAttributes($buttonName, TableNode $table)
+    {
+        $button = $this->getSession()->getPage()->findButton($buttonName);
+        if (null === $button) {
+            $button = $this->getSession()->getPage()->findLink($buttonName);
+        }
+        if (null === $button) {
+            /* @var $driver OroSelenium2Driver */
+            $driver = $this->getSession()->getDriver();
+
+            throw new ElementNotFoundException($driver, 'button', 'id|name|title|alt|value', $buttonName);
+        }
+
+        foreach ($table->getRows() as $row) {
+            list($attributeName, $expectedValue) = $row;
+            $attribute = $button->getAttribute($attributeName);
+
+            self::assertNotNull($attribute, sprintf("Attribute with name '%s' not found", $attributeName));
+            self::assertEquals($expectedValue, $attribute);
+        }
     }
 
     /**

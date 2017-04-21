@@ -20,6 +20,42 @@ oro_behat_extension:
       selector: 'div.ui-dialog'
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\UiDialog
 
+    UiDialog Title:
+      selector: 'span.ui-dialog-title'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiDialog Content:
+      selector: 'div.ui-dialog-content'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiDialog okButton:
+      selector: 'div.ui-dialog-buttonpane button[type=submit]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiDialog cancelButton:
+      selector: 'div.ui-dialog-buttonpane button[type=reset]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow:
+      selector: 'div.modal'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow Title:
+      selector: 'div.modal-header h3'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow Content:
+      selector: 'div.modal-body'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow okButton:
+      selector: 'div.modal-footer a.ok'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow cancelButton:
+      selector: 'div.modal-footer a.cancel'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
     ContextSelector:
       selector:
         type: xpath
