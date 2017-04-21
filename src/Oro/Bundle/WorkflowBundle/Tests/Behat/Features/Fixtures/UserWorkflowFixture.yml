@@ -1,0 +1,20 @@
+Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
+    user_workflow_definition:
+        name: 'user_workflow_definition'
+        label: 'oro.workflow.user_workflow_definition.label'
+        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        active: true
+        entityAttributeName: 'entity'
+        configuration:
+            steps:
+                step1:
+                    label: 'step1'
+                    allowed_transitions: ['start_transition']
+            transitions:
+                start_transition:
+                    label: 'oro.workflow.user_workflow_definition.transition.start_transition.label'
+                    step_to: 'step1'
+                    transition_definition: 'start_transition_definition'
+                    is_start: true
+            transition_definitions:
+                start_transition_definition: ~
