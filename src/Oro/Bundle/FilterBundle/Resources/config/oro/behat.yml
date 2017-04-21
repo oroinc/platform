@@ -1,0 +1,4 @@
+elements:
+  Filters condition builder:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: "div[id='oro_report-condition-builder']"
