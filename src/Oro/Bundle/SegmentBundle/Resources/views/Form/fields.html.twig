@@ -4,17 +4,51 @@
 
     {% set segment = form.vars.value %}
     {% set id = form.vars.id %}
+    {% set coditionBuilderId = id ~ '-condition-builder' %}
+    {% set criteriaListId = 'filter-criteria-list_' ~ id %}
+    {% set entityChoiceId = form.entity.vars.attr['data-ftid'] %}
+    {% set definitionId = form.definition.vars.attr['data-ftid'] %}
 
     {{ form_widget(form.entity) }}
     {{ form_widget(form.definition) }}
     {{ segmentQD.query_designer_condition_builder({
-        'id': id ~ '-condition-builder',
-        'criteria_list_id': 'filter-criteria-list',
-        'entity_choice_id': form.entity.vars.attr['data-ftid'],
+        'id': coditionBuilderId,
+        'criteria_list_id': criteriaListId,
+        'entity_choice_id': entityChoiceId,
         'currentSegmentId': segment.id|default(null),
         'page_limit': constant('\\Oro\\Bundle\\SegmentBundle\\Entity\\Manager\\SegmentManager::PER_PAGE')
     }) }}
+    {{ QD.query_designer_column_chain_template('column-chain-template-' ~ id) }}
 
-    {{ QD.query_designer_column_chain_template('column-chain-template') }}
-    {{ segmentQD.initJsWidgets(id, form, form.vars.entities, form.vars.metadata) }}
+    {% set fieldsData = {} %}
+    {% if not form.entity.vars.value is empty %}
+        {% set encodedEntityName = form.entity.vars.value|replace({'\\': '_'}) %}
+        {% set routeParams = {}|merge({'entityName': encodedEntityName}) %}
+        {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
+    {% endif %}
+
+    {% set widgetOptions = {
+        valueSource: '[data-ftid=' ~ definitionId ~ ']',
+        fieldsLoader: {
+            entityChoice:      '[data-ftid=' ~ entityChoiceId ~ ']',
+            loadingMaskParent: '#' ~ form.vars.id,
+            router:            'oro_api_querydesigner_fields_entity',
+            routingParams:     {},
+            fieldsData:        fieldsData,
+            confirmMessage:    'oro.segment.condition_builder.confirm_message'|trans,
+        },
+        filters: {
+            criteriaList:     '#' ~ criteriaListId,
+            conditionBuilder: '#' ~ coditionBuilderId,
+        },
+        entities:                   oro_query_filter_entities(),
+        metadata:                   oro_query_filter_metadata(),
+        initEntityChangeEvents:     false,
+        select2FieldChoiceTemplate: '#column-chain-template-' ~ id,
+    } %}
+
+    {% set widgetOptions = update_segment_widget_options(widgetOptions, id) %}
+    <div data-page-component-module="orosegment/js/app/components/segment-component"
+         data-page-component-options="{{ widgetOptions|json_encode }}">
+    </div>
 {% endblock %}

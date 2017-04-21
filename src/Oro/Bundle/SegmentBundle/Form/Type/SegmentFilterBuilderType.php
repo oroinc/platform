@@ -3,8 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType as SegmentTypeEntity;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -13,8 +11,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -37,16 +33,6 @@ class SegmentFilterBuilderType extends AbstractType
     const NAME = 'oro_segment_filter_builder';
 
     /**
-     * @var EntityProvider
-     */
-    private $entityProvider;
-
-    /**
-     * @var Manager
-     */
-    private $queryDesignerManager;
-
-    /**
      * @var DoctrineHelper
      */
     private $doctrineHelper;
@@ -57,19 +43,13 @@ class SegmentFilterBuilderType extends AbstractType
     private $tokenStorage;
 
     /**
-     * @param EntityProvider $entityProvider
-     * @param Manager $queryDesignerManager
      * @param DoctrineHelper $doctrineHelper
      * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(
-        EntityProvider $entityProvider,
-        Manager $queryDesignerManager,
         DoctrineHelper $doctrineHelper,
         TokenStorageInterface $tokenStorage
     ) {
-        $this->entityProvider = $entityProvider;
-        $this->queryDesignerManager = $queryDesignerManager;
         $this->doctrineHelper = $doctrineHelper;
         $this->tokenStorage = $tokenStorage;
     }
@@ -177,19 +157,5 @@ class SegmentFilterBuilderType extends AbstractType
                 }
             }
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        // Change fields ftids to match values expected by JS macros
-        $view->children['entity']->vars['attr']['data-ftid'] = $view->vars['id'] . '_form_entity';
-        $view->children['definition']->vars['attr']['data-ftid'] = $view->vars['id'] . '_form_definition';
-
-        // Load collections required by JS components
-        $view->vars['entities'] = $this->entityProvider->getEntities();
-        $view->vars['metadata'] = $this->queryDesignerManager->getMetadata('segment');
     }
 }

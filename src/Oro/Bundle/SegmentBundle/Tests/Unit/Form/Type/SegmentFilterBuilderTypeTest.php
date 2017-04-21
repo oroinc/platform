@@ -4,17 +4,14 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -23,16 +20,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
-
-    /**
-     * @var EntityProvider|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $entityProvider;
-
-    /**
-     * @var Manager|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $queryDesignerManager;
 
     /**
      * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
@@ -51,16 +38,12 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
-        $this->entityProvider = $this->createMock(EntityProvider::class);
-        $this->queryDesignerManager = $this->createMock(Manager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         parent::setUp();
 
         $this->formType = new SegmentFilterBuilderType(
-            $this->entityProvider,
-            $this->queryDesignerManager,
             $this->doctrineHelper,
             $this->tokenStorage
         );
@@ -146,35 +129,6 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         ];
 
         $this->assertEquals($expected, $resolver->resolve($options));
-    }
-
-    public function testFinishView()
-    {
-        $entityClass = '\stdClass';
-        $options = [
-            'segment_entity' => $entityClass
-        ];
-        $this->assertNormalizersCalls($entityClass);
-        $this->entityProvider->expects($this->once())
-            ->method('getEntities')
-            ->willReturn([]);
-        $this->queryDesignerManager->expects($this->once())
-            ->method('getMetadata')
-            ->with('segment')
-            ->willReturn([]);
-
-        $form = $this->factory->create($this->formType, null, $options);
-
-        $view = new FormView();
-        $view->vars['id'] = 'test_id';
-        $view->children = ['entity' => new FormView(), 'definition' => new FormView()];
-        $this->formType->finishView($view, $form, $form->getConfig()->getOptions());
-
-        $this->assertEquals('test_id_form_entity', $view->children['entity']->vars['attr']['data-ftid']);
-        $this->assertEquals('test_id_form_definition', $view->children['definition']->vars['attr']['data-ftid']);
-
-        $this->assertArrayHasKey('entities', $view->vars);
-        $this->assertArrayHasKey('metadata', $view->vars);
     }
 
     /**

@@ -12,8 +12,6 @@ services:
     oro_segment.form.type.segment_filter_builder:
         class: Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType
         arguments:
-            - '@oro_segment.entity_provider'
-            - '@oro_query_designer.query_designer.manager'
             - '@oro_entity.doctrine_helper'
             - '@security.token_storage'
         tags:
