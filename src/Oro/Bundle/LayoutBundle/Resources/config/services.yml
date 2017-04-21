@@ -227,3 +227,10 @@ services:
             - '@property_accessor'
         tags:
             - { name: layout.data_provider, alias: property_accessor }
+
+    oro_layout.provider.abstract_form:
+        abstract: true
+        class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider'
+        arguments:
+            - '@form.factory'
+            - '@router'
