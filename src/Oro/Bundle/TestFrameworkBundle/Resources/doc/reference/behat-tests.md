@@ -112,13 +112,13 @@ java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriv
 Run tests with Selenium and Firefox:
 
 ```bash
-vendor/bin/behat -p selenium2
+bin/behat -p selenium2
 ```
 
 Run tests with PhantomJs
 
 ```bash
-vendor/bin/behat
+bin/behat
 ```
 
 #### Fail tests
