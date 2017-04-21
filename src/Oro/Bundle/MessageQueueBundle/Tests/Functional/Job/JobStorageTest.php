@@ -51,7 +51,7 @@ class JobStorageTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getEntityManager()
+    protected function getDataFixtureExtecurotEntityManager()
     {
         return $this->entityManager;
     }
