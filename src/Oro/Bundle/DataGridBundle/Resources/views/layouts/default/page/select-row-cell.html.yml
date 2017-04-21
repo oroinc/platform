@@ -1,0 +1,9 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: 'select-row-cell.html.twig'
+
+        - '@add':
+            id: select_row_cell_template
+            blockType: block
+            parentId: head

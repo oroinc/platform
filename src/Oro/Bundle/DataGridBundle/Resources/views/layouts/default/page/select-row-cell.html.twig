@@ -1,0 +1,13 @@
+{% block _select_row_cell_template_widget %}
+    <script type="text/template" id="template-select-row-cell">
+        <label class="custom-checkbox">
+            <input type="checkbox"
+                   tabindex="-1"
+                   data-role="select-row-cell"
+                   class="custom-checkbox__input"
+                   <% if (checked) { %> checked="checked"<% } %>
+            >
+            <span class="custom-checkbox__icon"></span>
+        </label>
+    </script>
+{% endblock %}
