@@ -352,6 +352,12 @@ Transition configuration has next options:
 * **label** (translation file field)
     *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.label` 
     Label of transition, will to be shown in UI.
+* **button_label** (translation file field)
+    *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.button_label`
+    Used to define text of transition button. A `label` will be used if not defined. 
+* **button_title** (translation file field)
+    *Translatable*: `oro.workflow.{workflow_name}.transition.{transition_name}.button_title`
+    Used to define text of button hint (button hover). A `button_label` will be used if not defined.
 * **step_to**
     *string*
     Next step name. This is a reference to step that will be set to Workflow Item after transition is performed.

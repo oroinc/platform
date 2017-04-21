@@ -246,10 +246,7 @@ class WorkflowDefinitionTranslationFieldsIteratorTest extends \PHPUnit_Framework
             ]
         );
 
-        return [
-            'actual' => $caseNormalActual,
-            'expected' => $caseNormalExpected
-        ];
+        return ['actual' => $caseNormalActual, 'expected' => $caseNormalExpected];
     }
 
     /**
