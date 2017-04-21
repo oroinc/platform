@@ -51,7 +51,13 @@ class RecipientListType extends AbstractType
         $builder->add(
             'owner',
             'checkbox',
-            ['label' => 'oro.notification.emailnotification.owner.label', 'required' => false]
+            [
+                'label' => 'oro.notification.emailnotification.owner.label',
+                'required' => false,
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
+            ]
         );
     }
 

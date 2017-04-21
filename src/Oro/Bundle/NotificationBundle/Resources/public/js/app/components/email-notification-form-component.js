@@ -38,25 +38,22 @@ define(function(require) {
         },
 
         onChange: function() {
-            this.submitForm({});
+            this.submitForm();
         },
 
         /**
-         * @param {object} extraData
+         * @param {Object=} extraData
          */
         submitForm: function(extraData) {
             mediator.execute('showLoading');
 
-            var data = this.getForm().serializeArray();
-            var url = this.getForm().attr('action');
-            var event = {formEl: this.getForm(), data: data, reloadManually: true};
+            var form = this.getForm();
+            var data = form.serializeArray();
             if (extraData) {
                 data.push(extraData);
             }
 
-            if (event.reloadManually) {
-                mediator.execute('submitPage', {url: url, type: this.getForm().attr('method'), data: $.param(data)});
-            }
+            mediator.execute('submitPage', {url: form.attr('action'), type: form.attr('method'), data: $.param(data)});
         },
 
         /**

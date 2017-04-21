@@ -65,6 +65,9 @@ class EmailNotificationType extends AbstractType
                 'tooltip_parameters' => [
                     'url' => $this->router->generate('oro_email_emailtemplate_index')
                 ],
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
             ]
         );
 
@@ -81,6 +84,9 @@ class EmailNotificationType extends AbstractType
                 'configs'       => [
                     'allowClear'  => true,
                     'placeholder' => 'oro.notification.form.choose_event',
+                ],
+                'attr' => [
+                    'autocomplete' => 'off'
                 ],
                 'empty_value'   => '',
                 'required'      => true

@@ -37,7 +37,7 @@ class EmailNotificationHandler implements FormHandlerInterface
         $form->setData($data);
 
         if ($this->isApplicable($request)) {
-            $form->handleRequest($request);
+            $form->submit($request);
 
             if ($form->isValid()) {
                 $manager = $this->registry->getManagerForClass('OroNotificationBundle:EmailNotification');

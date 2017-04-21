@@ -9,6 +9,12 @@ services:
     oro_workflow.form.event_listener.required_attributes:
         class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener'
 
+    oro_workflow.form.event_listener.email_notification:
+        class: 'Oro\Bundle\WorkflowBundle\Form\EventListener\EmailNotificationTypeListener'
+        arguments:
+            - '@oro_workflow.registry.system'
+        public: false
+
     oro_workflow.form.type.attributes:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType'
         arguments:
@@ -102,6 +108,13 @@ services:
             - '@oro_workflow.restriction.manager'
         tags:
             - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+
+    oro_workflow.form.extension.email_notification:
+        class: 'Oro\Bundle\WorkflowBundle\Form\Extension\EmailNotificationTypeExtension'
+        arguments:
+            - '@oro_workflow.form.event_listener.email_notification'
+        tags:
+            - { name: form.type_extension, extended_type: 'Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType' }
 
     oro_workflow.form.type.variables:
         class: 'Oro\Bundle\WorkflowBundle\Form\Type\WorkflowVariablesType'

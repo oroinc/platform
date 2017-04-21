@@ -9,13 +9,15 @@ use Oro\Bundle\NotificationBundle\Entity\Event;
 
 class LoadWorkflowNotificationEvents extends AbstractFixture
 {
+    const TRANSIT_EVENT = 'oro.workflow.event.notification.workflow_transition';
+
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
         $eventNames = [
-            'transit' => 'oro.workflow.event.notification.workflow_transition'
+            'transit' => self::TRANSIT_EVENT
         ];
 
         foreach ($eventNames as $key => $name) {

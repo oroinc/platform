@@ -10,6 +10,7 @@ use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
+use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 
 class WorkflowTransitionRecordListener implements OptionalListenerInterface
 {
@@ -47,7 +48,7 @@ class WorkflowTransitionRecordListener implements OptionalListenerInterface
         }
 
         $this->eventDispatcher->dispatch(
-            'oro.workflow.event.notification.workflow_transition',
+            LoadWorkflowNotificationEvents::TRANSIT_EVENT,
             $this->getNotificationEvent($transitionRecord)
         );
     }

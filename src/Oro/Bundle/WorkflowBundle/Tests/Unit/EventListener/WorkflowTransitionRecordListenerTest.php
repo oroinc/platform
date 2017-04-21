@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowTransitionRecordListener;
+use Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\LoadWorkflowNotificationEvents;
 
 class WorkflowTransitionRecordListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,7 +65,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher->expects($this->exactly($expectedCount))
             ->method('dispatch')
-            ->with('oro.workflow.event.notification.workflow_transition', $event);
+            ->with(LoadWorkflowNotificationEvents::TRANSIT_EVENT, $event);
 
         $this->listener->postPersist($this->args);
     }
