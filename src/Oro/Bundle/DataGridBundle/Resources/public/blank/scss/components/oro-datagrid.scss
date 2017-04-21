@@ -1,6 +1,8 @@
 // @theme: blank;
 
 .oro-datagrid {
+    margin-bottom: $offset-x * 2;
+
     &.no-data-visible {
         .no-data {
             display: block;

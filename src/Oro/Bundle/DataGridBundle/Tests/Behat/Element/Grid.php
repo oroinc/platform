@@ -55,11 +55,38 @@ class Grid extends Table
     }
 
     /**
+     * @param int $number
+     * @param int $cellNumber
+     */
+    public function uncheckFirstRecords($number, $cellNumber = 0)
+    {
+        $rows = $this->getRows();
+
+        self::assertGreaterThanOrEqual(
+            $number,
+            count($rows),
+            sprintf('Can\'t uncheck %s records, because grid has only %s records', $number, count($rows))
+        );
+
+        for ($i = 0; $i < $number; $i++) {
+            $rows[$i]->uncheckMassActionCheckbox($cellNumber);
+        }
+    }
+
+    /**
      * @param string $content
      */
     public function checkRecord($content)
     {
         $this->getRowByContent($content)->checkMassActionCheckbox();
+    }
+
+    /**
+     * @param string $content
+     */
+    public function uncheckRecord($content)
+    {
+        $this->getRowByContent($content)->uncheckMassActionCheckbox();
     }
 
     /**

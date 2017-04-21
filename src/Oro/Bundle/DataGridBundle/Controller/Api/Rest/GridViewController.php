@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
@@ -71,7 +71,7 @@ class GridViewController extends RestController
      */
     public function putAction(Request $request, $id)
     {
-        /** @var GridView $gridView */
+        /** @var AbstractGridView $gridView */
         $gridView = $this->getManager()->find($id);
         $this->checkSharedAccess($request, $gridView);
 
@@ -101,7 +101,6 @@ class GridViewController extends RestController
     {
         return $this->handleDeleteRequest($id);
     }
-
 
     /**
      * Set/unset grid view as default for current user.
@@ -135,7 +134,7 @@ class GridViewController extends RestController
      */
     public function defaultAction($id, $default = false, $gridName = null)
     {
-        /** @var GridView $gridView */
+        /** @var AbstractGridView $gridView */
         $manager  = $this->getManager();
         $gridView = $manager->getView($id, $default, $gridName);
         if ($gridView) {
@@ -149,15 +148,15 @@ class GridViewController extends RestController
     }
 
     /**
-     * @param GridView $view
-     * @param Request  $request
+     * @param AbstractGridView $view
+     * @param Request $request
      *
      * @throws AccessDeniedException
      */
-    protected function checkSharedAccess(Request $request, GridView $view)
+    protected function checkSharedAccess(Request $request, AbstractGridView $view)
     {
         if ($request->request->get('type') !== $view->getType()) {
-            if (!$this->getSecurityFacade()->isGranted('oro_datagrid_gridview_publish')) {
+            if (!$this->isGridViewPublishGranted()) {
                 throw new AccessDeniedException();
             }
         }
@@ -170,15 +169,23 @@ class GridViewController extends RestController
      */
     protected function checkCreateSharedAccess(Request $request)
     {
-        if ($request->request->get('type') !== GridView::TYPE_PUBLIC) {
+        if ($request->request->get('type') !== AbstractGridView::TYPE_PUBLIC) {
             return;
         }
 
-        if ($this->getSecurityFacade()->isGranted('oro_datagrid_gridview_publish')) {
+        if ($this->isGridViewPublishGranted()) {
             return;
         }
 
         throw new AccessDeniedException();
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isGridViewPublishGranted()
+    {
+        return $this->getSecurityFacade()->isGranted('oro_datagrid_gridview_publish');
     }
 
     /**

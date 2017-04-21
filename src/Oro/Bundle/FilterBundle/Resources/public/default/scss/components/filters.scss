@@ -455,7 +455,7 @@
 
             .filter-criteria-hint {
                 max-width: 250px;
-                margin-right: 5px;
+                margin: 0 5px 2px 0;
 
                 display: inline-block;
                 vertical-align: middle;
@@ -466,6 +466,8 @@
             }
 
             .reset-filter {
+                position: relative;
+                top: -1px;
                 display: inline-block;
                 width: 12px;
 
