@@ -391,7 +391,7 @@ Before extend fields rendering in view page, event "oro.entity_extend_event.befo
 There is possibility for customize field rendering using this event.
 
 As example you can create Event Listener. Example:
-
+```yaml
     oro_entity_extend.listener.extend_field_value_render:
         class: %oro_entity_extend.listener.extend_field_value_render.class%
         arguments:
@@ -401,9 +401,10 @@ As example you can create Event Listener. Example:
             - @doctrine.orm.entity_manager
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
-
+```
 Each event listener try to made decision how we need to show field value and if it know how value need to be shown, he use `$event->setFieldViewValue($viewData);` to change field view value. Example:
-
+```php
+<?php
     $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
         if ($value && $underlyingFieldType == 'manyToOne') {
             $viewData = $this->getValueForManyToOne(
@@ -413,7 +414,7 @@ Each event listener try to made decision how we need to show field value and if 
 
             $event->setFieldViewValue($viewData);
         }
-
+```
 In this code we: 
 
 
