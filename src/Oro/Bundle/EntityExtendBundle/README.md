@@ -86,7 +86,8 @@ class AcmeTestBundle implements Migration
 ```
 
 Extend fields can be also marked as unique:
- ```
+ ```php
+ <?php
     $table->addColumn(
     'phone',
     'string',
