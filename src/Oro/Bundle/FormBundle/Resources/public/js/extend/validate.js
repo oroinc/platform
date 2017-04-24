@@ -152,7 +152,9 @@ define([
             // add temporary elements names to support validation for frontend elements
             element.name = _.uniqueId('temp-validation-name-');
         }
-        return check.call(this, element);
+        if (!$(element).hasClass('ignored')) {
+            return check.call(this, element);
+        }
     });
 
     $.validator.prototype.valid = _.wrap($.validator.prototype.valid, function(valid) {
@@ -368,7 +370,7 @@ define([
             $el.closest('.control-group').find('.control-label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
-        ignore: ':hidden:not([type=hidden])',
+        ignore: ':hidden:not([type=hidden]), .ignored',
         onfocusout: function(element, event) {
             if (!$(element).is(':disabled') && !this.checkable(element) && !this.isPristine(element)) {
                 if ($(element).hasClass('select2-focusser')) {

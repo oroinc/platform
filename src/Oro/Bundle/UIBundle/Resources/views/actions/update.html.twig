@@ -26,9 +26,30 @@
     {% if addQueryParameters is not defined or addQueryParameters == true %}
         {% set formAction = oro_url_add_query(formAction) %}
     {% endif %}
-    <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
-          method="{{ form.vars.method }}" data-collect="true"
-          {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}>
+
+    {% set formAttr = formAttr|default({}) %}
+    {% if pageComponent is defined %}
+        {% set formAttr = { "data-page-component-module": pageComponent.module }|merge(formAttr) %}
+        {% if pageComponent.options is defined %}
+            {% set formAttr = { "data-page-component-options": pageComponent.options|json_encode }|merge(formAttr) %}
+        {% endif %}
+        {% if pageComponent.name is defined %}
+            {% set formAttr = { "data-page-component-name": pageComponent.name }|merge(formAttr) %}
+        {% endif %}
+        {% if pageComponent.layout is defined %}
+            {% set formAttr = { "data-layout": pageComponent.layout }|merge(formAttr) %}
+        {% endif %}
+    {% endif %}
+
+    {% set formAttr = {
+        id: form.vars.id,
+        name: form.vars.name,
+        action: formAction,
+        method: form.vars.method,
+        "data-collect": "true"
+    }|merge(formAttr) %}
+
+    {{ form_start(form, {"attr": formAttr}) }}
         {% if isWidgetContext %}
             <div class="widget-actions">
                 <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
