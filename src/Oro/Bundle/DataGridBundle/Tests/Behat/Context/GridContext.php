@@ -637,7 +637,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row = $this->getGrid()->getRowByContent($content);
 
         foreach ($table as $item) {
-            $this->getGrid()->getActionLink(reset($item), $row);
+            // Grid Row will assert us if action does not exists
+            $row->getActionLink(reset($item));
         }
     }
 
@@ -653,7 +654,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $row = $this->getGrid()->getRowByContent($content);
 
         foreach ($table as $item) {
-            $action = $row->find('named', ['link', ucfirst(reset($item))]);
+            $action = $row->findActionLink(ucfirst(reset($item)));
             self::assertNull($action, "$action still exists for $content row");
         }
     }
