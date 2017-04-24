@@ -1,55 +1,38 @@
 // @theme: default;
 
-.input-widget-select {
-    &.error {
-        border: 1px solid get-color('ui', 'error-dark');
-        box-shadow: 0 1px 7px 0 rgba(223,96,96,.6);
-    }
-}
-
 .validation-failed,
 .validation-error,
 .validation-passed {
-    display: block;
-
-    min-height: 24px;
-    padding: 0 $offset-y-m;
-
-    line-height: 24px;
-    font-size: $base-font-size--s;
-
-    border-radius: 3px;
+    @extend .notification;
 }
 
 .validation-failed,
 .validation-error {
-    background: get-color('ui', 'error');
-    color: get-color('ui', 'error-dark');
+    @extend .notification--error;
 
     @include fa-icon($fa-var-warning);
 
     &:before {
         display: inline-block;
-
-        width: 11px;
         margin-right: 6px;
-
-        font-style: normal;
     }
 }
 
 .validation-passed {
-    background-color: get-color('ui', 'success');
-    color: get-color('ui', 'success-dark');
+    @extend .notification--success;
 }
 
 .controls {
     &.validation-error {
-        background: get-color('ui', 'error');
-        color: get-color('ui', 'error-dark');
-
         &:before {
-            display: none;
+            content: none;
         }
+    }
+}
+
+.input-widget-select {
+    &.error {
+        border: 1px solid get-color('ui', 'error-dark');
+        box-shadow: 0 1px 7px 0 rgba(223,96,96,.6);
     }
 }
