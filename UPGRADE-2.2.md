@@ -242,6 +242,26 @@ WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Model\TransitionAssembler` (`oro_workflow.transition_assembler`):
     - changed constructor signature:
         - added `TransitionOptionsResolver $optionsResolver`;
+- Class `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionCustomFormHandler` and service `@oro_workflow.handler.transition.form.page_form` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandler` and service `@oro_workflow.handler.transition.form` removed see replacements:
+  - `Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormProcessor`
+  - `Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormStartHandleProcessor`
+- Interface `Oro\Bundle\WorkflowBundle\Form\Handler\TransitionFormHandlerInterface` removed
+- Class `Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper` and service `@oro_workflow.handler.transition_helper` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler` and service `@oro_workflow.handler.start_transition_handler` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\StartHandleProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` and service `@oro_workflow.handler.transition_handler` removed (see `Oro\Bundle\WorkflowBundle\Processor\Transition\TransitionHandleProcessor`)
+- Class `Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper`:
+  - Constant `Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper::DEFAULT_TRANSITION_TEMPLATE` moved into `Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor::DEFAULT_TRANSITION_TEMPLATE`
+  - Constant `Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper::DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE` moved into `Oro\Bundle\WorkflowBundle\Processor\Transition\Template\CustomFormTemplateResponseProcessor::DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE`
+  - Signature parameters **removed**:
+     - `Symfony\Component\Form\FormFactoryInterface` $formFactory
+     - `Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer` $workflowDataSerializer
+  - Removed methods:
+    - `getEntityManager` - unused
+    - `getTransitionForm` - managed by processors
+    - `getTransitionFormTemplate` - managed by processors
+    - `processWorkflowData` - managed by processors
+- Added processor tag `oro_workflow.processor` and `oro_workflow.processor_bag` service to collect processors.
 
 
 PlatformBundle
