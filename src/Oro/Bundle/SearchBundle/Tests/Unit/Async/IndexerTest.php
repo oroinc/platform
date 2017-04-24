@@ -220,6 +220,25 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \ReflectionException
+     */
+    public function testReindexShouldNotAcceptInvalidEntity()
+    {
+        $entities = [new \stdClass()];
+
+        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityManagerForClass')
+            ->with($this->identicalTo($entities[0]))
+            ->will($this->throwException(new \ReflectionException()))
+        ;
+
+        $indexer = new Indexer(self::getMessageProducer(), $doctrineHelper);
+        $indexer->reindex($entities);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
      */
     protected function createDoctrineHelperMock()
