@@ -54,7 +54,8 @@ define(function(require) {
                     'route_parameters': [],
                     'confirmation': true,
                     'launcherOptions': {
-                        'iconClassName': 'fa-trash-o'
+                        'iconClassName': 'fa-trash-o',
+                        'className': 'datagrid-massaction__dropdown-item'
                     }
                 },
                 'rename': {
@@ -70,7 +71,8 @@ define(function(require) {
                     'route_parameters': [],
                     'confirmation': true,
                     'launcherOptions': {
-                        'iconClassName': 'fa-pencil'
+                        'iconClassName': 'fa-pencil',
+                        'className': 'datagrid-massaction__dropdown-item'
                     }
                 }
             };
