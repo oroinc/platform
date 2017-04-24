@@ -8,13 +8,13 @@ Feature: Create report
     And I go to Reports & Segments/ Manage Custom Reports
     And I press "Create Report"
     And I fill "Report Form" with:
-      | Name        | Accounts Report |
+      | Name        | Contacts Report |
       | Entity      | Contact Email   |
       | Report Type | Table           |
     And I add the following columns:
       | Email |
     And I add the following filters:
-      | Field Condition | Primary | Yes      |
+      | Field Condition | Primary | Yes |
     When I save form
     Then I should see "Report saved" flash message
     And I should see "field value is Yes"
