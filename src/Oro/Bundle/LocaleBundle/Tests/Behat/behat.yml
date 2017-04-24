@@ -9,3 +9,28 @@ oro_behat_extension:
           Title: 'oro_localization[titles][values][default]'
           Language: 'oro_localization[language]'
           Formatting: 'oro_localization[formattingCode]'
+
+    Localization Create Form:
+      selector: 'form[name="oro_localization"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Title Default Value: 'oro_localization[titles][values][default]'
+          Title English: 'oro_localization[titles][values][localizations][1][value]'
+          Title Use: 'oro_localization[titles][values][localizations][1][use_fallback]'
+
+    Fallback Status:
+      selector: '.fallback-status [class^="fa-folder"]'
+
+  pages:
+    Localization Config:
+      class: Oro\Bundle\LocaleBundle\Tests\Behat\Page\LocalizationConfig
+      route: 'oro_config_configuration_system'
+
+  suites:
+      OroLocaleBundle:
+        contexts:
+          - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+          - OroDataGridBundle::GridContext
+        paths:
+          - '@OroLocaleBundle/Tests/Behat/Features'
