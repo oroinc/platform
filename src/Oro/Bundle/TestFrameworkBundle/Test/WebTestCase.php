@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -219,7 +220,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
     /**
      * Get value of dbIsolation option from annotation of called class
-     *
+     *get
      * @return bool
      */
     private static function getDbIsolationSetting()
@@ -402,10 +403,18 @@ abstract class WebTestCase extends BaseWebTestCase
             $loader->addFixture($fixture);
         }
 
-        $executor = new DataFixturesExecutor($container->get('doctrine')->getManager());
+        $executor = new DataFixturesExecutor($this->getDataFixtureExtecurotEntityManager());
         $executor->execute($loader->getFixtures(), true);
         self::$referenceRepository = $executor->getReferenceRepository();
         $this->postFixtureLoad();
+    }
+
+    /**
+     * @return EntityManagerInterface
+     */
+    protected function getDataFixtureExtecurotEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getManager();
     }
 
     /**
