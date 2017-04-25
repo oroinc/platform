@@ -98,7 +98,7 @@ class BatchFileManagerTest extends \PHPUnit_Framework_TestCase
         $writer
             ->expects($this->once())
             ->method('setImportExportContext')
-            ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b']]));
+            ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b'], 'firstLineIsHeader' => true]));
         $writer
             ->expects($this->at(1))
             ->method('write')
