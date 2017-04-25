@@ -152,7 +152,7 @@ define([
             // add temporary elements names to support validation for frontend elements
             element.name = _.uniqueId('temp-validation-name-');
         }
-        if (!$(element).hasClass('ignored')) {
+        if (!$(element).is($.validator.defaults.ignore)) {
             return check.call(this, element);
         }
     });
