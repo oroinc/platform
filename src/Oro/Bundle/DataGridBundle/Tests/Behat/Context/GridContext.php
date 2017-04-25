@@ -626,6 +626,42 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check that row action links existing. Row searching by it's content
+     * Example: I should see following actions for Dutch in grid:
+     *           | View   |
+     *           | Edit   |
+     *           | Delete |
+     *
+     * @Given /^(?:|I )should see following actions for (?P<content>(?:[^"]|\\")*) in grid:$/
+     */
+    public function actionsForRowExist($content, TableNode $table)
+    {
+        $row = $this->getGrid()->getRowByContent($content);
+
+        foreach ($table as $item) {
+            // Grid Row will assert us if action does not exists
+            $row->getActionLink(reset($item));
+        }
+    }
+
+    /**
+     * Check that row action links existing. Row searching by it's content
+     * Example: I should not see following actions for Dutch in grid:
+     *           | Delete |
+     *
+     * @Given /^(?:|I )should not see following actions for (?P<content>(?:[^"]|\\")*) in grid:$/
+     */
+    public function actionsForRowNotExist($content, TableNode $table)
+    {
+        $row = $this->getGrid()->getRowByContent($content);
+
+        foreach ($table as $item) {
+            $action = $row->findActionLink(ucfirst(reset($item)));
+            self::assertNull($action, "$action still exists for $content row");
+        }
+    }
+
+    /**
      * @Given /^(?:|I )click (?P<action>[\w\s]*) on (?P<content>(?:[^"]|\\")*) in grid "(?P<grid>([\w\s]+))"$/
      *
      * @param string $content
