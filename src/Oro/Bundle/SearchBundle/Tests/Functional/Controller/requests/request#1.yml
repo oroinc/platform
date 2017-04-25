@@ -1,7 +1,7 @@
 # common test case
 request:
     supported_engines: [orm]
-    search: \"item9@mail.com\"
+    search: \"item9@mail.net\"
     offset: ~
     max_results: ~
 response:

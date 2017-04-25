@@ -21,6 +21,7 @@ operations:
         frontend_options:
             confirmation:
                 message: oro.locale.localization.delete_confirm
+                component: oroui/js/delete-confirmation
         actions:
             - '@assign_url':
                 attribute: $.rebuildCacheUrl

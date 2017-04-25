@@ -70,6 +70,11 @@ class Indexer implements IndexerInterface
             $classes = $class ? [$class] : [];
         }
 
+        //Ensure specified class exists, if not - exception will be thrown
+        foreach ($classes as $class) {
+            $this->doctrineHelper->getEntityManagerForClass($class);
+        }
+
         $this->producer->send(Topics::REINDEX, $classes);
     }
 

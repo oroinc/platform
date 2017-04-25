@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
@@ -20,6 +21,7 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -98,11 +100,15 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['assemble'])
             ->getMock();
 
+        /** @var TransitionOptionsResolver|\PHPUnit_Framework_MockObject_MockObject $optionsResolver */
+        $optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
             $this->conditionFactory,
             $this->actionFactory,
-            $this->formConfigurationAssembler
+            $this->formConfigurationAssembler,
+            $optionsResolver
         );
     }
 
@@ -900,6 +906,100 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($actualTransition->getCondition(), 'Incorrect condition');
         $this->assertNull($actualTransition->getPreAction(), 'Incorrect preaction');
         $this->assertNull($actualTransition->getAction(), 'Incorrect action');
+    }
+
+    /**
+     * @dataProvider assembleWithFrontendOptions
+     *
+     * @param array $transitionDefinition
+     * @param array $expectedFrontendOptions
+     */
+    public function testAssembleWithFrontendOptions(array $transitionDefinition, array $expectedFrontendOptions)
+    {
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
+            ->will($this->returnArgument(0));
+
+        $transitions = $this->assembler->assemble(
+            [
+                'transitions' => [
+                    'transition' => $transitionDefinition,
+                ],
+                'transition_definitions' => [
+                    'definition' => [],
+                ],
+            ],
+            [
+                'step1' => $this->createStep(),
+            ],
+            []
+        );
+
+        $this->assertEquals($expectedFrontendOptions, $transitions['transition']->getFrontendOptions());
+    }
+
+    /**
+     * @return array
+     */
+    public function assembleWithFrontendOptions()
+    {
+        return [
+            'without message' => [
+                'definition' => [
+                    'step_to' => 'step1',
+                    'transition_definition' => 'definition',
+                    'form_options' => [],
+                    'frontend_options' => [
+                        'option1' => 'value1',
+                    ],
+                ],
+                'expected' => [
+                    'option1' => 'value1',
+                ],
+            ],
+            'with message' => [
+                'definition' => [
+                    'step_to' => 'step1',
+                    'transition_definition' => 'definition',
+                    'form_options' => [],
+                    'frontend_options' => [
+                        'option1' => 'value1',
+                    ],
+                    'message' => 'warning message',
+                    'message_parameters' => ['param1' => 'value1'],
+                ],
+                'expected' => [
+                    'option1' => 'value1',
+                    'message' => [
+                        'message' => 'warning message',
+                        'message_parameters' => ['param1' => 'value1'],
+                    ],
+                ],
+            ],
+            'with message and custom message options' => [
+                'definition' => [
+                    'step_to' => 'step1',
+                    'transition_definition' => 'definition',
+                    'form_options' => [],
+                    'frontend_options' => [
+                        'option1' => 'value1',
+                        'message' => [
+                            'title' => 'message title',
+                        ],
+                    ],
+                    'message' => 'warning message',
+                    'message_parameters' => ['param1' => 'value1'],
+                ],
+                'expected' => [
+                    'option1' => 'value1',
+                    'message' => [
+                        'message' => 'warning message',
+                        'message_parameters' => ['param1' => 'value1'],
+                        'title' => 'message title',
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**

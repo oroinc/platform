@@ -11,6 +11,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
+    const SIMPLE_USER = 'simple_user';
+    const SIMPLE_USER_2 = 'simple_user2';
+
     /** @var ContainerInterface */
     protected $container;
 
@@ -31,7 +34,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $userManager = $this->container->get('oro_user.manager');
 
         $user = $userManager->createUser();
-        $user->setUsername('simple_user')
+        $user->setUsername(self::SIMPLE_USER)
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setFirstName("First Name")
@@ -44,7 +47,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $this->setReference($user->getUsername(), $user);
 
         $user = $userManager->createUser();
-        $user->setUsername('simple_user2')
+        $user->setUsername(self::SIMPLE_USER_2)
             ->setPlainPassword('simple_password2')
             ->setEmail('simple_user2@example.com')
             ->setFirstName("First Name")

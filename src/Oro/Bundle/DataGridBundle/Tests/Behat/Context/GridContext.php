@@ -115,6 +115,22 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^(?:|I )check (?P<content>\S+) record in grid$/
+     */
+    public function checkRecordInGrid($content)
+    {
+        $this->getGrid()->checkRecord($content);
+    }
+
+    /**
+     * @Then /^(?:|I )uncheck (?P<content>\S+) record in grid$/
+     */
+    public function uncheckRecordInGrid($content)
+    {
+        $this->getGrid()->uncheckRecord($content);
+    }
+
+    /**
      * Check two records in grid by one step
      * E.g. to check check accounts with "Columbia Pictures" and "Warner Brothers" content in it
      * Example: And check Warner Brothers and Columbia Pictures in grid
@@ -162,7 +178,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iUncheckFirstRecordsInColumn($number, $column)
     {
-        $this->getGrid()->checkFirstRecords($number, $column);
+        $this->getGrid()->uncheckFirstRecords($number, $column);
     }
 
     /**
@@ -172,7 +188,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iUncheckFirstRecordsInGrid($number)
     {
-        $this->getGrid()->checkFirstRecords($number);
+        $this->getGrid()->uncheckFirstRecords($number);
     }
 
     /**
@@ -605,6 +621,42 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function clickActionInRow($content, $action)
     {
         $this->getGrid()->clickActionLink($content, $action);
+    }
+
+    /**
+     * Check that row action links existing. Row searching by it's content
+     * Example: I should see following actions for Dutch in grid:
+     *           | View   |
+     *           | Edit   |
+     *           | Delete |
+     *
+     * @Given /^(?:|I )should see following actions for (?P<content>(?:[^"]|\\")*) in grid:$/
+     */
+    public function actionsForRowExist($content, TableNode $table)
+    {
+        $row = $this->getGrid()->getRowByContent($content);
+
+        foreach ($table as $item) {
+            // Grid Row will assert us if action does not exists
+            $row->getActionLink(reset($item));
+        }
+    }
+
+    /**
+     * Check that row action links existing. Row searching by it's content
+     * Example: I should not see following actions for Dutch in grid:
+     *           | Delete |
+     *
+     * @Given /^(?:|I )should not see following actions for (?P<content>(?:[^"]|\\")*) in grid:$/
+     */
+    public function actionsForRowNotExist($content, TableNode $table)
+    {
+        $row = $this->getGrid()->getRowByContent($content);
+
+        foreach ($table as $item) {
+            $action = $row->findActionLink(ucfirst(reset($item)));
+            self::assertNull($action, "$action still exists for $content row");
+        }
     }
 
     /**
