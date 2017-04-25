@@ -18,7 +18,10 @@ class LoadSegmentDeltaData extends AbstractFixture implements DependentFixtureIn
     const SEGMENT_REMOVED = LoadSegmentData::SEGMENT_DYNAMIC;
     const SEGMENT_ADDED = LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING;
 
-    private static $segmentDefinition = [
+    /**
+     * @var array
+     */
+    const SEGMENT_DEFINITION = [
         'columns' => [
             [
                 'func' => null,
@@ -61,7 +64,7 @@ class LoadSegmentDeltaData extends AbstractFixture implements DependentFixtureIn
         $segment->setName(self::SEGMENT);
         $segment->setEntity(Segment::class);
         $segment->setType($segmentType);
-        $segment->setDefinition(json_encode(self::$segmentDefinition));
+        $segment->setDefinition(json_encode(self::SEGMENT_DEFINITION));
         $manager->persist($segment);
         $this->setReference(self::SEGMENT, $segment);
 
