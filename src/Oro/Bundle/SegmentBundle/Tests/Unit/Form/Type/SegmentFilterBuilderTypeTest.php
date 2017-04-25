@@ -188,9 +188,15 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     {
         $entityClass = '\stdClass';
         $options = [
-            'segment_entity' => $entityClass
+            'segment_entity' => $entityClass,
+            'segment_columns' => ['id'],
         ];
-        $this->assertNormalizersCalls($entityClass);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManagerForClass')
+            ->with($entityClass, false)
+            ->willReturn($em);
 
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityReference');
@@ -210,7 +216,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
     public function formDataProvider()
     {
         return [
-            [
+            'without columns' => [
                 [
                     'entity' => '\stdClass',
                     'definition' => json_encode([
@@ -239,6 +245,49 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                         [
                             'name' => 'id',
                             'label' => 'id',
+                            'sorting' => null,
+                            'func' => null
+                        ]
+                    ]
+                ]
+            ],
+            'with columns' => [
+                [
+                    'entity' => '\stdClass',
+                    'definition' => json_encode([
+                        'filters' => [
+                            [
+                                'columnName' => 'id',
+                                'criterion' => [
+                                    'filter' => 'number',
+                                    'data' => ['value' => 10, 'type' => 3]
+                                ]
+                            ]
+                        ],
+                        'columns' => [
+                            [
+                                'name' => 'id',
+                                'label' => 'ID column',
+                                'sorting' => null,
+                                'func' => null
+                            ]
+                        ]
+                    ])
+                ],
+                [
+                    'filters' => [
+                        [
+                            'columnName' => 'id',
+                            'criterion' => [
+                                'filter' => 'number',
+                                'data' => ['value' => 10, 'type' => 3]
+                            ]
+                        ]
+                    ],
+                    'columns' => [
+                        [
+                            'name' => 'id',
+                            'label' => 'ID column',
                             'sorting' => null,
                             'func' => null
                         ]

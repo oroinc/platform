@@ -275,6 +275,7 @@ config:
         'oroui/js/app/views/jstree/collapse-action-view': 'bundles/oroui/js/app/views/jstree/collapse-action-view.js'
         'oroui/js/app/views/jstree/subtree-action-view': 'bundles/oroui/js/app/views/jstree/subtree-action-view.js'
         'oroui/js/app/views/jstree/move-action-view': 'bundles/oroui/js/app/views/jstree/move-action-view.js'
+        'oroui/js/singleton-service': 'bundles/oroui/js/singleton-service.js'
     appmodules:
         - oroui/js/app/modules/layout-module
         - oroui/js/app/modules/messenger-module

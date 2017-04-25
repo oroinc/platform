@@ -146,6 +146,15 @@ class SegmentFilterBuilderType extends AbstractType
 
                     $definition = json_decode($segment->getDefinition(), true);
                     foreach ((array)$config->getOption('segment_columns') as $column) {
+                        // Check for column existence and skip adding if found
+                        if (isset($definition['columns']) && is_array($definition['columns'])) {
+                            foreach ($definition['columns'] as $columnDefinition) {
+                                if (isset($columnDefinition['name']) && $columnDefinition['name'] === $column) {
+                                    continue 2;
+                                }
+                            }
+                        }
+
                         $definition['columns'][] = [
                             'name' => $column,
                             'label' => $column,
