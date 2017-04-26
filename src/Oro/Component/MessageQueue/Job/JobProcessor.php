@@ -75,20 +75,6 @@ class JobProcessor
 
     /**
      * @param string $jobName
-     *
-     * @return Job
-     */
-    public function findRootJobByUniqueName($jobName)
-    {
-        if (!$jobName) {
-            throw new \LogicException('Job name must not be empty');
-        }
-
-        return $this->jobStorage->findRootJobByUniqueJobName($jobName);
-    }
-
-    /**
-     * @param string $jobName
      * @param Job $rootJob
      *
      * @return Job
